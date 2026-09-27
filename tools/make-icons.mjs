@@ -152,8 +152,25 @@ function drawIcon(S, maskable) {
   return encodePNG(c.px, S, S);
 }
 
-mkdirSync('icons', { recursive: true });
-writeFileSync('icons/icon-192.png', drawIcon(192, false));
-writeFileSync('icons/icon-512.png', drawIcon(512, false));
-writeFileSync('icons/icon-maskable-512.png', drawIcon(512, true));
-console.log('icons written');
+export function makeIcon(S, maskable) {
+  return drawIcon(S, maskable);
+}
+
+// CLI: writes PWA icons, and (with --mipmap <dir>) Android launcher densities
+if (process.argv[1] && process.argv[1].endsWith('make-icons.mjs')) {
+  mkdirSync('icons', { recursive: true });
+  writeFileSync('icons/icon-192.png', drawIcon(192, false));
+  writeFileSync('icons/icon-512.png', drawIcon(512, false));
+  writeFileSync('icons/icon-maskable-512.png', drawIcon(512, true));
+  const mi = process.argv.indexOf('--mipmap');
+  if (mi >= 0 && process.argv[mi + 1]) {
+    const dir = process.argv[mi + 1];
+    const dens = { mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
+    for (const [d, s] of Object.entries(dens)) {
+      mkdirSync(`${dir}/mipmap-${d}`, { recursive: true });
+      writeFileSync(`${dir}/mipmap-${d}/ic_launcher.png`, drawIcon(s, false));
+    }
+    console.log('mipmap icons →', dir);
+  }
+  console.log('icons written');
+}

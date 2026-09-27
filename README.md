@@ -80,3 +80,18 @@ neurio/
 ```
 
 Made with ❤️ and Three.js
+
+---
+
+## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+
+A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
+It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+
+**Install on a phone:**
+1. Download `BashBaqiRacing.apk` onto your phone.
+2. Tap it → allow **"Install from unknown sources"** (once).
+3. Play — icon 🏁 sits on your home screen, works offline.
+
+- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
+- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
