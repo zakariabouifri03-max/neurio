@@ -116,3 +116,10 @@ neurio/
 كل وحدة بالأرقام الحقيقية ديالها تقريبا (hp، Nm، rpm، الوزن، عدد الفيتيسات، السرعة القصوى).
 
 الموديلات جاية من GitHub (أصلها Sketchfab) — ضغطناهم (Draco + WebP)، دورناهم وقيسناهم بالمتر، وجمعنا الروايض باش يدورو. المؤلفين والرخص (CC-BY / CC-BY-NC(-SA)) فـ [`assets/real/LICENSES.txt`](assets/real/LICENSES.txt). Ferrari 458 by vicent091036 (CC-BY 4.0) via three.js examples.
+
+### Japan update
+- More roads: a highway ring with Japanese markings, a mountain touge (yellow centre line), a lake loop, the west hills and a village road network.
+- A Japanese village with tiled hip-roof houses, block garden walls, a shrine with red torii gates, vending machines, and utility poles with sagging wires.
+- Neon katakana signs in the city and zebra crossings at intersections.
+- New trees: sugi cedars, broadleaf trees, momiji maples and sakura, all swaying in the wind. **Trees fall over when you hit them at speed.**
+- Dense grass that sways in the wind, streamed around the car.

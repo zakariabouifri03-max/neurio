@@ -354,7 +354,16 @@ function physics(dt) {
   // collisions: three circles along the car body
   const rad = current ? Math.max(0.8, current.width / 2 - 0.1) : 1;
   for (const off of [-P.a * 0.85, 0, P.b * 0.85]) {
-    const hit = world.collide(S.x + fx * off, S.z + fz * off, rad);
+    const hit = world.collide(S.x + fx * off, S.z + fz * off, rad, (o) => {
+      const sp = Math.hypot(S.vx, S.vz);
+      if (sp < 2.5) return false;                 // too slow: it's just a solid tree
+      world.knock(o, S.vx, S.vz);
+      const keep = Math.max(0.55, 1 - 6 / sp);     // lose some speed
+      S.vx *= keep; S.vz *= keep; S.w += (Math.random() - 0.5) * 0.4;
+      thud(Math.min(1, sp / 25));
+      toast('🌳 طيّحتي شجرة!');
+      return true;
+    });
     if (!hit) continue;
     S.x += hit.nx * hit.pen; S.z += hit.nz * hit.pen;
     const vn = S.vx * hit.nx + S.vz * hit.nz;
@@ -513,6 +522,16 @@ function updateAudio(dt) {
   const screech = Math.min(1, Math.max(0, Math.max(S.slipR, S.slipF) - 1.1)) * Math.min(1, Math.hypot(S.vx, S.vz) / 5);
   eng.sg.gain.setTargetAtTime(screech * 0.4, t, 0.05);
 }
+function thud(k) {
+  if (!actx) return;
+  const t = actx.currentTime, src = actx.createBufferSource(); src.buffer = makeNoise(actx, 0.6);
+  const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380;
+  const g = actx.createGain(); g.gain.setValueAtTime(0.9 * k, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+  src.connect(lp).connect(g).connect(eng.master); src.start(t); src.stop(t + 0.6);
+  // wood crack
+  const o = actx.createOscillator(), og = actx.createGain(); o.type = 'square'; o.frequency.setValueAtTime(180, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.15);
+  og.gain.setValueAtTime(0.25 * k, t); og.gain.exponentialRampToValueAtTime(0.001, t + 0.18); o.connect(og).connect(eng.master); o.start(t); o.stop(t + 0.2);
+}
 function horn(on) {
   if (!actx) return;
   if (on && !hornNode) {
@@ -635,7 +654,7 @@ renderer.setAnimationLoop(() => {
   // shadow camera follows the car; sky dome follows the camera
   sun.position.set(S.x + 20, groundY + 35, S.z + 12); sun.target.position.set(S.x, groundY, S.z);
   skyDome.position.copy(camera.position);
-  world.update(clock.elapsedTime);
+  world.update(clock.elapsedTime, S.x, S.z);
   drawMinimap();
   renderer.render(scene, camera);
 });
