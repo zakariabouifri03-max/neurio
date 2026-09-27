@@ -77,24 +77,24 @@ function addSkid(x, z, yaw) {
 // Models: Sketchfab artists via GitHub repos (see assets/real/LICENSES.txt) + Ferrari 458 (three.js examples)
 // hp · torque Nm · redline rpm · top km/h · mass kg · mu grip · drag · gears · cg height · downforce
 const CARS = [
-  { id: 'merc190',  name: 'Mercedes 190E Evo',          year: 1982, hp: 235, torque: 245, redline: 7200, top: 250, mass: 1340, mu: 1.0,  drag: 0.36, gears: 5, cg: 0.5 },
-  { id: 'gt350_65', name: 'Shelby GT350',               year: 1965, hp: 306, torque: 447, redline: 6500, top: 215, mass: 1270, mu: 0.95, drag: 0.42, gears: 4, cg: 0.5 },
-  { id: 'mach1',    name: 'Mustang Mach 1 428 CJ',      year: 1969, hp: 335, torque: 597, redline: 5600, top: 200, mass: 1600, mu: 0.95, drag: 0.45, gears: 4, cg: 0.55 },
-  { id: 'gt500_67', name: 'Shelby Cobra GT500',         year: 1967, hp: 355, torque: 570, redline: 5400, top: 210, mass: 1500, mu: 0.95, drag: 0.43, gears: 4, cg: 0.55 },
-  { id: 'p930',     name: 'Porsche 911 (930) Turbo',    year: 1975, hp: 260, torque: 343, redline: 6500, top: 250, mass: 1140, mu: 1.05, drag: 0.36, gears: 4, cg: 0.45 },
-  { id: 'supra',    name: 'Toyota Supra',               year: 1998, hp: 320, torque: 427, redline: 6800, top: 250, mass: 1510, mu: 1.05, drag: 0.34, gears: 6, cg: 0.48 },
-  { id: 'ghost',    name: 'Rolls-Royce Ghost',          year: 2021, hp: 563, torque: 850, redline: 5250, top: 250, mass: 2490, mu: 1.0,  drag: 0.44, gears: 8, cg: 0.6 },
-  { id: 'raptor',   name: 'Ford F-150 Raptor R',        year: 2024, hp: 700, torque: 868, redline: 6500, top: 180, mass: 2700, mu: 0.95, drag: 0.75, gears: 8, cg: 0.8, steer: 0.55 },
-  { id: 'ftype',    name: 'Jaguar F-Type R',            year: 2020, hp: 575, torque: 700, redline: 6500, top: 300, mass: 1700, mu: 1.1,  drag: 0.34, gears: 8, cg: 0.45 },
-  { id: 'gt350r',   name: 'Shelby GT350R',              year: 2016, hp: 526, torque: 582, redline: 8250, top: 290, mass: 1700, mu: 1.15, drag: 0.36, gears: 6, cg: 0.47 },
-  { id: 'db11',     name: 'Aston Martin DB11 V12',      year: 2017, hp: 630, torque: 700, redline: 7000, top: 322, mass: 1760, mu: 1.1,  drag: 0.32, gears: 8, cg: 0.46 },
-  { id: 'm8',       name: 'BMW M8 Competition',         year: 2020, hp: 625, torque: 750, redline: 7200, top: 305, mass: 1885, mu: 1.12, drag: 0.34, gears: 8, cg: 0.47 },
-  { id: 'gt500_20', name: 'Shelby GT500',               year: 2020, hp: 760, torque: 847, redline: 7500, top: 290, mass: 1900, mu: 1.12, drag: 0.40, gears: 7, cg: 0.47 },
-  { id: 'gt3',      name: 'Porsche 911 GT3 (992)',      year: 2022, hp: 510, torque: 470, redline: 9000, top: 318, mass: 1435, mu: 1.25, drag: 0.33, gears: 7, cg: 0.42, df: 0.3 },
-  { id: 'ferrari',  name: 'Ferrari 458 Italia',         year: 2010, hp: 562, torque: 540, redline: 8500, top: 325, mass: 1480, mu: 1.2,  drag: 0.30, gears: 6, cg: 0.45, df: 0.25 },
-  { id: 'r8',       name: 'Audi R8 V10 Performance',    year: 2021, hp: 620, torque: 580, redline: 8700, top: 331, mass: 1595, mu: 1.2,  drag: 0.30, gears: 7, cg: 0.44, df: 0.2 },
-  { id: 'fordgt',   name: 'Ford GT',                    year: 2017, hp: 647, torque: 746, redline: 7000, top: 348, mass: 1385, mu: 1.25, drag: 0.30, gears: 7, cg: 0.40, df: 0.6 },
-  { id: 'ccgt',     name: 'Koenigsegg CCGT (GT1)',      year: 2007, hp: 600, torque: 600, redline: 8500, top: 340, mass: 1100, mu: 1.35, drag: 0.36, gears: 6, cg: 0.36, df: 1.0 },
+  { id: 'merc190', engine: 'i4',  name: 'Mercedes 190E Evo',          year: 1982, hp: 235, torque: 245, redline: 7200, top: 250, mass: 1340, mu: 1.0,  drag: 0.36, gears: 5, cg: 0.5 },
+  { id: 'gt350_65', engine: 'v8x', name: 'Shelby GT350',               year: 1965, hp: 306, torque: 447, redline: 6500, top: 215, mass: 1270, mu: 0.95, drag: 0.42, gears: 4, cg: 0.5 },
+  { id: 'mach1', engine: 'v8big',    name: 'Mustang Mach 1 428 CJ',      year: 1969, hp: 335, torque: 597, redline: 5600, top: 200, mass: 1600, mu: 0.95, drag: 0.45, gears: 4, cg: 0.55 },
+  { id: 'gt500_67', engine: 'v8big', name: 'Shelby Cobra GT500',         year: 1967, hp: 355, torque: 570, redline: 5400, top: 210, mass: 1500, mu: 0.95, drag: 0.43, gears: 4, cg: 0.55 },
+  { id: 'p930', engine: 'f6t',     name: 'Porsche 911 (930) Turbo',    year: 1975, hp: 260, torque: 343, redline: 6500, top: 250, mass: 1140, mu: 1.05, drag: 0.36, gears: 4, cg: 0.45 },
+  { id: 'supra', engine: 'i6t',    name: 'Toyota Supra',               year: 1998, hp: 320, torque: 427, redline: 6800, top: 250, mass: 1510, mu: 1.05, drag: 0.34, gears: 6, cg: 0.48 },
+  { id: 'ghost', engine: 'v12lux',    name: 'Rolls-Royce Ghost',          year: 2021, hp: 563, torque: 850, redline: 5250, top: 250, mass: 2490, mu: 1.0,  drag: 0.44, gears: 8, cg: 0.6 },
+  { id: 'raptor', engine: 'v8sc',   name: 'Ford F-150 Raptor R',        year: 2024, hp: 700, torque: 868, redline: 6500, top: 180, mass: 2700, mu: 0.95, drag: 0.75, gears: 8, cg: 0.8, steer: 0.55 },
+  { id: 'ftype', engine: 'v8sc',    name: 'Jaguar F-Type R',            year: 2020, hp: 575, torque: 700, redline: 6500, top: 300, mass: 1700, mu: 1.1,  drag: 0.34, gears: 8, cg: 0.45 },
+  { id: 'gt350r', engine: 'v8f',   name: 'Shelby GT350R',              year: 2016, hp: 526, torque: 582, redline: 8250, top: 290, mass: 1700, mu: 1.15, drag: 0.36, gears: 6, cg: 0.47 },
+  { id: 'db11', engine: 'v12',     name: 'Aston Martin DB11 V12',      year: 2017, hp: 630, torque: 700, redline: 7000, top: 322, mass: 1760, mu: 1.1,  drag: 0.32, gears: 8, cg: 0.46 },
+  { id: 'm8', engine: 'v8tt',       name: 'BMW M8 Competition',         year: 2020, hp: 625, torque: 750, redline: 7200, top: 305, mass: 1885, mu: 1.12, drag: 0.34, gears: 8, cg: 0.47 },
+  { id: 'gt500_20', engine: 'v8sc', name: 'Shelby GT500',               year: 2020, hp: 760, torque: 847, redline: 7500, top: 290, mass: 1900, mu: 1.12, drag: 0.40, gears: 7, cg: 0.47 },
+  { id: 'gt3', engine: 'f6',      name: 'Porsche 911 GT3 (992)',      year: 2022, hp: 510, torque: 470, redline: 9000, top: 318, mass: 1435, mu: 1.25, drag: 0.33, gears: 7, cg: 0.42, df: 0.3 },
+  { id: 'ferrari', engine: 'v8f',  name: 'Ferrari 458 Italia',         year: 2010, hp: 562, torque: 540, redline: 8500, top: 325, mass: 1480, mu: 1.2,  drag: 0.30, gears: 6, cg: 0.45, df: 0.25 },
+  { id: 'r8', engine: 'v10',       name: 'Audi R8 V10 Performance',    year: 2021, hp: 620, torque: 580, redline: 8700, top: 331, mass: 1595, mu: 1.2,  drag: 0.30, gears: 7, cg: 0.44, df: 0.2 },
+  { id: 'fordgt', engine: 'v6tt',   name: 'Ford GT',                    year: 2017, hp: 647, torque: 746, redline: 7000, top: 348, mass: 1385, mu: 1.25, drag: 0.30, gears: 7, cg: 0.40, df: 0.6 },
+  { id: 'ccgt', engine: 'v8race',     name: 'Koenigsegg CCGT (GT1)',      year: 2007, hp: 600, torque: 600, redline: 8500, top: 340, mass: 1100, mu: 1.35, drag: 0.36, gears: 6, cg: 0.36, df: 1.0 },
 ];
 
 const car = new THREE.Group(); // physics transform (y-rot only)
@@ -180,8 +180,9 @@ function selectCar(i) {
     body = geo.root; wheels = geo.wheels;
     steeringWheel = geo.steeringWheel; steerQ0 = steeringWheel ? steeringWheel.quaternion.clone() : null;
     specPhysics(spec, geo);
+    applyEngine(ENGINES[spec.engine] || ENGINES.v8f);
     Object.assign(S, { vx: 0, vz: 0, w: 0, steer: 0, gear: 1, ax: 0, ay: 0 });
-    toast(`${carIdx + 1}/${CARS.length} · ${spec.name} · ${spec.hp} hp · ${spec.top} km/h`);
+    toast(`${carIdx + 1}/${CARS.length} · ${spec.name} · ${ENGINES[spec.engine].label} · ${spec.hp} hp · ${spec.top} km/h`);
     renderGarage();
     const l = document.getElementById('loader'); if (l) { l.style.opacity = 0; setTimeout(() => l.remove(), 500); }
   };
@@ -197,7 +198,7 @@ function renderGarage() {
     <button class="car-item${i === carIdx ? ' on' : ''}" data-i="${i}">
       <span class="n">${i + 1}</span>
       <span class="nm">${c.name} <small>${c.year}</small></span>
-      <span class="st">${c.hp} hp · ${c.top} km/h · ${c.mass} kg</span>
+      <span class="st">${ENGINES[c.engine].label} · ${c.hp} hp · ${c.top} km/h · ${c.mass} kg</span>
       <span class="bar"><i style="width:${(Math.sqrt(c.hp / maxHp) * 100).toFixed(0)}%"></i></span>
     </button>`).join('');
 }
@@ -292,6 +293,7 @@ function physics(dt) {
     else if (S.gear > 1 && S.rpm * P.gears[S.gear - 2] / P.gears[S.gear - 1] < P.redline * 0.8) { S.gear--; S.shiftT = 0.35; }
   }
   const shifting = S.shiftT > 0.2;
+  S.thr = throttle; S.shifting = shifting;
   let engineF = 0;
   if (throttle && !shifting) {
     engineF = torqueCurve(S.rpm) * ratio * P.final * P.eff / P.wheelR;
@@ -359,27 +361,149 @@ function physics(dt) {
   S.vF = vF;
 }
 
-// ───────────────────────── audio (synth engine) ─────────────────────────
-let actx = null, eng = null, hornNode = null, soundOn = false;
+// ───────────────────────── audio: per-engine synthesized sound ─────────────────────────
+// Each engine type has its own firing order / harmonics / induction:
+//  cyl      → firing frequency = rpm/60 · cyl/2
+//  uneven   → strength of half-orders (cross-plane V8 burble, boxer rasp)
+//  harm     → harmonic recipe of one combustion pulse (timbre)
+//  drive    → exhaust distortion  · lp/lpK → muffler brightness (base Hz + Hz per rpm)
+//  turbo / whine / crackle / vol
+const ENGINES = {
+  i4:    { label: 'I4',             cyl: 4,  uneven: 0.10, harm: [1, 0.55, 0.35, 0.2, 0.12, 0.08],            drive: 1.6, lp: 380, lpK: 0.20, turbo: 0,   whine: 0,   crackle: 0.15, vol: 0.85 },
+  v8x:   { label: 'V8',             cyl: 8,  uneven: 0.60, harm: [1, 0.8, 0.5, 0.45, 0.25, 0.2, 0.1],          drive: 3.2, lp: 260, lpK: 0.13, turbo: 0,   whine: 0,   crackle: 0.6,  vol: 1.1 },
+  v8big: { label: 'V8 big-block',   cyl: 8,  uneven: 0.75, harm: [1, 0.9, 0.6, 0.4, 0.2, 0.12],                drive: 3.8, lp: 220, lpK: 0.11, turbo: 0,   whine: 0,   crackle: 0.7,  vol: 1.2 },
+  v8sc:  { label: 'V8 supercharged',cyl: 8,  uneven: 0.50, harm: [1, 0.8, 0.55, 0.45, 0.3, 0.2, 0.12],         drive: 3.0, lp: 300, lpK: 0.16, turbo: 0,   whine: 1.0, crackle: 0.8,  vol: 1.1 },
+  v8f:   { label: 'V8 flat-plane',  cyl: 8,  uneven: 0.06, harm: [1, 0.35, 0.6, 0.25, 0.4, 0.15, 0.2, 0.1],    drive: 2.4, lp: 520, lpK: 0.32, turbo: 0,   whine: 0,   crackle: 0.45, vol: 1.0 },
+  v8tt:  { label: 'V8 twin-turbo',  cyl: 8,  uneven: 0.30, harm: [1, 0.6, 0.4, 0.25, 0.15, 0.08],              drive: 2.2, lp: 300, lpK: 0.12, turbo: 0.7, whine: 0,   crackle: 0.5,  vol: 0.95 },
+  v8race:{ label: 'V8 race',        cyl: 8,  uneven: 0.20, harm: [1, 0.5, 0.6, 0.35, 0.45, 0.2, 0.25, 0.12],   drive: 4.0, lp: 600, lpK: 0.35, turbo: 0,   whine: 0.3, crackle: 1.0,  vol: 1.25 },
+  f6:    { label: 'Flat-6',         cyl: 6,  uneven: 0.35, harm: [1, 0.45, 0.55, 0.3, 0.35, 0.15, 0.15],       drive: 2.2, lp: 480, lpK: 0.30, turbo: 0,   whine: 0,   crackle: 0.4,  vol: 1.0 },
+  f6t:   { label: 'Flat-6 turbo',   cyl: 6,  uneven: 0.40, harm: [1, 0.6, 0.45, 0.3, 0.2, 0.1],                drive: 2.0, lp: 330, lpK: 0.14, turbo: 1.0, whine: 0,   crackle: 0.3,  vol: 0.95 },
+  i6t:   { label: 'I6 turbo',       cyl: 6,  uneven: 0.03, harm: [1, 0.4, 0.3, 0.25, 0.18, 0.12, 0.08],        drive: 1.8, lp: 420, lpK: 0.22, turbo: 0.9, whine: 0,   crackle: 0.35, vol: 0.95 },
+  v6tt:  { label: 'V6 twin-turbo',  cyl: 6,  uneven: 0.25, harm: [1, 0.55, 0.45, 0.3, 0.25, 0.12],             drive: 2.6, lp: 380, lpK: 0.20, turbo: 1.0, whine: 0,   crackle: 0.6,  vol: 1.0 },
+  v10:   { label: 'V10',            cyl: 10, uneven: 0.15, harm: [1, 0.4, 0.55, 0.3, 0.35, 0.2, 0.2, 0.1],     drive: 2.6, lp: 560, lpK: 0.34, turbo: 0,   whine: 0,   crackle: 0.5,  vol: 1.05 },
+  v12:   { label: 'V12',            cyl: 12, uneven: 0.02, harm: [1, 0.3, 0.45, 0.2, 0.3, 0.15, 0.2, 0.1, 0.1],drive: 2.0, lp: 600, lpK: 0.30, turbo: 0,   whine: 0,   crackle: 0.35, vol: 1.0 },
+  v12lux:{ label: 'V12 twin-turbo (silent)', cyl: 12, uneven: 0.0, harm: [1, 0.2, 0.15, 0.08],                drive: 1.1, lp: 180, lpK: 0.05, turbo: 0.25,whine: 0,   crackle: 0,    vol: 0.5 },
+};
+let actx = null, eng = null, hornNode = null, soundOn = false, curEngine = ENGINES.v8f;
+function makeNoise(ctx, sec = 2) {
+  const buf = ctx.createBuffer(1, ctx.sampleRate * sec, ctx.sampleRate);
+  const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  return buf;
+}
+function shaperCurve(k) {
+  const c = new Float32Array(1024);
+  for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; c[i] = Math.tanh(k * x) / Math.tanh(k); }
+  return c;
+}
 function initAudio() {
   if (actx) return;
   actx = new (window.AudioContext || window.webkitAudioContext)();
-  const master = actx.createGain(); master.gain.value = 0; master.connect(actx.destination);
-  const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900; lp.Q.value = 3; lp.connect(master);
-  const o1 = actx.createOscillator(); o1.type = 'sawtooth';
-  const o2 = actx.createOscillator(); o2.type = 'square';
-  const g2 = actx.createGain(); g2.gain.value = 0.35;
-  o1.connect(lp); o2.connect(g2).connect(lp);
-  o1.start(); o2.start();
-  // tyre screech: filtered noise
-  const buf = actx.createBuffer(1, actx.sampleRate, actx.sampleRate);
-  const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  const n = actx.createBufferSource(); n.buffer = buf; n.loop = true;
-  const bp = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1400; bp.Q.value = 6;
-  const sg = actx.createGain(); sg.gain.value = 0;
-  n.connect(bp).connect(sg).connect(master); n.start();
-  eng = { master, lp, o1, o2, sg };
+  const A = actx;
+  const master = A.createGain(); master.gain.value = 0;
+  const comp = A.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
+  master.connect(comp).connect(A.destination);
+
+  // engine core: firing-order oscillator + half-order (burble) + crank order → distortion → muffler
+  const mix = A.createGain();
+  const fire = A.createOscillator(); const fireG = A.createGain(); fire.connect(fireG).connect(mix);
+  const half = A.createOscillator(); half.type = 'sawtooth'; const halfG = A.createGain(); half.connect(halfG).connect(mix);
+  const crank = A.createOscillator(); crank.type = 'triangle'; const crankG = A.createGain(); crank.connect(crankG).connect(mix);
+  // roughness: noise amplitude-modulating the mix (combustion variance)
+  const rough = A.createBufferSource(); rough.buffer = makeNoise(A); rough.loop = true;
+  const roughLP = A.createBiquadFilter(); roughLP.type = 'lowpass'; roughLP.frequency.value = 60;
+  const roughG = A.createGain(); roughG.gain.value = 0.25;
+  const amp = A.createGain(); amp.gain.value = 1;
+  rough.connect(roughLP).connect(roughG).connect(amp.gain);
+  const shaper = A.createWaveShaper(); shaper.oversample = '2x';
+  const muffler = A.createBiquadFilter(); muffler.type = 'lowpass'; muffler.Q.value = 1.2;
+  const body = A.createBiquadFilter(); body.type = 'peaking'; body.frequency.value = 120; body.gain.value = 6; body.Q.value = 0.8;
+  const engG = A.createGain();
+  mix.connect(amp).connect(shaper).connect(muffler).connect(body).connect(engG).connect(master);
+
+  // intake / induction noise (louder on throttle)
+  const intake = A.createBufferSource(); intake.buffer = makeNoise(A); intake.loop = true;
+  const intakeBP = A.createBiquadFilter(); intakeBP.type = 'bandpass'; intakeBP.Q.value = 1.5;
+  const intakeG = A.createGain(); intakeG.gain.value = 0;
+  intake.connect(intakeBP).connect(intakeG).connect(master);
+
+  // turbo whistle + blow-off valve
+  const turbo = A.createOscillator(); turbo.type = 'sine'; const turboG = A.createGain(); turboG.gain.value = 0;
+  turbo.connect(turboG).connect(master);
+  const bov = A.createBufferSource(); bov.buffer = makeNoise(A); bov.loop = true;
+  const bovHP = A.createBiquadFilter(); bovHP.type = 'bandpass'; bovHP.frequency.value = 2500; bovHP.Q.value = 0.7;
+  const bovG = A.createGain(); bovG.gain.value = 0; bov.connect(bovHP).connect(bovG).connect(master);
+
+  // supercharger whine (gear-driven → pitch locked to rpm)
+  const whine = A.createOscillator(); whine.type = 'triangle'; const whineG = A.createGain(); whineG.gain.value = 0;
+  whine.connect(whineG).connect(master);
+
+  // overrun crackle / pops
+  const pop = A.createBufferSource(); pop.buffer = makeNoise(A); pop.loop = true;
+  const popBP = A.createBiquadFilter(); popBP.type = 'bandpass'; popBP.frequency.value = 900; popBP.Q.value = 0.9;
+  const popG = A.createGain(); popG.gain.value = 0; pop.connect(popBP).connect(popG).connect(master);
+
+  // tyre screech
+  const scr = A.createBufferSource(); scr.buffer = makeNoise(A); scr.loop = true;
+  const bp = A.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1400; bp.Q.value = 6;
+  const sg = A.createGain(); sg.gain.value = 0;
+  scr.connect(bp).connect(sg).connect(master);
+
+  [fire, half, crank, rough, intake, turbo, bov, whine, pop, scr].forEach((n) => n.start());
+  eng = { master, fire, fireG, half, halfG, crank, crankG, roughG, shaper, muffler, body, engG, intakeBP, intakeG, turbo, turboG, bovG, whine, whineG, popG, popBP, sg, boost: 0, lastThr: 0, popT: 0 };
+  applyEngine(curEngine);
   soundOn = true; updateSoundBtn();
+}
+function applyEngine(e) {
+  curEngine = e;
+  if (!eng) return;
+  const n = e.harm.length + 1, re = new Float32Array(n), im = new Float32Array(n);
+  e.harm.forEach((h, i) => (im[i + 1] = h));
+  eng.fire.setPeriodicWave(actx.createPeriodicWave(re, im));
+  eng.shaper.curve = shaperCurve(e.drive);
+  eng.halfG.gain.value = e.uneven * 0.9;
+  eng.crankG.gain.value = e.uneven * 0.5 + 0.05;
+  eng.roughG.gain.value = 0.12 + e.uneven * 0.5;
+  eng.body.frequency.value = 60 + e.cyl * 12;
+}
+function updateAudio(dt) {
+  if (!eng) return;
+  const t = actx.currentTime, e = curEngine;
+  const rpm = S.rpm, rn = Math.min(1, rpm / P.redline);
+  const thr = S.shifting ? 0.15 : (S.thr || 0);
+  const ff = rpm / 60 * e.cyl / 2;               // firing frequency
+  eng.fire.frequency.setTargetAtTime(ff, t, 0.02);
+  eng.half.frequency.setTargetAtTime(ff / 2, t, 0.02);   // half-order: uneven firing
+  eng.crank.frequency.setTargetAtTime(rpm / 60, t, 0.02); // crank order
+  eng.fireG.gain.setTargetAtTime(0.55 + 0.45 * thr, t, 0.04);
+  eng.muffler.frequency.setTargetAtTime(e.lp + rpm * e.lpK * (0.55 + 0.45 * thr) + ff * 1.5, t, 0.05);
+  eng.engG.gain.setTargetAtTime(e.vol * (0.45 + 0.55 * thr) * (0.7 + 0.3 * rn), t, 0.05);
+  eng.intakeBP.frequency.setTargetAtTime(ff * 3 + 400, t, 0.05);
+  eng.intakeG.gain.setTargetAtTime(0.05 * thr * rn * (e.turbo ? 0.4 : 1), t, 0.05);
+  // turbo: boost spools with rpm under load; whistle pitch follows boost
+  if (e.turbo) {
+    const target = thr > 0.5 ? Math.min(1, Math.max(0, (rn - 0.25) / 0.5)) : 0;
+    eng.boost += (target - eng.boost) * Math.min(1, dt * (target > eng.boost ? 1.8 : 6));
+    eng.turbo.frequency.setTargetAtTime(1800 + eng.boost * 4200, t, 0.05);
+    eng.turboG.gain.setTargetAtTime(0.035 * e.turbo * eng.boost, t, 0.05);
+    if (eng.lastThr > 0.5 && thr < 0.5 && eng.boost > 0.4) { // lift-off: pssssh
+      eng.bovG.gain.cancelScheduledValues(t); eng.bovG.gain.setValueAtTime(0.18 * e.turbo * eng.boost, t);
+      eng.bovG.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+    }
+  } else eng.turboG.gain.setTargetAtTime(0, t, 0.05);
+  eng.whine.frequency.setTargetAtTime(rpm / 60 * 18, t, 0.03);
+  eng.whineG.gain.setTargetAtTime(0.03 * e.whine * rn * (0.3 + 0.7 * thr), t, 0.05);
+  // overrun crackle: off-throttle at high rpm → random pops
+  eng.popT -= dt;
+  if (e.crackle && thr < 0.1 && rn > 0.45 && eng.popT <= 0 && Math.random() < e.crackle * rn * 0.5) {
+    eng.popT = 0.03 + Math.random() * 0.12;
+    eng.popBP.frequency.setValueAtTime(500 + Math.random() * 900, t);
+    eng.popG.gain.cancelScheduledValues(t); eng.popG.gain.setValueAtTime(0.5 * e.crackle, t);
+    eng.popG.gain.exponentialRampToValueAtTime(0.0001, t + 0.05 + Math.random() * 0.05);
+  }
+  eng.lastThr = thr;
+  eng.master.gain.setTargetAtTime(soundOn ? 0.3 : 0, t, 0.05);
+  const screech = Math.min(1, Math.max(0, Math.max(S.slipR, S.slipF) - 1.1)) * Math.min(1, Math.hypot(S.vx, S.vz) / 5);
+  eng.sg.gain.setTargetAtTime(screech * 0.4, t, 0.05);
 }
 function horn(on) {
   if (!actx) return;
@@ -390,17 +514,6 @@ function horn(on) {
     a.connect(g); b.connect(g); a.start(); b.start();
     hornNode = { g, a, b };
   } else if (!on && hornNode) { hornNode.a.stop(); hornNode.b.stop(); hornNode.g.disconnect(); hornNode = null; }
-}
-function updateAudio() {
-  if (!eng) return;
-  const t = actx.currentTime;
-  const f = 28 + S.rpm / 60 * 2 * 0.5; // V8: 4 firing pulses per rev
-  eng.o1.frequency.setTargetAtTime(f, t, 0.03);
-  eng.o2.frequency.setTargetAtTime(f * 0.5, t, 0.03);
-  eng.lp.frequency.setTargetAtTime(500 + S.rpm * 0.25 + (keys.fwd || keys.back ? 600 : 0), t, 0.05);
-  eng.master.gain.setTargetAtTime(soundOn ? 0.22 : 0, t, 0.05);
-  const screech = Math.min(1, Math.max(0, Math.max(S.slipR, S.slipF) - 1.1)) * Math.min(1, Math.hypot(S.vx, S.vz) / 5);
-  eng.sg.gain.setTargetAtTime(screech * 0.5, t, 0.05);
 }
 const btnSound = document.getElementById('btn-sound');
 function updateSoundBtn() { btnSound.textContent = soundOn ? '🔊 الصوت' : '🔇 الصوت'; }
@@ -492,7 +605,7 @@ renderer.setAnimationLoop(() => {
   if (body) { acc += dt; while (acc >= STEP) { physics(STEP); acc -= STEP; } }
   syncVisuals(dt);
   updateCamera(dt);
-  updateAudio();
+  updateAudio(dt);
   // shadow camera + ground follow the car (endless world)
   sun.position.set(S.x + 20, 35, S.z + 12); sun.target.position.set(S.x, 0, S.z);
   ground.position.set(Math.round(S.x / 16) * 16, 0, Math.round(S.z / 16) * 16);

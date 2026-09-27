@@ -98,6 +98,8 @@ neurio/
 
 من الضعيفة للأقوى: Mercedes 190E Evo → Shelby GT350 '65 → Mustang Mach 1 '69 → Shelby Cobra GT500 '67 → Porsche 911 (930) Turbo → Toyota Supra '98 → Rolls-Royce Ghost → Ford F-150 Raptor R → Jaguar F-Type R → Shelby GT350R → Aston Martin DB11 → BMW M8 Competition → Shelby GT500 '20 → Porsche 911 GT3 (992) → **Ferrari 458** → Audi R8 V10 → Ford GT → **Koenigsegg CCGT**.
 
+🔊 **كل طوموبيل عندها صوت الموتور ديالها**: I4، V8 cross-plane (Mustang) وbig-block، V8 flat-plane (Ferrari / GT350R)، V8 supercharged مع الصفير ديال الكومبريسور، V8 twin-turbo، Flat-6 (Porsche)، I6 turbo (Supra) مع صوت التيربو والـ blow-off، V10 (R8)، V12 (DB11)، V12 الصامت ديال Rolls، V6 twin-turbo (Ford GT)، وV8 race (Koenigsegg) — مع طقطيق (pops) فاش كتطلق الأكسيليراتور.
+
 كل وحدة بالأرقام الحقيقية ديالها تقريبا (hp، Nm، rpm، الوزن، عدد الفيتيسات، السرعة القصوى).
 
 الموديلات جاية من GitHub (أصلها Sketchfab) — ضغطناهم (Draco + WebP)، دورناهم وقيسناهم بالمتر، وجمعنا الروايض باش يدورو. المؤلفين والرخص (CC-BY / CC-BY-NC(-SA)) فـ [`assets/real/LICENSES.txt`](assets/real/LICENSES.txt). Ferrari 458 by vicent091036 (CC-BY 4.0) via three.js examples.
