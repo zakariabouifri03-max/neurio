@@ -97,6 +97,11 @@ export class World {
     this.tvDirty = 0;
     this.signFlicker = false;
     this.walkFlicker = true;
+    this.buildMap();
+    this._setup && this._setup();
+  }
+  // episode 1 map — the Starview Motel (episode 2 subclasses override this)
+  buildMap() {
     this._buildMaterials();
     this._buildTerrain();
     this._buildBuilding();

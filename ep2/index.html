@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>LAST CALL — عش البومة · آخر نداء</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦉</text></svg>" />
+  <link rel="stylesheet" href="../src/style.css" />
+  <style>
+    /* ep2-specific */
+    #menu { background: linear-gradient(rgba(5,7,11,.42), rgba(5,7,11,.86)), url('./art/keyart.jpg') center bottom / cover no-repeat; }
+    .lang-ar { direction: rtl; }
+    .lang-ar #objective, .lang-ar #subtitle, .lang-ar #notify, .lang-ar .panel { direction: rtl; }
+    .lang-ar .menu-sub, .lang-ar .menu-kicker { letter-spacing: 2px; }
+    .owl-em { color: #f0b46a; text-shadow: 0 0 18px rgba(240,180,106,.5); }
+    select.setsel {
+      background: #14161c; color: #d8d2c4; border: 1px solid #3a3f48;
+      border-radius: 4px; padding: 6px 10px; font-family: inherit; font-size: 13px;
+      outline: none; min-width: 180px;
+    }
+    select.setsel:focus { border-color: #f0b46a; }
+    .menu-title.ep2 { font-size: clamp(46px, 9vw, 96px); }
+    .menu-title2 { font-size: clamp(18px, 3vw, 30px); color: #f0b46a; letter-spacing: 6px; margin-top: -6px; }
+    .drive-hint { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); color: #b8b0a0; font-size: 12px; letter-spacing: 3px; opacity: .7; }
+  </style>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+
+  <!-- ======================= HUD ======================= -->
+  <div id="hud" class="hidden">
+    <div id="crosshair"></div>
+    <div id="prompt" class="hidden"><span id="prompt-key">E</span><span id="prompt-text"></span></div>
+    <div id="objective" class="hidden"><span class="obj-tag" id="obj-tag">ⵎⵀⴰⵎ · OBJECTIVE</span><span id="objective-text"></span></div>
+    <div id="notify" class="hidden">
+      <div class="n-icon">✉</div>
+      <div class="n-body"><div id="notify-name">MESSAGES</div><div id="notify-text"></div></div>
+    </div>
+    <div id="subtitle" class="hidden"></div>
+    <div id="choice" class="hidden">
+      <div id="choice-title"></div>
+      <div class="choice-opt" id="choice-1"></div>
+      <div class="choice-opt" id="choice-2"></div>
+    </div>
+    <div id="stamina"><div id="stamina-fill"></div></div>
+    <div id="vig-hint" class="hidden"></div>
+  </div>
+
+  <div id="lb-top" class="letterbox"></div>
+  <div id="lb-bottom" class="letterbox"></div>
+
+  <div id="chapter-card" class="hidden"><div id="cc-time">10:41 PM</div><div id="cc-title">الدار</div></div>
+
+  <div id="fader"></div>
+
+  <!-- ======================= SMARTPHONE ======================= -->
+  <div id="phone" class="hidden">
+    <div id="phone-bezel">
+      <div id="phone-screen">
+        <div id="ph-status"><span id="ph-time">10:41 PM</span><span id="ph-carrier">IAM·MAR</span><span id="ph-batt">▮▮▮▮</span></div>
+        <div id="ph-apps" class="ph-page">
+          <div class="ph-app" data-app="messages"><div class="ph-app-ico msg">✉<span id="badge-msg" class="ph-badge hidden">1</span></div><div class="ph-app-name">الرسائل</div></div>
+          <div class="ph-app" data-app="tasks"><div class="ph-app-ico tsk">☰<span id="badge-tsk" class="ph-badge hidden">!</span></div><div class="ph-app-name">ملاحظات</div></div>
+          <div class="ph-app" data-app="flash"><div class="ph-app-ico fls" id="flash-ico">🔦</div><div class="ph-app-name">ضو</div></div>
+          <div class="ph-app" data-app="cam"><div class="ph-app-ico cam">📷</div><div class="ph-app-name">كاميرا</div></div>
+        </div>
+        <div id="ph-messages" class="ph-page hidden">
+          <div class="ph-title"><span class="ph-back" data-back>‹</span> الرسائل</div>
+          <div id="ph-threads"></div>
+        </div>
+        <div id="ph-thread" class="ph-page hidden">
+          <div class="ph-title"><span class="ph-back" data-back>‹</span> <span id="ph-thread-name"></span></div>
+          <div id="ph-bubbles"></div>
+          <div id="ph-replies" class="hidden"></div>
+        </div>
+        <div id="ph-tasks" class="ph-page hidden">
+          <div class="ph-title"><span class="ph-back" data-back>‹</span> ملاحظات</div>
+          <div id="ph-tasklist"></div>
+        </div>
+        <div id="ph-cam" class="ph-page hidden">
+          <div class="ph-title"><span class="ph-back" data-back>‹</span> كاميرا</div>
+          <div id="ph-cam-msg">بغيتش نصوروالو الليلة…</div>
+        </div>
+        <div id="ph-home"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= MENUS ======================= -->
+  <div id="menu" class="screen">
+    <div class="menu-inner">
+      <div class="menu-kicker" id="menu-kicker">قصة رعب تفاعلية عربية — THE SECOND STORY</div>
+      <h1 class="menu-title ep2">عشّ <span class="owl-em">البومة</span></h1>
+      <div class="menu-title2" id="menu-title2">LAST CALL · ROUTE 9</div>
+      <div class="menu-sub" id="menu-sub">من الدار حتى الشغل · HOME TO THE SHIFT</div>
+      <div class="menu-buttons">
+        <button id="btn-new" class="mbtn">لعبة جديدة · NEW GAME</button>
+        <button id="btn-continue" class="mbtn hidden">كمل · CONTINUE</button>
+        <button id="btn-chapters" class="mbtn hidden">الفصول · CHAPTERS</button>
+        <button id="btn-settings" class="mbtn">الإعدادات · SETTINGS</button>
+        <button id="btn-help" class="mbtn">كيفاش تلعب · HOW TO PLAY</button>
+        <button id="btn-credits" class="mbtn">الملحق · CREDITS</button>
+        <a class="mbtn" href="../index.html" style="display:block;text-decoration:none;line-height:1.6">↩ EP. 1 — STARVIEW · الحلقة الأولى</a>
+      </div>
+      <div class="menu-note" id="menu-note">سماعات الرأس منصوحة · dim the lights · <span id="menu-version">v2.0 ep2</span></div>
+      <div class="drive-hint" id="menu-hint">E = تفاعل · TAB = الهاتف · F = الضو · SHIFT = جري</div>
+    </div>
+  </div>
+
+  <div id="pause" class="screen hidden">
+    <div class="panel">
+      <h2 id="pause-title">توقف · PAUSED</h2>
+      <button id="btn-resume" class="mbtn">كمل · RESUME</button>
+      <button id="btn-p-settings" class="mbtn">الإعدادات · SETTINGS</button>
+      <button id="btn-restart" class="mbtn">عاود المرحلة · RESTART</button>
+      <button id="btn-quit" class="mbtn">خرج للقائمة · QUIT</button>
+    </div>
+  </div>
+
+  <div id="settings" class="screen hidden">
+    <div class="panel">
+      <h2 id="settings-title">الإعدادات · SETTINGS</h2>
+      <div class="setrow"><label id="lbl-lang">اللغة · Language</label>
+        <select id="sel-lang" class="setsel">
+          <option value="ar">العربية (Darija)</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <div class="setrow"><label id="lbl-quality">جودة الرسوم · Quality</label>
+        <select id="sel-quality" class="setsel"></select>
+      </div>
+      <div class="setrow"><label id="lbl-vol">صوت · Master volume</label><input id="set-vol" type="range" min="0" max="100" value="80"><span id="set-vol-v">80</span></div>
+      <div class="setrow"><label id="lbl-sens">حساسية · Sensitivity</label><input id="set-sens" type="range" min="10" max="200" value="80"><span id="set-sens-v">80</span></div>
+      <div class="setrow"><label id="lbl-inv">قلب Y · Invert Y</label><button id="set-inv" class="tog">OFF</button></div>
+      <div class="setrow"><label id="lbl-fov">مجال النظر · FOV</label><input id="set-fov" type="range" min="60" max="95" value="75"><span id="set-fov-v">75</span></div>
+      <div class="setrow"><label id="lbl-grain">حُبيب الفيلم · Film grain</label><button id="set-grain" class="tog">SUBTLE</button></div>
+      <div class="setrow"><label id="lbl-bright">السطوع · Brightness</label><input id="set-bright" type="range" min="50" max="150" value="100"><span id="set-bright-v">100</span></div>
+      <div class="setrow"><label id="lbl-subs">الترجمة · Subtitles</label><button id="set-subs" class="tog">ON</button></div>
+      <button id="btn-set-back" class="mbtn">رجوع · BACK</button>
+    </div>
+  </div>
+
+  <div id="help" class="screen hidden">
+    <div class="panel">
+      <h2 id="help-title">كيفاش تلعب · HOW TO PLAY</h2>
+      <div class="controls-grid">
+        <span>W A S D</span><span id="h-move">سير · Move</span>
+        <span>MOUSE</span><span id="h-look">شوف · Look</span>
+        <span>SHIFT</span><span id="h-run">جري (كيصدر الضجة) · Run</span>
+        <span>C / CTRL</span><span id="h-crouch">قرفص · Crouch</span>
+        <span>E</span><span id="h-use">تفاعل · Interact</span>
+        <span>G</span><span id="h-throw">اضح اليد · Throw</span>
+        <span>T / TAB</span><span id="h-phone">الهاتف · Phone</span>
+        <span>F</span><span id="h-flash">ضو الهاتف · Light</span>
+        <span>1 / 2</span><span id="h-choice">اختيارات · Choices</span>
+        <span>ESC</span><span id="h-pause">توقف · Pause</span>
+      </div>
+      <p class="help-tip" id="help-tip">شوف هاتفك. راقب الأبواب. ثقة ف السكينة… شوية برك.</p>
+      <button id="btn-help-back" class="mbtn">رجوع · BACK</button>
+    </div>
+  </div>
+
+  <div id="chapters" class="screen hidden">
+    <div class="panel">
+      <h2 id="ch-title">الفصول · CHAPTERS</h2>
+      <div id="chapter-list"></div>
+      <button id="btn-ch-back" class="mbtn">رجوع · BACK</button>
+    </div>
+  </div>
+
+  <div id="credits" class="screen hidden">
+    <div class="panel">
+      <h2 id="crx-title">الملحق · CREDITS</h2>
+      <div class="credits-body" id="credits-body">
+        <p><b>LAST CALL — عشّ البومة</b><br>an original interactive horror story · قصة أصلية</p>
+        <p>القصة، الشيفرة، البيئات، الشخصيات، الأصوات و الحوارات<br>كلها أعمال أصلية صُنعت لهذا المشروع.</p>
+        <p>Engine: Three.js r170 (MIT)<br>All textures & audio generated at runtime.<br>Nothing from any real game was used — الفكرة مستوحاة من رعب الليل فقط.</p>
+        <p class="dim">merhba bik ring road. تخس روحك · thank you for closing.</p>
+      </div>
+      <button id="btn-cr-back" class="mbtn">رجوع · BACK</button>
+    </div>
+  </div>
+
+  <div id="dead" class="screen hidden">
+    <div class="dead-inner">
+      <h1 id="dead-title">مت تستافد</h1>
+      <div id="dead-sub">عش البومة سيكون هادئاً مرة أخرى…</div>
+      <button id="btn-retry" class="mbtn">عاود · TRY AGAIN</button>
+      <button id="btn-dead-menu" class="mbtn">القائمة · MENU</button>
+    </div>
+  </div>
+
+  <div id="ending" class="screen hidden"><div id="ending-text"></div></div>
+
+  <div id="err" class="hidden"></div>
+  <div id="lock-hint" class="hidden">اضغط باش تشوف · CLICK TO LOOK</div>
+
+  <script type="importmap">
+  { "imports": { "three": "../vendor/three.module.js" } }
+  </script>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

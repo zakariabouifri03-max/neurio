@@ -9,6 +9,8 @@ export const defaultSettings = () => ({
   vol: 0.8, sens: 0.8, invertY: false, fov: 75,
   grain: 1,          // 0 off · 1 subtle · 2 strong
   bright: 1.0, subs: true,
+  quality: 3,        // 0..9 → effects.QUALITY_PRESETS (HIGH default)
+  lang: 'en',        // 'en' | 'ar'
 });
 
 export function loadSettings() {

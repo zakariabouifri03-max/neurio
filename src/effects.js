@@ -1,10 +1,27 @@
 // ============================================================
-// effects.js — retro post pipeline: scene renders into a small
+// effects.js — retro post pipeline: scene renders into a
 // render target, then a fullscreen shader applies film grain,
 // vignette, brightness, flash & chromatic-aberration impulses.
+// QUALITY PRESETS scale internal resolution, MSAA, shadows,
+// fog, grain filtering & draw distance from VERY LOW to SUPER MAX.
 // ============================================================
 import * as THREE from 'three';
 import { clamp, rand } from './utils.js';
+
+// index = 0..9
+export const QUALITY_PRESETS = [
+  { id: 'verylow', scale: 0.33, samples: 0, shadow: 0, shadowSize: 256, fogMul: 1.35, brightLift: 1.05, filterLinear: false, camFar: 90 },
+  { id: 'low', scale: 0.5, samples: 0, shadow: 0, shadowSize: 256, fogMul: 1.15, brightLift: 1.02, filterLinear: false, camFar: 120 },
+  { id: 'medium', scale: 0.66, samples: 0, shadow: 512, shadowSize: 512, fogMul: 1.0, brightLift: 1.0, filterLinear: true, camFar: 160 },
+  { id: 'high', scale: 0.8, samples: 0, shadow: 1024, shadowSize: 1024, fogMul: 0.92, brightLift: 1.0, filterLinear: true, camFar: 220 },
+  { id: 'veryhigh', scale: 1.0, samples: 2, shadow: 1024, shadowSize: 1024, fogMul: 0.85, brightLift: 1.0, filterLinear: true, camFar: 300 },
+  { id: 'ultra', scale: 1.25, samples: 4, shadow: 2048, shadowSize: 2048, fogMul: 0.8, brightLift: 1.0, filterLinear: true, camFar: 380 },
+  { id: 'extreme', scale: 1.5, samples: 4, shadow: 2048, shadowSize: 2048, fogMul: 0.75, brightLift: 1.0, filterLinear: true, camFar: 460 },
+  { id: 'max', scale: 1.75, samples: 8, shadow: 4096, shadowSize: 4096, fogMul: 0.7, brightLift: 1.0, filterLinear: true, camFar: 560 },
+  { id: 'supermax', scale: 2.0, samples: 8, shadow: 4096, shadowSize: 4096, fogMul: 0.65, brightLift: 1.0, filterLinear: true, camFar: 700 },
+  { id: '4k', scale: -1, fixed: [3840, 2160], samples: 8, shadow: 4096, shadowSize: 4096, fogMul: 0.62, brightLift: 1.0, filterLinear: true, camFar: 800 },
+];
+export const QUALITY_LABELS = ['VERY LOW', 'LOW', 'MEDIUM', 'HIGH', 'VERY HIGH', 'ULTRA', 'EXTREME', 'MAX', 'SUPER MAX', '4K'];
 
 const QUAD_VERT = /* glsl */`
   varying vec2 vUv;
@@ -55,6 +72,8 @@ export class Effects {
     this.rt = new THREE.WebGLRenderTarget(2, 2, {
       minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, depthBuffer: true,
     });
+    this.preset = QUALITY_PRESETS[clamp(settings.quality ?? 3, 0, QUALITY_PRESETS.length - 1)];
+    this.qualityIndex = clamp(settings.quality ?? 3, 0, QUALITY_PRESETS.length - 1);
     this.quadScene = new THREE.Scene();
     this.quadCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     this.uniforms = {
@@ -75,6 +94,41 @@ export class Effects {
     this.applySettings();
   }
 
+  setQuality(i) {
+    this.qualityIndex = clamp(i, 0, QUALITY_PRESETS.length - 1);
+    this.preset = QUALITY_PRESETS[this.qualityIndex];
+    this.settings.quality = this.qualityIndex;
+    this._applyPreset();
+    this.setSize(this.w, this.h);
+  }
+  _applyPreset() {
+    const p = this.preset;
+    // shadow maps (flashlight is the runtime shadow caster)
+    const cam = this.camera;
+    if (cam) {
+      cam.far = p.camFar; cam.updateProjectionMatrix();
+    }
+    if (this.G && this.G.player && this.G.player.flash) {
+      const fl = this.G.player.flash;
+      fl.castShadow = p.shadow > 0;
+      if (fl.shadow && fl.shadow.mapSize) {
+        fl.shadow.mapSize.set(p.shadowSize, p.shadowSize);
+        if (fl.shadow.map) { fl.shadow.map.dispose(); fl.shadow.map = null; }
+      }
+    }
+    // texture filtering: crunchy nearest (low presets) vs smooth linear
+    if (this.G && this.G.scene) {
+      this.G.scene.traverse((o) => {
+        if (o.material && o.material.map && o.material.map.isCanvasTexture) {
+          o.material.map.magFilter = p.filterLinear ? THREE.LinearFilter : THREE.NearestFilter;
+          o.material.map.needsUpdate = true;
+        }
+      });
+    }
+  }
+  // attach the game context so presets can affect world objects
+  bindGame(G) { this.G = G; this._applyPreset(); this.setSize(this.w, this.h); }
+
   applySettings() {
     const s = this.settings;
     this.uniforms.uGrain.value = [0.0, 0.05, 0.11][s.grain] ?? 0.05;
@@ -86,9 +140,17 @@ export class Effects {
   setSize(w, h) {
     this.w = w; this.h = h;
     this.renderer.setSize(w, h, false);
-    // low internal resolution => crunchy upscale, PS1 style
-    const scale = 0.5;
-    this.rt.setSize(Math.max(320, Math.floor(w * scale)), Math.max(180, Math.floor(h * scale)));
+    const p = this.preset || { scale: 0.5, samples: 0 };
+    let rw, rh;
+    rw = Math.floor(w * p.scale); rh = Math.floor(h * p.scale);
+    if (p.fixed) { rw = Math.min(p.fixed[0], 3840); rh = Math.min(p.fixed[1], 2160); }
+    rw = Math.max(320, Math.min(rw, 3840)); rh = Math.max(180, Math.min(rh, 2160));
+    this.rt.setSize(rw, rh);
+    this.rt.samples = p.samples || 0;
+    // smooth upscale on high presets, crunchy pixel upscale on low
+    const smooth = (this.QUALITY_SMOOTH = !!(p.filterLinear));
+    this.rt.texture.magFilter = smooth ? THREE.LinearFilter : THREE.NearestFilter;
+    this.rt.texture.minFilter = smooth ? THREE.LinearFilter : THREE.NearestFilter;
   }
 
   shake(amt) { this.shakeAmp = Math.max(this.shakeAmp, amt); }

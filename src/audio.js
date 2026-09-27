@@ -39,6 +39,100 @@ export class AudioEngine {
 
   setVolume(v) { if (this.master) this.master.gain.value = v * v * 1.15; }
 
+  // ---------- ep2 additions: cat meow ----------
+  meow(pos, vol = 0.2) {
+    if (!this.ctx) return;
+    const ctx = this.ctx, t = ctx.currentTime;
+    const o = this._osc('sine', 560, t);
+    o.frequency.exponentialRampToValueAtTime(420, t + 0.12);
+    o.frequency.exponentialRampToValueAtTime(620, t + 0.24);
+    o.frequency.exponentialRampToValueAtTime(380, t + 0.42);
+    const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 900; f.Q.value = 2.4;
+    const g = this._out(vol, 'sfx', pos, 1.2, 12, 0.2);
+    this._env(g.gain, t, 0.03, 1, 0.5);
+    o.connect(f); f.connect(g);
+    o.start(t); o.stop(t + 0.55);
+  }
+
+  // diner door chime (ding-dong)
+  doorbellBuzz(pos, vol = 0.35) {
+    if (!this.ctx) return;
+    const ctx = this.ctx, t = ctx.currentTime;
+    const tone = (freq, t0, dur, v) => {
+      const o = this._osc('sine', freq, t0);
+      const g = this._out(v, 'sfx', pos, 1.2, 18, 0.2);
+      this._env(g.gain, t0, 0.04, 1, dur);
+      o.connect(g); o.start(t0); o.stop(t0 + dur + 0.1);
+    };
+    tone(1030, t, 0.65, vol); tone(870, t + 0.22, 0.9, vol * 0.9);
+  }
+
+  // jukebox — a lost 60s diner tune (triangle melody + sub bass)
+  jukeboxSong(id, pos, { tempo = 112, reps = 3, vol = 0.16 } = {}) {
+    if (!this.ctx) return;
+    if (this._loops[id]) return;
+    const ctx = this.ctx;
+    const beat = 60 / tempo;
+    // 8 bars of a wandering minor key melody (frequencies)
+    const mel = [392, 466, 392, 349, 311, 349, 392, 466, 392, 466, 523, 466, 392, 349, 311, 277];
+    const bass = mel.map(f => f / 4);
+    let bar = 0;
+    const state = { dead: false, gains: [] };
+    const phrase = () => {
+      if (state.dead) return;
+      const t = ctx.currentTime + 0.05;
+      for (let i = 0; i < mel.length; i++) {
+        const o = this._osc('triangle', mel[i], t + i * beat);
+        const g = this._out(vol, 'sfx', pos, 1.6, 20, 0.25);
+        this._env(g.gain, t + i * beat, 0.01, 0.6, beat * 0.92);
+        o.connect(g); o.start(t + i * beat); o.stop(t + i * beat + beat);
+        const ob = this._osc('sine', bass[i], t + i * beat);
+        const gb = this._out(vol * 0.8, 'sfx', pos, 1.6, 20, 0.1);
+        this._env(gb.gain, t + i * beat, 0.02, 0.5, beat * 0.94);
+        ob.connect(gb); ob.start(t + i * beat); ob.stop(t + i * beat + beat);
+      }
+      // record scratch between phrases
+      bar++;
+      if (bar < reps) this._loopTimers.push(setTimeout(phrase, mel.length * beat * 1000));
+      else { if (this._loops[id]) this._loops[id].deadSet = true; delete this._loops[id]; }
+    };
+    this._loopTimers = this._loopTimers || [];
+    phrase();
+    this._loops[id] = { stop: () => { state.dead = true; }, gain: { setTargetAtTime: () => {} }, base: vol };
+  }
+
+  // car engine for the drive chapter
+  engineSet(on, vol = 0.22) {
+    const id = 'engine_loop';
+    if (on && !this._loops[id]) {
+      const ctx = this.ctx, t = ctx.currentTime;
+      const o1 = this._osc('sawtooth', 42, t);
+      const o2 = this._osc('square', 84.6, t);
+      const og = ctx.createGain(); og.gain.value = 0.4;
+      const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 320;
+      o1.connect(og); o2.connect(og); og.connect(f);
+      const trem = this._osc('sine', 8.2, t); const tg = ctx.createGain(); tg.gain.value = 0.1;
+      trem.connect(tg);
+      const g = this._out(vol, 'amb');
+      tg.connect(g.gain);
+      f.connect(g); o1.start(t); o2.start(t); trem.start(t);
+      this._loops[id] = { nodes: [o1, o2, trem], gain: g.gain, base: vol };
+    } else if (!on) this.stopLoop(id, 0.6);
+  }
+
+  // steady rain on windows/roof
+  startRain(id = 'rain', vol = 0.07) {
+    if (this._loops[id]) return;
+    const ctx = this.ctx, t = ctx.currentTime;
+    const src = this._noise();
+    const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1400; f.Q.value = 0.5;
+    const f2 = ctx.createBiquadFilter(); f2.type = 'highpass'; f2.frequency.value = 380;
+    src.connect(f); f.connect(f2);
+    const g = this._out(vol, 'amb');
+    f2.connect(g); src.start();
+    this._loops[id] = { nodes: [src], gain: g.gain, base: vol };
+  }
+
   updateListener(pos, fwd) {
     if (!this.ctx) return;
     const l = this.ctx.listener, t = this.ctx.currentTime;
