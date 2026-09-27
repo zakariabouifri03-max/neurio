@@ -1,59 +1,138 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>برج إيفل · Tour Eiffel 3D</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗼</text></svg>" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./src/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🏁 Bash Baqi Racing</title>
+<meta name="theme-color" content="#0ea5e9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/"
+  }
+}
+</script>
 </head>
 <body>
-  <canvas id="scene"></canvas>
+<div id="app"></div>
 
-  <!-- شاشة التحميل -->
-  <div id="loader" aria-hidden="true">
-    <div class="loader-icon">🗼</div>
-    <div class="loader-text">جارٍ بناء البرج…</div>
-    <div class="loader-bar"><span></span></div>
+<!-- error overlay -->
+<div id="errLog"></div>
+
+<!-- loading -->
+<div id="loading">
+  <div class="loadBox">
+    <div class="loadFlag">🏁</div>
+    <div class="loadTitle">BASH BAQI<br>RACING</div>
+    <div class="loadBar"><div></div></div>
+    <div class="loadTip">warming up the buggies…</div>
+  </div>
+</div>
+
+<!-- speed lines overlay -->
+<div id="speedLines"></div>
+<div id="coinPops"></div>
+
+<!-- ══════════ RACE HUD ══════════ -->
+<div id="hud">
+  <div class="hudTL">
+    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
+    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
+    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
+    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
   </div>
 
-  <!-- العنوان -->
-  <header class="hud hud-top">
-    <h1>برج إيفل <span class="fr">Tour Eiffel</span></h1>
-    <p class="sub">باريس · 1889 — غوستاف إيفل · نموذج ثلاثي الأبعاد</p>
-  </header>
-
-  <!-- أزرار التحكم -->
-  <div class="hud hud-actions">
-    <button id="btn-theme" class="chip" title="ليل / نهار">🌙</button>
-    <button id="btn-rotate" class="chip" title="دوران تلقائي">⏸</button>
-    <button id="btn-full" class="chip" title="ملء الشاشة">⛶</button>
+  <div id="progbar">
+    <span class="flagL">🏁</span>
+    <div class="track"><div id="progMarkers"></div></div>
+    <span class="flagR">🏆</span>
   </div>
 
-  <!-- بطاقة المعلومات -->
-  <aside class="hud facts" dir="rtl">
-    <div class="fact"><span class="k">الارتفاع</span><span class="v">330 m</span></div>
-    <div class="fact"><span class="k">الطوابق</span><span class="v">3</span></div>
-    <div class="fact"><span class="k">الوزن الحديدي</span><span class="v">7 300 t</span></div>
-    <div class="fact"><span class="k">سالبات الضوء</span><span class="v">20 000 💡</span></div>
-  </aside>
+  <button id="btnPauseTop" class="roundBtn">⏸</button>
 
-  <!-- تلميح التحكم -->
-  <footer class="hud hint" dir="rtl">
-    🖱️ اسحب للدوران · عجلة الفأرة للتقريب · الزر الأيمن للإزاحة · اضغط <b>N</b> للليل
-  </footer>
+  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
 
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "./vendor/three.module.js",
-      "three/addons/": "./vendor/"
-    }
-  }
-  </script>
-  <script type="module" src="./src/main.js"></script>
+  <div id="powerSlot" class="powerSlot">
+    <span id="hudPower"></span>
+    <span class="keyHint">SPACE</span>
+  </div>
+
+  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
+
+  <div id="banner"></div>
+
+  <!-- touch controls -->
+  <div id="touchWrap">
+    <div class="tcol left">
+      <button id="tLeft" class="tbtn">◀</button>
+      <button id="tRight" class="tbtn">▶</button>
+    </div>
+    <div class="tcol right">
+      <button id="tBrake" class="tbtn brake">▼</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ GARAGE UI ══════════ -->
+<div id="garageUI">
+  <div id="topbar">
+    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
+    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
+    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
+    <div class="spacer"></div>
+    <button id="btnMusic" class="miniBtn">🎵</button>
+    <button id="btnSfx" class="miniBtn">🔊</button>
+    <button id="btnFull" class="miniBtn">⛶</button>
+  </div>
+
+  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
+  <div id="carNamePlate"></div>
+
+  <div id="menuBar">
+    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
+    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
+    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
+    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
+    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
+    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
+  </div>
+</div>
+
+<!-- ══════════ Shop / panels ══════════ -->
+<div id="panel">
+  <div class="panelBox">
+    <div class="panelHead">
+      <h2 id="panelTitle">SHOP</h2>
+      <div id="panelTabs"></div>
+      <button id="panelClose" class="roundBtn">✖</button>
+    </div>
+    <div id="panelBody"></div>
+  </div>
+</div>
+
+<!-- results -->
+<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
+<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
+
+<!-- pause -->
+<div id="pauseModal">
+  <div class="modalBox">
+    <div class="rtitle">⏸ PAUSED</div>
+    <div class="rbtns">
+      <button id="btnResume" class="big race">▶ RESUME</button>
+      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="confetti"></div>
+
+<script type="module" src="src/main.js"></script>
 </body>
 </html>

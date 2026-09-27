@@ -1,74 +1,68 @@
-# 🗼 برج إيفل · Tour Eiffel 3D
+# 🏁 Bash Baqi Racing
 
-نموذج تفاعلي ثلاثي الأبعاد لبرج إيفل مبني بالكامل بشكل إجرائي (procedural) باستخدام **Three.js** — بدون بناء (no build step) وبدون أي CDN خارجي.
+لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
+A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
 
-> Interactive 3D model of the Eiffel Tower, fully procedural with Three.js. No build step, no external CDN — everything is vendored.
+**▶ Play:** serve the folder with any static server and open it:
 
-![برج إيفل نهارًا](docs/screenshot-day.png)
+```bash
+python3 -m http.server 8000
+# → http://localhost:8000
+```
 
-![برج إيفل ليلًا](docs/screenshot-night.png)
+No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
 
 ---
 
-## ✨ المميزات · Features
+## 🎮 The Game
 
-- 🏗️ **هيكل شبكي إجرائي** — أكثر من 33,000 مثلث مبنية برمجيًا بأبعاد حقيقية:
-  - القاعدة: 124.9 م · الطوابق: 57.6 / 115.7 / 276.1 م · قمة الهوائي: 330 م
-- 🌙 **وضع ليلي / نهاري** — إضاءة ذهبية + محاكاة **20,000 وميض** (الزر أو حرف `N`)
-- ⭐ سماء متدرجة مع نجوم متلألئة ومنارة حمراء وامضة (تحذير الطيران)
-- 🎥 دوران تلقائي يتوقف عند التفاعل
-- 🖱️ تحكم كامل: دوران / تقريب / إزاحة (OrbitControls)
-- 🇲🇦 واجهة عربية RTL بتصميم زجاجي (glassmorphism)
-- 📦 **صفر تبعيات وقت التشغيل** — three.js r170 مرفق داخل `vendor/`
+You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
 
-## 🚀 التشغيل · Run
+- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
+- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
+- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
+- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
+- 🪙 Coins also sit **on the track** — grab them mid-race
+- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
+- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
+- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
+- 💾 Progress auto-saves in the browser
 
-أي خادم ملفات ثابت يكفي:
+## 🕹️ Controls
 
-```bash
-python3 -m http.server 3000
-# أو
-npx serve .
-```
-
-ثم افتح `http://localhost:3000`
-
-## 🎮 التحكم · Controls
-
-| الفعل | الأداة |
+| Action | Keys |
 |---|---|
-| الدوران | سحب بالزر الأيسر / إصبع |
-| التقريب | عجلة الفأرة / قرصة |
-| الإزاحة | الزر الأيمن |
-| ليل / نهار | زر 🌙 أو حرف `N` |
-| دوران تلقائي | زر ⏸ / ▶ |
-| ملء الشاشة | زر ⛶ |
+| Drive | `W A S D` / arrows (auto-gas on mobile) |
+| Power-up | `SPACE` |
+| Reset on track | `R` |
+| Horn | `H` |
+| Pause | `ESC` |
 
-## 📁 البنية · Structure
+Touch buttons appear automatically on phones/tablets.
+
+## 🧱 Tech — 100% procedural
+
+- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
+- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
+- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
+- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
+- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
 
 ```
 neurio/
-├── index.html                      # الواجهة
+├── index.html            # UI layers (HUD, menus, shop, results)
 ├── src/
-│   ├── main.js                     # محرك المشهد + بناء البرج إجرائيًا
-│   └── style.css                   # التنسيق (RTL + زجاجية)
-├── vendor/                         # three.js r170 (مرفق — لا حاجة لإنترنت)
-│   ├── three.module.js
-│   ├── controls/OrbitControls.js
-│   └── utils/BufferGeometryUtils.js
-└── docs/                           # لقطات الشاشة
+│   ├── main.js           # state machine + renderer + economy
+│   ├── race.js           # race engine: physics, AI, powerups, HUD
+│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
+│   ├── builders.js       # 3D builders: cars, drivers, track worlds
+│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
+│   ├── tex.js            # canvas textures (roads, skies, faces…)
+│   ├── audio.js          # synth engine/sfx/music
+│   ├── post.js           # bloom post-processing
+│   ├── save.js           # localStorage persistence
+│   └── util.js           # seeded RNG + helpers
+└── vendor/               # three.js r170 (no internet needed)
 ```
 
-## 🧠 كيف يُبنى البرج؟
-
-كل شيء مرسوم برمجيًا في `src/main.js`:
-
-1. **منحنى جانبي** `w(y) = 3 + 59.5·e^(−y/78)` يحاكي الانفراج الأسطوري للبرج
-2. **4 أعمدة** متقاربة على 41 مستوى + حلقات أفقية + مقطعيات X على كل وجه
-3. **4 أقواس** شبه بيضاوية تحت الطابق الأول (تُصنع بأنابيب `TubeGeometry`)
-4. **منصات** الطوابق الثلاثة + الهوائي وكبينة القمة
-5. كل القضبان تُدمج في **شبكة واحدة** (`mergeGeometries`) للأداء
-
----
-
-صُنع بـ ❤️ باستخدام [Three.js](https://threejs.org) r170 (MIT © mrdoob والمساهمون)
+Made with ❤️ and Three.js
