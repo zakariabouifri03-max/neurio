@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#05060a" />
+    <meta
+      name="description"
+      content="NEURIO — an insanely realistic interactive 3D hypercar showroom. Pick your paint, drop the lights, ignite the engine."
+    />
+    <title>NEURIO · 3D Hypercar Showroom</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%2305060a'/%3E%3Cpath d='M18 46V18h7l14 18V18h7v28h-7L25 28v18z' fill='%23ff2d3f'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <!-- ==================== LOADER ==================== -->
+    <div id="loader">
+      <div class="loader-inner">
+        <div class="loader-logo">NEURIO</div>
+        <div class="loader-sub">HYPERCAR SHOWROOM</div>
+        <div class="loader-bar"><div id="loader-fill"></div></div>
+        <div id="loader-pct">0%</div>
+        <div id="loader-tip">Calibrating paint booth…</div>
+      </div>
+    </div>
+
+    <!-- ==================== CANVAS ==================== -->
+    <div id="stage"></div>
+
+    <!-- ==================== UI ==================== -->
+    <header id="brand" class="ui hidden">
+      <div class="brand-name">NEURIO</div>
+      <div class="brand-model">458&nbsp;·&nbsp;SHOWROOM EDITION</div>
+    </header>
+
+    <div id="hint" class="ui hidden">drag to orbit&nbsp;&nbsp;·&nbsp;&nbsp;scroll to zoom</div>
+
+    <!-- Speedometer HUD -->
+    <div id="hud" class="ui hidden">
+      <div id="speed-row">
+        <span id="speed-value">0</span>
+        <span id="speed-unit">km/h</span>
+      </div>
+      <div id="rpm-track"><div id="rpm-fill"></div></div>
+      <div id="gear-row">
+        <span class="gear-label">GEAR</span>
+        <span id="gear-value">N</span>
+      </div>
+    </div>
+
+    <!-- Control dock -->
+    <nav id="dock" class="ui hidden">
+      <div class="dock-section" id="paint-section">
+        <span class="dock-label">PAINT</span>
+        <div id="swatches"></div>
+      </div>
+
+      <div class="dock-divider"></div>
+
+      <div class="dock-section">
+        <span class="dock-label">FINISH</span>
+        <div id="finishes" class="segmented">
+          <button class="seg active" data-finish="gloss">GLOSS</button>
+          <button class="seg" data-finish="satin">SATIN</button>
+          <button class="seg" data-finish="pearl">PEARL</button>
+        </div>
+      </div>
+
+      <div class="dock-divider"></div>
+
+      <div class="dock-section dock-buttons">
+        <button id="btn-lights" class="icon-btn" title="Headlights">
+          <svg viewBox="0 0 24 24"><path d="M9 4h6l1 5a5 5 0 0 1-1 9H9a5 5 0 0 1-1-9zM10 18h4v2h-4zm1-13v2h2V5z" /></svg>
+          <span>LIGHTS</span>
+        </button>
+        <button id="btn-turntable" class="icon-btn" title="Auto rotate">
+          <svg viewBox="0 0 24 24"><path d="M12 6a6 6 0 1 1-5.3 3.2l-1.7 1A8 8 0 1 0 12 4V1l-4 3.5L12 8z" /></svg>
+          <span>SPIN</span>
+        </button>
+        <button id="btn-view" class="icon-btn" title="Camera view">
+          <svg viewBox="0 0 24 24"><path d="M4 7h3l2-2h6l2 2h3v12H4zm8 10a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0-2.5a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" /></svg>
+          <span id="view-label">HERO</span>
+        </button>
+        <button id="btn-sound" class="icon-btn" title="Engine sound">
+          <svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zm12.5 3a3.5 3.5 0 0 0-2-3.2v6.4a3.5 3.5 0 0 0 2-3.2zM14.5 4.3v2.1a6 6 0 0 1 0 11.2v2.1a8 8 0 0 0 0-15.4z" /></svg>
+          <span>SOUND</span>
+        </button>
+        <button id="btn-ignite" class="ignite-btn" title="Ignite engine">IGNITE</button>
+      </div>
+    </nav>
+
+    <footer id="credit" class="ui hidden">
+      Ferrari 458 model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
+      · rendered with <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
