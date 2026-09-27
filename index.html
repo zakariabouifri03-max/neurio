@@ -1,58 +1,182 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>برج إيفل · Tour Eiffel 3D</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗼</text></svg>" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>STARVIEW — a night shift horror story</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📼</text></svg>" />
   <link rel="stylesheet" href="./src/style.css" />
 </head>
 <body>
   <canvas id="scene"></canvas>
 
-  <!-- شاشة التحميل -->
-  <div id="loader" aria-hidden="true">
-    <div class="loader-icon">🗼</div>
-    <div class="loader-text">جارٍ بناء البرج…</div>
-    <div class="loader-bar"><span></span></div>
+  <!-- ======================= HUD ======================= -->
+  <div id="hud" class="hidden">
+    <div id="crosshair"></div>
+    <div id="prompt" class="hidden"><span id="prompt-key">E</span><span id="prompt-text"></span></div>
+    <div id="objective" class="hidden"><span class="obj-tag">OBJECTIVE</span><span id="objective-text"></span></div>
+    <div id="notify" class="hidden">
+      <div class="n-icon">✉</div>
+      <div class="n-body"><div id="notify-name">MESSAGES</div><div id="notify-text"></div></div>
+    </div>
+    <div id="subtitle" class="hidden"></div>
+    <div id="choice" class="hidden">
+      <div id="choice-title"></div>
+      <div class="choice-opt" id="choice-1"></div>
+      <div class="choice-opt" id="choice-2"></div>
+    </div>
+    <div id="stamina"><div id="stamina-fill"></div></div>
+    <div id="vig-hint" class="hidden"></div>
   </div>
 
-  <!-- العنوان -->
-  <header class="hud hud-top">
-    <h1>برج إيفل <span class="fr">Tour Eiffel</span></h1>
-    <p class="sub">باريس · 1889 — غوستاف إيفل · نموذج ثلاثي الأبعاد</p>
-  </header>
+  <!-- letterbox bars for cinematics -->
+  <div id="lb-top" class="letterbox"></div>
+  <div id="lb-bottom" class="letterbox"></div>
 
-  <!-- أزرار التحكم -->
-  <div class="hud hud-actions">
-    <button id="btn-theme" class="chip" title="ليل / نهار">🌙</button>
-    <button id="btn-rotate" class="chip" title="دوران تلقائي">⏸</button>
-    <button id="btn-full" class="chip" title="ملء الشاشة">⛶</button>
+  <!-- chapter card -->
+  <div id="chapter-card" class="hidden"><div id="cc-time">11:00 PM</div><div id="cc-title">THE SHIFT</div></div>
+
+  <!-- fullscreen fades / flashes -->
+  <div id="fader"></div>
+
+  <!-- ======================= SMARTPHONE ======================= -->
+  <div id="phone" class="hidden">
+    <div id="phone-bezel">
+      <div id="phone-screen">
+        <div id="ph-status"><span id="ph-time">11:00 PM</span><span id="ph-carrier">NORTHSTAR</span><span id="ph-batt">▮▮▮▮</span></div>
+        <div id="ph-apps" class="ph-page">
+          <div class="ph-app" data-app="messages"><div class="ph-app-ico msg">✉<span id="badge-msg" class="ph-badge hidden">1</span></div><div class="ph-app-name">Messages</div></div>
+          <div class="ph-app" data-app="tasks"><div class="ph-app-ico tsk">☰<span id="badge-tsk" class="ph-badge hidden">!</span></div><div class="ph-app-name">Notes</div></div>
+          <div class="ph-app" data-app="flash"><div class="ph-app-ico fls" id="flash-ico">🔦</div><div class="ph-app-name">Light</div></div>
+          <div class="ph-app" data-app="cam"><div class="ph-app-ico cam">📷</div><div class="ph-app-name">Camera</div></div>
+        </div>
+        <div id="ph-messages" class="ph-page hidden">
+          <div class="ph-title"><span class="ph-back" data-back>‹</span> Messages</div>
+          <div id="ph-threads"></div>
+        </div>
+        <div id="ph-thread" class="ph-page hidden">
+          <div class="ph-title"><span class="ph-back" data-back>‹</span> <span id="ph-thread-name"></span></div>
+          <div id="ph-bubbles"></div>
+          <div id="ph-replies" class="hidden"></div>
+        </div>
+        <div id="ph-tasks" class="ph-page hidden">
+          <div class="ph-title"><span class="ph-back" data-back>‹</span> Notes</div>
+          <div id="ph-tasklist"></div>
+        </div>
+        <div id="ph-cam" class="ph-page hidden">
+          <div class="ph-title"><span class="ph-back" data-back>‹</span> Camera</div>
+          <div id="ph-cam-msg">You don't feel like taking pictures tonight.</div>
+        </div>
+        <div id="ph-home"></div>
+      </div>
+    </div>
   </div>
 
-  <!-- بطاقة المعلومات -->
-  <aside class="hud facts" dir="rtl">
-    <div class="fact"><span class="k">الارتفاع</span><span class="v">330 m</span></div>
-    <div class="fact"><span class="k">الطوابق</span><span class="v">3</span></div>
-    <div class="fact"><span class="k">الوزن الحديدي</span><span class="v">7 300 t</span></div>
-    <div class="fact"><span class="k">سالبات الضوء</span><span class="v">20 000 💡</span></div>
-  </aside>
+  <!-- ======================= MENUS ======================= -->
+  <div id="menu" class="screen">
+    <div class="menu-inner">
+      <div class="menu-kicker">AN INTERACTIVE HORROR STORY</div>
+      <h1 class="menu-title"><span class="neon-s">S</span><span class="neon-t">T</span><span class="neon-a">A</span><span class="neon-r">R</span>VIEW</h1>
+      <div class="menu-sub">NIGHT SHIFT · ROUTE 9</div>
+      <div class="menu-buttons">
+        <button id="btn-new" class="mbtn">NEW GAME</button>
+        <button id="btn-continue" class="mbtn hidden">CONTINUE</button>
+        <button id="btn-chapters" class="mbtn hidden">CHAPTERS</button>
+        <button id="btn-settings" class="mbtn">SETTINGS</button>
+        <button id="btn-help" class="mbtn">HOW TO PLAY</button>
+        <button id="btn-credits" class="mbtn">CREDITS</button>
+      </div>
+      <div class="menu-note">headphones recommended · play in the dark · <span id="menu-version">v1.0</span></div>
+    </div>
+  </div>
 
-  <!-- تلميح التحكم -->
-  <footer class="hud hint" dir="rtl">
-    🖱️ اسحب للدوران · عجلة الفأرة للتقريب · الزر الأيمن للإزاحة · اضغط <b>N</b> للليل
-  </footer>
+  <div id="pause" class="screen hidden">
+    <div class="panel">
+      <h2>PAUSED</h2>
+      <button id="btn-resume" class="mbtn">RESUME</button>
+      <button id="btn-p-settings" class="mbtn">SETTINGS</button>
+      <button id="btn-restart" class="mbtn">RESTART CHECKPOINT</button>
+      <button id="btn-quit" class="mbtn">QUIT TO MENU</button>
+    </div>
+  </div>
+
+  <div id="settings" class="screen hidden">
+    <div class="panel">
+      <h2>SETTINGS</h2>
+      <div class="setrow"><label>Master volume</label><input id="set-vol" type="range" min="0" max="100" value="80"><span id="set-vol-v">80</span></div>
+      <div class="setrow"><label>Mouse sensitivity</label><input id="set-sens" type="range" min="10" max="200" value="80"><span id="set-sens-v">80</span></div>
+      <div class="setrow"><label>Invert Y</label><button id="set-inv" class="tog">OFF</button></div>
+      <div class="setrow"><label>Field of view</label><input id="set-fov" type="range" min="60" max="95" value="75"><span id="set-fov-v">75</span></div>
+      <div class="setrow"><label>Film grain</label><button id="set-grain" class="tog">SUBTLE</button></div>
+      <div class="setrow"><label>Brightness</label><input id="set-bright" type="range" min="50" max="150" value="100"><span id="set-bright-v">100</span></div>
+      <div class="setrow"><label>Subtitles</label><button id="set-subs" class="tog">ON</button></div>
+      <button id="btn-set-back" class="mbtn">BACK</button>
+    </div>
+  </div>
+
+  <div id="help" class="screen hidden">
+    <div class="panel">
+      <h2>HOW TO PLAY</h2>
+      <div class="controls-grid">
+        <span>W A S D / Arrows</span><span>Move</span>
+        <span>MOUSE</span><span>Look</span>
+        <span>SHIFT</span><span>Run (makes noise)</span>
+        <span>C or CTRL</span><span>Crouch (quiet, harder to see)</span>
+        <span>E</span><span>Interact / pick up</span>
+        <span>G</span><span>Throw held object</span>
+        <span>T or TAB</span><span>Smartphone</span>
+        <span>F</span><span>Phone light</span>
+        <span>1 / 2</span><span>Dialogue choices</span>
+        <span>ESC</span><span>Pause</span>
+      </div>
+      <p class="help-tip">Check your phone. Watch the doors. Trust the silence.</p>
+      <button id="btn-help-back" class="mbtn">BACK</button>
+    </div>
+  </div>
+
+  <div id="chapters" class="screen hidden">
+    <div class="panel">
+      <h2>CHAPTERS</h2>
+      <div id="chapter-list"></div>
+      <button id="btn-ch-back" class="mbtn">BACK</button>
+    </div>
+  </div>
+
+  <div id="credits" class="screen hidden">
+    <div class="panel">
+      <h2>CREDITS</h2>
+      <div class="credits-body" id="credits-body">
+        <p><b>STARVIEW</b> — an original interactive horror story</p>
+        <p>Story, code, environments, characters, sounds & dialogue<br>created procedurally for this project.</p>
+        <p>Engine: Three.js r170 (MIT)<br>All textures & audio generated at runtime.<br>No external assets except key art.</p>
+        <p>Every character, place and event is fictional.</p>
+        <p class="dim">Thank you for working the night shift.</p>
+      </div>
+      <button id="btn-cr-back" class="mbtn">BACK</button>
+    </div>
+  </div>
+
+  <!-- death screen -->
+  <div id="dead" class="screen hidden">
+    <div class="dead-inner">
+      <h1 id="dead-title">YOU DIDN'T MAKE IT</h1>
+      <div id="dead-sub">the lot is quiet again.</div>
+      <button id="btn-retry" class="mbtn">TRY AGAIN</button>
+      <button id="btn-dead-menu" class="mbtn">QUIT TO MENU</button>
+    </div>
+  </div>
+
+  <!-- ending / epilogue -->
+  <div id="ending" class="screen hidden"><div id="ending-text"></div></div>
+
+  <!-- error overlay (dev aid – shows runtime errors) -->
+  <div id="err" class="hidden"></div>
+
+  <!-- click to (re)capture mouse -->
+  <div id="lock-hint" class="hidden">CLICK TO LOOK AROUND</div>
 
   <script type="importmap">
-  {
-    "imports": {
-      "three": "./vendor/three.module.js",
-      "three/addons/": "./vendor/"
-    }
-  }
+  { "imports": { "three": "./vendor/three.module.js" } }
   </script>
   <script type="module" src="./src/main.js"></script>
 </body>
