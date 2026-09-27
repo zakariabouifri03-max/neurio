@@ -1,74 +1,67 @@
-# 🗼 برج إيفل · Tour Eiffel 3D
+# NEURIO · 3D Hypercar Showroom
 
-نموذج تفاعلي ثلاثي الأبعاد لبرج إيفل مبني بالكامل بشكل إجرائي (procedural) باستخدام **Three.js** — بدون بناء (no build step) وبدون أي CDN خارجي.
+**An insanely realistic, fully interactive 3D car showroom in the browser** — built with Three.js, physically-based materials, a real-time mirror floor, HDR studio lighting, and a synthesized V8 you can ignite.
 
-> Interactive 3D model of the Eiffel Tower, fully procedural with Three.js. No build step, no external CDN — everything is vendored.
+![NEURIO showroom](docs/showroom.png)
 
-![برج إيفل نهارًا](docs/screenshot-day.png)
+## ✨ Features
 
-![برج إيفل ليلًا](docs/screenshot-night.png)
+| | |
+|---|---|
+| 🏎️ **Real geometry** | Ferrari 458 Italia (Draco-compressed GLB) with 50+ parts — body, glass, carbon trim, brakes, full interior and steering wheel |
+| 🎨 **10 paints × 3 finishes** | Rosso Corsa → Nero Daytona, in **Gloss / Satin / Pearl** (true iridescence) |
+| 🪞 **Real-time mirror floor** | Planar reflector dimmed to polished concrete, with contact shadows and radial fade |
+| 💡 **HDR studio lighting** | 1K studio HDRI through PMREM + colored rim rig, ACES tonemapping, soft shadows |
+| 🔦 **Working headlights** | Emissive lenses + spotlight beams + volumetric cones + DRLs + taillight glow |
+| 📷 **Cinematic camera** | HERO / FRONT / SIDE / REAR / TOP presets with eased transitions, damped orbit |
+| 🚀 **IGNITE drive mode** | Spinning wheels, animated 6-speed gearbox HUD, scrolling speed grid, engine vibration, camera shake, FOV kick |
+| 🔊 **Synthesized V8** | Pure WebAudio engine — dual saws + sub through a resonant, waveshaped filter (no audio files) |
+| ✨ **Post-processing** | MSAA ×4, bloom, ACES output, vignette + film grain |
 
----
+![IGNITE drive mode](docs/drive-mode.png)
 
-## ✨ المميزات · Features
+## 🎮 Controls
 
-- 🏗️ **هيكل شبكي إجرائي** — أكثر من 33,000 مثلث مبنية برمجيًا بأبعاد حقيقية:
-  - القاعدة: 124.9 م · الطوابق: 57.6 / 115.7 / 276.1 م · قمة الهوائي: 330 م
-- 🌙 **وضع ليلي / نهاري** — إضاءة ذهبية + محاكاة **20,000 وميض** (الزر أو حرف `N`)
-- ⭐ سماء متدرجة مع نجوم متلألئة ومنارة حمراء وامضة (تحذير الطيران)
-- 🎥 دوران تلقائي يتوقف عند التفاعل
-- 🖱️ تحكم كامل: دوران / تقريب / إزاحة (OrbitControls)
-- 🇲🇦 واجهة عربية RTL بتصميم زجاجي (glassmorphism)
-- 📦 **صفر تبعيات وقت التشغيل** — three.js r170 مرفق داخل `vendor/`
+- **Drag** to orbit · **Scroll** to zoom
+- **PAINT** swatches — live repaint of the body
+- **FINISH** — `GLOSS` / `SATIN` / `PEARL`
+- **LIGHTS** — headlights, beams & taillights
+- **SPIN** — auto turntable
+- **HERO** — cycles camera views
+- **SOUND** — engine audio on/off
+- **IGNITE / STOP** — launch mode: wheels, gearbox HUD, speed grid, full noise
 
-## 🚀 التشغيل · Run
+## 🛠️ Tech
 
-أي خادم ملفات ثابت يكفي:
+- [Three.js](https://threejs.org) r186 — `MeshPhysicalMaterial`, `PMREMGenerator`, `Reflector`, `UnrealBloomPass`, Draco GLTF
+- [Vite](https://vite.dev) for dev server & builds
+- WebAudio API for the engine synth — zero audio assets
+- Fully static output → deploys to GitHub Pages
+
+## 🧑‍💻 Development
 
 ```bash
-python3 -m http.server 3000
-# أو
-npx serve .
+npm install
+npm run dev       # http://localhost:5173
+npm run build     # static site in dist/
+npm run preview   # serve the production build
 ```
 
-ثم افتح `http://localhost:3000`
+Headless screenshot helpers (used to generate the images above):
 
-## 🎮 التحكم · Controls
-
-| الفعل | الأداة |
-|---|---|
-| الدوران | سحب بالزر الأيسر / إصبع |
-| التقريب | عجلة الفأرة / قرصة |
-| الإزاحة | الزر الأيمن |
-| ليل / نهار | زر 🌙 أو حرف `N` |
-| دوران تلقائي | زر ⏸ / ▶ |
-| ملء الشاشة | زر ⛶ |
-
-## 📁 البنية · Structure
-
-```
-neurio/
-├── index.html                      # الواجهة
-├── src/
-│   ├── main.js                     # محرك المشهد + بناء البرج إجرائيًا
-│   └── style.css                   # التنسيق (RTL + زجاجية)
-├── vendor/                         # three.js r170 (مرفق — لا حاجة لإنترنت)
-│   ├── three.module.js
-│   ├── controls/OrbitControls.js
-│   └── utils/BufferGeometryUtils.js
-└── docs/                           # لقطات الشاشة
+```bash
+node scripts/shot.mjs http://localhost:5173/ out.png "lights,ignite,wait4000"
 ```
 
-## 🧠 كيف يُبنى البرج؟
+## 🚀 Deployment
 
-كل شيء مرسوم برمجيًا في `src/main.js`:
+Push to `main` — the **Deploy to GitHub Pages** workflow builds and publishes automatically.
+Live at: `https://zakariabouifri03-max.github.io/neurio/`
 
-1. **منحنى جانبي** `w(y) = 3 + 59.5·e^(−y/78)` يحاكي الانفراج الأسطوري للبرج
-2. **4 أعمدة** متقاربة على 41 مستوى + حلقات أفقية + مقطعيات X على كل وجه
-3. **4 أقواس** شبه بيضاوية تحت الطابق الأول (تُصنع بأنابيب `TubeGeometry`)
-4. **منصات** الطوابق الثلاثة + الهوائي وكبينة القمة
-5. كل القضبان تُدمج في **شبكة واحدة** (`mergeGeometries`) للأداء
+## 📄 Credits
 
----
+- **Car model:** Ferrari 458 Italia by [vicent091036](https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6) (via the [three.js examples](https://github.com/mrdoob/three.js))
+- **Environment map:** monochrome studio HDRI (Poly Haven, CC0) via three.js examples
+- Rendered with [three.js](https://threejs.org) (MIT)
 
-صُنع بـ ❤️ باستخدام [Three.js](https://threejs.org) r170 (MIT © mrdoob والمساهمون)
+*Fan/project demo — not affiliated with Ferrari.*
