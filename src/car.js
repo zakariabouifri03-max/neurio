@@ -505,6 +505,7 @@ renderer.setAnimationLoop(() => {
 });
 
 selectCar(carIdx);
+addEventListener('error', (e) => toast('⚠️ ' + e.message));
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();

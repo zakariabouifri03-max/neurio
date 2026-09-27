@@ -26,6 +26,8 @@
 أي خادم ملفات ثابت يكفي:
 
 ```bash
+python3 serve.py            # بلا كاش (مستحسن)
+# أو
 python3 -m http.server 3000
 # أو
 npx serve .
