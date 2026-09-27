@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Ferrari 458 · سوق الطوموبيل</title>
+  <title>الكاراج · 21 طوموبيل 3D</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏎️</text></svg>" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,6 +25,17 @@
     #touch .grp { display: flex; gap: 12px; pointer-events: auto; }
     #touch button { width: 72px; height: 72px; font-size: 28px; color: #fff; border-radius: 50%; }
     #touch button.on { background: rgba(255,204,51,.5); }
+    #garage { position: fixed; top: 64px; left: 16px; width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 90px); overflow-y: auto; padding: 12px; display: none; z-index: 5; }
+    #garage.open { display: block; }
+    #garage h3 { font-size: 16px; margin: 2px 4px 10px; }
+    .car-item { display: grid; grid-template-columns: 30px 1fr; grid-template-areas: "n nm" "n st" "n bar"; gap: 2px 8px; width: 100%; text-align: right; padding: 8px 10px; margin-bottom: 6px; border-radius: 10px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.05); color: #fff; font: inherit; cursor: pointer; }
+    .car-item:hover { background: rgba(255,255,255,.14); }
+    .car-item.on { border-color: #fc3; background: rgba(255,204,51,.18); }
+    .car-item .n { grid-area: n; align-self: center; font-size: 18px; font-weight: 800; opacity: .7; }
+    .car-item .nm { grid-area: nm; font-weight: 700; }
+    .car-item .st { grid-area: st; font-size: 12px; opacity: .75; direction: ltr; text-align: right; }
+    .car-item .bar { grid-area: bar; height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; overflow: hidden; }
+    .car-item .bar i { display: block; height: 100%; background: linear-gradient(90deg, #3cf, #fc3 60%, #f33); margin-right: 0; margin-left: auto; }
     @media (pointer: coarse) { #touch { display: flex; } #help { display: none; } #speedo { bottom: 110px; } }
   </style>
 </head>
@@ -37,13 +48,22 @@
     <div><b>A D</b> / <b>← →</b> لفّ الفولان</div>
     <div><b>Space</b> فرين ديال اليد (درِيفت)</div>
     <div><b>C</b> بدّل الكاميرا · <b>R</b> رجّع الطوموبيل · <b>H</b> كلاكسون</div>
+    <div><b>G</b> الكاراج · <b>Q</b> / <b>E</b> الطوموبيل اللي قبل / اللي بعد</div>
     <div><b>T</b> تحكم فالجرّ (TC) — طفيه باش تدريفتي</div>
   </div>
 
   <div id="top">
     <button id="btn-sound" class="glass">🔇 الصوت</button>
     <button id="btn-cam" class="glass">🎥 كاميرا</button>
+    <button id="btn-prev" class="glass">◀</button>
+    <button id="btn-garage" class="glass">🚗 الكاراج (G)</button>
+    <button id="btn-next" class="glass">▶</button>
     <a href="./index.html" class="glass">🗼</a>
+  </div>
+
+  <div id="garage" class="glass" dir="rtl">
+    <h3>🚗 الكاراج — من الضعيفة للأقوى</h3>
+    <div class="list"></div>
   </div>
 
   <div id="speedo" class="glass">

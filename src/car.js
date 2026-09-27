@@ -73,45 +73,145 @@ function addSkid(x, z, yaw) {
   skids.instanceMatrix.needsUpdate = true;
 }
 
-// ───────────────────────── load car from GitHub model ─────────────────────────
+// ───────────────────────── garage: 21 cars, weakest → strongest ─────────────────────────
+// Kenney Car Kit (CC0, github.com/Arslan12216775/kenney_car-kit) + Ferrari 458 (three.js examples)
+// torque Nm · redline rpm · top km/h · mass kg · mu grip · drag · gears · cg height · downforce
+const CARS = [
+  { id: 'tractor-shovel',   name: 'جرّافة · Shovel',        torque: 300,  redline: 2400,  top: 30,  mass: 5200, mu: 0.9,  drag: 1.2,  gears: 3, cg: 1.0, steer: 0.55 },
+  { id: 'tractor',          name: 'تراكتور · Tractor',      torque: 330,  redline: 2500,  top: 42,  mass: 3500, mu: 0.9,  drag: 1.0,  gears: 4, cg: 0.9 },
+  { id: 'garbage-truck',    name: 'كاميو الزبل · Garbage',  torque: 950,  redline: 2600,  top: 85,  mass: 12000, mu: 0.85, drag: 1.4, gears: 6, cg: 1.1, steer: 0.55 },
+  { id: 'truck-flat',       name: 'بلاطو · Flatbed',        torque: 800,  redline: 2800,  top: 100, mass: 6500, mu: 0.9,  drag: 1.1,  gears: 6, cg: 0.9, steer: 0.55 },
+  { id: 'truck',            name: 'كاميو · Truck',          torque: 900,  redline: 2800,  top: 105, mass: 7800, mu: 0.9,  drag: 1.2,  gears: 6, cg: 1.0, steer: 0.55 },
+  { id: 'firetruck',        name: 'لپومپيي · Firetruck',    torque: 1150, redline: 2800,  top: 115, mass: 11000, mu: 0.9, drag: 1.3,  gears: 6, cg: 1.0, steer: 0.55 },
+  { id: 'delivery',         name: 'ديليفري · Delivery',     torque: 400,  redline: 4200,  top: 125, mass: 3200, mu: 0.95, drag: 0.8,  gears: 5, cg: 0.8 },
+  { id: 'van',              name: 'فاركونيط · Van',         torque: 360,  redline: 5000,  top: 145, mass: 2400, mu: 1.0,  drag: 0.7,  gears: 5, cg: 0.75 },
+  { id: 'ambulance',        name: 'لانبيلانس · Ambulance',  torque: 470,  redline: 4800,  top: 155, mass: 3000, mu: 1.0,  drag: 0.75, gears: 5, cg: 0.8 },
+  { id: 'taxi',             name: 'طاكسي · Taxi',           torque: 260,  redline: 6000,  top: 175, mass: 1400, mu: 1.0,  drag: 0.45, gears: 5, cg: 0.55 },
+  { id: 'kart-oobi',        name: 'كارتينغ · Kart',         torque: 32,   redline: 9000,  top: 95,  mass: 170,  mu: 1.15, drag: 0.12, gears: 1, cg: 0.25, scale: 1.6, steer: 0.5 },
+  { id: 'sedan',            name: 'سيدان · Sedan',          torque: 320,  redline: 6200,  top: 195, mass: 1450, mu: 1.0,  drag: 0.42, gears: 5, cg: 0.55 },
+  { id: 'suv',              name: 'SUV · 4x4',              torque: 420,  redline: 5800,  top: 205, mass: 2100, mu: 0.95, drag: 0.5,  gears: 6, cg: 0.75 },
+  { id: 'kart-oozi',        name: 'كارتينغ سبور · Kart S',  torque: 48,   redline: 11000, top: 125, mass: 175,  mu: 1.2,  drag: 0.12, gears: 1, cg: 0.25, scale: 1.6, steer: 0.5 },
+  { id: 'police',           name: 'البوليس · Police',       torque: 470,  redline: 6500,  top: 240, mass: 1700, mu: 1.05, drag: 0.38, gears: 6, cg: 0.55 },
+  { id: 'suv-luxury',       name: 'SUV لوكس · Luxury',      torque: 680,  redline: 6500,  top: 255, mass: 2300, mu: 1.0,  drag: 0.42, gears: 8, cg: 0.7 },
+  { id: 'hatchback-sports', name: 'هاتشباك · Hot Hatch',    torque: 420,  redline: 7500,  top: 255, mass: 1300, mu: 1.1,  drag: 0.36, gears: 6, cg: 0.5 },
+  { id: 'sedan-sports',     name: 'سيدان سبور · Sport',     torque: 620,  redline: 7500,  top: 290, mass: 1600, mu: 1.12, drag: 0.34, gears: 7, cg: 0.5 },
+  { id: 'ferrari',          name: 'فيراري 458 · Ferrari',   torque: 540,  redline: 8500,  top: 325, mass: 1480, mu: 1.15, drag: 0.30, gears: 6, cg: 0.45, df: 0.25 },
+  { id: 'race',             name: 'فورمولا · Formula',      torque: 720,  redline: 11000, top: 345, mass: 800,  mu: 1.4,  drag: 0.50, gears: 7, cg: 0.3,  df: 1.6 },
+  { id: 'race-future',      name: 'المستقبل · Future',      torque: 1150, redline: 12000, top: 420, mass: 900,  mu: 1.6,  drag: 0.42, gears: 8, cg: 0.3,  df: 2.2 },
+];
+for (const c of CARS) c.hp = Math.round(c.torque * c.redline * 0.85 / 7127); // approx peak hp
+
 const car = new THREE.Group(); // physics transform (y-rot only)
 scene.add(car);
-let body = null, steeringWheel = null, steerQ0 = null;
-const wheels = {}; // fl fr rl rr → { spin: Object3D, pivot: Group }
-
+let body = null, steeringWheel = null, steerQ0 = null, current = null, carIdx = 18;
+let wheels = {}; // fl fr rl rr → { spin, pivot, base, pos }
 const draco = new DRACOLoader().setDecoderPath('./vendor/libs/draco/gltf/');
 const loader = new GLTFLoader().setDRACOLoader(draco);
-loader.load('./assets/ferrari.glb', (gltf) => {
-  const model = gltf.scene;
+const cache = {};
+
+function prepFerrari(model) {
   const paint = new THREE.MeshPhysicalMaterial({ color: 0xc00000, metalness: 1, roughness: 0.45, clearcoat: 1, clearcoatRoughness: 0.03 });
   const detail = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: 0.4 });
   const glass = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.25, roughness: 0, transmission: 1 });
   model.getObjectByName('body').material = paint;
   ['rim_fl', 'rim_fr', 'rim_rr', 'rim_rl', 'trim'].forEach((n) => { const o = model.getObjectByName(n); if (o) o.material = detail; });
   model.getObjectByName('glass').material = glass;
-  model.traverse((o) => { if (o.isMesh) { o.castShadow = true; } });
-
-  body = model.getObjectByName('main');
-  for (const k of ['fl', 'fr', 'rl', 'rr']) {
-    const w = model.getObjectByName('wheel_' + k);
-    // wrap each wheel in a pivot so we can steer (y) independently from spinning (x)
-    const pivot = new THREE.Group();
-    pivot.position.copy(w.position);
-    w.parent.add(pivot); pivot.add(w); w.position.set(0, 0, 0);
-    wheels[k] = { spin: w, pivot, base: w.quaternion.clone() };
-  }
-  steeringWheel = model.getObjectByName('steering_wheel');
-  steerQ0 = steeringWheel.quaternion.clone();
-
-  // baked ambient-occlusion shadow (shipped with the model)
   const ao = new THREE.Mesh(new THREE.PlaneGeometry(0.655 * 4, 1.3 * 4).rotateX(-Math.PI / 2),
     new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('./assets/ferrari_ao.png'), blending: THREE.MultiplyBlending, toneMapped: false, transparent: true, premultipliedAlpha: true }));
   ao.position.y = 0.01; ao.renderOrder = 2;
   model.add(ao);
+}
 
-  car.add(model);
-  const l = document.getElementById('loader'); l.style.opacity = 0; setTimeout(() => l.remove(), 500);
-}, undefined, (e) => { document.getElementById('loader').textContent = '⚠️ ' + e.message; });
+function buildCar(spec, gltf) {
+  const isF = spec.id === 'ferrari';
+  const model = gltf.scene.clone(true);
+  const root = new THREE.Group(); // suspension pitch/roll
+  const holder = new THREE.Group(); // orientation/scale → model faces -Z
+  root.add(holder); holder.add(model);
+  if (isF) prepFerrari(model);
+  else { holder.rotation.y = Math.PI; holder.scale.setScalar(spec.scale || 2.1); }
+  model.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+
+  const names = isF ? { fl: 'wheel_fl', fr: 'wheel_fr', rl: 'wheel_rl', rr: 'wheel_rr' }
+                    : { fl: 'wheel-front-left', fr: 'wheel-front-right', rl: 'wheel-back-left', rr: 'wheel-back-right' };
+  const ws = {};
+  root.updateMatrixWorld(true);
+  for (const k in names) {
+    const w = model.getObjectByName(names[k]);
+    const pivot = new THREE.Group();
+    pivot.position.copy(w.position);
+    w.parent.add(pivot); pivot.add(w); w.position.set(0, 0, 0);
+    root.updateMatrixWorld(true);
+    ws[k] = { spin: w, pivot, base: w.quaternion.clone(), pos: pivot.getWorldPosition(new THREE.Vector3()) };
+  }
+  // geometry → physics: put CG at 47% of wheelbase from the front axle
+  const zf = (ws.fl.pos.z + ws.fr.pos.z) / 2, zr = (ws.rl.pos.z + ws.rr.pos.z) / 2;
+  const L = zr - zf, cgz = zf + L * 0.47;
+  holder.position.z = -cgz;
+  for (const k in ws) ws[k].pos.z -= cgz;
+  const box = new THREE.Box3().setFromObject(root);
+  return {
+    root, wheels: ws, a: L * 0.47, b: L * 0.53, wheelR: Math.max(0.2, ws.rl.pos.y), height: box.max.y, length: box.max.z - box.min.z,
+    spinSign: isF ? -1 : 1, steeringWheel: isF ? model.getObjectByName('steering_wheel') : null,
+  };
+}
+
+function specPhysics(spec, geo) {
+  const n = spec.gears, spread = n === 1 ? 1 : (spec.mass > 3000 ? 5 : 3.4);
+  const topRatio = spec.redline * 2 * Math.PI / 60 * geo.wheelR / (spec.top / 3.6);
+  const gears = [];
+  for (let i = 0; i < n; i++) gears.push(topRatio * Math.pow(spread, n === 1 ? 0 : (n - 1 - i) / (n - 1)));
+  Object.assign(P, {
+    mass: spec.mass, inertia: spec.mass * (geo.a + geo.b) ** 2 / 4.5, a: geo.a, b: geo.b, cgH: spec.cg,
+    wheelR: geo.wheelR, mu: spec.mu, gears, reverse: gears[0], final: 1, eff: 0.85,
+    idle: Math.min(1000, spec.redline * 0.3), redline: spec.redline, peak: spec.torque,
+    dragC: spec.drag, rollC: spec.mass * 0.008, df: spec.df || 0,
+    brakeF: spec.mass * 9.81 * Math.min(1.1, spec.mu), handbrakeF: spec.mass * 9.81 * 0.35,
+    maxSteer: spec.steer || 0.62, revMax: Math.min(9, spec.top / 3.6 * 0.3),
+  });
+}
+
+function selectCar(i) {
+  carIdx = (i + CARS.length) % CARS.length;
+  const spec = CARS[carIdx];
+  const url = spec.id === 'ferrari' ? './assets/ferrari.glb' : `./assets/cars/${spec.id}.glb`;
+  toast('⏳ ' + spec.name);
+  const done = (gltf) => {
+    cache[url] = gltf;
+    if (CARS[carIdx] !== spec) return; // user switched again meanwhile
+    const geo = buildCar(spec, gltf);
+    if (current) car.remove(current.root);
+    current = geo; car.add(geo.root);
+    body = geo.root; wheels = geo.wheels;
+    steeringWheel = geo.steeringWheel; steerQ0 = steeringWheel ? steeringWheel.quaternion.clone() : null;
+    specPhysics(spec, geo);
+    Object.assign(S, { vx: 0, vz: 0, w: 0, steer: 0, gear: 1, ax: 0, ay: 0 });
+    toast(`${carIdx + 1}/${CARS.length} · ${spec.name} · ${spec.hp} hp · ${spec.top} km/h`);
+    renderGarage();
+    const l = document.getElementById('loader'); if (l) { l.style.opacity = 0; setTimeout(() => l.remove(), 500); }
+  };
+  if (cache[url]) done(cache[url]);
+  else loader.load(url, done, undefined, (e) => toast('⚠️ ' + e.message));
+}
+
+// garage UI
+const garage = document.getElementById('garage');
+function renderGarage() {
+  const maxHp = Math.max(...CARS.map((c) => c.hp));
+  garage.querySelector('.list').innerHTML = CARS.map((c, i) => `
+    <button class="car-item${i === carIdx ? ' on' : ''}" data-i="${i}">
+      <span class="n">${i + 1}</span>
+      <span class="nm">${c.name}</span>
+      <span class="st">${c.hp} hp · ${c.top} km/h · ${c.mass} kg</span>
+      <span class="bar"><i style="width:${(Math.sqrt(c.hp / maxHp) * 100).toFixed(0)}%"></i></span>
+    </button>`).join('');
+}
+garage.addEventListener('click', (e) => {
+  const b = e.target.closest('.car-item'); if (b) { selectCar(+b.dataset.i); garage.classList.remove('open'); }
+});
+document.getElementById('btn-garage').onclick = () => garage.classList.toggle('open');
+document.getElementById('btn-prev').onclick = () => selectCar(carIdx - 1);
+document.getElementById('btn-next').onclick = () => selectCar(carIdx + 1);
 
 // ───────────────────────── input ─────────────────────────
 const keys = { fwd: 0, back: 0, left: 0, right: 0, hand: 0 };
@@ -120,6 +220,9 @@ addEventListener('keydown', (e) => {
   if (map[e.code]) { keys[map[e.code]] = 1; e.preventDefault(); }
   if (e.code === 'KeyC') cycleCam();
   if (e.code === 'KeyR') resetCar();
+  if (e.code === 'KeyG') garage.classList.toggle('open');
+  if (e.code === 'KeyQ') selectCar(carIdx - 1);
+  if (e.code === 'KeyE') selectCar(carIdx + 1);
   if (e.code === 'KeyH') horn(true);
   if (e.code === 'KeyT') { P.tc = !P.tc; toast(P.tc ? '🛡️ TC: ON' : '🔥 TC: OFF — درِيفت!'); }
   initAudio();
@@ -154,10 +257,10 @@ const P = {
 const S = { x: 0, z: 0, yaw: 0, vx: 0, vz: 0, w: 0, steer: 0, gear: 1, rpm: 1000, ax: 0, ay: 0, wheelRot: 0, shiftT: 0, slipR: 0, slipF: 0 };
 function resetCar() { Object.assign(S, { vx: 0, vz: 0, w: 0, steer: 0, gear: 1, yaw: S.yaw }); }
 
-function torqueCurve(rpm) { // Nm — approx. 4.5 L V8
+function torqueCurve(rpm) {
   if (rpm >= P.redline) return 0;
   const t = rpm / P.redline;
-  return 540 * (0.62 + 0.55 * t - 0.25 * t * t);
+  return P.peak * (0.62 + 0.55 * t - 0.25 * t * t);
 }
 
 function physics(dt) {
@@ -171,7 +274,7 @@ function physics(dt) {
 
   // steering: less lock at speed, smooth rack
   const steerIn = keys.left - keys.right;
-  const lock = P.maxSteer / (1 + speed * speed / 350);
+  const lock = P.maxSteer / (1 + speed * speed / 150);
   const target = steerIn * lock;
   const rate = steerIn ? 2.6 : 4.0;
   S.steer += THREE.MathUtils.clamp(target - S.steer, -rate * dt, rate * dt);
@@ -190,20 +293,20 @@ function physics(dt) {
   S.rpm = Math.max(P.idle, Math.abs(wheelRpm * ratio * P.final));
   if (S.shiftT > 0) S.shiftT -= dt;
   if (S.gear > 0 && S.shiftT <= 0) {
-    if (S.rpm > 8000 && S.gear < 6) { S.gear++; S.shiftT = 0.35; }
-    else if (S.rpm < 3800 && S.gear > 1) { S.gear--; S.shiftT = 0.35; }
+    if (S.rpm > P.redline * 0.94 && S.gear < P.gears.length) { S.gear++; S.shiftT = 0.35; }
+    else if (S.gear > 1 && S.rpm * P.gears[S.gear - 2] / P.gears[S.gear - 1] < P.redline * 0.8) { S.gear--; S.shiftT = 0.35; }
   }
   const shifting = S.shiftT > 0.2;
   let engineF = 0;
   if (throttle && !shifting) {
     engineF = torqueCurve(S.rpm) * ratio * P.final * P.eff / P.wheelR;
-    if (S.gear < 0 && vF < -9) engineF = 0; // reverse speed limit ~ 32 km/h
+    if (S.gear < 0 && vF < -P.revMax) engineF = 0; // reverse speed limit
   }
 
   // weight transfer (uses last step accelerations)
-  const W = P.mass * P.g;
-  const Nf = Math.max(0, W * P.b / L - P.mass * S.ax * P.cgH / L);
-  const Nr = Math.max(0, W * P.a / L + P.mass * S.ax * P.cgH / L);
+  const W = P.mass * P.g; const DF = P.df * speed * speed; // downforce
+  const Nf = Math.max(0, (W + DF) * P.b / L - P.mass * S.ax * P.cgH / L);
+  const Nr = Math.max(0, (W + DF) * P.a / L + P.mass * S.ax * P.cgH / L);
 
   // longitudinal forces
   const sgn = Math.sign(vF) || 0;
@@ -219,10 +322,10 @@ function physics(dt) {
   const vLatR = vR + S.w * P.b;   // lateral velocity at rear axle
   const alphaF = Math.atan2(vLatF, vlong) + S.steer * Math.sign(vF || 1);
   const alphaR = Math.atan2(vLatR, vlong);
-  const tyre = (alpha, N, mu) => { const k = alpha * 9; const f = Math.abs(k) < 1 ? k : Math.sign(k) * (1 - 0.15 * Math.min(1, Math.abs(k) - 1)); return -f * mu * N; };
+  const tyre = (alpha, N, mu, fall) => { const k = alpha * 9; const f = Math.abs(k) < 1 ? k : Math.sign(k) * (1 - fall * Math.min(1, Math.abs(k) - 1)); return -f * mu * N; };
   const muR = keys.hand ? P.mu * 0.45 : P.mu * 1.1; // wider rear tyres → stable understeer balance
-  let FyF = tyre(alphaF, Nf, P.mu);
-  let FyR = tyre(alphaR, Nr, muR);
+  let FyF = tyre(alphaF, Nf, P.mu, 0.15); // front: slight drop past peak → understeer
+  let FyR = tyre(alphaR, Nr, muR, keys.hand ? 0.3 : 0); // rear: holds (stable) unless handbrake
   // friction circle at rear: wheelspin/braking reduces side grip → power oversteer
   const maxR = muR * Nr;
   if (P.tc && FxR > 0) { // traction control: keep drive force inside what the tyre has left
@@ -321,20 +424,23 @@ function updateCamera(dt) {
   const p = car.position;
   const speed = Math.hypot(S.vx, S.vz);
   const mode = CAMS[camMode];
+  const cl = current ? current.length : 4.6, ch = current ? current.height : 1.2;
   let want, look, k = 1 - Math.exp(-dt * 6);
   if (mode === 'chase') {
     // follow the velocity direction a bit so drifts look cool
-    want = p.clone().addScaledVector(f, -6.2 - speed * 0.02).add(new THREE.Vector3(0, 2.1, 0));
+    want = p.clone().addScaledVector(f, -(1.3 * cl + 0.6) - speed * 0.02).add(new THREE.Vector3(0, 0.6 + ch * 1.1, 0));
     look = p.clone().addScaledVector(f, 3).add(new THREE.Vector3(0, 0.8, 0));
   } else if (mode === 'far') {
-    want = p.clone().addScaledVector(f, -13).add(new THREE.Vector3(0, 6, 0));
+    want = p.clone().addScaledVector(f, -(2.8 * cl + 1)).add(new THREE.Vector3(0, 2 + ch * 3, 0));
     look = p.clone().addScaledVector(f, 4);
   } else if (mode === 'cockpit') {
-    want = p.clone().addScaledVector(f, 0.05).addScaledVector(r, -0.35).add(new THREE.Vector3(0, 1.08, 0));
+    want = CARS[carIdx].id === 'ferrari'
+      ? p.clone().addScaledVector(f, 0.05).addScaledVector(r, -0.35).add(new THREE.Vector3(0, 1.08, 0))
+      : p.clone().addScaledVector(f, 0.1 * cl).add(new THREE.Vector3(0, ch + 0.15, 0));
     look = want.clone().addScaledVector(f, 10).add(new THREE.Vector3(0, -0.3, 0));
     k = 1;
   } else {
-    want = p.clone().addScaledVector(r, 6).addScaledVector(f, 1.5).add(new THREE.Vector3(0, 1.2, 0));
+    want = p.clone().addScaledVector(r, 1.3 * cl).addScaledVector(f, 1.5).add(new THREE.Vector3(0, 1.2, 0));
     look = p.clone().add(new THREE.Vector3(0, 0.6, 0));
     k = 1 - Math.exp(-dt * 10);
   }
@@ -356,17 +462,17 @@ function syncVisuals(dt) {
   // suspension: pitch under accel/brake, roll in corners
   pitch += (THREE.MathUtils.clamp(S.ax * 0.006, -0.05, 0.05) - pitch) * Math.min(1, dt * 6);
   roll += (THREE.MathUtils.clamp(S.ay * 0.005, -0.05, 0.05) - roll) * Math.min(1, dt * 6);
-  body.parent.rotation.set(pitch, 0, roll); // model root (includes wheels, small angles — fine)
-  body.parent.position.y = -Math.abs(pitch) * 0.3;
+  body.rotation.set(pitch, 0, roll); // model root (includes wheels, small angles — fine)
+  body.position.y = -Math.abs(pitch) * 0.3;
   for (const k in wheels) {
     const w = wheels[k];
-    _qa.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -S.wheelRot);
+    _qa.setFromAxisAngle(new THREE.Vector3(1, 0, 0), current.spinSign * S.wheelRot);
     w.spin.quaternion.copy(_qa).multiply(w.base);
     w.pivot.rotation.y = k[0] === 'f' ? S.steer : 0;
   }
   // steering wheel (≈ 14:1 rack → ~ 500° lock to lock)
   _qa.setFromAxisAngle(steerAxis, S.steer * 7);
-  steeringWheel.quaternion.copy(steerQ0).multiply(_qa);
+  if (steeringWheel) steeringWheel.quaternion.copy(steerQ0).multiply(_qa);
 
   // skid marks at rear (and front when locking)
   skidTimer += dt;
@@ -374,8 +480,8 @@ function syncVisuals(dt) {
     skidTimer = 0;
     const s = Math.sin(S.yaw), c = Math.cos(S.yaw);
     const place = (lx, lz) => addSkid(S.x + lx * c + lz * s, S.z - lx * s + lz * c, S.yaw);
-    if (S.slipR > 1.2 && Math.hypot(S.vx, S.vz) > 2) { place(-0.82, 1.49); place(0.82, 1.49); }
-    if (S.slipF > 1.3 && Math.hypot(S.vx, S.vz) > 2) { place(-0.84, -1.15); place(0.83, -1.15); }
+    if (S.slipR > 1.2 && Math.hypot(S.vx, S.vz) > 2) { place(wheels.rl.pos.x, wheels.rl.pos.z); place(wheels.rr.pos.x, wheels.rr.pos.z); }
+    if (S.slipF > 1.3 && Math.hypot(S.vx, S.vz) > 2) { place(wheels.fl.pos.x, wheels.fl.pos.z); place(wheels.fr.pos.x, wheels.fr.pos.z); }
   }
 
   elSpeed.textContent = Math.round(Math.abs(S.vF || 0) * 3.6);
@@ -397,6 +503,8 @@ renderer.setAnimationLoop(() => {
   ground.position.set(Math.round(S.x / 16) * 16, 0, Math.round(S.z / 16) * 16);
   renderer.render(scene, camera);
 });
+
+selectCar(carIdx);
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
