@@ -1,59 +1,115 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>برج إيفل · Tour Eiffel 3D</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗼</text></svg>" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0c0e" />
+  <title>Borrowed Light</title>
   <link rel="stylesheet" href="./src/style.css" />
 </head>
 <body>
-  <canvas id="scene"></canvas>
+  <canvas id="game" aria-label="Borrowed Light game view"></canvas>
 
-  <!-- شاشة التحميل -->
-  <div id="loader" aria-hidden="true">
-    <div class="loader-icon">🗼</div>
-    <div class="loader-text">جارٍ بناء البرج…</div>
-    <div class="loader-bar"><span></span></div>
-  </div>
+  <div id="grain"></div>
+  <div id="vignette"></div>
+  <div id="flash"></div>
 
-  <!-- العنوان -->
-  <header class="hud hud-top">
-    <h1>برج إيفل <span class="fr">Tour Eiffel</span></h1>
-    <p class="sub">باريس · 1889 — غوستاف إيفل · نموذج ثلاثي الأبعاد</p>
-  </header>
+  <main id="menu" class="screen">
+    <div class="title-block">
+      <p class="eyebrow">AN ORIGINAL NIGHT STORY</p>
+      <h1>BORROWED<br><span>LIGHT</span></h1>
+      <p class="subtitle">A one-night favour at Alder Row.</p>
+      <div class="menu-actions">
+        <button id="playBtn" class="primary">BEGIN NIGHT <small>CLICK TO PLAY</small></button>
+        <button id="continueBtn" class="secondary" hidden>CONTINUE <small>LAST CHECKPOINT</small></button>
+        <button id="settingsBtn" class="secondary">SETTINGS</button>
+        <button id="creditsBtn" class="secondary">CREDITS</button>
+      </div>
+      <p class="legal">Headphones recommended · Original characters and story</p>
+    </div>
+    <div class="menu-scene-label">ALDER ROW · 11:43 PM · RAIN EXPECTED</div>
+  </main>
 
-  <!-- أزرار التحكم -->
-  <div class="hud hud-actions">
-    <button id="btn-theme" class="chip" title="ليل / نهار">🌙</button>
-    <button id="btn-rotate" class="chip" title="دوران تلقائي">⏸</button>
-    <button id="btn-full" class="chip" title="ملء الشاشة">⛶</button>
-  </div>
+  <section id="settings" class="modal" aria-hidden="true">
+    <div class="panel">
+      <button class="close" data-close="settings">×</button>
+      <p class="eyebrow">DISPLAY</p>
+      <h2>Settings</h2>
+      <label>QUALITY
+        <select id="qualitySelect">
+          <option value="low">LOW</option>
+          <option value="medium">MEDIUM</option>
+          <option value="high" selected>HIGH</option>
+          <option value="ultra">ULTRA</option>
+        </select>
+      </label>
+      <label class="switch-row">FILM GRAIN <input id="grainToggle" type="checkbox" checked><span></span></label>
+      <label class="switch-row">MOTION EFFECTS <input id="motionToggle" type="checkbox" checked><span></span></label>
+      <label class="switch-row">SCREEN VIGNETTE <input id="vignetteToggle" type="checkbox" checked><span></span></label>
+      <p class="settings-note">Quality changes resolution, shadows, view distance and post-processing. Settings save locally.</p>
+    </div>
+  </section>
 
-  <!-- بطاقة المعلومات -->
-  <aside class="hud facts" dir="rtl">
-    <div class="fact"><span class="k">الارتفاع</span><span class="v">330 m</span></div>
-    <div class="fact"><span class="k">الطوابق</span><span class="v">3</span></div>
-    <div class="fact"><span class="k">الوزن الحديدي</span><span class="v">7 300 t</span></div>
-    <div class="fact"><span class="k">سالبات الضوء</span><span class="v">20 000 💡</span></div>
-  </aside>
+  <section id="credits" class="modal" aria-hidden="true">
+    <div class="panel credits-panel">
+      <button class="close" data-close="credits">×</button>
+      <p class="eyebrow">BORROWED LIGHT</p>
+      <h2>Credits</h2>
+      <p>Designed and built as an original interactive browser horror experience.</p>
+      <p class="credit-name">Story &amp; world<br><b>Alder Row, 1999</b></p>
+      <p class="credit-name">Rendering<br><b>Procedural Three.js scene</b></p>
+      <p class="credit-name">Sound<br><b>Generated in-browser ambience</b></p>
+      <p class="settings-note">No third-party game assets are used.</p>
+    </div>
+  </section>
 
-  <!-- تلميح التحكم -->
-  <footer class="hud hint" dir="rtl">
-    🖱️ اسحب للدوران · عجلة الفأرة للتقريب · الزر الأيمن للإزاحة · اضغط <b>N</b> للليل
-  </footer>
+  <section id="hud" aria-live="polite">
+    <div id="chapter" class="chapter"></div>
+    <div id="objective" class="objective"></div>
+    <div id="saveMark" class="save-mark">CHECKPOINT SAVED</div>
+    <div id="notification" class="notification"></div>
+    <div id="subtitle" class="subtitle-box"></div>
+    <div id="crosshair"><i></i></div>
+    <div id="prompt" class="prompt"></div>
+    <div id="inventory" class="inventory"></div>
+    <div id="breath" class="breath"></div>
+    <button id="phoneButton" class="phone-corner" title="Open phone (Q)"><span>▣</span><b id="phoneBadge"></b></button>
+    <div id="controlsHint" class="controls-hint">WASD move · MOUSE look · E interact · SHIFT run · C crouch · Q phone</div>
+  </section>
 
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "./vendor/three.module.js",
-      "three/addons/": "./vendor/"
-    }
-  }
-  </script>
+  <section id="phone" class="phone" aria-hidden="true">
+    <div class="phone-shell">
+      <div class="phone-top"><span>11:43</span><b id="phoneStatus">● ● ●</b><span>86%</span></div>
+      <div id="phoneHome" class="phone-home">
+        <div class="phone-date">FRIDAY, OCTOBER 15</div>
+        <div class="app-grid">
+          <button data-app="messages" class="app msg-app"><i>✉</i><span>Messages</span><b id="messageCount">1</b></button>
+          <button data-app="notes" class="app"><i>▤</i><span>Notes</span></button>
+          <button data-app="photos" class="app"><i>◉</i><span>Photos</span></button>
+          <button data-app="torch" class="app"><i>☼</i><span>Light</span></button>
+          <button data-app="contacts" class="app"><i>●</i><span>Contacts</span></button>
+        </div>
+        <button id="phoneClose" class="phone-close">PRESS Q TO PUT AWAY</button>
+      </div>
+      <div id="phoneApp" class="phone-app" hidden></div>
+    </div>
+  </section>
+
+  <section id="pause" class="pause" aria-hidden="true">
+    <div class="pause-card"><p class="eyebrow">PAUSED</p><h2>Borrowed Light</h2><button id="resumeBtn" class="primary">RESUME</button><button id="pauseSettingsBtn" class="secondary">SETTINGS</button><button id="restartBtn" class="secondary">RESTART NIGHT</button></div>
+  </section>
+
+  <section id="ending" class="screen ending" aria-hidden="true">
+    <div class="ending-content">
+      <p id="endingKicker" class="eyebrow">THE NIGHT ENDS</p>
+      <h2 id="endingTitle">MORNING CALLS</h2>
+      <p id="endingText"></p>
+      <p class="ending-note">Thank you for playing</p>
+      <button id="endingRestart" class="primary">RETURN TO TITLE</button>
+    </div>
+  </section>
+
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>

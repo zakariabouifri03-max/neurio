@@ -1,74 +1,55 @@
-# 🗼 برج إيفل · Tour Eiffel 3D
+# Borrowed Light
 
-نموذج تفاعلي ثلاثي الأبعاد لبرج إيفل مبني بالكامل بشكل إجرائي (procedural) باستخدام **Three.js** — بدون بناء (no build step) وبدون أي CDN خارجي.
+**Borrowed Light** is a complete, original first-person psychological horror game for the browser. It is a self-contained Three.js experience with no build step and no downloaded game assets.
 
-> Interactive 3D model of the Eiffel Tower, fully procedural with Three.js. No build step, no external CDN — everything is vendored.
+> **Premise:** Mara has promised her friend Asha one mundane favour: spend a rainy Friday night at her bungalow on Alder Row, put away the groceries, and wait for morning. The house knows the sounds of its former maintenance contractor better than it should.
 
-![برج إيفل نهارًا](docs/screenshot-day.png)
+## Run
 
-![برج إيفل ليلًا](docs/screenshot-night.png)
-
----
-
-## ✨ المميزات · Features
-
-- 🏗️ **هيكل شبكي إجرائي** — أكثر من 33,000 مثلث مبنية برمجيًا بأبعاد حقيقية:
-  - القاعدة: 124.9 م · الطوابق: 57.6 / 115.7 / 276.1 م · قمة الهوائي: 330 م
-- 🌙 **وضع ليلي / نهاري** — إضاءة ذهبية + محاكاة **20,000 وميض** (الزر أو حرف `N`)
-- ⭐ سماء متدرجة مع نجوم متلألئة ومنارة حمراء وامضة (تحذير الطيران)
-- 🎥 دوران تلقائي يتوقف عند التفاعل
-- 🖱️ تحكم كامل: دوران / تقريب / إزاحة (OrbitControls)
-- 🇲🇦 واجهة عربية RTL بتصميم زجاجي (glassmorphism)
-- 📦 **صفر تبعيات وقت التشغيل** — three.js r170 مرفق داخل `vendor/`
-
-## 🚀 التشغيل · Run
-
-أي خادم ملفات ثابت يكفي:
+Serve the repository as a static site (ES modules cannot be opened directly from `file://`):
 
 ```bash
+cd /home/user/neurio
 python3 -m http.server 3000
-# أو
-npx serve .
 ```
 
-ثم افتح `http://localhost:3000`
+Then open `http://localhost:3000`.
 
-## 🎮 التحكم · Controls
+## Controls
 
-| الفعل | الأداة |
-|---|---|
-| الدوران | سحب بالزر الأيسر / إصبع |
-| التقريب | عجلة الفأرة / قرصة |
-| الإزاحة | الزر الأيمن |
-| ليل / نهار | زر 🌙 أو حرف `N` |
-| دوران تلقائي | زر ⏸ / ▶ |
-| ملء الشاشة | زر ⛶ |
+| Action | Control |
+| --- | --- |
+| Move / look | `WASD` / mouse |
+| Run | `Shift` |
+| Crouch / move quietly | `C` or `Ctrl` |
+| Interact / open / inspect | `E` |
+| Phone | `Q` or phone button |
+| Pause | `Esc` |
 
-## 📁 البنية · Structure
+Headphones are recommended. Click **Begin Night** to enable sound and pointer-lock controls.
 
+## Included game systems
+
+- Full start-to-finish original story across prologue, escalation, survival, ending, and epilogue
+- First-person controller with acceleration, head/hand bob, running, crouching, flashlight, and collision
+- Procedural low-fi Alder Row bungalow, study, bedroom, utility space, garage, rain, street, domestic clutter, lighting, and fog
+- Contextual interaction system for doors, keys, drawers, kettle, breaker, documents, recorder, garage release, hide spot, and inspectable props
+- Small persistent inventory and automatic local checkpoint save / continue
+- Smartphone UI: messages, notes, photos, contacts, flashlight, notifications, and story-critical unknown texts
+- Generated Web Audio cues for wind, hum, latches, footsteps, electrical static, messages, and scares
+- Human antagonist with glimpse, room search, retreat, chase, detection, and recoverable stumble behaviour
+- Randomised minor sounds / light flickers, controlled cinematic events, a wardrobe stealth beat, and garage escape chase
+- In-game pause, credits, quality presets, film grain, vignette, and motion settings
+
+## Originality
+
+All story, writing, characters, models, layout, sound synthesis, interface, and code in this experience are original to **Borrowed Light**. It does not include or reproduce assets, dialogue, characters, locations, or game content from other horror titles.
+
+## Project structure
+
+```text
+index.html       # Game UI and overlays
+src/main.js      # Scene, gameplay, story, AI, audio, save system
+src/style.css    # Low-fi UI, phone, menus, effects
+vendor/          # Vendored Three.js module
 ```
-neurio/
-├── index.html                      # الواجهة
-├── src/
-│   ├── main.js                     # محرك المشهد + بناء البرج إجرائيًا
-│   └── style.css                   # التنسيق (RTL + زجاجية)
-├── vendor/                         # three.js r170 (مرفق — لا حاجة لإنترنت)
-│   ├── three.module.js
-│   ├── controls/OrbitControls.js
-│   └── utils/BufferGeometryUtils.js
-└── docs/                           # لقطات الشاشة
-```
-
-## 🧠 كيف يُبنى البرج؟
-
-كل شيء مرسوم برمجيًا في `src/main.js`:
-
-1. **منحنى جانبي** `w(y) = 3 + 59.5·e^(−y/78)` يحاكي الانفراج الأسطوري للبرج
-2. **4 أعمدة** متقاربة على 41 مستوى + حلقات أفقية + مقطعيات X على كل وجه
-3. **4 أقواس** شبه بيضاوية تحت الطابق الأول (تُصنع بأنابيب `TubeGeometry`)
-4. **منصات** الطوابق الثلاثة + الهوائي وكبينة القمة
-5. كل القضبان تُدمج في **شبكة واحدة** (`mergeGeometries`) للأداء
-
----
-
-صُنع بـ ❤️ باستخدام [Three.js](https://threejs.org) r170 (MIT © mrdoob والمساهمون)
