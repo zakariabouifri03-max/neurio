@@ -14,6 +14,20 @@ No build step, no external CDN — everything is procedural and vendored (Three.
 
 ---
 
+## 📱 Install on your phone — كأنها APK!
+
+The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
+
+1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
+2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
+3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
+
+> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
+
+**Offline play** is built-in: a service worker caches all game files on first visit.
+
+---
+
 ## 🎮 The Game
 
 You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!

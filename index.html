@@ -5,7 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>🏁 Bash Baqi Racing</title>
 <meta name="theme-color" content="#0ea5e9">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bash Baqi">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="src/style.css">
@@ -85,6 +91,7 @@
     <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
     <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
     <div class="spacer"></div>
+    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
     <button id="btnMusic" class="miniBtn">🎵</button>
     <button id="btnSfx" class="miniBtn">🔊</button>
     <button id="btnFull" class="miniBtn">⛶</button>
@@ -134,5 +141,10 @@
 <div id="confetti"></div>
 
 <script type="module" src="src/main.js"></script>
+<script>
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
 </body>
 </html>

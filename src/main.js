@@ -283,6 +283,26 @@ function wireUI() {
     else document.documentElement.requestFullscreen().catch(() => {});
   };
 
+  // 📱 PWA install prompt (Android/desktop Chrome)
+  let deferredPrompt = null;
+  addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    $('btnInstall').hidden = false;
+  });
+  $('btnInstall').onclick = async () => {
+    audio.click();
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice.catch(() => null);
+    deferredPrompt = null;
+    $('btnInstall').hidden = true;
+  };
+  addEventListener('appinstalled', () => {
+    $('btnInstall').hidden = true;
+    game.toast('📱 Installed! See you on the track 🏁');
+  });
+
   // audio unlock + first gesture
   const unlock = () => { audio.unlock(); };
   addEventListener('pointerdown', unlock, { once: true });
