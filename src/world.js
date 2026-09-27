@@ -29,19 +29,25 @@ export const ZONES = {
   festival: { x: -470, z: 140, r: 95 },
   lake: { x: -90, z: 110, r: 105 },
   runway: { x0: -760, x1: -300, z0: -232, z1: -188 },
-  village: { x0: 40, x1: 262, z0: 492, z1: 688, h: 6 },
+  village: { x0: -60, x1: 162, z0: -420, z1: -224, h: 14 },
 };
 function baseHeight(x, z) {
   let h = 7 + fbm(x / 260, z / 260) * 16 + fbm(x / 60, z / 60, 3) * 2;
   const m = ss(-420, -900, z);                                         // north mountains
   const ridge = 1 - Math.abs(fbm(x / 320 + 7, z / 320 + 3, 4));
   h += m * (40 + 170 * ridge * ridge);
-  const edge = ss(880, 1180, Math.max(Math.abs(x), z < 0 ? -z : 0));   // rim hills (not over sea)
+  const edge = ss(880, 1180, Math.max(x < 0 ? -x : 0, z < 0 ? -z : 0));   // rim hills (not over sea)
   h += edge * 90 * (0.6 + 0.4 * vnoise(x / 90, z / 90));
   const east = ss(620, 950, x) * ss(-100, -400, z);                     // wind-farm hills
   h += east * 35;
-  const coast = ss(560, 900, z + fbm(x / 400, 0, 3) * 120);              // south sea
+  // coastline: south sea with a long peninsula below the city, a big bay to the east, an island in the bay
+  const zc = 330 + fbm(x / 300, 1, 3) * 40 + 680 * Math.exp(-(((x - 300) / 150) ** 2)) + 250 * Math.exp(-(((x + 700) / 220) ** 2));
+  const south = ss(0, 200, z - zc);
+  const eastC = ss(0, 200, x - (720 + fbm(z / 250, 5, 3) * 70)) * ss(-460, -260, z);
+  const isl = 1 - ss(90, 200, Math.hypot(x - 1000, z - 420));
+  const coast = Math.max(south, eastC) * (1 - isl);
   h = h * (1 - coast) + (-14) * coast;
+  h += isl * 25 * (0.5 + vnoise(x / 60, z / 60)) * (1 - ss(60, 190, Math.hypot(x - 1000, z - 420)));
   const L = ZONES.lake, dl = Math.hypot(x - L.x, z - L.z);
   h = THREE.MathUtils.lerp(h, -5 - 3 * (1 - dl / L.r), 1 - ss(L.r * 0.55, L.r * 1.25, dl));
   const C = ZONES.city;                                                 // flatten zones
@@ -58,26 +64,27 @@ function baseHeight(x, z) {
 
 // ───────── roads ─────────
 const ROADS_DEF = [
-  { name: 'ring', kind: 'highway', w: 8, loop: true, pts: [[-700, 330], [-300, 470], [100, 430], [480, 380], [760, 170], [820, -200], [620, -470], [200, -540], [-200, -500], [-600, -420], [-880, -120], [-870, 160]] },
-  { name: 'coast', kind: 'rural', w: 6, pts: [[-700, 330], [-620, 600], [-320, 780], [80, 840], [480, 770], [790, 560], [760, 170]] },
+  { name: 'ring', kind: 'highway', w: 8, loop: true, pts: [[-700, 250], [-300, 272], [100, 262], [480, 258], [640, 150], [680, -200], [620, -470], [200, -540], [-200, -500], [-600, -420], [-880, -120], [-870, 160]] },
+  { name: 'coast', kind: 'rural', w: 6, pts: [[100, 262], [240, 330], [300, 470], [270, 620], [330, 780], [300, 930]] },
+  { name: 'west-coast', kind: 'rural', w: 5, pts: [[-700, 250], [-760, 420], [-680, 530], [-560, 470]] },
   { name: 'pass', kind: 'mountain', w: 5, pts: [[-200, -500], [-160, -640], [-320, -760], [-250, -900], [-40, -980], [160, -880], [120, -720], [260, -640], [200, -540]] },
   { name: 'touge', kind: 'mountain', w: 4.5, pts: [[-600, -420], [-700, -560], [-560, -660], [-680, -800], [-480, -860], [-320, -760]] },
   { name: 'festival', kind: 'rural', w: 6, pts: [[-870, 160], [-620, 150], [-470, 140], [-320, 120], [-200, 20], [140, 0]] },
-  { name: 'lake', kind: 'rural', w: 5, loop: true, pts: [[-90, -40], [60, 20], [70, 190], [-60, 260], [-230, 200], [-240, 50]] },
+  { name: 'lake', kind: 'rural', w: 5, loop: true, pts: [[-90, -40], [60, 20], [70, 190], [-60, 230], [-230, 200], [-240, 50]] },
   { name: 'west-hills', kind: 'rural', w: 5, pts: [[-620, 150], [-660, 20], [-640, -120], [-560, -300], [-600, -420]] },
-  { name: 'city-link', kind: 'rural', w: 6, pts: [[560, 0], [700, -20], [820, -200]] },
+  { name: 'city-link', kind: 'rural', w: 6, pts: [[560, 0], [640, -40], [680, -200]] },
   { name: 'north-link', kind: 'rural', w: 6, pts: [[350, -200], [330, -380], [200, -540]] },
-  { name: 'south-link', kind: 'rural', w: 6, pts: [[350, 200], [330, 320], [300, 410]] },
-  { name: 'village-n', kind: 'rural', w: 5, pts: [[151, 492], [150, 455], [140, 430]] },
-  { name: 'village-s', kind: 'rural', w: 5, pts: [[151, 688], [140, 760], [110, 835]] },
+  { name: 'east-hills', kind: 'rural', w: 5, pts: [[620, -470], [520, -330], [560, -230], [560, -200]] },
+  { name: 'village-n', kind: 'rural', w: 5, pts: [[51, -420], [70, -460], [140, -470], [200, -540]] },
+  { name: 'village-s', kind: 'rural', w: 5, pts: [[51, -224], [45, -130], [60, 20]] },
 ];
 // city grid (Tokyo-style blocks)
 for (let x = 140; x <= 560; x += 105) ROADS_DEF.push({ name: 'city', kind: 'city', w: 5.5, flat: 4, pts: [[x, -200], [x, 200]] });
 for (let z = -200; z <= 200; z += 100) ROADS_DEF.push({ name: 'city', kind: 'city', w: 5.5, flat: 4, pts: [[140, z], [560, z]] });
 // village: narrow residential streets
-export const VX = [40, 114, 188, 262], VZ = [492, 557, 622, 688];
-for (const x of VX) ROADS_DEF.push({ name: 'town', kind: 'town', w: 3.2, flat: 6, pts: [[x, 492], [x, 688]] });
-for (const z of VZ) ROADS_DEF.push({ name: 'town', kind: 'town', w: 3.2, flat: 6, pts: [[40, z], [262, z]] });
+export const VX = [-60, 14, 88, 162], VZ = [-420, -355, -290, -224];
+for (const x of VX) ROADS_DEF.push({ name: 'town', kind: 'town', w: 3.2, flat: 14, pts: [[x, -420], [x, -224]] });
+for (const z of VZ) ROADS_DEF.push({ name: 'town', kind: 'town', w: 3.2, flat: 14, pts: [[-60, z], [162, z]] });
 
 function sampleRoad(def) {
   const v = def.pts.map(([x, z]) => new THREE.Vector3(x, 0, z));
@@ -531,7 +538,7 @@ export function buildWorld(scene, renderer) {
       for (const sx of [-2.6, 2.6]) addCircle(x + Math.cos(rot) * sx * s, z - Math.sin(rot) * sx * s, 0.4 * s);
     }
     // torii over the roads into the village and at the lake
-    const t1 = nearestRoad(148, 470, 3).s; torii(t1.x, t1.z, Math.atan2(t1.tx, t1.tz) + Math.PI / 2, 1.5, t1.y);
+    const t1 = nearestRoad(62, -445, 3).s; torii(t1.x, t1.z, Math.atan2(t1.tx, t1.tz) + Math.PI / 2, 1.5, t1.y);
     const lk = roads.find((r) => r.def.name === 'lake').s, t2 = lk[(lk.length * 0.72) | 0]; torii(t2.x, t2.z, Math.atan2(t2.tx, t2.tz) + Math.PI / 2, 1.3, t2.y);
     const houseMat = new THREE.MeshStandardMaterial({ map: houseTexture(renderer), vertexColors: true, roughness: 0.8 });
     const flatMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.7 });
@@ -545,7 +552,7 @@ export function buildWorld(scene, renderer) {
     const vmGeo = [], vmTex = vendingTexture(renderer);
     for (let k = 0; k < 10; k++) {
       const x = VX[(rnd() * VX.length) | 0] + 4.2 * (rnd() < 0.5 ? 1 : -1), z = VZ[0] + 10 + rnd() * (VZ[VZ.length - 1] - VZ[0] - 20);
-      const g = new THREE.BoxGeometry(0.9, 1.85, 0.75); g.rotateY(x > 150 ? -Math.PI / 2 : Math.PI / 2); g.translate(x, V.h + 0.93, z); vmGeo.push(g); addCircle(x, z, 0.6);
+      const g = new THREE.BoxGeometry(0.9, 1.85, 0.75); g.rotateY(x > 51 ? -Math.PI / 2 : Math.PI / 2); g.translate(x, V.h + 0.93, z); vmGeo.push(g); addCircle(x, z, 0.6);
     }
     const vm = new THREE.Mesh(mergeGeometries(vmGeo), new THREE.MeshStandardMaterial({ map: vmTex, emissive: 0xffffff, emissiveMap: vmTex, emissiveIntensity: 0.35 })); vm.castShadow = true; scene.add(vm);
   }
