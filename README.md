@@ -72,3 +72,23 @@ neurio/
 ---
 
 صُنع بـ ❤️ باستخدام [Three.js](https://threejs.org) r170 (MIT © mrdoob والمساهمون)
+
+---
+
+## 🏎️ سوق الطوموبيل · Drive the Ferrari (`car.html`)
+
+عالم خاوي وفيراري 458 ثلاثية الأبعاد (الموديل جاي من [mrdoob/three.js](https://github.com/mrdoob/three.js/tree/r170/examples/models/gltf) على GitHub) — كتمشي بحال طوموبيل حقيقية:
+
+- فيزياء: slip ديال الروايض، friction circle، نقل الوزن، بواط أوطوماتيك 6 فيتيسات + أريير، drag الهوا
+- فرين اليد للدريفت، TC كيتطفى بـ `T`، آثار الروايض فالأرض، صوت موتور V8 مصنّع
+- 4 كاميرات (`C`)، أزرار لمس للتيليفون
+
+| زر | فعل |
+|---|---|
+| `W`/`↑` | أكسيليراتور |
+| `S`/`↓` | فرين / أريير |
+| `A` `D` / `←` `→` | الفولان |
+| `Space` | فرين اليد |
+| `C` / `R` / `H` / `T` | كاميرا / reset / كلاكسون / TC |
+
+Ferrari 458 model by vicent091036 (CC-BY 4.0), via three.js examples.

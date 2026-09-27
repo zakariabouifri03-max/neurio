@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Ferrari 458 · سوق الطوموبيل</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏎️</text></svg>" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: system-ui, "Segoe UI", Tahoma, sans-serif; color: #fff; user-select: none; -webkit-user-select: none; touch-action: none; }
+    canvas { display: block; }
+    .glass { background: rgba(10, 14, 22, .55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; }
+    #loader { position: fixed; inset: 0; display: grid; place-items: center; background: #0b0f17; z-index: 10; font-size: 18px; transition: opacity .5s; }
+    #speedo { position: fixed; right: 20px; bottom: 20px; padding: 14px 22px; text-align: center; min-width: 150px; }
+    #speed { font-size: 52px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+    #speedo small { opacity: .7; font-size: 13px; }
+    #gear { position: absolute; top: 10px; left: 12px; font-size: 20px; font-weight: 700; color: #ffcc33; }
+    #rpmbar { height: 6px; margin-top: 8px; background: rgba(255,255,255,.15); border-radius: 3px; overflow: hidden; }
+    #rpmbar span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #3cf, #fc3 70%, #f33); }
+    #help { position: fixed; top: 16px; right: 16px; padding: 12px 16px; font-size: 14px; line-height: 1.8; direction: rtl; }
+    #help b { display: inline-block; min-width: 26px; padding: 0 6px; margin-left: 4px; text-align: center; border-radius: 5px; background: rgba(255,255,255,.18); }
+    #top { position: fixed; top: 16px; left: 16px; display: flex; gap: 8px; }
+    #top button, #top a { font: inherit; color: #fff; text-decoration: none; cursor: pointer; padding: 8px 12px; }
+    #touch { position: fixed; inset: auto 0 20px 0; display: none; justify-content: space-between; padding: 0 20px; pointer-events: none; }
+    #touch .grp { display: flex; gap: 12px; pointer-events: auto; }
+    #touch button { width: 72px; height: 72px; font-size: 28px; color: #fff; border-radius: 50%; }
+    #touch button.on { background: rgba(255,204,51,.5); }
+    @media (pointer: coarse) { #touch { display: flex; } #help { display: none; } #speedo { bottom: 110px; } }
+  </style>
+</head>
+<body>
+  <div id="loader">🏎️ كنشارجي الطوموبيل…</div>
+
+  <div id="help" class="glass">
+    <div><b>W</b> / <b>↑</b> زيد (أكسيليراتور)</div>
+    <div><b>S</b> / <b>↓</b> فرين / أريير</div>
+    <div><b>A D</b> / <b>← →</b> لفّ الفولان</div>
+    <div><b>Space</b> فرين ديال اليد (درِيفت)</div>
+    <div><b>C</b> بدّل الكاميرا · <b>R</b> رجّع الطوموبيل · <b>H</b> كلاكسون</div>
+    <div><b>T</b> تحكم فالجرّ (TC) — طفيه باش تدريفتي</div>
+  </div>
+
+  <div id="top">
+    <button id="btn-sound" class="glass">🔇 الصوت</button>
+    <button id="btn-cam" class="glass">🎥 كاميرا</button>
+    <a href="./index.html" class="glass">🗼</a>
+  </div>
+
+  <div id="speedo" class="glass">
+    <div id="gear">N</div>
+    <div id="speed">0</div>
+    <small>km/h</small>
+    <div id="rpmbar"><span></span></div>
+  </div>
+
+  <div id="touch">
+    <div class="grp">
+      <button class="glass" data-k="left">◀</button>
+      <button class="glass" data-k="right">▶</button>
+    </div>
+    <div class="grp">
+      <button class="glass" data-k="hand">✋</button>
+      <button class="glass" data-k="back">⏬</button>
+      <button class="glass" data-k="fwd">⏫</button>
+    </div>
+  </div>
+
+  <script type="importmap">
+  { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/" } }
+  </script>
+  <script type="module" src="./src/car.js"></script>
+</body>
+</html>
