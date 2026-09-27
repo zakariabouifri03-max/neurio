@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { buildWorld } from './world.js';
 
 // ───────────────────────── renderer / scene ─────────────────────────
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -18,10 +19,10 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 const SKY = 0xbfd6ea;
 scene.background = new THREE.Color(SKY);
-scene.fog = new THREE.Fog(SKY, 80, 600);
+scene.fog = new THREE.Fog(SKY, 250, 1700);
 scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
 
-const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 2000);
+const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 4000);
 
 scene.add(new THREE.HemisphereLight(0xffffff, 0x556070, 1.2));
 const sun = new THREE.DirectionalLight(0xffffff, 2.2);
@@ -31,31 +32,16 @@ Object.assign(sun.shadow.camera, { left: -15, right: 15, top: 15, bottom: -15, n
 sun.shadow.bias = -0.0005;
 scene.add(sun, sun.target);
 
-// ───────────────────────── empty world: endless grid ground ─────────────────────────
-function gridTexture() {
-  const c = document.createElement('canvas'); c.width = c.height = 512;
-  const g = c.getContext('2d');
-  g.fillStyle = '#6d747c'; g.fillRect(0, 0, 512, 512);
-  for (let i = 0; i < 4000; i++) { // asphalt noise
-    const v = 90 + Math.random() * 40 | 0;
-    g.fillStyle = `rgba(${v},${v},${v + 5},.35)`;
-    g.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
-  }
-  g.strokeStyle = 'rgba(255,255,255,.25)'; g.lineWidth = 2;
-  for (let i = 0; i <= 512; i += 64) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 512); g.moveTo(0, i); g.lineTo(512, i); g.stroke(); }
-  g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 4; g.strokeRect(0, 0, 512, 512);
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(250, 250); // each tile = 16 m, lines every 2 m
-  t.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000),
-  new THREE.MeshStandardMaterial({ map: gridTexture(), roughness: 0.95 }));
-ground.rotation.x = -Math.PI / 2;
-ground.receiveShadow = true;
-scene.add(ground);
+// ───────────────────────── open world ─────────────────────────
+// sky dome (gradient) — rendered behind everything, follows the camera
+const skyDome = new THREE.Mesh(new THREE.SphereGeometry(3000, 32, 16), new THREE.ShaderMaterial({
+  side: THREE.BackSide, depthWrite: false, fog: false,
+  vertexShader: 'varying vec3 vp; void main(){ vp = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }',
+  fragmentShader: 'varying vec3 vp; void main(){ float h = vp.y; vec3 top = vec3(.22,.45,.82), hor = vec3(.75,.84,.92), gnd = vec3(.62,.7,.76);'
+    + ' vec3 c = h > 0. ? mix(hor, top, pow(h, .55)) : gnd; vec3 sd = normalize(vec3(.5,.55,.3)); c += vec3(1.,.9,.7) * pow(max(dot(vp, sd), 0.), 400.) * 2.; c += vec3(1.,.8,.5) * pow(max(dot(vp, sd), 0.), 8.) * .25; gl_FragColor = vec4(c,1.); }',
+}));
+skyDome.renderOrder = -1; scene.add(skyDome);
+const world = buildWorld(scene, renderer);
 
 // ───────────────────────── skid marks ─────────────────────────
 const SKID_MAX = 6000;
@@ -66,7 +52,7 @@ scene.add(skids);
 let skidIdx = 0; const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _up = new THREE.Vector3(0, 1, 0);
 function addSkid(x, z, yaw) {
   _q.setFromAxisAngle(_up, yaw);
-  _m.compose(new THREE.Vector3(x, 0.012, z), _q, new THREE.Vector3(1, 1, 1));
+  _m.compose(new THREE.Vector3(x, world.heightAt(x, z) + 0.1, z), _q, new THREE.Vector3(1, 1, 1));
   skids.setMatrixAt(skidIdx, _m);
   skidIdx = (skidIdx + 1) % SKID_MAX;
   skids.count = Math.min(skids.count + 1, SKID_MAX);
@@ -146,7 +132,7 @@ function buildCar(spec, gltf) {
   for (const k in ws) ws[k].pos.z -= cgz;
   const box = new THREE.Box3().setFromObject(root);
   return {
-    root, wheels: ws, a: L * 0.47, b: L * 0.53, wheelR: Math.max(0.2, ws.rl.pos.y), height: box.max.y, length: box.max.z - box.min.z,
+    root, wheels: ws, a: L * 0.47, b: L * 0.53, wheelR: Math.max(0.2, ws.rl.pos.y), height: box.max.y, length: box.max.z - box.min.z, width: box.max.x - box.min.x,
     spinSign: -1, steeringWheel: isF ? model.getObjectByName('steering_wheel') : null,
   };
 }
@@ -251,7 +237,8 @@ const P = {
   tc: true,
 };
 const S = { x: 0, z: 0, yaw: 0, vx: 0, vz: 0, w: 0, steer: 0, gear: 1, rpm: 1000, ax: 0, ay: 0, wheelRot: 0, shiftT: 0, slipR: 0, slipF: 0 };
-function resetCar() { Object.assign(S, { vx: 0, vz: 0, w: 0, steer: 0, gear: 1, yaw: S.yaw }); }
+function resetCar() { const sp = world.spawnNear(S.x, S.z); Object.assign(S, { x: sp.x, z: sp.z, yaw: sp.yaw, vx: 0, vz: 0, w: 0, steer: 0, gear: 1, ax: 0, ay: 0 }); }
+{ const F = world.spawnNear(-340, 110); Object.assign(S, { x: F.x, z: F.z, yaw: F.yaw }); } // start next to the festival
 
 function torqueCurve(rpm) {
   if (rpm >= P.redline) return 0;
@@ -320,8 +307,10 @@ function physics(dt) {
   const alphaF = Math.atan2(vLatF, vlong) + S.steer * Math.sign(vF || 1);
   const alphaR = Math.atan2(vLatR, vlong);
   const tyre = (alpha, N, mu, fall) => { const k = alpha * 9; const f = Math.abs(k) < 1 ? k : Math.sign(k) * (1 - fall * Math.min(1, Math.abs(k) - 1)); return -f * mu * N; };
-  const muR = keys.hand ? P.mu * 0.45 : P.mu * 1.1; // wider rear tyres → stable understeer balance
-  let FyF = tyre(alphaF, Nf, P.mu, 0.15); // front: slight drop past peak → understeer
+  const surf = S.surf || { mu: 1, drag: 0 };
+  const muS = P.mu * surf.mu;
+  const muR = keys.hand ? muS * 0.45 : muS * 1.1; // wider rear tyres → stable understeer balance
+  let FyF = tyre(alphaF, Nf, muS, 0.15); // front: slight drop past peak → understeer
   let FyR = tyre(alphaR, Nr, muR, keys.hand ? 0.3 : 0); // rear: holds (stable) unless handbrake
   // friction circle at rear: wheelspin/braking reduces side grip → power oversteer
   const maxR = muR * Nr;
@@ -331,7 +320,7 @@ function physics(dt) {
   }
   FxR = THREE.MathUtils.clamp(FxR, -maxR, maxR);
   FyR *= Math.sqrt(Math.max(0, 1 - (FxR / maxR) ** 2)) || 0;
-  const maxF = P.mu * Nf; FxF = THREE.MathUtils.clamp(FxF, -maxF, maxF);
+  const maxF = muS * Nf; FxF = THREE.MathUtils.clamp(FxF, -maxF, maxF);
   S.slipR = Math.abs(alphaR) * 9 + (engineF > maxR * 1.05 ? 1.5 : 0) + (keys.hand && speed > 3 ? 1.5 : 0);
   S.slipF = Math.abs(alphaF) * 9 + (brake && speed > 3 && FxF === -sgn * maxF ? 1.2 : 0);
 
@@ -343,6 +332,11 @@ function physics(dt) {
   let Flong = FxR + fF_long;
   let Flat = FyR + fF_lat;
   Flong -= P.dragC * vF * Math.abs(vF) + P.rollC * vF;
+  // off-road drag (sand/water) + gravity along the slope
+  Flong -= P.mass * surf.drag * 0.1 * vF;
+  Flat -= P.mass * surf.drag * 0.3 * vR;
+  Flong -= P.mass * P.g * Math.sin(S.slopeP || 0);
+  Flat -= P.mass * P.g * Math.sin(S.slopeR || 0);
   Flat -= P.dragC * 2 * vR * Math.abs(vR);
 
   // yaw torque: front lateral acts at +a (forward), rear at -b
@@ -357,6 +351,20 @@ function physics(dt) {
   if (speed < 0.3 && !throttle) { S.vx *= 0.9; S.vz *= 0.9; S.w *= 0.8; }
   S.yaw += S.w * dt;
   S.x += S.vx * dt; S.z += S.vz * dt;
+  // collisions: three circles along the car body
+  const rad = current ? Math.max(0.8, current.width / 2 - 0.1) : 1;
+  for (const off of [-P.a * 0.85, 0, P.b * 0.85]) {
+    const hit = world.collide(S.x + fx * off, S.z + fz * off, rad);
+    if (!hit) continue;
+    S.x += hit.nx * hit.pen; S.z += hit.nz * hit.pen;
+    const vn = S.vx * hit.nx + S.vz * hit.nz;
+    if (vn < 0) {
+      S.vx -= 1.35 * vn * hit.nx; S.vz -= 1.35 * vn * hit.nz;   // bounce (35 % restitution)
+      S.vx *= 0.9; S.vz *= 0.9;
+      S.w += (off * (fx * hit.nz - fz * hit.nx)) * vn * 0.08;     // spin from off-centre hits
+      if (-vn > 4) S.crash = Math.min(1, -vn / 25);
+    }
+  }
   S.wheelRot += (vF / P.wheelR) * dt;
   S.vF = vF;
 }
@@ -552,7 +560,9 @@ function updateCamera(dt) {
     look = p.clone().add(new THREE.Vector3(0, 0.6, 0));
     k = 1 - Math.exp(-dt * 10);
   }
+  if (mode !== 'cockpit') { const gh = world.heightAt(want.x, want.z) + 0.6; if (want.y < gh) want.y = gh; }
   camPos.lerp(want, k); camLook.lerp(look, mode === 'cockpit' ? 1 : 1 - Math.exp(-dt * 12));
+  if (mode !== 'cockpit') camPos.y = Math.max(camPos.y, world.heightAt(camPos.x, camPos.z) + 0.5);
   camera.position.copy(camPos); camera.lookAt(camLook);
   const fovT = 60 + Math.min(speed, 90) * 0.18;
   camera.fov += (fovT - camera.fov) * k; camera.updateProjectionMatrix();
@@ -563,9 +573,25 @@ const elSpeed = document.getElementById('speed'), elGear = document.getElementBy
 const _e = new THREE.Euler(), _qa = new THREE.Quaternion(), steerAxis = new THREE.Vector3(0, 1, 0).applyAxisAngle(new THREE.Vector3(1, 0, 0), 0.35).normalize();
 let pitch = 0, roll = 0, skidTimer = 0;
 
+let groundY = 0;
+function terrainPose() {
+  // sample terrain under the 4 wheels → height, pitch, roll
+  const s = Math.sin(S.yaw), c = Math.cos(S.yaw), a = P.a, b = P.b, tw = current ? current.width * 0.4 : 0.8;
+  const at = (lx, lz) => world.heightAt(S.x + lx * c + lz * s, S.z - lx * s + lz * c);
+  const fl = at(-tw, -a), fr = at(tw, -a), rl = at(-tw, b), rr = at(tw, b);
+  const hF = (fl + fr) / 2, hR = (rl + rr) / 2, hL = (fl + rl) / 2, hRt = (fr + rr) / 2;
+  S.slopeP = Math.atan2(hF - hR, a + b);
+  S.slopeR = Math.atan2(hRt - hL, 2 * tw);
+  return (hF * b + hR * a) / (a + b);
+}
 function syncVisuals(dt) {
-  car.position.set(S.x, 0, S.z);
-  car.rotation.y = S.yaw;
+  const gy = terrainPose();
+  groundY += (gy - groundY) * Math.min(1, dt * 25);
+  car.position.set(S.x, groundY, S.z);
+  car.rotation.set(S.slopeP || 0, S.yaw, S.slopeR || 0, 'YXZ');
+  S.surf = world.surfaceAt(S.x, S.z);
+  if (S.surf.name === 'water' && S.surf.depth > 1.1) { toast('🌊 الطوموبيل دخلات للما — رجعناك للطريق'); resetCar(); }
+  if (S.crash) { toast('💥'); S.crash = 0; }
   if (!body) return;
   // suspension: pitch under accel/brake, roll in corners
   pitch += (THREE.MathUtils.clamp(S.ax * 0.006, -0.05, 0.05) - pitch) * Math.min(1, dt * 6);
@@ -606,11 +632,36 @@ renderer.setAnimationLoop(() => {
   syncVisuals(dt);
   updateCamera(dt);
   updateAudio(dt);
-  // shadow camera + ground follow the car (endless world)
-  sun.position.set(S.x + 20, 35, S.z + 12); sun.target.position.set(S.x, 0, S.z);
-  ground.position.set(Math.round(S.x / 16) * 16, 0, Math.round(S.z / 16) * 16);
+  // shadow camera follows the car; sky dome follows the camera
+  sun.position.set(S.x + 20, groundY + 35, S.z + 12); sun.target.position.set(S.x, groundY, S.z);
+  skyDome.position.copy(camera.position);
+  world.update(clock.elapsedTime);
+  drawMinimap();
   renderer.render(scene, camera);
 });
+
+// ───────────────────────── minimap ─────────────────────────
+const mmCanvas = document.getElementById('minimap'), mmCtx = mmCanvas.getContext('2d');
+const elSurf = document.getElementById('surface');
+const SURF_AR = { asphalt: '🛣️ زفت', grass: '🌿 عشب', sand: '🏖️ رملة', snow: '❄️ ثلج', water: '🌊 ما' };
+let lastSurf = '';
+function drawMinimap() {
+  const W = mmCanvas.width, R = W / 2, scale = 2.6; // px per minimap texel
+  const mpp = world.size / world.minimap.width;       // metres per texel
+  const cx = (S.x + world.size / 2) / mpp, cz = (S.z + world.size / 2) / mpp;
+  mmCtx.save(); mmCtx.clearRect(0, 0, W, W);
+  mmCtx.beginPath(); mmCtx.arc(R, R, R - 2, 0, 7); mmCtx.clip();
+  mmCtx.translate(R, R); mmCtx.rotate(S.yaw); mmCtx.scale(scale, scale); mmCtx.translate(-cx, -cz); // heading-up
+  mmCtx.drawImage(world.minimap, 0, 0);
+  mmCtx.restore();
+  mmCtx.fillStyle = '#ffcc33'; mmCtx.strokeStyle = '#000'; mmCtx.lineWidth = 2;
+  mmCtx.beginPath(); mmCtx.moveTo(R, R - 9); mmCtx.lineTo(R + 6, R + 7); mmCtx.lineTo(R, R + 3); mmCtx.lineTo(R - 6, R + 7); mmCtx.closePath(); mmCtx.stroke(); mmCtx.fill();
+  // north marker
+  const na = S.yaw; mmCtx.fillStyle = '#fff'; mmCtx.font = 'bold 13px system-ui'; mmCtx.textAlign = 'center';
+  mmCtx.fillText('N', R + (R - 12) * Math.sin(na), R - (R - 12) * Math.cos(na) + 4);
+  mmCtx.strokeStyle = 'rgba(255,255,255,.5)'; mmCtx.lineWidth = 3; mmCtx.beginPath(); mmCtx.arc(R, R, R - 2, 0, 7); mmCtx.stroke();
+  const sn = S.surf ? S.surf.name : ''; if (sn !== lastSurf) { lastSurf = sn; elSurf.textContent = SURF_AR[sn] || ''; }
+}
 
 selectCar(carIdx);
 addEventListener('error', (e) => toast('⚠️ ' + e.message));

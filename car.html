@@ -36,11 +36,14 @@
     .car-item .st { grid-area: st; font-size: 12px; opacity: .75; direction: ltr; text-align: right; }
     .car-item .bar { grid-area: bar; height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; overflow: hidden; }
     .car-item .bar i { display: block; height: 100%; background: linear-gradient(90deg, #3cf, #fc3 60%, #f33); margin-right: 0; margin-left: auto; }
-    @media (pointer: coarse) { #touch { display: flex; } #help { display: none; } #speedo { bottom: 110px; } }
+    #minimap { position: fixed; left: 16px; bottom: 16px; width: 190px; height: 190px; border-radius: 50%; box-shadow: 0 4px 20px rgba(0,0,0,.4); }
+    #surface { position: fixed; left: 60px; bottom: 214px; padding: 4px 10px; font-size: 13px; }
+    #surface:empty { display: none; }
+    @media (pointer: coarse) { #minimap { width: 120px; height: 120px; bottom: auto; top: 64px; left: auto; right: 12px; } #surface { display: none; } #touch { display: flex; } #help { display: none; } #speedo { bottom: 110px; } }
   </style>
 </head>
 <body>
-  <div id="loader">🏎️ كنشارجي الطوموبيل…</div>
+  <div id="loader">🌍 كنبنيو العالم…</div>
 
   <div id="help" class="glass">
     <div><b>W</b> / <b>↑</b> زيد (أكسيليراتور)</div>
@@ -48,6 +51,7 @@
     <div><b>A D</b> / <b>← →</b> لفّ الفولان</div>
     <div><b>Space</b> فرين ديال اليد (درِيفت)</div>
     <div><b>C</b> بدّل الكاميرا · <b>R</b> رجّع الطوموبيل · <b>H</b> كلاكسون</div>
+    <div>🗺️ عالم مفتوح: جبال، بحر، مدينة، فيستيفال، مطار — خرج من الطريق وشوف!</div>
     <div><b>G</b> الكاراج · <b>Q</b> / <b>E</b> الطوموبيل اللي قبل / اللي بعد</div>
     <div><b>T</b> تحكم فالجرّ (TC) — طفيه باش تدريفتي</div>
   </div>
@@ -65,6 +69,9 @@
     <h3>🚗 الكاراج — من الضعيفة للأقوى</h3>
     <div class="list"></div>
   </div>
+
+  <canvas id="minimap" width="190" height="190"></canvas>
+  <div id="surface" class="glass"></div>
 
   <div id="speedo" class="glass">
     <div id="gear">N</div>
@@ -88,6 +95,6 @@
   <script type="importmap">
   { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/" } }
   </script>
-  <script type="module" src="./src/car.js?v=5"></script>
+  <script type="module" src="./src/car.js?v=6"></script>
 </body>
 </html>
