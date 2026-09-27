@@ -94,10 +94,10 @@ neurio/
 | `C` / `R` / `H` / `T` | كاميرا / reset / كلاكسون / TC |
 | `G` / `Q` / `E` | الكاراج / اللي قبل / اللي بعد |
 
-### 🚗 الكاراج — 21 طوموبيل (`G`، `Q` / `E`)
+### 🚗 الكاراج — 18 طوموبيل واقعية (`G`، `Q` / `E`)
 
-من الضعيفة للأقوى: جرّافة → تراكتور → كاميو الزبل → بلاطو → كاميو → لپومپيي → ديليفري → فاركونيط → لانبيلانس → طاكسي → كارتينغ → سيدان → SUV → كارتينغ سبور → البوليس → SUV لوكس → هاتشباك → سيدان سبور → **فيراري 458** → فورمولا → **المستقبل** (420 km/h).
+من الضعيفة للأقوى: Mercedes 190E Evo → Shelby GT350 '65 → Mustang Mach 1 '69 → Shelby Cobra GT500 '67 → Porsche 911 (930) Turbo → Toyota Supra '98 → Rolls-Royce Ghost → Ford F-150 Raptor R → Jaguar F-Type R → Shelby GT350R → Aston Martin DB11 → BMW M8 Competition → Shelby GT500 '20 → Porsche 911 GT3 (992) → **Ferrari 458** → Audi R8 V10 → Ford GT → **Koenigsegg CCGT**.
 
-كل وحدة عندها الموتور ديالها (Nm، rpm، عدد الفيتيسات)، الوزن، الگريپ والـ downforce — الفيتيسات كتحسب أوطوماتيك من قطر الروايض والسرعة القصوى.
+كل وحدة بالأرقام الحقيقية ديالها تقريبا (hp، Nm، rpm، الوزن، عدد الفيتيسات، السرعة القصوى).
 
-Models: Ferrari 458 by vicent091036 (CC-BY 4.0) via three.js examples · 20 vehicles from Kenney Car Kit (CC0) via [Arslan12216775/kenney_car-kit](https://github.com/Arslan12216775/kenney_car-kit).
+الموديلات جاية من GitHub (أصلها Sketchfab) — ضغطناهم (Draco + WebP)، دورناهم وقيسناهم بالمتر، وجمعنا الروايض باش يدورو. المؤلفين والرخص (CC-BY / CC-BY-NC(-SA)) فـ [`assets/real/LICENSES.txt`](assets/real/LICENSES.txt). Ferrari 458 by vicent091036 (CC-BY 4.0) via three.js examples.

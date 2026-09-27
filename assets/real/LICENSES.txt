@@ -1,0 +1,105 @@
+3D car models used in car.html (downloaded from GitHub repos, originally from Sketchfab).
+Optimized (Draco + WebP) and re-oriented/re-scaled; wheels regrouped for animation.
+
+== assets/real/merc190.glb  (via https://github.com/FRAGG33R/mercedes-190-evo-3d/tree/HEAD/public/Models/mercedes_190e_evo)
+* title:	Mercedes 190E EVO 1982 3D Model Free
+* author:	Betier Models (https://sketchfab.com/betier)
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "Mercedes 190E EVO 1982 3D Model Free" (https://sketchfab.com/3d-models/mercedes-190e-evo-1982-3d-model-free-15e5576f4b724f2db357165caed3492b) by Betier Models (https://sketchfab.com/betier) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+== assets/real/supra.glb  (via https://github.com/anvnh/auto_showroom/tree/HEAD/client/public/3d/supra)
+* title:	1998 Toyota Supra
+* author:	BHP3D (https://sketchfab.com/BHP3D)
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "1998 Toyota Supra" (https://sketchfab.com/3d-models/1998-toyota-supra-b9ee69e17af947c0bce1c54d34195187) by BHP3D (https://sketchfab.com/BHP3D) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+== assets/real/raptor.glb  (via https://github.com/leomaxvj/fordegarage/tree/HEAD/public/models/2024_ford_f-150_raptor_r)
+* title:	2024 Ford F-150 Raptor R
+* author:	Ddiaz Design (https://sketchfab.com/ddiaz-design)
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+This work is based on "2024 Ford F-150 Raptor R" (https://sketchfab.com/3d-models/2024-ford-f-150-raptor-r-91aedf1119724f3396dcfe87686545c1) by Ddiaz Design (https://sketchfab.com/ddiaz-design) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+== assets/real/gt350_65.glb  (via https://github.com/leomaxvj/fordegarage/tree/HEAD/public/models/1965_ford_mustang_shelby_gt350)
+* title:	1965 Ford Mustang Shelby GT350
+* author:	Ddiaz Design (https://sketchfab.com/ddiaz-design)
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+This work is based on "1965 Ford Mustang Shelby GT350" (https://sketchfab.com/3d-models/1965-ford-mustang-shelby-gt350-12430f4d23ff40a6932963147a65a922) by Ddiaz Design (https://sketchfab.com/ddiaz-design) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+== assets/real/gt500_67.glb  (via https://github.com/leomaxvj/fordegarage/tree/HEAD/public/models/1967_ford_mustang_shelby_cobra_gt500)
+* title:	1967 Ford Mustang Shelby Cobra GT500
+* author:	Ddiaz Design (https://sketchfab.com/ddiaz-design)
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+This work is based on "1967 Ford Mustang Shelby Cobra GT500" (https://sketchfab.com/3d-models/1967-ford-mustang-shelby-cobra-gt500-e310cc7537bf4d1aa644a2c233a5fec6) by Ddiaz Design (https://sketchfab.com/ddiaz-design) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+== assets/real/mach1.glb  (via https://github.com/leomaxvj/fordegarage/tree/HEAD/public/models/1969_ford_mustang_mach-1_428_cobra_jet)
+* title:	1969 Ford Mustang Mach-1 428 Cobra Jet
+* author:	Ddiaz Design (https://sketchfab.com/ddiaz-design)
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+This work is based on "1969 Ford Mustang Mach-1 428 Cobra Jet" (https://sketchfab.com/3d-models/1969-ford-mustang-mach-1-428-cobra-jet-679cdf81b9854759860b0afe9d1e4012) by Ddiaz Design (https://sketchfab.com/ddiaz-design) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+== assets/real/p930.glb  (via https://github.com/Hyptofon/Home_Tree.js/tree/HEAD/public/models/sketchfab/cars/porsche_911_930)
+* title:	Porsche 911 (930) Turbo 1975
+* author:	Lexyc16 (https://sketchfab.com/Lexyc16)
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "Porsche 911 (930) Turbo 1975" (https://sketchfab.com/3d-models/porsche-911-930-turbo-1975-de1ffd344c41481892511f7fd332c136) by Lexyc16 (https://sketchfab.com/Lexyc16) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+== assets/real/ghost.glb  (via https://github.com/anvnh/auto_showroom/tree/HEAD/client/public/3d/rollsroyce_ghost)
+* title:	Rolls Royce Ghost
+* author:	Jagguz_wrld (https://sketchfab.com/jagathkrishna148)
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "Rolls Royce Ghost" (https://sketchfab.com/3d-models/rolls-royce-ghost-a45a10b1225644739475f8dd541f8875) by Jagguz_wrld (https://sketchfab.com/jagathkrishna148) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+== assets/real/gt350r.glb  (via https://github.com/leomaxvj/fordegarage/tree/HEAD/public/models/2016_ford_mustang_shelby_gt350r)
+* title:	2016 Ford Mustang Shelby GT350R
+* author:	Ddiaz Design (https://sketchfab.com/ddiaz-design)
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+This work is based on "2016 Ford Mustang Shelby GT350R" (https://sketchfab.com/3d-models/2016-ford-mustang-shelby-gt350r-1d03bb121b6e4371b0978dc584b788d8) by Ddiaz Design (https://sketchfab.com/ddiaz-design) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+== assets/real/ftype.glb  (via https://github.com/adeebjamil/LovocarZ/tree/HEAD/public/jaguar_f-type)
+* title:	Jaguar F-type
+* author:	Munawar-Khan (https://sketchfab.com/munawar-khan)
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "Jaguar F-type" (https://sketchfab.com/3d-models/jaguar-f-type-548f9180774c4bc6852adbfd409f0796) by Munawar-Khan (https://sketchfab.com/munawar-khan) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+== assets/real/db11.glb  (via https://github.com/jeantimex/gltf-collections/tree/HEAD/aston_martin_db11)
+* title:	Aston Martin db11
+* author:	Black Snow (https://sketchfab.com/BlackSnow02)
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "Aston Martin db11" (https://sketchfab.com/3d-models/aston-martin-db11-0ce56f01b1ff40b3a4e36bc56873dbc7) by Black Snow (https://sketchfab.com/BlackSnow02) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+== assets/real/gt500_20.glb  (via https://github.com/leomaxvj/fordegarage/tree/HEAD/public/models/2020_ford_mustang_shelby_gt500)
+* title:	2020 Ford Mustang Shelby GT500
+* author:	Ddiaz Design (https://sketchfab.com/ddiaz-design)
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+This work is based on "2020 Ford Mustang Shelby GT500" (https://sketchfab.com/3d-models/2020-ford-mustang-shelby-gt500-5e864cfc33294b34b7a43c96646bc9f4) by Ddiaz Design (https://sketchfab.com/ddiaz-design) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+== assets/real/m8.glb  (via https://github.com/anvnh/auto_showroom/tree/HEAD/client/public/3d/bmw_m8_f92)
+* title:	BMW M8 F92 Coupé Competition
+* author:	kevin (ケビン) (https://sketchfab.com/sohyalebret)
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "BMW M8 F92 Coupé Competition" (https://sketchfab.com/3d-models/bmw-m8-f92-coupe-competition-25d5b4f6d13e4217afa09bbf89f8d993) by kevin (ケビン) (https://sketchfab.com/sohyalebret) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+== assets/real/r8.glb  (via https://github.com/anvnh/auto_showroom/tree/HEAD/client/public/3d/audi_r8_2021)
+* title:	2021 Audi R8 V10 Performance Quattro
+* author:	supercarmodels (https://sketchfab.com/supercarmodels)
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "2021 Audi R8 V10 Performance Quattro" (https://sketchfab.com/3d-models/2021-audi-r8-v10-performance-quattro-8dd1c237238244d1a2a49d764d321b87) by supercarmodels (https://sketchfab.com/supercarmodels) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+== assets/real/gt3.glb  (via https://github.com/Toby-Query/StreetCred/tree/HEAD/public/cars/porsche_911_gt3)
+* title:	2022 Porsche 911 GT3 (992)
+* author:	Ddiaz Design (https://sketchfab.com/ddiaz-design)
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "2022 Porsche 911 GT3 (992)" (https://sketchfab.com/3d-models/2022-porsche-911-gt3-992-ba01afbaf32846e598db315be3507db3) by Ddiaz Design (https://sketchfab.com/ddiaz-design) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+== assets/real/fordgt.glb  (via https://github.com/leomaxvj/fordegarage/tree/HEAD/public/models/2017_ford_gt)
+* title:	2017 Ford GT
+* author:	Ddiaz Design (https://sketchfab.com/ddiaz-design)
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+This work is based on "2017 Ford GT" (https://sketchfab.com/3d-models/2017-ford-gt-7eb9c5aca1e84d428898bf88fa9ab8b7) by Ddiaz Design (https://sketchfab.com/ddiaz-design) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+== assets/real/ccgt.glb  (via https://github.com/abdullahriaz1/temujin/tree/HEAD/public/3d-assets/2007_koenigsegg_ccgt_gt1)
+* title:	2007 Koenigsegg CCGT (GT1)
+* author:	Ddiaz Design (https://sketchfab.com/ddiaz-design)
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "2007 Koenigsegg CCGT (GT1)" (https://sketchfab.com/3d-models/2007-koenigsegg-ccgt-gt1-a930b9ad6d9b474595c93f1b8c4a3ed6) by Ddiaz Design (https://sketchfab.com/ddiaz-design) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+

@@ -73,37 +73,33 @@ function addSkid(x, z, yaw) {
   skids.instanceMatrix.needsUpdate = true;
 }
 
-// ───────────────────────── garage: 21 cars, weakest → strongest ─────────────────────────
-// Kenney Car Kit (CC0, github.com/Arslan12216775/kenney_car-kit) + Ferrari 458 (three.js examples)
-// torque Nm · redline rpm · top km/h · mass kg · mu grip · drag · gears · cg height · downforce
+// ───────────────────────── garage: 19 realistic cars, weakest → strongest ─────────────────────────
+// Models: Sketchfab artists via GitHub repos (see assets/real/LICENSES.txt) + Ferrari 458 (three.js examples)
+// hp · torque Nm · redline rpm · top km/h · mass kg · mu grip · drag · gears · cg height · downforce
 const CARS = [
-  { id: 'tractor-shovel',   name: 'جرّافة · Shovel',        torque: 300,  redline: 2400,  top: 30,  mass: 5200, mu: 0.9,  drag: 1.2,  gears: 3, cg: 1.0, steer: 0.55 },
-  { id: 'tractor',          name: 'تراكتور · Tractor',      torque: 330,  redline: 2500,  top: 42,  mass: 3500, mu: 0.9,  drag: 1.0,  gears: 4, cg: 0.9 },
-  { id: 'garbage-truck',    name: 'كاميو الزبل · Garbage',  torque: 950,  redline: 2600,  top: 85,  mass: 12000, mu: 0.85, drag: 1.4, gears: 6, cg: 1.1, steer: 0.55 },
-  { id: 'truck-flat',       name: 'بلاطو · Flatbed',        torque: 800,  redline: 2800,  top: 100, mass: 6500, mu: 0.9,  drag: 1.1,  gears: 6, cg: 0.9, steer: 0.55 },
-  { id: 'truck',            name: 'كاميو · Truck',          torque: 900,  redline: 2800,  top: 105, mass: 7800, mu: 0.9,  drag: 1.2,  gears: 6, cg: 1.0, steer: 0.55 },
-  { id: 'firetruck',        name: 'لپومپيي · Firetruck',    torque: 1150, redline: 2800,  top: 115, mass: 11000, mu: 0.9, drag: 1.3,  gears: 6, cg: 1.0, steer: 0.55 },
-  { id: 'delivery',         name: 'ديليفري · Delivery',     torque: 400,  redline: 4200,  top: 125, mass: 3200, mu: 0.95, drag: 0.8,  gears: 5, cg: 0.8 },
-  { id: 'van',              name: 'فاركونيط · Van',         torque: 360,  redline: 5000,  top: 145, mass: 2400, mu: 1.0,  drag: 0.7,  gears: 5, cg: 0.75 },
-  { id: 'ambulance',        name: 'لانبيلانس · Ambulance',  torque: 470,  redline: 4800,  top: 155, mass: 3000, mu: 1.0,  drag: 0.75, gears: 5, cg: 0.8 },
-  { id: 'taxi',             name: 'طاكسي · Taxi',           torque: 260,  redline: 6000,  top: 175, mass: 1400, mu: 1.0,  drag: 0.45, gears: 5, cg: 0.55 },
-  { id: 'kart-oobi',        name: 'كارتينغ · Kart',         torque: 32,   redline: 9000,  top: 95,  mass: 170,  mu: 1.15, drag: 0.12, gears: 1, cg: 0.25, scale: 1.6, steer: 0.5 },
-  { id: 'sedan',            name: 'سيدان · Sedan',          torque: 320,  redline: 6200,  top: 195, mass: 1450, mu: 1.0,  drag: 0.42, gears: 5, cg: 0.55 },
-  { id: 'suv',              name: 'SUV · 4x4',              torque: 420,  redline: 5800,  top: 205, mass: 2100, mu: 0.95, drag: 0.5,  gears: 6, cg: 0.75 },
-  { id: 'kart-oozi',        name: 'كارتينغ سبور · Kart S',  torque: 48,   redline: 11000, top: 125, mass: 175,  mu: 1.2,  drag: 0.12, gears: 1, cg: 0.25, scale: 1.6, steer: 0.5 },
-  { id: 'police',           name: 'البوليس · Police',       torque: 470,  redline: 6500,  top: 240, mass: 1700, mu: 1.05, drag: 0.38, gears: 6, cg: 0.55 },
-  { id: 'suv-luxury',       name: 'SUV لوكس · Luxury',      torque: 680,  redline: 6500,  top: 255, mass: 2300, mu: 1.0,  drag: 0.42, gears: 8, cg: 0.7 },
-  { id: 'hatchback-sports', name: 'هاتشباك · Hot Hatch',    torque: 420,  redline: 7500,  top: 255, mass: 1300, mu: 1.1,  drag: 0.36, gears: 6, cg: 0.5 },
-  { id: 'sedan-sports',     name: 'سيدان سبور · Sport',     torque: 620,  redline: 7500,  top: 290, mass: 1600, mu: 1.12, drag: 0.34, gears: 7, cg: 0.5 },
-  { id: 'ferrari',          name: 'فيراري 458 · Ferrari',   torque: 540,  redline: 8500,  top: 325, mass: 1480, mu: 1.15, drag: 0.30, gears: 6, cg: 0.45, df: 0.25 },
-  { id: 'race',             name: 'فورمولا · Formula',      torque: 720,  redline: 11000, top: 345, mass: 800,  mu: 1.4,  drag: 0.50, gears: 7, cg: 0.3,  df: 1.6 },
-  { id: 'race-future',      name: 'المستقبل · Future',      torque: 1150, redline: 12000, top: 420, mass: 900,  mu: 1.6,  drag: 0.42, gears: 8, cg: 0.3,  df: 2.2 },
+  { id: 'merc190',  name: 'Mercedes 190E Evo',          year: 1982, hp: 235, torque: 245, redline: 7200, top: 250, mass: 1340, mu: 1.0,  drag: 0.36, gears: 5, cg: 0.5 },
+  { id: 'gt350_65', name: 'Shelby GT350',               year: 1965, hp: 306, torque: 447, redline: 6500, top: 215, mass: 1270, mu: 0.95, drag: 0.42, gears: 4, cg: 0.5 },
+  { id: 'mach1',    name: 'Mustang Mach 1 428 CJ',      year: 1969, hp: 335, torque: 597, redline: 5600, top: 200, mass: 1600, mu: 0.95, drag: 0.45, gears: 4, cg: 0.55 },
+  { id: 'gt500_67', name: 'Shelby Cobra GT500',         year: 1967, hp: 355, torque: 570, redline: 5400, top: 210, mass: 1500, mu: 0.95, drag: 0.43, gears: 4, cg: 0.55 },
+  { id: 'p930',     name: 'Porsche 911 (930) Turbo',    year: 1975, hp: 260, torque: 343, redline: 6500, top: 250, mass: 1140, mu: 1.05, drag: 0.36, gears: 4, cg: 0.45 },
+  { id: 'supra',    name: 'Toyota Supra',               year: 1998, hp: 320, torque: 427, redline: 6800, top: 250, mass: 1510, mu: 1.05, drag: 0.34, gears: 6, cg: 0.48 },
+  { id: 'ghost',    name: 'Rolls-Royce Ghost',          year: 2021, hp: 563, torque: 850, redline: 5250, top: 250, mass: 2490, mu: 1.0,  drag: 0.44, gears: 8, cg: 0.6 },
+  { id: 'raptor',   name: 'Ford F-150 Raptor R',        year: 2024, hp: 700, torque: 868, redline: 6500, top: 180, mass: 2700, mu: 0.95, drag: 0.75, gears: 8, cg: 0.8, steer: 0.55 },
+  { id: 'ftype',    name: 'Jaguar F-Type R',            year: 2020, hp: 575, torque: 700, redline: 6500, top: 300, mass: 1700, mu: 1.1,  drag: 0.34, gears: 8, cg: 0.45 },
+  { id: 'gt350r',   name: 'Shelby GT350R',              year: 2016, hp: 526, torque: 582, redline: 8250, top: 290, mass: 1700, mu: 1.15, drag: 0.36, gears: 6, cg: 0.47 },
+  { id: 'db11',     name: 'Aston Martin DB11 V12',      year: 2017, hp: 630, torque: 700, redline: 7000, top: 322, mass: 1760, mu: 1.1,  drag: 0.32, gears: 8, cg: 0.46 },
+  { id: 'm8',       name: 'BMW M8 Competition',         year: 2020, hp: 625, torque: 750, redline: 7200, top: 305, mass: 1885, mu: 1.12, drag: 0.34, gears: 8, cg: 0.47 },
+  { id: 'gt500_20', name: 'Shelby GT500',               year: 2020, hp: 760, torque: 847, redline: 7500, top: 290, mass: 1900, mu: 1.12, drag: 0.40, gears: 7, cg: 0.47 },
+  { id: 'gt3',      name: 'Porsche 911 GT3 (992)',      year: 2022, hp: 510, torque: 470, redline: 9000, top: 318, mass: 1435, mu: 1.25, drag: 0.33, gears: 7, cg: 0.42, df: 0.3 },
+  { id: 'ferrari',  name: 'Ferrari 458 Italia',         year: 2010, hp: 562, torque: 540, redline: 8500, top: 325, mass: 1480, mu: 1.2,  drag: 0.30, gears: 6, cg: 0.45, df: 0.25 },
+  { id: 'r8',       name: 'Audi R8 V10 Performance',    year: 2021, hp: 620, torque: 580, redline: 8700, top: 331, mass: 1595, mu: 1.2,  drag: 0.30, gears: 7, cg: 0.44, df: 0.2 },
+  { id: 'fordgt',   name: 'Ford GT',                    year: 2017, hp: 647, torque: 746, redline: 7000, top: 348, mass: 1385, mu: 1.25, drag: 0.30, gears: 7, cg: 0.40, df: 0.6 },
+  { id: 'ccgt',     name: 'Koenigsegg CCGT (GT1)',      year: 2007, hp: 600, torque: 600, redline: 8500, top: 340, mass: 1100, mu: 1.35, drag: 0.36, gears: 6, cg: 0.36, df: 1.0 },
 ];
-for (const c of CARS) c.hp = Math.round(c.torque * c.redline * 0.85 / 7127); // approx peak hp
 
 const car = new THREE.Group(); // physics transform (y-rot only)
 scene.add(car);
-let body = null, steeringWheel = null, steerQ0 = null, current = null, carIdx = 18;
+let body = null, steeringWheel = null, steerQ0 = null, current = null, carIdx = CARS.findIndex((c) => c.id === 'ferrari');
 let wheels = {}; // fl fr rl rr → { spin, pivot, base, pos }
 const draco = new DRACOLoader().setDecoderPath('./vendor/libs/draco/gltf/');
 const loader = new GLTFLoader().setDRACOLoader(draco);
@@ -128,12 +124,11 @@ function buildCar(spec, gltf) {
   const root = new THREE.Group(); // suspension pitch/roll
   const holder = new THREE.Group(); // orientation/scale → model faces -Z
   root.add(holder); holder.add(model);
-  if (isF) prepFerrari(model);
-  else { holder.rotation.y = Math.PI; holder.scale.setScalar(spec.scale || 2.1); }
+  if (isF) prepFerrari(model); // realistic models are pre-normalised offline: face -Z, metric, on the ground
   model.traverse((o) => { if (o.isMesh) o.castShadow = true; });
 
   const names = isF ? { fl: 'wheel_fl', fr: 'wheel_fr', rl: 'wheel_rl', rr: 'wheel_rr' }
-                    : { fl: 'wheel-front-left', fr: 'wheel-front-right', rl: 'wheel-back-left', rr: 'wheel-back-right' };
+                    : { fl: 'wheel_fl', fr: 'wheel_fr', rl: 'wheel_rl', rr: 'wheel_rr' };
   const ws = {};
   root.updateMatrixWorld(true);
   for (const k in names) {
@@ -152,12 +147,12 @@ function buildCar(spec, gltf) {
   const box = new THREE.Box3().setFromObject(root);
   return {
     root, wheels: ws, a: L * 0.47, b: L * 0.53, wheelR: Math.max(0.2, ws.rl.pos.y), height: box.max.y, length: box.max.z - box.min.z,
-    spinSign: isF ? -1 : 1, steeringWheel: isF ? model.getObjectByName('steering_wheel') : null,
+    spinSign: -1, steeringWheel: isF ? model.getObjectByName('steering_wheel') : null,
   };
 }
 
 function specPhysics(spec, geo) {
-  const n = spec.gears, spread = n === 1 ? 1 : (spec.mass > 3000 ? 5 : 3.4);
+  const n = spec.gears, spread = n === 1 ? 1 : (n >= 8 ? 4.5 : 3.4);
   const topRatio = spec.redline * 2 * Math.PI / 60 * geo.wheelR / (spec.top / 3.6);
   const gears = [];
   for (let i = 0; i < n; i++) gears.push(topRatio * Math.pow(spread, n === 1 ? 0 : (n - 1 - i) / (n - 1)));
@@ -174,7 +169,7 @@ function specPhysics(spec, geo) {
 function selectCar(i) {
   carIdx = (i + CARS.length) % CARS.length;
   const spec = CARS[carIdx];
-  const url = spec.id === 'ferrari' ? './assets/ferrari.glb' : `./assets/cars/${spec.id}.glb`;
+  const url = spec.id === 'ferrari' ? './assets/ferrari.glb' : `./assets/real/${spec.id}.glb`;
   toast('⏳ ' + spec.name);
   const done = (gltf) => {
     cache[url] = gltf;
@@ -201,7 +196,7 @@ function renderGarage() {
   garage.querySelector('.list').innerHTML = CARS.map((c, i) => `
     <button class="car-item${i === carIdx ? ' on' : ''}" data-i="${i}">
       <span class="n">${i + 1}</span>
-      <span class="nm">${c.name}</span>
+      <span class="nm">${c.name} <small>${c.year}</small></span>
       <span class="st">${c.hp} hp · ${c.top} km/h · ${c.mass} kg</span>
       <span class="bar"><i style="width:${(Math.sqrt(c.hp / maxHp) * 100).toFixed(0)}%"></i></span>
     </button>`).join('');
@@ -467,7 +462,7 @@ function syncVisuals(dt) {
   for (const k in wheels) {
     const w = wheels[k];
     _qa.setFromAxisAngle(new THREE.Vector3(1, 0, 0), current.spinSign * S.wheelRot);
-    w.spin.quaternion.copy(_qa).multiply(w.base);
+    w.spin.quaternion.copy(w.base).multiply(_qa); // spin about the wheel's own axle
     w.pivot.rotation.y = k[0] === 'f' ? S.steer : 0;
   }
   // steering wheel (≈ 14:1 rack → ~ 500° lock to lock)
