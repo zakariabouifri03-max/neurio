@@ -86,6 +86,18 @@ if (G.story.chapter < 2) { console.error('standalone: did not reach diner chapte
 console.log('✔ standalone home chapter playable');
 console.log('✔ standalone world pumps clean through drive + arrival (ch' + G.story.chapter + ')');
 
+// ---- physics pass: actually walk the player so collider resolution runs
+// (catches malformed colliders — the class of bug that black-screens the build)
+const fakeInput = { key: (k) => k === 'w', pressed: () => false };
+const walk = (x, z, ticks, yaw = 0) => {
+  G.player.pos.set(x, 0, z); G.player.yaw = yaw; G.player.hidden = null;
+  for (let k = 0; k < ticks; k++) { G.player.update(0.1, fakeInput); G.world.update(0.1); }
+};
+walk(-4, -16, 200);              // home stoop down to the road, into the tree line
+walk(-207.5, -9, 200, Math.PI);  // diner lot approach
+walk(-208, 0.5, 120, Math.PI);   // inside the dining room
+console.log('✔ standalone player physics pumps clean (road/trees/lot/diner)');
+
 // ---- full journey: opening tasks -> customers -> freezer -> blackout -> chase -> ending
 const hook = (...a) => G.story.hook(...a);
 hook('bossNoteDiner'); hook('breaker', 'SIGN'); hook('crate'); hook('crate'); hook('crate'); hook('grill');

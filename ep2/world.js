@@ -413,7 +413,8 @@ export class WorldE2 extends World {
       tg.position.set(0, 0, 0);
       this.scene.add(tg);
       this.trees.push(tg);
-      const b = { min: { x: x - 0.3, z: z - 0.3 }, max: { x: x + 0.3, z: z + 0.3 }, y0: 0, y1: 4, solid: true };
+      const b = AABB.fromCenter(x, z, 0.6, 0.6, 0, 4);
+      b.solid = true; b.blocksSight = false;
       this.colliders.push(b);
     };
     for (const t of [[-14, -26.5], [-36, -28], [-66, -27], [-96, -26.8], [-134, -28.4], [-170, -26.6], [-190, -28], [-226, -27], [-24, -14.6], [-58, -14.2], [-104, -15], [-158, -14.6]])
