@@ -206,7 +206,12 @@ function boot() {
     game._fpsT += dt; game._fpsN++;
     if (game._fpsT > 3) {
       const fps = game._fpsN / game._fpsT;
-      if (fps < 28 && game.fx.enabled) { game.fx.enabled = false; }
+      if (fps < 28) {
+        if (game.fx.enabled) game.fx.enabled = false;                    // 1st: bloom
+        else if (game.race && game.race.world.userData.water) {          // 2nd: water mirror
+          game.race.world.userData.water.setReflections(false);
+        }
+      }
       game._fpsT = 0; game._fpsN = 0;
     }
 

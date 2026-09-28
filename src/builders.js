@@ -4,6 +4,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ARCH, THEMES } from './data.js';
 import { mulberry32, clamp, lerp } from './util.js';
 import * as TEX from './tex.js';
+import { createWater } from './water.js';
 
 // tiny helpers ───────────────────────────────────────────────────────────────
 function tint(geo, hex) {
@@ -765,40 +766,70 @@ export function buildTrackWorld(map) {
 
   // ── 4. terrain ──
   const SIZE = 1500;
+  const WATER_Y = -0.75;
+  const sunDir = V3(0.5, 0.7, 0.35).normalize();
+  const isIsland = !!theme.water && map.theme !== 6;
+  const islandR = baseR + 90;
+  const nrRng = mulberry32(map.seed + 9);
+  const no1 = nrRng() * 10, no2 = nrRng() * 10, no3 = nrRng() * 10;
+  const amp = { 0: 5, 1: 9, 2: 9, 3: 3, 4: 10, 5: 10, 6: 3.5, 7: 11, 8: 5, 9: 6 }[map.theme] || 6;
+  const heightsAtSamples = samples.filter((_, i) => i % 4 === 0).map((s) => s.p);
+
+  // coarse "distance to track" field → lets us evaluate the terrain height
+  // anywhere (terrain mesh + water depth map share the exact same function,
+  // so the shoreline and the foam always line up)
+  const FCELL = 12, FEXT = 900, FN = Math.ceil((2 * FEXT) / FCELL) + 1;
+  const fD = new Float32Array(FN * FN), fY = new Float32Array(FN * FN);
+  for (let j = 0; j < FN; j++) {
+    const z = -FEXT + j * FCELL;
+    for (let i = 0; i < FN; i++) {
+      const x = -FEXT + i * FCELL;
+      let dmin = 1e9, nearY = 0;
+      for (let k = 0; k < heightsAtSamples.length; k++) {
+        const dx = heightsAtSamples[k].x - x, dz = heightsAtSamples[k].z - z;
+        const d2 = dx * dx + dz * dz;
+        if (d2 < dmin) { dmin = d2; nearY = heightsAtSamples[k].y; }
+      }
+      const o = j * FN + i;
+      fD[o] = Math.sqrt(dmin); fY[o] = nearY;
+    }
+  }
+  const _tf = [0, 0];
+  function sampleTrackField(x, z) {
+    const fx = clamp((x + FEXT) / FCELL, 0, FN - 1.001);
+    const fz = clamp((z + FEXT) / FCELL, 0, FN - 1.001);
+    const i0 = fx | 0, j0 = fz | 0;
+    const tx = fx - i0, tz = fz - j0;
+    const a = j0 * FN + i0, b = a + 1, c = a + FN, d = c + 1;
+    _tf[0] = lerp(lerp(fD[a], fD[b], tx), lerp(fD[c], fD[d], tx), tz);
+    _tf[1] = lerp(lerp(fY[a], fY[b], tx), lerp(fY[c], fY[d], tx), tz);
+  }
+  function heightAt(x, z) {
+    let h = (Math.sin(x * 0.021 + no1) * Math.cos(z * 0.019 + no2) * 0.55 +
+      Math.sin(x * 0.053 + no3) * Math.sin(z * 0.047 + no1) * 0.3 +
+      Math.sin((x + z) * 0.013 + no2) * 0.35) * amp;
+    sampleTrackField(x, z);
+    const mask = THREE.MathUtils.smoothstep(_tf[0], 14, 60);
+    h = lerp(_tf[1] - 0.55, h, mask);
+    if (isIsland) {
+      const rr = Math.sqrt(x * x + z * z);
+      const w = 1 - THREE.MathUtils.smoothstep(rr, islandR, islandR + 90);
+      if (w < 1) h = lerp(-9, Math.max(h, -9), w) - (1 - w) * 2;
+    }
+    return h;
+  }
+  userData.heightAt = heightAt;
+
   {
-    const geo = new THREE.PlaneGeometry(SIZE, SIZE, 100, 100);
+    const geo = new THREE.PlaneGeometry(SIZE, SIZE, 160, 160);
     geo.rotateX(-Math.PI / 2);
     const posA = geo.attributes.position;
     const colors = new Float32Array(posA.count * 3);
     const c1 = new THREE.Color(theme.ground[0]), c2 = new THREE.Color(theme.ground[1]);
     const sand = new THREE.Color('#f2e3b0');
-    const nrRng = mulberry32(map.seed + 9);
-    const no1 = nrRng() * 10, no2 = nrRng() * 10, no3 = nrRng() * 10;
-    const isIsland = !!theme.water && map.theme !== 6;
-    const islandR = baseR + 90;
-    const heightsAtSamples = samples.filter((_, i) => i % 4 === 0).map((s) => s.p);
-
-    const amp = { 0: 5, 1: 9, 2: 9, 3: 3, 4: 10, 5: 10, 6: 3.5, 7: 11, 8: 5, 9: 6 }[map.theme] || 6;
     for (let i = 0; i < posA.count; i++) {
       const x = posA.getX(i), z = posA.getZ(i);
-      let h = (Math.sin(x * 0.021 + no1) * Math.cos(z * 0.019 + no2) * 0.55 +
-        Math.sin(x * 0.053 + no3) * Math.sin(z * 0.047 + no1) * 0.3 +
-        Math.sin((x + z) * 0.013 + no2) * 0.35) * amp;
-      // distance to track (coarse)
-      let dmin = 1e9, nearY = 0;
-      for (let j = 0; j < heightsAtSamples.length; j++) {
-        const dx = heightsAtSamples[j].x - x, dz = heightsAtSamples[j].z - z;
-        const d2 = dx * dx + dz * dz;
-        if (d2 < dmin) { dmin = d2; nearY = heightsAtSamples[j].y; }
-      }
-      const d = Math.sqrt(dmin);
-      const mask = THREE.MathUtils.smoothstep(d, 14, 60);
-      h = lerp(nearY - 0.55, h, mask);
-      if (isIsland) {
-        const rr = Math.sqrt(x * x + z * z);
-        const w = 1 - THREE.MathUtils.smoothstep(rr, islandR, islandR + 90);
-        if (w < 1) h = lerp(-9, Math.max(h, -9), w) - (1 - w) * 2;
-      }
+      const h = heightAt(x, z);
       posA.setY(i, h);
       // colors
       const nz = 0.5 + 0.5 * Math.sin(x * 0.09 + no3) * Math.cos(z * 0.08 + no1);
@@ -814,18 +845,14 @@ export function buildTrackWorld(map) {
     group.add(terr);
   }
 
-  // ── 5. water / lava ──
+  // ── 5. water / lava (realistic shader water) ──
   if (theme.water) {
-    const isLava = map.theme === 5;
-    const wmat = new THREE.MeshPhongMaterial({
-      color: new THREE.Color(theme.water), shininess: 90, transparent: true, opacity: 0.9,
-      emissive: isLava ? new THREE.Color(0xff4400) : new THREE.Color(0x003355),
-      emissiveIntensity: isLava ? 0.9 : 0.25,
+    const highQ = typeof window !== 'undefined' && window.GAME ? window.GAME.highQ !== false : true;
+    const water = createWater({
+      theme, themeIndex: map.theme, map,
+      waterLevel: WATER_Y, heightAt, sunDir, quality: highQ,
     });
-    const water = new THREE.Mesh(new THREE.PlaneGeometry(2400, 2400), wmat);
-    water.rotation.x = -Math.PI / 2;
-    water.position.y = -0.75;
-    group.add(water);
+    group.add(water.mesh);
     userData.water = water;
   }
 
@@ -839,7 +866,6 @@ export function buildTrackWorld(map) {
         new THREE.MeshBasicMaterial({ map: TEX.starsTexture(), side: THREE.BackSide, transparent: true, fog: false, depthWrite: false, blending: THREE.AdditiveBlending }));
       group.add(stars);
     }
-    const sunDir = V3(0.5, 0.7, 0.35).normalize();
     const sun = new THREE.Sprite(new THREE.SpriteMaterial({
       map: TEX.glowTexture(), color: new THREE.Color(theme.sun[0]), transparent: true, fog: false, depthWrite: false, blending: THREE.AdditiveBlending,
     }));
@@ -1028,11 +1054,22 @@ export function buildGarageWorld() {
   sand.receiveShadow = true;
   g.add(sand);
 
-  // sea
-  const sea = new THREE.Mesh(new THREE.PlaneGeometry(2600, 2600), new THREE.MeshPhongMaterial({ color: 0x1e90c8, shininess: 90, transparent: true, opacity: 0.92 }));
-  sea.rotation.x = -Math.PI / 2;
-  sea.position.y = -0.7;
-  g.add(sea);
+  // sea — same realistic water system as the island tracks
+  {
+    const highQ = typeof window !== 'undefined' && window.GAME ? window.GAME.highQ !== false : true;
+    const sandEdge = 690;
+    const seaH = (x, z) => {
+      const r = Math.hypot(x, z);
+      return r < sandEdge ? -0.05 : lerp(-0.05, -16, THREE.MathUtils.smoothstep(r, sandEdge, sandEdge + 120));
+    };
+    const water = createWater({
+      theme: THEMES[0], themeIndex: 0, map: { seed: 12345, theme: 0 },
+      waterLevel: -0.7, heightAt: seaH, sunDir: V3(0.5, 0.7, 0.35).normalize(),
+      quality: highQ, depthExtent: 1800, extent: 3000,
+    });
+    g.add(water.mesh);
+    userData.water = water;
+  }
 
   // cobble platform
   const plat = new THREE.Mesh(new THREE.CylinderGeometry(6.4, 6.8, 0.55, 36),
@@ -1123,5 +1160,5 @@ export function buildGarageWorld() {
     userData.balloons.push(bg);
   }
 
-  return { group: g, carAnchor, driverAnchor, userData, theme: THEMES[0], sunDir: V3(0.5, 0.7, 0.35).normalize() };
+  return { scene: g, group: g, carAnchor, driverAnchor, userData, theme: THEMES[0], sunDir: V3(0.5, 0.7, 0.35).normalize() };
 }

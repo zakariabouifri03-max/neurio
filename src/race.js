@@ -754,7 +754,7 @@ export class Race {
       b.rotation.y += dt * 0.05;
     }
     for (const c of ud.clouds) c.position.x += c.userData.drift * dt;
-    if (ud.water) ud.water.position.y = -0.75 + Math.sin(performance.now() * 0.001) * 0.08;
+    if (ud.water) ud.water.update(performance.now() * 0.001, this.camera, this.renderer, this.scene);
 
     // sun follows player for shadows
     this.sun.position.copy(this.player.pos).addScaledVector(this.world.sunDir, 180);
@@ -814,6 +814,7 @@ export class Race {
     document.getElementById('touchWrap').classList.remove('on');
     if (audio.ctx) { audio.engineOn = false; audio.engine(0, false); }
     this.game.speedLines(false);
+    if (this.world.userData.water) this.world.userData.water.dispose();
     this.scene.traverse((o) => {
       if (o.geometry) o.geometry.dispose();
       if (o.material) {

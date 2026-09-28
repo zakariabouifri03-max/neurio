@@ -1,5 +1,5 @@
 // Bash Baqi Racing — service worker: full offline support
-const VERSION = 'bbr-v1';
+const VERSION = 'bbr-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const ASSETS = [
   './src/util.js',
   './src/save.js',
   './src/post.js',
+  './src/water.js',
   './src/style.css',
   './vendor/three.module.js',
   './vendor/utils/BufferGeometryUtils.js',

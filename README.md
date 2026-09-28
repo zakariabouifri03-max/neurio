@@ -37,6 +37,7 @@ You are dropped **straight into a race** the moment the game loads. Finish, earn
 - 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
 - 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
 - 🪙 Coins also sit **on the track** — grab them mid-race
+- 🌊 **Realistic water** on the island: real displaced waves, sun glitter, depth-based turquoise shallows, foam on the shore and true mirror reflections of the world
 - 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
 - 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
 - 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns

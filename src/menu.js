@@ -143,9 +143,13 @@ export class Garage {
       b.position.y = b.userData.baseY + Math.sin(performance.now() * 0.0004 + b.userData.bobPhase) * 3;
     }
     for (const c of this.world.userData.clouds) c.position.x += c.userData.drift * dt;
+    if (this.world.userData.water) {
+      this.world.userData.water.update(performance.now() * 0.001, this.camera, this.game.renderer, this.scene);
+    }
   }
 
   dispose() {
+    if (this.world.userData.water) this.world.userData.water.dispose();
     const el = this.game.renderer.domElement;
     el.removeEventListener('pointerdown', this._pd);
     removeEventListener('pointermove', this._pm);
