@@ -157,6 +157,13 @@ class Game {
     this.clock = new THREE.Clock();
     this.renderer.setAnimationLoop(() => this._loop());
     setTimeout(() => this.ui.fade(false, 1800), 250);
+
+    // direct-entry link: ?play starts a new game right away
+    try {
+      if (/play|nouveau|direct/i.test(location.search)) {
+        setTimeout(() => { if (this.state === 'menu') this.newGame(); }, 600);
+      }
+    } catch {}
   }
 
   // menu background: a slow circle around the diner on Route 9
