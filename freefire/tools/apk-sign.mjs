@@ -50,6 +50,7 @@ export function parseZip(buf) {
   let p = cdOffset;
   for (let i = 0; i < count; i++) {
     if (u32(buf, p) !== CD_SIG) throw new Error(`bad central directory record at ${p}`);
+    const flags = u16(buf, p + 8);
     const method = u16(buf, p + 10);
     const crc = u32(buf, p + 16);
     const compSize = u32(buf, p + 20);
@@ -65,7 +66,8 @@ export function parseZip(buf) {
     const lNameLen = u16(buf, localOffset + 26);
     const lExtraLen = u16(buf, localOffset + 28);
     const dataOffset = localOffset + 30 + lNameLen + lExtraLen;
-    entries.push({ name, method, crc, compSize, uncompSize, localOffset, dataOffset, extra, cdRecord: p });
+    const lFlags = u16(buf, localOffset + 6);
+    entries.push({ name, flags, lFlags, method, crc, compSize, uncompSize, localOffset, dataOffset, extra, cdRecord: p });
     p += 46 + nameLen + extraLen + commentLen2;
   }
   return { entries, cdOffset, cdSize, eocd, commentLen, comment: buf.subarray(eocd + 22, eocd + 22 + commentLen) };
@@ -296,6 +298,9 @@ export function verifyApk(buf) {
 // ═══════════════════════════ WRITING ════════════════════════════════════════
 const DOS_TIME = 0;
 const DOS_DATE = 0x0021;                    // 1980-01-01
+const FILE_FLAGS = 0x0800;                  // names are UTF-8 (apksigner sets this)
+const ALIGN_EXTRA_ID = 0xd935;              // zipalign/apksigner alignment record
+const STRIPPING_PROTECTION_ID = 0xbeeff00d; // "this APK must not be v1-stripped"
 
 let crc32fn = null;
 try { crc32fn = (buf) => zlib.crc32(buf) >>> 0; } catch { crc32fn = null; }
@@ -327,13 +332,23 @@ export function buildZipParts(entries) {
       const deflated = zlib.deflateRawSync(e.data, { level: 9 });
       if (deflated.length < e.data.length) { method = 8; payload = deflated; }
     }
+    // align stored entries the way apksigner does: a 0xd935 extra-field record
+    // carrying the alignment, padded so the file data starts on a 4-byte boundary
     const align = e.align || 1;
-    const extra = align > 1 ? (align - ((offset + 30 + name.length) % align)) % align : 0;
+    let extraField = Buffer.alloc(0);
+    if (align > 1) {
+      const pad = (align - ((offset + 30 + name.length + 6) % align)) % align;
+      extraField = Buffer.alloc(6 + pad);
+      extraField.writeUInt16LE(ALIGN_EXTRA_ID, 0);
+      extraField.writeUInt16LE(2 + pad, 2);
+      extraField.writeUInt16LE(align, 4);
+    }
+    const extra = extraField.length;
     const crc = crc32(e.data);
     const lh = Buffer.alloc(30);
     lh.writeUInt32LE(LFH_SIG, 0);
     lh.writeUInt16LE(20, 4);                 // version needed to extract
-    lh.writeUInt16LE(0, 6);                  // flags
+    lh.writeUInt16LE(FILE_FLAGS, 6);
     lh.writeUInt16LE(method, 8);
     lh.writeUInt16LE(DOS_TIME, 10);
     lh.writeUInt16LE(DOS_DATE, 12);
@@ -342,13 +357,13 @@ export function buildZipParts(entries) {
     lh.writeUInt32LE(e.data.length, 22);
     lh.writeUInt16LE(name.length, 26);
     lh.writeUInt16LE(extra, 28);
-    locals.push(lh, name, Buffer.alloc(extra), payload);
+    locals.push(lh, name, extraField, payload);
 
     const cd = Buffer.alloc(46);
     cd.writeUInt32LE(CD_SIG, 0);
     cd.writeUInt16LE(20, 4);                 // version made by
     cd.writeUInt16LE(20, 6);
-    cd.writeUInt16LE(0, 8);
+    cd.writeUInt16LE(FILE_FLAGS, 8);
     cd.writeUInt16LE(method, 10);
     cd.writeUInt16LE(DOS_TIME, 12);
     cd.writeUInt16LE(DOS_DATE, 14);
@@ -361,7 +376,7 @@ export function buildZipParts(entries) {
     cd.writeUInt16LE(0, 34);
     cd.writeUInt32LE(0, 36);                 // external attributes
     cd.writeUInt32LE(offset, 42);
-    cds.push(cd, name, Buffer.alloc(extra));
+    cds.push(cd, name, extraField);
     offset += 30 + name.length + extra + payload.length;
   }
   const cd = Buffer.concat(cds);
@@ -394,12 +409,27 @@ export function makeIdentity({ keyPem, certPem, commonName = 'BOOYAH FIRE', days
   const keys = forge.pki.rsa.generateKeyPair(2048);
   const cert = forge.pki.createCertificate();
   cert.publicKey = keys.publicKey;
-  cert.serialNumber = '01' + forge.util.bytesToHex(forge.random.getBytesSync(15));
-  cert.validity.notBefore = new Date();
+  cert.serialNumber = '00' + forge.util.bytesToHex(forge.random.getBytesSync(15));
+  // Backdate the start of the validity window: package installers reject a
+  // certificate that is not valid yet, and a phone whose clock is a few hours
+  // behind the machine that signed the APK would hit exactly that.
+  cert.validity.notBefore = new Date(Date.now() - 30 * 86400000);
   cert.validity.notAfter = new Date(Date.now() + days * 86400000);
-  const attrs = [{ name: 'commonName', value: commonName }, { name: 'organizationName', value: 'BOOYAH FIRE' }];
+  const attrs = [
+    { name: 'commonName', value: commonName },
+    { shortName: 'OU', value: 'Games' },
+    { name: 'organizationName', value: 'BOOYAH FIRE' },
+    { shortName: 'C', value: 'MA' },
+  ];
   cert.setSubject(attrs);
   cert.setIssuer(attrs);
+  // a real code-signing profile, like keytool/apksigner produce
+  cert.setExtensions([
+    { name: 'basicConstraints', cA: false },
+    { name: 'keyUsage', digitalSignature: true, critical: true },
+    { name: 'extKeyUsage', codeSigning: true },
+    { name: 'subjectKeyIdentifier' },
+  ]);
   cert.sign(keys.privateKey, forge.md.sha256.create());   // not SHA-1: modern Android rejects it
   return {
     key: keys.privateKey, cert,
@@ -450,12 +480,21 @@ export function buildV2Block(digest, identity) {
   const digestEntry = lenPrefixed([u32le(ALG.RSASSA_PKCS1V15_SHA256), u32le(digest.length), digest]);
   const digests = lenPrefixed([digestEntry]);
   const certs = lenPrefixed([lenPrefixed([identity.certDer])]);
-  const signedData = Buffer.concat([digests, certs, u32le(0)]);   // no additional attributes
+  // apksigner adds one additional attribute to signed data: the "stripping
+  // protection" marker (id 0xbeeff00d, value 3), which tells the platform not to
+  // accept this APK if its v2/v3 signature is somehow stripped
+  const attrs = lenPrefixed([lenPrefixed([u32le(STRIPPING_PROTECTION_ID), u32le(3)])]);
+  const signedData = Buffer.concat([digests, certs, attrs]);
   // the signature covers the signed-data *content*; the signer blob carries it
   // behind its own length prefix
   const signature = crypto.sign('sha256', signedData, identity.keyPem);
   const signatures = lenPrefixed([lenPrefixed([u32le(ALG.RSASSA_PKCS1V15_SHA256), u32le(signature.length), signature])]);
-  const publicKeys = lenPrefixed([lenPrefixed([identity.certDer])]);
+  // the public-keys field carries the signer's SubjectPublicKeyInfo — NOT the
+  // certificate; verifiers compare it against the certificate's key and reject the
+  // APK when they disagree (which is exactly what "package appears to be invalid"
+  // from the installer means)
+  const spki = crypto.createPublicKey(identity.certPem).export({ type: 'spki', format: 'der' });
+  const publicKeys = lenPrefixed([lenPrefixed([spki])]);
   const signer = lenPrefixed([lenPrefixed([signedData]), signatures, publicKeys]);
   const value = lenPrefixed([signer]);
   const pairs = Buffer.concat([u64le(4 + value.length), u32le(0x7109871a), value]);

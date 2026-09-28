@@ -80,7 +80,7 @@ function mipmapEntries(templateZip, tpl) {
 }
 
 // ── the APK ─────────────────────────────────────────────────────────────────
-export function buildApk({ out = path.join(root, 'BOOYAH-FIRE.apk'), quiet = false } = {}) {
+export function buildApk({ out = path.join(root, 'BOOYAH-FIRE.apk'), quiet = false, v2 = true } = {}) {
   if (!fs.existsSync(TEMPLATE)) throw new Error(`reference APK missing: ${TEMPLATE}`);
   const tpl = fs.readFileSync(TEMPLATE);
   const zip = parseZip(tpl);
@@ -139,10 +139,10 @@ export function buildApk({ out = path.join(root, 'BOOYAH-FIRE.apk'), quiet = fal
     fs.writeFileSync(certPath, identity.certPem);
   }
 
-  const apk = signApk({ entries, identity, v1: true, v2: true });
+  const apk = signApk({ entries, identity, v1: true, v2 });
   const v1 = verifyV1(apk);
-  const v2 = verifyV2(apk);
-  if (!v1.ok || !v2.ok) throw new Error(`self-check failed — v1 ${v1.reason}; v2 ${v2.reason}`);
+  const v2check = v2 ? verifyV2(apk) : { ok: true, signer: '(v1 only)' };
+  if (!v1.ok || !v2check.ok) throw new Error(`self-check failed — v1 ${v1.reason}; v2 ${v2check.reason}`);
 
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, apk);
@@ -154,19 +154,28 @@ export function buildApk({ out = path.join(root, 'BOOYAH-FIRE.apk'), quiet = fal
     entries: entries.length + 3,   // + MANIFEST.MF, CERT.SF, CERT.RSA
     gameHtmlBytes: replaced.get('assets/game.html').length,
     icons: mipmapEntries(zip, tpl).map((m) => `${m.size}px`).join(' '),
-    signer: v2.signer, signerValid: `${v1.files} v1 files · v2 block ${v2.blockSize} B`,
+    signer: v2check.signer,
+    signerValid: v2
+      ? `${v1.files} v1 files · v2 block ${v2check.blockSize} B`
+      : `${v1.files} v1 files · JAR signature only`,
   };
   if (!quiet) {
     console.log(`BOOYAH FIRE → ${out}`);
     console.log(`  ${(apk.length / 1048576).toFixed(2)} MB · ${info.entries} entries · game ${(info.gameHtmlBytes / 1024).toFixed(0)} kB · icons ${info.icons}`);
     console.log(`  ${info.package} · "${info.label}" · ${info.activity}`);
-    console.log(`  signed: v1 ${v1.files} files + v2 (${info.signer}) — verified`);
+    console.log(v2
+      ? `  signed: v1 ${v1.files} files + v2 (${info.signer}) — verified`
+      : `  signed: v1 JAR only (${info.signer}) — verified`);
   }
   return info;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const i = process.argv.indexOf('--out');
-  const info = buildApk({ out: i > 0 ? path.resolve(process.argv[i + 1]) : undefined });
+  const v1Only = process.argv.includes('--v1-only');
+  const info = buildApk({
+    out: i > 0 ? path.resolve(process.argv[i + 1]) : (v1Only ? path.join(root, 'BOOYAH-FIRE-v1-only.apk') : undefined),
+    v2: !v1Only,
+  });
   void info;
 }

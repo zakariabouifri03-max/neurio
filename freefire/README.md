@@ -48,13 +48,23 @@ There is no Android SDK, Gradle or `apksigner` in this repo, so the APK is assem
 | manifest & resources | `tools/axml.mjs` rewrites the *binary* manifest string pool (package `com.booyah.fire`, label `BOOYAH FIRE`, and a fully-qualified activity name, since `classes.dex` still owns `com.bashbaqi.racing.MainActivity`) and patches the package name in `resources.arsc` in place |
 | icons | the mipmaps are drawn by the same procedural artwork as the PWA icons, at 48/72/96/144/192 px |
 | zip | `tools/apk-sign.mjs` writes the archive itself: entries deflated (stored + 4-byte aligned for `.arsc`, `.dex`, `.png`), then the v2 APK Signing Block spliced in before the central directory |
-| signing | JAR v1 (`MANIFEST.MF` → `CERT.SF` → PKCS#7 `CERT.RSA`) **and** APK Signature Scheme v2 (RSA-PKCS1-v1_5 + SHA-256, 1 MB chunk digests) — both schemes, verified internally before the file is written |
-| the key | `android/keystore/booyah-fire.key.pem` / `.cert.pem` (self-signed dev certificate, committed) so every rebuild upgrades the installed app instead of fighting it |
+| signing | JAR v1 (`MANIFEST.MF` → `CERT.SF` → PKCS#7 `CERT.RSA`) **and** APK Signature Scheme v2 (RSA-PKCS1-v1_5 + SHA-256, 1 MB chunk digests, signer's SubjectPublicKeyInfo, `0xbeeff00d` stripping protection) — both schemes verified internally before the file is written |
+| the key | `android/keystore/booyah-fire.key.pem` / `.cert.pem` (self-signed code-signing certificate: `keyUsage=digitalSignature`, `extKeyUsage=codeSigning`, backdated 30 days so a phone with a slightly slow clock still accepts it) — committed, so every rebuild upgrades the installed app instead of fighting it |
 
 `npm run test:apk` checks the wire format against a real one: it verifies the reference APK signed by
 `apksigner` (9 v1 files, v2 block 4088 B, two extra blocks), round-trips an untouched manifest string
 pool byte-for-byte, then signs a synthetic APK, confirms both schemes accept it, and confirms they
-*reject* it after a single byte is flipped in a file or in the central directory.
+*reject* it after a single byte is flipped in a file or in the central directory. It also asserts the
+details an installer actually looks at: every stored entry 4-byte aligned with a `0xd935` record in
+*both* the local and central headers, the UTF-8 flag set on every name, the stripping-protection
+attribute present, and the signer's public-key field carrying the certificate's own key.
+
+`npm run verify:apk` (needs `pip install cryptography`) is the second opinion: `tools/verify-apk.py`
+parses the files from scratch and lets OpenSSL check the RSA signatures, so a mistake shared by the
+Node writer and the Node verifier cannot hide. It signs off on the reference APK too.
+
+If a device ever refuses the v2 signature, `npm run build:apk:v1` produces `BOOYAH-FIRE-v1-only.apk`
+— the same APK signed with JAR v1 only, which is all Android 5/6 understand.
 
 ## What's in it
 
@@ -151,9 +161,11 @@ freefire/
 │   └── main.js             bootstrap: lobby, panels, input (keyboard/mouse/touch), save, game loop
 ├── android/keystore/       dev signing key + certificate (rebuilds upgrade in place)
 ├── BOOYAH-FIRE.apk         built by `npm run build:apk` — sideload this on Android
+├── BOOYAH-FIRE-v1-only.apk fallback build (JAR v1 only) for stubborn installers
 └── tools/                  verification harnesses, the icon generator and the APK toolchain
     ├── apk-sign.mjs        zip writer + APK v1/v2 signer & verifier (no SDK)
     ├── axml.mjs            binary AndroidManifest.xml / resources.arsc rewriting
+    ├── verify-apk.py       independent v1/v2 verification with OpenSSL
     └── build-apk.mjs       the whole APK build: bundle → inline → sign → verify
 ```
 

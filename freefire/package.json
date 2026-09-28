@@ -16,7 +16,9 @@
     "icons": "node tools/make-icons-ff.mjs",
     "serve": "python3 -m http.server 8000 --bind 0.0.0.0",
     "test:apk": "node tools/test-apk-sign.mjs",
-    "build:apk": "node tools/build-apk.mjs"
+    "build:apk": "node tools/build-apk.mjs",
+    "verify:apk": "python3 tools/verify-apk.py",
+    "build:apk:v1": "node tools/build-apk.mjs --v1-only"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",

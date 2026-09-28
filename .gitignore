@@ -3,3 +3,5 @@ Thumbs.db
 *.log
 node_modules/
 freefire/dist/
+__pycache__/
+*.pyc

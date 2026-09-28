@@ -7,6 +7,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
+import forge from 'node-forge';
 import {
   parseZip, entryData, signApk, verifyV1, verifyV2, makeIdentity, parseSigningBlock, v2Digests,
 } from './apk-sign.mjs';
@@ -16,6 +18,45 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..');
 const TEMPLATE = path.join(root, '..', 'BashBaqiRacing.apk');
 const BUILT = path.join(root, 'BOOYAH-FIRE.apk');
+
+// ── helpers for the writer invariants ───────────────────────────────────────
+function localExtraOf(apk, name) {
+  const lh = parseZip(apk).entries.find((e) => e.name === name);
+  const start = lh.headerOffset ?? lh.localOffset;
+  const nl = apk.readUInt16LE(start + 26);
+  const el = apk.readUInt16LE(start + 28);
+  return apk.subarray(start + 30 + nl, start + 30 + nl + el);
+}
+
+// read the v2 signer blob and pull out the interesting bits
+function v2SignerKey(apk) {
+  const block = parseSigningBlock(apk);
+  const value = block.pairs.find((p) => p.id === 0x7109871a).value;
+  const lp = (b, o) => { const n = b.readUInt32LE(o); return [b.subarray(o + 4, o + 4 + n), o + 4 + n]; };
+  const [signers] = lp(value, 0);
+  const [signer] = lp(signers, 0);
+  const [signedData, afterSd] = lp(signer, 0);
+  const [digests] = lp(signedData, 0);
+  const [digestEntry] = lp(digests, 0);
+  const [, p1] = lp(signedData, 0);
+  const [certs, p2] = lp(signedData, p1);
+  const [certDer] = lp(certs, 0);
+  const [attrs] = lp(signedData, p2);
+  let protection = false, off = 0;
+  while (off < attrs.length) {
+    const [item, next] = lp(attrs, off);
+    if (item.readUInt32LE(0) === 0xbeeff00d) protection = true;
+    off = next;
+  }
+  const [, afterSigs] = lp(signer, afterSd);
+  const [publicKeys] = lp(signer, afterSigs);
+  const [inner] = lp(publicKeys, 0);
+  const spki = crypto.createPublicKey(forge.pki.certificateToPem(
+    forge.pki.certificateFromAsn1(forge.asn1.fromDer(certDer.toString('binary')))))
+    .export({ type: 'spki', format: 'der' });
+  return { protection, digestAlg: digestEntry.readUInt32LE(4 * 0 + 0), spkiMatchesCert: inner.equals(spki) };
+}
+
 
 let fails = 0;
 const fail = (m) => { fails++; console.log('  ✗ ' + m); };
@@ -87,7 +128,20 @@ const tpl = fs.readFileSync(TEMPLATE);
   check(v2Digests(apk, parseSigningBlock(apk).blockStart, parseSigningBlock(apk).size).chunks > 1,
     'content digest spans multiple 1 MB chunks');
   eq(parseZip(apk).entries.length, entries.length + 3, 'v1 adds MANIFEST.MF + CERT.SF + CERT.RSA');
-  eq(parseZip(apk).entries.find((e) => e.name === 'resources.arsc').dataOffset % 4, 0, 'stored entries stay 4-byte aligned');
+  const arscEntry = parseZip(apk).entries.find((e) => e.name === 'resources.arsc');
+  eq(arscEntry.dataOffset % 4, 0, 'stored entries stay 4-byte aligned');
+  eq(arscEntry.extra.subarray(0, 2).readUInt16LE(0), 0xd935, 'alignment is recorded as a 0xd935 extra field');
+  eq(arscEntry.extra.readUInt16LE(4), 4, 'the extra field names the 4-byte alignment');
+  eq(localExtraOf(apk, arscEntry.name).equals(arscEntry.extra), true, 'local and central headers carry the same extra field');
+  check(parseZip(apk).entries.every((e) => (e.flags & 0x0800) !== 0 && e.lFlags === e.flags),
+    'every entry is flagged as UTF-8 named, in both headers');
+
+  // the signer's public-keys field must carry the certificate's own key: senders
+  // and verifiers disagree here, and a mismatch makes the installer reject the APK
+  const key = v2SignerKey(apk);
+  check(key.spkiMatchesCert, 'signer public key matches the certificate');
+  check(key.protection, 'signed data carries the 0xbeeff00d stripping-protection attribute');
+  eq(key.digestAlg, 0x0103, 'content digest algorithm is RSASSA-PKCS1-v1_5 SHA-256');
 
   // flip one byte inside assets/game.html → both schemes must reject the file
   const victim = parseZip(apk).entries.find((e) => e.name === 'classes.dex');
