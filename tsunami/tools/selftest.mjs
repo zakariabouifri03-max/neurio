@@ -165,6 +165,49 @@ check('flood drains over ~23s', ocean.level < 2.0, `level=${ocean.level.toFixed(
 const spec = buildWaveSet(7, 1, [1, 0], 0.8);
 check('wave spectrum', spec.length === 8 && spec.every((w) => w.amp > 0 && w.k > 0 && Number.isFinite(w.steep)));
 
+// ---- audio one-shot coverage: every play('name') in src/ must have a case in audio.js
+{
+  const { readFileSync, readdirSync } = await import('node:fs');
+  const audio = readFileSync(new URL('../src/audio.js', import.meta.url), 'utf8');
+  const cases = new Set([...audio.matchAll(/case '([a-zA-Z_]+)'/g)].map((m) => m[1]));
+  const used = new Set();
+  for (const f of readdirSync(new URL('../src', import.meta.url))) {
+    if (!f.endsWith('.js')) continue;
+    const src = readFileSync(new URL(`../src/${f}`, import.meta.url), 'utf8');
+    for (const m of src.matchAll(/\.play\('([a-zA-Z_]+)'/g)) used.add(m[1]);
+  }
+  const missing = [...used].filter((n) => !cases.has(n));
+  check('audio one-shots all implemented', missing.length === 0, missing.join(',') || `${used.size} names`);
+}
+
+// ---- gameplay module import smoke: every module must load and expose its public API
+{
+  const mods = {
+    '../src/particles.js': ['FX'],
+    '../src/player.js': ['Player', 'STANCE'],
+    '../src/vehicles.js': ['VehicleSystem', 'VEHICLE_SPECS'],
+    '../src/survival.js': ['Survival', 'ITEMS', 'RECIPES', 'Inventory'],
+    '../src/fishing.js': ['Fishing', 'FISH', 'BAITS'],
+    '../src/npc.js': ['NPCSystem'],
+    '../src/disasters.js': ['Disasters'],
+    '../src/audio.js': ['Audio'],
+    '../src/post.js': ['Post'],
+    '../src/ui.js': ['UI'],
+    '../src/resource.js': ['ResourceField'],
+    '../src/sky.js': ['Sky'],
+    '../src/main.js': [],            // boots a Game on import — only checked for non-empty source
+  };
+  let bad = [];
+  for (const [file, names] of Object.entries(mods)) {
+    try {
+      if (file === '../src/main.js') continue;
+      const m = await import(file);
+      for (const n of names) if (!(n in m)) bad.push(`${file}:${n}`);
+    } catch (e) { bad.push(`${file} → ${e.message}`); }
+  }
+  check('gameplay modules import', bad.length === 0, bad.join(' | ') || `${Object.keys(mods).length} modules`);
+}
+
 log(`total ${Date.now() - t0} ms`);
 log(fails === 0 ? 'ALL CHECKS PASSED' : `${fails} CHECK(S) FAILED`);
 process.exit(fails === 0 ? 0 : 1);
