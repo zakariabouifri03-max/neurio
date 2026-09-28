@@ -1,59 +1,506 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>برج إيفل · Tour Eiffel 3D</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗼</text></svg>" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./src/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NEURIO GUYS — Fall Guys Menu</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>" />
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#0a7cff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Neurio Guys" />
+  <link rel="apple-touch-icon" href="./icons/icon-512.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css?v=fgmenu" />
+  <style>
+  /* Fall Guys main menu — exact screenshot */
+  .fgMain{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.22) 0 2px, transparent 2.2px 14px),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,.16) 0 1.8px, transparent 2px 18px),
+    linear-gradient(180deg, #0f8cff 0%, #2a9cff 22%, #3fafff 45%, #6ec8ff 100%);
+    overflow:hidden}
+  .fgMain.hidden{display:none}
+  .fgTop{height:46px;display:flex;align-items:center;gap:10px;padding:6px 10px;flex-shrink:0}
+  .fame{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border-radius:12px;background:#0b0f1a;color:#fff;border:1.5px solid rgba(255,255,255,.18);box-shadow:0 3px 10px rgba(0,0,0,.25)}
+  .fame .fp{width:30px;height:30px;border-radius:8px;background:linear-gradient(180deg,#ff7ab6,#ff3b8d);display:grid;place-items:center;font-size:14px}
+  .fame b{font-family:Fredoka,sans-serif;font-size:11px;line-height:1}
+  .fame small{font-size:10px;opacity:.7}
+  .fame .lock{margin-left:6px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:10px}
+  .topCenter{flex:1;display:flex;justify-content:center;gap:8px;pointer-events:none}
+  .topPill{padding:6px 10px;border-radius:999px;background:#0b0f1a;color:#fff;border:1px solid rgba(255,255,255,.18);display:flex;gap:6px;align-items:center;font-weight:800;font-size:12px;box-shadow:0 3px 8px rgba(0,0,0,.2)}
+  .topPill .ic{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px}
+  .topPill.crown .ic{background:#2ecc71;color:#fff}
+  .topPill.gem .ic{background:#e84393;color:#fff}
+  .topPill.add{width:22px;height:22px;padding:0;display:grid;place-items:center;background:#2ecc71;color:#fff;font-weight:900}
+  .topGear{width:34px;height:34px;border-radius:10px;background:#0b0f1a;border:1px solid rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;font-size:14px;cursor:pointer}
+  .fgBody{flex:1;display:grid;grid-template-columns:146px 1fr 180px;gap:12px;padding:8px 10px 14px;align-items:stretch}
+  .leftNav{display:flex;flex-direction:column;gap:8px;align-items:stretch;padding-top:6px}
+  .ln{padding:10px 8px;border-radius:14px;background:#0b66e0;border:2px solid #0a4eb0;color:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;box-shadow:0 4px 0 #0a4eb0, 0 6px 16px rgba(0,0,0,.25);font-weight:800;font-size:11px;letter-spacing:.04em;position:relative}
+  .ln:hover{transform:translateY(-1px);box-shadow:0 5px 0 #0a4eb0, 0 8px 18px rgba(0,0,0,.28)}
+  .ln .ico{font-size:18px}
+  .ln .alert{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#ff3b30;color:#fff;display:grid;place-items:center;font-size:11px;border:2px solid #fff}
+  .centerStage{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:end;padding-bottom:14px}
+  .beanWrap{position:relative;width:220px;height:300px;display:grid;place-items:end center}
+  .beanShadow{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);width:140px;height:30px;border-radius:50%;background:radial-gradient(ellipse at center, rgba(0,0,0,.35) 0%, transparent 70%);filter:blur(6px)}
+  .pedestal{width:160px;height:78px;border-radius:22px;background:linear-gradient(180deg,#ff9d3d 0%,#ff7a18 100%);border:3px solid #b85a0f;box-shadow:0 8px 0 #b85a0f, 0 12px 22px rgba(0,0,0,.3);display:flex;align-items:start;justify-content:center;padding-top:10px;position:relative}
+  .pedestal::after{content:'';position:absolute;inset:8px 8px auto 8px;height:14px;border-radius:999px;background:rgba(255,255,255,.18)}
+  /* 3D bean will be rendered via canvas behind, this is just DOM placeholder for menu — canvas bean will show */
+  .beanDOM{position:absolute;bottom:54px;left:50%;transform:translateX(-50%);width:140px;height:170px;border-radius:70px 70px 50px 50px;background:linear-gradient(180deg,#2a8cff 0%,#0a5bd8 100%);border:3px solid #0a3a8a;box-shadow:inset 0 10px 18px rgba(255,255,255,.22);display:flex;flex-direction:column;align-items:center;justify-content:start;padding-top:26px;overflow:hidden}
+  .beanDOM .face{width:76px;height:52px;border-radius:28px;background:#fefefe;display:flex;gap:14px;align-items:center;justify-content:center}
+  .beanDOM .eye{width:14px;height:18px;border-radius:8px;background:#111}
+  .playerCard{margin-top:10px;display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:linear-gradient(180deg,#3a6bff,#1a4dff);border:2px solid rgba(255,255,255,.9);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+  .playerCard .crownSmall{width:28px;height:28px;border-radius:8px;background:linear-gradient(180deg,#ffe27a,#ffb81c);border:2px solid #fff;display:grid;place-items:center;font-size:14px}
+  .playerCard .star{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center}
+  .playerCard b{font-family:Fredoka,sans-serif;font-size:12px}
+  .playerCard small{font-size:10px;opacity:.8}
+  .rightCol{display:flex;flex-direction:column;gap:10px;align-items:stretch;justify-content:space-between;padding:6px 0}
+  .friendsBtn{align-self:end;padding:8px 14px;border-radius:12px;background:#0b66e0;border:2px solid #0a4eb0;color:#fff;font-weight:800;font-size:12px;display:flex;gap:6px;align-items:center;cursor:pointer;box-shadow:0 3px 0 #0a4eb0}
+  .changeGame{padding:12px;border-radius:16px;background:linear-gradient(180deg,#ffffff,#e6f0ff);border:2px solid #0a4eb0;color:#0a4eb0;display:flex;gap:10px;align-items:center;cursor:pointer;box-shadow:0 4px 0 #0a4eb0}
+  .changeGame .cup{width:38px;height:38px;border-radius:10px;background:linear-gradient(180deg,#ffb81c,#ff8c00);display:grid;place-items:center;font-size:18px;border:2px solid #fff}
+  .changeGame b{font-family:Fredoka,sans-serif;font-size:13px}
+  .changeGame small{font-size:11px;opacity:.7}
+  .playBtn{padding:14px;border-radius:16px;background:linear-gradient(180deg,#fff 0%,#ffe27a 100%);border:3px solid #ff8c00;color:#7a3a00;display:flex;flex-direction:column;align-items:center;cursor:pointer;box-shadow:0 6px 0 #ff8c00, 0 10px 22px rgba(0,0,0,.3);transition:transform .12s}
+  .playBtn:hover{transform:translateY(-2px)}
+  .playBtn b{font-family:Fredoka,sans-serif;font-size:24px;letter-spacing:.04em}
+  .playBtn small{font-weight:800;letter-spacing:.12em;font-size:10px;opacity:.7}
+  .leftBottom{position:absolute;bottom:10px;left:10px;display:flex;gap:8px;align-items:center}
+  .lbadge{padding:6px 10px;border-radius:999px;background:#0b0f1a;color:#fff;border:1px solid rgba(255,255,255,.18);font-weight:800;font-size:11px;display:flex;gap:6px;align-items:center}
+  @media(max-width:760px){
+    .fgBody{grid-template-columns:1fr;gap:8px}
+    .leftNav{flex-direction:row;overflow:auto}
+    .ln{flex:1;min-width:92px;padding:8px 6px}
+    .rightCol{flex-direction:row;flex-wrap:wrap}
+    .changeGame,.playBtn{flex:1}
+    .beanWrap{height:240px}
+  }
+  </style>
 </head>
 <body>
-  <canvas id="scene"></canvas>
+  <canvas id="game"></canvas>
 
-  <!-- شاشة التحميل -->
-  <div id="loader" aria-hidden="true">
-    <div class="loader-icon">🗼</div>
-    <div class="loader-text">جارٍ بناء البرج…</div>
-    <div class="loader-bar"><span></span></div>
+  <!-- Fall Guys main menu — exact screenshot -->
+  <div id="fgMainMenu" class="fgMain">
+    <div class="fgTop">
+      <div class="fame">
+        <div class="fp">🎫</div>
+        <div>
+          <b>FAME PASS</b><br><small>22  372/29,900 &nbsp; 170 07H</small>
+        </div>
+        <div class="lock">🔒</div>
+      </div>
+      <div class="topCenter">
+        <div class="topPill crown"><span class="ic">👑</span> 0</div>
+        <button class="topPill add">+</button>
+        <div class="topPill gem"><span class="ic">◆</span> 1,600</div>
+      </div>
+      <button class="topGear" id="btnGear">⚙</button>
+    </div>
+
+    <div class="fgBody">
+      <nav class="leftNav">
+        <div class="ln" id="lnChallenges"><span class="alert">1</span><span class="ico">⚪⚪</span>CHALLENGES</div>
+        <div class="ln" id="lnCustom"><span class="ico">🎭</span>CUSTOMISE</div>
+        <div class="ln" id="lnShop"><span class="ico">🛒</span>SHOP</div>
+        <div class="ln" id="lnParty"><span class="ico">👥</span>PARTY</div>
+        <div class="ln" id="lnEvents"><span class="ico">📅</span>EVENTS</div>
+        <div class="leftBottom">
+          <div class="lbadge">⭐ 3/2</div>
+          <button id="btnHideMenu" style="padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(11,15,26,.7);color:#fff;cursor:pointer;font-size:11px">✕ HYAD</button>
+        </div>
+      </nav>
+
+      <div class="centerStage">
+        <div class="beanWrap">
+          <div class="beanShadow"></div>
+          <!-- DOM bean (canvas bean shows behind) -->
+          <div class="beanDOM">
+            <div class="face"><span class="eye"></span><span class="eye"></span></div>
+          </div>
+          <div class="pedestal"></div>
+        </div>
+        <div class="playerCard">
+          <div class="crownSmall">👑</div>
+          <div>
+            <b>Andrestto_epi</b><br><small>Rookie</small>
+          </div>
+          <div class="star">👤</div>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <button class="friendsBtn" id="btnFriends">👥 FRIENDS</button>
+        <div style="flex:1"></div>
+        <button class="changeGame" id="btnChangeGame">
+          <div class="cup">🏆</div>
+          <div><b>CHANGE GAME</b><br><small>KNOCKOUT</small></div>
+        </button>
+        <button class="playBtn" id="btnPlayFG">
+          <b>PLAY!</b><small>KNOCKOUT</small>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- العنوان -->
-  <header class="hud hud-top">
-    <h1>برج إيفل <span class="fr">Tour Eiffel</span></h1>
-    <p class="sub">باريس · 1889 — غوستاف إيفل · نموذج ثلاثي الأبعاد</p>
+  <!-- SHOP — exact Fall Guys shop (FEATURED/SEASON/ITEMS/SHOW-BUCKS) -->
+  <div id="shopMenu" class="hidden" style="position:fixed;inset:0;z-index:35;display:none;flex-direction:column;background:
+    radial-gradient(circle at 15% 20%, rgba(255,255,255,.14) 0 1.5px, transparent 1.5px 12px),
+    linear-gradient(180deg,#0a7cff 0%,#095bff 40%,#0840c0 100%);overflow:auto">
+    <div style="height:42px;background:#0b0f1a;display:flex;align-items:center;gap:6px;padding:0 10px;flex-shrink:0">
+      <span style="color:#fff;font-weight:800;font-size:13px;letter-spacing:.06em">SHOP</span>
+      <div style="flex:1;display:flex;justify-content:center;gap:6px">
+        <button class="shopTab" data-tab="featured" style="padding:6px 14px;border-radius:999px;background:#6b7cff;color:#fff;border:2px solid #fff;font-weight:800;font-size:11px">FEATURED</button>
+        <button class="shopTab" data-tab="season" style="padding:6px 14px;border-radius:999px;background:#2a3a6a;color:#fff;border:1px solid rgba(255,255,255,.18);font-weight:800;font-size:11px;opacity:.7">SEASON</button>
+        <button class="shopTab active" data-tab="items" style="padding:6px 14px;border-radius:999px;background:#ff3b8d;color:#fff;border:2px solid #fff;font-weight:800;font-size:11px">ITEMS</button>
+        <button class="shopTab" data-tab="bucks" style="padding:6px 14px;border-radius:999px;background:#1a274a;color:#fff;border:1px solid rgba(255,255,255,.18);font-weight:700;font-size:11px;opacity:.7">SHOW-BUCKS</button>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="padding:5px 8px;border-radius:999px;background:#0b0f1a;border:1px solid rgba(255,255,255,.18);color:#fff;font-weight:800;font-size:12px;display:flex;gap:6px;align-items:center"><span style="width:18px;height:18px;border-radius:50%;background:#ff3b30;display:grid;place-items:center;font-size:10px">Q</span> <span style="width:18px;height:18px;border-radius:50%;background:#fff;color:#0b0f1a;display:grid;place-items:center">⌂</span> <span style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center">👕</span> <span style="width:18px;height:18px;border-radius:50%;background:#ff3b8d;color:#fff;display:grid;place-items:center">🛒</span> <span style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center">⚙</span> <span style="margin-left:6px">E</span></span>
+        <span style="padding:6px 10px;border-radius:999px;background:#0b0f1a;border:1px solid rgba(255,255,255,.18);color:#fff;font-weight:800;font-size:12px;display:flex;gap:6px;align-items:center">🌈 2350</span>
+        <button id="shopClose" style="width:32px;height:32px;border-radius:10px;background:#0b0f1a;border:1px solid rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div style="padding:14px 14px 10px;flex:1;overflow:auto">
+      <div style="display:flex;gap:8px;margin-bottom:10px;overflow:auto">
+        <span style="padding:6px 12px;border-radius:999px;background:#0b66e0;color:#fff;border:2px solid #fff;font-weight:800;font-size:11px;white-space:nowrap">Z FEATURED</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(11,102,224,.35);color:#fff;border:1px solid rgba(255,255,255,.18);font-weight:700;font-size:11px;white-space:nowrap">SEASON</span>
+        <span style="padding:6px 12px;border-radius:999px;background:#ff3b8d;color:#fff;border:2px solid #fff;font-weight:800;font-size:11px;white-space:nowrap">ITEMS</span>
+        <span style="padding:6px 12px;border-radius:999px;background:rgba(26,39,74,.6);color:#fff;border:1px solid rgba(255,255,255,.18);font-weight:700;font-size:11px;white-space:nowrap">SHOW-BUCKS</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-weight:800;font-size:12px;color:#fff;display:flex;gap:6px;align-items:center">Daily <span style="padding:4px 8px;border-radius:999px;background:#0b0f1a;color:#fff;font-size:11px;display:flex;gap:4px;align-items:center">⏱ 23h 01m</span></span>
+        <span style="margin-left:auto;padding:4px 10px;border-radius:999px;background:#0b0f1a;color:#fff;font-size:11px;display:flex;gap:6px;align-items:center">🌈 0 <span style="background:#2ecc71;color:#fff;padding:2px 6px;border-radius:999px">+</span> ◆ 1,600 <span style="width:22px;height:22px;border-radius:8px;background:#fff;color:#0b0f1a;display:grid;place-items:center">⚙</span></span>
+      </div>
+      <div id="shopGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
+        <!-- cards injected by JS -->
+      </div>
+      <div style="margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(11,15,26,.45);border:1px solid rgba(255,255,255,.12);color:#fff;display:flex;justify-content:space-between">
+        <div><b style="font-family:Fredoka,sans-serif">SHOW-BUCKS</b><br><small style="opacity:.7">Show-Bucks</small></div>
+        <div style="text-align:right;opacity:.6;font-size:12px">Select <span style="padding:2px 6px;border-radius:6px;background:#fff;color:#0b0f1a">L</span> Confirm <span style="padding:2px 6px;border-radius:6px;background:#fff;color:#0b0f1a">✕</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wheel — 5 games 3chwaeiyin, 3ajala katdoor hta tiyahna fchi map -->
+  <div id="wheelOverlay" style="position:fixed;inset:0;z-index:45;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:radial-gradient(ellipse at center, rgba(15,30,110,.92) 0%, rgba(5,10,40,.96) 70%), linear-gradient(180deg,#0a7cff,#081a6a);backdrop-filter:blur(6px)">
+    <div style="text-align:center;color:#fff">
+      <div style="font-family:Fredoka,sans-serif;font-weight:800;font-size:22px;letter-spacing:.04em;display:flex;gap:8px;align-items:center;justify-content:center">🎡 KNOCKOUT WHEEL <span id="wheelRoundBadge" style="padding:4px 10px;border-radius:999px;background:#ff3b8d;border:2px solid #fff;font-size:12px">ROUND 1 / 5</span></div>
+      <small style="opacity:.7">5 maps 3chwaeiyin — l3ajala gha tdor hta ntayho f map!</small>
+      <div id="wheelQueue" style="margin-top:6px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap"></div>
+    </div>
+    <div style="position:relative;width:360px;height:360px;display:grid;place-items:center">
+      <div id="wheelPointer" style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);z-index:3;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:22px solid #ffd93d;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))"></div>
+      <div id="wheel" style="width:340px;height:340px;border-radius:50%;border:6px solid #fff;box-shadow:0 10px 30px rgba(0,0,0,.45), inset 0 0 0 12px rgba(0,0,0,.08);position:relative;overflow:hidden;transition:transform 4.2s cubic-bezier(.15,.85,.15,1);background:conic-gradient(from 0deg, #ff7ab6 0 36deg, #2ee5ff 36deg 72deg, #7b5cff 72deg 108deg, #0f1a3a 108deg 144deg, #2ecc71 144deg 180deg, #ff3b30 180deg 216deg, #87ceeb 216deg 252deg, #ffd93d 252deg 288deg, #16213e 288deg 324deg, #ff7a3d 324deg 360deg);transform:rotate(0deg)">
+        <!-- labels injected by JS -->
+      </div>
+      <div style="position:absolute;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 30% 20%, #fff 0 22%, #ffe27a 26% 60%, #ff8c00 100%);border:4px solid #fff;display:grid;place-items:center;font-size:28px;z-index:2;box-shadow:0 4px 12px rgba(0,0,0,.35)">👑</div>
+    </div>
+    <div id="wheelResult" style="padding:10px 16px;border-radius:14px;background:rgba(255,255,255,.95);color:#0b0f1a;font-weight:800;font-family:Fredoka,sans-serif;display:none;box-shadow:0 6px 18px rgba(0,0,0,.25)">→ CANDY CANYON ULTRA</div>
+    <button id="wheelSkip" style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);color:#fff;font-weight:700;cursor:pointer;font-size:11px">SKIP ⏩</button>
+  </div>
+
+  <!-- Loader -->
+  <div id="loader" style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(13,17,36,.92);color:#fff;text-align:center">
+    <div>
+      <div style="font-size:44px">👑</div>
+      <div style="font-family:Fredoka,sans-serif;font-weight:800;margin:6px 0">NEURIO GUYS ULTRA</div>
+      <div style="opacity:.6;font-size:11px;letter-spacing:.1em">FALL GUYS MENU • LOADING…</div>
+      <div style="margin-top:12px;width:200px;height:6px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden;margin-inline:auto"><span style="display:block;width:40%;height:100%;background:linear-gradient(90deg,#ff3b8d,#ffd93d);animation:slide 1s infinite"></span></div>
+    </div>
+  </div>
+  <style>@keyframes slide{0%{transform:translateX(-120%)}100%{transform:translateX(320%)}} @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}</style>
+
+  <!-- Game HUD (shown after PLAY) -->
+  <header id="gameHud" class="hidden" style="position:fixed;top:10px;left:10px;right:10px;z-index:20;display:flex;justify-content:space-between;pointer-events:none">
+    <button id="backMenu" style="pointer-events:auto;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(16,20,45,.7);color:#fff;cursor:pointer">← MENU</button>
+    <div style="display:flex;gap:8px">
+      <span id="hudFps" style="padding:6px 10px;border-radius:999px;background:rgba(16,20,45,.7);color:#fff;font-size:11px;border:1px solid rgba(255,255,255,.15)">60 FPS</span>
+      <span id="hudTime" style="padding:6px 10px;border-radius:999px;background:rgba(16,20,45,.7);color:#fff;font-size:11px;border:1px solid rgba(255,255,255,.15)">01:30</span>
+    </div>
   </header>
 
-  <!-- أزرار التحكم -->
-  <div class="hud hud-actions">
-    <button id="btn-theme" class="chip" title="ليل / نهار">🌙</button>
-    <button id="btn-rotate" class="chip" title="دوران تلقائي">⏸</button>
-    <button id="btn-full" class="chip" title="ملء الشاشة">⛶</button>
+  <div id="toast" style="position:fixed;left:50%;top:62px;transform:translateX(-50%);z-index:70;padding:10px 16px;border-radius:999px;background:linear-gradient(90deg,#ff3b8d,#7b5cff);color:#fff;font-weight:800;display:none">Toast</div>
+
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/" } }</script>
+  <script>
+  // PWA — install as APK-like
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').then(()=>console.log('SW ok APK ready')).catch(()=>{}); }
+  // hide loader fallback
+  setTimeout(()=>{ const l=document.getElementById('loader'); if(l) l.style.display='none'; }, 2600);
+  // menu logic + KNOCKOUT 5 GAMES 3CHWAEIYIN — 3ajala
+  const fgMenu=document.getElementById('fgMainMenu');
+  const gameHud=document.getElementById('gameHud');
+  const toast=document.getElementById('toast');
+  const wheelOverlay=document.getElementById('wheelOverlay');
+  const wheelEl=document.getElementById('wheel');
+  const wheelQueue=document.getElementById('wheelQueue');
+  const wheelRoundBadge=document.getElementById('wheelRoundBadge');
+  const wheelResult=document.getElementById('wheelResult');
+  function showToast(m){ toast.textContent=m; toast.style.display='block'; setTimeout(()=>toast.style.display='none',2200); }
+  // map data for wheel (mirrors LONG_MAPS names/colors) — 10 maps
+  const WHEEL_MAPS=[
+    {id:0,name:'CANDY CANYON ULTRA',accent:'#ff7ab6',color:'#fff4cc',icon:'🍬'},
+    {id:1,name:'SLIME CLIMB XL',accent:'#2ee5ff',color:'#d8ffe6',icon:'💦'},
+    {id:2,name:'HEX TOWER MEGA',accent:'#7b5cff',color:'#e0dbff',icon:'⬣'},
+    {id:3,name:'SPACE DASH 500M',accent:'#0f1a3a',color:'#1a2a5a',icon:'🚀'},
+    {id:4,name:'JUNGLE SLIDE XXL',accent:'#2ecc71',color:'#8ed48c',icon:'🌴'},
+    {id:5,name:'NEON CITY NIGHT',accent:'#ff00e6',color:'#16213e',icon:'🌃'},
+    {id:6,name:'VOLCANO RUSH',accent:'#ff3b30',color:'#ff9f1c',icon:'🌋'},
+    {id:7,name:'SKY RACE 400M',accent:'#87ceeb',color:'#fff0d0',icon:'☁️'},
+    {id:8,name:'DOOR DASH CLASSIC',accent:'#ffd93d',color:'#ffffff',icon:'🚪'},
+    {id:9,name:'TIP TOE ULTRA',accent:'#ff7a3d',color:'#ffd6e8',icon:'👣'},
+  ];
+  let tournament={queue:[], idx:0, results:[]};
+  let wheelSpinning=false;
+  let wheelAngle=0;
+  function buildWheelLabels(){
+    wheelEl.innerHTML='';
+    WHEEL_MAPS.forEach((m,i)=>{
+      const a=i*36;
+      const lab=document.createElement('div');
+      lab.style.cssText=`position:absolute;left:50%;top:50%;width:110px;height:34px;margin-left:-55px;margin-top:-170px;transform-origin:50% 170px;transform:rotate(${a+18}deg);display:flex;flex-direction:column;align-items:center;justify-content:start;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);pointer-events:none`;
+      lab.innerHTML=`<span style="font-size:15px">${m.icon}</span><span style="font-size:7px;font-weight:800;letter-spacing:.04em;text-align:center;line-height:1.1">${m.name}</span>`;
+      wheelEl.appendChild(lab);
+    });
+  }
+  buildWheelLabels();
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+  function ensureGameLoaded(cb){
+    if(!window._gameLoaded){
+      window._gameLoaded=true;
+      const s=document.createElement('script'); s.type='module'; s.src='./src/main.js?v=wheel5';
+      s.onload=()=> setTimeout(cb,300);
+      document.body.appendChild(s);
+    } else cb();
+  }
+  function renderQueue(){
+    if(!wheelQueue) return;
+    wheelQueue.innerHTML='';
+    tournament.queue.forEach((id,i)=>{
+      const m=WHEEL_MAPS.find(x=>x.id===id);
+      const pill=document.createElement('span');
+      const state = i < tournament.idx ? '✅' : i===tournament.idx ? '🎯' : '○';
+      const bg = i===tournament.idx ? '#ffd93d' : i < tournament.idx ? 'rgba(46,204,113,.9)' : 'rgba(255,255,255,.12)';
+      const col = i===tournament.idx ? '#0b0f1a' : '#fff';
+      const border = i===tournament.idx ? '2px solid #fff':'1px solid rgba(255,255,255,.18)';
+      pill.style.cssText=`padding:4px 8px;border-radius:999px;background:${bg};color:${col};border:${border};font-weight:800;font-size:10px;display:flex;gap:4px;align-items:center`;
+      pill.textContent=`${state} ${i+1}. ${m.name}`;
+      wheelQueue.appendChild(pill);
+    });
+  }
+  function spinWheelTo(targetId, cb){
+    if(wheelSpinning) return;
+    wheelSpinning=true;
+    const targetIdx=WHEEL_MAPS.findIndex(m=>m.id===targetId);
+    const segAngle=360 / WHEEL_MAPS.length; // 36deg
+    const targetCenter = targetIdx*segAngle + segAngle/2; // angle of center of segment at 0deg
+    // we want pointer at 0deg (top). wheel rotation should bring targetCenter to 0deg. Wheel rotates clockwise. So wheelAngle should be 360 - targetCenter + extra spins
+    const spins = 5 + Math.floor(Math.random()*3); // 5-7 full spins
+    const finalAngle = spins*360 + (360 - targetCenter);
+    const currentMod = wheelAngle % 360;
+    const delta = finalAngle - currentMod;
+    wheelAngle += delta;
+    wheelEl.style.transform=`rotate(${wheelAngle}deg)`;
+    wheelResult.style.display='none';
+    wheelResult.textContent='';
+    // tick sounds via WebAudio click ? use showToast
+    let ticks=0; const tickInterval=setInterval(()=>{ ticks++; if(ticks>18) clearInterval(tickInterval); }, 180);
+    setTimeout(()=>{
+      wheelSpinning=false;
+      const m=WHEEL_MAPS.find(x=>x.id===targetId);
+      wheelResult.textContent=`🎯 ${m.icon}  ${m.name}  → GO!`;
+      wheelResult.style.display='block';
+      wheelResult.style.background='#ffd93d';
+      if(cb) cb();
+    }, 4300);
+  }
+  function hideWheelAndStartMap(mapId){
+    setTimeout(()=>{
+      wheelOverlay.style.display='none';
+      gameHud.classList.remove('hidden'); gameHud.style.display='flex';
+      if(window._game && window._game.startLong){
+        window._game.startLong(mapId);
+      } else if(window._game && window._game.start){
+        window._game.start();
+      }
+      showToast(`ROUND ${tournament.idx+1}/5 — ${WHEEL_MAPS.find(m=>m.id===mapId).name} 🏃`);
+    }, 900);
+  }
+  function startTournament(){
+    fgMenu.classList.add('hidden');
+    // generate 5 random distinct maps
+    const ids=shuffle(WHEEL_MAPS.map(m=>m.id)).slice(0,5);
+    tournament={queue:ids, idx:0, results:[]};
+    // expose globally for main.js finish hook
+    window._tournament=tournament;
+    window._wheelSpinForNext = spinNext; // expose
+    renderQueue();
+    // ensure game loaded then spin first round
+    ensureGameLoaded(()=>{
+      wheelOverlay.style.display='flex';
+      wheelRoundBadge.textContent=`ROUND 1 / 5`;
+      renderQueue();
+      // small delay then spin
+      setTimeout(()=> spinWheelTo(tournament.queue[0], ()=> hideWheelAndStartMap(tournament.queue[0]) ), 500);
+    });
+  }
+  function spinNext(){
+    // called after a round finishes (qualified). Increment idx and spin to next.
+    tournament.idx++;
+    window._tournament=tournament;
+    if(tournament.idx >= tournament.queue.length){
+      // tournament finished — all 5 survived (rare). Show victory
+      setTimeout(()=> showTournamentFinish(true), 600);
+      return;
+    }
+    wheelOverlay.style.display='flex';
+    wheelRoundBadge.textContent=`ROUND ${tournament.idx+1} / 5`;
+    renderQueue();
+    // hide game hud during spin
+    gameHud.style.display='none';
+    setTimeout(()=> spinWheelTo(tournament.queue[tournament.idx], ()=> hideWheelAndStartMap(tournament.queue[tournament.idx]) ), 600);
+  }
+  function showTournamentFinish(victory){
+    wheelOverlay.style.display='flex';
+    wheelEl.style.transform=`rotate(${wheelAngle}deg)`;
+    wheelResult.style.display='block';
+    wheelResult.style.background= victory ? 'linear-gradient(90deg,#ffd93d,#ff8c00)' : 'rgba(255,59,141,.95)';
+    wheelResult.style.color= victory ? '#0b0f1a':'#fff';
+    const passed=tournament.results.filter(r=>r.qualified).length;
+    const name=victory?'🏆 TOURNAMENT CHAMPION!':'💀 ELIMINATED';
+    wheelResult.innerHTML=`${name} — ${passed}/5 maps cleared<br><small style="font-weight:600;opacity:.8">Click PLAY again for new 5 random maps</small>`;
+    wheelRoundBadge.textContent=`FINISHED ${tournament.idx+1}/5`;
+    renderQueue();
+    // after 2.5s allow return to menu
+    setTimeout(()=>{ wheelOverlay.style.display='none'; fgMenu.classList.remove('hidden'); gameHud.style.display='none'; }, victory? 3800:3200);
+  }
+  window._showTournamentFinish=showTournamentFinish;
+  window._onRoundFinish=(qualified, place, time)=>{
+    tournament.results.push({mapId:tournament.queue[tournament.idx], qualified, place, time});
+    if(!qualified){
+      setTimeout(()=> showTournamentFinish(false), 1200);
+    } else {
+      setTimeout(()=> spinNext(), 1800);
+    }
+  };
+  // expose spin skip
+  document.getElementById('wheelSkip')?.addEventListener('click', ()=>{
+    if(wheelSpinning){ wheelEl.style.transition='none'; wheelEl.offsetHeight; wheelEl.style.transition='transform 0.25s ease'; }
+    // fast forward: jump to target immediately
+    wheelSpinning=false;
+    const targetId=tournament.queue[tournament.idx];
+    const m=WHEEL_MAPS.find(x=>x.id===targetId);
+    wheelResult.textContent=`🎯 ${m.icon} ${m.name} → GO!`;
+    wheelResult.style.display='block';
+    wheelResult.style.background='#ffd93d';
+    setTimeout(()=> hideWheelAndStartMap(targetId), 400);
+  });
+  function play(){
+    startTournament();
+  }
+  document.getElementById('btnPlayFG').addEventListener('click', play);
+  document.getElementById('btnChangeGame').addEventListener('click', ()=>{
+    const m=document.getElementById('map-modal'); if(m) m.classList.remove('hidden'); else play();
+  });
+  document.getElementById('btnHideMenu').addEventListener('click', ()=>{ fgMenu.classList.add('hidden'); showToast('Menu hyad — M to rje3'); });
+  document.getElementById('backMenu').addEventListener('click', ()=>{ fgMenu.classList.remove('hidden'); gameHud.style.display='none'; });
+  document.getElementById('btnGear').addEventListener('click', ()=>{ const s=document.getElementById('settings-modal'); if(s) s.classList.remove('hidden'); else showToast('⚙ Settings'); });
+  document.getElementById('lnChallenges').addEventListener('click', ()=> showToast('Challenges — Dive 15x'));
+  document.getElementById('lnCustom').addEventListener('click', ()=> showToast('Customise — coming soon'));
+  document.getElementById('btnFriends').addEventListener('click', ()=>{ const m=document.getElementById('mp-modal'); if(m) m.classList.remove('hidden'); else showToast('Friends'); });
+  // SHOP — bhal had shop screenshots
+  const shopMenu=document.getElementById('shopMenu');
+  const shopGrid=document.getElementById('shopGrid');
+  const shopItems=[
+    {name:'CROWNED BEANDANA', price:2200, rarity:'COMMON', bg:'#0a8cff', accent:'#ff3b30', icon:'👑'},
+    {name:'STRIPY SOCKS', price:1800, rarity:'COMMON', bg:'#0a8cff', accent:'#ff6b6b', icon:'🧦'},
+    {name:'STAR SIGN', price:1100, rarity:'COMMON', bg:'#ffe033', accent:'#7b5cff', icon:'⭐'},
+    {name:'RASPBERRY LIME', price:2000, rarity:'COMMON', bg:'#0affa0', accent:'#ff3b8d', icon:'🥤'},
+    {name:'BIG WHALE', price:500, rarity:'COMMON', bg:'#0a8cff', accent:'#ffb81c', icon:'🐳'},
+    {name:'GLIZZY BAND', price:2200, rarity:'COMMON', bg:'#1a1a2e', accent:'#ffb81c', icon:'🌭'},
+    {name:'BOOTS OF MERCURY', price:1800, rarity:'COMMON', bg:'#ff6b9b', accent:'#fff', icon:'👢'},
+    {name:'SWEET FADE', price:1100, rarity:'COMMON', bg:'#1a1a2e', accent:'#333', icon:'◼'},
+    {name:'OLD OS', price:2000, rarity:'COMMON', bg:'#00e6ff', accent:'#0a3a8a', icon:'🖥️'},
+    {name:'KNOCK OFF', price:8000, rarity:'RARE', bg:'#0a8cff', accent:'#ffcc00', icon:'🥊'},
+    {name:'TWOO', price:3, rarity:'EPIC', cur:'👑', bg:'#7b5cff', accent:'#fff', icon:'🦉'},
+    {name:'NINJA', price:7000, rarity:'EPIC', bg:'#0a8cff', accent:'#00e6ff', icon:'🥷'},
+  ];
+  function renderShop(filter='all'){
+    if(!shopGrid) return;
+    shopGrid.innerHTML='';
+    shopItems.forEach(it=>{
+      const card=document.createElement('div');
+      card.style.cssText=`padding:10px;border-radius:14px;background:linear-gradient(180deg,#0a9cff 0%, #0666e0 100%);border:2px solid #fff;color:#fff;box-shadow:0 4px 0 #0a4eb0;display:flex;flex-direction:column;gap:6px;cursor:pointer;position:relative;overflow:hidden`;
+      const rarityColor = it.rarity==='RARE'?'#2ecc71':it.rarity==='EPIC'?'#9b59b6':'#2ecc71';
+      card.innerHTML=`
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:999px;background:${it.rarity==='RARE'?'#2ecc71':it.rarity==='EPIC'?'#8e44ad':'#2ecc71'};color:#fff">${it.rarity}</span>
+          <span style="font-size:10px;opacity:.6">Daily ⏱ 23h 01m</span>
+        </div>
+        <div style="height:96px;border-radius:10px;background:${it.bg};display:grid;place-items:center;font-size:42px;position:relative;overflow:hidden">
+          <span>${it.icon}</span>
+          <span style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(0,0,0,.18);color:#fff;white-space:nowrap">${it.name}</span>
+        </div>
+        <div style="text-align:center">
+          <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(0,0,0,.18);color:#fff">${it.rarity}</span>
+          <div style="margin-top:4px;padding:4px 8px;border-radius:999px;background:${it.cur==='👑'?'#ffb81c':'#9b59b6'};color:#fff;font-weight:800;font-size:13px;display:flex;gap:6px;align-items:center;justify-content:center">${it.cur||'◆'} ${it.price}</div>
+        </div>
+      `;
+      card.onclick=()=> showToast(`🛒 ${it.name} — ${it.price} ${it.cur||'◆'} (Owned demo)`);
+      shopGrid.appendChild(card);
+    });
+  }
+  renderShop();
+  document.getElementById('lnShop')?.addEventListener('click', ()=>{ shopMenu.style.display='flex'; renderShop(); });
+  document.getElementById('shopClose')?.addEventListener('click', ()=> shopMenu.style.display='none');
+  document.querySelectorAll('.shopTab').forEach(b=> b.addEventListener('click', ()=>{
+    document.querySelectorAll('.shopTab').forEach(x=> x.style.opacity='.7');
+    b.style.opacity='1'; renderShop(b.dataset.tab);
+  }));
+  window.addEventListener('keydown', e=>{ if(e.key==='Escape' && shopMenu.style.display==='flex') shopMenu.style.display='none'; });
+  window.addEventListener('keydown', e=>{ if(e.key==='Enter' && !fgMenu.classList.contains('hidden')) play(); if(e.key.toLowerCase()==='m'){ fgMenu.classList.toggle('hidden'); }});
+  // expose for main.js
+  window._showToast = showToast;
+  </script>
+
+  <!-- keep original modals (settings/map/mp/finish) for game — hidden initially -->
+  <div id="settings-modal" class="overlay hidden" style="position:fixed;inset:0;z-index:80;display:none;place-items:center;background:rgba(13,17,36,.92)">
+    <div style="background:#1a1f46;padding:20px;border-radius:16px;color:#fff;max-width:520px;text-align:center">
+      <h3 style="font-family:Fredoka,sans-serif">⚙ SETTINGS — ULTRA</h3>
+      <p style="opacity:.7;font-size:13px;margin:8px 0">RTX 5060 • 4096 shadows • 60fps light for weak phones</p>
+      <button onclick="document.getElementById('settings-modal').style.display='none'" style="padding:10px 16px;border-radius:10px;border:none;background:#ff3b8d;color:#fff;font-weight:800;cursor:pointer">CLOSE</button>
+    </div>
+  </div>
+  <div id="map-modal" class="overlay hidden" style="position:fixed;inset:0;z-index:80;display:none;place-items:center;background:rgba(13,17,36,.92)">
+    <div style="background:#1a1f46;padding:20px;border-radius:16px;color:#fff;max-width:640px;width:90%;text-align:center">
+      <h3 style="font-family:Fredoka,sans-serif">🗺️ MAPS TAWILA</h3>
+      <div id="map-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0"></div>
+      <button onclick="document.getElementById('map-modal').style.display='none'" style="padding:10px 16px;border-radius:10px;border:none;background:#7b5cff;color:#fff;font-weight:800;cursor:pointer">CLOSE</button>
+    </div>
+  </div>
+  <div id="mp-modal" class="overlay hidden" style="position:fixed;inset:0;z-index:80;display:none;place-items:center;background:rgba(13,17,36,.92)">
+    <div style="background:#1a1f46;padding:20px;border-radius:16px;color:#fff;max-width:520px;text-align:center">
+      <h3>🛜 LAN</h3>
+      <p style="opacity:.7;font-size:13px">WiFi LAN — host/join via code</p>
+      <button onclick="document.getElementById('mp-modal').style.display='none'" style="padding:10px 16px;border-radius:10px;border:none;background:#2ecc71;color:#fff;font-weight:800;cursor:pointer">CLOSE</button>
+    </div>
+  </div>
+  <div id="overlay-finish" class="overlay hidden" style="position:fixed;inset:0;z-index:80;display:none;place-items:center;background:rgba(13,17,36,.92);color:#fff;text-align:center">
+    <div>
+      <div style="font-size:48px">👑</div>
+      <h2>QUALIFIED!</h2>
+      <button onclick="document.getElementById('overlay-finish').style.display='none'; document.getElementById('fgMainMenu').classList.remove('hidden')" style="margin-top:12px;padding:10px 16px;border-radius:10px;border:none;background:#ff3b8d;color:#fff;font-weight:800;cursor:pointer">BACK TO MENU</button>
+    </div>
   </div>
 
-  <!-- بطاقة المعلومات -->
-  <aside class="hud facts" dir="rtl">
-    <div class="fact"><span class="k">الارتفاع</span><span class="v">330 m</span></div>
-    <div class="fact"><span class="k">الطوابق</span><span class="v">3</span></div>
-    <div class="fact"><span class="k">الوزن الحديدي</span><span class="v">7 300 t</span></div>
-    <div class="fact"><span class="k">سالبات الضوء</span><span class="v">20 000 💡</span></div>
-  </aside>
-
-  <!-- تلميح التحكم -->
-  <footer class="hud hint" dir="rtl">
-    🖱️ اسحب للدوران · عجلة الفأرة للتقريب · الزر الأيمن للإزاحة · اضغط <b>N</b> للليل
-  </footer>
-
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "./vendor/three.module.js",
-      "three/addons/": "./vendor/"
-    }
-  }
-  </script>
-  <script type="module" src="./src/main.js"></script>
+  <!-- Hidden HUD for main.js compatibility (so game engine finds its elements) -->
+  <div id="compatHud" style="display:none">
+    <div id="game-hud"></div><div id="left-hud"></div><div id="bottom-hud"></div>
+    <span id="hud-time">01:30</span><span id="hud-qualified">0 / 12</span><span id="hud-pos">#1</span><span id="hud-fps">60 FPS</span>
+    <div id="progress-fill"></div><div id="progress-bean"></div><div id="progress-bots"></div><div id="player-dots"></div><span id="progress-pct">0%</span>
+    <canvas id="mini" width="180" height="180"></canvas>
+    <div id="player-dots"></div><div id="toast-compat" class="toast hidden"></div>
+    <div id="overlay-menu" class="overlay fg-menu hidden"></div>
+    <div id="touch"><div id="stick"><div id="stick-inner"></div></div><button id="t-jump"></button><button id="t-dive"></button></div>
+  </div>
 </body>
 </html>

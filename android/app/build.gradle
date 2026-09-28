@@ -1,0 +1,40 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.neurio.guys'
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.neurio.guys"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+}
+dependencies { implementation 'androidx.appcompat:appcompat:1.6.1' }
+// copy web assets into APK (offline)
+task copyWebAssets(type: Copy) {
+    from rootProject.file('../index.html')
+    from rootProject.file('../manifest.json')
+    from rootProject.file('../sw.js')
+    into 'src/main/assets'
+}
+task copySrc(type: Copy) {
+    from rootProject.file('../src')
+    into 'src/main/assets/src'
+}
+task copyVendor(type: Copy) {
+    from rootProject.file('../vendor')
+    into 'src/main/assets/vendor'
+}
+task copyIcons(type: Copy) {
+    from rootProject.file('../icons')
+    into 'src/main/assets/icons'
+}
+preBuild.dependsOn copyWebAssets, copySrc, copyVendor, copyIcons

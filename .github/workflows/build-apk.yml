@@ -1,0 +1,41 @@
+name: Build APK
+on:
+  push:
+    branches: [ arena/01a0e3cc-neurio, main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Setup Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls -la $ANDROID_HOME/cmdline-tools/ || true
+          if [ ! -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            mkdir -p $ANDROID_HOME/cmdline-tools
+            wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline.zip
+            unzip -q /tmp/cmdline.zip -d /tmp
+            rm -rf $ANDROID_HOME/cmdline-tools/latest
+            mv /tmp/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+          fi
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" || $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+      - uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.4
+      - name: Build APK
+        working-directory: android
+        run: gradle assembleDebug --stacktrace --info
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: neurio-guys-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
