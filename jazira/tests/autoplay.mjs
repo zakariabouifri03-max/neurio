@@ -242,8 +242,14 @@ while (frames < MAX) {
         const coop = w.struct('coop');
         if (coop && Math.hypot(coop.x - p.x, (coop.y + 30) - p.y) > 26) walkToward(coop.x, coop.y + 30, 320);
         else tick();
-      } else if (Math.hypot(a.x - p.x, a.y - p.y) > 30) walkToward(a.x, a.y + 4, 200);
-      else { g.doAction(); tick(); }
+      } else {
+        // الآلية الجديدة: إلا وقفت وعندك بزر، الدجاجة كتقرب بوحدها
+        const d = Math.hypot(a.x - p.x, a.y - p.y);
+        const it = g.nearestInteraction();
+        if (it && String(it.label).includes('بزر') && d < 52) { g.doAction(); tick(); }
+        else if (d > 95) { g.input.run = true; walkToward(a.x, a.y + 4, 200); g.input.run = false; }
+        else { g.input.x = 0; g.input.y = 0; tick(); }     // وقفان باش تجي الدجاجة
+      }
       break;
     }
     case 'boat': { goToAndAct(plan.boat.x, plan.boat.y + 22, 46); break; }

@@ -221,7 +221,7 @@ catch (e) { ok(false, 'اللعب من بعد الرجوع طاح: ' + e.message
 
 console.log('\n[الإقلاع الحقيقي — main.js]');
 // كنقلعو اللعبة بحال ما كتقلع فالمتصفح، فحالات مختلفة
-async function bootReal(url, { saved = null, fakeWebgl = false } = {}) {
+async function bootReal(url, { saved = null, fakeWebgl = false, save = null } = {}) {
   const d = new JSDOM(html, { pretendToBeVisual: true, url });
   const w = d.window;
   w.HTMLCanvasElement.prototype.getContext = function (type) {
@@ -238,6 +238,7 @@ async function bootReal(url, { saved = null, fakeWebgl = false } = {}) {
   globalThis.location = w.location;
   globalThis.requestAnimationFrame = () => 0;
   if (saved) w.localStorage.setItem('jazira_mode', saved);
+  if (save) w.localStorage.setItem('jazira_save_v1', save);
   await import('../src/main.js?boot=' + Math.random());
   await wait(400);
   return w;
@@ -260,6 +261,29 @@ ok(wD.game.view.type === '2d', 'WebGL مزيّف/خايب → كترجع 2D بل
 
 const wE = await bootReal('http://localhost:8080/');
 ok(wE.game.view.type === '2d', 'بلا WebGL اصلا → 2D أوتوماتيك');
+
+console.log('\n[?play=1 — اللعب ديريكت]');
+const wF = await bootReal('http://localhost:8080/?play=1');
+ok(wF.game.state === 'playing', `الدخول ديريكت للعب (state=${wF.game.state})`);
+ok(wF.document.querySelectorAll('#ui .screen:not(.hidden)').length === 0, 'ما كايناش شاشة مفتوحة');
+ok(!!wF.game.world && !!wF.game.player, 'العالم واللاعب واجدين');
+ok(wF.document.body.classList.contains('autoplay'), 'الوضع الأوتوماتيك معلّم فالـbody');
+ok(!!wF.document.getElementById('hud') && !!wF.document.getElementById('barHp'), 'HUD كاين (الصحة والمرحلة)');
+const day0 = wF.game.world.time;
+wF.game.update(0.5);
+ok(wF.game.world.time > day0, 'الوقت كيدور (اللعبة خدامة ماشي مصوّرة)');
+
+const wG = await bootReal('http://localhost:8080/?auto=1&seed=20240928');
+ok(wG.game.state === 'playing', '?auto=1 تالخداكة');
+ok(wG.game.seed === 20240928, `البذرة من الرابط (${wG.game.seed})`);
+const wH = await bootReal('http://localhost:8080/?play=0');
+ok(wH.game.state === 'menu', '?play=0 كيبقى على القائمة');
+
+// ?play=1 مع حفظ موجود → كيكمّل من الحفظ ماشي جزيرة جديدة
+const saveJson = JSON.stringify(wF.game.toJSON());
+const wI = await bootReal('http://localhost:8080/?play=1', { save: saveJson });
+ok(wI.game.state === 'playing', '?play=1 مع حفظ → كيكمّل مباشرة');
+ok(wI.game.seed === wF.game.seed, `نفس الجزيرة المحفوظة (${wI.game.seed})`);
 
 console.log(fails === 0 ? `\n🎉 ${total} اختبار فالواجهة كاملين خدامين!` : `\n⚠️ ${fails}/${total} اختبارات طايحين`);
 process.exit(fails ? 1 : 0);

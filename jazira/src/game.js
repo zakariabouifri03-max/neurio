@@ -211,10 +211,10 @@ export class Game {
     // الحيوانات
     for (const a of world.animals) {
       const d = dist(p.x, p.y, a.x, a.y) - a.r;
-      if (d > 40) continue;
+      if (d > 46) continue;
       if (a.type === 'chicken') {
         if (a.tamed) continue;
-        push(d - 8, this.inv.seed > 0 ? `🐔 عطي بزر (${a.affinity || 0}/3)` : '🐔 الدجاج خايف (خاصك بزر)', () => this.feedChicken(a), '🐔', a);
+        push(d - 16, this.inv.seed > 0 ? `🐔 عطي بزر (${a.affinity || 0}/3)` : '🐔 الدجاج خايف (خاصك بزر)', () => this.feedChicken(a), '🐔', a);
       } else if (a.type === 'goat') push(d, '🐐 اضرب العنزة', () => this.attackAnimal(a), '🐐');
       else if (a.type === 'boar') push(d, '🐗 اضرب الخنزير (خود بالك!)', () => this.attackAnimal(a), '🐗', a);
     }
@@ -557,6 +557,17 @@ export class Game {
   }
 
   addBuilt(kind, x, y) {
+    // ما نخليوش بناية تنزل فوق حيوان (كان كيعلقوه)
+    const r = (KIND_DEF[kind].r || 20) + 8;
+    for (const a of this.world.animals) {
+      const d = Math.hypot(a.x - x, a.y - y);
+      if (d < r + a.r) {
+        const ux = d < 0.01 ? 1 : (a.x - x) / d, uy = d < 0.01 ? 0 : (a.y - y) / d;
+        a.x = x + ux * (r + a.r + 2);
+        a.y = y + uy * (r + a.r + 2);
+        a.moveAcc = 0; a.bestD = undefined; a.lx = undefined;
+      }
+    }
     const o = this.world.addObj({ kind, x, y });
     if (kind === 'campfire') o.lit = true;
     if (kind === 'boat') {

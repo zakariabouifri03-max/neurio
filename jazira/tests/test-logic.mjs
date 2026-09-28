@@ -86,28 +86,40 @@ while (!rock2.depleted && guard++ < 40) { game.hitCd = 0; game.doAction(); step(
 t.ok(rock2.depleted, 'الصخرة تنقّات بالمعول');
 
 t.section('[5] الدجاج');
-const chick = w.animals.filter((a) => a.type === 'chicken').sort((a, b) => near(a) - near(b))[0];
-game.addItem('seed', 8);
-t.ok(walkTo(chick.x, chick.y + 18), 'وصلت للدجاجة');
-for (let i = 0; i < 14 && !chick.tamed; i++) {
-  walkTo(chick.x, chick.y + 18, 240);
-  const it = game.nearestInteraction();
-  if (it && !String(it.label).includes('بزر') && !String(it.label).includes('دجاج')) {
-    // واقفين حدا حاجة أخرى — نقربو للدجاجة أكثر
-    walkTo(chick.x - Math.cos(chick.dir) * 10, chick.y + 10 + Math.sin(chick.dir) * 10, 120);
+// الدجاجة اللي كتقرب لينا بالبزر (يمكن يكونو باقيين، كنتبعو اللي كتولّف)
+let fed = null;
+let approached = false;
+for (let i = 0; i < 70 && !fed; i++) {
+  const nearChick = w.animals.filter((a) => a.type === 'chicken' && !a.tamed)
+    .sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+  if (!nearChick) break;
+  const dChick = Math.hypot(nearChick.x - p.x, nearChick.y - p.y);
+  if (dChick > 100) { game.input.run = true; walkTo(nearChick.x, nearChick.y, 240); game.input.run = false; }
+  game.input.x = 0; game.input.y = 0;                  // وقفان: بزر = الدجاج كيقرب بوحدو
+  for (let k = 0; k < 8 && !fed; k++) {
+    step(4);
+    if (Math.hypot(nearChick.x - p.x, nearChick.y - p.y) < 46) approached = true;
+    const it = game.nearestInteraction();
+    if (it && String(it.label).includes('بزر')) { game.hitCd = 0; game.doAction(); }
+    fed = w.animals.find((a) => a.type === 'chicken' && a.tamed) || null;
   }
-  game.hitCd = 0; game.doAction();
 }
-t.ok(chick.tamed === true, `الدجاجة تولّفت 🐔💛 (${chick.affinity || 0}/3)`);
+t.ok(approached || !!fed, 'الدجاجة قربت لييك بالبزر 🌱');
+t.ok(!!fed && fed.tamed === true, `الدجاجة تولّفت 🐔💛${fed ? ' (' + (fed.affinity || 0) + '/3)' : ''}`);
 t.ok(game.flags.tamed >= 1, `دجاج موالف: ${game.flags.tamed}`);
 const coop = w.struct('coop');
 t.ok(!!coop, 'القفص موجود');
-chick.coop = coop;
-walkTo(coop.x, coop.y + 30, 1200);
-step(60 * 25);          // وقت باش الدجاجة توصل وتدخل
-t.ok(chick.inside, 'الدجاجة دخلت القفص');
-step(60 * 40);
-t.ok(coop.eggs > 0, `البيض فالقفص: ${coop.eggs}`);
+if (fed) {
+  fed.coop = coop;
+  walkTo(coop.x, coop.y + 30, 1200);
+  step(60 * 25);          // وقت باش الدجاجة توصل وتدخل
+  t.ok(fed.inside, 'الدجاجة دخلت القفص');
+  step(60 * 40);
+  t.ok(coop.eggs > 0, `البيض فالقفص: ${coop.eggs}`);
+} else {
+  t.ok(false, 'الدجاجة دخلت القفص');
+  t.ok(false, 'البيض فالقفص: 0');
+}
 
 t.section('[6] الصحة والموت والرجوع');
 game.state = 'playing'; game.stageDone = true;

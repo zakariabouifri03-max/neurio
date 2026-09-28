@@ -102,8 +102,10 @@ export function updateAnimals(dt, game) {
     a.cool = Math.max(0, a.cool - dt);
     const dPlayer = dist(a.x, a.y, player.x, player.y);
 
-    // مخافة عامة من اللاعب
-    const scared = dPlayer < (a.type === 'chicken' ? 72 : 120) && !a.tamed;
+    // مخافة عامة من اللاعب — الدجاج كيولّف شوية بشوية، وكيقرب ملي تكون عندك بزر
+    const seedBonus = (game.inv && game.inv.seed > 0) ? 8 : 0;
+    const fleeR = Math.max(30, 72 - 18 * (a.affinity || 0) - seedBonus);
+    const scared = dPlayer < (a.type === 'chicken' ? fleeR : 120) && !a.tamed;
 
     switch (a.type) {
       case 'chicken': {
@@ -113,16 +115,21 @@ export function updateAnimals(dt, game) {
           const dCoop = dist(a.x, a.y, a.coop.x, a.coop.y);
           const playerNearCoop = dist(player.x, player.y, a.coop.x, a.coop.y) < 170;
           if (playerNearCoop && dCoop < 300) {
-            // اللاعب قرب من القفص → نعييطو للدجاجة تدخل
+            // اللاعب قرب من القفص → الدجاجة كتمشي نحوه وكتدخل (بلا ما يلغيها الـwander)
             a.state = 'toCoop';
-            if (dCoop > 42) moveToward(a, a.coop.x, a.coop.y + 12, 152, dt, world);
-            else {
-              a.inside = true; a.state = 'coop';
-              game.audio.pop();
-              game.fx.sparkle(a.x, a.y - 6, '#ffe08a');
-              game.fx.heart(a.x, a.y - 18);
+            if (dCoop > 42) {
+              moveSmart(a, a.coop.x, a.coop.y + 12, 152, dt, world);
+              a.bob += dt * 8;
+              break;
             }
-          } else if (dCoop > 62) a.state = 'follow';
+            a.inside = true; a.state = 'coop';
+            game.audio.pop();
+            game.fx.sparkle(a.x, a.y - 6, '#ffe08a');
+            game.fx.heart(a.x, a.y - 18);
+            a.bob += dt * 3;
+            break;
+          }
+          if (dCoop > 62) a.state = 'follow';
         }
         if (a.inside) {
           // داخل القفص: كيبيض
@@ -145,6 +152,15 @@ export function updateAnimals(dt, game) {
           a.bob += dt * 3;
           continue;
         }
+        // عندك بزر وواقف ماشي كتجرّي؟ الدجاجة كتقرّب لييك بوحدها
+        const playerStill = Math.hypot(game.input.x, game.input.y) < 0.2;
+        if (!a.tamed && playerStill && dPlayer < 150 && (game.inv.seed || 0) > 0) {
+          if (dPlayer > 34) { moveSmart(a, player.x, player.y, 62, dt, world); a.state = 'interest'; a.bob += dt * 5; break; }
+          a.state = 'interest';
+          a.dir = Math.atan2(player.y - a.y, player.x - a.x);
+          a.bob += dt * 3.5;
+          break;
+        }
         if (a.state === 'follow') {
           const tx = player.x - Math.cos(player.dir) * 34, ty = player.y - Math.sin(player.dir) * 34;
           const d = dist(a.x, a.y, tx, ty);
@@ -162,7 +178,7 @@ export function updateAnimals(dt, game) {
         if (scared && a.cool <= 0) { a.state = 'flee'; a.fleeT = 1.6; }
         if (a.state === 'flee') {
           a.fleeT -= dt;
-          moveToward(a, a.x - (player.x - a.x), a.y - (player.y - a.y), 108, dt, world);
+          moveSmart(a, a.x - (player.x - a.x), a.y - (player.y - a.y), 108, dt, world);
           if (a.fleeT <= 0) a.state = 'wander';
         } else wander(a, dt, world, 26, 130, 34);
         break;
@@ -172,7 +188,7 @@ export function updateAnimals(dt, game) {
         const aggro = !scaredOfFire && (a.state === 'angry' || (night > 0.35 && dPlayer < 175));
         if (aggro && dPlayer < 320) {
           a.state = 'chase';
-          moveToward(a, player.x, player.y, 96, dt, world);
+          moveSmart(a, player.x, player.y, 96, dt, world);
           if (dPlayer < a.r + player.r + 8 && a.cool <= 0) {
             a.cool = 1.9;
             player.hurt(6, game, 'الخنزير البري ضربك! 🐗');
@@ -220,6 +236,57 @@ function wander(a, dt, world, speed, homeRange, turn) {
   const ny = a.y + Math.sin(a.dir) * sp * dt;
   const res = world.moveBody(a, nx - a.x, ny - a.y, a.r);
   if (res.hitX || res.hitY) a.dir += 1.9 + Math.random();
+}
+
+// بحال moveToward ولكن إلا مشا بلا ما يقرب للهدف (حجرة، شجرة، تخباط) كيدور عليها
+function moveSmart(a, tx, ty, speed, dt, world) {
+  if (a.moveAcc === undefined) { a.moveAcc = 0; a.stillT = 0; a.bestD = Math.hypot(tx - a.x, ty - a.y); }
+  const dNow = Math.hypot(tx - a.x, ty - a.y);
+  const wantAng = Math.atan2(ty - a.y, tx - a.x);
+
+  // واقف فبلاصتو؟ ولا كيتزحلق بلا ما يقرب؟ (زوج الحالات = مسدود)
+  if (a.lx === undefined) { a.lx = a.x; a.ly = a.y; }
+  const movedNow = Math.hypot(a.x - a.lx, a.y - a.ly);
+  a.lx = a.x; a.ly = a.y;
+  a.moveAcc += movedNow;
+  a.stillT = movedNow < Math.max(0.25, speed * dt * 0.25) ? a.stillT + dt : 0;
+  if (dNow < a.bestD - 6) { a.bestD = dNow; a.moveAcc = 0; a.stillT = 0; }
+  const blockedNow = a.stillT > 0.35 || a.moveAcc > 55;
+
+  // كنكملو الخروج من التخباط حتى نحيدو التصادم
+  if (a.squeeze) {
+    const nx = a.x + Math.cos(a.escapeAng) * speed * dt, ny = a.y + Math.sin(a.escapeAng) * speed * dt;
+    if (!world.blockedCircle(a.x, a.y, a.r) || !world.walkableAt(nx, ny, a.r)) { a.squeeze = false; a.moveAcc = 0; a.stillT = 0; a.bestD = dNow; }
+    else {
+      moveToward(a, a.x + Math.cos(a.escapeAng) * 60, a.y + Math.sin(a.escapeAng) * 60, speed * 0.9, dt, world, true);
+      return;
+    }
+  }
+
+  if (blockedNow) {
+    // حجرة قدامنا → ندورو عليها
+    a.moveAcc = 0; a.stillT = 0; a.bestD = dNow;
+    // داخل حجرة/بناية (تخباط ولا بناية تنزلت فوقنا)؟ كنخرجو بلطف بلا تصادم
+    if (world.blockedCircle(a.x, a.y, a.r)) {
+      a.squeeze = true; a.escapeAng = wantAng;
+      moveToward(a, tx, ty, speed * 0.9, dt, world, true);
+      return;
+    }
+    if (a.side === undefined) a.side = Math.random() < 0.5 ? 1 : -1;
+    const reach = a.r + 12;
+    let detour = null;
+    for (let i = 1; i <= 7; i++) {
+      const ang = wantAng + a.side * i * 0.45;
+      if (!world.blockedCircle(a.x + Math.cos(ang) * reach, a.y + Math.sin(ang) * reach, a.r)) { detour = ang; break; }
+    }
+    a.side = -a.side;
+    if (detour !== null) { moveToward(a, a.x + Math.cos(detour) * 70, a.y + Math.sin(detour) * 70, speed, dt, world); return; }
+    // مسدود من كل جيهة (تخباط بين حجرين) — كنخرجو فاتجاه الهدف بلا تصادم
+    a.squeeze = true; a.escapeAng = wantAng;
+    moveToward(a, tx, ty, speed * 0.9, dt, world, true);
+    return;
+  }
+  moveToward(a, tx, ty, speed, dt, world);
 }
 
 function moveToward(a, tx, ty, speed, dt, world, ignoreBlock = false) {

@@ -38,9 +38,33 @@ async function makeView(mode) {
   return new View2D();
 }
 
+// ?play=1 ولا ?auto=1 → كيتحل اللعب ديريكت (بلا قائمة وبلا شاشة التعليم)
+function wantAutoPlay() {
+  try {
+    const q = new URLSearchParams(location.search);
+    for (const k of ['play', 'auto', 'start']) {
+      if (!q.has(k)) continue;
+      const v = (q.get(k) || '').toLowerCase();
+      if (v === '' || v === '1' || v === 'true' || v === 'yes' || v === 'on') return true;
+    }
+  } catch (e) { }
+  return false;
+}
+
+// ?seed=123 → جزيرة معيّنة (كيفما كتشارك جزيرة مع صاحبك)
+function seedFromUrl() {
+  try {
+    const v = new URLSearchParams(location.search).get('seed');
+    if (v === null || v === '') return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? (n >>> 0) : null;
+  } catch (e) { return null; }
+}
+
 async function boot() {
   let canvas = document.getElementById('game');
   const loading = document.getElementById('loading');
+  const auto = wantAutoPlay();
   const mode = pickMode();
   let view = await makeView(mode);
 
@@ -60,7 +84,22 @@ async function boot() {
 
   window.game = game;
   game.idleWorld();
-  game.ui.open('menu');
+
+  if (auto) {
+    // كنقلبو نيشان للعب: كمّل إلا كان حفظ، وإلا جزيرة جديدة — وبلا شاشة تعليم
+    const seed = seedFromUrl();
+    try {
+      if (seed !== null) game.newGame(seed);          // بذرة من الرابط = جزيرة معيّنة
+      else if (game.hasSave()) game.loadSave();
+      else game.newGame();
+    } catch (e) { if (seed !== null) game.newGame(seed); else game.newGame(); }
+    game.ui.hideAll();
+    game.state = 'playing';
+    game.fade = 1;
+    document.body.classList.add('autoplay');
+  } else {
+    game.ui.open('menu');
+  }
   canvas.addEventListener('pointerdown', () => game.audio.resume(), { once: true });
 
   document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
