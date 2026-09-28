@@ -95,3 +95,27 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 🌊 New game in this repo — Tsunami survival
+
+`tsunami/` holds a second, independent browser game: **TSUNAMI — survival on the Moroccan coast**.
+A full 3D survival game (procedural world, no assets): it opens on a **live 3D main menu** (drone shot
+over the town, CONTINUE / NEW GAME with difficulty / settings), then a calm cinematic morning, a
+tsunami that wipes the fishing town, a car escape up the mountain, and survival — building, hunting,
+fishing with the rod you repair, and a two-tier crafting system where the advanced gear needs a
+**workbench** you craft, place and use.
+
+```bash
+cd tsunami
+python3 -m http.server 8000   # → http://localhost:8000
+```
+
+Details, controls and the story flow: [`tsunami/README.md`](tsunami/README.md).
+
+Dev checks (no browser needed): `node tools/selftest.mjs`, `node tools/sim.mjs`,
+`node --import ./tools/three-stub/register.mjs tools/boot.mjs` and `node tools/shadercheck.mjs`
+from inside `tsunami/` — the last one compiles every GLSL program with a real compiler, which is
+how a "the ocean is invisible" bug (three silently skips a mesh whose shader fails to compile) was
+caught and fixed.
