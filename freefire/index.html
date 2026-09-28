@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>🔥 BOOYAH FIRE — Free Battle Royale</title>
+<meta name="theme-color" content="#f59e0b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BOOYAH FIRE">
+<meta name="description" content="Free Fire style battle royale in your browser: parachute in, loot, gloo walls, shrinking zone, 40 fighters, BOOYAH!">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="stylesheet" href="src/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div id="errLog"></div>
+
+<!-- ══════════════ LOADING ══════════════ -->
+<div id="loading">
+  <div class="loadBox">
+    <div class="loadFire">🔥</div>
+    <div class="loadTitle">BOOYAH<br>FIRE</div>
+    <div class="loadBar"><div></div></div>
+    <div class="loadTip" id="loadingTip">loading the island…</div>
+  </div>
+</div>
+
+<!-- ══════════════ MATCH HUD ══════════════ -->
+<div id="hud" class="hidden">
+  <div id="lookZone"></div>
+
+  <div class="hudTop">
+    <canvas id="compass" width="220" height="26"></canvas>
+    <div class="topStats">
+      <span class="chip alive"><b id="aliveCount">40</b> alive</span>
+      <span class="chip"><b id="matchTimer">0:00</b></span>
+      <span class="chip kill"><b id="killCount">0</b> kills</span>
+    </div>
+    <div id="killFeed"></div>
+  </div>
+
+  <div class="hudLeft">
+    <canvas id="minimap" width="176" height="176"></canvas>
+    <div id="zoneTimer" class="zTimer">ZONE SOON</div>
+    <div id="squadList"></div>
+  </div>
+
+  <div id="crosshair"><i></i><i></i><i></i><i></i><b></b></div>
+  <div id="hitmarker" class="hm hidden"></div>
+  <div id="dmgPops"></div>
+  <div id="pickupList"></div>
+
+  <div id="vehHud" class="hidden">
+    <div class="vhRow"><span id="vehIcon">🚙</span><b id="vehSpeed">0</b><i>km/h</i></div>
+    <div id="vehBar"><b id="vehFill"></b></div>
+  </div>
+  <div id="vehHint" class="hidden"></div>
+
+  <div id="zoneWarn" class="hidden">⚠ OUTSIDE THE SAFE ZONE — MOVE IN!</div>
+  <div id="banner" class="hidden"></div>
+  <div id="spectateHint" class="hidden"></div>
+  <div id="toastWrap"></div>
+  <div id="useBar"><i>USING</i><div><b id="useFill"></b></div></div>
+  <div id="reloadBar"><i>RELOADING</i><div><b id="reloadFill"></b></div></div>
+
+  <div id="dropInfo" class="hidden">
+    <div class="dropCard">
+      <span class="di">🪂</span>
+      <div><b id="altText">200m</b><small>tap the map to steer</small></div>
+    </div>
+  </div>
+
+  <div class="hudBottom">
+    <div class="hpWrap">
+      <div id="hpBar"><b id="hpFill"></b></div>
+      <div class="hpRow"><span class="hpIcon">❤️</span><span id="hpText">100</span><span id="gearIcons"></span></div>
+    </div>
+    <div id="itemsBar"></div>
+    <div class="gunWrap">
+      <div id="weaponName" class="wpn">USP</div>
+      <div id="ammoText" class="ammo"><b>12</b><span>/36</span></div>
+      <div id="slots"></div>
+    </div>
+  </div>
+
+  <div class="touchOnly">
+    <div id="joyZone"><div id="joyKnob"></div></div>
+    <div class="actionRow">
+      <button id="btnPickup" class="abtn small">✋</button>
+      <button id="btnCrouch" class="abtn small">⬇️</button>
+      <button id="btnReload" class="abtn small">🔄</button>
+      <button id="btnJump" class="abtn small">⤴️</button>
+    </div>
+    <div class="fireRow">
+      <button id="btnAds" class="abtn">🎯</button>
+      <button id="btnFire" class="abtn fire">🔥</button>
+    </div>
+    <button id="btnSprint" class="abtn run">🏃</button>
+  </div>
+  <button id="btnPause" class="pauseBtn">⏸</button>
+
+  <div id="bigMap" class="hidden"><canvas id="bigMapCanvas" width="512" height="512"></canvas><small>TAP TO CHOOSE YOUR LANDING SPOT</small></div>
+
+  <div id="flashOverlay" class="hidden"></div>
+  <div id="hurtOverlay"></div>
+  <div id="damageVig"></div>
+</div>
+
+<!-- ══════════════ LOBBY ══════════════ -->
+<div id="lobby" class="hidden">
+  <div class="lobbyTop">
+    <div class="prof">
+      <div class="pAvatar">🧑‍🚀</div>
+      <div class="pText">
+        <b id="lobbyRank">🥉 Bronze I</b>
+        <span id="lobbyName">Kelly</span>
+        <div class="xpBar"><i id="lobbyXpBar"></i></div>
+        <small id="lobbyXpText">0 / 250 XP</small>
+      </div>
+    </div>
+    <div class="wallet">
+      <span class="wChip">🪙 <b id="coins">0</b></span>
+      <span class="wChip">💎 <b id="diamonds">0</b></span>
+    </div>
+  </div>
+
+  <div class="lobbyStats" id="lobbyStats"></div>
+
+  <div class="modeRow" id="modeRow"></div>
+
+  <div class="playRow">
+    <button id="btnPlay" class="playBtn" data-act>▶ START MATCH</button>
+    <div class="mapPreview" id="mapPreview"></div>
+  </div>
+
+  <div class="lobbyBtns">
+    <button id="btnShop" class="mb" data-act><span>🛒</span>SHOP</button>
+    <button id="btnLoadout" class="mb" data-act><span>🎒</span>LOADOUT</button>
+    <button id="btnWheel" class="mb" data-act><span>🎡</span>WHEEL</button>
+    <button id="btnSpin" class="mb ready" data-act><span>🎁</span>FREE SPIN</button>
+    <button id="btnMissions" class="mb" data-act><span>🎯</span>MISSIONS</button>
+    <button id="btnSettings" class="mb" data-act><span>⚙️</span>SETTINGS</button>
+    <button id="btnHelp" class="mb" data-act><span>❓</span>CONTROLS</button>
+  </div>
+</div>
+
+<!-- ══════════════ PANELS ══════════════ -->
+<div id="panel" class="hidden">
+  <div class="panelInner">
+    <div class="panelHead"><h2 id="panelTitle">SHOP</h2><button id="panelClose" class="xBtn">✕</button></div>
+    <div id="panelBody"></div>
+  </div>
+</div>
+
+<!-- ══════════════ PAUSE ══════════════ -->
+<div id="pauseMenu" class="hidden">
+  <div class="pauseCard">
+    <h2>PAUSED</h2>
+    <div id="pauseStats" class="pauseStats"></div>
+    <button id="btnResume" class="bigBtn">▶ RESUME</button>
+    <button id="btnSettings2" class="bigBtn off" style="display:none"></button>
+    <button id="btnQuit" class="bigBtn off">🚪 LEAVE MATCH</button>
+  </div>
+</div>
+
+<!-- ══════════════ RESULTS ══════════════ -->
+<div id="results" class="hidden">
+  <div class="resCard">
+    <div id="resultTitle" class="rTitle">BOOYAH!</div>
+    <div id="resultStats" class="statGrid"></div>
+    <div id="resultRewards" class="resRewards"></div>
+    <div id="resultRank" class="resRank"></div>
+    <div id="resultAch" class="resAch"></div>
+    <div class="resBtns">
+      <button id="btnPlayAgain" class="playBtn small" data-act>🔁 PLAY AGAIN</button>
+      <button id="btnLobby2" class="mb" data-act>🏠 LOBBY</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DEATH ══════════════ -->
+<div id="deathScreen" class="hidden">
+  <div class="deathCard">
+    <h2>YOU ARE DOWN</h2>
+    <p>Killed by <b id="deathBy">?</b></p>
+    <p class="small">Your squad can still win it — the match continues.</p>
+    <div class="resBtns">
+      <button id="btnShopDeath" class="mb">🛒 SHOP</button>
+      <button id="btnDeathsReturn" class="playBtn small">🏠 LOBBY</button>
+    </div>
+  </div>
+</div>
+
+<div id="booyah" class="hidden">BOOYAH!</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

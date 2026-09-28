@@ -1,3 +1,9 @@
 .DS_Store
 Thumbs.db
 *.log
+node_modules/
+freefire/dist/
+__pycache__/
+*.pyc
+__pycache__/
+*.pyc
