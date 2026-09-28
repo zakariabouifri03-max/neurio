@@ -99,6 +99,7 @@ process.on('unhandledRejection', (e) => {
   console.error('[boot] UNHANDLED REJECTION:', e && e.stack ? e.stack : e);
 });
 
+const { RECIPES } = await import('../src/survival.js');
 await import('../src/main.js');
 const game = globalThis.TsunamiGame || globalThis.window.TsunamiGame;
 check('game module booted', !!game);
@@ -266,10 +267,51 @@ if (hero) {
 /* ---------------------------------------------------- 7. pause / save / hud */
 game.pause();
 check('pause works', game.state === 'paused');
-check('pause menu is visible', game.ui.el.pause.classList.contains('hidden') === false);
+check('pause menu is visible', game.ui.menuOpen && game.ui.menu.mode === 'paused'
+  && game.ui.el.menu.classList.contains('hidden') === false);
 game.resume();
 check('resume works', game.state === 'play');
 check('save was written', !!store.get('tsunami.save'));
+check('save has a slot summary', /Day \d+/.test(game.saveSummary()), game.saveSummary());
+
+/* --------------------------------------------- 7b. main menu + workbench tier */
+game.gotoMenu();
+check('quit to menu works', game.state === 'title' && game.ui.menuOpen && game.ui.menu.mode === 'title', `state=${game.state}`);
+check('menu offers continue for the saved run', game.ui.menu.hasSave === true, game.ui.menu.saveInfo || 'no save');
+game.onUiAction('newgame');
+check('new game opens the difficulty page', game.ui.menuPage === 'new');
+game.onUiAction('difficulty:hard');
+check('difficulty is selectable', game.survival.difficulty.id === 'normal' || game.difficulty === 'hard', `menu=${game.difficulty}`);
+game.onUiAction('menu:main');
+game.onUiAction('settings');
+check('settings page opens', game.ui.menuPage === 'settings');
+game.onUiAction('menu:main');
+game.onUiAction('controls');
+game.onUiAction('menu:main');
+game.onUiAction('howto');
+game.onUiAction('menu:main');
+
+// a new run must start clean: mission -1, empty bag, the difficulty's starting kit
+game.beginRun('new');
+check('new game starts play', game.state === 'cinematic' || game.state === 'play', `state=${game.state}`);
+check('new game resets the run', game.mission === -1 || game.mission === 0, `mission=${game.mission}`);
+game.skipCinematic?.();
+if (game.state === 'cinematic') game.endCinematic();
+check('new run began after the cinematic', game.state === 'play', `state=${game.state}`);
+
+// ---- the workbench tier: recipes that are only craftable at a placed table
+const S = game.survival;
+S.inv.add('stick', 12); S.inv.add('plank', 10); S.inv.add('rope', 8); S.inv.add('cloth', 10);
+const tableRecipe = { id: 'backpack' };
+check('workbench recipe is locked without a table', S.canCraft(RECIPES.find((r) => r.id === 'backpack')) === false);
+const craftedTable = S.craft('craft_table');
+check('workbench is craftable in hand', craftedTable && S.inv.count('craft_table') === 1, `n=${S.inv.count('craft_table')}`);
+const placed = S.build('craft_table', new THREE.Vector3(game.player.pos.x + 1.6, 0, game.player.pos.z + 1.6), 0.4);
+check('workbench can be placed', placed && S.structures.some((st) => st.kind === 'craft_table'));
+check('standing at the workbench is detected', S.atTable === true);
+const backpackOK = S.craft('backpack');
+check('workbench recipe unlocks at the table', backpackOK && S.upgrades.backpack === true && S.inv.cap > 28, `cap=${S.inv.cap}`);
+void tableRecipe;
 for (let i = 0; i < 120; i++) stepFrame();
 check('frame loop keeps running', game.renderer.renderCount > 60, `renders=${game.renderer.renderCount}`);
 check('fps counter is sane', game.fps > 0 && game.fps < 10000, `fps=${game.fps.toFixed(0)}`);

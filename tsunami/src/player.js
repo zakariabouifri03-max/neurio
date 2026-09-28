@@ -260,6 +260,7 @@ export class Player {
 
   damage(amount, cause = '') {
     if (!this.alive) return;
+    amount *= this.damageScale || 1;
     this.health = Math.max(0, this.health - amount);
     if (cause === 'fall' || cause === 'crash') this.bleeding = Math.min(1, this.bleeding + amount / 120);
     if (this.health <= 0) { this.alive = false; this.emit('death', { cause }); }

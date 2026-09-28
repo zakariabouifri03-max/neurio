@@ -705,9 +705,109 @@ float gWet = 0.0;
       this.spawns.beach = { x: bx + 40, y: this.heightAt(bx + 40, bz) + 0.1, z: bz };
       this.spawns.pier = { x: bx + 16, y: py + 0.3, z: bz + 10 };
       this.beachCenter = { x: bx + 30, z: bz };
+      this.buildBeachLife(bx, bz);
     }
 
     void streetW;
+  }
+
+  /* ------------------------------------------- the fishing village on the sand */
+  // Everything within a stone's throw of where the run starts: drawn-up boats, net racks,
+  // crates, buoys, a fire pit, palms and a fish stall. It is what makes the opening read as
+  // a working Moroccan beach instead of an empty plain.
+  buildBeachLife(bx, bz) {
+    const rng = mulberry32(this.seed + 71);
+    const at = (dx, dz) => ({ x: bx + dx, z: bz + dz, y: this.heightAt(bx + dx, bz + dz) });
+    const put = (dx, dz, fn) => { const p = at(dx, dz); fn(this.ctxFor(p.x, p.z), p, rng); };
+    // one prop: tinted (the mesher materials read vertex colours) and dropped on the sand
+    const mesh = (key, geo, color, dx, dz, dy, rotY = 0) => put(dx, dz, (ctx, p) => {
+      ctx.m.add(key, xf2(geo, color, p.x, p.y + (dy || 0), p.z, rotY));
+    });
+    const ground = (dx, dz) => this.heightAt(bx + dx, bz + dz);
+
+    // --- boats pulled up onto the sand at the waterline
+    for (const [dx, dz, rot, len, col, st] of [
+      [10, 34, 0.55, 7.4, 0xd9d2c0, 0x2f6fa8],
+      [14, -30, -0.7, 6.6, 0xc9c2ae, 0x9c3f34],
+      [26, 58, 0.2, 8.2, 0xe2dccb, 0x356b8c],
+    ]) {
+      put(dx, dz, (ctx, p) => addFishingBoat(ctx, rng, { x: p.x, y: p.y + 0.12, z: p.z, rot, len, color: col, stripe: st, mast: false }));
+    }
+    // --- drying racks with nets and buoys
+    for (const [dx, dz, rot] of [[30, 16, 0.4], [24, -14, -0.9]]) {
+      put(dx, dz, (ctx, p) => {
+        const h = 2.4, w = 5.2;
+        for (let i = -1; i <= 1; i += 2) {
+          mesh('wood', new THREE.CylinderGeometry(0.09, 0.11, h, 7), 0x6b4a2e, dx + i * w * 0.5, dz, h / 2, rot);
+        }
+        mesh('wood', new THREE.BoxGeometry(w, 0.1, 0.12), 0x7a5636, dx, dz, h - 0.15, rot);
+        // the net itself: a sagging sheet of dark olive twine
+        const net = new THREE.PlaneGeometry(w * 0.94, 1.5, 6, 3);
+        const pos = net.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const u = pos.getX(i) / (w * 0.47);
+          pos.setZ(i, -0.28 * (1 - u * u));
+        }
+        net.computeVertexNormals();
+        net.rotateX(-Math.PI / 2);                    // hang it flat, sagging
+        const np = at(dx, dz);
+        // colourGeoLocal tints the geometry (the mesher materials read vertex colours) and places it
+        this.ctxFor(np.x, np.z).m.add('net', colorGeoLocal(net, 0x50523a, np.x, np.y + h - 0.75, np.z, rot));
+        // floats along the top rope
+        for (let i = -2; i <= 2; i++) {
+          mesh('fabric', new THREE.SphereGeometry(0.16, 8, 6), 0xd4763a, dx + i * 1.05 * Math.cos(rot), dz - i * 1.05 * Math.sin(rot), h - 0.1);
+        }
+      });
+    }
+    // --- crates, barrels and coiled rope by the pier head
+    for (let i = 0; i < 7; i++) {
+      const dx = 22 + (i % 3) * 2.3 + rng() * 0.6, dz = 4 + Math.floor(i / 3) * 2.1 - rng() * 0.5;
+      mesh('wood', new THREE.BoxGeometry(1.15, 0.75, 0.85), 0x8a6a44, dx, dz, 0.38, rng() * 0.5);
+      if (i % 3 === 0) mesh('wood', new THREE.BoxGeometry(1.05, 0.7, 0.8), 0x9c7a4c, dx + 0.1, dz + 0.15, 1.1, rng() * 0.6);
+    }
+    for (let i = 0; i < 4; i++) {
+      mesh('metal', new THREE.CylinderGeometry(0.42, 0.42, 0.92, 12), 0x7d848a, 19 + i * 1.4, -6 - i * 0.8, 0.46, rng() * 0.4);
+    }
+    for (let i = 0; i < 3; i++) mesh('net', new THREE.TorusGeometry(0.36, 0.09, 6, 14), 0x9c8f6a, 27 + i * 1.1, 9 + i * 0.6, 0.09, rng());
+    // --- a fire pit of stones with cold ash
+    put(34, -6, (ctx, p) => {
+      for (let i = 0; i < 11; i++) {
+        const a = (i / 11) * TAU;
+        mesh('rock', new THREE.DodecahedronGeometry(0.24 + rng() * 0.09, 0), 0x8c8478, 34 + Math.cos(a) * 1.05, -6 + Math.sin(a) * 1.05, 0.05);
+      }
+      mesh('concrete', new THREE.CylinderGeometry(0.95, 0.95, 0.06, 14), 0x3b3733, 34, -6, 0.03);
+      ctx.fireSpots.push({ x: p.x, z: p.z, y: p.y });
+    });
+    // --- a fish stall and a bench facing the water
+    put(38, 22, (ctx, p) => addStall(ctx, rng, { x: p.x, y: p.y, z: p.z, rot: -1.5 }));
+    put(40, 6, (ctx, p) => addBench(ctx, rng, { x: p.x, y: p.y, z: p.z, rot: 1.6 }));
+    put(30, 44, (ctx, p) => addSign(ctx, rng, { x: p.x, y: p.y, z: p.z, rot: -1.4, text: 'RHĪSSA · PLAGE' }));
+    // --- a fishing hut, its door facing the sea, with a water tank and a fence
+    put(52, -18, (ctx, p) => {
+      const w = 4.6, d = 4.0, h = 2.7;
+      ctx.m.add('thatch', xf2(new THREE.ConeGeometry(w * 0.82, 1.7, 4), 0x9d7f4c, p.x, p.y + h + 0.6, p.z, Math.PI / 4));
+      ctx.m.add('plaster', xf2(new THREE.BoxGeometry(w, h, d), 0xdfd6c2, p.x, p.y + h / 2, p.z));
+      ctx.m.add('wood', xf2(new THREE.BoxGeometry(1.1, 2.1, 0.14), 0x6b4a2e, p.x, p.y + 1.05, p.z - d / 2 - 0.05));
+      ctx.colliders.push({ cx: p.x, cz: p.z, hx: w / 2, hz: d / 2, rot: 0, y0: p.y, y1: p.y + h, kind: 'hut' });
+      addWaterTank(ctx, rng, { x: p.x + 3.4, y: p.y, z: p.z + 2.2 });
+    });
+    for (let i = 0; i < 3; i++) {
+      const dz = 26 + i * 6;
+      mesh('wood', new THREE.BoxGeometry(6, 1.1, 0.14), 0x6b4a2e, 44, dz, 0.55, 1.5);
+    }
+    // --- palms right where the player wakes up, so the opening shot has trees in it
+    for (const [dx, dz, sc, lean] of [[46, -34, 1.15, 0.16], [56, -44, 0.95, 0.1], [44, 52, 1.05, 0.2], [62, 30, 0.85, 0.12], [50, 68, 1.0, 0.18]]) {
+      put(dx, dz, (ctx, p) => addPalm(ctx, rng, { x: p.x, y: p.y, z: p.z, scale: sc, lean, rotY: rng() * TAU }));
+    }
+    // --- low scrub on the dunes behind the beach
+    for (let i = 0; i < 22; i++) {
+      const dx = 46 + rng() * 90, dz = -70 + rng() * 150;
+      const y = ground(dx, dz);
+      if (y < 1.4 || y > 13) continue;
+      put(dx, dz, (ctx, p) => (rng() < 0.55
+        ? addBush(ctx, rng, { x: p.x, y: p.y, z: p.z, scale: 0.7 + rng() * 0.5 })
+        : addRock(ctx, rng, { x: p.x, y: p.y + 0.15, z: p.z, scale: 0.5 + rng() * 0.7 })));
+    }
   }
 
   /* --------------------------------------------------------------- harbour */

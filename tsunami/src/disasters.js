@@ -8,6 +8,8 @@ export class Disasters {
     this.npc = npc; this.vehicles = vehicles; this.survival = survival; this.ui = ui; this.scene = scene;
     this.mats = mats || {};
     this.quality = quality;
+    /** set from the menu difficulty: 1 normal, <1 calmer sea, >1 bigger waves */
+    this.waveScale = 1;
     this.rng = mulberry32(112358);
     this.shake = new Shake();
     this.tsunami = null;
@@ -32,7 +34,7 @@ export class Disasters {
     const beach = this.world.beachCenter || { x: 0, z: -150 };
     const t = {
       active: true, phase: 'drawback', t: 0, fronts: [], flood: false, destruction: 0,
-      maxLevel: opts.height ?? 16.5, destroyedCount: 0, hitShore: false, sirens: 0, warned: false,
+      maxLevel: opts.height ?? (16.5 * this.waveScale), destroyedCount: 0, hitShore: false, sirens: 0, warned: false,
       origin: { x: this.world.coastX(beach.z) - 1750, z: beach.z }, beach,
       direction: opts.direction || { x: 1, z: 0.05 },
     };
@@ -72,7 +74,7 @@ export class Disasters {
           t.phase = 'wave';
           t.t = 0;
           const dir = t.direction;
-          const H = 13.5;
+          const H = 13.5 * this.waveScale;
           const first = ocean.spawnFront({
             x: t.origin.x, z: t.origin.z, dirX: dir.x, dirZ: dir.z,
             height: H, speed: 78, lead: 40, trail: 300,
@@ -89,11 +91,11 @@ export class Disasters {
         ocean.setWaveHeight(1.2);
         // extra front waves for drama
         if (t.fronts.length === 1 && t.t > 3.5) {
-          t.fronts.push(ocean.spawnFront({ x: t.origin.x - 320, z: t.origin.z + 60, dirX: t.direction.x, dirZ: t.direction.z, height: 19.5, speed: 82, lead: 46, trail: 340 }));
+          t.fronts.push(ocean.spawnFront({ x: t.origin.x - 320, z: t.origin.z + 60, dirX: t.direction.x, dirZ: t.direction.z, height: 19.5 * this.waveScale, speed: 82, lead: 46, trail: 340 }));
           this.ui?.chapter('WAVE 2', '');
         }
         if (t.fronts.length === 2 && t.t > 7) {
-          t.fronts.push(ocean.spawnFront({ x: t.origin.x - 260, z: t.origin.z - 120, dirX: t.direction.x, dirZ: t.direction.z, height: 24, speed: 88, lead: 52, trail: 380 }));
+          t.fronts.push(ocean.spawnFront({ x: t.origin.x - 260, z: t.origin.z - 120, dirX: t.direction.x, dirZ: t.direction.z, height: 24 * this.waveScale, speed: 88, lead: 52, trail: 380 }));
           this.ui?.chapter('WAVE 3', 'The big one');
           this.audio?.play('rumble');
         }

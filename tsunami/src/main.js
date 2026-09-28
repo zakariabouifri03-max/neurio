@@ -5,7 +5,7 @@ import { Sky } from './sky.js';
 import { Ocean } from './ocean.js';
 import { Player } from './player.js';
 import { VehicleSystem } from './vehicles.js';
-import { Survival, ITEMS, RECIPES } from './survival.js';
+import { Survival, ITEMS, RECIPES, DIFFICULTY_IDS, difficultyPreset } from './survival.js';
 import { Fishing } from './fishing.js';
 import { Disasters } from './disasters.js';
 import { NPCSystem } from './npc.js';
@@ -18,10 +18,19 @@ import { createMaterials } from './materials.js';
 import { clamp, clamp01, lerp, damp, smoothstep, rand, mulberry32, TAU } from './util.js';
 
 const QUALITIES = ['low', 'medium', 'high', 'ultra'];
+const SAVE_SLOTS = ['tsunami.save', 'tsunami.legacy'];
+const activeSlot = () => { try { return localStorage.getItem('tsunami.slot') || SAVE_SLOTS[0]; } catch (e) { return SAVE_SLOTS[0]; } };
+const setActiveSlot = (k) => { try { localStorage.setItem('tsunami.slot', k); } catch (e) { } };
 
 class Game {
   constructor() {
     this.quality = this.loadSetting('quality', this.detectQuality());
+    this.difficulty = this.loadSetting('difficulty', 'normal');
+    if (!DIFFICULTY_IDS.includes(this.difficulty)) this.difficulty = 'normal';
+    this.sens = this.loadSetting('sens', 1);
+    this.volume = this.loadSetting('volume', 0.85);
+    this.intro = this.loadSetting('intro', true);
+    this.playTime = 0;
     this.state = 'loading';
     this.time = 0;
     this.clockT = 0.24;          // 0..1 sky time (0.24 ≈ morning)
@@ -52,10 +61,39 @@ class Game {
   }
   loadSetting(k, d) { try { const v = localStorage.getItem('tsunami.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
   saveSetting(k, v) { try { localStorage.setItem('tsunami.' + k, JSON.stringify(v)); } catch (e) { } }
-  loadSave() { try { const v = localStorage.getItem('tsunami.save'); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+
+  /** read a slot, migrating the old single save file */
+  static readSlot(key) {
+    try {
+      let raw = localStorage.getItem(key);
+      if (!raw && key === SAVE_SLOTS[1]) { raw = localStorage.getItem(SAVE_SLOTS[0]); if (raw) { localStorage.setItem(key, raw); localStorage.removeItem(SAVE_SLOTS[0]); } }
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  loadSave() { return Game.readSlot(activeSlot()); }
+  /** the run the menu should offer to continue (active slot, else the other one) */
+  bestSave() {
+    const a = Game.readSlot(SAVE_SLOTS[0]); if (a && a.mission >= 0) return { slot: SAVE_SLOTS[0], data: a };
+    const b = Game.readSlot(SAVE_SLOTS[1]); if (b && b.mission >= 0) return { slot: SAVE_SLOTS[1], data: b };
+    return null;
+  }
+  static slotSummary(d) {
+    if (!d) return '';
+    const mins = Math.max(0, Math.round((d.playTime || 0) / 60));
+    const diff = (difficultyPreset(d.survival && d.survival.difficulty).label || 'NORMAL');
+    const day = (d.stats && d.stats.days) || 1;
+    const mis = (d.mission | 0) + 1;
+    const hh = String(Math.floor((d.clock || 0.24) * 24)).padStart(2, '0');
+    const mm = String(Math.floor((((d.clock || 0.24) * 24) % 1) * 60)).padStart(2, '0');
+    return `Day ${day} · Chapter ${mis}/10 · ${hh}:${mm} · ${diff} · ${mins} min of play`;
+  }
   writeSave() {
     try {
-      localStorage.setItem('tsunami.save', JSON.stringify({
+      if (!this.player || !this.survival) return;
+      this.playTime = (this.playTime || 0);
+      localStorage.setItem(activeSlot(), JSON.stringify({
+        v: 2,
+        playTime: this.playTime,
         mission: this.mission,
         flags: this.flags,
         stats: this.stats,
@@ -204,7 +242,15 @@ class Game {
     this.spawnPlayerAtBeach();
     this.setupMissions();
     this.ui.setLoading(1, 'Ready.');
+    this.setupTitleScene();
+    let debugOn = false;
+    try { debugOn = /(^|[?&])debug\b/.test(location.search || ''); } catch (e) { }
+    if (debugOn) this.toggleDebug();
     this.ui.showStart();
+    this.ui.showMenu({
+      mode: 'title', hasSave: !!this.bestSave(), saveInfo: this.saveSummary(),
+      difficulty: this.difficulty, quality: this.quality, sens: this.sens, volume: this.volume, intro: this.intro,
+    });
     this.state = 'title';
     this.renderer.setAnimationLoop(() => this.tick());
     window.addEventListener('resize', () => this.onResize());
@@ -278,6 +324,7 @@ class Game {
       else if (this.state === 'paused') this.resume();
       return;
     }
+    if (k === 'f3') { this.toggleDebug(); return; }
     if (this.state === 'cinematic' && (k === 'enter' || k === ' ')) { this.endCinematic(); return; }
     if (this.state !== 'play') return;
     if (k === 'i' || k === 'b') this.ui.openPanel('inv', this.panelCtx());
@@ -295,14 +342,53 @@ class Game {
   }
 
   onUiAction(a) {
-    if (a === 'start' || a === 'newGame') this.beginPlaythrough(true);
-    else if (a === 'skip') this.endCinematic();
-    else if (a === 'resume') this.resume();
-    else if (a === 'restart') { localStorage.removeItem('tsunami.save'); location.reload(); }
-    else if (a === 'lang') {
-      this.ui.setLang(this.ui.lang === 'en' ? 'ar' : 'en');
+    const [head, arg] = [a.split(':')[0], a.split(':')[1]];
+    const MENU_CLICKS = ['play', 'beginrun', 'start', 'newgame', 'back', 'menu', 'difficulty', 'toggle',
+      'settings', 'controls', 'howto', 'about', 'savegame', 'quitmenu', 'resume', 'restart', 'lang'];
+    if (MENU_CLICKS.includes(head) || MENU_CLICKS.includes(a)) {
+      // the click is a user gesture: this is the moment the audio context may start
+      try { this.audio.init(); this.audio.play(head === 'beginrun' || head === 'play' ? 'uiBig' : 'ui'); } catch (e) { }
+    }
+    if (head === 'play') this.beginRun('continue');
+    else if (head === 'beginrun' || a === 'start') this.beginRun('new');
+    else if (head === 'newgame') { this.ui.setMenuPage('new'); this.ui.showMenu({ mode: 'title' }); }
+    else if (head === 'back') this.ui.setMenuPage('main');
+    else if (head === 'difficulty') {
+      this.difficulty = DIFFICULTY_IDS.includes(arg) ? arg : 'normal';
+      this.saveSetting('difficulty', this.difficulty);
+      this.ui.renderMenu();
+    } else if (head === 'toggle' && arg === 'intro') {
+      this.intro = !this.intro;
+      this.saveSetting('intro', this.intro);
+      this.ui.renderMenu();
+    } else if (head === 'quality') {
+      const q = QUALITIES.includes(arg) ? arg : QUALITIES[(QUALITIES.indexOf(this.quality) + 1) % QUALITIES.length];
+      if (q === this.quality) { this.ui.message('Quality: ' + q); return; }
+      this.quality = q; this.saveSetting('quality', q);
+      this.ui.el.qLabel.textContent = q.toUpperCase();
+      this.ui.message('Quality: ' + q + ' — press RELOAD to apply', 4);
+      this.ui.renderMenu();
+    } else if (head === 'sens') { this.sens = clamp(parseFloat(arg) || 1, 0.2, 4); this.saveSetting('sens', this.sens); }
+    else if (head === 'volume') {
+      this.volume = clamp01(parseFloat(arg));
+      this.saveSetting('volume', this.volume);
+      if (this.audio.volumes) this.audio.volumes.master = this.volume;
+      this.audio.setMuted(this.audio.muted);
+    } else if (a === 'reload') location.reload();
+    else if (head === 'lang') {
+      this.ui.setLang(arg === 'ar' ? 'ar' : 'en');
       this.saveSetting('lang', this.ui.lang);
-    } else if (a === 'sound') {
+      this.ui.renderMenu();
+    } else if (head === 'menu') this.ui.setMenuPage(arg === 'main' ? 'main' : arg);
+    else if (a === 'settings' || a === 'controls' || a === 'howto' || a === 'about') this.ui.setMenuPage(a);
+    else if (a === 'savegame') { this.writeSave(); this.refreshPauseInfo(); this.ui.message('Progress saved.', 3); }
+    else if (a === 'quitmenu') this.gotoMenu();
+    else if (a === 'restart') {
+      Game.clearSave();
+      location.reload();
+    } else if (a === 'skip') this.endCinematic();
+    else if (a === 'resume') this.resume();
+    else if (a === 'sound') {
       this.audio.setMuted(!this.audio.muted);
       this.ui.message(this.audio.muted ? 'Sound off' : 'Sound on');
     } else if (a === 'quality') {
@@ -339,14 +425,50 @@ class Game {
   }
 
   pause() {
+    if (this.state !== 'play') return;
     this.state = 'paused';
-    this.ui.el.pause.classList.remove('hidden');
-    if (document.pointerLockElement) document.exitPointerLock();
+    this.ui.closePanel();
+    this.ui.el.pause.classList.add('hidden');
     this.writeSave();
+    this.ui.showMenu({
+      mode: 'paused', hasSave: true, saveInfo: this.saveSummary(),
+      difficulty: this.difficulty, quality: this.quality, sens: this.sens, volume: this.volume, intro: this.intro,
+    });
+    if (document.pointerLockElement) document.exitPointerLock();
+  }
+  /* ------------------------------------------------------------ diagnostics */
+  toggleDebug() {
+    this.debug = !this.debug;
+    this.ui.showDebug(this.debug ? this.debugText() : null);
+    if (this.debug) this.ui.message('Debug overlay on (F3)', 2);
+  }
+  debugText() {
+    const p = this.player, o = this.ocean;
+    const cam = this.camera.position;
+    const g = this.world.heightAt(cam.x, cam.z);
+    const lines = [
+      `TSUNAMI · ${this.state} · fps ${this.fps.toFixed(0)} · t ${this.time.toFixed(0)}s`,
+      `quality ${this.quality} · difficulty ${this.survival.difficulty.id} · mission ${this.mission}/${this.missions.length}`,
+      `player ${p.pos.x.toFixed(1)},${p.pos.y.toFixed(1)},${p.pos.z.toFixed(1)} yaw ${p.yaw.toFixed(2)} ${p.vehicle ? 'IN VEHICLE' : ''}`,
+      `camera ${cam.x.toFixed(1)},${cam.y.toFixed(1)},${cam.z.toFixed(1)} ground ${g.toFixed(1)}`,
+      `water level ${o.level.toFixed(2)} depth@cam ${(o.waterYAt(cam.x, cam.z) - g).toFixed(2)} fronts ${o.fronts ? o.fronts.length : 0}`,
+      `bag ${this.survival.inv.slots.size} items · structures ${this.survival.structures.length} · workbench ${this.survival.atTable ? 'in reach' : '—'}`,
+      `objects ${this.scene.children.length} · draw calls ${this.renderer.info ? this.renderer.info.render.calls : '?'} · warnings ${(globalThis.__tsWarnings || []).length}`,
+    ];
+    if (globalThis.__tsShaderError) lines.push('SHADER ERROR: ' + String(globalThis.__tsShaderError).slice(0, 200));
+    const w = (globalThis.__tsWarnings || []).slice(-2);
+    for (const x of w) lines.push('warn: ' + String(x).slice(0, 120));
+    return lines.join('\n');
+  }
+  refreshPauseInfo() {
+    this.ui.menu = Object.assign({}, this.ui.menu, { saveInfo: this.saveSummary() });
+    this.ui.renderMenu();
   }
   resume() {
+    if (this.state !== 'paused') return;
     this.state = 'play';
-    this.ui.el.pause.classList.add('hidden');
+    this.ui.setMenuPage('main');
+    this.ui.hideMenu();
     this.renderer.domElement.requestPointerLock?.();
   }
   toggleMap() {
@@ -354,18 +476,80 @@ class Game {
     else this.ui.openPanel('log', this.panelCtx());
   }
   panelCtx() {
+    const s = this.survival;
     return {
-      inv: this.survival.inv, fishing: this.fishing, stats: { ...this.stats, ...this.survival.stats },
+      inv: s.inv, fishing: this.fishing, stats: { ...this.stats, ...s.stats },
+      atTable: !!s.nearCraftTable(),
+      canCraft: (r) => s.canCraft(r),
+      station: s.nearCraftTable() ? 'table' : (s.nearFire() ? 'fire' : 'hand'),
     };
   }
 
   /* =========================================================== playthrough */
-  beginPlaythrough(fresh) {
+  /** the saving model: two slots, so a NEW GAME never silently eats the run you were on */
+  static clearSave(slot) {
+    try { localStorage.removeItem(slot || activeSlot()); } catch (e) { }
+  }
+  bestRun() { return this.bestSave(); }
+  saveSummary() { const b = this.bestSave(); return b ? Game.slotSummary(b.data) : ''; }
+  /** a slot that is safe to start a new run in (never the one we are continuing) */
+  freshSlot() {
+    const has = (k) => { const d = Game.readSlot(k); return !!(d && d.mission >= 0); };
+    if (!has(SAVE_SLOTS[0])) return SAVE_SLOTS[0];
+    if (!has(SAVE_SLOTS[1])) return SAVE_SLOTS[1];
+    const best = this.bestSave();
+    return best && best.slot === SAVE_SLOTS[0] ? SAVE_SLOTS[1] : SAVE_SLOTS[0];
+  }
+  applySettings() {
+    const preset = this.survival.setDifficulty(this.difficulty);
+    if (this.disasters) this.disasters.waveScale = preset.wave;
+    if (this.player) this.player.damageScale = preset.danger;
+    if (this.audio.volumes) this.audio.volumes.master = this.volume;
+    this.audio.setMuted(this.audio.muted);
+    if (this.ui.el.qLabel) this.ui.el.qLabel.textContent = this.quality.toUpperCase();
+  }
+
+  /** CONTINUE (load the saved run) or NEW GAME (a clean morning on the beach) */
+  beginRun(mode) {
+    if (mode === 'continue') {
+      const best = this.bestSave();
+      if (!best) { this.ui.message('No saved run yet — start a new game.', 3); return; }
+      setActiveSlot(best.slot);
+      this.savedState = best.data;
+      this.beginPlaythrough('resume');
+      return;
+    }
+    // ---- brand-new run: reuse the slot we are not playing from
+    const slot = this.freshSlot();
+    try { localStorage.removeItem(slot); } catch (e) { }
+    setActiveSlot(slot);
+    this.savedState = null;
+    this.mission = -1;
+    this.flags = {};
+    this.time = 0;
+    this.playTime = 0;
+    this.clockT = 0.16;
+    this.stats = { fishCaught: 0, treesChopped: 0, structuresBuilt: 0, animalsHunted: 0, peopleSaved: 0, days: 1 };
+    const s = this.survival;
+    s.stats = { fishCaught: 0, animalsHunted: 0, treesChopped: 0, structuresBuilt: 0, daysSurvived: 0, waterDrunk: 0, foodEaten: 0 };
+    s.inv.slots.clear();
+    s.upgrades = { backpack: false, harpoon: false, bedroll: false, net: false, steelAxe: false };
+    for (const st of s.structures) { if (st.data && st.data.light) this.scene.remove(st.data.light); this.scene.remove(st.mesh); }
+    s.structures.length = 0;
+    s.setDifficulty(this.difficulty);
+    s.giveStartingKit();
+    this.beginPlaythrough('new');
+  }
+
+  beginPlaythrough(mode = 'new') {
     this.audio.init();
     this.audio.resume();
     this.ui.hideLoading();
+    this.ui.hideMenu();
     this.ui.setLang(this.ui.lang);
-    if (this.savedState && this.savedState.mission >= 0) {
+    this.applySettings();
+    if (mode === 'resume' && !(this.savedState && this.savedState.mission >= 0)) mode = 'new';
+    if (mode === 'resume') {
       this.mission = this.savedState.mission;
       this.flags = this.savedState.flags || {};
       Object.assign(this.stats, this.savedState.stats || {});
@@ -373,14 +557,48 @@ class Game {
       const p = this.savedState.player;
       if (p) { this.player.setPosition(p.x, p.y, p.z); this.player.yaw = p.yaw; this.player.health = p.health; this.player.hunger = p.hunger; this.player.thirst = p.thirst; this.player.warmth = p.warmth; }
       this.clockT = this.savedState.clock || 0.24;
+      this.playTime = this.savedState.playTime || 0;
       this.state = 'play';
-      this.ui.message('Resumed your journey.', 3);
+      this.ui.message('Resumed your journey — ' + this.saveSummary(), 4);
       this.setMission(this.mission, true);
       this.renderer.domElement.requestPointerLock?.();
       return;
     }
-    if (!fresh) { this.state = 'play'; return; }
+    // ---- new run: the opening cinematic, or straight to the beach if it is switched off
+    if (!this.intro) {
+      this.startPlay();
+      return;
+    }
     this.startCinematic();
+  }
+
+  /** start play without the flyover (intro disabled, or after a skip) */
+  startPlay() {
+    this.applySettings();
+    this.sky.setTimeOfDay(this.clockT);
+    this.ui.showCinema(false);
+    this.ui.el.subtitle.classList.add('hidden');
+    this.cinematicCam = null;
+    this.state = 'play';
+    this.setMission(0, true);
+    this.renderer.domElement.requestPointerLock?.();
+    this.ui.message('W A S D to move · E to interact · I for your bag', 6);
+    if (this.difficulty === 'hard') this.ui.message('BRUTAL: the wave, the cold and your hunger all bite harder.', 6);
+    else if (this.difficulty === 'calm') this.ui.message('CALM: a gentler sea, a slower hunger.', 6);
+  }
+
+  /** leave the run and go back to the title menu (the save stays on disk) */
+  gotoMenu() {
+    this.writeSave();
+    if (document.pointerLockElement) document.exitPointerLock();
+    this.ui.closePanel();
+    this.ui.el.pause.classList.add('hidden');
+    this.state = 'title';
+    this.setupTitleScene();
+    this.ui.showMenu({
+      mode: 'title', hasSave: !!this.bestSave(), saveInfo: this.saveSummary(),
+      difficulty: this.difficulty, quality: this.quality, sens: this.sens, volume: this.volume, intro: this.intro,
+    });
   }
 
   startCinematic() {
@@ -394,14 +612,56 @@ class Game {
     this.cinematicCam = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.2, 9000);
   }
 
-  endCinematic() {
+  endCinematic() { this.startPlay(); }
+
+  /* ============================================================ title scene */
+  /** the menu backdrop: a slow, handheld orbit over the living town */
+  setupTitleScene() {
+    const city = (this.world.landmarks && this.world.landmarks.city) || { x: 420, z: -60 };
+    const plaza = (this.world.spawns && this.world.spawns.tower) || { x: city.x + 6, z: city.z - 6 };
+    const ground = this.world.heightAt(plaza.x, plaza.z);
+    const coast = this.world.coastX(plaza.z);
+    // a drone shot: orbit above the roofs of the town, always looking out over the bay,
+    // so the menu backdrop shows the town AND the sea the tsunami will come from
+    this.titleOrbit = {
+      cx: plaza.x, cz: plaza.z, r: 70, t: 0.4, y: ground + 21,
+      look: { x: coast + 130, y: ground + 5, z: plaza.z - 45 },
+    };
+    this.clockT = 0.2;
+    this.sky.setTimeOfDay(this.clockT);
+    this.sky.setWeather(0.08, true);
+    this.ocean.syncSky(this.sky);
     this.ui.showCinema(false);
-    this.ui.el.subtitle.classList.add('hidden');
-    this.cinematicCam = null;
-    this.state = 'play';
-    this.setMission(0, true);
-    this.renderer.domElement.requestPointerLock?.();
-    this.ui.message('W A S D to move · E to interact · I for your bag', 6);
+  }
+
+  updateTitle(dt) {
+    this.time += dt;
+    this.clockT = (this.clockT + dt / (this.dayLength * 4)) % 1;
+    this.sky.setTimeOfDay(this.clockT);
+    this.sky.update(dt, this.camera);
+    if (!this.titleOrbit) this.setupTitleScene();
+    const o = this.titleOrbit;
+    o.t += dt * 0.03;                           // one slow lap every few minutes
+    const a = o.t;
+    // the camera flies in a wide, slightly elliptical circle around the square
+    const x = o.cx + Math.cos(a) * o.r;
+    const z = o.cz + Math.sin(a) * (o.r * 0.78);
+    const ground = this.world.heightAt(x, z);
+    const y = Math.max(ground + 13, o.y + Math.sin(a * 2.1) * 2.4);   // stay above the roofs
+    const n = (k, s) => Math.sin(this.time * s + k) * 0.6 + Math.sin(this.time * s * 1.73 + k * 2.3) * 0.4;
+    this.camera.position.set(x + n(1.1, 0.23) * 0.6, y + n(2.3, 0.31) * 0.25, z + n(3.7, 0.19) * 0.6);
+    // handheld drift on the aim as well, so the shot breathes instead of being locked
+    this.camera.lookAt(
+      o.look.x + n(4.1, 0.17) * 2.2,
+      o.look.y + n(5.3, 0.21) * 1.1,
+      o.look.z + n(6.7, 0.13) * 2.2,
+    );
+    // keep the living world alive behind the menu
+    this.npc.update(dt, this.player, { panic: 0.18, tsunami: false });
+    this.vehicles.update(dt, null, {});
+    this.ocean.update(dt, this.camera, this.camera.position);
+    this.ocean.syncSky(this.sky);
+    this.render(dt);
   }
 
   updateCinematic(dt) {
@@ -441,10 +701,16 @@ class Game {
     const W = this.world;
     this.missions = [
       {
-        id: 'wake', obj: 'Explore the beach — you washed up here. Find something useful.',
-        goal: () => (W.spawns.hut ? { x: W.spawns.hut.x, z: W.spawns.hut.z } : null),
-        check: () => this.survival.inv.count('rod_broken') > 0 || this.survival.inv.count('rod') > 0,
-        hint: 'Follow the beach; the broken rod lies near the jetty.',
+        id: 'wake', obj: 'Morning on the beach — walk out to the jetty and see what the sea left behind.',
+        goal: () => (W.spawns.pier ? { x: W.spawns.pier.x, z: W.spawns.pier.z } : null),
+        // walking out to the jetty is what starts the story (the old check wanted an item
+        // the player could only be given by the *next* mission, which deadlocked the chain)
+        check: () => {
+          const pier = W.spawns.pier; if (!pier) return true;
+          const d = Math.hypot(this.player.pos.x - pier.x, this.player.pos.z - pier.z);
+          return d < 9 || this.survival.inv.count('rod_broken') > 0 || this.survival.inv.count('rod') > 0;
+        },
+        hint: 'The jetty is out in front of you, past the boats drawn up on the sand.',
       },
       {
         id: 'repair', obj: 'Repair the fishing rod — collect fibre & scrap, then craft it (I → CRAFT).',
@@ -454,7 +720,8 @@ class Game {
           const b = W.beachCenter;
           const y = W.heightAt(b.x + 8, b.z - 6);
           this.survival.inv.add('rod_broken', 1);
-          this.ui.message('You pick up a splintered fishing rod.', 5);
+          this.ui.message('A splintered fishing rod, half buried by the jetty. You pick it up.', 6);
+          this.ui.chapter('THE ROD', 'Repair it: 2 fibre · 1 scrap — press C');
           this.goalMarker = { x: b.x + 8, z: b.z - 6 };
         },
       },
@@ -600,6 +867,7 @@ class Game {
         if (s.kind === 'campfire') return { type: 'fire', label: s.fuel > 0 ? 'Cook / add wood (E)' : 'Add wood to relight', obj: s };
         if (s.kind === 'shelter') return { type: 'shelter', label: 'Rest (sleep until morning)', obj: s };
       }
+      if (s.kind === 'craft_table' && d < 3.4) return { type: 'workbench', label: 'Use the workbench (craft advanced gear)', obj: s };
     }
     // resource
     const r = this.survival.nearestResource(c, 3.6);
@@ -668,6 +936,11 @@ class Game {
       }
       case 'shelter': {
         this.sleep();
+        break;
+      }
+      case 'workbench': {
+        this.ui.openPanel('craft', this.panelCtx());
+        this.ui.message('Workbench: new recipes unlocked — backpack, harpoon, steel axe, net, bedroll.', 5);
         break;
       }
       case 'resource': {
@@ -782,6 +1055,8 @@ class Game {
       ['wall', 'Wind wall — 3 plank'],
       ['marker', 'Stone marker — 3 stone'],
     ];
+    if (this.survival.inv.count('craft_table') > 0) opts.push(['craft_table', '🛠️ Place workbench — from your bag']);
+    else opts.push(['craft_table', '🛠️ Workbench — craft one first (6 stick · 4 plank)']);
     this.ui.openPanel('craft', this.panelCtx());
     const body = this.ui.el.panelBody;
     body.innerHTML = `<h3>Build</h3><div class="recipes">${opts.map(([k, label]) =>
@@ -799,8 +1074,9 @@ class Game {
   }
 
   sleep() {
-    if (!this.survival.nearShelter()) { this.ui.message('Build a shelter first.'); return; }
-    if (this.survival.structures.filter((s) => s.kind === 'campfire' && s.fuel > 0).length === 0) { this.ui.message('You need a burning fire to stay warm.'); return; }
+    const bedroll = this.survival.canSleepAnywhere;
+    if (!this.survival.nearShelter() && !bedroll) { this.ui.message('Build a shelter first — or sew a bedroll at the workbench.'); return; }
+    if (this.survival.structures.filter((s) => s.kind === 'campfire' && s.fuel > 0).length === 0 && !bedroll) { this.ui.message('You need a burning fire to stay warm.'); return; }
     this.clockT = (this.clockT + 0.35) % 1;
     this.sky.setTimeOfDay(this.clockT);
     this.player.health = Math.min(100, this.player.health + 25);
@@ -889,7 +1165,8 @@ class Game {
     this._last = now;
     this.fpsAcc += dt; this.fpsN++;
     if (this.fpsAcc > 1) { this.fps = this.fpsN / this.fpsAcc; this.fpsAcc = 0; this.fpsN = 0; }
-    if (this.state === 'title' || this.state === 'loading') { this.renderer.render(this.scene, this.camera); return; }
+    if (this.state === 'title') { this.updateTitle(dt); return; }
+    if (this.state === 'loading') { this.renderer.render(this.scene, this.camera); return; }
     this.update(dt);
     this.render(dt);
   }
@@ -905,6 +1182,8 @@ class Game {
 
   update(dt) {
     this.time += dt;
+    this.playTime += dt;
+    if (this.debug && (this._dbgT = (this._dbgT || 0) + dt) > 0.4) { this._dbgT = 0; this.ui.showDebug(this.debugText()); }
     // ---- clock / sky
     this.clockT = (this.clockT + dt / this.dayLength) % 1;
     this.sky.setTimeOfDay(this.clockT);
@@ -1004,7 +1283,7 @@ class Game {
     }
     // mouse look
     if (this.pointerLocked) {
-      const sens = 0.0022;
+      const sens = 0.0022 * (this.sens || 1);
       this.player.yaw += this.mouse.dx * sens;
       this.player.pitch = clamp(this.player.pitch - this.mouse.dy * sens, -1.35, 1.2);
       this.mouse.dx = 0; this.mouse.dy = 0;
@@ -1142,7 +1421,22 @@ function frame() { return new Promise((r) => requestAnimationFrame(() => r())); 
 
 /* A shader that fails to compile is silently skipped by three: the mesh just never draws.
    That is how "the ocean disappeared" happens, so put the compiler log on screen. */
+/* keep a short ring of console warnings: the debug overlay (F3) shows them */
+function watchConsole() {
+  if (globalThis.__tsWatch) return;
+  globalThis.__tsWatch = true;
+  globalThis.__tsWarnings = globalThis.__tsWarnings || [];
+  for (const level of ['warn', 'error']) {
+    const orig = console[level].bind(console);
+    console[level] = (...args) => {
+      try { globalThis.__tsWarnings.push(args.map((a) => String(a)).join(' ')); if (globalThis.__tsWarnings.length > 24) globalThis.__tsWarnings.shift(); } catch (e) { }
+      orig(...args);
+    };
+  }
+}
+
 function showShaderWarning(log) {
+  globalThis.__tsShaderError = log;
   try {
     let box = document.getElementById('glwarn');
     if (!box) {
@@ -1159,6 +1453,7 @@ function showShaderWarning(log) {
   } catch (e) { /* never break the boot because of a warning box */ }
 }
 
+watchConsole();
 const game = new Game();
 window.TsunamiGame = game;
 game.boot().catch((e) => {

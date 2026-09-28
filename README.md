@@ -101,9 +101,11 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 ## 🌊 New game in this repo — Tsunami survival
 
 `tsunami/` holds a second, independent browser game: **TSUNAMI — survival on the Moroccan coast**.
-A full 3D survival game (procedural world, no assets): a calm cinematic morning, a tsunami that
-wipes the fishing town, a car escape up the mountain, then survival — building, hunting, and the
-fishing rod you have to repair and cast.
+A full 3D survival game (procedural world, no assets): it opens on a **live 3D main menu** (drone shot
+over the town, CONTINUE / NEW GAME with difficulty / settings), then a calm cinematic morning, a
+tsunami that wipes the fishing town, a car escape up the mountain, and survival — building, hunting,
+fishing with the rod you repair, and a two-tier crafting system where the advanced gear needs a
+**workbench** you craft, place and use.
 
 ```bash
 cd tsunami

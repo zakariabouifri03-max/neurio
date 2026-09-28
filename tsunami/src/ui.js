@@ -12,6 +12,40 @@ const T = {
     respawn: 'TRY AGAIN', 'play again': 'Play again', fishCaught: 'Fish caught', survived: 'Survived',
     water: 'Water', food: 'Food', warmth: 'Warmth', health: 'Health', stamina: 'Stamina', breath: 'Breath',
     zoom: 'Zoom', need: 'Need', have: 'Have', built: 'Built', recipes: 'Recipes', touchHint: 'Drag to move',
+    // ---- main menu
+    menuTag: 'survive the wave · عيش بعد الموجة',
+    tagline: 'A fishing town. A morning tide that never comes back. And a mountain to survive on.',
+    start: 'PLAY', cont: 'CONTINUE', contInfo: 'Continue your journey',
+    newRun: 'NEW GAME', newRunInfo: 'Wake up on the beach again',
+    settings: 'SETTINGS', settingsInfo: 'Graphics, sound, language',
+    controlsInfo: 'Keys & touch', howto: 'HOW TO SURVIVE', howtoInfo: 'Craft, fish, build, escape',
+    about: 'ABOUT', aboutInfo: 'Credits & tech',
+    difficulty: 'DIFFICULTY', calm: 'CALM', normal: 'NORMAL', brutal: 'BRUTAL',
+    calmInfo: 'Mild weather, slow hunger, forgiving waves.',
+    normalInfo: 'The intended experience: one hard day on the coast.',
+    brutalInfo: 'Faster injury, hungrier body, taller waves.',
+    intro: 'Opening cinematic', on: 'ON', off: 'OFF',
+    begin: 'BEGIN THE DAY', back: 'BACK',
+    quality: 'QUALITY', language: 'LANGUAGE', mouseSens: 'Mouse sensitivity', volume: 'Master volume',
+    resumeGame: 'RESUME GAME', saveGame: 'SAVE GAME', mainMenu: 'MAIN MENU', quitToMenu: 'QUIT TO MENU',
+    restartRun: 'RESTART RUN', applyNow: 'Reload to apply', reload: 'RELOAD',
+    stationHand: 'HAND', stationTable: 'WORKBENCH', stationFar: 'no table nearby',
+    stationNear: 'workbench in reach', stationHint: 'Craft a workbench (6 stick · 4 plank), place it with G, then press E at it.',
+    advRecipes: 'WORKBENCH RECIPES', handRecipes: 'HAND RECIPES',
+    noSave: 'No saved run yet', slots: 'slots',
+    tip1: 'Press I for your bag and C for crafting wherever you are.',
+    tip2: 'A hatchet needs 2 stick · 2 stone · 1 rope — chop palms for the fronds.',
+    tip3: 'When the sea pulls back, run uphill: the water reaches 16 m.',
+    tip4: 'Fishing: LMB casts, LMB again strikes, keep the tension inside the zone.',
+    keyboardHint: '↑ ↓ choose · Enter confirm · Esc back',
+    kMove: 'move · drive', kRun: 'sprint · give line', kJump: 'jump · handbrake', kCrouch: 'crouch',
+    kUse: 'interact · harvest · workbench', kLmb: 'attack · cast · reel', kRmb: 'give line',
+    kF: 'enter / leave vehicle', kG: 'build & place', kT: 'torch', kQ: 'flare · throw spear',
+    kI: 'bag', kC: 'crafting', kJ: 'journal', kM: 'map', kV: '1st / 3rd person', kNum: 'quick use', kEsc: 'pause',
+    step1: 'Wake on the beach and gather sticks, stone, fibre and berries — keep your eyes on the sea.',
+    step2: 'Craft a hatchet and a fishing rod, then fish off the pier while the morning is calm.',
+    step3: 'Do not build your camp in the town: the flood reaches 16 m up the waterfront.',
+    aboutText: 'TSUNAMI — survival on the Moroccan coast. A hand-written Three.js game: every hill, building, wave and texture is generated at runtime from code — no external assets. Write-up, source and checks in the repository.',
   },
   ar: {
     loading: 'كنبنيو الساحل…', play: 'ابدا اللعب', continue: 'كمل', newGame: 'لعبة جديدة',
@@ -22,6 +56,40 @@ const T = {
     'play again': 'العب من جديد', fishCaught: 'الحوت اللي شديتي', survived: 'نجيتي',
     water: 'الما', food: 'الماكلة', warmth: 'الدفا', health: 'الصحة', stamina: 'القوة', breath: 'النفس',
     zoom: 'تكبير', need: 'خاصك', have: 'عندك', built: 'بنيتي', recipes: 'وصفات', touchHint: 'حرك الصبع',
+    // ---- المينو
+    menuTag: 'عيش بعد الموجة · survive the wave',
+    tagline: 'مدينة صغيرة ديال الصيادين. صباح هادي… ومن بعد البحر كيرجع نيشان. وجبل عليك تعيش فيه.',
+    start: 'ابدا', cont: 'كمل اللعب', contInfo: 'رجع من فين وقفتي',
+    newRun: 'لعبة جديدة', newRunInfo: 'عاود فيق فالساحل',
+    settings: 'الإعدادات', settingsInfo: 'الرسم، الصوت، اللغة',
+    controlsInfo: 'الكيبورد واللمس', howto: 'كيفاش تنجى', howtoInfo: 'صنع، صيد، بناء، هربة',
+    about: 'حول اللعبة', aboutInfo: 'المعلومات والتقنية',
+    difficulty: 'الصعوبة', calm: 'هادئ', normal: 'عادي', brutal: 'قاسح',
+    calmInfo: 'موج خفيف، الجوع شوية بطيء، تسامح.',
+    normalInfo: 'التجربة العادية: نهار صعيب فالساحل.',
+    brutalInfo: 'جرح أسرع، جوع أكبر، وموج عالي.',
+    intro: 'مشهد البداية', on: 'خدام', off: 'مطفي',
+    begin: 'بدا النهار', back: 'رجع',
+    quality: 'الجودة', language: 'اللغة', mouseSens: 'حساسية الفارة', volume: 'الصوت',
+    resumeGame: 'كمل اللعب', saveGame: 'سجل', mainMenu: 'المينو الرئيسي', quitToMenu: 'خروج للمينو',
+    restartRun: 'عاود من البداية', applyNow: 'خاص إعادة تحميل', reload: 'عاود حمّل',
+    stationHand: 'الید', stationTable: 'طابلة الخدمة', stationFar: 'ما كاينة طابلة قريبة',
+    stationNear: 'الطابلة قريبة', stationHint: 'صاوب طابلة (6 عود · 4 لوح)، حطها ب G، ومن بعد كليك E عندها.',
+    advRecipes: 'وصفات الطابلة', handRecipes: 'وصفات الید',
+    noSave: 'مازال ما كاين تسجيل', slots: 'خانة',
+    tip1: 'كليك I = الشنطة، كليك C = الصناعة فأي بلاصة.',
+    tip2: 'الفأس كيحتاج 2 عود · 2 حجر · 1 حبل — قطع النخل باش تاخد السعف.',
+    tip3: 'إيلا البحر حيد، طلع للعالي: الما كيوصل 16 متر.',
+    tip4: 'الصيد: كليك يسار كترمي، عاود كليك كتضرب، و خلي الشد وسط المنطقة.',
+    keyboardHint: '↑ ↓ اختيار · Enter تأكيد · Esc رجوع',
+    kMove: 'التحرك · السياقة', kRun: 'جري · تسريح الخيط', kJump: 'قفزة · فران', kCrouch: 'انحنى',
+    kUse: 'تفاعل · حصاد · طابلة الخدمة', kLmb: 'هجوم · رمي السنارة · جر', kRmb: 'سريح الخيط',
+    kF: 'طلع / هبط من الطونوبيل', kG: 'بناء و تحطيط', kT: 'الشعلة', kQ: 'إشارة · رمي الرمح',
+    kI: 'الشنطة', kC: 'الصناعة', kJ: 'اليوميات', kM: 'الخريطة', kV: 'منظور 1 / 3', kNum: 'استعمال سريع', kEsc: 'وقفة',
+    step1: 'فيق فالساحل و جمع العود، الحجر، الليف و العنب — و خلي عينك فالبحر.',
+    step2: 'صاوب الفأس و السنارة، و صيّد من الرصيف قبل ما البحر يقلب.',
+    step3: 'ما بنيش المخيم فالحيط: الفيضان كيوصل 16 متر.',
+    aboutText: 'تسونامي — النجاة فالساحل المغربي. لعبة Three.js مكتوبة بيد: كل تل، عمارة، موجة و تكستور كيتصنع فالوقت الحقيقي بكود — بلا ملفات خارجية.',
   },
 };
 
@@ -56,9 +124,106 @@ export class UI {
     <div class="loadTitle" data-i18n="loading">Building the coast…</div>
     <div class="loadBar"><i></i></div>
     <div class="loadPct">0%</div>
-    <div class="loadTip">Three.js · procedural world · no assets</div>
-    <button id="startBtn" class="btn big hidden" data-act="start" data-i18n="play">PLAY</button>
-    <div class="loadNote">W A S D move · SHIFT run · Space jump · E interact · LMB attack/cast · <b>I</b> bag · <b>C</b> craft · <b>M</b> map</div>
+    <div class="loadTip">Three.js r170 · procedural world · no assets</div>
+  </div>
+</div>
+
+<div id="menu" class="screen menu hidden">
+  <div class="menuVignette"></div>
+  <div class="menuGrain"></div>
+  <div class="menuWrap">
+    <header class="menuHead">
+      <div class="menuCrest">🌊</div>
+      <h1 class="menuTitle">TSUNAMI</h1>
+      <div class="menuRule"><i></i><span>⚓</span><i></i></div>
+      <p class="menuTag" data-i18n="menuTag">survive the wave</p>
+      <p class="menuDesc" data-i18n="tagline"></p>
+    </header>
+
+    <div id="menuMain" class="menuMain"></div>
+
+    <div class="menuPages">
+      <section class="mpage hidden" data-page="new">
+        <h2 class="mpTitle" data-i18n="difficulty">DIFFICULTY</h2>
+        <div class="diffRow">
+          <button class="card diff" data-act="difficulty:calm"><span class="dIco">🌤️</span><b data-i18n="calm">CALM</b><em data-i18n="calmInfo"></em></button>
+          <button class="card diff" data-act="difficulty:normal"><span class="dIco">⛅</span><b data-i18n="normal">NORMAL</b><em data-i18n="normalInfo"></em></button>
+          <button class="card diff" data-act="difficulty:hard"><span class="dIco">⛈️</span><b data-i18n="brutal">BRUTAL</b><em data-i18n="brutalInfo"></em></button>
+        </div>
+        <button class="chip toggle" data-act="toggle:intro">🎬 <span data-i18n="intro">Opening cinematic</span> <b id="introState">ON</b></button>
+        <div class="row">
+          <button class="btn big" id="beginBtn" data-act="beginrun" data-i18n="begin">BEGIN THE DAY</button>
+          <button class="btn ghost" data-act="menu:main" data-i18n="back">BACK</button>
+        </div>
+      </section>
+
+      <section class="mpage hidden" data-page="settings">
+        <h2 class="mpTitle" data-i18n="quality">QUALITY</h2>
+        <div class="chipRow" id="qRow"></div>
+        <h2 class="mpTitle" data-i18n="language">LANGUAGE</h2>
+        <div class="chipRow" id="langRow">
+          <button class="chip" data-act="lang:en">ENGLISH</button>
+          <button class="chip" data-act="lang:ar">العربية</button>
+        </div>
+        <label class="sliderRow"><span data-i18n="mouseSens">Mouse sensitivity</span>
+          <input type="range" min="0.4" max="2.4" step="0.05" data-slider="sens"></label>
+        <label class="sliderRow"><span data-i18n="volume">Master volume</span>
+          <input type="range" min="0" max="1" step="0.05" data-slider="volume"></label>
+        <div class="row">
+          <button class="btn" data-act="reload" data-i18n="reload">RELOAD</button>
+          <button class="btn ghost" data-act="menu:main" data-i18n="back">BACK</button>
+        </div>
+      </section>
+
+      <section class="mpage hidden" data-page="controls">
+        <h2 class="mpTitle" data-i18n="controls">CONTROLS</h2>
+        <div class="keyGrid">
+          <div><kbd>W A S D</kbd><span data-i18n="kMove">move · drive</span></div>
+          <div><kbd>Shift</kbd><span data-i18n="kRun">sprint · give line</span></div>
+          <div><kbd>Space</kbd><span data-i18n="kJump">jump · handbrake</span></div>
+          <div><kbd>C</kbd><span data-i18n="kCrouch">crouch</span></div>
+          <div><kbd>E</kbd><span data-i18n="kUse">interact · harvest · workbench</span></div>
+          <div><kbd>LMB</kbd><span data-i18n="kLmb">attack · cast · reel</span></div>
+          <div><kbd>RMB</kbd><span data-i18n="kRmb">give line</span></div>
+          <div><kbd>F</kbd><span data-i18n="kF">enter / leave vehicle</span></div>
+          <div><kbd>G</kbd><span data-i18n="kG">build & place</span></div>
+          <div><kbd>T</kbd><span data-i18n="kT">torch</span></div>
+          <div><kbd>Q</kbd><span data-i18n="kQ">flare · throw spear</span></div>
+          <div><kbd>I</kbd><span data-i18n="kI">bag</span></div>
+          <div><kbd>C</kbd><span data-i18n="kC">crafting</span></div>
+          <div><kbd>J</kbd><span data-i18n="kJ">journal</span></div>
+          <div><kbd>M</kbd><span data-i18n="kM">map</span></div>
+          <div><kbd>V</kbd><span data-i18n="kV">1st / 3rd person</span></div>
+          <div><kbd>1..9</kbd><span data-i18n="kNum">quick use</span></div>
+          <div><kbd>Esc</kbd><span data-i18n="kEsc">pause</span></div>
+        </div>
+        <div class="row"><button class="btn ghost" data-act="menu:main" data-i18n="back">BACK</button></div>
+      </section>
+
+      <section class="mpage hidden" data-page="howto">
+        <h2 class="mpTitle" data-i18n="howto">HOW TO SURVIVE</h2>
+        <ol class="tips">
+          <li data-i18n="step1"></li>
+          <li data-i18n="step2"></li>
+          <li data-i18n="step3"></li>
+          <li data-i18n="stationHint"></li>
+          <li data-i18n="tip3"></li>
+          <li data-i18n="tip4"></li>
+        </ol>
+        <div class="row"><button class="btn ghost" data-act="menu:main" data-i18n="back">BACK</button></div>
+      </section>
+
+      <section class="mpage hidden" data-page="about">
+        <h2 class="mpTitle" data-i18n="about">ABOUT</h2>
+        <p class="aboutText" data-i18n="aboutText"></p>
+        <div class="row"><button class="btn ghost" data-act="menu:main" data-i18n="back">BACK</button></div>
+      </section>
+    </div>
+
+    <footer class="menuFoot">
+      <span id="menuSaveInfo" class="saveInfo"></span>
+      <span class="menuHint" data-i18n="keyboardHint"></span>
+    </footer>
   </div>
 </div>
 
@@ -89,6 +254,7 @@ export class UI {
   <div id="subtitle" class="hidden"><b id="subName"></b><span id="subText"></span></div>
   <div id="chapter" class="hidden"><div class="cTitle">—</div><div class="cSub">—</div></div>
   <div id="toast" class="hidden"></div>
+  <div id="debug" class="hidden"></div>
 
   <div id="fishPanel" class="hidden">
     <div class="fTitle">🎣 <span id="fishName">—</span></div>
@@ -129,21 +295,17 @@ export class UI {
 </div>
 
 <div id="pause" class="screen hidden">
-  <div class="menuBox">
-    <h1>TSUNAMI</h1>
+  <div class="menuBox glass">
+    <h1 class="pauseTitle">TSUNAMI</h1>
     <p class="tagline">survive the wave — عيش بعد الموجة</p>
-    <button class="btn" data-act="resume" data-i18n="resume">RESUME</button>
-    <button class="btn" data-act="restart" data-i18n="restart">RESTART</button>
-    <div class="row">
-      <button class="btn small" data-act="lang" data-i18n="lang">ARABIC</button>
-      <button class="btn small" data-act="sound">🔊 <span data-i18n="sound">SOUND</span></button>
-      <button class="btn small" data-act="quality">Q: <span id="qLabel">HIGH</span></button>
-    </div>
-    <div class="controlsList">
-      <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump · <kbd>C</kbd> crouch</div>
-      <div><kbd>E</kbd> interact / harvest · <kbd>LMB</kbd> attack · <kbd>RMB</kbd> aim/hook · <kbd>Q</kbd> throw spear/flare</div>
-      <div><kbd>F</kbd> enter/exit vehicle · <kbd>I</kbd> bag · <kbd>C</kbd> craft · <kbd>M</kbd> map · <kbd>V</kbd> 1st/3rd person</div>
-      <div><kbd>1..9</kbd> quick use · <kbd>G</kbd> place structure · <kbd>T</kbd> torch · <kbd>H</kbd> help</div>
+    <div id="pauseInfo" class="saveInfo"></div>
+    <div class="pauseBtns">
+      <button class="btn big" data-act="resume" data-i18n="resume">RESUME</button>
+      <button class="btn" data-act="savegame" data-i18n="saveGame">SAVE GAME</button>
+      <button class="btn" data-act="settings" data-i18n="settings">SETTINGS</button>
+      <button class="btn" data-act="controls" data-i18n="controls">CONTROLS</button>
+      <button class="btn" data-act="quitmenu" data-i18n="quitToMenu">QUIT TO MENU</button>
+      <button class="btn ghost" data-act="restart" data-i18n="restartRun">RESTART RUN</button>
     </div>
   </div>
 </div>
@@ -168,7 +330,7 @@ export class UI {
     // cache elements
     const q = (s) => this.root.querySelector(s);
     this.el = {
-      loading: q('#loading'), loadBar: q('.loadBar i'), loadPct: q('.loadPct'), startBtn: q('#startBtn'),
+      loading: q('#loading'), loadBar: q('.loadBar i'), loadPct: q('.loadPct'),
       hud: q('#hud'), bHealth: q('#bHealth'), bStamina: q('#bStamina'), bFood: q('#bFood'), bWater: q('#bWater'),
       bWarmth: q('#bWarmth'), bBreath: q('#bBreath'), breathRow: q('#breathRow'),
       objText: q('#objText'), clock: q('#clock'), prompt: q('#prompt'), promptText: q('#promptText'),
@@ -179,6 +341,8 @@ export class UI {
       panelBody: q('#panelBody'), pause: q('#pause'), dead: q('#dead'), deadReason: q('#deadReason'),
       end: q('#end'), endStats: q('#endStats'), minimap: q('#minimap'), cinema: q('#cinema'),
       skipBtn: q('#skipBtn'), touch: q('#touch'), qLabel: q('#qLabel'), stick: q('#stick'),
+      menu: q('#menu'), menuMain: q('#menuMain'), menuSaveInfo: q('#menuSaveInfo'),
+      introState: q('#introState'), pauseInfo: q('#pauseInfo'), startBtn: q('#beginBtn'), debug: q('#debug'),
     };
     // wire buttons
     this.root.addEventListener('click', (e) => {
@@ -187,8 +351,115 @@ export class UI {
       const act = b.dataset.act || (b.dataset.tab ? 'tab:' + b.dataset.tab : null);
       if (act) this.onAction(act);
     });
+    // settings sliders report live
+    this.root.querySelectorAll('input[type=range][data-slider]').forEach((inp) => {
+      inp.addEventListener('input', () => this.onAction(`${inp.dataset.slider}:${inp.value}`));
+      inp.addEventListener('change', () => this.onAction(`${inp.dataset.slider}:${inp.value}`));
+    });
+    window.addEventListener('keydown', (e) => this.onMenuKey(e));
     this._touchSetup();
     this._mapBase = null;
+    this.menu = null;
+    this.menuPage = 'main';
+  }
+
+  /* ------------------------------------------------------------------- menu */
+  /* this is both the title menu and the pause menu */
+  showMenu(ctx = {}) {
+    this.menu = Object.assign({
+      mode: 'title', hasSave: false, saveInfo: '', difficulty: 'normal',
+      quality: 'high', sens: 1, volume: 0.85, intro: true,
+    }, this.menu || {}, ctx);
+    if (ctx.page) this.menuPage = ctx.page;
+    this.el.menu.classList.remove('hidden');
+    this.el.hud.classList.add('hidden');
+    this.renderMenu();
+  }
+  hideMenu() {
+    this.el.menu.classList.add('hidden');
+    this.el.hud.classList.remove('hidden');
+  }
+  get menuOpen() { return !this.el.menu.classList.contains('hidden'); }
+  setMenuPage(page) { this.menuPage = page || 'main'; this.renderMenu(); }
+
+  renderMenu() {
+    const m = this.menu || {};
+    const paused = m.mode === 'paused';
+    const B = (act, icon, label, sub, extra = '') =>
+      `<button class="mbtn ${extra}" data-act="${act}"><span class="mIco">${icon}</span>`
+      + `<span class="mTxt"><b>${label}</b>${sub ? `<em>${sub}</em>` : ''}</span>`
+      + `<span class="mArrow">›</span></button>`;
+    const rows = [];
+    if (paused) {
+      rows.push(B('resume', '▶', this.t('resumeGame'), '', 'primary'));
+      rows.push(B('savegame', '💾', this.t('saveGame'), ''));
+      rows.push(B('settings', '⚙️', this.t('settings'), this.t('settingsInfo')));
+      rows.push(B('controls', '🎮', this.t('controls'), this.t('controlsInfo')));
+      rows.push(B('quitmenu', '🏠', this.t('quitToMenu'), ''));
+      rows.push(B('restart', '↻', this.t('restartRun'), '', 'ghost'));
+    } else {
+      if (m.hasSave) rows.push(B('play', '▶', this.t('cont'), m.saveInfo || this.t('contInfo'), 'primary'));
+      rows.push(B('newgame', '🌊', this.t('newRun'), this.t('newRunInfo'), m.hasSave ? '' : 'primary'));
+      rows.push(B('settings', '⚙️', this.t('settings'), this.t('settingsInfo')));
+      rows.push(B('controls', '🎮', this.t('controls'), this.t('controlsInfo')));
+      rows.push(B('howto', '🎣', this.t('howto'), this.t('howtoInfo')));
+      rows.push(B('about', 'ⓘ', this.t('about'), this.t('aboutInfo'), 'ghost'));
+    }
+    this.el.menuMain.innerHTML = rows.join('');
+    this.root.querySelectorAll('.mpage').forEach((sec) => {
+      sec.classList.toggle('hidden', sec.dataset.page !== this.menuPage);
+    });
+    const d = m.difficulty || 'normal';
+    this.root.querySelectorAll('.diff').forEach((b) => b.classList.toggle('on', b.dataset.act === 'difficulty:' + d));
+    if (this.el.introState) this.el.introState.textContent = m.intro ? this.t('on') : this.t('off');
+    const qRow = this.root.querySelector('#qRow');
+    if (qRow) {
+      qRow.innerHTML = ['low', 'medium', 'high', 'ultra'].map((q) =>
+        `<button class="chip ${m.quality === q ? 'on' : ''}" data-act="quality:${q}">${q.toUpperCase()}</button>`).join('');
+    }
+    this.root.querySelectorAll('#langRow .chip').forEach((b) => b.classList.toggle('on', b.dataset.act === 'lang:' + this.lang));
+    const s1 = this.root.querySelector('[data-slider="sens"]');
+    if (s1) s1.value = m.sens;
+    const s2 = this.root.querySelector('[data-slider="volume"]');
+    if (s2) s2.value = m.volume;
+    if (this.el.pauseInfo) {
+      this.el.pauseInfo.textContent = paused ? (m.saveInfo || '') : '';
+    }
+    if (this.el.menuSaveInfo) this.el.menuSaveInfo.textContent = paused ? '' : (m.hasSave ? m.saveInfo : this.t('noSave'));
+    this.focusMenuItem(0);
+  }
+
+  menuFocusables() {
+    const page = this.menuPage && this.menuPage !== 'main' ? `.mpage[data-page="${this.menuPage}"] ` : '';
+    const sel = `${page}button, #menuMain button`;
+    return [...this.root.querySelectorAll(sel)].filter((b) => !b.disabled);
+  }
+  focusMenuItem(i = 0) {
+    const items = this.menuFocusables();
+    items.forEach((b) => b.classList.remove('sel'));
+    if (!items.length) return;
+    const b = items[((i % items.length) + items.length) % items.length];
+    b.classList.add('sel');
+    if (b.focus) { try { b.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
+  }
+  onMenuKey(e) {
+    if (!this.menuOpen || !this.menu) return;
+    const k = e.key;
+    if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Enter', 'Escape', ' '].includes(k)) return;
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+    if (k === 'Escape') {
+      // only step back through the pages here: closing the paused menu is the game's own
+      // Escape handler (both listeners see the same event, so only one may act on it)
+      if (this.menuPage !== 'main') this.setMenuPage('main');
+      return;
+    }
+    const items = this.menuFocusables();
+    if (!items.length) return;
+    const cur = items.findIndex((b) => b.classList.contains('sel'));
+    if (k === 'Enter' || k === ' ') { items[cur < 0 ? 0 : cur].click(); return; }
+    const step = (k === 'ArrowDown' || k === 'ArrowRight') ? 1 : -1;
+    this.focusMenuItem((cur < 0 ? 0 : cur) + step);
   }
 
   /* ---------------------------------------------------------------- loading */
@@ -197,8 +468,18 @@ export class UI {
     this.el.loadPct.textContent = `${Math.round(clamp01(p) * 100)}%`;
     if (text) this.el.loading.querySelector('.loadTitle').textContent = text;
   }
-  showStart() { this.el.startBtn.classList.remove('hidden'); }
+  /** the loading screen hands over to the title menu; the world keeps rendering behind it */
+  showStart() { this.el.loading.classList.add('hidden'); this.showMenu(); }
   hideLoading() { this.el.loading.classList.add('hidden'); this.el.hud.classList.remove('hidden'); }
+
+  /** the F3 self-check overlay: what the game thinks is happening right now */
+  showDebug(text) {
+    const el = this.el.debug;
+    if (!el) return;
+    if (!text) { el.classList.add('hidden'); return; }
+    el.textContent = text;
+    el.classList.remove('hidden');
+  }
 
   /* ------------------------------------------------------------------ hud */
   message(text, dur = 4) {
@@ -427,18 +708,36 @@ export class UI {
       }).join('')}</div>`;
       if (!list.length) body.innerHTML = '<p class="dim">Your bag is empty. Harvest sticks, stone, fibre and berries.</p>';
     } else if (this.panelTab === 'craft') {
-      body.innerHTML = `<div class="recipes">${RECIPES.map((r) => {
-        const can = inv ? inv.has(r.cost) : false;
+      // two stations: your hands (anywhere) and the workbench you place in the world
+      const atTable = !!ctx.atTable;
+      const canFn = ctx.canCraft || ((r) => (inv ? inv.has(r.cost) : false) && (r.station !== 'table' || atTable));
+      const row = (r) => {
+        const can = canFn(r);
         const cost = Object.entries(r.cost).map(([k, v]) => {
           const has = inv ? inv.count(k) : 0;
           return `<span class="cost ${has >= v ? 'ok' : 'no'}">${ITEMS[k] ? ITEMS[k].icon : k} ${has}/${v}</span>`;
         }).join('');
-        return `<div class="recipe ${can ? '' : 'no'}">
-          <div class="rHead">${ITEMS[r.out[0]].icon} <b>${r.label}</b>${r.station ? ' <em>(fire)</em>' : ''}</div>
+        const tag = r.station === 'table' ? '🛠' : r.station === 'fire' ? '🔥' : '';
+        return `<div class="recipe ${can ? '' : 'no'}${r.station === 'table' && !atTable ? ' locked' : ''}">
+          <div class="rHead">${ITEMS[r.out[0]].icon} <b>${r.label}</b>${r.out[1] > 1 ? ` ×${r.out[1]}` : ''}${tag ? ` <em>${tag}</em>` : ''}</div>
           <div class="rCost">${cost}</div>
           <button class="mini" data-act="craft:${r.id}" ${can ? '' : 'disabled'}>${this.t('craft')}</button>
         </div>`;
-      }).join('')}</div>`;
+      };
+      const hand = RECIPES.filter((r) => r.station !== 'table');
+      const table = RECIPES.filter((r) => r.station === 'table');
+      body.innerHTML = `
+        <div class="stationBar">
+          <span class="chip on">🖐 ${this.t('stationHand')}</span>
+          <span class="chip ${atTable ? 'on' : ''}">🛠 ${this.t('stationTable')}${atTable ? ` — ${this.t('stationNear')}` : ` — ${this.t('stationFar')}`}</span>
+        </div>
+        <h3>${this.t('handRecipes')}</h3>
+        <div class="recipes">${hand.map(row).join('')}</div>
+        <h3>${this.t('advRecipes')}</h3>
+        ${atTable ? '' : `<p class="dim">${this.t('stationHint')}</p>`}
+        <div class="recipes">${table.map(row).join('')}</div>`;
+      const tab = this.root.querySelector('[data-tab="craft"]');
+      if (tab) tab.classList.toggle('glow', atTable);
     } else if (this.panelTab === 'log') {
       const f = ctx.fishing;
       const log = f ? f.log : {};

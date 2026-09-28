@@ -19,11 +19,47 @@ python3 -m http.server 8000
 # → open http://localhost:8000
 ```
 
+## 🖥 Main menu — المينو
+
+The game opens on a **live 3D menu**: a slow drone shot orbiting above the fishing town's roofs,
+looking out over the bay, with traffic and villagers moving below and the full post pipeline
+running behind the panel. From there:
+
+- **CONTINUE** — only offered when a run is saved (the slot summary shows day, chapter, clock, difficulty and playtime).
+- **NEW GAME** — a second page picks the **difficulty** (CALM / NORMAL / BRUTAL: hunger & thirst rate,
+  cold, injury, wave height and the starting kit) and whether to play the opening cinematic.
+- **SETTINGS** — quality (LOW → ULTRA, applies on RELOAD), language (EN / AR, full RTL), mouse
+  sensitivity and master volume. Everything is remembered in `localStorage`.
+- **CONTROLS / HOW TO SURVIVE / ABOUT** — key list, a first-day walkthrough and credits.
+
+`Esc` during play opens the same menu in paused mode (resume · save · settings · controls · quit to
+menu · restart run). `↑ ↓` + `Enter` navigate it, `Esc` goes back — and the game **saves into two
+slots**, so starting a new run never silently eats the run you were on.
+
+Press **`F3`** (or add `?debug` to the url) for an on-screen self check: state, fps, player/camera
+position, water level and depth at the camera, bag/structure counts, draw calls and any console
+warning or shader error. It is the fastest way to report what the game is actually doing.
+
+## 🛠 The workbench — طابلة الخدمة
+
+Survival has two crafting tiers:
+
+1. **In your hands** (`C` anywhere): sticks, fibre, rope, bandages, the hatchet, the **workbench
+   itself** (6 stick · 4 plank), campfires, walls…
+2. **At a workbench**: craft the table, place it with `G`, then press `E` at it (or open `C` while
+   standing next to it) to unlock the advanced list — **canvas backpack (+6 bag slots)**, **harpoon**
+   (2× the spear), **steel axe** (fells a tree in half the swings), **fishing net** (+1 fish per
+   catch), **bedroll** (sleep anywhere) and bulk water purification. Each one is a real mechanic,
+   not a label: the backpack really widens the bag, the net really changes the catch.
+
+The crafting panel shows both stations and tells you why a recipe is locked.
+
 ## 🎬 The story flow — الأحداث
 
 1. **Cinematic intro** — a golden morning over the fishing town: boats in the bay, people on the sand.
-2. **Beach** — you wake on the beach. Pick up the splintered **fishing rod**, repair it (`I` → CRAFT),
-   gather fibre, scrap and berries.
+2. **Beach** — you wake on the sand of a working fishing beach (drawn-up boats, net racks, crates,
+   a fish stall, the jetty and the sea in front of you). Walk out to the jetty: you find the
+   **splintered fishing rod**, repair it (`C` → CRAFT), gather fibre, scrap and berries.
 3. **The sea pulls back** — the water drains off the seabed, sirens, then a 13 m wall of water,
    two more waves and the flood. **Run uphill** (the flood tops out at 16.5 m).
 4. **The town** — waterfront buildings collapse, debris floats, crates wash up. Reach the upper town.
@@ -49,6 +85,7 @@ python3 -m http.server 8000
 | `RMB` | give line (fishing) |
 | `F` | enter / leave a vehicle |
 | `I` `C` `J` `M` | inventory · crafting · journal · map |
+| `F3` | debug / self-check overlay (`?debug` in the url) |
 | `G` | build menu · `T` torch · `Q` flare/spear throw · `1..9` quick use |
 | `V` | first / third person · `Esc` pause |
 
@@ -62,7 +99,11 @@ Touch devices get a virtual stick + action buttons automatically.
 - Real water model: swell spectrum, 3 tsunami fronts with a moving crest shader, flood level, currents,
   foam, floating debris and buoyant vehicles.
 - Crowd + wildlife AI (people flee to towers/camps, animals graze & bolt), melee hunting.
-- Full survival loop: inventory (36 items), 10 recipes, structures, cooking, water purification.
+- Full survival loop: inventory (42 items), 17 recipes in two tiers (hand + workbench), 6 buildable
+  structures, cooking, water purification, sleeping, bleeding and cold.
+- Live 3D main menu with difficulty presets, two save slots, quality/language/sensitivity settings.
+- Two-tier crafting: hand recipes anywhere, advanced gear only at a **workbench** you craft, place
+  and use (`E`).
 - Procedural WebAudio: ocean/wind/rain beds, engine, ~36 one-shots, sparse music, all gesture-gated.
 
 ## 🧪 Dev checks — أدوات التطوير

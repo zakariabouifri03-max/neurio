@@ -525,6 +525,9 @@ export class VehicleSystem {
         const h = world.heightAt(x, z);
         if (h < 4 || h > 30) continue;
         const road = world.onRoad(x, z);
+        // no cars parked on the sand: the beach strip is for boats, not traffic
+        const region = world.regionAt ? world.regionAt(x, z) : 'city';
+        if (!road && region !== 'city') continue;
         const rot = road ? Math.atan2(road.dx, road.dz) : world.city.rot + rng() * 0.4;
         const kind = pick(rng, ['hatch', 'hatch', 'pickup', 'suv', 'suv', 'bus']);
         const v = this.spawn(kind, x, h + 0.05, z, rot + (rng() - 0.5) * 0.1);

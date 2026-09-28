@@ -1,4 +1,25 @@
 // survival.js — inventory, crafting, gathering, building, hunger/thirst/warmth
+
+/** Difficulty presets chosen in the main menu. */
+const DIFFICULTIES = {
+  calm: {
+    id: 'calm', label: 'CALM',
+    drain: 0.62, wave: 0.82, cold: 0.6, danger: 0.6, spawnBoost: true,
+    starting: { water_clean: 2, bandage: 2, stick: 4, plank: 2, fiber: 3, stone: 2 },
+  },
+  normal: {
+    id: 'normal', label: 'NORMAL',
+    drain: 1, wave: 1, cold: 1, danger: 1, spawnBoost: false,
+    starting: { water_clean: 1, bandage: 1 },
+  },
+  hard: {
+    id: 'hard', label: 'BRUTAL',
+    drain: 1.45, wave: 1.22, cold: 1.35, danger: 1.35, spawnBoost: false,
+    starting: { water_clean: 1, bandage: 1 },
+  },
+};
+const DIFFICULTY_IDS = ['calm', 'normal', 'hard'];
+function difficultyPreset(id) { return DIFFICULTIES[id] || DIFFICULTIES.normal; }
 import * as THREE from 'three';
 import { clamp, clamp01, lerp, mulberry32, rand, pick, TAU, colorGeo, xf } from './util.js';
 
@@ -44,6 +65,14 @@ export const ITEMS = {
   fuel_can: { name: 'Fuel can', icon: '⛽', stack: 3, kind: 'quest', desc: 'Refills vehicles.' },
   flare: { name: 'Flare', icon: '🧨', stack: 5, kind: 'quest', desc: 'Signal at night for rescuers.' },
   medkit: { name: 'First-aid kit', icon: '🧰', stack: 2, kind: 'med', heal: 55, bleed: 1, desc: 'Serious medicine.' },
+
+  // ---- workbench tier
+  craft_table: { name: 'Workbench', icon: '🛠️', stack: 3, kind: 'build', desc: 'Place it (G), then press E at it to craft the advanced recipes.' },
+  backpack: { name: 'Canvas backpack', icon: '🎒', stack: 1, kind: 'gear', desc: '+6 bag slots. Sewn at a workbench.' },
+  harpoon: { name: 'Harpoon', icon: '🗡️', stack: 1, kind: 'tool', desc: 'Long reach, deep wounds — 2× the spear.' },
+  bedroll: { name: 'Bedroll', icon: '🛏️', stack: 1, kind: 'gear', desc: 'Sleep anywhere, not only in a shelter.' },
+  fish_net: { name: 'Fishing net', icon: '🕸️', stack: 1, kind: 'gear', desc: '+1 fish on every catch.' },
+  steel_axe: { name: 'Steel axe', icon: '🪓', stack: 1, kind: 'tool', desc: 'Fells a tree in half the swings.' },
 };
 
 /* ----------------------------------------------------------------- recipes */
@@ -58,6 +87,17 @@ export const RECIPES = [
   { id: 'bandage', out: ['bandage', 2], cost: { cloth: 2, herb: 1 }, label: 'Bandages ×2', desc: '2 cloth · 1 herb' },
   { id: 'bucket', out: ['bucket', 1], cost: { scrap: 2, rope: 1 }, label: 'Bucket', desc: '2 scrap · 1 rope' },
   { id: 'water_clean', out: ['water_clean', 1], cost: { water_dirty: 1, charcoal: 1 }, station: 'fire', label: 'Purify water', desc: 'Murky water + charcoal (at fire)' },
+
+  // ---- build your own workbench (in your hands, anywhere)
+  { id: 'craft_table', out: ['craft_table', 1], cost: { stick: 6, plank: 4 }, label: 'Workbench 🛠️', desc: '6 stick · 4 plank — then place it with G' },
+
+  // ---- workbench-only recipes (station never in the bag)
+  { id: 'backpack', out: ['backpack', 1], cost: { cloth: 8, rope: 4, plank: 2 }, station: 'table', label: 'Canvas backpack 🎒', desc: '+6 bag slots' },
+  { id: 'harpoon', out: ['harpoon', 1], cost: { knife: 1, scrap: 2, stick: 3, rope: 2 }, station: 'table', label: 'Harpoon 🗡️', desc: 'upgrade from the knife' },
+  { id: 'bedroll', out: ['bedroll', 1], cost: { cloth: 6, rope: 3, frond: 2 }, station: 'table', label: 'Bedroll 🛏️', desc: 'sleep anywhere' },
+  { id: 'fish_net', out: ['fish_net', 1], cost: { rope: 4, fiber: 6 }, station: 'table', label: 'Fishing net 🕸️', desc: '+1 fish per catch' },
+  { id: 'steel_axe', out: ['steel_axe', 1], cost: { axe: 1, scrap: 2, rope: 1 }, station: 'table', label: 'Steel axe 🪓', desc: 'twice the chopping' },
+  { id: 'water_clean_table', out: ['water_clean', 2], cost: { water_dirty: 2, charcoal: 1 }, station: 'table', label: 'Purify water ×2', desc: 'filtered at the workbench, no fire' },
 ];
 
 /* ------------------------------------------------------------------ bag */
@@ -113,6 +153,9 @@ export class Survival {
     this.waterSources = [];
     this.cookTimer = [];
     this.stats = { fishCaught: 0, animalsHunted: 0, treesChopped: 0, structuresBuilt: 0, daysSurvived: 0, waterDrunk: 0, foodEaten: 0 };
+    // permanent upgrades unlocked at the workbench
+    this.upgrades = { backpack: false, harpoon: false, bedroll: false, net: false, steelAxe: false };
+    this.difficulty = DIFFICULTIES.normal;
     this.onEvent = () => {};
     this.group = new THREE.Group();
     this.group.name = 'structures';
@@ -139,8 +182,8 @@ export class Survival {
     let msg = null;
     switch (r.type) {
       case 'tree': {
-        if (!hasAxe) { msg = 'You need a hatchet to cut this tree.'; break; }
-        r.hp -= 2;
+        if (!hasAxe && !this.upgrades.steelAxe) { msg = 'You need a hatchet to cut this tree.'; break; }
+        r.hp -= this.upgrades.steelAxe ? 4 : 2;
         this.fx.debrisBurst(r.x, r.y + 1.4, r.z, 8, [0.45, 0.33, 0.2]);
         this.audio?.play('chop');
         if (r.hp <= 0) {
@@ -286,22 +329,79 @@ export class Survival {
     return true;
   }
 
+  /* ---------------------------------------------------------- difficulty */
+  setDifficulty(id) {
+    this.difficulty = difficultyPreset(id);
+    return this.difficulty;
+  }
+  /** starting kit for the chosen difficulty (called when a run begins) */
+  giveStartingKit() {
+    const kit = this.difficulty.starting || {};
+    for (const [id, n] of Object.entries(kit)) if (ITEMS[id]) this.inv.add(id, n);
+    if (this.difficulty.spawnBoost) {
+      for (const r of this.resources || []) {
+        if (r.type === 'driftwood' || r.type === 'shell' || r.type === 'bush') r.hp = Math.max(r.hp, 2);
+      }
+    }
+    return kit;
+  }
+
+  /* ------------------------------------------------------- workbench (station) */
+  /** the workbench structure the player placed, if one is in arm's reach */
+  nearCraftTable(radius = 3.6) {
+    const p = this.player.pos;
+    let best = null, bd = radius;
+    for (const s of this.structures) {
+      if (s.kind !== 'craft_table') continue;
+      const d = Math.hypot(s.pos.x - p.x, s.pos.z - p.z);
+      if (d < bd && Math.abs(s.pos.y - p.y) < 3.5) { bd = d; best = s; }
+    }
+    return best;
+  }
+  get atTable() { return !!this.nearCraftTable(); }
+
   /* -------------------------------------------------------------- crafting */
   canCraft(recipe) {
     if (!this.inv.has(recipe.cost)) return false;
     if (recipe.station === 'fire' && !this.nearFire()) return false;
+    if (recipe.station === 'table' && !this.nearCraftTable()) return false;
     return true;
   }
   craft(id) {
     const r = RECIPES.find((x) => x.id === id);
     if (!r) return false;
-    if (!this.canCraft(r)) { this.onEvent({ type: 'message', text: r.station === 'fire' ? 'You need to be next to a fire.' : 'Not enough materials.' }); return false; }
+    if (!this.canCraft(r)) {
+      const why = r.station === 'fire' ? 'You need to be next to a fire.'
+        : r.station === 'table' ? 'This needs a workbench — build one (6 stick · 4 plank) and stand at it.'
+          : 'Not enough materials.';
+      this.onEvent({ type: 'message', text: why });
+      return false;
+    }
     this.inv.pay(r.cost);
     this.inv.add(r.out[0], r.out[1]);
+    this.applyCraftEffect(r);
     this.audio?.play('craft');
     this.onEvent({ type: 'message', text: `Crafted ${ITEMS[r.out[0]].name} ×${r.out[1]}` });
     return true;
   }
+
+  /** the upgrades are real mechanics, not a label */
+  applyCraftEffect(r) {
+    switch (r.id) {
+      case 'backpack':
+        this.inv.cap += 6;
+        this.upgrades.backpack = true;
+        this.onEvent({ type: 'message', text: `Backpack sewn — bag now holds ${this.inv.cap} slots.` });
+        break;
+      case 'harpoon': this.upgrades.harpoon = true; break;
+      case 'bedroll': this.upgrades.bedroll = true; break;
+      case 'fish_net': this.upgrades.net = true; break;
+      case 'steel_axe': this.upgrades.steelAxe = true; break;
+      default: break;
+    }
+  }
+  /** sleep anywhere with a bedroll */
+  get canSleepAnywhere() { return this.upgrades.bedroll || this.inv.count('bedroll') > 0; }
 
   /* -------------------------------------------------------------- building */
   nearFire() {
@@ -320,9 +420,14 @@ export class Survival {
       rack: { cost: { stick: 4, rope: 1 }, name: 'Drying rack' },
       wall: { cost: { plank: 3 }, name: 'Wind wall' },
       marker: { cost: { stone: 3 }, name: 'Stone marker' },
+      // the workbench is placed from the crafted item, not from raw materials
+      craft_table: { item: 'craft_table', name: 'Workbench' },
     }[kind];
     if (!opts) return false;
-    if (!this.inv.pay(opts.cost)) { this.onEvent({ type: 'message', text: `Need more materials for the ${opts.name.toLowerCase()}.` }); return false; }
+    if (opts.item) {
+      if (this.inv.count(opts.item) === 0) { this.onEvent({ type: 'message', text: 'Craft a workbench first (6 stick · 4 plank).' }); return false; }
+      this.inv.remove(opts.item, 1);
+    } else if (!this.inv.pay(opts.cost)) { this.onEvent({ type: 'message', text: `Need more materials for the ${opts.name.toLowerCase()}.` }); return false; }
     const y = this.world.heightAt(pos.x, pos.z);
     const mesh = this._structureMesh(kind, rot);
     mesh.position.set(pos.x, y, pos.z);
@@ -330,6 +435,12 @@ export class Survival {
     mesh.castShadow = true; mesh.receiveShadow = true;
     this.group.add(mesh);
     const st = new Structure(kind, mesh, new THREE.Vector3(pos.x, y, pos.z), { fuel: kind === 'campfire' ? 100 : 0 });
+    if (kind === 'craft_table') {
+      const light = new THREE.PointLight(0xffc98a, 2.6, 13, 2);
+      light.position.set(pos.x, y + 1.5, pos.z);
+      st.data.light = light;
+      this.scene.add(light);
+    }
     if (kind === 'campfire') {
       const light = new THREE.PointLight(0xffa94d, 6, 26, 2);
       light.position.set(pos.x, y + 1.0, pos.z);
@@ -343,6 +454,10 @@ export class Survival {
       this.world.colliders.push({ cx: pos.x, cz: pos.z, hx: 1.6, hz: 1.4, rot, y0: y, y1: y + 2.0, kind: 'shelter' });
     }
     if (kind === 'wall') this.world.colliders.push({ cx: pos.x, cz: pos.z, hx: 2.2, hz: 0.18, rot, y0: y, y1: y + 1.6, kind: 'wall' });
+    if (kind === 'craft_table') {
+      this.world.colliders.push({ cx: pos.x, cz: pos.z, hx: 0.95, hz: 0.55, rot, y0: y, y1: y + 0.95, kind: 'workbench' });
+      st.rot = rot;
+    }
     this.structures.push(st);
     this.stats.structuresBuilt++;
     this.audio?.play('build');
@@ -353,8 +468,13 @@ export class Survival {
   _structureMesh(kind, rot) {
     const g = new THREE.Group();
     const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, metalness: 0.03 });
-    const add = (geo, color, pos, quat) => {
-      const m = new THREE.Mesh(colorGeo(geo, new THREE.Color(color)), mat);
+    const matMetal = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.42, metalness: 0.65 });
+    const matGlass = new THREE.MeshStandardMaterial({
+      vertexColors: true, roughness: 0.25, metalness: 0.0, transparent: true, opacity: 0.55,
+      emissive: new THREE.Color(0xffb761), emissiveIntensity: 1.4,
+    });
+    const add = (geo, color, pos, quat, kind = 'wood') => {
+      const m = new THREE.Mesh(colorGeo(geo, new THREE.Color(color)), kind === 'metal' ? matMetal : kind === 'glass' ? matGlass : mat);
       m.position.set(pos[0], pos[1], pos[2]);
       if (quat) m.rotation.set(quat[0], quat[1], quat[2]);
       m.castShadow = true; m.receiveShadow = true;
@@ -389,6 +509,41 @@ export class Survival {
       for (let i = 0; i < 9; i++) add(new THREE.BoxGeometry(0.45, 1.6, 0.06), i % 2 ? 0x9a7a52 : 0x8a6a44, [-1.9 + i * 0.48, 0.85, 0], [0, 0, 0.02 * (i % 3 - 1)]);
     } else if (kind === 'marker') {
       for (let i = 0; i < 5; i++) add(new THREE.DodecahedronGeometry(0.3 + i * 0.05, 0), 0x8c8478, [0, 0.3 + i * 0.35, 0], [i, i * 2, 0]);
+    } else if (kind === 'craft_table') {
+      // ---- a heavy carpentry bench: plank top, braced legs, vice, saw, mallet, lantern, shavings
+      const top = 0.92;
+      for (let i = 0; i < 2; i++) {
+        add(new THREE.BoxGeometry(1.9, 0.09, 0.52), i ? 0x9a7a52 : 0xa6895e, [0, top, i ? 0.29 : -0.29]);
+      }
+      add(new THREE.BoxGeometry(1.74, 0.05, 1.02), 0x6f5537, [0, top - 0.34, 0]);        // lower shelf
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+        add(new THREE.BoxGeometry(0.14, top, 0.14), 0x7d5f3d, [sx * 0.84, top / 2, sz * 0.42]);
+      }
+      for (const sz of [-1, 1]) add(new THREE.BoxGeometry(1.72, 0.08, 0.1), 0x5f4a30, [0, 0.2, sz * 0.42]);
+      add(new THREE.BoxGeometry(0.1, 0.08, 0.94), 0x5f4a30, [0, 0.5, 0]);
+      // vice + thread
+      add(new THREE.BoxGeometry(0.28, 0.2, 0.32), 0x484d53, [-0.78, top + 0.16, 0], null, 'metal');
+      add(new THREE.CylinderGeometry(0.035, 0.035, 0.52, 8), 0x7c838a, [-0.78, top + 0.2, 0.26], [Math.PI / 2, 0, 0], 'metal');
+      add(new THREE.TorusGeometry(0.07, 0.02, 6, 12), 0x7c838a, [-0.78, top + 0.2, 0.5], [0, 0, 0], 'metal');
+      // saw leaning against the front rail
+      add(new THREE.BoxGeometry(0.66, 0.34, 0.02), 0x9aa3ab, [-0.08, top - 0.44, -0.5], [0, 0, 0.12], 'metal');
+      add(new THREE.BoxGeometry(0.5, 0.055, 0.045), 0x8a6a44, [0.3, top - 0.3, -0.5], [0, 0, 0.34]);
+      // mallet + chisel + a straight edge on top
+      add(new THREE.CylinderGeometry(0.045, 0.05, 0.34, 8), 0x8a6a44, [0.44, top + 0.2, 0.02], [0, 0, 0.12]);
+      add(new THREE.CylinderGeometry(0.09, 0.09, 0.17, 10), 0x6d5233, [0.48, top + 0.37, 0.02], [0, 0, 0.12]);
+      add(new THREE.BoxGeometry(0.04, 0.03, 0.28), 0x9aa3ab, [0.7, top + 0.1, 0.22], null, 'metal');
+      add(new THREE.BoxGeometry(0.5, 0.02, 0.12), 0x9aa3ab, [-0.2, top + 0.07, 0.3], null, 'metal');
+      // lantern (light comes from build())
+      add(new THREE.CylinderGeometry(0.12, 0.14, 0.05, 10), 0x484d53, [0.74, top + 0.1, -0.3], null, 'metal');
+      add(new THREE.CylinderGeometry(0.1, 0.1, 0.22, 10), 0xffe1b0, [0.74, top + 0.24, -0.3], null, 'glass');
+      for (let i = 0; i < 3; i++) add(new THREE.BoxGeometry(0.02, 0.24, 0.02), 0x484d53, [0.74 + Math.cos(i / 3 * TAU) * 0.1, top + 0.24, -0.3 + Math.sin(i / 3 * TAU) * 0.1], null, 'metal');
+      add(new THREE.CylinderGeometry(0.11, 0.11, 0.04, 10), 0x484d53, [0.74, top + 0.38, -0.3], null, 'metal');
+      // wood shavings + a tin of nails
+      for (let i = 0; i < 8; i++) {
+        add(new THREE.BoxGeometry(0.14 + (i % 3) * 0.07, 0.016, 0.05), 0xb99a6b,
+          [-0.55 + i * 0.15, top + 0.06, 0.14 + (i % 2) * 0.12], [0, i * 1.1, 0]);
+      }
+      add(new THREE.CylinderGeometry(0.09, 0.1, 0.1, 10), 0x8d949a, [0.2, top + 0.12, -0.34], null, 'metal');
     }
     return g;
   }
@@ -437,8 +592,9 @@ export class Survival {
     }
     // ---- survival meters
     const activity = p.speed > 5 ? 1.6 : p.speed > 1 ? 1.15 : 0.85;
-    p.hunger = clamp(p.hunger - dt * 0.058 * activity, 0, 100);
-    p.thirst = clamp(p.thirst - dt * 0.082 * activity, 0, 100);
+    const diff = this.difficulty || difficultyPreset('normal');
+    p.hunger = clamp(p.hunger - dt * 0.058 * activity * diff.drain, 0, 100);
+    p.thirst = clamp(p.thirst - dt * 0.082 * activity * diff.drain, 0, 100);
     // warmth: cold at night / in rain / on the mountain / when wet / in water
     const alt = p.pos.y;
     let cold = 0;
@@ -449,7 +605,7 @@ export class Survival {
     cold += p.swimming ? 0.6 : 0;
     if (this.nearFire()) cold -= 1.6;
     if (this.nearShelter()) cold -= 0.55;
-    cold = clamp(cold, -2, 2.4);
+    cold = clamp(cold, -2, 2.4) * diff.cold;
     p.warmth = clamp(p.warmth - cold * dt * 2.1, 0, 100);
     // consequences
     let dmg = 0;
@@ -492,6 +648,9 @@ export class Survival {
     return {
       inv: this.inv.save(),
       stats: this.stats,
+      upgrades: { ...this.upgrades },
+      difficulty: this.difficulty.id,
+      cap: this.inv.cap,
       structures: this.structures.map((s) => ({ kind: s.kind, x: s.pos.x, y: s.pos.y, z: s.pos.z, fuel: s.fuel, rot: s.mesh.rotation.y })),
     };
   }
@@ -499,8 +658,11 @@ export class Survival {
     if (!data) return;
     this.inv.load(data.inv);
     Object.assign(this.stats, data.stats || {});
+    Object.assign(this.upgrades, data.upgrades || {});
+    if (data.difficulty) this.setDifficulty(data.difficulty);
+    if (data.cap) this.inv.cap = data.cap;
     for (const s of data.structures || []) this.build(s.kind, new THREE.Vector3(s.x, s.y, s.z), s.rot || 0);
   }
 }
 
-export { rand, pick, lerp, clamp01 };
+export { rand, pick, lerp, clamp01, DIFFICULTIES, DIFFICULTY_IDS, difficultyPreset };
