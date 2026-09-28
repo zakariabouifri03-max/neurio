@@ -11,6 +11,17 @@ npm run serve        # → http://localhost:8000     (or just open index.html)
 
 ---
 
+## Three ways to play
+
+| | |
+|---|---|
+| **One file, no server** | `BOOYAH-FIRE.html` — double-click it. Everything (game, three.js, styles, icon) is inlined, so it runs from `file://`, from a USB stick, offline. `npm run build:html` rebuilds it. |
+| **Browser / PWA** | serve the folder (`npm run serve`) and open `index.html`; installable as an app and cached offline by `sw.js`. |
+| **Android app** | `BOOYAH-FIRE.apk` — sideload it on a phone (see *Android APK* below). |
+
+> **اللعب من ملف واحد:** نزّل `BOOYAH-FIRE.html` وكليكي عليه — اللعبة كاملة داخلو (بلا سيرفر، بلا إنترنت، بلا تثبيت).
+> كتخدم من `file://` مباشرة، حتى من فلاش ديسك.
+
 ## Play
 
 | | |
@@ -44,7 +55,7 @@ There is no Android SDK, Gradle or `apksigner` in this repo, so the APK is assem
 | step | how |
 |---|---|
 | the app shell | `BashBaqiRacing.apk` in the repo root is the template: its 2.4 kB `classes.dex` is a WebView that loads `file:///android_asset/game.html` |
-| the game | esbuild bundles `src/main.js` (+ three.js) and the bundle, the CSS and the favicon are inlined into one self-contained `assets/game.html` |
+| the game | esbuild bundles `src/main.js` (+ three.js) and the bundle, the CSS and the favicon are inlined into one self-contained `assets/game.html` — the same inlining (`tools/build-standalone.mjs`) produces the browser's single-file build |
 | manifest & resources | `tools/axml.mjs` rewrites the *binary* manifest string pool (package `com.booyah.fire`, label `BOOYAH FIRE`, and a fully-qualified activity name, since `classes.dex` still owns `com.bashbaqi.racing.MainActivity`) and patches the package name in `resources.arsc` in place |
 | icons | the mipmaps are drawn by the same procedural artwork as the PWA icons, at 48/72/96/144/192 px |
 | zip | `tools/apk-sign.mjs` writes the archive itself: entries deflated (stored + 4-byte aligned for `.arsc`, `.dex`, `.png`), then the v2 APK Signing Block spliced in before the central directory |
@@ -123,6 +134,7 @@ npm install          # only pulls the 'three' devDependency the headless harness
 npm run test:all     # assets + markup + stylesheet + simulation + view + full-app smoke test
 npm run lint         # eslint: no-undef catches the classic "forgot to import" crash
 npm run icons        # regenerate icons/ from the procedural artwork in tools/make-icons-ff.mjs
+npm run build:html   # inline everything into BOOYAH-FIRE.html (one file, runs from file://)
 npm run build:apk    # pack the game into BOOYAH-FIRE.apk (toolchain in tools/apk-sign.mjs + tools/axml.mjs)
 ```
 
@@ -134,6 +146,7 @@ npm run build:apk    # pack the game into BOOYAH-FIRE.apk (toolchain in tools/ap
 | `tools/test-sim.mjs` | 41 k frames of headless match simulation: TTK table, zone timing, landings, knocks, revives, loot, backpacks, and every land vehicle on 12 islands actually driven |
 | `tools/test-view.mjs` | builds the whole three.js scene without WebGL: mesh/triangle/sprite budgets, LOD, pose paths, driving a car and wrecking it |
 | `tools/test-dom.mjs` | boots the real app against a DOM shim: lobby → match → combat → loot → map → vehicles → death → results → menus → save → touch |
+| `tools/check-standalone.mjs` | the single-file build stays single-file: no `src`/`href` to any other file, no import map, no module syntax, the markup intact — and that the committed `BOOYAH-FIRE.html` still matches a fresh build from `src/` |
 | `tools/test-apk-sign.mjs` | the APK wire format: verifies a real apksigner-signed APK, round-trips the binary manifest, signs and then tamper-checks `BOOYAH-FIRE.apk` |
 
 The same `three` build the browser loads is the one the tests import (`vendor/` and
@@ -159,6 +172,7 @@ freefire/
 │   ├── audio.js            synthesized Web Audio engine (SFX, ambience, music, vehicle engines)
 │   ├── hud.js              minimap, compass, health/armor/ammo, speedometer, kill feed, damage pops
 │   └── main.js             bootstrap: lobby, panels, input (keyboard/mouse/touch), save, game loop
+├── BOOYAH-FIRE.html        single-file build — double-click to play, no server
 ├── android/keystore/       dev signing key + certificate (rebuilds upgrade in place)
 ├── BOOYAH-FIRE.apk         built by `npm run build:apk` — sideload this on Android
 ├── BOOYAH-FIRE-v1-only.apk fallback build (JAR v1 only) for stubborn installers
@@ -166,6 +180,7 @@ freefire/
     ├── apk-sign.mjs        zip writer + APK v1/v2 signer & verifier (no SDK)
     ├── axml.mjs            binary AndroidManifest.xml / resources.arsc rewriting
     ├── verify-apk.py       independent v1/v2 verification with OpenSSL
+    ├── build-standalone.mjs  the one-file HTML build (shares the inliner with the APK)
     └── build-apk.mjs       the whole APK build: bundle → inline → sign → verify
 ```
 

@@ -45,11 +45,12 @@ export function bundleGame() {
   return r.outputFiles[0].text;
 }
 
-export function inlineGameHtml({ minify = false } = {}) {
+export function inlineGameHtml({ minify = false, banner = '' } = {}) {
   let html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const css = fs.readFileSync(path.join(root, 'src', 'style.css'), 'utf8');
   const js = bundleGame();
   const icon = fs.readFileSync(path.join(root, 'icons', 'icon-192.png')).toString('base64');
+  void minify;
 
   const swap = (from, to, why) => {
     if (!html.includes(from)) throw new Error(`index.html changed — cannot inline ${why}`);
@@ -64,7 +65,24 @@ export function inlineGameHtml({ minify = false } = {}) {
   if (!map) throw new Error('index.html changed — no import map to drop');
   html = html.replace(map[0], '');
   swap('<script type="module" src="src/main.js"></script>', `<script>${js}</script>`, 'the game script');
+  if (banner) html = html.replace('<head>', `<head>\n${banner}`);
+  if (js.includes('</script') || css.includes('</style')) {
+    throw new Error('the bundle would close its own <script>/<style> tag');
+  }
+  assertSelfContained(html);
   return html;
+}
+
+// A single-file build has to survive being opened from a USB stick, so nothing may
+// point at another file. Every src/href must be inline (data: URI) or an anchor.
+export function assertSelfContained(html) {
+  const refs = [...html.matchAll(/(?:src|href)\s*=\s*"([^"]*)"/g)].map((m) => m[1]);
+  const external = refs.filter((r) => !r.startsWith('data:') && !r.startsWith('#'));
+  if (external.length) throw new Error(`single-file build still references: ${external.join(', ')}`);
+  for (const want of ['<div id="app">', 'id="loading"', '</html>']) {
+    if (!html.includes(want)) throw new Error(`single-file build is missing ${want}`);
+  }
+  return refs.length;
 }
 
 // ── icons ───────────────────────────────────────────────────────────────────

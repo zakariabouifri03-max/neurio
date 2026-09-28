@@ -11,14 +11,15 @@
     "test:assets": "node tools/check-assets.mjs",
     "test:html": "node tools/check-html.mjs",
     "test:style": "node tools/check-style.mjs",
-    "test:all": "node tools/check-assets.mjs && node tools/check-html.mjs && node tools/check-style.mjs && node tools/test-sim.mjs && node tools/test-view.mjs && node tools/test-dom.mjs && node tools/test-apk-sign.mjs",
+    "test:all": "node tools/check-assets.mjs && node tools/check-html.mjs && node tools/check-style.mjs && node tools/check-standalone.mjs && node tools/test-sim.mjs && node tools/test-view.mjs && node tools/test-dom.mjs && node tools/test-apk-sign.mjs",
     "lint": "eslint src sw.js tools",
     "icons": "node tools/make-icons-ff.mjs",
     "serve": "python3 -m http.server 8000 --bind 0.0.0.0",
     "test:apk": "node tools/test-apk-sign.mjs",
     "build:apk": "node tools/build-apk.mjs",
     "verify:apk": "python3 tools/verify-apk.py",
-    "build:apk:v1": "node tools/build-apk.mjs --v1-only"
+    "build:apk:v1": "node tools/build-apk.mjs --v1-only",
+    "build:html": "node tools/build-standalone.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",
