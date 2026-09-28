@@ -19,6 +19,10 @@
 
 ## ▶ كيفاش تلعب
 
+**1) بلا سيرفر — ملف HTML وحد:** حمّل `jazira-standalone.html` ودوبل كليك — كلشي داخلو (اللعبة + Three.js)، كيخدم حتى أوفلاين 🌍
+(إلا بغيتي تعاود تبنيه من بعد أي تعديل: `node tools/build-single.mjs`)
+
+**2) ولا بالسيرفر (PWA — كتزيدها للشاشة الرئيسية):**
 ```bash
 python3 -m http.server 8000 --directory jazira
 # من بعد حل: http://localhost:8000
@@ -112,6 +116,9 @@ node tests/test-visual.mjs    # الكاميرا والمشهد بلا متصف�
 node tests/test-ui.mjs        # الواجهة (كيحتاج jsdom، وإلا كيتخطى)
 node tests/autoplay.mjs 20240928      # روبوت كيلعب 2D حتى للقارب
 node tests/autoplay.mjs 20240928 3d   # نفس الشي فالوضع 3D
+node tests/test-single.mjs    # الملف الوحد: كيبنيو، كيحلو، وكيتأكد بلي كيخدم (26 اختبار)
 ```
+
+> 🧱 `tools/build-single.mjs` كيجمع كل الوحدات (وThree.js) فسكريبت وحد داخل HTML — بلا أي تبعية خارجية.
 
 الروبوت كيوصل للمرحلة 7 وكيهرب فـ~4 دقايق فالوضعين (0 مرات موت).
