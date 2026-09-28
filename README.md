@@ -95,3 +95,19 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 🌊 New game in this repo — Tsunami survival
+
+`tsunami/` holds a second, independent browser game: **TSUNAMI — survival on the Moroccan coast**.
+A full 3D survival game (procedural world, no assets): a calm cinematic morning, a tsunami that
+wipes the fishing town, a car escape up the mountain, then survival — building, hunting, and the
+fishing rod you have to repair and cast.
+
+```bash
+cd tsunami
+python3 -m http.server 8000   # → http://localhost:8000
+```
+
+Details, controls and the story flow: [`tsunami/README.md`](tsunami/README.md).

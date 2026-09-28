@@ -1,0 +1,7 @@
+{
+  "name": "tsunami-survival-dev",
+  "private": true,
+  "type": "module",
+  "description": "dev-only manifest: lets node --check / node import treat src/*.js as ES modules. The game itself is plain static files.",
+  "imports": {}
+}
