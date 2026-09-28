@@ -68,13 +68,46 @@ console.log('✔ standalone boots to menu');
 
 G.ui.chapterCard = (t, ti, cb) => { cb && cb(); };
 G.ui.fade = () => {};
+G.ui.showEnding = (lines, cb) => { G.ui.__ending = { lines, cb }; };
 G.audio.ensure();
 G.newGame();
-const pump = (s) => { for (let k = 0; k < s; k++) G.story.update(0.1); };
+// pump BOTH story and world so flickers/doors/tv also tick (this catches
+// runtime crashes that only happen when the world updates)
+const pump = (s) => { for (let k = 0; k < s; k++) { G.story.update(0.1); G.world.update(0.1); } };
 pump(90);
 G.story.hook('bossNoteHome'); G.story.hook('coffee'); G.story.hook('catbowl'); G.story.hook('homeKeys'); G.story.hook('jacket');
 G.story.homeTasksTick();
 if (!G.story.flags.homeDone) { console.error('standalone: home chapter sim FAIL'); process.exit(1); }
+// walk to the car and drive
+G.world.triggers.find(t => t.id === 's_carhome').cb();
+G.story.hook('carInteract');
+pump(900); // run the world through the drive + arrival beats
+if (G.story.chapter < 2) { console.error('standalone: did not reach diner chapter, at ' + G.story.chapter); process.exit(1); }
 console.log('✔ standalone home chapter playable');
+console.log('✔ standalone world pumps clean through drive + arrival (ch' + G.story.chapter + ')');
+
+// ---- full journey: opening tasks -> customers -> freezer -> blackout -> chase -> ending
+const hook = (...a) => G.story.hook(...a);
+hook('bossNoteDiner'); hook('breaker', 'SIGN'); hook('crate'); hook('crate'); hook('crate'); hook('grill');
+G.player.giveItem('cashkeys', {}); hook('registerOpen'); hook('trashcan'); hook('dumpster');
+if (!G.story.flags.everythingDone) { console.error('standalone: shift tasks FAIL'); process.exit(1); }
+pump(200); // 20 sim-seconds: customers card
+if (G.story.chapter !== 3) { console.error('standalone: never reached customers, ch' + G.story.chapter); process.exit(1); }
+pump(5400); // ~540 sim-seconds: tarek -> hedi -> stranger -> jukebox -> leaves
+if (G.story.chapter !== 4) { console.error('standalone: never hit freezer chapter, ch' + G.story.chapter); process.exit(1); }
+console.log('✔ standalone customers chapter played (npcs walk, jukebox scare fired =', !!G.story.flags.jukePlayed + ')');
+G.world.triggers.find(t => t.id === 's_freezer_in').cb();
+pump(300); // ~30 s: slam -> handle tries -> escape -> blackout
+if (!G.story.flags.blackout) { console.error('standalone: blackout never fired'); process.exit(1); }
+console.log('✔ standalone freezer trap + blackout, stalker mode =', G.stalker.mode);
+G.player.giveItem('fuse', {}); hook('fuseSlot'); hook('breaker', 'MAIN');
+pump(80); // ~8 s: restore + chapter 5 + chase begins
+if (G.story.chapter !== 5 || !G.story._chaseOn) { console.error('standalone: chase never started, ch' + G.story.chapter); process.exit(1); }
+const carX = G.world.props.playerCar.position.x;
+G.player.pos.set(carX + 0.6, 0, -6.2);
+G.story._carMash(); G.story._carMash(); G.story._carMash();
+pump(200);
+if (!G.ui.__ending) { console.error('standalone: ending never reached'); process.exit(1); }
+console.log('✔ standalone full journey to the ending');
 console.log('\nSTANDALONE (LASTCALL) BOOT + SIM: PASS');
 process.exit(0);

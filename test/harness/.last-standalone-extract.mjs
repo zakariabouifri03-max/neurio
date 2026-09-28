@@ -22751,7 +22751,7 @@ var WorldE2 = class extends World {
       head.position.set(x, 6.34, -18.5);
       this.scene.add(pole, arm, head);
       const l = this.addLight("lamp_" + x, x, 5.6, -18.8, 16757598, 4.2, 14);
-      this.flickers.push({ t: rand(0, 4), speed: 0.7 + Math.random(), eval: (t) => Math.sin(t * 3.1 + x) > -0.93 ? 1 : 0.2, entry: l });
+      this.flickers.push({ t: rand(0, 4), speed: 0.7 + Math.random(), eval: (t) => Math.sin(t * 3.1 + x) > -0.93 ? 1 : 0.2, entry: this.lights.get("lamp_" + x) });
       this.glowSprite(T.glowDot, x, 6.3, -18.5, 2.2, 0.4);
     };
     lampAt(-16);
@@ -23408,6 +23408,70 @@ var WorldE2 = class extends World {
     this.applyPowerMap();
   }
   _setup() {
+  }
+  // ep2-specific frame update — the base World.update is tailoured to the
+  // ep1 motel (sign meshes, walkway lamps, CCTV); here we run the shared
+  // machinery only, plus our own diner accents.
+  update(dt) {
+    this.time += dt;
+    for (const d of this.doors.values())
+      d.update(dt);
+    for (const d of this.drawers.values())
+      d.update(dt);
+    for (const k of Object.keys(this.props)) {
+      if (!k.startsWith("closet_"))
+        continue;
+      const st = this.props[k];
+      st.open01 = lerp2(st.open01, st.target, 1 - Math.exp(-4.5 * dt));
+      st.panel.position.z = st.z + st.open01 * st.w * 0.95;
+      st.closed.solid = st.open01 < 0.7;
+    }
+    for (const f of this.flickers) {
+      f.t += dt * f.speed;
+      const v = f.eval(f.t);
+      if (f.entry)
+        f.entry.light.intensity = f.entry.on ? f.entry.base * v : 0;
+      if (f.mesh)
+        f.mesh.material.emissiveIntensity = v * (f.emisBase || 1.4);
+      if (f.sprite)
+        f.sprite.material.opacity = f.spriteBase * v;
+    }
+    if (this._tvTex) {
+      this.tvDirty -= dt;
+      if (this.tvDirty <= 0) {
+        this.tvDirty = 0.12;
+        const ctx = this._tvCtx;
+        const img = ctx.createImageData(64, 48);
+        for (let i = 0; i < img.data.length; i += 4) {
+          const v = Math.random() * 90 + 20;
+          img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+          img.data[i + 3] = 255;
+        }
+        ctx.putImageData(img, 0, 0);
+        this._tvTex.needsUpdate = true;
+      }
+    }
+    if (this.props.dinerSignMesh && this._powerFlag && this.breaker.SIGN) {
+      const v = 0.94 + 0.06 * Math.sin(this.time * 3.1);
+      this.props.dinerSignMesh.material.emissiveIntensity = 1.2 * v;
+      this.props.openSignMesh && (this.props.openSignMesh.material.emissiveIntensity = 1.6 * v);
+    }
+    const p = this.G.player;
+    if (p) {
+      for (const t of this.triggers) {
+        if (t.fired && t.once)
+          continue;
+        if (t.box.contains2D(p.pos.x, p.pos.z)) {
+          t.fired = true;
+          t.cb();
+        }
+      }
+    }
+    if (this.props.clockMin && this.G.story) {
+      const mins = this.G.story.clockMin;
+      this.props.clockMin.rotation.z = -(mins % 60 / 60) * Math.PI * 2;
+      this.props.clockHr.rotation.z = -(mins / 60 % 12 / 12) * Math.PI * 2;
+    }
   }
 };
 function pickColor() {
