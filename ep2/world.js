@@ -25,6 +25,36 @@ export class WorldE2 extends World {
     // power circuits
     this.breaker = { MAIN: true, DINING: true, KITCHEN: true, SIGN: false, fuseIn: true };
     this._powerFlag = true;
+    this._ep2Lighting();
+  }
+
+  // ---------------- readability pass: night that READS as night ----------------
+  // (horror-dark but never pitch black — dinner with the shadows, not blindness)
+  _ep2Lighting() {
+    // lift the sky hemisphere and correct its colors for Route 9's blue hour
+    this.hemi.intensity = 0.66;
+    this.hemi.color = new THREE.Color(0x2e3c58);
+    this.hemi.groundColor = new THREE.Color(0x14110c);
+    // faint moonlight so outdoors reads in monochrome — classic night film
+    if (!this.moonLight) {
+      this.moonLight = new THREE.DirectionalLight(0x9ab4d8, 0.32);
+      this.moonLight.position.set(30, 40, -30);
+      this.scene.add(this.moonLight);
+    }
+    // apartment: the lamp brighter + a warm kitchen/hall fill
+    const lamp = this.lights.get('home_lamp');
+    if (lamp) { lamp.base = 4.6; lamp.light.intensity = 4.6; lamp.light.distance = 10; }
+    this.addLight('home_kitchen', 2.6, 2.2, 0.4, 0xffd9a8, 3.2, 7);
+    this.addLight('home_door_l', 0.0, 2.3, -3.2, 0xffc890, 2.6, 6);
+    // diner reads warm and inviting from across the lot
+    const boost = (id, v, dist) => { const e = this.lights.get(id); if (e) { e.base = v; e.light.distance = dist; if (e.on) e.light.intensity = v; } };
+    boost('dining_a', 6.2, 12);
+    boost('dining_b', 5.6, 12);
+    boost('kitchen_l', 5.6, 11);
+    boost('diner_porch', 4.4, 11);
+    boost('sign_l', 4.6, 14);
+    // street lamps a touch stronger
+    for (const [id, e] of this.lights) if (id.startsWith('lamp_')) { e.base *= 1.35; e.light.distance = 16; if (e.on) e.light.intensity = e.base; }
   }
 
   // ---------------- own texture bits ----------------

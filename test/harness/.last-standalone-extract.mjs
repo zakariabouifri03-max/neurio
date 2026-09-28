@@ -22292,6 +22292,48 @@ var WorldE2 = class extends World {
     this._buildThinkers();
     this.breaker = { MAIN: true, DINING: true, KITCHEN: true, SIGN: false, fuseIn: true };
     this._powerFlag = true;
+    this._ep2Lighting();
+  }
+  // ---------------- readability pass: night that READS as night ----------------
+  // (horror-dark but never pitch black — dinner with the shadows, not blindness)
+  _ep2Lighting() {
+    this.hemi.intensity = 0.66;
+    this.hemi.color = new Color(3030104);
+    this.hemi.groundColor = new Color(1315084);
+    if (!this.moonLight) {
+      this.moonLight = new DirectionalLight(10138840, 0.32);
+      this.moonLight.position.set(30, 40, -30);
+      this.scene.add(this.moonLight);
+    }
+    const lamp = this.lights.get("home_lamp");
+    if (lamp) {
+      lamp.base = 4.6;
+      lamp.light.intensity = 4.6;
+      lamp.light.distance = 10;
+    }
+    this.addLight("home_kitchen", 2.6, 2.2, 0.4, 16767400, 3.2, 7);
+    this.addLight("home_door_l", 0, 2.3, -3.2, 16763024, 2.6, 6);
+    const boost = (id, v, dist) => {
+      const e = this.lights.get(id);
+      if (e) {
+        e.base = v;
+        e.light.distance = dist;
+        if (e.on)
+          e.light.intensity = v;
+      }
+    };
+    boost("dining_a", 6.2, 12);
+    boost("dining_b", 5.6, 12);
+    boost("kitchen_l", 5.6, 11);
+    boost("diner_porch", 4.4, 11);
+    boost("sign_l", 4.6, 14);
+    for (const [id, e] of this.lights)
+      if (id.startsWith("lamp_")) {
+        e.base *= 1.35;
+        e.light.distance = 16;
+        if (e.on)
+          e.light.intensity = e.base;
+      }
   }
   // ---------------- own texture bits ----------------
   _buildOwnTextures() {
@@ -24937,7 +24979,7 @@ var Story = class {
         this.flags.blackout = true;
         G2.phone.setSignal(false);
         W.killPower();
-        W.hemi.intensity = 0.2;
+        W.hemi.intensity = 0.15;
         G2.player.items.set("fuse", { label: S("MAIN fuse", "\u0627\u0644\u0641\u064A\u0648\u0632 \u0627\u0644\u0631\u0626\u064A\u0633\u064A") });
         G2.player.items.set("cashkeys", { label: S("Car keys", "\u0645\u0641\u0627\u062A\u064A\u062D \u0627\u0644\u0633\u064A\u0627\u0631\u0629") });
         break;
@@ -25442,7 +25484,7 @@ var Story = class {
       this.later(3.6, () => {
         G2.audio.engineSet(true, 0.28);
         G2.effects.shake(0.4);
-        G2.world.hemi.intensity = 0.34;
+        G2.world.hemi.intensity = 0.5;
         const hl = new SpotLight(14213887, 30, 26, 0.5, 0.4, 1.2);
         hl.position.set(cp.x, 0.9, cp.z);
         hl.target.position.set(cp.x + Math.sin(car.rotation.y) * -14, 0.4, cp.z + Math.cos(car.rotation.y) * -14);
@@ -25876,7 +25918,7 @@ var Story = class {
         if (this.flags.blackout && a === true) {
           this.flags.blackout = false;
           this.flags.restored = true;
-          G2.world.hemi.intensity = 0.4;
+          G2.world.hemi.intensity = 0.66;
           G2.effects.vignetteBoost(0.95);
           this.later(0.9, () => this._enterChapter(5));
         }
@@ -25894,7 +25936,7 @@ var Story = class {
 };
 function W_powerDieSlow(W) {
   if (W.hemi)
-    W.hemi.intensity = 0.3;
+    W.hemi.intensity = 0.34;
 }
 function Phome_uncaught(G2) {
 }
@@ -26687,6 +26729,7 @@ var Game = class {
     this.canvas = el("scene");
     this.settings = loadSettings();
     setLang(localStorage.getItem("lastcall_lang") || "ar");
+    this.settings.bright = Math.max(this.settings.bright ?? 1, 1.18);
     this.state = "boot";
     this.time = 0;
     this.T = buildTextures();

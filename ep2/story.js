@@ -164,7 +164,7 @@ export class Story {
       case 'closing': {
         this.flags.noteDinerRead = true; this.flags.hidingUnlocked = true; this.flags.trapped = true;
         this.flags.blackout = true; G.phone.setSignal(false);
-        W.killPower(); W.hemi.intensity = 0.2;
+        W.killPower(); W.hemi.intensity = 0.15;
         G.player.items.set('fuse', { label: S('MAIN fuse', 'الفيوز الرئيسي') });
         G.player.items.set('cashkeys', { label: S('Car keys', 'مفاتيح السيارة') });
         break;
@@ -654,7 +654,7 @@ export class Story {
       this.later(3.6, () => {
         G.audio.engineSet(true, 0.28);
         G.effects.shake(0.4);
-        G.world.hemi.intensity = 0.34;
+        G.world.hemi.intensity = 0.5;
         const hl = new THREE.SpotLight(0xd8e2ff, 30, 26, 0.5, 0.4, 1.2);
         hl.position.set(cp.x, 0.9, cp.z);
         hl.target.position.set(cp.x + Math.sin(car.rotation.y) * -14, 0.4, cp.z + Math.cos(car.rotation.y) * -14);
@@ -1046,7 +1046,7 @@ export class Story {
         if (this.flags.blackout && a === true) {
           this.flags.blackout = false;
           this.flags.restored = true;
-          G.world.hemi.intensity = 0.4;
+          G.world.hemi.intensity = 0.66;
           G.effects.vignetteBoost(0.95);
           this.later(0.9, () => this._enterChapter(5));
         }
@@ -1065,6 +1065,6 @@ export class Story {
 
 // server-render helper used in freezer beat
 function W_powerDieSlow(W) {
-  if (W.hemi) W.hemi.intensity = 0.3;
+  if (W.hemi) W.hemi.intensity = 0.34;
 }
 function Phome_uncaught(G) { /* shadow figure present, camera jump happens in Stalker model */ }

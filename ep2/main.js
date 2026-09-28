@@ -109,6 +109,8 @@ class Game {
     this.settings = loadSettings();
     // episode 2 is Arabic-first; remember the player's own choice
     I18N.setLang(localStorage.getItem('lastcall_lang') || 'ar');
+    // night needs to be visible: ep2 floor for brightness (user can still lower it)
+    this.settings.bright = Math.max(this.settings.bright ?? 1, 1.18);
     this.state = 'boot';
     this.time = 0;
     this.T = buildTextures();
