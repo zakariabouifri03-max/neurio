@@ -170,6 +170,16 @@ const lsStub = {
 try { Object.defineProperty(globalThis, 'localStorage', { value: lsStub, configurable: true, writable: true }); } catch (e) { globalThis.localStorage = lsStub; }
 try { globalThis.navigator.hardwareConcurrency = 8; } catch (e) { /* read-only in newer node */ }
 try { Object.defineProperty(globalThis, 'navigator', { value: { hardwareConcurrency: 8, userAgent: 'node', maxTouchPoints: 0 }, configurable: true, writable: true }); } catch (e) { /* keep node's */ }
+// deterministic randomness: without this the match seed (Date-based in main.js →
+// Math.random) changes every run, so a failure could never be reproduced
+let rngState = 0x5eed1234;
+Math.random = () => {
+  rngState = (rngState + 0x6d2b79f5) >>> 0;
+  let t = rngState;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
 globalThis.location = { protocol: 'http:', href: 'http://localhost/' };
 globalThis.confirm = () => false;
 globalThis.AudioContext = undefined;

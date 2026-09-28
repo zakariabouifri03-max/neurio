@@ -2,7 +2,7 @@
   "name": "booyah-fire",
   "private": true,
   "version": "1.0.0",
-  "description": "BOOYAH FIRE — a Free Fire–style 3D battle royale that runs in the browser with no build step. The game itself loads three.js from ./vendor/ via an importmap; the 'three' devDependency below exists only so the headless Node test harnesses can import the same modules.",
+  "description": "BOOYAH FIRE — a Free Fire–style 3D battle royale that runs in the browser with no build step. The game itself loads three.js from ./vendor/ via an importmap, and tools/build-apk.mjs packs it into an Android APK with a pure-Node signer; the 'three' devDependency below exists only so the headless Node test harnesses can import the same modules.",
   "type": "module",
   "scripts": {
     "test": "node tools/test-sim.mjs",
@@ -11,14 +11,18 @@
     "test:assets": "node tools/check-assets.mjs",
     "test:html": "node tools/check-html.mjs",
     "test:style": "node tools/check-style.mjs",
-    "test:all": "node tools/check-assets.mjs && node tools/check-html.mjs && node tools/check-style.mjs && node tools/test-sim.mjs && node tools/test-view.mjs && node tools/test-dom.mjs",
-    "lint": "eslint src sw.js",
+    "test:all": "node tools/check-assets.mjs && node tools/check-html.mjs && node tools/check-style.mjs && node tools/test-sim.mjs && node tools/test-view.mjs && node tools/test-dom.mjs && node tools/test-apk-sign.mjs",
+    "lint": "eslint src sw.js tools",
     "icons": "node tools/make-icons-ff.mjs",
-    "serve": "python3 -m http.server 8000 --bind 0.0.0.0"
+    "serve": "python3 -m http.server 8000 --bind 0.0.0.0",
+    "test:apk": "node tools/test-apk-sign.mjs",
+    "build:apk": "node tools/build-apk.mjs"
   },
   "devDependencies": {
+    "esbuild": "^0.24.0",
     "eslint": "^9.0.0",
     "globals": "^15.0.0",
+    "node-forge": "^1.3.1",
     "parse5": "^7.0.0",
     "three": "0.170.0"
   }

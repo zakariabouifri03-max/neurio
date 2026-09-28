@@ -1330,8 +1330,16 @@ export class Battle {
         const x = clamp(road.x + Math.cos(a) * rr, -WORLD * 0.46, WORLD * 0.46);
         const z = clamp(road.z + Math.sin(a) * rr, -WORLD * 0.46, WORLD * 0.46);
         if (this.island.height(x, z) < 0.6) continue;             // keep cars out of the shallows
+        // a car parked on a cliff face can't out-climb gravity: grip scales with
+        // slope, so a 60°+ slope leaves it crawling at walking pace
+        if (this.island.slopeAt(x, z) > 0.7) continue;
         const yaw = this.rng() * TAU;
-        if (!this._clearSpot(x, z, 2.6) || !this._clearRun(x, z, yaw, 8)) continue;
+        // 3.2 m of clearance is the vehicle's own footprint plus a margin: a car
+        // parked inside a crate's collision box is a car that cannot drive away
+        if (!this._clearSpot(x, z, 3.2) || !this._clearRun(x, z, yaw, 9)) continue;
+        // don't stack two cars on the same spot: the "nearest vehicle" prompt would
+        // pick the wrong one and driving off would bump into a neighbour
+        if (this.vehicles.some((v) => Math.hypot(v.x - x, v.z - z) < 6)) continue;
         this.vehicles.push(this._makeVehicle(kinds[i], x, z, yaw));
         break;
       }
@@ -1345,7 +1353,7 @@ export class Battle {
           const x = Math.cos(a) * r, z = Math.sin(a) * r;
           if (this.island.height(x, z) < -0.2) { shore = { x, z }; break; }
         }
-        if (shore) {
+        if (shore && !this.vehicles.some((v) => Math.hypot(v.x - shore.x, v.z - shore.z) < 6)) {
           this.vehicles.push(this._makeVehicle('boat', shore.x, shore.z, a + Math.PI / 2));
           break;
         }
@@ -1377,13 +1385,16 @@ export class Battle {
   // is the road ahead (and behind) clear enough to actually drive away?
   _clearRun(x, z, yaw, len) {
     for (const dir of [1, -1]) {
-      for (let d = 3; d <= len; d += 2.5) {
+      for (let d = 2; d <= len; d += 2) {
         const cx = x + Math.sin(yaw) * d * dir, cz = z + Math.cos(yaw) * d * dir;
         if (this.island.height(cx, cz) < 0.4) continue;             // over water is fine to skip
+        if (dir === 1 && this.island.slopeAt(cx, cz) > 1) return false;   // no cliff straight ahead
         for (const idx of this.island.propsNear(cx, cz)) {
           const pr = this.island.props[idx];
-          if (pr.type === 'tree' || pr.type === 'rock') continue;
-          if (Math.abs(cx - pr.x) < pr.hw + 1.6 && Math.abs(cz - pr.z) < pr.hd + 1.6) return false;
+          // 2.6 m half-width for solid buildings, 1.2 m for trunks and boulders:
+          // the corridor has to fit the car, not just its centre line
+          const pad = pr.type === 'tree' || pr.type === 'rock' ? 1.2 : 2.6;
+          if (Math.abs(cx - pr.x) < pr.hw + pad && Math.abs(cz - pr.z) < pr.hd + pad) return false;
         }
       }
     }
@@ -1466,24 +1477,26 @@ export class Battle {
         const nz = v.z + Math.cos(v.yaw) * v.speed * dt;
         v.x = clamp(nx, -WORLD * 0.47, WORLD * 0.47);
         v.z = clamp(nz, -WORLD * 0.47, WORLD * 0.47);
-        // solid props stop the car
+        // solid props stop the car. Trees and boulders are "soft" (no damage, less
+        // speed lost) but they still shove the car out — otherwise a car nosed into
+        // a trunk grinds against it at walking pace forever instead of sliding free
         for (const idx of this.island.propsNear(v.x, v.z)) {
           const pr = this.island.props[idx];
-          if (Math.abs(v.x - pr.x) > pr.hw + 1.7 || Math.abs(v.z - pr.z) > pr.hd + 1.7) continue;
+          const bx = pr.hw + 1.7, bz = pr.hd + 1.7;
+          if (Math.abs(v.x - pr.x) > bx || Math.abs(v.z - pr.z) > bz) continue;
           const hit = Math.abs(v.speed);
-          if (pr.type === 'tree' || pr.type === 'rock') {
-            // bushes and boulders just scrub speed
-            v.speed *= Math.pow(0.45, dt * 10);
-            continue;
-          }
-          // shove the car out along the shortest axis and keep some momentum
+          const soft = pr.type === 'tree' || pr.type === 'rock';
+          if (soft) v.speed *= Math.pow(0.45, dt * 10);
+          else v.speed *= hit > 8 ? -0.12 : 0.55;
+          if (!soft && hit > 8) this._hurtVehicle(v, hit * 1.5, null);
+          // shove the car out along the shortest axis, at driving pace: even a
+          // crawling car escapes the box within a few frames
           const ox = v.x - pr.x, oz = v.z - pr.z;
-          const pushX = Math.abs(ox) / (pr.hw + 1.7) > Math.abs(oz) / (pr.hd + 1.7) ? Math.sign(ox) : 0;
+          const pushX = Math.abs(ox) / bx > Math.abs(oz) / bz ? Math.sign(ox) : 0;
           const pushZ = pushX === 0 ? Math.sign(oz) : 0;
-          v.x += pushX * Math.min(hit, 10) * dt * 2.2;
-          v.z += pushZ * Math.min(hit, 10) * dt * 2.2;
-          v.speed *= hit > 8 ? -0.12 : 0.55;
-          if (hit > 8) this._hurtVehicle(v, hit * 1.5, null);
+          const push = Math.min(Math.max(hit, 3), 10) * dt * 2.2;
+          v.x += pushX * push;
+          v.z += pushZ * push;
           break;
         }
         // land vehicles can't drive into the open sea

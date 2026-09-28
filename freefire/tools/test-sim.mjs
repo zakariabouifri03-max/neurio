@@ -179,16 +179,23 @@ console.log('\n── vehicles & backpacks ──');
   if (leastVehicles < 3) fail(`only ${leastVehicles} vehicles on some islands`);
   else ok(`vehicles: avg ${(land / 25).toFixed(1)} land + ${(boats / 25).toFixed(1)} boats · boats present on ${seedsWithBoat}/25 islands`);
 
-  // drive each land vehicle from its spawn: they must all reach a real speed
+  // drive every land vehicle from its spawn: each one must reach a real speed.
+  // A fresh battle per vehicle keeps the player alive and the island identical
+  // (terrain is a pure function of the seed), and driving into a trunk or a crate
+  // must not leave the car grinding away at walking pace
   let driven = 0, worst = 99, stuck = 0;
-  for (const seed of [1, 7, 42, 88, 4242]) {
-    const b = new Battle({ seed, mode: 'solo' });
-    const p = b.player;
-    for (const car of b.vehicles.filter((v) => !v.water)) {
+  const swept = 12;
+  for (let seed = 1; seed <= swept; seed++) {
+    const landCount = new Battle({ seed, mode: 'solo' }).vehicles.filter((v) => !v.water).length;
+    for (let k = 0; k < landCount; k++) {
+      const b = new Battle({ seed, mode: 'solo' });
+      const p = b.player;
+      const car = b.vehicles.filter((v) => !v.water)[k];
+      if (!car) continue;
       p.parachuting = false; p.knocked = false; p.vehicle = null; p.interactHeld = false;
       p.x = car.x + 1.5; p.z = car.z; p.y = Math.max(b.island.height(p.x, p.z), 0.05);
       b.update(1 / 60, { interact: true, yaw: car.yaw });
-      if (p.vehicle !== car) { fail(`could not enter a ${car.kind}`); continue; }
+      if (p.vehicle !== car) { fail(`could not enter a ${car.kind} (seed ${seed})`); continue; }
       let peak = 0;
       for (let i = 0; i < 150; i++) {
         b.update(1 / 60, { yaw: car.yaw, pitch: 0, fwd: 1 });
@@ -201,7 +208,7 @@ console.log('\n── vehicles & backpacks ──');
       if (p.vehicle) fail(`${car.kind}: could not exit`);
     }
   }
-  ok(`drove ${driven} vehicles · slowest run still hit ${worst.toFixed(1)} m/s · stuck: ${stuck}`);
+  ok(`drove ${driven} vehicles over ${swept} islands · slowest run still hit ${worst.toFixed(1)} m/s · stuck: ${stuck}`);
 
   // a wreck ejects and hurts its driver; the sim keeps ticking afterwards
   const b = new Battle({ seed: 11, mode: 'solo' });

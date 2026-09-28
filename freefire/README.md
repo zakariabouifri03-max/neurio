@@ -26,6 +26,36 @@ walking over them; weapons and vehicles are chosen deliberately (`F` or tapping 
 Being knocked in duo/squad starts a 26-second bleed-out — your squad can revive you, and if you die
 while they're still alive the match continues and the camera follows a teammate.
 
+## Android APK
+
+The same game ships as a sideloadable APK — **one file, 0.34 MB, works offline**:
+
+```bash
+npm run build:apk     # → BOOYAH-FIRE.apk   (also: npm run test:apk)
+```
+
+Copy `BOOYAH-FIRE.apk` to the phone, tap it and allow *Install unknown apps* for your file manager.
+
+> ثبّت اللعبة على الأندرويد: انسخ ملف `BOOYAH-FIRE.apk` إلى الهاتف، اضغط عليه، ثم اسمح بـ «تثبيت تطبيقات
+> غير معروفة». يعمل التطبيق بدون إنترنت — الحزمة كاملة داخل الملف.
+
+There is no Android SDK, Gradle or `apksigner` in this repo, so the APK is assembled in plain Node:
+
+| step | how |
+|---|---|
+| the app shell | `BashBaqiRacing.apk` in the repo root is the template: its 2.4 kB `classes.dex` is a WebView that loads `file:///android_asset/game.html` |
+| the game | esbuild bundles `src/main.js` (+ three.js) and the bundle, the CSS and the favicon are inlined into one self-contained `assets/game.html` |
+| manifest & resources | `tools/axml.mjs` rewrites the *binary* manifest string pool (package `com.booyah.fire`, label `BOOYAH FIRE`, and a fully-qualified activity name, since `classes.dex` still owns `com.bashbaqi.racing.MainActivity`) and patches the package name in `resources.arsc` in place |
+| icons | the mipmaps are drawn by the same procedural artwork as the PWA icons, at 48/72/96/144/192 px |
+| zip | `tools/apk-sign.mjs` writes the archive itself: entries deflated (stored + 4-byte aligned for `.arsc`, `.dex`, `.png`), then the v2 APK Signing Block spliced in before the central directory |
+| signing | JAR v1 (`MANIFEST.MF` → `CERT.SF` → PKCS#7 `CERT.RSA`) **and** APK Signature Scheme v2 (RSA-PKCS1-v1_5 + SHA-256, 1 MB chunk digests) — both schemes, verified internally before the file is written |
+| the key | `android/keystore/booyah-fire.key.pem` / `.cert.pem` (self-signed dev certificate, committed) so every rebuild upgrades the installed app instead of fighting it |
+
+`npm run test:apk` checks the wire format against a real one: it verifies the reference APK signed by
+`apksigner` (9 v1 files, v2 block 4088 B, two extra blocks), round-trips an untouched manifest string
+pool byte-for-byte, then signs a synthetic APK, confirms both schemes accept it, and confirms they
+*reject* it after a single byte is flipped in a file or in the central directory.
+
 ## What's in it
 
 - **Battle royale loop** — drop → loot → rotate with the zone → final circles → **BOOYAH** win screen.
@@ -39,7 +69,7 @@ while they're still alive the match continues and the camera follows a teammate.
   cosmetic: level 3 turns 36 reserve rounds into 84 and roughly doubles every consumable stack.
 - **Consumables & gadgets** — medkit, first aid, gloo wall (2.9 × 2.7 m, 340 HP, 34 s), frag
   grenade, smoke, flashbang, plus airdrops at 145 s and 320 s.
-- **Vehicles** — 6 land vehicles (off-roader, buggy, bike) and 3 boats per island: enter with `F`,
+- **Vehicles** — up to 6 land vehicles (off-roader, buggy, bike) and 3 boats per island: enter with `F`,
   arcade handling with terrain/slope effects, running people over, and vehicles that soak bullets for
   their occupant, smoke when wrecked, then explode and eject the driver.
 - **8 phases of the safe zone** (wait 32 → 12 s, shrink 32 → 11 s, ratio 0.63 → 0.80, 1 → 20 DPS).
@@ -69,7 +99,7 @@ drop ──▶ loot ──▶ gear up ──▶ zone rotates ──▶ top 10 �
 | zone | 8 phases, damage 1 → 20 DPS, minimum radius 11 m |
 | gloo walls | 340 HP, 34 s lifetime, blocks bullets and sight |
 | backpacks | lv1 ×4 reserve / ×1.3 stacks · lv2 ×5.5 / ×1.7 · lv3 ×7 / ×2.2 |
-| vehicles | 8–9 per island · 120–260 HP · top speed 19–28 m/s · 1–4 seats |
+| vehicles | 8–9 per island · 120–260 HP · top speed 19–28 m/s · 1–4 seats · parked clear of walls, trunks and cliffs so you can always drive off |
 | vehicles take damage | the car absorbs ~58 % of incoming fire, the occupant 42 % |
 | knock / revive | 3 s revive → 40 % HP, 26 s bleed-out |
 
@@ -83,6 +113,7 @@ npm install          # only pulls the 'three' devDependency the headless harness
 npm run test:all     # assets + markup + stylesheet + simulation + view + full-app smoke test
 npm run lint         # eslint: no-undef catches the classic "forgot to import" crash
 npm run icons        # regenerate icons/ from the procedural artwork in tools/make-icons-ff.mjs
+npm run build:apk    # pack the game into BOOYAH-FIRE.apk (toolchain in tools/apk-sign.mjs + tools/axml.mjs)
 ```
 
 | check | what it guards |
@@ -90,9 +121,10 @@ npm run icons        # regenerate icons/ from the procedural artwork in tools/ma
 | `tools/check-assets.mjs` | every `href`/`src`/import/importmap/service-worker reference exists on disk |
 | `tools/check-html.mjs` | parses `index.html` with parse5: well-formed, ids unique, every `$('…')` in JS resolves |
 | `tools/check-style.mjs` | balanced CSS, and every class the app toggles has a rule (a missing `.hidden` breaks everything) |
-| `tools/test-sim.mjs` | 44 k frames of headless match simulation: TTK table, zone timing, landings, knocks, revives, loot, backpacks, and 30 vehicles actually driven |
+| `tools/test-sim.mjs` | 41 k frames of headless match simulation: TTK table, zone timing, landings, knocks, revives, loot, backpacks, and every land vehicle on 12 islands actually driven |
 | `tools/test-view.mjs` | builds the whole three.js scene without WebGL: mesh/triangle/sprite budgets, LOD, pose paths, driving a car and wrecking it |
 | `tools/test-dom.mjs` | boots the real app against a DOM shim: lobby → match → combat → loot → map → vehicles → death → results → menus → save → touch |
+| `tools/test-apk-sign.mjs` | the APK wire format: verifies a real apksigner-signed APK, round-trips the binary manifest, signs and then tamper-checks `BOOYAH-FIRE.apk` |
 
 The same `three` build the browser loads is the one the tests import (`vendor/` and
 `node_modules/three` are byte-identical at r170), so a passing test really does exercise shipping code.
@@ -117,12 +149,17 @@ freefire/
 │   ├── audio.js            synthesized Web Audio engine (SFX, ambience, music, vehicle engines)
 │   ├── hud.js              minimap, compass, health/armor/ammo, speedometer, kill feed, damage pops
 │   └── main.js             bootstrap: lobby, panels, input (keyboard/mouse/touch), save, game loop
-└── tools/                  verification harnesses + the icon generator
+├── android/keystore/       dev signing key + certificate (rebuilds upgrade in place)
+├── BOOYAH-FIRE.apk         built by `npm run build:apk` — sideload this on Android
+└── tools/                  verification harnesses, the icon generator and the APK toolchain
+    ├── apk-sign.mjs        zip writer + APK v1/v2 signer & verifier (no SDK)
+    ├── axml.mjs            binary AndroidManifest.xml / resources.arsc rewriting
+    └── build-apk.mjs       the whole APK build: bundle → inline → sign → verify
 ```
 
 `sim.js` never imports three.js — it is a pure, deterministic function of (seed, input) — which is
-what makes the headless tests meaningful: the same match logic that ships is exercised 44 000 frames
-at a time, including driving every vehicle off the line.
+what makes the headless tests meaningful: the same match logic that ships is exercised 41 000 frames
+at a time, including driving every land vehicle on a dozen islands off the line.
 
 ## Notes
 
