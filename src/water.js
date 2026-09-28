@@ -303,6 +303,7 @@ class PlanarReflection {
     const c = this.cam;
     c.position.set(this._p.x, 2 * waterLevel - this._p.y, this._p.z);
     c.up.set(0, -1, 0);
+    if (Math.abs(this._t.y) > 0.995) c.up.set(0, 0, -1).normalize();   // straight-down camera guard
     c.lookAt(
       c.position.x + this._t.x,
       c.position.y - this._t.y,
