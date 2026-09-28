@@ -510,6 +510,38 @@ class Game {
   }
 
   /** CONTINUE (load the saved run) or NEW GAME (a clean morning on the beach) */
+  /** put the world back to the state a brand-new run expects (used by NEW GAME) */
+  resetRunState() {
+    const d = this.disasters, o = this.ocean, w = this.world;
+    // buildings standing again
+    for (const b of w.destructibles || []) {
+      b.state = 'standing'; b.t = 0;
+      if (b.group) { b.group.rotation.set(0, 0, 0); b.group.position.y = 0; }
+    }
+    // hazards off and their meshes gone
+    d.tsunami = null;                 // tsunamiPhase is derived from this
+    d.storm = { active: false, t: 0, duration: 0, intensity: 0, hail: false, hailTimer: 0, strikeTimer: 4 };
+    for (const f of d.fires || []) if (f && f.mesh) this.scene.remove(f.mesh);
+    for (const r of d.rocks || []) if (r && r.mesh) this.scene.remove(r.mesh);
+    for (const m of d.debris || []) if (m && m.mesh) this.scene.remove(m.mesh);
+    for (const c of d.cracks || []) this.scene.remove(c);
+    d.fires.length = 0; d.rocks.length = 0; d.debris.length = 0; d.cracks.length = 0;
+    d.aftershockQueue.length = 0;
+    if (d.shake) d.shake.trauma = 0;
+    o.clearFronts?.();
+    o.level = 0; o.levelTarget = 0;
+    o.waveSig = 0.75; o.waveSigTarget = 0.75;
+    o.setWaveHeight?.(1);
+    // the player, fresh off the beach
+    const p = this.player;
+    this.spawnPlayerAtBeach();
+    p.vehicle = null; p.health = 100; p.hunger = 100; p.thirst = 100; p.warmth = 100;
+    p.stamina = 100; p.bleeding = 0; p.sick = 0; p.wet = 0; p.alive = true;
+    this.underwater = false;
+    this.fishing?.unequip?.();
+    this.ui.closePanel();
+  }
+
   beginRun(mode) {
     if (mode === 'continue') {
       const best = this.bestSave();
@@ -538,6 +570,7 @@ class Game {
     s.structures.length = 0;
     s.setDifficulty(this.difficulty);
     s.giveStartingKit();
+    this.resetRunState();
     this.beginPlaythrough('new');
   }
 

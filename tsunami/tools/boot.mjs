@@ -299,6 +299,21 @@ game.skipCinematic?.();
 if (game.state === 'cinematic') game.endCinematic();
 check('new run began after the cinematic', game.state === 'play', `state=${game.state}`);
 
+// ---- the new run really is a clean world: hazards gone, town standing, bag reset
+const haz = (game.disasters.fires.length + game.disasters.rocks.length
+  + game.disasters.debris.length + game.disasters.cracks.length);
+check('new run clears the hazards', !game.disasters.tsunami && haz === 0, `leftovers=${haz}`);
+check('new run stands the town back up',
+  (game.world.destructibles || []).every((d) => d.state === 'standing'),
+  `collapsed=${(game.world.destructibles || []).filter((d) => d.state !== 'standing').length}`);
+check('new run resets the player',
+  game.player.health === 100 && game.player.hunger === 100 && !game.player.vehicle
+  && Math.hypot(game.player.pos.x - game.world.spawns.beach.x, game.player.pos.z - game.world.spawns.beach.z) < 3,
+  `pos=${game.player.pos.x.toFixed(0)},${game.player.pos.z.toFixed(0)}`);
+check('new run empties the bag down to the starting kit',
+  !game.survival.inv.count('scrap') && !game.survival.inv.count('axe') && game.survival.structures.length === 0,
+  `items=${game.survival.inv.slots.size} structures=${game.survival.structures.length}`);
+
 // ---- the workbench tier: recipes that are only craftable at a placed table
 const S = game.survival;
 S.inv.add('stick', 12); S.inv.add('plank', 10); S.inv.add('rope', 8); S.inv.add('cloth', 10);
