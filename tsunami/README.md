@@ -71,10 +71,26 @@ No browser needed for logic verification:
 
 ```bash
 cd tsunami
-node tools/selftest.mjs                                   # world + ocean model
+node tools/selftest.mjs                                   # world + ocean model + module/audio integrity
 node tools/sim.mjs                                       # gameplay integration sim (tsunami → fishing → storm)
 node --import ./tools/three-stub/register.mjs tools/boot.mjs   # boots the REAL main.js headlessly
+node tools/shadercheck.mjs                               # compiles every shader with glslangValidator
 ```
+
+`tools/shadercheck.mjs` is the important one for "a mesh vanished": three **silently skips a mesh
+whose shader fails to compile** — the ocean disappearing behind a sand-coloured seabed was exactly
+that (`uAmp` used in the water fragment shader but never declared). The validator is not vendored
+(~5 MB third-party binary); install it once:
+
+```bash
+npm i --no-save glslang-validator-prebuilt-predownloaded
+mkdir -p ~/.cache/glslang
+cp node_modules/glslang-validator-prebuilt-predownloaded/bin/glslangValidator.linux ~/.cache/glslang/glslangValidator
+chmod +x ~/.cache/glslang/glslangValidator            # or export GLSLANG=/path/to/glslangValidator
+```
+
+The game also reports shader errors on screen at runtime (red box, bottom-left) — if a mesh ever
+goes missing again, that box and the browser console will say why.
 
 `tools/three-stub/` swaps in a stubbed `WebGLRenderer` so the whole game shell (boot, cinematic,
 missions, HUD, post pipeline calls, frame loop) runs in Node.

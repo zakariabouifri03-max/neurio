@@ -21,6 +21,8 @@ export class WebGLRenderer {
     this.extensions = { has: () => true, get: () => ({}) };
     this.info = { render: { calls: 0, triangles: 0, frame: 0 }, memory: { geometries: 0, textures: 0 }, programs: [], autoReset: true, reset: noop };
     this.properties = { get: () => ({}), remove: noop };
+    // three's shader-error hook (real renderer: renderer.debug.onShaderError)
+    this.debug = { checkShaderErrors: true, onShaderError: null };
     this.state = { setBlending: noop, reset: noop, buffers: {} };
     this.xr = { enabled: false, isPresenting: false, addEventListener: noop, getSession: () => null, setAnimationLoop: noop };
     this.isWebGLRenderer = true;

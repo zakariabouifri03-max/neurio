@@ -24,18 +24,18 @@ uniform float uCloudAOn, uCloudBOn;
 ${NOISE}
 ${SKY}
 
-vec4 sampleClouds(sampler2D tex, vec3 dir, float wind, float scale){
+/* The cloud panoramas are baked in equirectangular space (u = azimuth/2π, v = elevation/(π/2),
+   v = 1 at the zenith), so sample them exactly like that instead of re-projecting the noise
+   domain: the old flat-plane lookup (dir.xz/dir.y + fract) blew up near the horizon, where the
+   coordinates race to infinity, and turned the sky into radial moiré streaks. */
+vec4 sampleClouds(sampler2D tex, vec3 dir, float drift, float vScale, float vBias){
   if (dir.y < 0.006) return vec4(0.0);
-  vec2 p = dir.xz / max(dir.y, 0.02);
-  p = p * scale + vec2(uCloudRot*0.0);
-  // drift
-  p += vec2(wind, wind*0.35) * uTime * 0.0025;
-  p = p * 0.5 + 0.5;
-  p = fract(p);
-  // avoid wrap artefacts on the projection edge
-  float edge = smoothstep(0.0, 0.06, p.x) * smoothstep(1.0, 0.94, p.x);
+  float u = atan(dir.z, dir.x) * 0.15915494 + 0.5;
+  float v = asin(clamp(dir.y, 0.0, 1.0)) * 0.63661977;
+  vec2 p = vec2(u + drift * uTime * 0.0009, v * vScale + vBias);
   vec4 c = texture2D(tex, p);
-  c.a *= edge * smoothstep(0.006, 0.05, dir.y);
+  // fade into the haze band at the horizon (the panorama's bottom rows are the cloud bases)
+  c.a *= smoothstep(0.008, 0.055, dir.y);
   return c;
 }
 
@@ -46,9 +46,9 @@ void main(){
 
   // ---- clouds: two baked panoramic layers (fair weather + storm) ----
   vec3 cA = vec3(0.0); float aA = 0.0;
-  vec4 s = sampleClouds(uCloudA, dir, 1.0, 1.25);
+  vec4 s = sampleClouds(uCloudA, dir, 1.0, 0.98, 0.01);
   cA = s.rgb; aA = s.a * uCloudAOn;
-  vec4 s2 = sampleClouds(uCloudB, dir, 2.1, 0.85);
+  vec4 s2 = sampleClouds(uCloudB, dir, 2.1, 0.88, 0.06);
   vec3 cB = s2.rgb; float aB = s2.a * uCloudBOn;
   vec3 cloudCol = mix(cA, cB, clamp(aB/(aA+aB+1e-4), 0.0, 1.0));
   float cloudA = clamp(aA + aB, 0.0, 1.0);

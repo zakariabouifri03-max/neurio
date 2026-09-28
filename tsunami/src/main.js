@@ -86,6 +86,23 @@ class Game {
     this.renderer.toneMapping = this.quality === 'low' ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // A shader that fails to compile is *silently skipped* by three: the mesh simply never
+    // draws (this is exactly how "the ocean disappeared" happens). Surface it on screen.
+    this.shaderErrors = [];
+    if (this.renderer.debug) {
+      this.renderer.debug.checkShaderErrors = true;
+      this.renderer.debug.onShaderError = (gl, program, vs, fs) => {
+        let log = '';
+        try {
+          log = [gl.getShaderInfoLog(vs), gl.getShaderInfoLog(fs), gl.getProgramInfoLog(program)]
+            .filter(Boolean).join('\n').trim();
+        } catch (e) { log = '(no log)'; }
+        if (!log || this.shaderErrors.includes(log)) return;
+        this.shaderErrors.push(log);
+        console.error('[shader] compile failed:', log);
+        showShaderWarning(log);
+      };
+    }
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.canvasHost = document.getElementById('game-canvas') || document.body;
@@ -1122,6 +1139,25 @@ class Game {
 }
 
 function frame() { return new Promise((r) => requestAnimationFrame(() => r())); }
+
+/* A shader that fails to compile is silently skipped by three: the mesh just never draws.
+   That is how "the ocean disappeared" happens, so put the compiler log on screen. */
+function showShaderWarning(log) {
+  try {
+    let box = document.getElementById('glwarn');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'glwarn';
+      box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;max-width:60vw;max-height:34vh;'
+        + 'overflow:auto;padding:8px 10px;border-radius:8px;font:11px/1.35 ui-monospace,monospace;'
+        + 'background:#3b0d0dee;color:#ffd9d9;border:1px solid #ff6b6b;white-space:pre-wrap';
+      (document.body || document.documentElement).appendChild(box);
+    }
+    const short = log.split('\n').filter((l) => /ERROR/.test(l)).slice(0, 3).join('\n') || log.slice(0, 300);
+    box.textContent = `⚠ GLSL COMPILE ERROR (this mesh will not render)\n${short}`;
+    box.style.display = 'block';
+  } catch (e) { /* never break the boot because of a warning box */ }
+}
 
 const game = new Game();
 window.TsunamiGame = game;

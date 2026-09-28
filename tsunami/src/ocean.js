@@ -205,7 +205,7 @@ varying vec3 vNormalW;
 varying float vFoam;
 varying float vCrest;
 uniform vec3 uCamPos, uSunDir, uSunCol, uDeep, uShallow, uFogColor;
-uniform float uTime, uStorm, uUnderwater, uFoamBoost, uFloodAge, uFogDensity, uFlash;
+uniform float uTime, uAmp, uStorm, uUnderwater, uFoamBoost, uFloodAge, uFogDensity, uFlash;
 uniform sampler2D uTerrainTex, uNormalTex;
 uniform float uTerrainSize, uTerrainMin, uTerrainTexel;
 uniform samplerCube uEnvMap;
@@ -615,9 +615,20 @@ export class Ocean {
     this._pendingCube = false;
     const wv = this.mesh.visible, cv = this.crest.visible;
     this.mesh.visible = false; this.crest.visible = false;
-    this.cubeCam.position.set(focus.x, Math.max(this.level, 0) + 2.5, focus.z);
-    this.cubeCam.update(renderer, scene);
-    this.mesh.visible = wv; this.crest.visible = cv;
+    try {
+      this.cubeCam.position.set(focus.x, Math.max(this.level, 0) + 2.5, focus.z);
+      this.cubeCam.update(renderer, scene);
+    } catch (e) {
+      // A camera/renderer that cannot render into the cube target must never take the sea
+      // with it: drop the reflection probe and keep the analytic sky reflection.
+      this.envFailures = (this.envFailures || 0) + 1;
+      if (this.envFailures === 1) console.warn('[ocean] reflection probe failed, using the analytic sky:', e && e.message);
+      this.uniforms.uEnvOn.value = 0;
+      this.envRT = null; this.cubeCam = null;
+    } finally {
+      this.mesh.visible = wv;             // never leave the ocean hidden
+      this.crest.visible = cv;
+    }
     return true;
   }
 

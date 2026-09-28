@@ -8,6 +8,30 @@ export class Mesher {
   constructor() { this.parts = new Map(); }
   add(key, geo) {
     if (!geo) return;
+    // A single non-finite vertex gives the merged geometry a NaN bounding sphere, and
+    // three then culls the WHOLE bucket (all trees / all buildings of that material).
+    // Scrub it here and shout, so a generator bug shows up as a warning instead of a
+    // silently empty world.
+    const pos = geo.attributes && geo.attributes.position;
+    if (pos) {
+      const a = pos.array;
+      let bad = 0;
+      for (let i = 0; i < a.length; i++) {
+        if (a[i] !== a[i] || a[i] === Infinity || a[i] === -Infinity) { a[i] = 0; bad++; }
+      }
+      if (bad) console.warn(`Mesher: ${bad} non-finite vertex value(s) in "${key}" — scrubbed`);
+      const nrm = geo.attributes.normal;
+      if (nrm) {
+        const na = nrm.array;
+        let nbad = 0;
+        for (let i = 0; i < na.length; i += 3) {
+          if (!Number.isFinite(na[i]) || !Number.isFinite(na[i + 1]) || !Number.isFinite(na[i + 2])) {
+            na[i] = 0; na[i + 1] = 1; na[i + 2] = 0; nbad++;
+          }
+        }
+        if (nbad) console.warn(`Mesher: ${nbad} non-finite normal(s) in "${key}" — reset`);
+      }
+    }
     // every bucket must be uniformly indexed or mergeGeometries bails out
     if (!geo.index) {
       const n = geo.attributes.position.count;
@@ -247,7 +271,7 @@ export function hullGeometry(len = 7.5, wid = 2.6, dep = 1.2, nl = 10, nw = 6) {
   const verts = [], idx = [], uvs = [];
   for (let i = 0; i <= nl; i++) {
     const u = i / nl;                 // 0 stern → 1 bow
-    const taper = Math.pow(Math.sin(Math.pow(u, 0.85) * Math.PI * 0.94 + 0.06), 0.62);
+    const taper = Math.pow(Math.max(0, Math.sin(Math.pow(u, 0.85) * Math.PI * 0.94 + 0.06)), 0.62);
     const bowRise = Math.pow(u, 3.2);
     for (let j = 0; j <= nw; j++) {
       const v = j / nw;
@@ -328,7 +352,9 @@ export function addPalm(ctx, rng, { x, y, z, scale = 1, lean = 0.1, rotY = 0 }) 
     const pos = frondGeo.attributes.position;
     for (let i = 0; i < pos.count; i++) {
       const fx = pos.getX(i), fy = pos.getY(i);
-      const t = (fx + 1.7) / 3.4;
+      // clamp: Float32 rounding makes (fx + halfWidth) come out as -0.00000005 at the
+      // root vertices, and Math.pow(negative, 1.9) is NaN — which poisons the merged mesh
+      const t = clamp((fx + 1.7) / 3.4, 0, 1);
       pos.setZ(i, -Math.pow(t, 1.9) * 1.4);
       pos.setY(i, fy * (1 - t * 0.55));
     }

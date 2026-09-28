@@ -111,3 +111,9 @@ python3 -m http.server 8000   # → http://localhost:8000
 ```
 
 Details, controls and the story flow: [`tsunami/README.md`](tsunami/README.md).
+
+Dev checks (no browser needed): `node tools/selftest.mjs`, `node tools/sim.mjs`,
+`node --import ./tools/three-stub/register.mjs tools/boot.mjs` and `node tools/shadercheck.mjs`
+from inside `tsunami/` — the last one compiles every GLSL program with a real compiler, which is
+how a "the ocean is invisible" bug (three silently skips a mesh whose shader fails to compile) was
+caught and fixed.

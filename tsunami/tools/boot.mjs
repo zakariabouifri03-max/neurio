@@ -86,7 +86,9 @@ function check(name, cond, extra = '') {
 }
 const uiLog = [];
 const realConsoleError = console.error;
+const realConsoleWarn = console.warn;
 console.error = (...a) => { uiLog.push(['error', a.map(String).join(' ')]); realConsoleError('[game]', ...a); };
+console.warn = (...a) => { uiLog.push(['warn', a.map(String).join(' ')]); realConsoleWarn('[game]', ...a); };
 const uncaught = [];
 process.on('uncaughtException', (e) => {
   uncaught.push(e);
@@ -124,6 +126,28 @@ const resetScreens = () => {
   game.ui.el.panel.classList.add('hidden');
 };
 
+// ---- "what does the camera actually see" probe: ray-cast a few screen samples and
+// classify the first hit (sea / ground / props / sky). This is how we catch an opening
+// shot that stares at an empty plain instead of the ocean.
+const THREE = await import('three');
+const _ray = new THREE.Raycaster();
+function sampleView(tag) {
+  game.camera.updateMatrixWorld(true);
+  game.camera.updateProjectionMatrix();
+  const out = [];
+  for (const [x, y] of [[0, 0.4], [0, 0.16], [0, 0], [0, -0.25], [-0.62, 0.02], [0.62, 0.02], [0, -0.8]]) {
+    _ray.setFromCamera(new THREE.Vector2(x, y), game.camera);
+    _ray.far = 4000;
+    const found = _ray.intersectObjects(game.scene.children, true).filter((h) => h.object.isMesh && h.object.visible);
+    if (!found.length) { out.push(`${x},${y}:sky`); continue; }
+    const o = found[0].object;
+    const name = o === game.ocean.mesh ? 'sea' : o === game.world.terrainMesh ? 'ground' : (o.name || o.type);
+    out.push(`${x},${y}:${name}@${found[0].distance.toFixed(0)}m`);
+  }
+  log(`view[${tag}]`, `pos=${game.player.pos.x.toFixed(0)},${game.player.pos.z.toFixed(0)} yaw=${game.player.yaw.toFixed(2)}`, out.join(' '));
+  return out;
+}
+
 const _h = game.vehicles.hero;
 const heroSpawnY = _h ? _h.pos.y : 0;
 check('escape pickup spawns above the flood line', heroSpawnY > 17, `y=${heroSpawnY.toFixed(1)}`);
@@ -157,6 +181,13 @@ for (let i = 0; i < 60 * 34; i++) {                  // ~34 s of cinema
 }
 check('cinematic camera never clips the ground', cineGroundHits === 0, `clipped=${cineGroundHits}/${cineSamples}`);
 check('cinematic finished and play began', game.state === 'play', `state=${game.state}`);
+{
+  const v = sampleView('opening shot');
+  const sea = v.filter((h) => h.includes(':sea')).length;
+  const props = v.filter((h) => !h.includes(':sky') && !h.includes(':sea') && !h.includes(':ground')).length;
+  check('the sea is in the opening shot', sea >= 2, `sea=${sea}/7`);
+  check('the opening shot has scenery (not an empty plain)', props >= 1, `props=${props}/7`);
+}
 check('first mission is live', game.mission === 0, `mission=${game.mission}`);
 check('mission objective shown', String(game.ui.el.objText.textContent).length > 4, `obj="${game.ui.el.objText.textContent}"`);
 
@@ -244,6 +275,54 @@ check('frame loop keeps running', game.renderer.renderCount > 60, `renders=${gam
 check('fps counter is sane', game.fps > 0 && game.fps < 10000, `fps=${game.fps.toFixed(0)}`);
 check('no leftover console errors', uiLog.filter((e) => e[0] === 'error').length === 0,
   uiLog.filter((e) => e[0] === 'error').map((e) => e[1]).slice(0, 3).join(' | '));
+const warnMsgs = uiLog.filter((e) => e[0] === 'warn').map((e) => e[1]);
+check('no leftover console warnings', warnMsgs.length === 0, warnMsgs.slice(0, 4).join(' | ') || 'none');
+
+/* --------------------------------------------- scene integrity (NaN poisons)
+   A single NaN vertex, instance matrix or shader uniform makes three compute a NaN
+   bounding sphere / write NaN clip coords, and the whole mesh silently disappears.
+   This is the classic "the water / the town went invisible" failure, so guard it. */
+const nanBad = [];
+let meshCount = 0;
+game.scene.traverse((o) => {
+  if (!o.isMesh || !o.geometry) return;
+  const attr = o.geometry.attributes && o.geometry.attributes.position;
+  if (!attr) return;
+  meshCount++;
+  const a = attr.array;
+  const step = Math.max(1, Math.floor(a.length / 1500));
+  let bad = 0;
+  for (let i = 0; i < a.length; i += step) if (!Number.isFinite(a[i])) bad++;
+  if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+  const bs = o.geometry.boundingSphere;
+  const bsBad = !bs || !Number.isFinite(bs.radius) || !Number.isFinite(bs.center.x);
+  let matBad = false;
+  for (const v of o.matrixWorld.elements) if (!Number.isFinite(v)) { matBad = true; break; }
+  if (o.isInstancedMesh && !matBad) {
+    const ia = o.instanceMatrix.array;
+    for (const v of ia) if (!Number.isFinite(v)) { matBad = true; break; }
+  }
+  if (bad || bsBad || matBad) nanBad.push(`${o.name || o.type}#${o.id}(verts=${attr.count} bad=${bad} bs=${bsBad} mat=${matBad})`);
+});
+check('no NaN geometry / transforms', nanBad.length === 0, nanBad.slice(0, 5).join(' | ') || `${meshCount} meshes`);
+
+const nanUniforms = [];
+function scanUniform(sys, u) {
+  const walk = (path, v) => {
+    if (typeof v === 'number') { if (!Number.isFinite(v)) nanUniforms.push(`${sys}.${path}`); return; }
+    if (typeof v === 'boolean' || v === null || v === undefined) return;
+    if (v.isTexture) return;
+    if (Array.isArray(v)) { v.forEach((x, i) => walk(`${path}[${i}]`, x)); return; }
+    if (v.toArray) { v.toArray().forEach((x, i) => walk(`${path}[${i}]`, x)); return; }
+    if (typeof v === 'object') { for (const k of Object.keys(v)) walk(`${path}.${k}`, v[k]); }
+  };
+  for (const [k, uu] of Object.entries(u || {})) walk(k, uu && uu.value);
+}
+scanUniform('ocean', game.ocean.uniforms);
+scanUniform('crest', game.ocean.crestUniforms);
+scanUniform('sky', game.sky.mesh.material.uniforms);
+if (game.world.terrainMaterial?.userData?.shader) scanUniform('terrain', game.world.terrainMaterial.userData.shader.uniforms);
+check('shader uniforms are finite', nanUniforms.length === 0, nanUniforms.slice(0, 8).join(',') || 'ocean+crest+sky+terrain');
 
 /* ---------------------------------------------------------- memory sanity */
 const geomCount = () => {
