@@ -15,7 +15,7 @@
 <div id="pause"><div class="modal panel"><h2>PAUSED</h2><p>Physics, traffic and the route timer are waiting.</p><button id="resume">RESUME</button><button id="quit">QUIT TO MENU</button></div></div>
 <div id="result"><div class="modal panel"><h2 id="resultTitle">RUN COMPLETE</h2><p id="resultText"></p><button id="again">PLAY AGAIN</button><button id="menuBtn">GARAGE / MENU</button></div></div>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js';
+import * as THREE from './three.module.js';
 
 const $=id=>document.getElementById(id), root=$('game'), mapCanvas=$('mapCanvas'), mapCtx=mapCanvas.getContext('2d');
 let renderer,scene,camera,clock,player,worldGroup,weatherPoints,weatherGeo,weatherPositions,light,gameState='menu',paused=false,lastEvent=0,fullMap=false,camMode=0;
