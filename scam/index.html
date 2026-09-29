@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Scam Baqi — سكام مع الصحاب (offline)</title>
+<meta name="description" content="لعبة 3D كاملة offline: مكتب كول سنتر ديال السكام، كولات مع شخصيات AI، كوتا، مداهمات و ضربات جوية — كلشي ف المتصفح بلا إنترنت.">
+<meta name="theme-color" content="#0b0f18">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Scam Baqi">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="scene"></canvas>
+<div id="vignette"></div>
+
+<!-- ============================ HUD ============================ -->
+<div id="hud" class="hidden">
+  <div class="hud-row">
+    <div class="hud-pill" id="hud-day">اليوم 1</div>
+    <div class="hud-pill" id="hud-clock">09:00</div>
+    <div class="hud-quota">
+      <div class="hud-bar" id="hud-bar"><i></i></div>
+      <span id="hud-earned">0 / 0</span>
+    </div>
+    <div class="hud-pill" id="hud-cash">💰 0</div>
+    <div class="hud-nerves" id="hud-nerves" title="التوتر / الأعصاب"><i></i></div>
+    <button class="hud-btn" id="btn-pause" title="وقفة">⏸️</button>
+  </div>
+  <div id="hud-flash"></div>
+</div>
+
+<div id="interact" class="hidden"></div>
+<button id="btn-stand" class="hidden">🚶 قوم من الديسك</button>
+
+<!-- ======================= MOBILE CONTROLS ===================== -->
+<div id="touch-ui" class="hidden ui-block">
+  <div class="joy" id="joy"><div class="joy-knob" id="joy-knob"></div><span class="joy-hint">تحرك</span></div>
+  <div class="tbtns">
+    <button class="tbtn big ui-block" id="btn-act">تفاعل ✋</button>
+    <button class="tbtn ui-block" id="btn-run">جري 🏃</button>
+  </div>
+</div>
+
+<!-- ========================= TOASTS =========================== -->
+<div id="toasts"></div>
+
+<!-- ==================== INCOMING CALL CARD ==================== -->
+<div id="ringing" class="overlay hidden"></div>
+
+<!-- ======================= ALERT BOX ========================= -->
+<div id="alert" class="overlay hidden"></div>
+
+<!-- ========================= VIRUS ============================ -->
+<div id="virus" class="hidden">
+  <div class="virus-bg"></div>
+  <div class="virus-txt">SYSTEM 32 · فشل ف النظام · الملفات مشفّرة</div>
+</div>
+
+<!-- ====================== DESKTOP (OS) ======================== -->
+<div id="desktop" class="hidden">
+  <div class="wallpaper"></div>
+  <div id="dt-icons" class="dt-icons"></div>
+  <div id="dt-windows" class="dt-windows"></div>
+  <div class="dt-taskbar">
+    <button id="start-btn" class="start-btn ui-block">🪟 ابدأ</button>
+    <div id="dt-tasks" class="dt-tasks"></div>
+    <div class="tray">
+      <span id="dt-quota">🎯 0 / 0</span>
+      <span id="dt-clock">09:00</span>
+    </div>
+  </div>
+  <div id="start-menu" class="start-menu hidden"></div>
+</div>
+
+<!-- ========================= MENUS ============================ -->
+<div id="menu" class="screen hidden">
+  <div class="menu-card">
+    <div class="logo">☎️</div>
+    <h1>SCAM <span>BAQI</span></h1>
+    <p class="tag">لعبة كول سنتر ديال السكام — 3D، كاملة، و <b>100% offline</b>. بحال اللعبة ديال ستيم، ولكن ف المتصفح و بلا إنترنت.</p>
+    <div class="menu-btns">
+      <button id="btn-start" class="ui-block primary big">▶️ ابدا لعبة جديدة</button>
+      <button id="btn-continue" class="ui-block hidden">📁 كمّل من فين وقفتي</button>
+      <button id="btn-how" class="ui-block">❓ كيفاش تلعب</button>
+    </div>
+    <p class="small dim">كلشي خيال: الجرايات مولّدين محلياً، و الفلوس فلوس اللعبة. هاد اللعبة كتعلّمك كيفاش تعرف النصب — ماشي كيفاش تديرو.</p>
+  </div>
+</div>
+
+<div id="help" class="screen hidden">
+  <div class="menu-card wide">
+    <div id="help-body"></div>
+    <button id="btn-help-close" class="ui-block primary">فهمت 👍</button>
+  </div>
+</div>
+
+<div id="pause" class="screen hidden">
+  <div class="menu-card">
+    <h2>⏸️ وقفة</h2>
+    <div class="menu-btns">
+      <button id="btn-resume" class="ui-block primary">▶️ رجّع</button>
+      <button id="btn-pause-settings" class="ui-block">⚙️ الإعدادات</button>
+      <button id="btn-restart" class="ui-block">🔄 بدا من جديد</button>
+      <button id="btn-menu" class="ui-block">🏠 القائمة الرئيسية</button>
+    </div>
+    <p class="small dim">Esc كترجّعك للعبة.</p>
+  </div>
+</div>
+
+<div id="brief" class="screen hidden">
+  <div class="menu-card">
+    <div class="brief-body"></div>
+    <button id="btn-brief-go" class="ui-block primary big">يلا، بدا الشيفت 🕘</button>
+  </div>
+</div>
+
+<div id="review" class="screen hidden">
+  <div class="menu-card">
+    <div class="review-body"></div>
+    <button id="btn-review-go" class="ui-block primary big">كمّل ➡️</button>
+  </div>
+</div>
+
+<div id="shop-between" class="screen hidden">
+  <div class="menu-card wide">
+    <div class="sb-body"></div>
+    <button id="btn-shop-go" class="ui-block primary big">سير للنهار الجاي ➡️</button>
+  </div>
+</div>
+
+<div id="over" class="screen hidden">
+  <div class="menu-card">
+    <div class="over-body"></div>
+    <button id="btn-over-again" class="ui-block primary big">🔄 بدا run جديد</button>
+  </div>
+</div>
+
+<div id="win" class="screen hidden">
+  <div class="menu-card">
+    <div class="win-body"></div>
+    <div class="menu-btns">
+      <button id="btn-win-continue" class="ui-block primary">😎 كمّل (وضع الحرية)</button>
+      <button id="btn-win-menu" class="ui-block">🏠 القائمة</button>
+    </div>
+  </div>
+</div>
+
+<div id="board" class="screen hidden">
+  <div class="menu-card">
+    <div class="board-body" id="board-body"></div>
+    <button id="btn-board-close" class="ui-block primary">رجع للخدمة</button>
+  </div>
+</div>
+
+<!-- ========================= LOADING ========================== -->
+<div id="loading">
+  <div class="loadBox">
+    <div class="loadFlag">☎️</div>
+    <div class="loadTitle">SCAM BAQI</div>
+    <div class="loadBar"><div></div></div>
+    <div class="loadTip">كنجهزو المكتب… (بلا إنترنت، بالجد)</div>
+  </div>
+</div>
+
+<div id="errLog"></div>
+
+<script src="vendor/three.global.js"></script>
+<script src="src/util.js"></script>
+<script src="src/audio.js"></script>
+<script src="src/data.js"></script>
+<script src="src/callers.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/desktop.js"></script>
+<script src="src/calls.js"></script>
+<script src="src/world.js"></script>
+<script src="src/player.js"></script>
+<script src="src/day.js"></script>
+<script src="src/main.js"></script>
+<!-- pwa:start -->
+<script>
+  // offline app-shell (only when served over http/https; file:// works anyway)
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+</script>
+<!-- pwa:end -->
+<script>
+  // hide the loading screen once everything is up (or after a beat)
+  (function () {
+    function done() {
+      var l = document.getElementById('loading');
+      if (l) l.classList.add('done');
+      setTimeout(function () { if (l && l.parentNode) l.parentNode.removeChild(l); }, 600);
+    }
+    window.addEventListener('load', done);
+    setTimeout(done, 6000);
+  })();
+</script>
+</body>
+</html>
