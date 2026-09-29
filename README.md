@@ -74,6 +74,17 @@ scripts/                   reproducible Godot export commands
 docs/                      architecture and production handoff notes
 ```
 
+## Optional browser preview
+
+A lightweight single-file browser preview is available at `web/roadfall.html`. Open it directly in a modern browser or serve the repository with:
+
+```bash
+python3 -m http.server 8000
+# open http://localhost:8000/web/roadfall.html
+```
+
+This is an optional browser preview for quickly trying ROADFALL controls. It does not replace the native Godot Android/Windows build, APK/AAB export, shared physics runtime, or production multiplayer target.
+
 ## Multiplayer and production handoff
 
 The first functional build intentionally uses AI competitors so the complete match can be played without backend credentials. `RoadfallNetcodeAdapter` defines the transport seam and validation contracts for server-authoritative match state, loot, inventory, rank, currency, destination progression, reconnect, private lobbies, reporting and anti-cheat. The gameplay scene does not need to be rewritten when a transport is connected.
