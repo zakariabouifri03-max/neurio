@@ -73,7 +73,8 @@ MAIN MENU → CREATE / JOIN (code) → LOBBY (invite · ready · customise · em
   (`lobby → hush → tense → reveal → results → final`), plus ~30 SFX: chips, stamps, deals, lies (detuned pad), good/bad
   stingers, gavel, riser, alarm, whoosh, final horn. `swindle/js/audio.js`
 * **Graphics presets**: `low / medium / high / ultra` (dpr, shadows, bloom, particle budget, fog, anisotropy) — auto-detected
-  on first run; 60 FPS target with adaptive dpr.
+  on first run, 60 FPS target with adaptive dpr. The whole simulation tick (room + 8 characters + particles + camera) costs
+  **0.05–0.11 ms of JS per frame** (`npm run bench`), so the budget is spent on pixels, not bookkeeping.
 * **PWA**: installable, own icons, offline-capable (the solo table and all assets keep working with no network).
   `swindle/manifest.webmanifest`, `swindle/sw.js`
 
@@ -119,6 +120,7 @@ neurio/
     ├── smoke-3d.mjs                  # headless build of room/characters/FX/textures
     ├── smoke-client.mjs              # headless run of main.js+ui.js through a whole game
     ├── check-wiring.mjs              # DOM/three/import surface cross-check
+    ├── bench-frame.mjs              # per-preset js frame cost with 8 players
     └── make-swindle-icons.mjs        # procedural PNG icons (own encoder, no deps)
 ```
 
@@ -129,7 +131,8 @@ npm run sim        # node tools/sim-rounds.mjs 4 6   — authority: rounds, phas
 npm run smoke3d    # headless room/characters/FX      → 3D SMOKE OK
 npm run smoke      # headless client plays a full game → CLIENT SMOKE OK
 npm run proto      # boots the server on a spare port and runs the live WS suite → PROTOCOL OK
-npm run wire       # ids/classes/three/imports cross-check
+npm run wire       # ids/classes/three/imports/css cross-check
+npm run bench      # js frame cost with 8 players, per quality preset
 npm run icons      # regenerate swindle/icons/*.png
 ```
 

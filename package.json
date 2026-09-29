@@ -12,6 +12,7 @@
     "smoke3d": "node tools/smoke-3d.mjs",
     "proto": "node tools/proto-run.mjs",
     "wire": "node tools/check-wiring.mjs",
+    "bench": "node tools/bench-frame.mjs",
     "icons": "node tools/make-swindle-icons.mjs && node tools/make-icons.mjs",
     "check": "node tools/sim-rounds.mjs 4 6 && npm run smoke3d && npm run smoke && npm run wire",
     "all": "npm run check && npm run proto"
