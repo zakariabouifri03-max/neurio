@@ -1,97 +1,81 @@
-# 🏁 Bash Baqi Racing
+# ROADFALL
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+ROADFALL is a native 3D cross-platform driving Battle Royale foundation for **Android ARM64** and **Windows 64-bit**. It is built as one Godot 4 project with one shared gameplay codebase, not a web page or a WebView shell.
 
-**▶ Play:** serve the folder with any static server and open it:
+The current build is a playable offline-bot slice of the commercial game loop:
+
+- streamed 12 km × 12 km world with City, Suburbs, Industrial, Airport, Mountain, Forest, Desert, Coast, Farmland and Snow regions;
+- continuous orthogonal highway/local-road network with safe, fast, off-road and risky route choices;
+- real-time physics vehicle controller with throttle, braking, steering, handbrake, boost, surfaces, grip, weight/mass and upgrades;
+- Street Car, Rally Car, Muscle Car, Off-Road SUV, Sports Car, Hyper Car, Heavy Utility and Performance SUV loadouts;
+- 50-competitor match director with 49 route-selecting AI bots, mistakes, low-detail far simulation, sequential destinations and elimination;
+- FINAL RUN, finish/winner/reward/rank progression, Credits and Road Gems;
+- deterministic pickup/inventory/temporary upgrade system;
+- dynamic weather and world events: rain, fog, sandstorm, snowstorm, convoy, train crossing, bridge closure, police pursuit and more;
+- responsive minimap plus full interactive map, destinations, route marker, live competitors and landmarks;
+- garage, shop, cosmetics-first economy, profile, leaderboard/season/challenge panels and JSON save system;
+- Android-first touch controls (accelerator, brake, steering buttons, handbrake, boost, map, inventory and camera) plus configurable steering layout setting;
+- keyboard, mouse and Xbox-style controller support: WASD, Space, Shift, E, M, Tab, Esc, C and I;
+- automatic Low/Medium/High/Ultra detection, manual quality settings, Battery Saver/Balanced/Performance/Quality modes, dynamic resolution/shadow/traffic budgets;
+- server-authority seam in `game/netcode_adapter.gd` so a network transport can replace bots without rewriting gameplay rules.
+
+## Build requirements
+
+Install **Godot 4.3 or newer** with the Android build template and Android SDK/NDK configured. Godot is not bundled in this repository. No browser or Node runtime is used by the game.
+
+### Run in the editor
+
+1. Open this directory in Godot 4.
+2. Press Play Project.
+3. The first run creates `user://roadfall_profile.json`.
+4. Use `WASD`, a controller, or the on-screen controls on a touch device.
+
+### Windows 64-bit build
 
 ```bash
-python3 -m http.server 8000
-# → http://localhost:8000
+./scripts/build_windows.sh
+# build/windows/ROADFALL.exe
 ```
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+### Android ARM64 APK and AAB
 
----
+Connect the Android SDK/NDK in Godot Editor → Editor Settings → Export → Android, then:
 
-## 📱 Install on your phone — كأنها APK!
+```bash
+./scripts/build_android.sh apk
+# build/android/ROADFALL.apk
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
-
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
-
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
-**Offline play** is built-in: a service worker caches all game files on first visit.
-
----
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
-|---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
-
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
+./scripts/build_android.sh aab
+# build/android/ROADFALL.aab
 ```
 
-Made with ❤️ and Three.js
+The export presets set the package to `com.roadfall.game`, app name `ROADFALL`, landscape orientation, release metadata, and ARM64-only Android architecture. Sign the release artifact with the production keystore before store upload; the preset is intentionally not shipped with a secret signing key.
 
----
+## Project layout
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+```text
+project.godot              Godot native project settings
+export_presets.cfg         Windows, Android APK and Android AAB presets
+scenes/Main.tscn           single shared native entry scene
+branding/                  original ROADFALL icon and splash artwork
+game/data.gd               shared rules, vehicles, loot, regions, destinations
+game/game.gd               platform-neutral game bootstrap and input bridge
+game/world_stream.gd       12 km world cells, roads, landmarks and surfaces
+game/vehicle.gd            shared vehicle physics and upgrade application
+game/bot_vehicle.gd        swappable bot driver/navigation behavior
+game/match_director.gd     50-player match, routes, events, elimination, winner
+game/hud.gd                responsive HUD, touch controls, map and inventory
+game/map_view.gd           minimap/full map rendering and markers
+game/quality_manager.gd    auto quality, scalable budgets and thermal fallback
+game/menu.gd               menu, garage, shop, profile and settings
+game/save_system.gd        local profile/progression persistence
+game/netcode_adapter.gd    server-authoritative multiplayer integration seam
+scripts/                   reproducible Godot export commands
+docs/                      architecture and production handoff notes
+```
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+## Multiplayer and production handoff
 
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
+The first functional build intentionally uses AI competitors so the complete match can be played without backend credentials. `RoadfallNetcodeAdapter` defines the transport seam and validation contracts for server-authoritative match state, loot, inventory, rank, currency, destination progression, reconnect, private lobbies, reporting and anti-cheat. The gameplay scene does not need to be rewritten when a transport is connected.
 
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+This repository contains source and reproducible export configuration. The sandbox does not include the Godot editor/export templates or Android signing credentials, so release APK/AAB and Windows binaries are generated by the build commands in an installed Godot environment rather than pretending that a web bundle is an APK.

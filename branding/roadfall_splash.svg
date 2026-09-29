@@ -1,0 +1,7 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+<rect width="1280" height="720" fill="#08121d"/>
+<path d="M100 720L560 0h170l450 720H100z" fill="#102c3b"/>
+<path d="M655 35l-15 105m-27 105l-13 100m-24 100l-13 104m-26 105l-8 66" stroke="#f6cd5b" stroke-width="22" stroke-linecap="round"/>
+<text x="640" y="350" text-anchor="middle" font-family="sans-serif" font-size="94" font-weight="800" letter-spacing="18" fill="#e8f8ff">ROADFALL</text>
+<text x="640" y="405" text-anchor="middle" font-family="sans-serif" font-size="20" letter-spacing="7" fill="#42d8ff">OPEN-ROAD BATTLE ROYALE</text>
+</svg>

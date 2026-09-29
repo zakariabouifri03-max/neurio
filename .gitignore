@@ -1,3 +1,15 @@
-.DS_Store
-Thumbs.db
-*.log
+# Godot/editor
+.godot/
+.import/
+/export.cfg
+*.translation
+# Native exports and generated caches
+build/
+*.pck
+*.exe
+*.apk
+*.aab
+*.keystore
+*.jks
+# local profile
+roadfall_profile.json

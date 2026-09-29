@@ -1,0 +1,46 @@
+; ROADFALL native game project
+; Godot 4.3+ / shared Android ARM64 and Windows x86_64 build
+config_version=5
+
+[application]
+config/name="ROADFALL"
+config/description="Open-world driving battle royale"
+run/main_scene="res://scenes/Main.tscn"
+config/icon="res://branding/roadfall_icon.svg"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+boot_splash/image="res://branding/roadfall_splash.svg"
+boot_splash/bg_color=Color(0.025, 0.04, 0.07, 1)
+config/version="0.1.0"
+
+[display/window]
+size/viewport_width=1920
+size/viewport_height=1080
+size/window_width_override=1280
+size/window_height_override=720
+stretch/mode="canvas_items"
+handheld/orientation=0
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
+textures/canvas_textures/default_texture_filter=1
+world/3d/physics_engine="godot_physics"
+
+[physics]
+3d/default_gravity=24.0
+3d/default_linear_damp=0.1
+3d/default_angular_damp=0.5
+
+[autoload]
+RoadfallData="*res://game/data.gd"
+RoadfallSave="*res://game/save_system.gd"
+
+[android]
+config/permissions=["android.permission.VIBRATE"]
+
+[debug]
+settings/stdout/verbose_stdout=false
+
+[gui]
+theme/default_font_multichannel_signed_distance_field=true
