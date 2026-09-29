@@ -145,11 +145,41 @@ if (bundle.includes('</script')) bundle = bundle.replace(/<\/script/g, '<\\/scri
 
 const html0 = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 if (!html0.includes('src/main.js')) throw new Error('ما لقيتش src/main.js فـindex.html');
-let html = html0
-  .replace(/<script[^>]*src="src\/main\.js"[^>]*><\/script>\s*/i, '')
-  .replace(/<link[^>]*manifest[^>]*>\s*/i, '')
+
+// ---------- 3) الـCSS والصور: كلشي داخل الملف (باش يخدم من file:// بلا سيرفر) ----------
+function dataUri(file) {
+  const ext = path.extname(file).toLowerCase();
+  const mime = { '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream';
+  const buf = fs.readFileSync(path.join(ROOT, file));
+  if (mime.startsWith('text/')) return `data:${mime};charset=utf-8,` + encodeURIComponent(buf.toString('utf8'));
+  return `data:${mime};base64,` + buf.toString('base64');
+}
+
+let html = html0;
+// CSS: كنحولوه لـ<style> (مع أي url() داخلو)
+html = html.replace(/<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>\s*/i, (all, href) => {
+  let css = fs.readFileSync(path.join(ROOT, href), 'utf8');
+  css = css.replace(/url\(\s*['"]?([^'")]+)['"]?\s*\)/g, (m, u) => {
+    if (/^(data:|https?:|#)/.test(u)) return m;
+    const f = path.posix.normalize(path.posix.join(path.posix.dirname(href), u));
+    return `url(${dataUri(f)})`;
+  });
+  return `<style>\n${css}\n</style>\n`;
+});
+// الأيقونات
+html = html.replace(/<link([^>]*rel=["']apple-touch-icon["'][^>]*)href=["']([^"']+)["']([^>]*)>\s*/i,
+  (all, a, href, b) => `<link${a}href="${dataUri(href)}"${b}>\n`);
+// المانيفست ما كيديرش خدمة من ملف وحد
+html = html.replace(/<link[^>]*rel=["']manifest["'][^>]*>\s*/i, '');
+// السكريبت
+html = html.replace(/<script[^>]*src="src\/main\.js"[^>]*><\/script>\s*/i, '')
   // ⚠️ دالة عوض نص: '$, $' وغيرهم عندهم معنى خاص فـreplace
-  .replace('</body>', () => `<script>\n${bundle}\n</script>\n</body>`);
+  .replace('</body>', () => `<script>window.__JAZIRA_STANDALONE = true;</script>\n<script>\n${bundle}\n</script>\n</body>`);
+
+// ---------- 4) تحقّق: ما خاص يكون حتى شي حاجة من برا ----------
+const leftovers = [...html.matchAll(/(?:src|href)\s*=\s*["'](?!#|data:)([^"']+)["']/g)].map((m) => m[1]);
+if (leftovers.length) throw new Error('بقاو علامات خارجية: ' + leftovers.join(', '));
+if (!/<style>/.test(html)) throw new Error('الـCSS ما دخلش');
 
 const kb = (s) => (Buffer.byteLength(s, 'utf8') / 1024).toFixed(0) + ' ك.ب';
 fs.writeFileSync(OUT, html);

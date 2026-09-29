@@ -30,6 +30,7 @@ export class Game {
     this.ui = new UI(this);
     this.ui.build();
     if (view) {
+      view.game = this;                 // باش المصيّر يقدر يرجع لـ2D بوحدو (webglcontextlost)
       if (view.attach && view.autoAttach !== false) view.attach(canvas, this);
       if (view.init) view.init(this, canvas);
     }

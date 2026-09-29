@@ -1,12 +1,17 @@
 // نقطة البداية — main.js
 import { Game } from './game.js';
 
-function hasWebGL() {
+// three.js r170 كيحتاج WebGL2 — كنفرّقو بيناتهم باش ما نختاروش 3D على متصفح قديم
+function webglLevel() {
   try {
     const c = document.createElement('canvas');
-    return !!(c.getContext('webgl2') || c.getContext('webgl'));
-  } catch (e) { return false; }
+    const gl2 = c.getContext('webgl2');
+    if (gl2) return 2;
+    const c2 = document.createElement('canvas');
+    return (c2.getContext('webgl') || c2.getContext('experimental-webgl')) ? 1 : 0;
+  } catch (e) { return 0; }
 }
+function hasWebGL() { return webglLevel() === 2; }
 
 function pickMode() {
   const q = new URLSearchParams(location.search).get('mode');
@@ -42,6 +47,11 @@ async function makeView(mode) {
 function wantAutoPlay() {
   try {
     const q = new URLSearchParams(location.search);
+    // الملف الوحد (HTML وحد): كيقلع ديريكت بوحدو — ?play=0 باش تشوف القائمة
+    if (window.__JAZIRA_STANDALONE) {
+      const qv = (q.get('play') || '').toLowerCase();
+      if (qv !== '0' && qv !== 'false' && qv !== 'no') return true;
+    }
     for (const k of ['play', 'auto', 'start']) {
       if (!q.has(k)) continue;
       const v = (q.get(k) || '').toLowerCase();
@@ -92,7 +102,10 @@ async function boot() {
       if (seed !== null) game.newGame(seed);          // بذرة من الرابط = جزيرة معيّنة
       else if (game.hasSave()) game.loadSave();
       else game.newGame();
-    } catch (e) { if (seed !== null) game.newGame(seed); else game.newGame(); }
+    } catch (e) {
+      console.warn('بداية اللعبة طاحت، كنعاودو بجزيرة جديدة', e);
+      try { game.newGame(); } catch (e2) { }
+    }
     game.ui.hideAll();
     game.state = 'playing';
     game.fade = 1;
@@ -104,12 +117,47 @@ async function boot() {
 
   document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 
+  // دوران التيليفون ولا تبديل حجم النافذة → نحيّنو المصيّر
+  const doResize = () => { try { if (view.resize) view.resize(); } catch (e) { } };
+  window.addEventListener('orientationchange', () => setTimeout(doResize, 120));
+  window.addEventListener('resize', doResize);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', doResize);
+  if (window.ResizeObserver) {
+    try { new ResizeObserver(doResize).observe(document.documentElement); } catch (e) { }
+  }
+
   setInterval(() => { if (window.game.state === 'playing') window.game.saveNow(); }, 30000);
   window.addEventListener('pagehide', () => {
     if (window.game.state === 'playing' || window.game.state === 'paused') window.game.saveNow();
   });
 
   if (loading) loading.remove();
+
+  // تشخيص صغير: علاش هاد الوضع
+  try {
+    const note = document.getElementById('modeNote');
+    if (note) {
+      const lvl = webglLevel();
+      note.textContent = view.type === '3d'
+        ? '🎮 3D خدام'
+        : (lvl === 2 ? '🖼️ 2D (مختار)' : (lvl === 1 ? '🖼️ 2D — المتصفح ما فيهش WebGL2' : '🖼️ 2D — WebGL ماشي متوفر'));
+    }
+  } catch (e) { }
+
+  // 🛡️ شبكة أمان: إلا المصيّر 3D ما رسمش حتى حاجة من بعد ثانية ونصف، كنرجعو 2D بوحدنا
+  if (view.type === '3d') {
+    setTimeout(() => {
+      try {
+        const r = view.renderer;
+        const calls = r && r.info ? r.info.render.calls : 0;
+        const lost = r && r.getContext && r.getContext().isContextLost && r.getContext().isContextLost();
+        if (!r || lost || calls === 0) {
+          console.warn('3D ما رسمش شي حاجة — كنرجعو 2D', { calls, lost });
+          game.fallbackTo2D(new Error('3D ما رسمش شي حاجة'));
+        }
+      } catch (e) { }
+    }, 1500);
+  }
 
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     navigator.serviceWorker.register('sw.js').catch(() => { });

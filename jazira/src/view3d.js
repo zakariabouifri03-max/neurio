@@ -573,9 +573,16 @@ export class View3D {
     this.canvas = canvas;
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(this.pixelRatio);
-    this.renderer.setSize(window.innerWidth, window.innerHeight, false);
+    this.renderer.setSize(window.innerWidth || 800, window.innerHeight || 600, false);
+    this.renderer.setClearColor(this.skyColor ? this.skyColor.getHex() : 0x8fd0f0, 1);   // حتى بلا سماء: ما تبقاش بيضة
     this.renderer.shadowMap.enabled = this.shadows;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // إلا ضاع سياق WebGL (بطارية ضعيفة، تبديل تطبيق…) → كنرجعو 2D
+    canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      console.warn('WebGL ضاع السياق — كنرجعو 2D');
+      if (this.game && this.game.fallbackTo2D) this.game.fallbackTo2D(new Error('webglcontextlost'));
+    }, false);
     this.bindCameraControls();
     this.resize();
   }
@@ -636,7 +643,7 @@ export class View3D {
 
   resize() {
     if (!this.renderer) return;
-    const W = window.innerWidth, H = window.innerHeight;
+    const W = Math.max(1, window.innerWidth || 800), H = Math.max(1, window.innerHeight || 600);
     this.renderer.setPixelRatio(Math.min(this.pixelRatio, 2));
     this.renderer.setSize(W, H, false);
     this.camera.aspect = W / H;

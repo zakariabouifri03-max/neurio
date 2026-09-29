@@ -27,6 +27,12 @@ const inline = html.slice(html.lastIndexOf('<script>'), html.lastIndexOf('</scri
 ok(inline.length > 500000, 'السكريبت داخلي وكبير');
 ok(!/^\s*(import|export)\s/m.test(inline), 'ما بقاوش imports/exports فالسكريبت');
 ok(inline.includes('WebGLRenderer'), 'Three.js داخل للسكريبت');
+ok(/<style>/i.test(html), 'الـCSS داخلة فالملف (ماشي link من برا)');
+ok(html.includes('canvas#game{position:fixed'), 'CSS الكانفاس كاينة (اللعبة ما كتبقاش بيضة)');
+ok(html.includes('__JAZIRA_STANDALONE'), 'الملف معلّم بلي هو "وحد" (كيقلع ديريكت)');
+const outside = [...html.matchAll(/(?:src|href)\s*=\s*["'](?!#|data:)([^"']+)["']/g)].map((m) => m[1]);
+ok(outside.length === 0, `ما كايناش حتى ملف من برا (${outside.join(', ') || 'نقي'})`);
+ok(/apple-touch-icon" href="data:image\/png;base64/.test(html) || !/apple-touch-icon/.test(html), 'الأيقونة داخل الملف (data:)');
 
 // 2) نحلّوه فـDOM حقيقي
 let JSDOM = null;
@@ -124,7 +130,7 @@ const fellBack = warns.some((m) => m.includes('3D ما خدمش') || m.includes(
 ok(!!w3.game, 'اللعبة قلعت مع طلب 3D');
 ok(w3.game.view && w3.game.view.type === '2d', 'الرجوع لـ2D خدام داخل الملف الوحد');
 ok(fellBack, `three.js تشغّل داخل الملف وطاح بلطف (${warns.filter((m) => m.includes('3D')).length} رسالة)`);
-ok(w3.game.state === 'menu', 'القائمة بانت (بلا ?play=1)');
+ok(w3.game.state === 'playing', 'الملف الوحد كيقلع ديريكت للعب');
 
 // 5) بحال ملي كتحلو دوبل كليك (file://) — بلا سيرفر وبلا service worker
 console.log('\n[file:// — دوبل كليك]');
@@ -144,7 +150,9 @@ dom5.window.addEventListener('error', (e) => errs5.push(String(e.message || e.er
 await new Promise((r) => setTimeout(r, 600));
 const w5 = dom5.window;
 ok(errs5.length === 0, `بلا أخطاء من file://${errs5.length ? ': ' + errs5[0].slice(0, 100) : ''}`);
-ok(!!w5.game && w5.game.state === 'playing', 'اللعبة خدامة من file:// ديريكت');
+ok(!!w5.game && w5.game.state === 'playing', 'اللعبة خدامة من file:// ديريكت (بلا ?play)');
+ok(!!w5.document.getElementById('modeNote') && w5.document.getElementById('modeNote').textContent.length > 3,
+  `التشخيص كتب: ${w5.document.getElementById('modeNote') ? w5.document.getElementById('modeNote').textContent : '-'}`);
 ok(!!w5.game.world && w5.game.world.objs.length > 800, `الجزيرة تولدات (${w5.game.world ? w5.game.world.objs.length : 0} غرض)`);
 
 console.log(fails === 0 ? `\n🎉 ${total} اختبار فالملف الوحد خدامين!` : `\n⚠️ ${fails}/${total} طايحين`);

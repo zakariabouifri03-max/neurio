@@ -80,6 +80,7 @@ export class UI {
           <button class="btn tab" id="btnMode2d" data-mode="2d">🗺️ من الفوق 2D</button>
         </div>
         <div class="hint">بلا ماوس: <b class="keyhint">WASD</b> باش تمشي، <b class="keyhint">SPACE</b> لكل حاجة — <span id="modeHint">3D: دير الدورة بالماوس (سحب) وبالعجلة تقرّب</span></div>
+        <div class="hint" id="modeNote" style="opacity:.85"></div>
       </div>
     </div>
 
