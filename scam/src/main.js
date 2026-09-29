@@ -47,6 +47,7 @@
     // cinematic menu orbit
     player.setMode('cinematic', { r: 9 });
     if (world.flags.boss) world.flags.boss.say('مرحبا بيكم ف المكتب. الكوتا كتبدل.', 6000);
+    player.viewmodel(false);
 
     // ---- desktop api
     SWYF.Desktop.init({
@@ -177,6 +178,11 @@
     SWYF.audio.sfx('click');
     switch (it.kind) {
       case 'desk': seat(false); break;
+      case 'casino':
+        SWYF.audio.sfx('coins');
+        SWYF.ui.toast('🎰 مرحبا ف الكازينو — ربح ولا خسر، و البوس ماشي بعيد.', 4000);
+        SWYF.Casino.open('slots');
+        break;
       case 'coffee':
         SWYF.audio.sfx('success');
         buffs.patience = 20;
@@ -252,6 +258,10 @@
     if (!SWYF.Day.S.paused && !paused) {
       player.update(dt);
       world.update(dt, player.pos);
+    // first-person hands: phone up while you're on a call
+    var onCall = !!(SWYF.Calls.active() || (SWYF.Day.S.ring && SWYF.Day.state().phase === 'shift'));
+    player.viewmodel(onCall && player.mode !== 'cinematic');
+    if (player.waveHands && onCall) player.waveHands(performance.now() / 1000);
       SWYF.Calls.tick(dt);
       SWYF.Day.update(dt);
       // interaction prompt

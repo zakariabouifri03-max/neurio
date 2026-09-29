@@ -22,6 +22,9 @@
     { id: 'recorder', name: 'Recorder', icon: '🎥', w: 560, h: 420, hint: 'تسجيل الشاشة' },
     { id: 'camera', name: 'Camera', icon: '📷', w: 560, h: 420, hint: 'تصويرة' },
     { id: 'files', name: 'الملفات', icon: '📁', w: 600, h: 430, hint: 'حفظ / تصفير' },
+    { id: 'truth', name: 'Caller Truth', icon: '🕵️', w: 620, h: 560, hint: 'ملف الضحية' },
+    { id: 'browser', name: 'SAKARY', icon: '🌐', w: 860, h: 600, hint: 'مواقع مزيفة' },
+    { id: 'ducktalk', name: 'DuckTalk', icon: '📹', w: 640, h: 520, hint: 'كولاية بالفيديو' },
     { id: 'ai', name: 'الذكاء (AI)', icon: '🧠', w: 680, h: 540, hint: 'AI حقيقي / محلي' },
     { id: 'settings', name: 'الإعدادات', icon: '⚙️', w: 580, h: 480, hint: 'صوت و مساعدة' }
   ];
@@ -125,15 +128,34 @@
   function taskbar() {
     if (!tasksEl) return;
     U.clear(tasksEl);
-    open.forEach(function (o) {
-      var b = U.el('button', 'tb-task', o.app.icon + ' ' + o.app.name);
-      U.on(b, 'click', function () {
-        if (o.win.style.display === 'none') { o.win.style.display = 'flex'; o.win.classList.remove('minimized'); }
-        focus(o.id);
-      });
+    var running = {};
+    open.forEach(function (o) { running[o.id] = o; });
+    // pinned + running apps as coloured square icons (reference taskbar)
+    APPS.forEach(function (app) {
+      var o = running[app.id];
+      var b = U.el('button', 'tb-icon' + (o ? ' run' : ''), app.icon);
+      b.title = app.name + (o ? ' — مفتوح' : '');
+      U.on(b, 'click', function () { openApp(app.id); });
       tasksEl.appendChild(b);
     });
   }
+
+  /** live clock + quota strip in the taskbar (in-game time) */
+  function tickClock() {
+    var el = document.getElementById('dt-clock');
+    if (!el) return;
+    var t = api && api.getTime ? api.getTime() : 540;
+    var h = Math.floor(t / 60), m = Math.floor(t % 60);
+    el.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+    var q = document.getElementById('dt-quota');
+    if (q && api && api.getState) {
+      var st = api.getState();
+      q.textContent = '🎯 ' + U.money(st.earnedToday) + ' / ' + U.money(st.quota) + ' · 💰 ' + U.money(st.cash);
+    }
+    // live app ticks (DuckTalk video, etc.)
+    open.forEach(function (o) { if (o.instance && o.instance.tick) { try { o.instance.tick(); } catch (e) {} } });
+  }
+  if (typeof window !== 'undefined') setInterval(tickClock, 220);
 
   function notify(appId, text, ms) {
     var host = document.getElementById('toasts');
@@ -451,6 +473,201 @@
       if (confirm('واش متأكد؟ غادي يتمسح كلشي.')) { U.wipe(); location.reload(); }
     });
     return {};
+  };
+
+  // ---- CALLER TRUTH (the reference's caller dossier + HANG UP button) --------
+  BUILDERS.truth = function (body) {
+    var faceCanvas = document.createElement('canvas');
+    faceCanvas.width = 220; faceCanvas.height = 220;
+    var o = {
+      render: function () {
+        var c = api.getCaller();
+        var st = api.getState();
+        var v = (vignette(c));
+        body.innerHTML =
+          '<div class="ct">' +
+            '<div class="ct-left"><canvas class="ct-face" width="220" height="220"></canvas>' +
+              '<div class="ct-name">' + (c ? c.name : '— ما كاينش كولاية —') + '</div>' +
+              '<div class="dim small">' + (c ? c.city + ' · ' + c.job : 'الخط فارغ') + '</div>' +
+              '<button class="ct-hang ui-block danger">📴 HANG UP</button>' +
+              '<button class="ct-recall ui-block">📞 عاود عيّط</button>' +
+            '</div>' +
+            '<div class="ct-right">' +
+              '<div class="ct-row"><b>Persona</b><span>' + (c ? c.persona.emoji + ' ' + c.persona.label : '—') + '</span></div>' +
+              '<div class="ct-row"><b>Risk</b><span class="' + (v.risk > 55 ? 'bad' : 'ok') + '">' + v.risk + '% ' + (v.flag || '') + '</span></div>' +
+              '<div class="ct-row"><b>Trust</b><span>' + Math.round(c ? c.trust : 0) + ' / 100</span></div>' +
+              '<div class="ct-row"><b>Suspicion</b><span>' + Math.round(c ? c.suspicion : 0) + ' / 100</span></div>' +
+              '<div class="ct-row"><b>Patience</b><span>' + Math.round(c ? c.patience : 0) + 's</span></div>' +
+              '<div class="ct-row"><b>Worth</b><span>' + U.money(c ? c.savings : 0) + '</span></div>' +
+              '<div class="ct-row"><b>Stealed files</b><span>' + (c ? (c.leverageUsed || []).length : 0) + ' / ' + (c ? c.facts.length : 0) + '</span></div>' +
+              '<div class="ct-row"><b>Phone / ID</b><span class="mono">' + (c ? c.contact : '—') + '</span></div>' +
+              '<div class="ct-note dim small">' + (v.note || 'افتح AnyViewer باش تجمع معلومات، من بعد استعملها ف المكالمة.') + '</div>' +
+            '</div>' +
+          '</div>';
+        // draw the suspect portrait (flat, procedural — mugshot board look)
+        drawFace(body.querySelector('.ct-face'), c);
+        U.on(body.querySelector('.ct-hang'), 'click', function () { if (SWYF.Calls.active()) SWYF.Calls.endNow(); });
+        U.on(body.querySelector('.ct-recall'), 'click', function () {
+          if (SWYF.Calls.active()) { SWYF.ui.toast('📞 راك ف مكالمة دابا', 2000); return; }
+          SWYF.Day.startRing();
+          SWYF.ui.toast('📞 التيليفون كيدق… رجّع للديسك باش ترد.', 2600);
+        });
+      }
+    };
+    function vignette(c) {
+      if (!c) return { risk: 0 };
+      var risk = Math.round(U.clamp((c.scambaiter ? 62 : 8) + c.suspicion * 0.35 + (c.leverageUsed || []).length * -2, 2, 99));
+      return { risk: risk, flag: c.scambaiter ? '⚠️ مرشح سكام بايتر' : (risk > 50 ? '⚠️ مشكوك' : '✅ عادي'), note: c.scambaiter ? 'الملف فيه «bloclist» — سد التيليفون بسرعة!' : '' };
+    }
+    function drawFace(cv, c) {
+      if (!cv) return;
+      var g = cv.getContext('2d');
+      g.fillStyle = '#0e1626'; g.fillRect(0, 0, 220, 220);
+      for (var y = 0; y < 220; y += 10) { g.fillStyle = 'rgba(255,255,255,0.03)'; g.fillRect(0, y, 220, 4); }
+      if (!c) { g.fillStyle = '#3a4560'; g.font = 'bold 22px Tahoma'; g.textAlign = 'center'; g.fillText('NO CALL', 110, 115); return; }
+      var skin = '#' + ('000000' + (c.gender === 'f' ? 0xffb08a : 0xd9a066).toString(16)).slice(-6);
+      g.fillStyle = skin;
+      g.beginPath(); g.ellipse(110, 118, 56, 66, 0, 0, 6.3); g.fill();
+      g.fillStyle = '#2a1d16';
+      g.beginPath(); g.ellipse(110, 74, 58, 34, 0, Math.PI, 0); g.fill();
+      g.fillStyle = '#14181f';
+      g.beginPath(); g.ellipse(88, 112, 7, 9, 0, 0, 6.3); g.fill();
+      g.beginPath(); g.ellipse(132, 112, 7, 9, 0, 0, 6.3); g.fill();
+      g.strokeStyle = '#8a5a3b'; g.lineWidth = 4;
+      g.beginPath(); g.arc(110, 140, 20, 0.5, Math.PI - 0.5); g.stroke();
+      g.fillStyle = '#e8eefc'; g.font = 'bold 16px monospace'; g.textAlign = 'center';
+      g.fillText('CALLER TRUTH DB', 110, 208);
+    }
+    o.render();
+    return o;
+  };
+
+  // ---- SAKARY / Simpletax browser (fake pages + the HTML source view) --------
+  var PAGES = {
+    sakary: {
+      url: 'https://sakary-bank.moc/verify',
+      title: 'SAKARY BANK — verify account',
+      html: '<h1 style="color:#1e66d0">SAKARY BANK</h1><p>Verify your account to unlock it.</p>' +
+        '<label>Account <input placeholder="MA28 ****"></label><br><label>PIN <input type="password"></label><br>' +
+        '<button>VERIFY NOW</button><p class="dim">⚠️ الصفحة مزيفة: الرابط ماشي رسمي و كيطلب الرمز السري.</p>',
+      lesson: '📌 الحقيقة: البنك عمرو ما كيطلب الرمز السري ف مكالمة ولا رابط. الرابط «moc» ماشي رسمي.'
+    },
+    simpletax: {
+      url: 'https://simpletax-fake.moc/1040',
+      title: 'Simpletax — Social Security form',
+      html: '<h1 style="color:#25d366">Simpletax</h1><p>Request a refund — enter the details.</p>' +
+        '<label>Full name <input></label><br><label>SSN <input placeholder="000-00-0000"></label><br>' +
+        '<label>Card <input placeholder="**** **** **** ****"></label><br><button>PROCEED</button>' +
+        '<p class="dim">⚠️ وثيقة مزيفة كتبني باش تقنع الضحية.</p>',
+      lesson: '📌 الحقيقة: المؤسسات الرسمية ما كتطلبش رقم البطاقة عبر نموذج مفاجئ ف مكالمة.'
+    },
+    prize: {
+      url: 'https://winticket-2026.moc/claim',
+      title: 'WIN A CAR — claim your prize',
+      html: '<h1 style="color:#e94f37">🎁 مبروك! ربحتي طوموبيل</h1><p>خلّص غير 199 درهم ديال الرسوم و تدي الجايزة.</p>' +
+        '<button>CLAIM</button><p class="dim">⚠️ «رسوم مسبقة» = علامة نصب كلاسيكية.</p>',
+      lesson: '📌 الحقيقة: أي جايزة كتطلب فلوس قبل = نصب. الجوايز الحقيقية ما كتطلبش أداء مسبق.'
+    },
+    bank: {
+      url: 'https://intranet-mk.local/files',
+      title: 'مكتب الاتصال — الملفات',
+      html: '<h1>📁 ملفات المكتب</h1><p>الملفات اللي كتعاون ف الهندسة الاجتماعية:</p>' +
+        '<ul><li>كشف الحساب (PDF)</li><li>تصاور العائلة</li><li>ملف الخدمة</li><li>⚠️ bloclist — أرقام مبلّغ عنها</li></ul>' +
+        '<p class="dim">كل معلومة سرقتيها كتزيد ف الثقة… و كتزيد ف الخطر.</p>'
+    }
+  };
+  BUILDERS.browser = function (body) {
+    var pageId = 'sakary', showSrc = false;
+    var o = {
+      render: function () {
+        var p = PAGES[pageId] || PAGES.sakary;
+        body.innerHTML =
+          '<div class="br">' +
+            '<div class="br-tabs">' + Object.keys(PAGES).map(function (k) {
+              return '<button class="br-tab' + (k === pageId ? ' on' : '') + '" data-p="' + k + '">' + PAGES[k].title.split('—')[0].trim() + '</button>';
+            }).join('') + '</div>' +
+            '<div class="br-bar"><span class="br-url mono">' + p.url + '</span>' +
+              '<button class="br-src">' + (showSrc ? '👁️ الصفحة' : '</> الكود') + '</button></div>' +
+            (showSrc
+              ? '<pre class="br-src-view mono">' + escapeHtml(p.html) + '</pre>'
+              : '<div class="br-page">' + p.html + '</div>') +
+            '<div class="br-foot dim small">' + (p.lesson || '') + '</div>' +
+          '</div>';
+        Array.prototype.forEach.call(body.querySelectorAll('.br-tab'), function (b) {
+          U.on(b, 'click', function () { pageId = b.getAttribute('data-p'); o.render(); });
+        });
+        U.on(body.querySelector('.br-src'), 'click', function () { showSrc = !showSrc; o.render(); });
+        var form = body.querySelector('.br-page button');
+        if (form) U.on(form, 'click', function () {
+          api.evidence('paint', '🧾 ولّدت وثيقة مزيفة (evidence) — كتبان مقنعة كثر ف المكالمة.');
+          SWYF.Desktop.notify('paint', '🧾 وثيقة جديدة جاهزة (evidence).');
+          SWYF.audio.sfx('success');
+        });
+      }
+    };
+    o.render();
+    return o;
+  };
+  function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  // ---- DUCKTALK: video call with the current caller (animated flat face) ----
+  BUILDERS.ducktalk = function (body) {
+    var cv = document.createElement('canvas');
+    cv.width = 320; cv.height = 240;
+    var typing = '';
+    var o = {
+      render: function () {
+        var c = api.getCaller();
+        body.innerHTML =
+          '<div class="dt">' +
+            '<canvas class="dt-vid" width="320" height="240"></canvas>' +
+            '<div class="dt-side">' +
+              '<div class="dt-title">' + (c ? '📹 ' + c.name : '📹 DuckTalk — ما كاينش كولاية') + '</div>' +
+              '<div class="dt-msg dim small">' + (c ? typing || 'الضحية كيهضر…' : 'رد على كولاية باش تشوف الوجه.') + '</div>' +
+              '<button class="dt-mute ui-block">' + (SWYF.audio.isEnabled() ? '🔊 الصوت شغال' : '🔇 الصوت مسدود') + '</button>' +
+              '<button class="dt-hang ui-block danger">📴 سد</button>' +
+            '</div>' +
+          '</div>';
+        U.on(body.querySelector('.dt-mute'), 'click', function () {
+          SWYF.audio.setEnabled(!SWYF.audio.isEnabled()); o.render();
+        });
+        U.on(body.querySelector('.dt-hang'), 'click', function () { if (SWYF.Calls.active()) SWYF.Calls.endNow(); });
+      }
+    };
+    var mouth = 0, blink = 0;
+    o.tick = function () {
+      var c = api.getCaller();
+      var g = cv.getContext('2d');
+      var t = performance.now() / 1000;
+      g.fillStyle = '#101828'; g.fillRect(0, 0, 320, 240);
+      g.fillStyle = '#1d2b45'; g.fillRect(0, 180, 320, 60);
+      if (!c) {
+        g.fillStyle = '#33405e'; g.font = 'bold 22px Tahoma'; g.textAlign = 'center';
+        g.fillText('NO SIGNAL', 160, 125);
+        return;
+      }
+      // flat big-head avatar that talks & blinks
+      var skin = '#' + ('000000' + (c.gender === 'f' ? 0xffb08a : 0xd9a066).toString(16)).slice(-6);
+      mouth = 0.5 + Math.sin(t * 9) * 0.5;
+      blink = (Math.sin(t * 1.3) > 0.97) ? 0.15 : 1;
+      g.fillStyle = skin;
+      g.beginPath(); g.ellipse(160, 118, 62, 70, 0, 0, 6.3); g.fill();
+      g.fillStyle = '#2a1d16';
+      g.beginPath(); g.ellipse(160, 70, 64, 34, 0, Math.PI, 0); g.fill();
+      g.fillStyle = '#14181f';
+      g.beginPath(); g.ellipse(136, 112, 7, 9 * blink, 0, 0, 6.3); g.fill();
+      g.beginPath(); g.ellipse(184, 112, 7, 9 * blink, 0, 0, 6.3); g.fill();
+      g.fillStyle = '#3a1a1a';
+      g.beginPath(); g.ellipse(160, 152, 18, 6 + mouth * 12, 0, 0, 6.3); g.fill();
+      g.fillStyle = '#e8eefc'; g.font = 'bold 15px monospace'; g.textAlign = 'left';
+      g.fillText('DuckTalk · ' + c.city, 12, 228);
+      g.fillStyle = '#ff4d4d'; g.beginPath(); g.arc(302, 20, 6, 0, 6.3); g.fill();
+      g.fillStyle = '#ffb3b3'; g.font = 'bold 12px monospace'; g.fillText('REC', 276, 25);
+    };
+    o.render();
+    // hook the subtitle channel from the phone
+    var origSay = null;
+    return o;
   };
 
   // ---- AI (local model bridge + offline brain) --------------------------------

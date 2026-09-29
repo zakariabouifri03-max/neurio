@@ -11,7 +11,7 @@
     phase: 'menu',            // menu | brief | shift | review | shop | gameover | win
     day: 1, cash: 400, quota: D.boss.quotaStart, earnedToday: 0,
     shiftT: 0, shiftLen: 300,   // real seconds
-    upgrades: {}, nerves: 100,
+    upgrades: {}, nerves: 100, stinkBombs: 0, balls: 0, meeting: null,
     stats: { answered: 0, landed: 0, totalEarned: 0, daysSurvived: 0, viruses: 0, raids: 0, strikes: 0, lessons: 0 },
     handled: 0, scamsLanded: 0,
     ring: null, ringT: 8, nextIn: 0,
@@ -26,7 +26,8 @@
     { id: 'virus', weight: 14, min: 2, kind: 'hud' },
     { id: 'raid', weight: 11, min: 3, kind: 'hud' },
     { id: 'inspector', weight: 9, min: 3, kind: 'hud' },
-    { id: 'strike', weight: 9, min: 4, kind: 'walk' }
+    { id: 'strike', weight: 9, min: 4, kind: 'walk' },
+    { id: 'meeting', weight: 13, min: 1, kind: 'walk' }
   ];
 
   function hooks() { return SWYF.main.hooks; }
@@ -67,6 +68,7 @@
     S.quota = D.boss.quotaStart + (S.day - 1) * 700;
     S.earnedToday = 0; S.shiftT = 0; S.shiftLen = Math.max(220, 300 - (S.day - 1) * 12);
     S.handled = 0; S.scamsLanded = 0; S.nerves = U.clamp(S.nerves + 12, 0, 100);
+    S.meeting = null; SWYF.ui.meetingBanner('', '', false);
     S.ring = null; S.currentEvent = null; S.eventT = 0; S.virusT = 0;
     S.targets = []; S.ringT = U.rnd(6, 12); S.phase = 'brief';
     for (var i = 0; i < 4; i++) S.targets.push(planTarget(i));
@@ -196,6 +198,15 @@
         S.nerves = U.clamp(S.nerves - 6, 0, 100);
         break;
       }
+      case 'meeting': {
+        if (S.meeting) break;                    // one meeting at a time
+        // purple banner: walk to the conference room before the door closes
+        SWYF.ui.meetingBanner('Meeting is about to start!', 'الاجتماع غادي يبدا ف قاعة الاجتماعات — سير دابا (', true);
+        if (SWYF.audio.sfx) SWYF.audio.sfx('boss');
+        SWYF.Desktop.notify('boss', '🟣 Meeting is about to start in the conference room!');
+        S.meeting = { t: 28, done: false };
+        break;
+      }
       case 'coworker': {
         var cw = U.pick(SWYF.world.npcs);
         var line2 = U.pick([D.events.coworker_coffee, D.events.coworker_cover, D.events.coworker_tip]).replace('{co}', cw.name);
@@ -321,6 +332,36 @@
         if (S.eventAwait.type === 'strike' && S.eventAwait.done) S.eventAwait = null;
         if (S.eventAwait.t <= 0 && !S.eventAwait.done) { S.eventAwait = null; }
       }
+      // ---- the meeting: be in the conference room before it closes ----------
+      if (S.meeting && !S.meeting.done) {
+        S.meeting.t -= dt;
+        var ms = SWYF.world && SWYF.world.flags && SWYF.world.flags.meetingSpot;
+        var pl = SWYF.player;
+        var near = ms && pl && pl.pos && (Math.abs(pl.pos.x - ms.x) < 2.0 && Math.abs(pl.pos.z - ms.z) < 2.2);
+        var banner = document.getElementById('meeting');
+        if (banner && !banner.classList.contains('hidden')) {
+          var b2 = banner.querySelector('span');
+          if (b2) b2.textContent = 'الاجتماع غادي يبدا ف قاعة الاجتماعات — باقي ' + Math.max(0, Math.round(S.meeting.t)) + ' ثانية';
+        }
+        if (near) {
+          S.meeting.done = true;
+          SWYF.ui.meetingBanner('', '', false);
+          S.nerves = U.clamp(S.nerves + 10, 0, 100);
+          var bl = '«مبروك عليكم، جيتو ف الوقت. هاد شي فريق كيحترم.»';
+          if (SWYF.world.flags.boss && SWYF.world.flags.boss.say) SWYF.world.flags.boss.say(bl, 5000);
+          SWYF.Desktop.addLesson('📌 الاجتماع: الحضور ف الوقت كيرفع الثقة… و الغياب كيتسجل.');
+          SWYF.ui.toast('✅ حضرت الاجتماع — +10 أعصاب', 3200);
+          S.meeting = null;
+        } else if (S.meeting.t <= 0) {
+          S.meeting.done = true;
+          SWYF.ui.meetingBanner('', '', false);
+          S.nerves = U.clamp(S.nerves - 16, 0, 100);
+          SWYF.ui.toast('❌ فوتّي الاجتماع — البوس كتب عليك غياب (-16)', 3600);
+          SWYF.audio.sfx('boo');
+          if (SWYF.world.flags.boss && SWYF.world.flags.boss.say) SWYF.world.flags.boss.say('«الاجتماع… و نتا فين؟ هاد الغياب غادي نتفكر.»', 5200);
+          S.meeting = null;
+        }
+      }
       // nerves recovery
       S.nerves = U.clamp(S.nerves + dt * 0.25, 0, 100);
     }
@@ -340,6 +381,7 @@
 
   function endShift() {
     S.phase = 'review';
+    if (S.meeting) { S.meeting = null; SWYF.ui.meetingBanner('', '', false); }
     SWYF.ui.hud(false);
     SWYF.ui.hideRing();
     SWYF.audio.sfx('door');
@@ -387,7 +429,17 @@
   function buy(id) {
     var up = null;
     for (var i = 0; i < D.upgrades.length; i++) if (D.upgrades[i].id === id) up = D.upgrades[i];
-    if (!up || S.upgrades[id] || S.cash < up.price) return false;
+    if (!up || S.cash < up.price) return false;
+    if (up.consumable) {
+      S.cash -= up.price;
+      if (id === 'stink') S.stinkBombs = (S.stinkBombs || 0) + 3;
+      else if (id === 'balls') S.balls = (S.balls || 0) + 5;
+      else if (id === 'chips') S.cash += 800;
+      SWYF.audio.sfx('cash');
+      SWYF.ui.refreshHud();
+      return true;
+    }
+    if (S.upgrades[id]) return false;
     S.cash -= up.price;
     S.upgrades[id] = 1;
     SWYF.ui.refreshHud();

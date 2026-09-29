@@ -56,8 +56,40 @@
         else if (H.onResume) H.onResume();
       }
       if (e.code === 'KeyR') cleanVirus();
+      // ---- toy physics: F = shove, G = stink bomb, B = throw a ball ---------
+      var P = SWYF.main && SWYF.main.player, Wd = SWYF.main && SWYF.main.world;
+      if (!P || !Wd || P.mode !== 'walk') return;
+      if (e.code === 'KeyF') {
+        var hit = SWYF.physics.shove(Wd, P.pos, P.yaw, { power: 1 });
+        SWYF.ui.toast(hit ? '💥 دستو!' : '✋ ما كاينش شي واحد قدامك', 1600);
+      }
+      if (e.code === 'KeyG') {
+        if ((SWYF.Day.S.stinkBombs || 0) <= 0) { SWYF.ui.toast('🦨 ما عندكش قنبلة غاز — شريها من Scamazon', 2200); return; }
+        SWYF.Day.S.stinkBombs--;
+        var fwd = new THREE.Vector3(Math.sin(P.yaw), 0, Math.cos(P.yaw));
+        SWYF.physics.stinkCloud(P.pos.clone().add(fwd.multiplyScalar(1.4)).setY(0.45), 3.6, 1.25);
+        SWYF.audio.sfx('gas');
+      }
+      if (e.code === 'KeyB') {
+        var d = new THREE.Vector3(Math.sin(P.yaw), -0.05, Math.cos(P.yaw));
+        SWYF.physics.throwBall(P.pos.clone().setY(1.3).add(d.clone().multiplyScalar(0.4)), d, Wd);
+        SWYF.audio.sfx('whoosh');
+      }
     });
     if (isTouch()) U.show($('#touch-ui'));
+  }
+
+  /** Purple "Meeting is about to start!" banner (reference-accurate). */
+  function meetingBanner(text, sub, on) {
+    var el = document.getElementById('meeting');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'meeting';
+      document.body.appendChild(el);
+    }
+    if (!on) { el.classList.add('hidden'); return; }
+    el.innerHTML = '<b>' + text + '</b><span>' + (sub || '') + '</span>';
+    el.classList.remove('hidden');
   }
 
   function showHelp(on) {
@@ -338,7 +370,7 @@
     init: init, hud: hud, refreshHud: refreshHud, flashQuota: flashQuota, toast: toast,
     alert: alertBox, showRing: showRing, hideRing: hideRing, showBrief: showBrief,
     showReview: showReview, showShopBetweenDays: showShopBetweenDays,
-    showGameOver: showGameOver, showWin: showWin, showHelp: showHelp,
+    showGameOver: showGameOver, showWin: showWin, showHelp: showHelp, meetingBanner: meetingBanner,
     virus: virus, vignette: vignette, shake: shake, setInteract: setInteract, showBoard: showBoard,
     seatForCall: seatForCall, isTouch: isTouch, show: show, hide: hide
   };

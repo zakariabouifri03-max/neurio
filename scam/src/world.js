@@ -8,6 +8,7 @@
   var SWYF = (window.SWYF = window.SWYF || {});
   var U = SWYF.util;
   var THREE = window.THREE;
+  var ART = SWYF.art;
 
   // ---------------------------------------------------------------- textures
   function canvasTex(w, h, draw, repeat) {
@@ -134,6 +135,78 @@
     });
   }
 
+  /** The in-world computer: fake-browser desktop with a source-code view, a
+   *  form window, coloured taskbar icons and a clock (reference-accurate). */
+  function drawOS(g, w, h, tag, opts) {
+    opts = opts || {};
+    var clock = opts.clock || '9:00';
+    var caller = opts.caller || '';
+    // wallpaper
+    var wall = g.createLinearGradient(0, 0, w, h);
+    wall.addColorStop(0, '#12233f'); wall.addColorStop(1, '#0b1526');
+    g.fillStyle = wall; g.fillRect(0, 0, w, h);
+    // window 1: SAKARY fake bank page with the HTML source view
+    g.fillStyle = '#1b2740'; roundRect(g, 26, 24, w * 0.54, h * 0.68, 10); g.fill();
+    g.fillStyle = '#25406b'; roundRect(g, 26, 24, w * 0.54, 40, 10); g.fill();
+    g.fillStyle = '#9fd0ff'; g.font = 'bold 22px monospace'; g.textAlign = 'left';
+    g.fillText('SAKARY — bank portal', 40, 52);
+    g.fillStyle = '#eef3ff'; g.fillRect(36, 74, w * 0.54 - 20, h * 0.68 - 60);
+    var code = [
+      '<html><body bgcolor="#fff">',
+      '<h1>SAKARY BANK — verify</h1>',
+      '<form action="post.php">',
+      '  <input name="acc" placeholder="account">',
+      '  <input name="pin" type="password">',
+      '  <button>LOGIN</button>',
+      '</form></body></html>'
+    ];
+    g.font = '17px monospace';
+    for (var i = 0; i < code.length; i++) {
+      g.fillStyle = i % 3 === 0 ? '#1e66d0' : (i % 3 === 1 ? '#b8860b' : '#7a3bd0');
+      g.fillText(code[i], 46, 104 + i * 24);
+    }
+    // window 2: the tax/SS form (Simpletax vibe)
+    g.fillStyle = '#22304d'; roundRect(g, w * 0.58, h * 0.16, w * 0.36, h * 0.5, 10); g.fill();
+    g.fillStyle = '#2c4670'; roundRect(g, w * 0.58, h * 0.16, w * 0.36, 34, 10); g.fill();
+    g.fillStyle = '#cfe3ff'; g.font = 'bold 19px monospace';
+    g.fillText('Simpletax — form 1040', w * 0.58 + 12, h * 0.16 + 24);
+    g.fillStyle = '#f4f7ff';
+    for (var r2 = 0; r2 < 4; r2++) {
+      ART.roundRect(g, w * 0.58 + 16, h * 0.16 + 52 + r2 * 38, w * 0.36 - 32, 26, 6); g.fill();
+    }
+    g.fillStyle = '#7a3bd0'; ART.roundRect(g, w * 0.58 + 16, h * 0.16 + 52 + 4 * 38 + 8, 110, 30, 6); g.fill();
+    g.fillStyle = '#fff'; g.font = 'bold 18px Tahoma';
+    g.fillText('PROCEED', w * 0.58 + 30, h * 0.16 + 52 + 4 * 38 + 30);
+    // taskbar with coloured app icons
+    g.fillStyle = 'rgba(9,14,24,0.92)'; g.fillRect(0, h - 34, w, 34);
+    var cols = ['#3b6fd9', '#f0c02a', '#7a3bd0', '#25d366', '#e94f37', '#00c2d1', '#ff7ab8', '#9aa3ad'];
+    for (var ic = 0; ic < cols.length; ic++) {
+      g.fillStyle = cols[ic];
+      ART.roundRect(g, 10 + ic * 30, h - 28, 22, 22, 5); g.fill();
+    }
+    g.fillStyle = '#dfe8ff'; g.font = '16px monospace'; g.textAlign = 'right';
+    g.fillText(clock + '   ' + (tag === 'mine' ? 'YOU' : tag.toUpperCase()), w - 12, h - 12);
+    // incoming call overlay
+    if (caller) {
+      g.fillStyle = 'rgba(255,40,70,0.92)';
+      ART.roundRect(g, w / 2 - 190, h / 2 - 70, 380, 120, 14); g.fill();
+      g.fillStyle = '#fff'; g.font = 'bold 34px "Noto Kufi Arabic",Tahoma,sans-serif'; g.textAlign = 'center';
+      g.fillText('📞 ' + caller, w / 2, h / 2 - 22);
+      g.font = '22px "Noto Kufi Arabic",Tahoma,sans-serif';
+      g.fillText('CALLER TRUTH — دق التيليفون', w / 2, h / 2 + 16);
+    }
+  }
+
+  function osScreen(tag) {
+    var c = document.createElement('canvas');
+    c.width = 1024; c.height = 640;
+    var g = c.getContext('2d');
+    drawOS(g, c.width, c.height, tag, {});
+    var t = new THREE.CanvasTexture(c);
+    t.anisotropy = 4;
+    return { canvas: c, tex: t, tag: tag, last: '' };
+  }
+
   function skylineTexture() {
     return canvasTex(1024, 512, function (g, w, h) {
       var sky = g.createLinearGradient(0, 0, 0, h);
@@ -194,11 +267,12 @@
     }
 
     // ---- materials
-    var matFloor = new THREE.MeshStandardMaterial({ map: floorTexture(), roughness: 0.85, metalness: 0.05 });
-    var matWall = new THREE.MeshStandardMaterial({ color: 0xd9d3c4, roughness: 0.95 });
-    var matWall2 = new THREE.MeshStandardMaterial({ color: 0x35617a, roughness: 0.95 });
-    var matCeil = new THREE.MeshStandardMaterial({ color: 0xeeeae1, roughness: 1 });
-    var matWood = new THREE.MeshStandardMaterial({ color: 0x8a5a35, roughness: 0.7 });
+    var ART = SWYF.art;
+    var matFloor = new THREE.MeshStandardMaterial({ map: ART.officeCarpet(), roughness: 0.95, metalness: 0 });
+    var matWall = new THREE.MeshStandardMaterial({ color: 0x2a3450, roughness: 0.95 });
+    var matWall2 = new THREE.MeshStandardMaterial({ color: 0x1f2a44, roughness: 0.95 });
+    var matCeil = new THREE.MeshStandardMaterial({ color: 0x3a4054, roughness: 1 });
+    var matWood = new THREE.MeshStandardMaterial({ color: 0xc9ccd2, roughness: 0.7 });
     var matDark = new THREE.MeshStandardMaterial({ color: 0x2a2f38, roughness: 0.6 });
     var matMetal = new THREE.MeshStandardMaterial({ color: 0x9aa3ad, roughness: 0.35, metalness: 0.7 });
     var matGlassM = new THREE.MeshStandardMaterial({ color: 0x9fd6ff, transparent: true, opacity: 0.18, roughness: 0.05, metalness: 0.2 });
@@ -220,10 +294,12 @@
     wall(0, -DP / 2, W, 0.2, matWall);           // north (view wall for boss)
     wall(0, DP / 2, W, 0.2, matWall);            // south
     wall(-W / 2, 0, 0.2, DP, matWall2);          // west (windows)
-    wall(W / 2, 0, 0.2, DP, matWall);            // east
+    // east wall — split so the casino door is a real opening
+    wall(W / 2, -0.875, 0.2, 10.25, matWall);
+    wall(W / 2, 5.875, 0.2, 0.25, matWall);
 
     // carpet runner
-    var carpet = new THREE.Mesh(new THREE.PlaneGeometry(4.4, DP - 1.4), new THREE.MeshStandardMaterial({ map: carpetTexture(), roughness: 1 }));
+    var carpet = new THREE.Mesh(new THREE.PlaneGeometry(4.4, DP - 1.4), new THREE.MeshStandardMaterial({ color: 0x263457, roughness: 1 }));
     carpet.rotation.x = -Math.PI / 2; carpet.position.set(-1.0, 0.011, 0);
     root.add(carpet);
 
@@ -237,22 +313,24 @@
       root.add(win);
       var frame = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.05, 2.75), matDark);
       frame.position.set(-W / 2 + 0.06, 1.75, wz); root.add(frame);
-      var lightPool = new THREE.PointLight(0xffc48a, 0.5, 5.5, 2);
+      var lightPool = new THREE.PointLight(0xffb066, 0.85, 6.5, 2);
       lightPool.position.set(-W / 2 + 1.2, 1.6, wz); root.add(lightPool);
+      // venetian blinds — the warm sunset look of the reference office
+      for (var bl = 0; bl < 12; bl++) {
+        var slat = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.03, 2.5), new THREE.MeshStandardMaterial({ color: 0x243047, roughness: 0.8 }));
+        slat.position.set(-W / 2 + 0.2, 0.95 + bl * 0.15, wz); root.add(slat);
+      }
     }
 
     // ---- ceiling lamps
-    for (var li = 0; li < 4; li++) {
-      var lx = -5 + (li % 2) * 10, lz = -3 + Math.floor(li / 2) * 6;
-      var shade = new THREE.Mesh(new THREE.ConeGeometry(0.62, 0.4, 18, 1, true), new THREE.MeshStandardMaterial({ color: 0x2f3b4a, side: THREE.DoubleSide, roughness: 0.6 }));
-      shade.position.set(lx, H - 0.35, lz); root.add(shade);
-      var bulb = new THREE.Mesh(new THREE.SphereGeometry(0.14, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffeec2 }));
-      bulb.position.set(lx, H - 0.58, lz); root.add(bulb);
-      var pl = new THREE.PointLight(0xfff0cf, 0.55, 11, 2);
-      pl.position.set(lx, H - 0.8, lz); root.add(pl);
-      lamps.push({ light: pl, bulb: bulb });
+    for (var li = 0; li < 6; li++) {
+      var lx = -6.4 + (li % 3) * 6.4, lz = -3.2 + Math.floor(li / 3) * 6.4;
+      var strip = ART.stripLight(2.6);
+      strip.position.set(lx, H - 0.12, lz);
+      root.add(strip);
+      lamps.push({ light: strip.userData.light, bulb: strip.children[0], strip: true });
     }
-    var hemi = new THREE.HemisphereLight(0xbfd4ff, 0x2a2118, 0.55); scene.add(hemi);
+    var hemi = new THREE.HemisphereLight(0x9fc0ff, 0x1a2440, 0.5); scene.add(hemi);
     var sun = new THREE.DirectionalLight(0xffd9a8, 0.85);
     sun.position.set(-9, 8, 5); sun.castShadow = true;
     sun.shadow.mapSize.set(1024, 1024);
@@ -282,13 +360,14 @@
       stand.position.set(-0.5, 0.79 + 0.03, -0.25); grp.add(stand);
       var neck = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.28, 0.07), matDark);
       neck.position.set(-0.5, 0.95, -0.25); grp.add(neck);
-      var scr = new THREE.Mesh(new THREE.PlaneGeometry(0.66, 0.42), new THREE.MeshBasicMaterial({ map: screenTexture(i === 3 ? 'call' : 'idle') }));
+      var osScreenObj = osScreen(d.mine ? 'mine' : 'npc');
+      var scr = new THREE.Mesh(new THREE.PlaneGeometry(0.66, 0.42), new THREE.MeshBasicMaterial({ map: osScreenObj.tex }));
       scr.position.set(-0.5, 1.3, -0.22); grp.add(scr);
       var bezel = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.48, 0.05), matDark);
       bezel.position.set(-0.5, 1.3, -0.25); grp.add(bezel);
       var glare = new THREE.PointLight(0x88bbff, 0.25, 2.2, 2);
       glare.position.set(-0.5, 1.25, -0.1); grp.add(glare);
-      monitors.push({ mesh: scr, glare: glare, mine: d.mine });
+      monitors.push({ mesh: scr, glare: glare, mine: d.mine, os: osScreenObj, t: Math.random() * 2 });
       // keyboard + phone + papers + mug
       var kb = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.03, 0.18), matDark);
       kb.position.set(0.15, 0.8, -0.1); grp.add(kb);
@@ -303,15 +382,10 @@
       }
       var mug = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.12, 12), new THREE.MeshStandardMaterial({ color: d.mine ? 0xd94f4f : 0x4f7fd9, roughness: 0.5 }));
       mug.position.set(0.45, 0.86, 0.3); grp.add(mug);
-      // chair
-      var seat = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.09, 0.5), matDark);
-      seat.position.set(d.mine ? 0.05 : -0.05, 0.46, 1.05); grp.add(seat);
-      var back = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.08), matDark);
-      back.position.set(d.mine ? 0.05 : -0.05, 0.78, 1.28); grp.add(back);
-      var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.42, 10), matMetal);
-      pole.position.set(d.mine ? 0.05 : -0.05, 0.22, 1.05); grp.add(pole);
-      var base = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.3, 0.05, 14), matMetal);
-      base.position.set(d.mine ? 0.05 : -0.05, 0.03, 1.05); grp.add(base);
+      // chair (flat-art office chair: orange = yours, blue = the others)
+      var chairMesh = ART.chair(d.mine ? 0xe8552f : 0x2f7dff);
+      chairMesh.position.set(d.mine ? 0.05 : -0.05, 0, 1.05);
+      grp.add(chairMesh);
       if (d.mine) {
         var jacket = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.5, 0.12), new THREE.MeshStandardMaterial({ color: 0x6d3b2c, roughness: 0.9 }));
         jacket.position.set(0.05, 0.78, 1.22); grp.add(jacket);
@@ -373,6 +447,42 @@
       pl.position.set(W / 2 - 0.14, 1.95 - i * 0.02, -3.2 + i * 3.1);
       pl.rotation.y = -Math.PI / 2; root.add(pl);
     });
+    // ---- flat art-direction pass: big motivational posters (south wall)
+    ['awake', 'quota', 'smile'].forEach(function (kind, i) {
+      var mp = new THREE.Mesh(new THREE.PlaneGeometry(1.25, 1.65), new THREE.MeshBasicMaterial({ map: ART.motivationalPoster(kind) }));
+      mp.position.set(-5.6 + i * 1.5, 2.05, DP / 2 - 0.14);
+      mp.rotation.y = Math.PI;
+      root.add(mp);
+      var fr = new THREE.Mesh(new THREE.BoxGeometry(1.32, 1.72, 0.04), matDark);
+      fr.position.set(-5.6 + i * 1.5, 2.05, DP / 2 - 0.1); root.add(fr);
+    });
+    // "STAY AWAKE" sticky notes in front of the player's desk (north wall)
+    [[2.6, 1.62, 'SLEEP = FIRED'], [2.15, 1.42, 'STAY AWAKE'], [3.05, 1.30, 'CALL. CALL. CALL.']].forEach(function (n) {
+      var note = new THREE.Mesh(new THREE.PlaneGeometry(0.38, 0.38), new THREE.MeshBasicMaterial({ map: ART.stickyNote(n[2]) }));
+      note.position.set(n[0], n[1], -DP / 2 + 0.14);
+      note.rotation.z = U.rnd(-0.09, 0.09);
+      root.add(note);
+    });
+    // ---- cubicle dividers (blue-grey panels, like the reference)
+    var divMat = new THREE.MeshStandardMaterial({ color: 0x2b3a63, roughness: 0.9 });
+    var divMat2 = new THREE.MeshStandardMaterial({ color: 0x1b2745, roughness: 0.95 });
+    [[-3.2, -2.4], [-3.2, 1.1], [2.6, -2.4], [2.6, 1.1]].forEach(function (d, i) {
+      var panel = new THREE.Mesh(new THREE.BoxGeometry(2.3, 1.35, 0.08), i % 2 ? divMat2 : divMat);
+      panel.position.set(d[0], 0.68, d[1] + 0.62);
+      panel.castShadow = true; panel.receiveShadow = true;
+      root.add(panel);
+      var cap = new THREE.Mesh(new THREE.BoxGeometry(2.36, 0.06, 0.12), matDark);
+      cap.position.set(d[0], 1.37, d[1] + 0.62); root.add(cap);
+    });
+    // a real glass partition wall (image 7 of the reference)
+    var glass = new THREE.Mesh(new THREE.BoxGeometry(4.6, 2.5, 0.1), matGlassM);
+    glass.position.set(-2.4, 1.35, -DP / 2 + 0.6); glass.rotation.y = 0; root.add(glass);
+    var glassFrame = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.1, 0.16), matDark);
+    glassFrame.position.set(-2.4, 2.6, -DP / 2 + 0.6); root.add(glassFrame);
+    [-4.7, -2.4, -0.1].forEach(function (gx) {
+      var post = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.16), matDark);
+      post.position.set(gx, 1.35, -DP / 2 + 0.6); root.add(post);
+    });
 
     // ---- neon sign over the whiteboard (parody brand wall)
     var neon = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.4), new THREE.MeshBasicMaterial({
@@ -382,7 +492,7 @@
     neon.position.set(3.0, 2.45, DP / 2 - 0.16); neon.rotation.y = Math.PI; root.add(neon);
 
     // ---- kitchen corner (north-west)
-    var kitchen = new THREE.Group(); kitchen.position.set(-6.6, 0, -4.3); root.add(kitchen);
+    var kitchen = new THREE.Group(); kitchen.position.set(-6.6, 0, 4.2); root.add(kitchen);
     var counter = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.95, 1.2), new THREE.MeshStandardMaterial({ color: 0xb9b3a6, roughness: 0.8 }));
     counter.position.set(0, 0.48, 0); counter.castShadow = true; kitchen.add(counter);
     var counterTop = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.08, 1.3), matDark);
@@ -395,9 +505,9 @@
     water.position.set(0.6, 1.42, 0); kitchen.add(water);
     var snack = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.5, 0.35), new THREE.MeshStandardMaterial({ color: 0x2f3a4a, roughness: 0.5 }));
     snack.position.set(1.1, 1.28, 0); kitchen.add(snack);
-    addCollider(-6.6, -4.3, 3.4, 1.4, 0.2);
-    interactables.push({ id: 'coffee', label: 'دير قهوة ☕', pos: new THREE.Vector3(-7.2, 1.1, -3.2), radius: 1.3, kind: 'coffee' });
-    interactables.push({ id: 'vending', label: 'شري حاجة من الماكينة', pos: new THREE.Vector3(-5.6, 1.1, -3.2), radius: 1.3, kind: 'vending' });
+    addCollider(-6.6, 4.2, 3.4, 1.4, 0.2);
+    interactables.push({ id: 'coffee', label: 'دير قهوة ☕', pos: new THREE.Vector3(-7.2, 1.1, 3.1), radius: 1.3, kind: 'coffee' });
+    interactables.push({ id: 'vending', label: 'شري حاجة من الماكينة', pos: new THREE.Vector3(-5.6, 1.1, 3.1), radius: 1.3, kind: 'vending' });
 
     // ---- protection spot (under the strong table) — for air strikes
     var bunkerTable = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.14, 1.1), new THREE.MeshStandardMaterial({ color: 0x6b5540, roughness: 0.9 }));
@@ -412,8 +522,8 @@
 
     // ---- radio (music)
     var radio = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.3, 0.25), new THREE.MeshStandardMaterial({ color: 0x3d2b1a, roughness: 0.6 }));
-    radio.position.set(-6.6, 1.16, -4.3); root.add(radio);
-    interactables.push({ id: 'radio', label: 'شغّل/وقّف الراديو 🎵', pos: new THREE.Vector3(-6.6, 1.0, -3.3), radius: 1.2, kind: 'radio' });
+    radio.position.set(-6.6, 1.16, 4.2); root.add(radio);
+    interactables.push({ id: 'radio', label: 'شغّل/وقّف الراديو 🎵', pos: new THREE.Vector3(-6.6, 1.0, 3.2), radius: 1.2, kind: 'radio' });
 
     // ---- water cooler
     var cooler = new THREE.Group(); cooler.position.set(7.4, 0, 1.2); root.add(cooler);
@@ -435,18 +545,81 @@
     handMin.position.y = 0.15;
     var mGrp = new THREE.Group(); mGrp.position.set(W / 2 - 0.19, 2.35, 3.6); mGrp.add(handMin); root.add(mGrp);
 
+    // ---- CONFERENCE ROOM (glass box, like the reference) -------------------
+    var room = new THREE.Group();
+    room.position.set(-6.4, 0, -4.3); root.add(room);
+    var roomGlassF = new THREE.MeshStandardMaterial({ color: 0x9fd6ff, transparent: true, opacity: 0.17, roughness: 0.05, metalness: 0.2, side: THREE.DoubleSide });
+    var RW = 3.8, RD = 3.2, RH = 2.5;
+    var backG = new THREE.Mesh(new THREE.BoxGeometry(RW, RH, 0.08), roomGlassF); backG.position.set(0, RH / 2, -RD / 2); room.add(backG);
+    var leftG = new THREE.Mesh(new THREE.BoxGeometry(0.08, RH, RD), roomGlassF); leftG.position.set(-RW / 2, RH / 2, 0); room.add(leftG);
+    var rightG = new THREE.Mesh(new THREE.BoxGeometry(0.08, RH, RD), roomGlassF); rightG.position.set(RW / 2, RH / 2, 0); room.add(rightG);
+    // front: two panels with a doorway in the middle
+    [-1.25, 1.25].forEach(function (dx) {
+      var p = new THREE.Mesh(new THREE.BoxGeometry(1.25, RH, 0.08), roomGlassF);
+      p.position.set(dx, RH / 2, RD / 2); room.add(p);
+    });
+    var topFrame = new THREE.Mesh(new THREE.BoxGeometry(RW + 0.16, 0.12, RD + 0.16), matDark);
+    topFrame.position.set(0, RH + 0.06, 0); room.add(topFrame);
+    [[-RW / 2, -RD / 2], [RW / 2, -RD / 2], [-RW / 2, RD / 2], [RW / 2, RD / 2], [-0.63, RD / 2], [0.63, RD / 2]].forEach(function (p) {
+      var post = new THREE.Mesh(new THREE.BoxGeometry(0.1, RH, 0.1), matDark);
+      post.position.set(p[0], RH / 2, p[1]); room.add(post);
+    });
+    var mtable = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.09, 1.1), ART.flat(0xd8d3c8, { rough: 0.6 }));
+    mtable.position.set(0, 0.76, 0); mtable.castShadow = true; room.add(mtable);
+    [[-1.0, -0.45], [1.0, -0.45], [-1.0, 0.45], [1.0, 0.45]].forEach(function (p) {
+      var leg = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.72, 8), matMetal);
+      leg.position.set(p[0], 0.36, p[1]); room.add(leg);
+    });
+    for (var mc = 0; mc < 4; mc++) {
+      var ch2 = ART.chair(mc % 2 ? 0x2f7dff : 0xe8552f);
+      ch2.scale.setScalar(0.9);
+      ch2.position.set(-1.2 + mc * 0.8, 0, (mc < 2 ? -0.95 : 0.95));
+      ch2.rotation.y = mc < 2 ? 0 : Math.PI;
+      room.add(ch2);
+    }
+    var mScreen = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.0), new THREE.MeshBasicMaterial({
+      map: signTexture('MEETING', 'الاجتماع بدا', { bg: '#1a0f2e', border: '#a05cff', title: '#d9b3ff', sub: '#ffffff', foot: 'قاعة الاجتماعات — ما تتأخرش' })
+    }));
+    mScreen.position.set(0, 1.75, -RD / 2 + 0.06); room.add(mScreen);
+    var roomLight = new THREE.PointLight(0xd9b3ff, 0.5, 6, 2);
+    roomLight.position.set(0, 2.2, 0); room.add(roomLight);
+    addCollider(-6.4, -5.9, RW, 0.3, 0.0);
+    addCollider(-8.3, -4.3, 0.3, RD, 0.0);
+    addCollider(-4.5, -4.3, 0.3, RD, 0.0);
+    addCollider(-6.4, -4.3, 2.0, 0.3, 0.0);     // the meeting table
+    addCollider(-7.66, -2.7, 1.27, 0.16, 0.0);  // glass panels (doorway stays open)
+    addCollider(-5.13, -2.7, 1.27, 0.16, 0.0);
+    flags.meetingSpot = new THREE.Vector3(-6.4, 0, -3.1);
+    flags.meetingRoom = room;
+
+    // ---- CASINO next door (neon, duck race, treasure chamber) --------------
+    if (SWYF.Casino) {
+      SWYF.Casino.build({ root: root, addCollider: addCollider, flags: flags, scene: scene, W: W });
+      interactables.push({ id: 'casino', label: 'دخول الكازينو 🎰 (خطر: البوس)', pos: new THREE.Vector3(W / 2 - 0.6, 1.0, 5), radius: 1.5, kind: 'casino' });
+      // neon doorway trim on the office side
+      var neonTrim = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.6, 1.7), ART.flat(0xff4fd8, { emissive: 0x8a1360, ei: 0.9 }));
+      neonTrim.position.set(W / 2 - 0.02, 1.3, 5); root.add(neonTrim);
+    }
+
     // ---- junk / props
     for (var b = 0; b < 7; b++) {
       var box = new THREE.Mesh(new THREE.BoxGeometry(U.rnd(0.3, 0.6), U.rnd(0.3, 0.5), U.rnd(0.3, 0.6)), new THREE.MeshStandardMaterial({ color: new THREE.Color().setHSL(0.09, 0.35, U.rnd(0.25, 0.5)), roughness: 0.95 }));
-      var bx = U.rnd(-7.5, 7.5), bz = U.rnd(-5, 5);
-      if (Math.abs(bx) < 4.5 && Math.abs(bz) < 3) bx += 5;      // keep the desk area clear
-      if (bx > -1 && bx < 3.2 && bz > -1.5 && bz < 2.6) bx -= 5; // keep the way to your desk clear
+      var bx = 0, bz = 0;
+      for (var tries = 0; tries < 20; tries++) {               // junk never lands in a doorway
+        bx = U.rnd(-7.5, 7.5); bz = U.rnd(-5, 5);
+        if (Math.abs(bx) < 4.5 && Math.abs(bz) < 3) continue;                       // the desk island
+        if (bx > -1 && bx < 3.2 && bz > -1.5 && bz < 2.6) continue;                 // your way to your desk
+        if (bx > -8.8 && bx < -4.0 && bz > -3.7 && bz < -2.0) continue;             // glass meeting room door
+        if (bx > W / 2 - 2.5 && bz > 3.2 && bz < 6.8) continue;                     // casino door
+        if (bx > -7.2 && bx < -6.0 && bz > 3.4 && bz < 4.9) continue;               // kitchen counter
+        break;
+      }
       box.position.set(bx, box.geometry.parameters.height / 2, bz);
       box.rotation.y = U.rnd(0, 6.28); box.castShadow = true; root.add(box);
       addCollider(bx, bz, 0.7, 0.7, 0.05);
     }
     // plants
-    [[-8.0, 4.6], [8.0, -5.0]].forEach(function (p) {
+    [[-8.2, 0.4], [8.0, -5.0]].forEach(function (p) {
       var pot = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.2, 0.4, 12), new THREE.MeshStandardMaterial({ color: 0x8a5a3b, roughness: 0.9 }));
       pot.position.set(p[0], 0.2, p[1]); root.add(pot);
       var leafMat = new THREE.MeshStandardMaterial({ color: 0x2f7d4f, roughness: 0.9, side: THREE.DoubleSide });
@@ -528,13 +701,26 @@
       };
     }
 
+    // ---- the real look: flat-shaded, big-headed, featureless characters with
+    //      floating name tags — exactly the reference art direction ------------
+    makeHuman = function (opts) {
+      opts = opts || {};
+      return ART.makeCharacter(opts);   // same surface: group / arms / legs / bubble / say
+    };
+
     // ---- coworkers walking
     var coopSpots = [
       new THREE.Vector3(-1.5, 0, -1.2), new THREE.Vector3(1.2, 0, 2.6), new THREE.Vector3(-5.5, 0, 3.2),
       new THREE.Vector3(5.6, 0, -0.6), new THREE.Vector3(-1.6, 0, 4.2), new THREE.Vector3(3.4, 0, 4.4)
     ];
+    var TAG_COLS = [0xffd447, 0x6ad0ff, 0xff8a3d, 0xff7ab8, 0x9b5cff, 0x8fd46a];
     SWYF.data.coworkers.forEach(function (cw, i) {
-      var hum = makeHuman({ hair: i % 2 ? 0x2a1a12 : 0x3a2a18 });
+      var hum = makeHuman({
+        name: cw.name, emoji: cw.emoji, tagColor: TAG_COLS[i % TAG_COLS.length],
+        skin: ART.SKINS[i % ART.SKINS.length], hair: ART.HAIRS[(i + 3) % ART.HAIRS.length],
+        shirt: ART.SHIRTS[i % ART.SHIRTS.length], pants: ART.PANTS[i % ART.PANTS.length],
+        hairTuft: i % 3 === 0
+      });
       hum.group.position.copy(coopSpots[i % coopSpots.length]);
       root.add(hum.group);
       var npc = {
@@ -547,7 +733,10 @@
     });
 
     // ---- boss npc
-    var bossHum = makeHuman({ tie: 0xd23b3b, hair: 0x101010 });
+    var bossHum = makeHuman({
+      tie: 0xd23b3b, hair: 0x101010, shirt: 0x21252e, skin: 0xd9a066, pants: 0x1f2430,
+      name: 'السيد بولعيد', emoji: '👔', tagColor: 0xff5d6c, mouth: false, headset: false
+    });
     bossHum.group.position.copy(flags.bossStand);
     bossHum.group.scale.set(1.06, 1.06, 1.06);
     root.add(bossHum.group);
@@ -590,6 +779,7 @@
       scene.background.setHex(on ? 0x0a0e16 : 0x05070c);
       scene.fog.color.setHex(on ? 0x0a0e16 : 0x05070c);
       monitors.forEach(function (m) { m.glare.intensity = on ? 0.25 : 0.06; });
+      if (flags.casinoEntry) flags.casinoEntry.intensity = on ? 0.8 : 0.15;
     }
     function setFire(on, pos) {
       if (on && !hazardFire) {
@@ -621,7 +811,20 @@
       firedPoster.material.needsUpdate = true;
     }
 
+    // ---- walkable bounds: office + the casino wing (through the neon door)
+    function inBounds(x, z) {
+      var half = 0.45;
+      if (x >= -W / 2 + half && x <= W / 2 - half && z >= -DP / 2 + half && z <= DP / 2 - half) return true;
+      var cs = SWYF.Casino && SWYF.Casino.built();
+      if (!cs) return false;
+      var cz1 = -cs.D / 2 + half, cz2 = cs.D / 2 - half;
+      if (x < W / 2 - half || x > cs.ox + cs.W / 2 - half || z < cz1 || z > cz2) return false;
+      if (x <= W / 2 + half && (z < 4.25 || z > 5.75)) return false;   // only the doorway
+      return true;
+    }
+
     // ---- simple NPC update
+    var api = { npcs: npcs, colliders: colliders, root: root, flags: flags, W: W, DP: DP, inBounds: inBounds };
     function update(dt, playerPos) {
       var t = performance.now() / 1000;
       npcs.forEach(function (n, i) {
@@ -633,14 +836,20 @@
           var vx = (dx / dist) * n.speed * dt, vz = (dz / dist) * n.speed * dt;
           g.position.x += vx; g.position.z += vz;
           g.rotation.y = Math.atan2(vx, vz);
-          var sw = Math.sin(t * 9 + i) * 0.6;
-          n.obj.legs[0].rotation.x = sw; n.obj.legs[1].rotation.x = -sw;
-          n.obj.arms[0].rotation.x = -sw * 0.7; n.obj.arms[1].rotation.x = sw * 0.7;
+          if (n.obj.walk) n.obj.walk(1, t + i);
+          else {
+            var sw = Math.sin(t * 9 + i) * 0.6;
+            n.obj.legs[0].rotation.x = sw; n.obj.legs[1].rotation.x = -sw;
+            n.obj.arms[0].rotation.x = -sw * 0.7; n.obj.arms[1].rotation.x = sw * 0.7;
+          }
         } else {
           n.waitT -= dt;
-          var sw2 = Math.sin(t * 2 + i) * 0.06;
-          n.obj.legs[0].rotation.x = 0; n.obj.legs[1].rotation.x = 0;
-          n.obj.arms[0].rotation.x = sw2; n.obj.arms[1].rotation.x = -sw2;
+          if (n.obj.idle) n.obj.idle(t + i);
+          else {
+            var sw2 = Math.sin(t * 2 + i) * 0.06;
+            n.obj.legs[0].rotation.x = 0; n.obj.legs[1].rotation.x = 0;
+            n.obj.arms[0].rotation.x = sw2; n.obj.arms[1].rotation.x = -sw2;
+          }
           if (n.waitT <= 0) {
             n.waitT = U.rnd(3, 9);
             n.target = coopSpots[U.irnd(0, coopSpots.length - 1)].clone();
@@ -664,10 +873,27 @@
         flags.boss.arms[0].rotation.x = Math.sin(t * 1.3) * 0.12;
         flags.boss.arms[1].rotation.x = -Math.sin(t * 1.3) * 0.12;
       }
-      // monitor sizzle (cheap flicker on the glare only)
+      // monitors: live in-world OS (clock, caller overlay) + glare flicker
+      var call = null;
+      try { call = SWYF.Calls && SWYF.Calls.active ? SWYF.Calls.active() : null; } catch (e) { call = null; }
+      var clockStr = '9:00';
+      try { clockStr = U.minutes(SWYF.Day.time()); } catch (e) {}
       monitors.forEach(function (m) {
+        m.t += dt;
+        if (m.t > (m.mine ? 0.66 : 1.6)) {
+          m.t = 0;
+          var want = (call && call.name ? 'CALL ' + call.name : '') + '|' + clockStr;
+          if (m.mine || want !== m.os.last) {
+            m.os.last = want;
+            drawOS(m.os.canvas.getContext('2d'), m.os.canvas.width, m.os.canvas.height, m.os.tag, { clock: clockStr, caller: (call && call.name) ? call.name : '' });
+            m.os.tex.needsUpdate = true;
+          }
+        }
         if (Math.random() < 0.01) m.glare.intensity = 0.18 + Math.random() * 0.2;
       });
+      // toy physics (knocked-over characters, bouncing props, stink clouds)
+      if (SWYF.physics) SWYF.physics.step(dt, api);
+      if (SWYF.Casino) SWYF.Casino.update(dt);
       if (hazardFire) {
         hazardFire.t += dt;
         var s = 1 + Math.sin(t * 12) * 0.12;
@@ -682,7 +908,9 @@
       update: update, setPower: setPower, setFire: setFire, setShift: setShift,
       setQuota: setQuota, setFired: setFired, virusCube: virusCube, fireball: fireball,
       signTexture: signTexture, screenTexture: screenTexture, makeHuman: makeHuman,
-      addCollider: addCollider, root: root
+      addCollider: addCollider, root: root, monitors: monitors, osScreen: osScreen,
+      inBounds: inBounds, ART: ART,
+      casino: flags.casinoEntry ? (SWYF.Casino && SWYF.Casino.built()) : null, api: api
     };
   }
 

@@ -109,9 +109,12 @@
         var b = c[i];
         if (x > b.x1 - r && x < b.x2 + r && z > b.z1 - r && z < b.z2 + r) return true;
       }
-      // room bounds
-      if (x < -world.W / 2 + 0.45 || x > world.W / 2 - 0.45) return true;
-      if (z < -world.DP / 2 + 0.45 || z > world.DP / 2 - 0.45) return true;
+      // room bounds (office + casino wing)
+      if (world.inBounds) { if (!world.inBounds(x, z)) return true; }
+      else {
+        if (x < -world.W / 2 + 0.45 || x > world.W / 2 - 0.45) return true;
+        if (z < -world.DP / 2 + 0.45 || z > world.DP / 2 - 0.45) return true;
+      }
       return false;
     }
 
@@ -181,6 +184,34 @@
     }
 
     // -------------------------------------------------------------- interactions
+    // ---- first-person hands holding the phone (reference look) -------------
+    var vm = null;
+    P.viewmodel = function (on) {
+      if (!vm) {
+        vm = new THREE.Group();
+        var skin = SWYF.art ? SWYF.art.flat(0xf0b189, { rough: 0.8 }) : new THREE.MeshStandardMaterial({ color: 0xf0b189 });
+        var dark = SWYF.art ? SWYF.art.flat(0x1b1f27, { rough: 0.5 }) : new THREE.MeshStandardMaterial({ color: 0x1b1f27 });
+        var hand = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 10), skin);
+        hand.scale.set(1, 0.8, 1.25); hand.position.set(0.19, -0.17, -0.32); vm.add(hand);
+        var phone = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.17, 0.02), dark);
+        phone.position.set(0.19, -0.10, -0.36); phone.rotation.set(-0.35, 0.18, 0.12); vm.add(phone);
+        var scr = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.14), new THREE.MeshBasicMaterial({ color: 0x2f7dff }));
+        scr.position.set(0.19, -0.10, -0.349); scr.rotation.copy(phone.rotation); vm.add(scr);
+        var hand2 = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), skin);
+        hand2.scale.set(1, 0.8, 1.2); hand2.position.set(0.10, -0.20, -0.34); vm.add(hand2);
+        vm.visible = false;
+        if (P.camera) P.camera.add(vm);
+        P.hands = vm;
+      }
+      vm.visible = !!on;
+    };
+    P.waveHands = function (t) {
+      if (!P.hands) return;
+      P.hands.position.y = Math.sin(t * 2.2) * 0.012;
+      P.hands.rotation.z = Math.sin(t * 1.4) * 0.05;
+    };
+
+    if (world.scene && camera.parent !== world.scene) world.scene.add(camera);
     P.free = function (x, z) { return !collide(x, z); };
     P.findFreeSpot = function (x, z) {
       for (var r = 0; r < 12; r++) {

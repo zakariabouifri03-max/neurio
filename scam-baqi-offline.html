@@ -353,6 +353,103 @@ button.big{font-size:17px;padding:16px}
 .writer .mic.rec { background: rgba(255,90,90,.28); border-color: #ff6b6b; animation: micPulse 1.1s infinite; }
 @keyframes micPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,90,90,.5); } 50% { box-shadow: 0 0 0 8px rgba(255,90,90,0); } }
 
+/* ======================= CASINO + MEETING (reference look) ================= */
+#meeting {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 60; min-width: 340px; max-width: 82vw;
+  background: linear-gradient(180deg, #a05cff, #6a2bd0);
+  border: 2px solid #d9b3ff; border-radius: 10px;
+  padding: 10px 16px; box-shadow: 0 10px 30px rgba(120,60,255,.45);
+  display: flex; flex-direction: column; gap: 2px; text-align: center;
+  animation: meetPop .35s ease-out;
+}
+#meeting b { color: #fff; font-size: 15px; letter-spacing: .3px; }
+#meeting span { color: #f0e6ff; font-size: 12.5px; }
+@keyframes meetPop { from { transform: translate(-50%, -14px); opacity: 0; } }
+
+#casino-ui { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 40%, rgba(60,20,120,.55), rgba(4,4,10,.85)); }
+#casino-ui.hidden { display: none; }
+.cs-card { width: min(620px, 94vw); max-height: 88vh; overflow: auto;
+  background: linear-gradient(180deg, #1b1030, #120a24);
+  border: 2px solid #7a3bd0; border-radius: 16px; padding: 14px 16px 18px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.6), 0 0 0 4px rgba(122,59,208,.15) inset; color: #f2ecff; }
+.cs-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.cs-head b { font-size: 16px; color: #ffd447; }
+.cs-head .dim { font-size: 11.5px; }
+.cs-cash { margin-inline-start: auto; background: rgba(255,212,71,.14); border: 1px solid rgba(255,212,71,.4);
+  color: #ffe9a8; border-radius: 999px; padding: 3px 10px; font-size: 12px; }
+.cs-close { background: #3a2a5c; border: 1px solid #6a4bd0; color: #fff; border-radius: 8px;
+  width: 30px; height: 28px; cursor: pointer; }
+.cs-reels { display: flex; gap: 10px; justify-content: center; margin: 12px 0; }
+.cs-reel { width: 82px; height: 82px; display: grid; place-items: center; font-size: 40px;
+  background: #2a1240; border: 3px solid #ffd447; border-radius: 12px;
+  box-shadow: 0 0 22px rgba(255,212,71,.25) inset; }
+.cs-reel.spin { animation: reelSpin .18s linear infinite; }
+@keyframes reelSpin { 50% { transform: translateY(-4px) scale(1.03); } }
+.cs-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0; font-size: 13px; }
+.cs-row button, .cs-bet, .cs-rbet, .cs-cbet { background: #2f2350; border: 1px solid #6a4bd0; color: #e8dcff;
+  border-radius: 9px; padding: 7px 12px; cursor: pointer; font-family: inherit; }
+.cs-row button:hover { background: #3d2d68; }
+.cs-spin { background: linear-gradient(180deg, #27d17a, #12a35c) !important; border-color: #6ef0a8 !important;
+  color: #04210f !important; font-weight: 700; }
+.cs-spin[disabled] { opacity: .55; }
+.cs-msg { font-size: 12.5px; }
+.cs-lanes { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 10px 0; }
+.cs-lane { background: #241640; border: 2px solid #4a2f86; color: #eadcff; border-radius: 10px; padding: 9px;
+  cursor: pointer; font-family: inherit; }
+.cs-lane.sel { border-color: #ffd447; background: #3a2358; box-shadow: 0 0 0 3px rgba(255,212,71,.2); }
+.cs-lane .duck { font-size: 17px; }
+.cs-lane .duck.d0 { filter: none; } .cs-lane .duck.d1 { filter: hue-rotate(40deg); }
+.cs-lane .duck.d2 { filter: hue-rotate(180deg); } .cs-lane .duck.d3 { filter: hue-rotate(300deg); }
+.cs-lane .duck.d4 { filter: hue-rotate(90deg); }
+.cs-track { display: flex; flex-direction: column; gap: 5px; margin: 10px 0; }
+.cs-lanepos { position: relative; height: 18px; background: #1b2a4a; border-radius: 9px; overflow: hidden; }
+.cs-lanepos i.prog { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #27d17a, #6ef0a8); transition: width .1s linear; }
+.cs-lanepos span { position: absolute; top: -1px; inset-inline-end: 6px; font-size: 14px; }
+.cs-hand { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+.card { display: inline-grid; place-items: center; width: 40px; height: 56px; border-radius: 7px;
+  background: #fdfdff; color: #16202e; font-weight: 700; font-size: 15px; box-shadow: 0 3px 10px rgba(0,0,0,.4); }
+.card.red { color: #d0203a; }
+.card.hidden { background: repeating-linear-gradient(45deg, #3b2a6b, #3b2a6b 6px, #2a1c50 6px, #2a1c50 12px); color: transparent; }
+.cs-table { background: radial-gradient(circle at 50% 20%, #1c6b45, #0e3f29); border-radius: 12px; padding: 10px;
+  border: 2px solid #6b4b22; }
+
+/* ---- reference desktop apps: Caller Truth · browser · DuckTalk ------------ */
+#desktop .tb-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(180deg,#2a3552,#1b2338);
+  border:1px solid #3d4a70;color:#eaf1ff;font-size:16px;display:grid;place-items:center;cursor:pointer}
+#desktop .tb-icon:hover{background:#37456b}
+#desktop .tb-icon.run{outline:2px solid rgba(120,180,255,.6);background:#31406a}
+.ct{display:flex;gap:14px;padding:6px}
+.ct-left{display:flex;flex-direction:column;gap:6px;align-items:center;width:200px}
+.ct-face{border:2px solid #3d4a70;border-radius:10px;width:170px;height:170px}
+.ct-name{font-weight:700;font-size:14px}
+.ct-hang{margin-top:6px;width:100%}
+.ct-recall{width:100%}
+.ct-right{flex:1;display:flex;flex-direction:column;gap:6px}
+.ct-row{display:flex;justify-content:space-between;gap:8px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:6px 9px;font-size:12.5px}
+.ct-row b{color:#9fb6d8;font-weight:600}
+.ct-row .ok{color:#7fe6b5}.ct-row .bad{color:#ff9a9a}
+.ct-note{margin-top:auto;border-top:1px dashed #33405e;padding-top:8px}
+.br{display:flex;flex-direction:column;height:100%;gap:8px}
+.br-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.br-tab{background:#222b44;border:1px solid #384466;color:#cfe0ff;border-radius:8px 8px 0 0;padding:6px 10px;font-size:12px;cursor:pointer}
+.br-tab.on{background:#2f3f68;color:#fff}
+.br-bar{display:flex;gap:8px;align-items:center}
+.br-url{flex:1;background:#101728;border:1px solid #2b3552;border-radius:8px;padding:6px 9px;font-size:11.5px;color:#8fd9ff}
+.br-src,.br-page button{background:#3a2a6b;border:1px solid #6a4bd0;color:#e8dcff;border-radius:8px;padding:6px 10px;cursor:pointer;font-family:inherit}
+.br-page{background:#fff;color:#16202e;border-radius:8px;padding:14px;flex:1;overflow:auto;font-size:13.5px}
+.br-page h1{margin:.2em 0 .4em}
+.br-page input{display:block;width:min(320px,100%);margin:4px 0 10px;padding:6px 8px;border:1px solid #b9c3d4;border-radius:6px;font-family:inherit}
+.br-src-view{background:#0d1424;color:#9fe3ff;border:1px solid #2a3552;border-radius:8px;padding:12px;flex:1;overflow:auto;font-size:12px;white-space:pre-wrap;direction:ltr}
+.br-foot{border-top:1px dashed #33405e;padding-top:6px}
+.dt{display:flex;gap:12px;padding:4px}
+.dt-vid{width:320px;height:240px;border:2px solid #3d4a70;border-radius:10px;background:#101828}
+.dt-side{flex:1;display:flex;flex-direction:column;gap:8px}
+.dt-title{font-weight:700}
+.dt-msg{flex:1;background:rgba(255,255,255,.04);border-radius:8px;padding:8px}
+
 </style>
 </head>
 <body>
@@ -55809,7 +55906,10 @@ window.THREE = {ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimat
     { id: 'antivirus', name: 'برنامج مضاد للفيروسات', emoji: '🛡️', price: 1900, desc: 'كنسلي الفيروس قضية دقيقتين بلا توقف الخدمة.' },
     { id: 'secondmonitor', name: 'شاشة ثانية', emoji: '🖥️', price: 1500, desc: 'معلومتين (facts) مفتوحين ف نفس الوقت ف Remote Access.' },
     { id: 'fakeoffice', name: 'خلفية صوت مكتب رسمي', emoji: '🔊', price: 1100, desc: 'لايف ديال الأصوات كيزيد في مصداقيتك كمكتب رسمي.' },
-    { id: 'chairman', name: 'بذلة و كرافة', emoji: '🕴️', price: 2600, desc: '+1 مستوى ف كل «سلطة» — كتربح بزاف مع الشخصيات اللي كتخاف.' }
+    { id: 'chairman', name: 'بذلة و كرافة', emoji: '🕴️', price: 2600, desc: '+1 مستوى ف كل «سلطة» — كتربح بزاف مع الشخصيات اللي كتخاف.' },
+    { id: 'stink', name: 'قنبلة الغاز الأخضر ×3', emoji: '🦨', price: 350, consumable: true, desc: 'G باش تطيّر اللي قدامك (فيزيك ديال اللعبة الأصلية).' },
+    { id: 'balls', name: 'كور مطاطية ×5', emoji: '🏐', price: 250, consumable: true, desc: 'B باش ترمي كورة — كتطيّر اللي كيضربوها.' },
+    { id: 'chips', name: 'جيتون الكازينو (+800)', emoji: '🎰', price: 600, consumable: true, desc: '800 درهم فلوس الكازينو — الحظ ماشي مضمون.' }
   ];
 
   // ---------------------------------------------------------------- events
@@ -55831,7 +55931,8 @@ window.THREE = {ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimat
     coworker_tip: '{co} كيهمس ليك: «سير شوف ف الـ Remote Access، كاين ملف كيدير كلشي. خدمة ديال 4000 درهم.»',
     power: '⚡ الضو تقطع! المكالمة تقلبت ل «وضع الطوارئ»: الجرايات ما كيسمعوكش مزيان.',
     police_warn: '🚔 صوت صفارات بعيدة… دخل شي واحد للعيادة ديال الجيران و حكى على «مكتب فوق الطبقة الثانية».',
-    inspector: '🕴️ شي راجل ببذلة دخل للمكتب و هو كيسول على «الرخصة ديال مراكز الاتصال». خبّي الملفات!'
+    inspector: '🕴️ شي راجل ببذلة دخل للمكتب و هو كيسول على «الرخصة ديال مراكز الاتصال». خبّي الملفات!',
+    meeting: '🟣 Meeting is about to start! — الاجتماع ف قاعة الاجتماعات. سير دابا قبل ما يسد الباب!'
   };
 
   // ---------------------------------------------------------------- boss
@@ -57215,6 +57316,1367 @@ SWYF.nluModel = {
 </script>
 <script>
 /* ============================================================================
+ * Scam Baqi — art.js
+ * The flat-shaded "toy" art kit: big-headed featureless characters with floating
+ * name tags, neon signs, checkered casino walls, blue office carpet, sticky
+ * notes, motivational posters, office chairs, strip lights…
+ *
+ * Everything is generated procedurally (canvas + primitives) — 100% offline.
+ * ==========================================================================*/
+(function () {
+  'use strict';
+  var SWYF = (window.SWYF = window.SWYF || {});
+  var U = SWYF.util;
+  var THREE = window.THREE;
+
+  // ------------------------------------------------------------------ palettes
+  // Exotic flat skin tones straight out of the reference screenshots
+  var SKINS = [0xff8a3d, 0xffb03a, 0xf7d24a, 0x8fd46a, 0x66c9a0, 0xff7a8a, 0xd9a066, 0xc98fe0, 0x6fb8ff, 0xffffff];
+  var HAIRS = [0xff5a1f, 0xffd23a, 0x3a2a1f, 0x111111, 0xff4d8d, 0x6ad0ff, 0xb46bff, 0xf0f0f0, 0x8a4b2a];
+  var SHIRTS = [0xff4d4d, 0x2f7dff, 0x22c07a, 0xffd23a, 0xff8a3d, 0x9b5cff, 0x00c2d1, 0xf0f0f0, 0x21252e, 0xff7ab8];
+  var PANTS = [0x2b3a55, 0x3b3f4a, 0x5a3b2a, 0x243b2e, 0x4a2b3b, 0x1f2430];
+  var SHOES = [0x1b1f27, 0xf0f0f0, 0xff5a1f, 0x2f7dff];
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function flat(color, opts) {
+    opts = opts || {};
+    return new THREE.MeshStandardMaterial({
+      color: color, roughness: opts.rough == null ? 0.82 : opts.rough,
+      metalness: opts.metal == null ? 0 : opts.metal,
+      flatShading: opts.smooth ? false : true,
+      emissive: opts.emissive == null ? 0x000000 : opts.emissive,
+      emissiveIntensity: opts.ei == null ? 1 : opts.ei,
+      transparent: !!opts.transparent, opacity: opts.opacity == null ? 1 : opts.opacity,
+      side: opts.side || THREE.FrontSide
+    });
+  }
+  function basic(color, opts) {
+    opts = opts || {};
+    return new THREE.MeshBasicMaterial({
+      color: color, transparent: !!opts.transparent, opacity: opts.opacity == null ? 1 : opts.opacity,
+      side: opts.side || THREE.FrontSide, map: opts.map || null, depthTest: opts.depthTest !== false
+    });
+  }
+
+  // ------------------------------------------------------------------- canvas
+  function canvas(w, h, draw) {
+    var c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h);
+    return c;
+  }
+  function tex(c, repeat) {
+    var t = new THREE.CanvasTexture(c);
+    if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
+    t.anisotropy = 4;
+    return t;
+  }
+  function roundRect(g, x, y, w, h, r) {
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + h, r);
+    g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+  }
+
+  // ---------------------------------------------------------- name tag sprite
+  function nameTagTexture(name, colorHex, emoji) {
+    var W = 512, H = 160;
+    var c = canvas(W, H, function (g) {
+      g.clearRect(0, 0, W, H);
+      var col = '#' + ('000000' + colorHex.toString(16)).slice(-6);
+      g.textAlign = 'left';
+      g.textBaseline = 'middle';
+      g.font = 'bold 74px "Noto Kufi Arabic",Tahoma,sans-serif';
+      var tw = g.measureText(name).width;
+      // avatar chip
+      var chip = 100, pad = 16;
+      var totalW = Math.min(W - 20, chip + tw + pad * 3);
+      var x0 = (W - totalW) / 2;
+      g.fillStyle = 'rgba(0,0,0,0.28)';
+      roundRect(g, x0, 26, totalW, chip, 26); g.fill();
+      g.fillStyle = 'rgba(20,26,40,0.85)';
+      roundRect(g, x0 + 6, 32, totalW - 12, chip - 12, 22); g.fill();
+      g.fillStyle = col;
+      roundRect(g, x0 + 12, 38, chip - 12, chip - 12, 18); g.fill();
+      g.font = '58px "Segoe UI Emoji",sans-serif';
+      g.textAlign = 'center';
+      g.fillText(emoji || '🙂', x0 + 12 + (chip - 12) / 2, 38 + (chip - 12) / 2 + 2);
+      g.font = 'bold 70px "Noto Kufi Arabic",Tahoma,sans-serif';
+      g.textAlign = 'left';
+      g.lineWidth = 12; g.strokeStyle = 'rgba(12,16,26,0.95)';
+      g.strokeText(name, x0 + chip + 14, 38 + (chip - 12) / 2 + 4);
+      g.fillStyle = col;
+      g.fillText(name, x0 + chip + 14, 38 + (chip - 12) / 2 + 4);
+    });
+    return tex(c);
+  }
+
+  function makeNameTag(name, colorHex, emoji) {
+    var t = nameTagTexture(name, colorHex, emoji);
+    var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false }));
+    s.scale.set(1.25, 0.39, 1);
+    s.position.y = 2.12;
+    s.renderOrder = 999;
+    return s;
+  }
+
+  // ----------------------------------------------------------------- characters
+  /**
+   * The signature look: big featureless head, capsule limbs, flat colours,
+   * headphones, floating name tag, springy walk.
+   */
+  function makeCharacter(opts) {
+    opts = opts || {};
+    var skin = opts.skin != null ? opts.skin : pick(SKINS);
+    var hair = opts.hair != null ? opts.hair : pick(HAIRS);
+    var shirt = opts.shirt != null ? opts.shirt : pick(SHIRTS);
+    var pants = opts.pants != null ? opts.pants : pick(PANTS);
+    var shoe = opts.shoe != null ? opts.shoe : pick(SHOES);
+    var scale = opts.scale || 1;
+    var headR = 0.30;
+
+    var g = new THREE.Group();
+    var M = {
+      skin: flat(skin, { rough: 0.75 }),
+      hair: flat(hair, { rough: 0.9 }),
+      shirt: flat(shirt, { rough: 0.85 }),
+      pants: flat(pants, { rough: 0.9 }),
+      shoe: flat(shoe, { rough: 0.7 }),
+      dark: flat(0x1b1f27, { rough: 0.6 }),
+      metal: flat(0xb9c2cc, { rough: 0.4, metal: 0.5 })
+    };
+
+    // torso: chunky capsule (no neck visible — head sits straight on it)
+    var torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.26, 0.20, 4, 12), M.shirt);
+    torso.position.y = 1.03; torso.scale.set(1.18, 1, 0.92);
+    torso.castShadow = true; g.add(torso);
+
+    var hip = new THREE.Mesh(new THREE.CapsuleGeometry(0.23, 0.1, 4, 10), M.pants);
+    hip.position.y = 0.79; hip.scale.set(1.2, 1, 0.95); hip.castShadow = true; g.add(hip);
+
+    // big flat-shaded head (sphere, slightly squashed) + hair cap
+    var head = new THREE.Mesh(new THREE.SphereGeometry(headR, 14, 12), M.skin);
+    head.position.y = 1.55; head.scale.set(1, 1.02, 0.96); head.castShadow = true; g.add(head);
+
+    var hairMesh = new THREE.Mesh(new THREE.SphereGeometry(headR + 0.015, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.62), M.hair);
+    hairMesh.position.y = 1.56; hairMesh.castShadow = true; g.add(hairMesh);
+    if (opts.hairTuft) {
+      var tuft = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.18, 8), M.hair);
+      tuft.position.set(0.02, 1.86, -0.02); tuft.rotation.z = 0.25; g.add(tuft);
+    }
+
+    // face: two flat oval eyes (featureless otherwise — exactly like the reference)
+    var eyes = [];
+    for (var e = 0; e < 2; e++) {
+      var eye = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), basic(opts.eyeColor == null ? 0x14181f : opts.eyeColor));
+      eye.position.set(e ? 0.095 : -0.095, 1.60, headR - 0.045);
+      eye.scale.set(1, 1.25, 0.45);
+      g.add(eye); eyes.push(eye);
+    }
+    // tiny mouth (optional)
+    var mouth = null;
+    if (opts.mouth !== false) {
+      mouth = new THREE.Mesh(new THREE.SphereGeometry(0.032, 8, 8), basic(0x2a1010));
+      mouth.position.set(0, 1.47, headR - 0.05);
+      mouth.scale.set(1.5, 0.8, 0.4);
+      g.add(mouth);
+    }
+
+    // arms with mitten hands
+    var arms = [], hands = [];
+    for (var a = 0; a < 2; a++) {
+      var pivot = new THREE.Group();
+      pivot.position.set(a ? 0.29 : -0.29, 1.20, 0);
+      var arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.075, 0.30, 4, 8), M.shirt);
+      arm.position.y = -0.20; arm.castShadow = true; pivot.add(arm);
+      var hand = new THREE.Mesh(new THREE.SphereGeometry(0.085, 10, 8), M.skin);
+      hand.position.y = -0.42; hand.scale.set(1, 0.9, 1); pivot.add(hand);
+      g.add(pivot); arms.push(pivot); hands.push(hand);
+    }
+
+    // legs + chunky shoes
+    var legs = [], shoes = [];
+    for (var l = 0; l < 2; l++) {
+      var lp = new THREE.Group();
+      lp.position.set(l ? 0.11 : -0.11, 0.72, 0);
+      var leg = new THREE.Mesh(new THREE.CapsuleGeometry(0.085, 0.42, 4, 8), M.pants);
+      leg.position.y = -0.31; leg.castShadow = true; lp.add(leg);
+      var sh = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.11, 0.28), M.shoe);
+      sh.position.set(0, -0.60, 0.04); sh.castShadow = true; lp.add(sh);
+      g.add(lp); legs.push(lp); shoes.push(sh);
+    }
+
+    // headphones (call-centre crew)
+    var headphones = null;
+    if (opts.headset !== false) {
+      headphones = new THREE.Group();
+      var band = new THREE.Mesh(new THREE.TorusGeometry(headR + 0.035, 0.025, 8, 18, Math.PI), M.dark);
+      band.position.y = 1.57; band.rotation.z = Math.PI; headphones.add(band);
+      var padL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.05, 12), M.dark);
+      padL.rotation.z = Math.PI / 2; padL.position.set(-(headR + 0.03), 1.55, 0); headphones.add(padL);
+      var padR = padL.clone(); padR.position.x = headR + 0.03; headphones.add(padR);
+      var mic = new THREE.Mesh(new THREE.CapsuleGeometry(0.015, 0.22, 4, 6), M.dark);
+      mic.position.set(headR - 0.02, 1.42, 0.10); mic.rotation.z = 1.15; mic.rotation.x = -0.5; headphones.add(mic);
+      var tip = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), M.metal);
+      tip.position.set(headR - 0.12, 1.34, 0.16); headphones.add(tip);
+      g.add(headphones);
+    }
+
+    // tie / collar for the boss look
+    if (opts.tie) {
+      var tie = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.30, 0.04), flat(opts.tie, { rough: 0.5 }));
+      tie.position.set(0, 1.06, 0.24); g.add(tie);
+      var collar = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.08, 12, 1, true), flat(0xf2f2f2, { rough: 0.7 }));
+      collar.position.y = 1.24; g.add(collar);
+    }
+
+    // floating name tag
+    var tag = null;
+    if (opts.name) {
+      tag = makeNameTag(opts.name, opts.tagColor == null ? shirt : opts.tagColor, opts.emoji || '🙂');
+      g.add(tag);
+    }
+
+    // speech bubble (same API the old characters had)
+    var bCanvas = canvas(512, 192, function () {});
+    var bTex = tex(bCanvas);
+    var bubble = new THREE.Sprite(new THREE.SpriteMaterial({ map: bTex, transparent: true, depthTest: false }));
+    bubble.scale.set(1.5, 0.56, 1); bubble.position.y = 2.5; bubble.visible = false;
+    g.add(bubble);
+
+    g.scale.setScalar(scale);
+
+    var char = {
+      group: g, torso: torso, hip: hip, head: head, hair: hairMesh, eyes: eyes, mouth: mouth,
+      arms: arms, hands: hands, legs: legs, shoes: shoes, headphones: headphones, tag: tag,
+      bubble: bubble, bCtx: bCanvas.getContext('2d'), bTex: bTex,
+      skinColor: skin, shirtColor: shirt,
+      bobT: Math.random() * 6.28, knocked: 0, ragdoll: false, vy: 0, vx: 0, vz: 0, spin: 0, spinV: 0,
+      say: function (text, ms) {
+        var g2 = char.bCtx;
+        g2.clearRect(0, 0, 512, 192);
+        g2.fillStyle = 'rgba(12,18,30,0.92)';
+        roundRect(g2, 6, 6, 500, 180, 26); g2.fill();
+        g2.strokeStyle = '#7ef0b4'; g2.lineWidth = 5; g2.stroke();
+        g2.direction = 'rtl'; g2.textAlign = 'center';
+        g2.fillStyle = '#eaf3ff';
+        g2.font = 'bold 38px "Noto Kufi Arabic",Tahoma,sans-serif';
+        var words = String(text).split(' '), line = '', lines = [];
+        for (var i = 0; i < words.length; i++) {
+          if ((line + ' ' + words[i]).length > 26) { lines.push(line); line = words[i]; } else line = line ? line + ' ' + words[i] : words[i];
+        }
+        if (line) lines.push(line);
+        lines.slice(0, 3).forEach(function (ln, i) { g2.fillText(ln, 256, 68 + i * 46); });
+        bTex.needsUpdate = true;
+        bubble.visible = true;
+        if (bubble.userData.t) clearTimeout(bubble.userData.t);
+        bubble.userData.t = setTimeout(function () { bubble.visible = false; }, ms || 4200);
+      },
+      /** walk animation (call every frame with speed 0…1) */
+      walk: function (spd, t) {
+        if (char.ragdoll) return;
+        var sw = Math.sin(t * 9) * 0.75 * spd;
+        char.legs[0].rotation.x = sw; char.legs[1].rotation.x = -sw;
+        char.arms[0].rotation.x = -sw * 0.8; char.arms[1].rotation.x = sw * 0.8;
+        char.bobT = t;
+        g.position.y = Math.abs(Math.sin(t * 9)) * 0.045 * spd;
+      },
+      idle: function (t) {
+        if (char.ragdoll) return;
+        char.legs[0].rotation.x = 0; char.legs[1].rotation.x = 0;
+        char.arms[0].rotation.x = Math.sin(t * 1.6) * 0.09;
+        char.arms[1].rotation.x = -Math.sin(t * 1.6) * 0.09;
+        g.position.y = Math.sin(t * 1.7) * 0.012;
+      },
+      look: function (x, z) { g.rotation.y = Math.atan2(x - g.position.x, z - g.position.z); }
+    };
+    return char;
+  }
+
+  // ------------------------------------------------------------------ textures
+  function officeCarpet() {
+    return tex(canvas(512, 512, function (g, w, h) {
+      g.fillStyle = '#33477a'; g.fillRect(0, 0, w, h);
+      for (var i = 0; i < 5200; i++) {
+        g.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.05) + ')';
+        g.fillRect(Math.random() * w, Math.random() * h, 3, 3);
+      }
+      for (var x = 0; x < w; x += 128) {
+        for (var y = 0; y < h; y += 128) {
+          g.fillStyle = ((x / 128 + y / 128) % 2) ? 'rgba(20,30,60,0.18)' : 'rgba(90,120,200,0.14)';
+          g.fillRect(x, y, 128, 128);
+        }
+      }
+    }), [7, 5]);
+  }
+
+  function casinoCarpet() {
+    return tex(canvas(512, 512, function (g, w, h) {
+      g.fillStyle = '#2a1b4a'; g.fillRect(0, 0, w, h);
+      var cols = ['#e94f37', '#f6b93b', '#2f9e9e', '#5a2a8a', '#d94f8a', '#3b6fd9'];
+      for (var i = 0; i < 26; i++) {
+        g.fillStyle = cols[i % cols.length];
+        g.beginPath();
+        var cx = Math.random() * w, cy = Math.random() * h, r = U.rnd(22, 70);
+        g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();
+        g.fillStyle = 'rgba(255,255,255,0.22)';
+        g.beginPath(); g.arc(cx, cy, r * 0.45, 0, Math.PI * 2); g.fill();
+      }
+      g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 10;
+      for (var k = 0; k < w; k += 128) { g.beginPath(); g.moveTo(k, 0); g.lineTo(k, h); g.stroke(); g.beginPath(); g.moveTo(0, k); g.lineTo(w, k); g.stroke(); }
+    }), [6, 6]);
+  }
+
+  function checkerWall(colA, colB) {
+    return tex(canvas(256, 256, function (g, w, h) {
+      for (var y = 0; y < h; y += 32) {
+        for (var x = 0; x < w; x += 32) {
+          g.fillStyle = ((x / 32 + y / 32) % 2) ? colA : colB;
+          g.fillRect(x, y, 32, 32);
+        }
+      }
+      g.fillStyle = 'rgba(0,0,0,0.06)'; g.fillRect(0, 0, w, h);
+    }), [8, 3]);
+  }
+
+  /** "STAY AWAKE" style sticky note (image 1 of the reference) */
+  function stickyNote(text, color) {
+    return tex(canvas(256, 256, function (g, w, h) {
+      g.fillStyle = color || '#ffe14d'; g.fillRect(0, 0, w, h);
+      g.fillStyle = 'rgba(0,0,0,0.08)'; g.fillRect(0, h - 26, w, 26);
+      g.fillStyle = '#1b1b1b';
+      g.font = 'bold 54px "Noto Kufi Arabic",Impact,Tahoma,sans-serif';
+      g.textAlign = 'center';
+      var words = String(text).split(' ');
+      words.slice(0, 2).forEach(function (ln, i) { g.fillText(ln, w / 2, 108 + i * 58); });
+      // doodle eyes, like the reference note
+      g.strokeStyle = '#1b1b1b'; g.lineWidth = 6;
+      g.beginPath(); g.arc(w / 2 - 30, 210, 16, 0, 6.3); g.stroke();
+      g.beginPath(); g.arc(w / 2 + 30, 210, 16, 0, 6.3); g.stroke();
+      g.beginPath(); g.arc(w / 2 - 30, 210, 6, 0, 6.3); g.stroke();
+      g.beginPath(); g.arc(w / 2 + 30, 210, 6, 0, 6.3); g.stroke();
+    }));
+  }
+
+  /** Big glowing neon sign (casino / arcade look) */
+  function neonTexture(text, color, opts) {
+    opts = opts || {};
+    return tex(canvas(1024, 384, function (g, w, h) {
+      g.clearRect(0, 0, w, h);
+      var col = color || '#ff4fd8';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.font = (opts.font || 'bold 150px') + ' Impact,"Noto Kufi Arabic",Tahoma,sans-serif';
+      g.shadowColor = col; g.shadowBlur = 60;
+      for (var i = 0; i < 3; i++) { g.fillStyle = col; g.fillText(text, w / 2, h / 2); }
+      g.shadowBlur = 18; g.fillStyle = '#fff'; g.fillText(text, w / 2, h / 2);
+      g.strokeStyle = '#ffffff'; g.lineWidth = 6; g.strokeText(text, w / 2, h / 2);
+      if (opts.sub) {
+        g.shadowBlur = 24; g.shadowColor = opts.subColor || '#ffd447';
+        g.fillStyle = opts.subColor || '#ffd447';
+        g.font = 'bold 64px "Noto Kufi Arabic",Tahoma,sans-serif';
+        g.fillText(opts.sub, w / 2, h / 2 + 120);
+      }
+    }));
+  }
+
+  function motivationalPoster(kind) {
+    var sets = {
+      awake: { bg: '#f7f3e2', title: 'STAY AWAKE', sub: 'القهوة ماشي رفاهية', col: '#e74c3c', art: 'coffee' },
+      quota: { bg: '#eef4ff', title: 'SELL SELL SELL', sub: 'الكوتا قبل 18:00', col: '#2f7dff', art: 'chart' },
+      smile: { bg: '#fdf0f6', title: 'SMILE!', sub: 'الضحية كتحس بالصوت', col: '#ff4d8d', art: 'face' },
+      quiet: { bg: '#eafaf1', title: 'KEEP IT DOWN', sub: 'البوس كيسمع كلشي', col: '#22c07a', art: 'shh' },
+      danger: { bg: '#fff4e5', title: 'DANGER SIGNS', sub: '«بلوكيست» · سؤال الملف', col: '#e67e22', art: 'warn' }
+    };
+    var s = sets[kind] || sets.awake;
+    return tex(canvas(768, 1024, function (g, w, h) {
+      g.fillStyle = s.bg; g.fillRect(0, 0, w, h);
+      g.strokeStyle = s.col; g.lineWidth = 22; g.strokeRect(11, 11, w - 22, h - 22);
+      g.fillStyle = s.col;
+      g.font = 'bold 92px Impact,"Noto Kufi Arabic",Tahoma,sans-serif';
+      g.textAlign = 'center';
+      g.fillText(s.title, w / 2, 170);
+      g.fillStyle = '#243247';
+      g.font = 'bold 52px "Noto Kufi Arabic",Tahoma,sans-serif';
+      g.fillText(s.sub, w / 2, 250);
+      g.translate(w / 2, 620);
+      g.strokeStyle = s.col; g.fillStyle = s.col; g.lineWidth = 18;
+      if (s.art === 'coffee') {
+        g.beginPath(); g.moveTo(-110, -60); g.lineTo(90, -60); g.lineTo(70, 130); g.lineTo(-90, 130); g.closePath(); g.stroke();
+        g.beginPath(); g.arc(110, 10, 45, -1.2, 1.2); g.stroke();
+        g.beginPath(); g.moveTo(-60, -110); g.quadraticCurveTo(-30, -150, -60, -190); g.stroke();
+        g.beginPath(); g.moveTo(0, -110); g.quadraticCurveTo(30, -150, 0, -190); g.stroke();
+      } else if (s.art === 'chart') {
+        g.fillRect(-160, 40, 60, 100); g.fillRect(-70, -20, 60, 160); g.fillRect(20, -100, 60, 240); g.fillRect(110, -160, 60, 300);
+      } else if (s.art === 'face') {
+        g.beginPath(); g.arc(0, 0, 150, 0, 6.3); g.stroke();
+        g.beginPath(); g.arc(-55, -30, 22, 0, 6.3); g.fill();
+        g.beginPath(); g.arc(55, -30, 22, 0, 6.3); g.fill();
+        g.beginPath(); g.arc(0, 30, 90, 0.2, Math.PI - 0.2); g.stroke();
+      } else if (s.art === 'shh') {
+        g.beginPath(); g.arc(0, -30, 120, 0, 6.3); g.stroke();
+        g.beginPath(); g.moveTo(-40, 20); g.quadraticCurveTo(0, 40, 40, 20); g.stroke();
+        g.font = 'bold 280px Tahoma'; g.textAlign = 'center'; g.fillText('!', 0, 250);
+      } else {
+        g.beginPath(); g.moveTo(0, -190); g.lineTo(180, 150); g.lineTo(-180, 150); g.closePath(); g.stroke();
+        g.font = 'bold 200px Tahoma'; g.textAlign = 'center'; g.fillText('!', 0, 90);
+      }
+    }));
+  }
+
+  // ------------------------------------------------------------------- props
+  function chair(color) {
+    var g = new THREE.Group();
+    var c = color == null ? 0xe8552f : color;
+    var seat = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.09, 0.5), flat(c, { rough: 0.7 }));
+    seat.position.y = 0.47; seat.castShadow = true; g.add(seat);
+    var back = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.62, 0.1), flat(c, { rough: 0.7 }));
+    back.position.set(0, 0.79, 0.24); back.rotation.x = -0.12; back.castShadow = true; g.add(back);
+    var post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.4, 10), flat(0x9aa3ad, { metal: 0.5, rough: 0.4 }));
+    post.position.y = 0.24; g.add(post);
+    var base = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.32, 0.06, 12), flat(0x2b2f38));
+    base.position.y = 0.03; g.add(base);
+    for (var i = 0; i < 5; i++) {
+      var a = (i / 5) * Math.PI * 2;
+      var leg = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.05, 0.06), flat(0x2b2f38));
+      leg.position.set(Math.sin(a) * 0.16, 0.05, Math.cos(a) * 0.16);
+      leg.rotation.y = a; g.add(leg);
+    }
+    return g;
+  }
+
+  function stripLight(len) {
+    var g = new THREE.Group();
+    var box = new THREE.Mesh(new THREE.BoxGeometry(len || 2.0, 0.09, 0.42), flat(0xf4f6ff, { rough: 0.5, emissive: 0xfff4dd, ei: 0.7 }));
+    g.add(box);
+    var frame = new THREE.Mesh(new THREE.BoxGeometry((len || 2.0) + 0.1, 0.05, 0.5), flat(0xccd2dd));
+    frame.position.y = 0.06; g.add(frame);
+    var l = new THREE.PointLight(0xfff2d8, 0.42, 9, 2);
+    l.position.y = -0.35; g.add(l);
+    g.userData.light = l;
+    return g;
+  }
+
+  function plant() {
+    var g = new THREE.Group();
+    var pot = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.19, 0.38, 10), flat(0xc9754a, { rough: 0.9 }));
+    pot.position.y = 0.19; pot.castShadow = true; g.add(pot);
+    var leafMat = flat(0x3fbf6a, { rough: 0.85, side: THREE.DoubleSide });
+    for (var i = 0; i < 7; i++) {
+      var leaf = new THREE.Mesh(new THREE.ConeGeometry(0.09, U.rnd(0.45, 0.75), 5), leafMat);
+      var a = (i / 7) * Math.PI * 2;
+      leaf.position.set(Math.sin(a) * 0.11, 0.62, Math.cos(a) * 0.11);
+      leaf.rotation.set(U.rnd(-0.35, 0.35), a, U.rnd(-0.3, 0.3));
+      g.add(leaf);
+    }
+    return g;
+  }
+
+  function waterCooler() {
+    var g = new THREE.Group();
+    var body = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.3, 0.95, 14), flat(0xeff2f6, { rough: 0.6 }));
+    body.position.y = 0.48; body.castShadow = true; g.add(body);
+    var bottle = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.62, 14), flat(0x8fd9ff, { transparent: true, opacity: 0.7, rough: 0.15 }));
+    bottle.position.y = 1.28; g.add(bottle);
+    var tap = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.1, 0.16), flat(0x2f7dff));
+    tap.position.set(0, 0.72, -0.28); g.add(tap);
+    return g;
+  }
+
+  /** The office PC from the reference: grey desk, widescreen monitor, keyboard, mouse */
+  function deskSetup(opts) {
+    opts = opts || {};
+    var g = new THREE.Group();
+    var topMat = flat(opts.topColor == null ? 0xc9ccd2 : opts.topColor, { rough: 0.7 });
+    var top = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.07, 1.1), topMat);
+    top.position.y = 0.76; top.castShadow = top.receiveShadow = true; g.add(top);
+    var legMat = flat(0x9aa3ad, { metal: 0.4, rough: 0.5 });
+    [[-1.0, -0.45], [1.0, -0.45], [-1.0, 0.45], [1.0, 0.45]].forEach(function (p) {
+      var leg = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.76, 0.07), legMat);
+      leg.position.set(p[0], 0.38, p[1]); g.add(leg);
+    });
+    // widescreen monitor
+    var stand = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.2, 0.04, 14), flat(0x22262e));
+    stand.position.set(-0.42, 0.82, -0.22); g.add(stand);
+    var neck = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.26, 0.05), flat(0x22262e));
+    neck.position.set(-0.42, 0.96, -0.22); g.add(neck);
+    var bezel = new THREE.Mesh(new THREE.BoxGeometry(1.02, 0.62, 0.05), flat(0x181c24, { rough: 0.5 }));
+    bezel.position.set(-0.42, 1.30, -0.20); bezel.castShadow = true; g.add(bezel);
+    var screen = new THREE.Mesh(new THREE.PlaneGeometry(0.94, 0.54), basic(0x0a1220, { map: opts.screenMap }));
+    screen.position.set(-0.42, 1.30, -0.17); g.add(screen);
+    var glare = new THREE.PointLight(0x88bbff, 0.22, 2.4, 2);
+    glare.position.set(-0.42, 1.25, -0.02); g.add(glare);
+    // keyboard + mouse
+    var kb = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.03, 0.24), flat(0x22262e, { rough: 0.55 }));
+    kb.position.set(0.28, 0.81, -0.06); g.add(kb);
+    for (var r = 0; r < 4; r++) for (var c = 0; c < 14; c++) {
+      var key = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.012, 0.045), flat(0x3a4150));
+      key.position.set(0.28 + (c - 6.5) * 0.053, 0.828, -0.06 + (r - 1.5) * 0.055); g.add(key);
+    }
+    var mouse = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), flat(0x22262e, { rough: 0.5 }));
+    mouse.position.set(0.82, 0.81, -0.04); mouse.scale.set(0.8, 0.6, 1.2); g.add(mouse);
+    g.userData.screen = screen; g.userData.glare = glare;
+    return g;
+  }
+
+  function boxProp(size, color) {
+    var m = new THREE.Mesh(new THREE.BoxGeometry(size, size * U.rnd(0.7, 1.1), size * U.rnd(0.8, 1.2)), flat(color, { rough: 0.9 }));
+    m.castShadow = true;
+    return m;
+  }
+
+  SWYF.art = {
+    SKINS: SKINS, HAIRS: HAIRS, SHIRTS: SHIRTS, PANTS: PANTS, SHOES: SHOES,
+    flat: flat, basic: basic, canvas: canvas, tex: tex, roundRect: roundRect, pick: pick,
+    makeCharacter: makeCharacter, makeNameTag: makeNameTag, nameTagTexture: nameTagTexture,
+    officeCarpet: officeCarpet, casinoCarpet: casinoCarpet, checkerWall: checkerWall,
+    stickyNote: stickyNote, neonTexture: neonTexture, motivationalPoster: motivationalPoster,
+    chair: chair, stripLight: stripLight, plant: plant, waterCooler: waterCooler,
+    deskSetup: deskSetup, boxProp: boxProp
+  };
+})();
+
+</script>
+<script>
+/* ============================================================================
+ * Scam Baqi — physics.js
+ * A tiny bouncy toy-physics layer (no engine, no dependency):
+ *   • dynamic props (boxes, cups, chairs) that bounce and slide
+ *   • characters that get KNOCKED OVER — they tumble, skid, then get back up
+ *   • a green stink-cloud that sends everyone nearby flying (see the reference)
+ *   • throwables (balls) and a melee "shove" for the player
+ *
+ * Sphere-vs-AABB against the world colliders, gravity, restitution, friction.
+ * ==========================================================================*/
+(function () {
+  'use strict';
+  var SWYF = (window.SWYF = window.SWYF || {});
+  var U = SWYF.util;
+
+  var bodies = [], sprays = [], throwables = [];
+  var GRAV = -9.8;
+
+  function addBody(mesh, opts) {
+    opts = opts || {};
+    var b = {
+      mesh: mesh, r: opts.r || 0.28, restitution: opts.restitution == null ? 0.55 : opts.restitution,
+      friction: opts.friction == null ? 0.86 : opts.friction, mass: opts.mass || 1,
+      vx: 0, vy: 0, vz: 0, sx: 0, sy: 0, sz: 0, sleep: 0, kind: opts.kind || 'prop',
+      onGround: false, home: mesh.position.clone()
+    };
+    bodies.push(b);
+    return b;
+  }
+  function removeBody(b) {
+    var i = bodies.indexOf(b);
+    if (i >= 0) bodies.splice(i, 1);
+  }
+
+  function impulse(b, x, y, z) {
+    b.vx += x / b.mass; b.vy += y / b.mass; b.vz += z / b.mass; b.sleep = 0;
+  }
+
+  /** Knock a character over: tumble + skid, then stand back up. */
+  function knock(char, dirX, dirZ, power, world) {
+    if (!char || char.ragdoll || power <= 0) return false;
+    char.ragdoll = true;
+    char.knocked = 2.4 + Math.random() * 1.6;
+    var v = 2.4 * power;
+    char.vx = dirX * v; char.vz = dirZ * v; char.vy = 3.0 * power;
+    char.spinV = (Math.random() < 0.5 ? -1 : 1) * U.rnd(5, 9) * power;
+    char.spin = 0;
+    char.group.rotation.z = 0;
+    if (SWYF.physics && SWYF.audio) SWYF.audio.sfx('thud');
+    if (char.say && Math.random() < 0.75) {
+      char.say(U.pick(['أوووه!', 'آي! شنو دار ليك؟', 'واااع!', 'بسلامة الراس!', 'أخااي!']), 2200);
+    }
+    return true;
+  }
+
+  function updateCharacter(char, dt, colliders) {
+    var g = char.group;
+    if (!char.ragdoll) return;
+    // flight: integrate + rotate to "lying" while tumbling
+    g.position.x += char.vx * dt;
+    g.position.z += char.vz * dt;
+    g.position.y += char.vy * dt;
+    char.vy += GRAV * dt;
+    char.spin += char.spinV * dt;
+    var lie = U.clamp(Math.abs(char.spin) / (Math.PI / 2), 0, 1);
+    g.rotation.z = Math.sin(char.spin) * (Math.PI / 2) * lie;
+    g.rotation.x = Math.sin(char.spin * 0.6) * 0.5 * lie;
+    if (g.position.y <= 0) {
+      g.position.y = 0;
+      char.vy = Math.abs(char.vy) * 0.35;
+      char.vx *= 0.7; char.vz *= 0.7;
+      char.spinV *= 0.55;
+      if (Math.abs(char.vy) < 0.4) char.vy = 0;
+    }
+    // walls
+    if (colliders) {
+      for (var i = 0; i < colliders.length; i++) {
+        var c = colliders[i];
+        if (g.position.x > c.x1 && g.position.x < c.x2 && g.position.z > c.z1 && g.position.z < c.z2) {
+          var dl = g.position.x - c.x1, dr = c.x2 - g.position.x, db = g.position.z - c.z1, df = c.z2 - g.position.z;
+          var m = Math.min(dl, dr, db, df);
+          if (m === dl) { g.position.x = c.x1; char.vx = -Math.abs(char.vx) * 0.4; }
+          else if (m === dr) { g.position.x = c.x2; char.vx = Math.abs(char.vx) * 0.4; }
+          else if (m === db) { g.position.z = c.z1; char.vz = -Math.abs(char.vz) * 0.4; }
+          else { g.position.z = c.z2; char.vz = Math.abs(char.vz) * 0.4; }
+        }
+      }
+    }
+    char.vx *= 0.985; char.vz *= 0.985;
+    char.knocked -= dt;
+    if (char.knocked <= 0) {
+      char.ragdoll = false;
+      g.rotation.set(0, g.rotation.y, 0);
+      if (char.say && Math.random() < 0.5) char.say(U.pick(['الله يسمح ليك…', 'شكون دارها؟', 'راسي… واخا، نكمل.', 'الله يلعن الشيطان.']), 2200);
+    }
+  }
+
+  // -------------------------------------------------------------- stink cloud
+  function stinkCloud(pos, radius, power) {
+    radius = radius || 3.4; power = power || 1.2;
+    var grp = new THREE.Group();
+    grp.position.copy(pos);
+    var puffs = [];
+    for (var i = 0; i < 14; i++) {
+      var m = new THREE.Mesh(
+        new THREE.SphereGeometry(U.rnd(0.18, 0.38), 8, 6),
+        new THREE.MeshBasicMaterial({ color: 0x6fe36f, transparent: true, opacity: 0.55 })
+      );
+      m.position.set(U.rnd(-0.3, 0.3), U.rnd(0.2, 0.9), U.rnd(-0.3, 0.3));
+      grp.add(m); puffs.push({ m: m, v: new THREE.Vector3(U.rnd(-0.5, 0.5), U.rnd(0.2, 0.8), U.rnd(-0.5, 0.5)) });
+    }
+    if (SWYF.main && SWYF.main.world) SWYF.main.world.root.add(grp);
+    sprays.push({ grp: grp, puffs: puffs, t: 0, life: 2.6, radius: radius, power: power, done: false });
+    return grp;
+  }
+
+  // ---------------------------------------------------------------- throwable
+  function throwBall(pos, dir, world) {
+    var m = new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 10), SWYF.art.flat(SWYF.art.pick([0xff4d4d, 0x2f7dff, 0xffd23a, 0x22c07a])));
+    m.position.copy(pos); m.castShadow = true;
+    world.root.add(m);
+    var t = { m: m, vx: dir.x * 9, vy: dir.y * 9 + 1.5, vz: dir.z * 9, life: 7 };
+    throwables.push(t);
+    return t;
+  }
+
+  // ------------------------------------------------------------------- player
+  /** Melee shove: knock the nearest coworker in front of the player. */
+  function shove(world, playerPos, yaw, opts) {
+    opts = opts || {};
+    var range = opts.range || 1.9, power = opts.power || 1;
+    var dirX = Math.sin(yaw), dirZ = Math.cos(yaw);
+    var best = null, bestD = range;
+    (world.npcs || []).forEach(function (n) {
+      if (!n.obj || !n.obj.group) return;
+      var dx = n.obj.group.position.x - playerPos.x, dz = n.obj.group.position.z - playerPos.z;
+      var d = Math.sqrt(dx * dx + dz * dz);
+      var dot = (dx / (d || 1)) * dirX + (dz / (d || 1)) * dirZ;
+      if (d < bestD && dot > 0.2) { best = { npc: n, dx: dx / (d || 1), dz: dz / (d || 1), d: d }; bestD = d; }
+    });
+    if (!best) return null;
+    var ok = knock(best.npc.obj, best.dx, best.dz, power, world);
+    if (ok) {
+      best.npc.ragdollT = 0;
+      if (SWYF.audio) SWYF.audio.sfx('punch');
+      if (world.flags && world.flags.casino) { /* nothing */ }
+      // the boss does NOT like this
+      if (SWYF.Day && SWYF.Day.S.phase === 'shift') SWYF.Day.S.nerves = U.clamp(SWYF.Day.S.nerves - 3, 0, 100);
+    }
+    return ok ? best.npc : null;
+  }
+
+  // --------------------------------------------------------------------- step
+  function step(dt, world) {
+    var colliders = (world && world.colliders) || [];
+    var i, b;
+
+    // props
+    for (i = bodies.length - 1; i >= 0; i--) {
+      b = bodies[i];
+      if (b.sleep > 1.5) { b.sleep += dt; continue; }
+      b.vy += GRAV * dt;
+      b.mesh.position.x += b.vx * dt;
+      b.mesh.position.y += b.vy * dt;
+      b.mesh.position.z += b.vz * dt;
+      b.mesh.rotation.x += b.vx * dt * 2;
+      b.mesh.rotation.z += b.vz * dt * 2;
+      // floor
+      if (b.mesh.position.y - b.r * 0.5 <= 0) {
+        b.mesh.position.y = b.r * 0.5;
+        if (Math.abs(b.vy) < 0.6) { b.vy = 0; b.vx *= b.friction; b.vz *= b.friction; }
+        else { b.vy = -b.vy * b.restitution; if (SWYF.audio && Math.abs(b.vy) > 1.2) SWYF.audio.sfx('thud'); }
+        b.onGround = true;
+      }
+      // walls
+      for (var c = 0; c < colliders.length; c++) {
+        var col = colliders[c];
+        if (b.mesh.position.x > col.x1 - b.r && b.mesh.position.x < col.x2 + b.r &&
+            b.mesh.position.z > col.z1 - b.r && b.mesh.position.z < col.z2 + b.r && b.mesh.position.y < 1.1) {
+          var dl = b.mesh.position.x - (col.x1 - b.r), dr = (col.x2 + b.r) - b.mesh.position.x;
+          var db = b.mesh.position.z - (col.z1 - b.r), df = (col.z2 + b.r) - b.mesh.position.z;
+          var m = Math.min(dl, dr, db, df);
+          if (m === dl) { b.mesh.position.x = col.x1 - b.r; b.vx = -Math.abs(b.vx) * b.restitution; }
+          else if (m === dr) { b.mesh.position.x = col.x2 + b.r; b.vx = Math.abs(b.vx) * b.restitution; }
+          else if (m === db) { b.mesh.position.z = col.z1 - b.r; b.vz = -Math.abs(b.vz) * b.restitution; }
+          else { b.mesh.position.z = col.z2 + b.r; b.vz = Math.abs(b.vz) * b.restitution; }
+        }
+      }
+      if (Math.abs(b.vx) + Math.abs(b.vz) + Math.abs(b.vy) < 0.05 && b.onGround) b.sleep += dt;
+      else b.sleep = 0;
+    }
+
+    // stink clouds: push characters + fade
+    for (i = sprays.length - 1; i >= 0; i--) {
+      var s = sprays[i];
+      s.t += dt;
+      s.puffs.forEach(function (p) {
+        p.m.position.x += p.v.x * dt;
+        p.m.position.y += p.v.y * dt;
+        p.m.position.z += p.v.z * dt;
+        p.v.y += 0.35 * dt;
+        p.m.scale.multiplyScalar(1 + dt * 1.4);
+        p.m.material.opacity = Math.max(0, 0.55 * (1 - s.t / s.life));
+      });
+      if (!s.done) {
+        s.done = true;
+        (world.npcs || []).forEach(function (n) {
+          if (!n.obj) return;
+          var dx = n.obj.group.position.x - s.grp.position.x, dz = n.obj.group.position.z - s.grp.position.z;
+          var d = Math.sqrt(dx * dx + dz * dz) || 1;
+          if (d < s.radius) knock(n.obj, dx / d, dz / d, s.power * (1 - d / s.radius) * 1.6, world);
+        });
+        if (SWYF.audio) SWYF.audio.sfx('gas');
+      }
+      if (s.t > s.life) {
+        if (s.grp.parent) s.grp.parent.remove(s.grp);
+        sprays.splice(i, 1);
+      }
+    }
+
+    // throwables
+    for (i = throwables.length - 1; i >= 0; i--) {
+      var t = throwables[i];
+      t.life -= dt;
+      t.vy += GRAV * dt;
+      t.m.position.x += t.vx * dt; t.m.position.y += t.vy * dt; t.m.position.z += t.vz * dt;
+      for (var cc = 0; cc < colliders.length; cc++) {
+        var cl = colliders[cc];
+        if (t.m.position.x > cl.x1 - 0.14 && t.m.position.x < cl.x2 + 0.14 &&
+            t.m.position.z > cl.z1 - 0.14 && t.m.position.z < cl.z2 + 0.14 && t.m.position.y < 1.1) {
+          var dl2 = t.m.position.x - (cl.x1 - 0.14), dr2 = (cl.x2 + 0.14) - t.m.position.x;
+          var db2 = t.m.position.z - (cl.z1 - 0.14), df2 = (cl.z2 + 0.14) - t.m.position.z;
+          var mm = Math.min(dl2, dr2, db2, df2);
+          if (mm === dl2) { t.m.position.x = cl.x1 - 0.14; t.vx = -t.vx * 0.6; }
+          else if (mm === dr2) { t.m.position.x = cl.x2 + 0.14; t.vx = -t.vx * 0.6; }
+          else if (mm === db2) { t.m.position.z = cl.z1 - 0.14; t.vz = -t.vz * 0.6; }
+          else { t.m.position.z = cl.z2 + 0.14; t.vz = -t.vz * 0.6; }
+        }
+      }
+      if (t.m.position.y <= 0.14) {
+        t.m.position.y = 0.14;
+        t.vy = -t.vy * 0.62;
+        t.vx *= 0.94; t.vz *= 0.94;
+        if (Math.abs(t.vy) < 0.5) t.vy = 0;
+      }
+      // knock a coworker?
+      (world.npcs || []).forEach(function (n) {
+        if (!n.obj || n.obj.ragdoll) return;
+        var dx = n.obj.group.position.x - t.m.position.x, dz = n.obj.group.position.z - t.m.position.z;
+        var dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist < 0.55 && t.m.position.y < 1.6) {
+          knock(n.obj, t.vx / 9, t.vz / 9, 0.8, world);
+        }
+      });
+      if (t.life <= 0) {
+        if (t.m.parent) t.m.parent.remove(t.m);
+        throwables.splice(i, 1);
+      }
+    }
+
+    // characters (ragdoll recovery + tumble)
+    (world.npcs || []).forEach(function (n) { if (n.obj && n.obj.ragdoll !== undefined) updateCharacter(n.obj, dt, colliders); });
+    if (world.flags && world.flags.boss && world.flags.boss.ragdoll !== undefined) updateCharacter(world.flags.boss, dt, colliders);
+  }
+
+  SWYF.physics = {
+    bodies: bodies, addBody: addBody, removeBody: removeBody, impulse: impulse,
+    knock: knock, stinkCloud: stinkCloud, throwBall: throwBall, shove: shove, step: step,
+    activeSprays: function () { return sprays.length; },
+    spawnProp: function (world, pos, size, color) {
+      var m = SWYF.art.boxProp(size, color == null ? SWYF.art.pick([0xd9a066, 0x4f7fd9, 0xc0392b, 0x4a8f5c]) : color);
+      m.position.copy(pos);
+      world.root.add(m);
+      var b = addBody(m, { r: size, restitution: 0.5, mass: 1.2 });
+      return b;
+    }
+  };
+})();
+
+</script>
+<script>
+/* ============================================================================
+ * Scam Baqi — casino.js
+ * The neon casino next door: TREASURE CHAMBER slot machines, the DUCK RACE, a
+ * blackjack table and the results board — exactly the vibe of the reference.
+ *
+ * 3D room built procedurally + DOM game panels. Everything offline.
+ * ==========================================================================*/
+(function () {
+  'use strict';
+  var SWYF = (window.SWYF = window.SWYF || {});
+  var U = SWYF.util, ART = SWYF.art;
+  var THREE = window.THREE;
+
+  var built = null;
+  var ui = null;
+  var state = { slots: null, race: null, cards: null, spins: 0, races: 0, hands: 0, net: 0 };
+  var SLOT_SYMBOLS = ['🪙', '🪲', '☥', '👁️', '🐍', '💎', '🏺'];
+  var SLOT_PAY = { 3: 6, 2: 1.4 };
+
+  // -------------------------------------------------------------------- money
+  function cash() { return SWYF.Day ? SWYF.Day.S.cash : 0; }
+  function addCash(d) {
+    if (!SWYF.Day) return;
+    SWYF.Day.S.cash = Math.max(0, SWYF.Day.S.cash + d);
+    if (SWYF.ui) SWYF.ui.refreshHud();
+  }
+  function burnTime(secs) {
+    if (SWYF.Day && SWYF.Day.S.phase === 'shift') SWYF.Day.S.shiftT += secs;
+  }
+  function riskBoss() {
+    if (!SWYF.Day || SWYF.Day.S.phase !== 'shift') return;
+    if (Math.random() < 0.18) {
+      SWYF.Day.S.nerves = U.clamp(SWYF.Day.S.nerves - 10, 0, 100);
+      if (SWYF.ui) {
+        SWYF.ui.toast('👔 البوس شافك قريب من الطاولة… رجّع راسك للديسك!', 4200);
+        SWYF.audio.sfx('boss');
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------- room
+  function build(ctx) {
+    var root = ctx.root, addCollider = ctx.addCollider, flags = ctx.flags, scene = ctx.scene;
+    var officeW = ctx.W;
+    var W = 20, D = 20, H = 4.2;
+    var ox = officeW / 2 + W / 2;               // east of the office
+
+    var g = new THREE.Group();
+    g.position.set(ox, 0, 0);
+    root.add(g);
+
+    function wall(x, z, w, d, mat, h) {
+      var m = new THREE.Mesh(new THREE.BoxGeometry(w, h || H, d), mat);
+      m.position.set(x, (h || H) / 2, z);
+      m.receiveShadow = true;
+      g.add(m); return m;
+    }
+
+    // floor + ceiling
+    var floor = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ map: ART.casinoCarpet(), roughness: 0.75 }));
+    floor.rotation.x = -Math.PI / 2; g.add(floor);
+    var ceil = new THREE.Mesh(new THREE.BoxGeometry(W, 0.2, D), ART.flat(0x140e2b, { rough: 1 }));
+    ceil.position.y = H; g.add(ceil);
+
+    // checkered walls + neon strips
+    var wallMat = new THREE.MeshStandardMaterial({ map: ART.checkerWall('#3a2456', '#2a1b40'), roughness: 0.85 });
+    wall(0, -D / 2, W, 0.2, wallMat);
+    wall(0, D / 2, W, 0.2, wallMat);
+    wall(-W / 2, 0, 0.2, D, new THREE.MeshStandardMaterial({ color: 0x2b1e46, roughness: 0.9 }));
+    wall(W / 2, 0, 0.2, D, wallMat);
+
+    // neon ceiling tubes
+    [[-4, -4, 0xff4fd8], [4, -4, 0x4fd0ff], [-4, 4, 0xffd447], [4, 4, 0x9b5cff]].forEach(function (p) {
+      var tube = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.08, 0.08), ART.basic(p[2]));
+      tube.position.set(p[0], H - 0.3, p[1]); g.add(tube);
+      var l = new THREE.PointLight(p[2], 0.75, 9, 2);
+      l.position.set(p[0], H - 0.55, p[1]); g.add(l);
+    });
+    var amb = new THREE.PointLight(0x6a4fd0, 0.5, 26, 2);
+    amb.position.set(0, 3.4, 0); g.add(amb);
+
+    // ---- big neon signs
+    var sign = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 2.8), new THREE.MeshBasicMaterial({ map: ART.neonTexture('DUCK RACE', '#ff4fd8', { sub: 'سباق البط 🦆' }), transparent: true, side: THREE.DoubleSide }));
+    sign.position.set(0, 3.1, -D / 2 + 0.14); g.add(sign);
+    var sign2 = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 2.4), new THREE.MeshBasicMaterial({ map: ART.neonTexture('CASINO ROYALE', '#ffd447', { sub: 'BARAKA · 24/7' }), transparent: true, side: THREE.DoubleSide }));
+    sign2.position.set(W / 2 - 0.16, 3.0, 0); sign2.rotation.y = -Math.PI / 2; g.add(sign2);
+    var crown = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), new THREE.MeshBasicMaterial({ map: ART.neonTexture('♛', '#ffd447', { font: 'bold 260px' }), transparent: true, side: THREE.DoubleSide }));
+    crown.position.set(-W / 2 + 0.16, 3.0, -3); crown.rotation.y = Math.PI / 2; g.add(crown);
+
+    // ---- door back to the office
+    var doorFrame = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.6, 0.2), ART.flat(0xff4fd8, { emissive: 0x66115a, ei: 0.7 }));
+    doorFrame.position.set(-W / 2 + 0.1, 1.3, 5); g.add(doorFrame);
+    var doorHole = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 2.3), ART.basic(0x0b0f18));
+    doorHole.position.set(-W / 2 + 0.21, 1.2, 5); doorHole.rotation.y = Math.PI / 2; g.add(doorHole);
+
+    // ---- TREASURE CHAMBER slot machines (3 in a row)
+    var slots = [];
+    for (var s = 0; s < 3; s++) {
+      var m = buildSlotMachine(s === 0 ? 'TREASURE CHAMBER' : (s === 1 ? 'GOLDEN SCARAB' : 'LUCKY ANKH'), s);
+      m.position.set(-5.2 + s * 5.2, 0, -7.4);
+      m.rotation.y = 0;
+      g.add(m);
+      slots.push({ group: m, screen: m.userData.screen, glow: m.userData.glow, reels: m.userData.reels, canvas: m.userData.canvas });
+      addCollider(ox - 5.2 + s * 5.2, -7.4, 1.4, 1.0, 0.1);
+    }
+    built = { group: g, ox: ox, W: W, D: D, H: H, slots: slots };
+
+    // ---- DUCK RACE lane board (rigged fun)
+    var race = buildRaceBoard();
+    race.group.position.set(0, 0, 2.6);
+    g.add(race.group);
+    built.race = race;
+    addCollider(ox, 2.6, 6.2, 2.6, 0.1);
+    // neon "MIDNIGHT DASH" arcade next to it
+    var arcade = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2), new THREE.MeshBasicMaterial({ map: ART.neonTexture('WIN', '#4fd0ff', { sub: '3 IN A ROW', font: 'bold 220px' }), transparent: true, side: THREE.DoubleSide }));
+    arcade.position.set(7.6, 2.0, 6.6); g.add(arcade);
+
+    // ---- blackjack table
+    var table = buildBlackjackTable();
+    table.group.position.set(-6.4, 0, 4.6);
+    g.add(table.group);
+    addCollider(ox - 6.4, 4.6, 2.6, 2.0, 0.1);
+
+    // ---- results board (black board, red digits, like the reference)
+    var boardCanvas = ART.canvas(512, 384, function (gg, w, h) {
+      gg.fillStyle = '#0d0d0f'; gg.fillRect(0, 0, w, h);
+      gg.strokeStyle = '#2a2a2e'; gg.lineWidth = 8; gg.strokeRect(6, 6, w - 12, h - 12);
+      gg.fillStyle = '#ff3b3b'; gg.font = 'bold 52px monospace'; gg.textAlign = 'left';
+      var rows = state.board || ['BACCARAT', '17:18', '17:6', '17:9', 'DUCKS 4'];
+      rows.forEach(function (r, i) { gg.fillText(r, 26, 76 + i * 62); });
+    });
+    var boardTex = ART.tex(boardCanvas);
+    var board = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.8), new THREE.MeshBasicMaterial({ map: boardTex }));
+    board.position.set(6.6, 1.9, -2.4); board.rotation.y = -Math.PI / 2; g.add(board);
+    built.board = { mesh: board, canvas: boardCanvas, tex: boardTex };
+
+    // ---- crates, neon props
+    for (var i = 0; i < 8; i++) {
+      var b = ART.boxProp(U.rnd(0.4, 0.7), ART.pick([0x7a4fd0, 0x3b6fd9, 0xd94f8a, 0x4fd08a]));
+      var pos = new THREE.Vector3(U.rnd(-8, 8), b.geometry.parameters.height / 2, U.rnd(-8, 8));
+      b.position.copy(pos); g.add(b);
+      SWYF.physics.addBody(b, { r: 0.35, restitution: 0.5 });
+    }
+
+    // ---- casino entrance lights on the office side
+    var entrance = new THREE.PointLight(0xff4fd8, 0.8, 8, 2);
+    entrance.position.set(officeW / 2 + 1.2, 2.2, 5);
+    root.add(entrance);
+
+    flags.casinoEntry = new THREE.Vector3(officeW / 2 + 1.4, 1.0, 5);
+    flags.casinoSlot = new THREE.Vector3(ox, 0, -6.2);
+    return built;
+  }
+
+  // ---------------------------------------------------------- slot machine 3D
+  function buildSlotMachine(title, variant) {
+    var g = new THREE.Group();
+    var cabCol = variant === 0 ? 0xf0c02a : (variant === 1 ? 0xd9a726 : 0xc99a3a);
+    var body = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.1, 0.9), ART.flat(cabCol, { rough: 0.45, metal: 0.15 }));
+    body.position.y = 1.05; body.castShadow = true; g.add(body);
+    var topper = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.42, 1.0), ART.flat(0x2a1430, { emissive: 0x7722aa, ei: 0.6 }));
+    topper.position.y = 2.32; g.add(topper);
+
+    var c = ART.canvas(512, 640, function (gg, w, h) {
+      gg.fillStyle = '#12061c'; gg.fillRect(0, 0, w, h);
+      gg.fillStyle = '#ffd447'; gg.font = 'bold 40px Impact,Tahoma,sans-serif'; gg.textAlign = 'center';
+      gg.fillText(title.slice(0, 16), w / 2, 62);
+      gg.fillStyle = '#1a0a24'; gg.fillRect(40, 90, w - 80, 300);
+      gg.strokeStyle = '#ffd447'; gg.lineWidth = 6; gg.strokeRect(40, 90, w - 80, 300);
+      for (var r = 0; r < 3; r++) for (var cc = 0; cc < 3; cc++) {
+        gg.fillStyle = '#2a1240';
+        ART.roundRect(gg, 60 + cc * 132, 105 + r * 95, 116, 82, 12); gg.fill();
+        gg.font = '58px "Segoe UI Emoji",sans-serif'; gg.fillStyle = '#fff';
+        gg.fillText('🪙', 118 + cc * 132, 162 + r * 95);
+      }
+      gg.fillStyle = '#25d366'; ART.roundRect(gg, w / 2 - 110, 420, 220, 70, 16); gg.fill();
+      gg.fillStyle = '#06210f'; gg.font = 'bold 46px Tahoma'; gg.fillText('SPIN', w / 2, 470);
+      gg.fillStyle = '#e8d9ff'; gg.font = '30px monospace';
+      gg.fillText('CREDIT ' + String(cash()).slice(0, 6), w / 2, 545);
+      gg.fillText('BET 10   +10  +1  MAX', w / 2, 590);
+    });
+    var screenTex = ART.tex(c);
+    var screen = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.25), ART.basic(0xffffff, { map: screenTex }));
+    screen.position.set(0, 1.62, 0.46); g.add(screen);
+    var keypad = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.5, 0.06), ART.flat(0xd8d2c4));
+    keypad.position.set(0, 0.62, 0.46); keypad.rotation.x = -0.25; g.add(keypad);
+    for (var k = 0; k < 9; k++) {
+      var key = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.13, 0.04), ART.flat(0xf2eee3));
+      key.position.set(-0.28 + (k % 3) * 0.28, 0.74 - Math.floor(k / 3) * 0.16, 0.49);
+      key.rotation.x = -0.25; g.add(key);
+    }
+    var glow = new THREE.PointLight(0xffd447, 0.55, 4.5, 2);
+    glow.position.set(0, 1.7, 0.9); g.add(glow);
+    g.userData = { screen: screen, glow: glow, canvas: c, tex: screenTex };
+    return g;
+  }
+
+  // -------------------------------------------------------------- race board
+  function buildRaceBoard() {
+    var g = new THREE.Group();
+    var frame = new THREE.Mesh(new THREE.BoxGeometry(6.0, 0.9, 2.4), ART.flat(0x8a2f4a, { rough: 0.6 }));
+    frame.position.y = 0.45; frame.castShadow = true; g.add(frame);
+    var lanes = new THREE.Mesh(new THREE.BoxGeometry(5.7, 0.06, 2.1), ART.flat(0x1b6b4a, { rough: 0.5 }));
+    lanes.position.y = 0.93; g.add(lanes);
+    for (var i = 0; i < 5; i++) {
+      var line = new THREE.Mesh(new THREE.BoxGeometry(5.7, 0.02, 0.03), ART.basic(0xffffff));
+      line.position.set(0, 0.97, -0.9 + i * 0.45); g.add(line);
+    }
+    var sign = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.9), new THREE.MeshBasicMaterial({ map: ART.neonTexture('DUCK RACE', '#ff4fd8', { font: 'bold 170px' }), transparent: true }));
+    sign.position.set(0, 1.75, 0); sign.rotation.x = -0.35; g.add(sign);
+
+    var ducks = [];
+    for (var d = 0; d < 5; d++) {
+      var duck = new THREE.Group();
+      var body = new THREE.Mesh(new THREE.SphereGeometry(0.15, 10, 8), ART.flat([0xffffff, 0xffd447, 0x8fd9ff, 0xff8fd9, 0xa8ff8f][d], { rough: 0.5 }));
+      body.scale.set(1.3, 1, 1); duck.add(body);
+      var head = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), ART.flat(0xffffff, { rough: 0.5 }));
+      head.position.set(0.14, 0.12, 0); duck.add(head);
+      var beak = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.1, 6), ART.flat(0xff8a1f));
+      beak.rotation.z = -Math.PI / 2; beak.position.set(0.24, 0.11, 0); duck.add(beak);
+      duck.position.set(-2.6, 1.06, -0.9 + d * 0.45);
+      g.add(duck);
+      ducks.push(duck);
+    }
+    return { group: g, ducks: ducks, races: 0 };
+  }
+
+  // ------------------------------------------------------------ blackjack 3D
+  function buildBlackjackTable() {
+    var g = new THREE.Group();
+    var felt = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.35, 0.1, 22), ART.flat(0x1f7a4d, { rough: 0.8 }));
+    felt.position.y = 0.78; felt.castShadow = true; g.add(felt);
+    var rim = new THREE.Mesh(new THREE.CylinderGeometry(1.38, 1.4, 0.1, 22), ART.flat(0x5a3b22, { rough: 0.6 }));
+    rim.position.y = 0.72; g.add(rim);
+    var post = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, 0.72, 12), ART.flat(0x3b2a1b));
+    post.position.y = 0.36; g.add(post);
+    var shoes = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.14, 0.2), ART.flat(0x22262e));
+    shoes.position.set(0.5, 0.86, -0.5); g.add(shoes);
+    return { group: g };
+  }
+
+  // ------------------------------------------------------------------ UI (DOM)
+  function panelEl() {
+    if (ui) return ui;
+    ui = document.createElement('div');
+    ui.id = 'casino-ui';
+    ui.className = 'hidden';
+    document.body.appendChild(ui);
+    return ui;
+  }
+  function close() { if (ui) ui.classList.add('hidden'); SWYF.ui.showInteract && null; }
+  function open(game) {
+    var el = panelEl();
+    el.classList.remove('hidden');
+    if (game === 'slots') renderSlots(el);
+    else if (game === 'race') renderRace(el);
+    else if (game === 'cards') renderCards(el);
+  }
+
+  function head(title, sub) {
+    return '<div class="cs-head"><b>' + title + '</b><span class="dim">' + sub + '</span>' +
+      '<span class="cs-cash">💰 ' + U.money(cash()) + '</span><button class="cs-close ui-block">✕</button></div>';
+  }
+  function wire(el) {
+    var b = el.querySelector('.cs-close');
+    if (b) b.onclick = function () { close(); };
+  }
+
+  // ---- slots
+  function renderSlots(el) {
+    var bet = (state.slots && state.slots.bet) || 10;
+    var res = state.slots || {};
+    el.innerHTML = '<div class="cs-card">' + head('🎰 TREASURE CHAMBER', 'المكافأة: 3 = ×6 · 2 = ×1.4') +
+      '<div class="cs-reels">' +
+        [0, 1, 2].map(function (i) {
+          var sym = res.reels ? res.reels[i] : '🪙';
+          return '<div class="cs-reel' + (res.spinning ? ' spin' : '') + '">' + sym + '</div>';
+        }).join('') +
+      '</div>' +
+      '<div class="cs-row"><span class="dim">الرهان</span>' +
+        '<button class="cs-bet" data-b="-10">−10</button>' +
+        '<b class="cs-betval">' + bet + '</b>' +
+        '<button class="cs-bet" data-b="10">+10</button>' +
+        '<button class="cs-bet" data-b="100">+100</button>' +
+        '<button class="cs-bet" data-b="max">MAX</button></div>' +
+      '<div class="cs-row"><button class="cs-spin ui-block primary"' + (res.spinning ? ' disabled' : '') + '>SPIN 🎰</button>' +
+        '<span class="cs-msg dim">' + (res.msg || 'دور و شوف الحظ…') + '</span></div>' +
+      '<div class="dim small">الخسارة كتخسر الفلوس و الوقت — و البوس ماشي غافل.</div>' +
+      '</div>';
+    wire(el);
+    el.querySelectorAll('.cs-bet').forEach(function (b) {
+      b.onclick = function () {
+        var v = b.getAttribute('data-b');
+        var cur = (state.slots && state.slots.bet) || 10;
+        if (v === 'max') cur = Math.max(10, Math.floor(cash() / 10) * 10);
+        else cur = Math.max(10, Math.min(cash() || 10, cur + parseInt(v, 10)));
+        state.slots = Object.assign(state.slots || {}, { bet: cur });
+        renderSlots(el);
+      };
+    });
+    el.querySelector('.cs-spin').onclick = function () { spin(el); };
+  }
+
+  function spin(el) {
+    var bet = (state.slots && state.slots.bet) || 10;
+    if (bet > cash()) { SWYF.ui.toast('💸 ما عندكش فلوس كافيين', 2500); return; }
+    addCash(-bet);
+    state.spins++;
+    state.slots = Object.assign(state.slots || {}, { spinning: true, msg: '…كنتدور', bet: bet });
+    burnTime(6);
+    var sfx = SWYF.audio;
+    sfx.sfx('coins');
+    var ticks = 0;
+    var iv = setInterval(function () {
+      ticks++;
+      var r = [0, 1, 2].map(function () { return U.pick(SLOT_SYMBOLS); });
+      state.slots.reels = r;
+      if (el.querySelector('.cs-reels')) renderSlots(el);
+      if (ticks > 9) {
+        clearInterval(iv);
+        finishSpin(el, bet);
+      }
+    }, 90);
+  }
+
+  function finishSpin(el, bet) {
+    var r = state.slots.reels;
+    var pay = 0;
+    if (r[0] === r[1] && r[1] === r[2]) pay = bet * SLOT_PAY[3];
+    else if (r[0] === r[1] || r[1] === r[2] || r[0] === r[2]) pay = Math.round(bet * SLOT_PAY[2]);
+    state.slots.spinning = false;
+    if (pay > 0) {
+      addCash(pay);
+      state.slots.msg = '🎉 ربحتي ' + U.money(pay) + '!';
+      SWYF.audio.sfx('cash');
+      SWYF.audio.speak('مبروك! ربحتي', { pitch: 1.1 });
+    } else {
+      state.slots.msg = '😐 ما كانش الحظ… عاود?';
+    }
+    state.net += pay - bet;
+    riskBoss();
+    refreshBoard();
+    renderSlots(el);
+  }
+
+  // ---- duck race
+  function renderRace(el) {
+    var r = state.race || {};
+    var bet = r.bet || 20, pick = r.pick == null ? -1 : r.pick;
+    var names = ['البطة البيضا', 'الصفرا', 'الزرقا', 'الوردية', 'الخضرا'];
+    el.innerHTML = '<div class="cs-card">' + head('🦆 DUCK RACE', 'اختار بطة… و الربح ×4') +
+      '<div class="cs-lanes">' +
+        names.map(function (n, i) {
+          return '<button class="cs-lane' + (pick === i ? ' sel' : '') + '" data-i="' + i + '">' +
+            '<span class="duck d' + i + '">🦆</span> ' + n + '</button>';
+        }).join('') +
+      '</div>' +
+      '<div class="cs-row"><span class="dim">الرهان</span><b>' + bet + ' درهم</b>' +
+        '<button class="cs-rbet" data-b="-10">−10</button><button class="cs-rbet" data-b="10">+10</button>' +
+        '<button class="cs-run ui-block primary">سبّق! 🦆</button></div>' +
+      '<div class="cs-track">' + names.map(function (n, i) {
+        return '<div class="cs-lanepos"><i class="prog p' + i + '" style="width:' + ((r.pos && r.pos[i]) || 0) + '%"></i><span>🦆</span></div>';
+      }).join('') + '</div>' +
+      '<div class="cs-msg dim">' + (r.msg || 'سباق مشبوه… البطة الحرجة دايمن كتفوت.') + '</div>' +
+      '</div>';
+    wire(el);
+    el.querySelectorAll('.cs-lane').forEach(function (b) {
+      b.onclick = function () { state.race = Object.assign(state.race || {}, { pick: +b.getAttribute('data-i') }); renderRace(el); };
+    });
+    el.querySelectorAll('.cs-rbet').forEach(function (b) {
+      b.onclick = function () {
+        var cur = (state.race && state.race.bet) || 20;
+        cur = Math.max(10, Math.min(Math.max(10, cash()), cur + parseInt(b.getAttribute('data-b'), 10)));
+        state.race = Object.assign(state.race || {}, { bet: cur });
+        renderRace(el);
+      };
+    });
+    el.querySelector('.cs-run').onclick = function () { runRace(el); };
+  }
+
+  function runRace(el) {
+    var r = state.race || {};
+    if (r.pick == null || r.pick < 0) { SWYF.ui.toast('🦆 اختار بطة الأول', 2200); return; }
+    var bet = r.bet || 20;
+    if (bet > cash()) { SWYF.ui.toast('💸 ما عندكش فلوس كافيين', 2500); return; }
+    addCash(-bet);
+    state.races++;
+    burnTime(10);
+    SWYF.audio.sfx('beep');
+    var pos = [0, 0, 0, 0, 0];
+    // rigged: house duck gets a boost (like the reference's crooked race)
+    var house = U.irnd(0, 4);
+    var speed = [0, 0, 0, 0, 0].map(function () { return U.rnd(0.75, 1.25); });
+    speed[house] *= 1.42;
+    state.race.pos = pos;
+    var iv = setInterval(function () {
+      for (var i = 0; i < 5; i++) pos[i] = Math.min(100, pos[i] + speed[i] * U.rnd(1.2, 3.4));
+      state.race.pos = pos.slice();
+      var bars = el.querySelectorAll('.prog');
+      if (bars.length === 5) bars.forEach(function (b, i) { b.style.width = pos[i] + '%'; });
+      if (pos.some(function (p) { return p >= 100; })) {
+        clearInterval(iv);
+        var win = pos.indexOf(Math.max.apply(null, pos));
+        var pay = (win === r.pick) ? bet * 4 : 0;
+        if (pay) { addCash(pay); SWYF.audio.sfx('cash'); }
+        state.race.msg = win === r.pick ? '🎉 البطة ديالك ربحت! +' + U.money(pay) : '😾 ' + ['البيضا', 'الصفرا', 'الزرقا', 'الوردية', 'الخضرا'][win] + ' هي اللي فاتت…';
+        state.net += pay - bet;
+        riskBoss();
+        refreshBoard();
+        renderRace(el);
+      }
+    }, 110);
+  }
+
+  // ---- blackjack
+  var CARD_VALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+  function cardValue(c) {
+    if (c === 'A') return 11;
+    if (['J', 'Q', 'K'].indexOf(c) >= 0) return 10;
+    return parseInt(c, 10);
+  }
+  function handScore(h) {
+    var s = h.reduce(function (a, c) { return a + cardValue(c); }, 0);
+    var aces = h.filter(function (c) { return c === 'A'; }).length;
+    while (s > 21 && aces > 0) { s -= 10; aces--; }
+    return s;
+  }
+  function draw() { return U.pick(CARD_VALS); }
+
+  function renderCards(el) {
+    var h = state.cards || {};
+    var cards = function (list, cls) {
+      return (list || []).map(function (c) {
+        var red = ['♥', '♦'].indexOf(c.suit) >= 0;
+        return '<span class="card ' + (red ? 'red' : '') + ' ' + (cls || '') + '">' + c.v + c.suit + '</span>';
+      }).join('');
+    };
+    el.innerHTML = '<div class="cs-card">' + head('♠️ MIDNIGHT BLACKJACK', 'ديلر كيوقف على 17') +
+      '<div class="cs-table">' +
+        '<div class="cs-hand"><span class="dim">الديلر ' + (h.hideDealer ? '?' : handScore(h.dealer || [])) + '</span>' + cards(h.dealer, h.hideDealer ? 'hidden' : '') + '</div>' +
+        '<div class="cs-hand"><span class="dim">نتا ' + handScore(h.player || []) + '</span>' + cards(h.player) + '</div>' +
+      '</div>' +
+      '<div class="cs-row">' +
+        (h.active
+          ? '<button class="cs-hit ui-block primary">كارت 🃏</button><button class="cs-stand ui-block">وقف ✋</button>'
+          : '<span class="dim">الرهان</span><button class="cs-cbet" data-b="-10">−10</button><b>' + (h.bet || 25) + '</b><button class="cs-cbet" data-b="10">+10</button><button class="cs-deal ui-block primary">لعب ♠️</button>') +
+        '<span class="cs-msg dim">' + (h.msg || 'القاعدة: 21 بلا ما تفوت.') + '</span></div>' +
+      '</div>';
+    wire(el);
+    var hit = el.querySelector('.cs-hit'), stand = el.querySelector('.cs-stand');
+    if (hit) hit.onclick = function () { bjHit(el); };
+    if (stand) stand.onclick = function () { bjStand(el); };
+    var deal = el.querySelector('.cs-deal');
+    if (deal) deal.onclick = function () { bjDeal(el); };
+    el.querySelectorAll('.cs-cbet').forEach(function (b) {
+      b.onclick = function () {
+        var cur = (state.cards && state.cards.bet) || 25;
+        cur = Math.max(10, Math.min(Math.max(10, cash()), cur + parseInt(b.getAttribute('data-b'), 10)));
+        state.cards = Object.assign(state.cards || {}, { bet: cur });
+        renderCards(el);
+      };
+    });
+  }
+
+  function bjDeal(el) {
+    var bet = (state.cards && state.cards.bet) || 25;
+    if (bet > cash()) { SWYF.ui.toast('💸 ما عندكش فلوس كافيين', 2500); return; }
+    addCash(-bet);
+    state.hands++;
+    state.cards = { bet: bet, player: [{ v: draw(), suit: U.pick(['♠', '♥', '♦', '♣']) }, { v: draw(), suit: U.pick(['♠', '♥', '♦', '♣']) }], dealer: [{ v: draw(), suit: U.pick(['♠', '♥', '♦', '♣']) }], hideDealer: true, active: true, msg: 'دورك: كارت ولا وقف؟' };
+    SWYF.audio.sfx('card');
+    renderCards(el);
+  }
+  function bjHit(el) {
+    var c = state.cards;
+    c.player.push({ v: draw(), suit: U.pick(['♠', '♥', '♦', '♣']) });
+    SWYF.audio.sfx('card');
+    if (handScore(c.player) > 21) { c.active = true; return bjFinish(el); }
+    renderCards(el);
+  }
+  function bjStand(el) {
+    var c = state.cards;
+    c.hideDealer = false;
+    while (handScore(c.dealer) < 17) c.dealer.push({ v: draw(), suit: U.pick(['♠', '♥', '♦', '♣']) });
+    bjFinish(el);
+  }
+  function bjFinish(el) {
+    var c = state.cards;
+    var p = handScore(c.player), d = handScore(c.dealer);
+    c.hideDealer = false;
+    c.active = false;
+    var pay = 0;
+    if (p > 21) { c.msg = '😵 فوت 21 — خسرتي ' + U.money(c.bet); }
+    else if (d > 21 || p > d) { pay = c.bet * 2; c.msg = '🎉 ربحتي ' + U.money(pay) + '!'; }
+    else if (p === d) { pay = c.bet; c.msg = '🤝 تعادل — رجعو ليك الفلوس'; }
+    else { c.msg = '😾 الديلر فاتك (' + d + ' ضد ' + p + ')'; }
+    if (pay) addCash(pay);
+    state.net += pay - c.bet;
+    burnTime(8);
+    riskBoss();
+    refreshBoard();
+    SWYF.audio.sfx(pay > c.bet ? 'cash' : 'beep');
+    renderCards(el);
+  }
+
+  function refreshBoard() {
+    if (!built || !built.board) return;
+    var rows = ['BACCARAT', '17:' + (10 + (state.spins % 9)), '17:' + (2 + (state.races % 8)), 'NET ' + (state.net >= 0 ? '+' : '') + state.net, 'SPINS ' + state.spins];
+    state.board = rows;
+    var g = built.board.canvas.getContext('2d');
+    g.fillStyle = '#0d0d0f'; g.fillRect(0, 0, 512, 384);
+    g.strokeStyle = '#2a2a2e'; g.lineWidth = 8; g.strokeRect(6, 6, 500, 372);
+    g.fillStyle = '#ff3b3b'; g.font = 'bold 46px monospace'; g.textAlign = 'left';
+    rows.forEach(function (r, i) { g.fillText(r, 26, 76 + i * 62); });
+    built.board.tex.needsUpdate = true;
+  }
+
+  // -------------------------------------------------------------- 3D ticker
+  function update(dt) {
+    if (!built) return;
+    var t = performance.now() / 1000;
+    // slot screen flicker + credit readout
+    built.slots.forEach(function (s, i) {
+      s.glow.intensity = 0.45 + Math.sin(t * 3 + i) * 0.12;
+      if (Math.random() < 0.01) {
+        var g = s.canvas.getContext('2d');
+        g.fillStyle = '#12061c'; g.fillRect(0, 520, 512, 90);
+        g.fillStyle = '#e8d9ff'; g.font = '30px monospace'; g.textAlign = 'center';
+        g.fillText('CREDIT ' + String(cash()).slice(0, 6), 256, 545);
+        g.fillText('SPINS ' + state.spins, 256, 590);
+        s.screen.material.map.needsUpdate = true;
+      }
+    });
+    // duck idle bobbing
+    if (built.race) {
+      built.race.ducks.forEach(function (d, i) {
+        d.position.y = 1.06 + Math.sin(t * 2.4 + i) * 0.03;
+        d.rotation.z = Math.sin(t * 2 + i) * 0.08;
+      });
+    }
+  }
+
+  SWYF.Casino = {
+    build: build, update: update, open: open, close: close,
+    built: function () { return built; },
+    stats: function () { return { spins: state.spins, races: state.races, hands: state.hands, net: state.net }; },
+    /** called from the office door interactable */
+    enter: function () { open('slots'); },
+    gamble: { slots: function () { open('slots'); }, race: function () { open('race'); }, cards: function () { open('cards'); } }
+  };
+})();
+
+</script>
+<script>
+/* ============================================================================
  * Scam Baqi — callers.js
  * محرّك الشخصيات و الحوار — بديل محلي 100% للـ AI ديال اللعبة الأصلية.
  * (The persona + dialogue engine: persona generation, tactic library, free-text
@@ -57785,8 +59247,40 @@ SWYF.nluModel = {
         else if (H.onResume) H.onResume();
       }
       if (e.code === 'KeyR') cleanVirus();
+      // ---- toy physics: F = shove, G = stink bomb, B = throw a ball ---------
+      var P = SWYF.main && SWYF.main.player, Wd = SWYF.main && SWYF.main.world;
+      if (!P || !Wd || P.mode !== 'walk') return;
+      if (e.code === 'KeyF') {
+        var hit = SWYF.physics.shove(Wd, P.pos, P.yaw, { power: 1 });
+        SWYF.ui.toast(hit ? '💥 دستو!' : '✋ ما كاينش شي واحد قدامك', 1600);
+      }
+      if (e.code === 'KeyG') {
+        if ((SWYF.Day.S.stinkBombs || 0) <= 0) { SWYF.ui.toast('🦨 ما عندكش قنبلة غاز — شريها من Scamazon', 2200); return; }
+        SWYF.Day.S.stinkBombs--;
+        var fwd = new THREE.Vector3(Math.sin(P.yaw), 0, Math.cos(P.yaw));
+        SWYF.physics.stinkCloud(P.pos.clone().add(fwd.multiplyScalar(1.4)).setY(0.45), 3.6, 1.25);
+        SWYF.audio.sfx('gas');
+      }
+      if (e.code === 'KeyB') {
+        var d = new THREE.Vector3(Math.sin(P.yaw), -0.05, Math.cos(P.yaw));
+        SWYF.physics.throwBall(P.pos.clone().setY(1.3).add(d.clone().multiplyScalar(0.4)), d, Wd);
+        SWYF.audio.sfx('whoosh');
+      }
     });
     if (isTouch()) U.show($('#touch-ui'));
+  }
+
+  /** Purple "Meeting is about to start!" banner (reference-accurate). */
+  function meetingBanner(text, sub, on) {
+    var el = document.getElementById('meeting');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'meeting';
+      document.body.appendChild(el);
+    }
+    if (!on) { el.classList.add('hidden'); return; }
+    el.innerHTML = '<b>' + text + '</b><span>' + (sub || '') + '</span>';
+    el.classList.remove('hidden');
   }
 
   function showHelp(on) {
@@ -58067,7 +59561,7 @@ SWYF.nluModel = {
     init: init, hud: hud, refreshHud: refreshHud, flashQuota: flashQuota, toast: toast,
     alert: alertBox, showRing: showRing, hideRing: hideRing, showBrief: showBrief,
     showReview: showReview, showShopBetweenDays: showShopBetweenDays,
-    showGameOver: showGameOver, showWin: showWin, showHelp: showHelp,
+    showGameOver: showGameOver, showWin: showWin, showHelp: showHelp, meetingBanner: meetingBanner,
     virus: virus, vignette: vignette, shake: shake, setInteract: setInteract, showBoard: showBoard,
     seatForCall: seatForCall, isTouch: isTouch, show: show, hide: hide
   };
@@ -58099,6 +59593,9 @@ SWYF.nluModel = {
     { id: 'recorder', name: 'Recorder', icon: '🎥', w: 560, h: 420, hint: 'تسجيل الشاشة' },
     { id: 'camera', name: 'Camera', icon: '📷', w: 560, h: 420, hint: 'تصويرة' },
     { id: 'files', name: 'الملفات', icon: '📁', w: 600, h: 430, hint: 'حفظ / تصفير' },
+    { id: 'truth', name: 'Caller Truth', icon: '🕵️', w: 620, h: 560, hint: 'ملف الضحية' },
+    { id: 'browser', name: 'SAKARY', icon: '🌐', w: 860, h: 600, hint: 'مواقع مزيفة' },
+    { id: 'ducktalk', name: 'DuckTalk', icon: '📹', w: 640, h: 520, hint: 'كولاية بالفيديو' },
     { id: 'ai', name: 'الذكاء (AI)', icon: '🧠', w: 680, h: 540, hint: 'AI حقيقي / محلي' },
     { id: 'settings', name: 'الإعدادات', icon: '⚙️', w: 580, h: 480, hint: 'صوت و مساعدة' }
   ];
@@ -58202,15 +59699,34 @@ SWYF.nluModel = {
   function taskbar() {
     if (!tasksEl) return;
     U.clear(tasksEl);
-    open.forEach(function (o) {
-      var b = U.el('button', 'tb-task', o.app.icon + ' ' + o.app.name);
-      U.on(b, 'click', function () {
-        if (o.win.style.display === 'none') { o.win.style.display = 'flex'; o.win.classList.remove('minimized'); }
-        focus(o.id);
-      });
+    var running = {};
+    open.forEach(function (o) { running[o.id] = o; });
+    // pinned + running apps as coloured square icons (reference taskbar)
+    APPS.forEach(function (app) {
+      var o = running[app.id];
+      var b = U.el('button', 'tb-icon' + (o ? ' run' : ''), app.icon);
+      b.title = app.name + (o ? ' — مفتوح' : '');
+      U.on(b, 'click', function () { openApp(app.id); });
       tasksEl.appendChild(b);
     });
   }
+
+  /** live clock + quota strip in the taskbar (in-game time) */
+  function tickClock() {
+    var el = document.getElementById('dt-clock');
+    if (!el) return;
+    var t = api && api.getTime ? api.getTime() : 540;
+    var h = Math.floor(t / 60), m = Math.floor(t % 60);
+    el.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+    var q = document.getElementById('dt-quota');
+    if (q && api && api.getState) {
+      var st = api.getState();
+      q.textContent = '🎯 ' + U.money(st.earnedToday) + ' / ' + U.money(st.quota) + ' · 💰 ' + U.money(st.cash);
+    }
+    // live app ticks (DuckTalk video, etc.)
+    open.forEach(function (o) { if (o.instance && o.instance.tick) { try { o.instance.tick(); } catch (e) {} } });
+  }
+  if (typeof window !== 'undefined') setInterval(tickClock, 220);
 
   function notify(appId, text, ms) {
     var host = document.getElementById('toasts');
@@ -58528,6 +60044,201 @@ SWYF.nluModel = {
       if (confirm('واش متأكد؟ غادي يتمسح كلشي.')) { U.wipe(); location.reload(); }
     });
     return {};
+  };
+
+  // ---- CALLER TRUTH (the reference's caller dossier + HANG UP button) --------
+  BUILDERS.truth = function (body) {
+    var faceCanvas = document.createElement('canvas');
+    faceCanvas.width = 220; faceCanvas.height = 220;
+    var o = {
+      render: function () {
+        var c = api.getCaller();
+        var st = api.getState();
+        var v = (vignette(c));
+        body.innerHTML =
+          '<div class="ct">' +
+            '<div class="ct-left"><canvas class="ct-face" width="220" height="220"></canvas>' +
+              '<div class="ct-name">' + (c ? c.name : '— ما كاينش كولاية —') + '</div>' +
+              '<div class="dim small">' + (c ? c.city + ' · ' + c.job : 'الخط فارغ') + '</div>' +
+              '<button class="ct-hang ui-block danger">📴 HANG UP</button>' +
+              '<button class="ct-recall ui-block">📞 عاود عيّط</button>' +
+            '</div>' +
+            '<div class="ct-right">' +
+              '<div class="ct-row"><b>Persona</b><span>' + (c ? c.persona.emoji + ' ' + c.persona.label : '—') + '</span></div>' +
+              '<div class="ct-row"><b>Risk</b><span class="' + (v.risk > 55 ? 'bad' : 'ok') + '">' + v.risk + '% ' + (v.flag || '') + '</span></div>' +
+              '<div class="ct-row"><b>Trust</b><span>' + Math.round(c ? c.trust : 0) + ' / 100</span></div>' +
+              '<div class="ct-row"><b>Suspicion</b><span>' + Math.round(c ? c.suspicion : 0) + ' / 100</span></div>' +
+              '<div class="ct-row"><b>Patience</b><span>' + Math.round(c ? c.patience : 0) + 's</span></div>' +
+              '<div class="ct-row"><b>Worth</b><span>' + U.money(c ? c.savings : 0) + '</span></div>' +
+              '<div class="ct-row"><b>Stealed files</b><span>' + (c ? (c.leverageUsed || []).length : 0) + ' / ' + (c ? c.facts.length : 0) + '</span></div>' +
+              '<div class="ct-row"><b>Phone / ID</b><span class="mono">' + (c ? c.contact : '—') + '</span></div>' +
+              '<div class="ct-note dim small">' + (v.note || 'افتح AnyViewer باش تجمع معلومات، من بعد استعملها ف المكالمة.') + '</div>' +
+            '</div>' +
+          '</div>';
+        // draw the suspect portrait (flat, procedural — mugshot board look)
+        drawFace(body.querySelector('.ct-face'), c);
+        U.on(body.querySelector('.ct-hang'), 'click', function () { if (SWYF.Calls.active()) SWYF.Calls.endNow(); });
+        U.on(body.querySelector('.ct-recall'), 'click', function () {
+          if (SWYF.Calls.active()) { SWYF.ui.toast('📞 راك ف مكالمة دابا', 2000); return; }
+          SWYF.Day.startRing();
+          SWYF.ui.toast('📞 التيليفون كيدق… رجّع للديسك باش ترد.', 2600);
+        });
+      }
+    };
+    function vignette(c) {
+      if (!c) return { risk: 0 };
+      var risk = Math.round(U.clamp((c.scambaiter ? 62 : 8) + c.suspicion * 0.35 + (c.leverageUsed || []).length * -2, 2, 99));
+      return { risk: risk, flag: c.scambaiter ? '⚠️ مرشح سكام بايتر' : (risk > 50 ? '⚠️ مشكوك' : '✅ عادي'), note: c.scambaiter ? 'الملف فيه «bloclist» — سد التيليفون بسرعة!' : '' };
+    }
+    function drawFace(cv, c) {
+      if (!cv) return;
+      var g = cv.getContext('2d');
+      g.fillStyle = '#0e1626'; g.fillRect(0, 0, 220, 220);
+      for (var y = 0; y < 220; y += 10) { g.fillStyle = 'rgba(255,255,255,0.03)'; g.fillRect(0, y, 220, 4); }
+      if (!c) { g.fillStyle = '#3a4560'; g.font = 'bold 22px Tahoma'; g.textAlign = 'center'; g.fillText('NO CALL', 110, 115); return; }
+      var skin = '#' + ('000000' + (c.gender === 'f' ? 0xffb08a : 0xd9a066).toString(16)).slice(-6);
+      g.fillStyle = skin;
+      g.beginPath(); g.ellipse(110, 118, 56, 66, 0, 0, 6.3); g.fill();
+      g.fillStyle = '#2a1d16';
+      g.beginPath(); g.ellipse(110, 74, 58, 34, 0, Math.PI, 0); g.fill();
+      g.fillStyle = '#14181f';
+      g.beginPath(); g.ellipse(88, 112, 7, 9, 0, 0, 6.3); g.fill();
+      g.beginPath(); g.ellipse(132, 112, 7, 9, 0, 0, 6.3); g.fill();
+      g.strokeStyle = '#8a5a3b'; g.lineWidth = 4;
+      g.beginPath(); g.arc(110, 140, 20, 0.5, Math.PI - 0.5); g.stroke();
+      g.fillStyle = '#e8eefc'; g.font = 'bold 16px monospace'; g.textAlign = 'center';
+      g.fillText('CALLER TRUTH DB', 110, 208);
+    }
+    o.render();
+    return o;
+  };
+
+  // ---- SAKARY / Simpletax browser (fake pages + the HTML source view) --------
+  var PAGES = {
+    sakary: {
+      url: 'https://sakary-bank.moc/verify',
+      title: 'SAKARY BANK — verify account',
+      html: '<h1 style="color:#1e66d0">SAKARY BANK</h1><p>Verify your account to unlock it.</p>' +
+        '<label>Account <input placeholder="MA28 ****"></label><br><label>PIN <input type="password"></label><br>' +
+        '<button>VERIFY NOW</button><p class="dim">⚠️ الصفحة مزيفة: الرابط ماشي رسمي و كيطلب الرمز السري.</p>',
+      lesson: '📌 الحقيقة: البنك عمرو ما كيطلب الرمز السري ف مكالمة ولا رابط. الرابط «moc» ماشي رسمي.'
+    },
+    simpletax: {
+      url: 'https://simpletax-fake.moc/1040',
+      title: 'Simpletax — Social Security form',
+      html: '<h1 style="color:#25d366">Simpletax</h1><p>Request a refund — enter the details.</p>' +
+        '<label>Full name <input></label><br><label>SSN <input placeholder="000-00-0000"></label><br>' +
+        '<label>Card <input placeholder="**** **** **** ****"></label><br><button>PROCEED</button>' +
+        '<p class="dim">⚠️ وثيقة مزيفة كتبني باش تقنع الضحية.</p>',
+      lesson: '📌 الحقيقة: المؤسسات الرسمية ما كتطلبش رقم البطاقة عبر نموذج مفاجئ ف مكالمة.'
+    },
+    prize: {
+      url: 'https://winticket-2026.moc/claim',
+      title: 'WIN A CAR — claim your prize',
+      html: '<h1 style="color:#e94f37">🎁 مبروك! ربحتي طوموبيل</h1><p>خلّص غير 199 درهم ديال الرسوم و تدي الجايزة.</p>' +
+        '<button>CLAIM</button><p class="dim">⚠️ «رسوم مسبقة» = علامة نصب كلاسيكية.</p>',
+      lesson: '📌 الحقيقة: أي جايزة كتطلب فلوس قبل = نصب. الجوايز الحقيقية ما كتطلبش أداء مسبق.'
+    },
+    bank: {
+      url: 'https://intranet-mk.local/files',
+      title: 'مكتب الاتصال — الملفات',
+      html: '<h1>📁 ملفات المكتب</h1><p>الملفات اللي كتعاون ف الهندسة الاجتماعية:</p>' +
+        '<ul><li>كشف الحساب (PDF)</li><li>تصاور العائلة</li><li>ملف الخدمة</li><li>⚠️ bloclist — أرقام مبلّغ عنها</li></ul>' +
+        '<p class="dim">كل معلومة سرقتيها كتزيد ف الثقة… و كتزيد ف الخطر.</p>'
+    }
+  };
+  BUILDERS.browser = function (body) {
+    var pageId = 'sakary', showSrc = false;
+    var o = {
+      render: function () {
+        var p = PAGES[pageId] || PAGES.sakary;
+        body.innerHTML =
+          '<div class="br">' +
+            '<div class="br-tabs">' + Object.keys(PAGES).map(function (k) {
+              return '<button class="br-tab' + (k === pageId ? ' on' : '') + '" data-p="' + k + '">' + PAGES[k].title.split('—')[0].trim() + '</button>';
+            }).join('') + '</div>' +
+            '<div class="br-bar"><span class="br-url mono">' + p.url + '</span>' +
+              '<button class="br-src">' + (showSrc ? '👁️ الصفحة' : '</> الكود') + '</button></div>' +
+            (showSrc
+              ? '<pre class="br-src-view mono">' + escapeHtml(p.html) + '</pre>'
+              : '<div class="br-page">' + p.html + '</div>') +
+            '<div class="br-foot dim small">' + (p.lesson || '') + '</div>' +
+          '</div>';
+        Array.prototype.forEach.call(body.querySelectorAll('.br-tab'), function (b) {
+          U.on(b, 'click', function () { pageId = b.getAttribute('data-p'); o.render(); });
+        });
+        U.on(body.querySelector('.br-src'), 'click', function () { showSrc = !showSrc; o.render(); });
+        var form = body.querySelector('.br-page button');
+        if (form) U.on(form, 'click', function () {
+          api.evidence('paint', '🧾 ولّدت وثيقة مزيفة (evidence) — كتبان مقنعة كثر ف المكالمة.');
+          SWYF.Desktop.notify('paint', '🧾 وثيقة جديدة جاهزة (evidence).');
+          SWYF.audio.sfx('success');
+        });
+      }
+    };
+    o.render();
+    return o;
+  };
+  function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  // ---- DUCKTALK: video call with the current caller (animated flat face) ----
+  BUILDERS.ducktalk = function (body) {
+    var cv = document.createElement('canvas');
+    cv.width = 320; cv.height = 240;
+    var typing = '';
+    var o = {
+      render: function () {
+        var c = api.getCaller();
+        body.innerHTML =
+          '<div class="dt">' +
+            '<canvas class="dt-vid" width="320" height="240"></canvas>' +
+            '<div class="dt-side">' +
+              '<div class="dt-title">' + (c ? '📹 ' + c.name : '📹 DuckTalk — ما كاينش كولاية') + '</div>' +
+              '<div class="dt-msg dim small">' + (c ? typing || 'الضحية كيهضر…' : 'رد على كولاية باش تشوف الوجه.') + '</div>' +
+              '<button class="dt-mute ui-block">' + (SWYF.audio.isEnabled() ? '🔊 الصوت شغال' : '🔇 الصوت مسدود') + '</button>' +
+              '<button class="dt-hang ui-block danger">📴 سد</button>' +
+            '</div>' +
+          '</div>';
+        U.on(body.querySelector('.dt-mute'), 'click', function () {
+          SWYF.audio.setEnabled(!SWYF.audio.isEnabled()); o.render();
+        });
+        U.on(body.querySelector('.dt-hang'), 'click', function () { if (SWYF.Calls.active()) SWYF.Calls.endNow(); });
+      }
+    };
+    var mouth = 0, blink = 0;
+    o.tick = function () {
+      var c = api.getCaller();
+      var g = cv.getContext('2d');
+      var t = performance.now() / 1000;
+      g.fillStyle = '#101828'; g.fillRect(0, 0, 320, 240);
+      g.fillStyle = '#1d2b45'; g.fillRect(0, 180, 320, 60);
+      if (!c) {
+        g.fillStyle = '#33405e'; g.font = 'bold 22px Tahoma'; g.textAlign = 'center';
+        g.fillText('NO SIGNAL', 160, 125);
+        return;
+      }
+      // flat big-head avatar that talks & blinks
+      var skin = '#' + ('000000' + (c.gender === 'f' ? 0xffb08a : 0xd9a066).toString(16)).slice(-6);
+      mouth = 0.5 + Math.sin(t * 9) * 0.5;
+      blink = (Math.sin(t * 1.3) > 0.97) ? 0.15 : 1;
+      g.fillStyle = skin;
+      g.beginPath(); g.ellipse(160, 118, 62, 70, 0, 0, 6.3); g.fill();
+      g.fillStyle = '#2a1d16';
+      g.beginPath(); g.ellipse(160, 70, 64, 34, 0, Math.PI, 0); g.fill();
+      g.fillStyle = '#14181f';
+      g.beginPath(); g.ellipse(136, 112, 7, 9 * blink, 0, 0, 6.3); g.fill();
+      g.beginPath(); g.ellipse(184, 112, 7, 9 * blink, 0, 0, 6.3); g.fill();
+      g.fillStyle = '#3a1a1a';
+      g.beginPath(); g.ellipse(160, 152, 18, 6 + mouth * 12, 0, 0, 6.3); g.fill();
+      g.fillStyle = '#e8eefc'; g.font = 'bold 15px monospace'; g.textAlign = 'left';
+      g.fillText('DuckTalk · ' + c.city, 12, 228);
+      g.fillStyle = '#ff4d4d'; g.beginPath(); g.arc(302, 20, 6, 0, 6.3); g.fill();
+      g.fillStyle = '#ffb3b3'; g.font = 'bold 12px monospace'; g.fillText('REC', 276, 25);
+    };
+    o.render();
+    // hook the subtitle channel from the phone
+    var origSay = null;
+    return o;
   };
 
   // ---- AI (local model bridge + offline brain) --------------------------------
@@ -59080,6 +60791,7 @@ SWYF.nluModel = {
   var SWYF = (window.SWYF = window.SWYF || {});
   var U = SWYF.util;
   var THREE = window.THREE;
+  var ART = SWYF.art;
 
   // ---------------------------------------------------------------- textures
   function canvasTex(w, h, draw, repeat) {
@@ -59206,6 +60918,78 @@ SWYF.nluModel = {
     });
   }
 
+  /** The in-world computer: fake-browser desktop with a source-code view, a
+   *  form window, coloured taskbar icons and a clock (reference-accurate). */
+  function drawOS(g, w, h, tag, opts) {
+    opts = opts || {};
+    var clock = opts.clock || '9:00';
+    var caller = opts.caller || '';
+    // wallpaper
+    var wall = g.createLinearGradient(0, 0, w, h);
+    wall.addColorStop(0, '#12233f'); wall.addColorStop(1, '#0b1526');
+    g.fillStyle = wall; g.fillRect(0, 0, w, h);
+    // window 1: SAKARY fake bank page with the HTML source view
+    g.fillStyle = '#1b2740'; roundRect(g, 26, 24, w * 0.54, h * 0.68, 10); g.fill();
+    g.fillStyle = '#25406b'; roundRect(g, 26, 24, w * 0.54, 40, 10); g.fill();
+    g.fillStyle = '#9fd0ff'; g.font = 'bold 22px monospace'; g.textAlign = 'left';
+    g.fillText('SAKARY — bank portal', 40, 52);
+    g.fillStyle = '#eef3ff'; g.fillRect(36, 74, w * 0.54 - 20, h * 0.68 - 60);
+    var code = [
+      '<html><body bgcolor="#fff">',
+      '<h1>SAKARY BANK — verify</h1>',
+      '<form action="post.php">',
+      '  <input name="acc" placeholder="account">',
+      '  <input name="pin" type="password">',
+      '  <button>LOGIN</button>',
+      '</form></body></html>'
+    ];
+    g.font = '17px monospace';
+    for (var i = 0; i < code.length; i++) {
+      g.fillStyle = i % 3 === 0 ? '#1e66d0' : (i % 3 === 1 ? '#b8860b' : '#7a3bd0');
+      g.fillText(code[i], 46, 104 + i * 24);
+    }
+    // window 2: the tax/SS form (Simpletax vibe)
+    g.fillStyle = '#22304d'; roundRect(g, w * 0.58, h * 0.16, w * 0.36, h * 0.5, 10); g.fill();
+    g.fillStyle = '#2c4670'; roundRect(g, w * 0.58, h * 0.16, w * 0.36, 34, 10); g.fill();
+    g.fillStyle = '#cfe3ff'; g.font = 'bold 19px monospace';
+    g.fillText('Simpletax — form 1040', w * 0.58 + 12, h * 0.16 + 24);
+    g.fillStyle = '#f4f7ff';
+    for (var r2 = 0; r2 < 4; r2++) {
+      ART.roundRect(g, w * 0.58 + 16, h * 0.16 + 52 + r2 * 38, w * 0.36 - 32, 26, 6); g.fill();
+    }
+    g.fillStyle = '#7a3bd0'; ART.roundRect(g, w * 0.58 + 16, h * 0.16 + 52 + 4 * 38 + 8, 110, 30, 6); g.fill();
+    g.fillStyle = '#fff'; g.font = 'bold 18px Tahoma';
+    g.fillText('PROCEED', w * 0.58 + 30, h * 0.16 + 52 + 4 * 38 + 30);
+    // taskbar with coloured app icons
+    g.fillStyle = 'rgba(9,14,24,0.92)'; g.fillRect(0, h - 34, w, 34);
+    var cols = ['#3b6fd9', '#f0c02a', '#7a3bd0', '#25d366', '#e94f37', '#00c2d1', '#ff7ab8', '#9aa3ad'];
+    for (var ic = 0; ic < cols.length; ic++) {
+      g.fillStyle = cols[ic];
+      ART.roundRect(g, 10 + ic * 30, h - 28, 22, 22, 5); g.fill();
+    }
+    g.fillStyle = '#dfe8ff'; g.font = '16px monospace'; g.textAlign = 'right';
+    g.fillText(clock + '   ' + (tag === 'mine' ? 'YOU' : tag.toUpperCase()), w - 12, h - 12);
+    // incoming call overlay
+    if (caller) {
+      g.fillStyle = 'rgba(255,40,70,0.92)';
+      ART.roundRect(g, w / 2 - 190, h / 2 - 70, 380, 120, 14); g.fill();
+      g.fillStyle = '#fff'; g.font = 'bold 34px "Noto Kufi Arabic",Tahoma,sans-serif'; g.textAlign = 'center';
+      g.fillText('📞 ' + caller, w / 2, h / 2 - 22);
+      g.font = '22px "Noto Kufi Arabic",Tahoma,sans-serif';
+      g.fillText('CALLER TRUTH — دق التيليفون', w / 2, h / 2 + 16);
+    }
+  }
+
+  function osScreen(tag) {
+    var c = document.createElement('canvas');
+    c.width = 1024; c.height = 640;
+    var g = c.getContext('2d');
+    drawOS(g, c.width, c.height, tag, {});
+    var t = new THREE.CanvasTexture(c);
+    t.anisotropy = 4;
+    return { canvas: c, tex: t, tag: tag, last: '' };
+  }
+
   function skylineTexture() {
     return canvasTex(1024, 512, function (g, w, h) {
       var sky = g.createLinearGradient(0, 0, 0, h);
@@ -59266,11 +61050,12 @@ SWYF.nluModel = {
     }
 
     // ---- materials
-    var matFloor = new THREE.MeshStandardMaterial({ map: floorTexture(), roughness: 0.85, metalness: 0.05 });
-    var matWall = new THREE.MeshStandardMaterial({ color: 0xd9d3c4, roughness: 0.95 });
-    var matWall2 = new THREE.MeshStandardMaterial({ color: 0x35617a, roughness: 0.95 });
-    var matCeil = new THREE.MeshStandardMaterial({ color: 0xeeeae1, roughness: 1 });
-    var matWood = new THREE.MeshStandardMaterial({ color: 0x8a5a35, roughness: 0.7 });
+    var ART = SWYF.art;
+    var matFloor = new THREE.MeshStandardMaterial({ map: ART.officeCarpet(), roughness: 0.95, metalness: 0 });
+    var matWall = new THREE.MeshStandardMaterial({ color: 0x2a3450, roughness: 0.95 });
+    var matWall2 = new THREE.MeshStandardMaterial({ color: 0x1f2a44, roughness: 0.95 });
+    var matCeil = new THREE.MeshStandardMaterial({ color: 0x3a4054, roughness: 1 });
+    var matWood = new THREE.MeshStandardMaterial({ color: 0xc9ccd2, roughness: 0.7 });
     var matDark = new THREE.MeshStandardMaterial({ color: 0x2a2f38, roughness: 0.6 });
     var matMetal = new THREE.MeshStandardMaterial({ color: 0x9aa3ad, roughness: 0.35, metalness: 0.7 });
     var matGlassM = new THREE.MeshStandardMaterial({ color: 0x9fd6ff, transparent: true, opacity: 0.18, roughness: 0.05, metalness: 0.2 });
@@ -59292,10 +61077,12 @@ SWYF.nluModel = {
     wall(0, -DP / 2, W, 0.2, matWall);           // north (view wall for boss)
     wall(0, DP / 2, W, 0.2, matWall);            // south
     wall(-W / 2, 0, 0.2, DP, matWall2);          // west (windows)
-    wall(W / 2, 0, 0.2, DP, matWall);            // east
+    // east wall — split so the casino door is a real opening
+    wall(W / 2, -0.875, 0.2, 10.25, matWall);
+    wall(W / 2, 5.875, 0.2, 0.25, matWall);
 
     // carpet runner
-    var carpet = new THREE.Mesh(new THREE.PlaneGeometry(4.4, DP - 1.4), new THREE.MeshStandardMaterial({ map: carpetTexture(), roughness: 1 }));
+    var carpet = new THREE.Mesh(new THREE.PlaneGeometry(4.4, DP - 1.4), new THREE.MeshStandardMaterial({ color: 0x263457, roughness: 1 }));
     carpet.rotation.x = -Math.PI / 2; carpet.position.set(-1.0, 0.011, 0);
     root.add(carpet);
 
@@ -59309,22 +61096,24 @@ SWYF.nluModel = {
       root.add(win);
       var frame = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.05, 2.75), matDark);
       frame.position.set(-W / 2 + 0.06, 1.75, wz); root.add(frame);
-      var lightPool = new THREE.PointLight(0xffc48a, 0.5, 5.5, 2);
+      var lightPool = new THREE.PointLight(0xffb066, 0.85, 6.5, 2);
       lightPool.position.set(-W / 2 + 1.2, 1.6, wz); root.add(lightPool);
+      // venetian blinds — the warm sunset look of the reference office
+      for (var bl = 0; bl < 12; bl++) {
+        var slat = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.03, 2.5), new THREE.MeshStandardMaterial({ color: 0x243047, roughness: 0.8 }));
+        slat.position.set(-W / 2 + 0.2, 0.95 + bl * 0.15, wz); root.add(slat);
+      }
     }
 
     // ---- ceiling lamps
-    for (var li = 0; li < 4; li++) {
-      var lx = -5 + (li % 2) * 10, lz = -3 + Math.floor(li / 2) * 6;
-      var shade = new THREE.Mesh(new THREE.ConeGeometry(0.62, 0.4, 18, 1, true), new THREE.MeshStandardMaterial({ color: 0x2f3b4a, side: THREE.DoubleSide, roughness: 0.6 }));
-      shade.position.set(lx, H - 0.35, lz); root.add(shade);
-      var bulb = new THREE.Mesh(new THREE.SphereGeometry(0.14, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffeec2 }));
-      bulb.position.set(lx, H - 0.58, lz); root.add(bulb);
-      var pl = new THREE.PointLight(0xfff0cf, 0.55, 11, 2);
-      pl.position.set(lx, H - 0.8, lz); root.add(pl);
-      lamps.push({ light: pl, bulb: bulb });
+    for (var li = 0; li < 6; li++) {
+      var lx = -6.4 + (li % 3) * 6.4, lz = -3.2 + Math.floor(li / 3) * 6.4;
+      var strip = ART.stripLight(2.6);
+      strip.position.set(lx, H - 0.12, lz);
+      root.add(strip);
+      lamps.push({ light: strip.userData.light, bulb: strip.children[0], strip: true });
     }
-    var hemi = new THREE.HemisphereLight(0xbfd4ff, 0x2a2118, 0.55); scene.add(hemi);
+    var hemi = new THREE.HemisphereLight(0x9fc0ff, 0x1a2440, 0.5); scene.add(hemi);
     var sun = new THREE.DirectionalLight(0xffd9a8, 0.85);
     sun.position.set(-9, 8, 5); sun.castShadow = true;
     sun.shadow.mapSize.set(1024, 1024);
@@ -59354,13 +61143,14 @@ SWYF.nluModel = {
       stand.position.set(-0.5, 0.79 + 0.03, -0.25); grp.add(stand);
       var neck = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.28, 0.07), matDark);
       neck.position.set(-0.5, 0.95, -0.25); grp.add(neck);
-      var scr = new THREE.Mesh(new THREE.PlaneGeometry(0.66, 0.42), new THREE.MeshBasicMaterial({ map: screenTexture(i === 3 ? 'call' : 'idle') }));
+      var osScreenObj = osScreen(d.mine ? 'mine' : 'npc');
+      var scr = new THREE.Mesh(new THREE.PlaneGeometry(0.66, 0.42), new THREE.MeshBasicMaterial({ map: osScreenObj.tex }));
       scr.position.set(-0.5, 1.3, -0.22); grp.add(scr);
       var bezel = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.48, 0.05), matDark);
       bezel.position.set(-0.5, 1.3, -0.25); grp.add(bezel);
       var glare = new THREE.PointLight(0x88bbff, 0.25, 2.2, 2);
       glare.position.set(-0.5, 1.25, -0.1); grp.add(glare);
-      monitors.push({ mesh: scr, glare: glare, mine: d.mine });
+      monitors.push({ mesh: scr, glare: glare, mine: d.mine, os: osScreenObj, t: Math.random() * 2 });
       // keyboard + phone + papers + mug
       var kb = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.03, 0.18), matDark);
       kb.position.set(0.15, 0.8, -0.1); grp.add(kb);
@@ -59375,15 +61165,10 @@ SWYF.nluModel = {
       }
       var mug = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.12, 12), new THREE.MeshStandardMaterial({ color: d.mine ? 0xd94f4f : 0x4f7fd9, roughness: 0.5 }));
       mug.position.set(0.45, 0.86, 0.3); grp.add(mug);
-      // chair
-      var seat = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.09, 0.5), matDark);
-      seat.position.set(d.mine ? 0.05 : -0.05, 0.46, 1.05); grp.add(seat);
-      var back = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.08), matDark);
-      back.position.set(d.mine ? 0.05 : -0.05, 0.78, 1.28); grp.add(back);
-      var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.42, 10), matMetal);
-      pole.position.set(d.mine ? 0.05 : -0.05, 0.22, 1.05); grp.add(pole);
-      var base = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.3, 0.05, 14), matMetal);
-      base.position.set(d.mine ? 0.05 : -0.05, 0.03, 1.05); grp.add(base);
+      // chair (flat-art office chair: orange = yours, blue = the others)
+      var chairMesh = ART.chair(d.mine ? 0xe8552f : 0x2f7dff);
+      chairMesh.position.set(d.mine ? 0.05 : -0.05, 0, 1.05);
+      grp.add(chairMesh);
       if (d.mine) {
         var jacket = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.5, 0.12), new THREE.MeshStandardMaterial({ color: 0x6d3b2c, roughness: 0.9 }));
         jacket.position.set(0.05, 0.78, 1.22); grp.add(jacket);
@@ -59445,6 +61230,42 @@ SWYF.nluModel = {
       pl.position.set(W / 2 - 0.14, 1.95 - i * 0.02, -3.2 + i * 3.1);
       pl.rotation.y = -Math.PI / 2; root.add(pl);
     });
+    // ---- flat art-direction pass: big motivational posters (south wall)
+    ['awake', 'quota', 'smile'].forEach(function (kind, i) {
+      var mp = new THREE.Mesh(new THREE.PlaneGeometry(1.25, 1.65), new THREE.MeshBasicMaterial({ map: ART.motivationalPoster(kind) }));
+      mp.position.set(-5.6 + i * 1.5, 2.05, DP / 2 - 0.14);
+      mp.rotation.y = Math.PI;
+      root.add(mp);
+      var fr = new THREE.Mesh(new THREE.BoxGeometry(1.32, 1.72, 0.04), matDark);
+      fr.position.set(-5.6 + i * 1.5, 2.05, DP / 2 - 0.1); root.add(fr);
+    });
+    // "STAY AWAKE" sticky notes in front of the player's desk (north wall)
+    [[2.6, 1.62, 'SLEEP = FIRED'], [2.15, 1.42, 'STAY AWAKE'], [3.05, 1.30, 'CALL. CALL. CALL.']].forEach(function (n) {
+      var note = new THREE.Mesh(new THREE.PlaneGeometry(0.38, 0.38), new THREE.MeshBasicMaterial({ map: ART.stickyNote(n[2]) }));
+      note.position.set(n[0], n[1], -DP / 2 + 0.14);
+      note.rotation.z = U.rnd(-0.09, 0.09);
+      root.add(note);
+    });
+    // ---- cubicle dividers (blue-grey panels, like the reference)
+    var divMat = new THREE.MeshStandardMaterial({ color: 0x2b3a63, roughness: 0.9 });
+    var divMat2 = new THREE.MeshStandardMaterial({ color: 0x1b2745, roughness: 0.95 });
+    [[-3.2, -2.4], [-3.2, 1.1], [2.6, -2.4], [2.6, 1.1]].forEach(function (d, i) {
+      var panel = new THREE.Mesh(new THREE.BoxGeometry(2.3, 1.35, 0.08), i % 2 ? divMat2 : divMat);
+      panel.position.set(d[0], 0.68, d[1] + 0.62);
+      panel.castShadow = true; panel.receiveShadow = true;
+      root.add(panel);
+      var cap = new THREE.Mesh(new THREE.BoxGeometry(2.36, 0.06, 0.12), matDark);
+      cap.position.set(d[0], 1.37, d[1] + 0.62); root.add(cap);
+    });
+    // a real glass partition wall (image 7 of the reference)
+    var glass = new THREE.Mesh(new THREE.BoxGeometry(4.6, 2.5, 0.1), matGlassM);
+    glass.position.set(-2.4, 1.35, -DP / 2 + 0.6); glass.rotation.y = 0; root.add(glass);
+    var glassFrame = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.1, 0.16), matDark);
+    glassFrame.position.set(-2.4, 2.6, -DP / 2 + 0.6); root.add(glassFrame);
+    [-4.7, -2.4, -0.1].forEach(function (gx) {
+      var post = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.16), matDark);
+      post.position.set(gx, 1.35, -DP / 2 + 0.6); root.add(post);
+    });
 
     // ---- neon sign over the whiteboard (parody brand wall)
     var neon = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.4), new THREE.MeshBasicMaterial({
@@ -59454,7 +61275,7 @@ SWYF.nluModel = {
     neon.position.set(3.0, 2.45, DP / 2 - 0.16); neon.rotation.y = Math.PI; root.add(neon);
 
     // ---- kitchen corner (north-west)
-    var kitchen = new THREE.Group(); kitchen.position.set(-6.6, 0, -4.3); root.add(kitchen);
+    var kitchen = new THREE.Group(); kitchen.position.set(-6.6, 0, 4.2); root.add(kitchen);
     var counter = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.95, 1.2), new THREE.MeshStandardMaterial({ color: 0xb9b3a6, roughness: 0.8 }));
     counter.position.set(0, 0.48, 0); counter.castShadow = true; kitchen.add(counter);
     var counterTop = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.08, 1.3), matDark);
@@ -59467,9 +61288,9 @@ SWYF.nluModel = {
     water.position.set(0.6, 1.42, 0); kitchen.add(water);
     var snack = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.5, 0.35), new THREE.MeshStandardMaterial({ color: 0x2f3a4a, roughness: 0.5 }));
     snack.position.set(1.1, 1.28, 0); kitchen.add(snack);
-    addCollider(-6.6, -4.3, 3.4, 1.4, 0.2);
-    interactables.push({ id: 'coffee', label: 'دير قهوة ☕', pos: new THREE.Vector3(-7.2, 1.1, -3.2), radius: 1.3, kind: 'coffee' });
-    interactables.push({ id: 'vending', label: 'شري حاجة من الماكينة', pos: new THREE.Vector3(-5.6, 1.1, -3.2), radius: 1.3, kind: 'vending' });
+    addCollider(-6.6, 4.2, 3.4, 1.4, 0.2);
+    interactables.push({ id: 'coffee', label: 'دير قهوة ☕', pos: new THREE.Vector3(-7.2, 1.1, 3.1), radius: 1.3, kind: 'coffee' });
+    interactables.push({ id: 'vending', label: 'شري حاجة من الماكينة', pos: new THREE.Vector3(-5.6, 1.1, 3.1), radius: 1.3, kind: 'vending' });
 
     // ---- protection spot (under the strong table) — for air strikes
     var bunkerTable = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.14, 1.1), new THREE.MeshStandardMaterial({ color: 0x6b5540, roughness: 0.9 }));
@@ -59484,8 +61305,8 @@ SWYF.nluModel = {
 
     // ---- radio (music)
     var radio = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.3, 0.25), new THREE.MeshStandardMaterial({ color: 0x3d2b1a, roughness: 0.6 }));
-    radio.position.set(-6.6, 1.16, -4.3); root.add(radio);
-    interactables.push({ id: 'radio', label: 'شغّل/وقّف الراديو 🎵', pos: new THREE.Vector3(-6.6, 1.0, -3.3), radius: 1.2, kind: 'radio' });
+    radio.position.set(-6.6, 1.16, 4.2); root.add(radio);
+    interactables.push({ id: 'radio', label: 'شغّل/وقّف الراديو 🎵', pos: new THREE.Vector3(-6.6, 1.0, 3.2), radius: 1.2, kind: 'radio' });
 
     // ---- water cooler
     var cooler = new THREE.Group(); cooler.position.set(7.4, 0, 1.2); root.add(cooler);
@@ -59507,18 +61328,81 @@ SWYF.nluModel = {
     handMin.position.y = 0.15;
     var mGrp = new THREE.Group(); mGrp.position.set(W / 2 - 0.19, 2.35, 3.6); mGrp.add(handMin); root.add(mGrp);
 
+    // ---- CONFERENCE ROOM (glass box, like the reference) -------------------
+    var room = new THREE.Group();
+    room.position.set(-6.4, 0, -4.3); root.add(room);
+    var roomGlassF = new THREE.MeshStandardMaterial({ color: 0x9fd6ff, transparent: true, opacity: 0.17, roughness: 0.05, metalness: 0.2, side: THREE.DoubleSide });
+    var RW = 3.8, RD = 3.2, RH = 2.5;
+    var backG = new THREE.Mesh(new THREE.BoxGeometry(RW, RH, 0.08), roomGlassF); backG.position.set(0, RH / 2, -RD / 2); room.add(backG);
+    var leftG = new THREE.Mesh(new THREE.BoxGeometry(0.08, RH, RD), roomGlassF); leftG.position.set(-RW / 2, RH / 2, 0); room.add(leftG);
+    var rightG = new THREE.Mesh(new THREE.BoxGeometry(0.08, RH, RD), roomGlassF); rightG.position.set(RW / 2, RH / 2, 0); room.add(rightG);
+    // front: two panels with a doorway in the middle
+    [-1.25, 1.25].forEach(function (dx) {
+      var p = new THREE.Mesh(new THREE.BoxGeometry(1.25, RH, 0.08), roomGlassF);
+      p.position.set(dx, RH / 2, RD / 2); room.add(p);
+    });
+    var topFrame = new THREE.Mesh(new THREE.BoxGeometry(RW + 0.16, 0.12, RD + 0.16), matDark);
+    topFrame.position.set(0, RH + 0.06, 0); room.add(topFrame);
+    [[-RW / 2, -RD / 2], [RW / 2, -RD / 2], [-RW / 2, RD / 2], [RW / 2, RD / 2], [-0.63, RD / 2], [0.63, RD / 2]].forEach(function (p) {
+      var post = new THREE.Mesh(new THREE.BoxGeometry(0.1, RH, 0.1), matDark);
+      post.position.set(p[0], RH / 2, p[1]); room.add(post);
+    });
+    var mtable = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.09, 1.1), ART.flat(0xd8d3c8, { rough: 0.6 }));
+    mtable.position.set(0, 0.76, 0); mtable.castShadow = true; room.add(mtable);
+    [[-1.0, -0.45], [1.0, -0.45], [-1.0, 0.45], [1.0, 0.45]].forEach(function (p) {
+      var leg = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.72, 8), matMetal);
+      leg.position.set(p[0], 0.36, p[1]); room.add(leg);
+    });
+    for (var mc = 0; mc < 4; mc++) {
+      var ch2 = ART.chair(mc % 2 ? 0x2f7dff : 0xe8552f);
+      ch2.scale.setScalar(0.9);
+      ch2.position.set(-1.2 + mc * 0.8, 0, (mc < 2 ? -0.95 : 0.95));
+      ch2.rotation.y = mc < 2 ? 0 : Math.PI;
+      room.add(ch2);
+    }
+    var mScreen = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.0), new THREE.MeshBasicMaterial({
+      map: signTexture('MEETING', 'الاجتماع بدا', { bg: '#1a0f2e', border: '#a05cff', title: '#d9b3ff', sub: '#ffffff', foot: 'قاعة الاجتماعات — ما تتأخرش' })
+    }));
+    mScreen.position.set(0, 1.75, -RD / 2 + 0.06); room.add(mScreen);
+    var roomLight = new THREE.PointLight(0xd9b3ff, 0.5, 6, 2);
+    roomLight.position.set(0, 2.2, 0); room.add(roomLight);
+    addCollider(-6.4, -5.9, RW, 0.3, 0.0);
+    addCollider(-8.3, -4.3, 0.3, RD, 0.0);
+    addCollider(-4.5, -4.3, 0.3, RD, 0.0);
+    addCollider(-6.4, -4.3, 2.0, 0.3, 0.0);     // the meeting table
+    addCollider(-7.66, -2.7, 1.27, 0.16, 0.0);  // glass panels (doorway stays open)
+    addCollider(-5.13, -2.7, 1.27, 0.16, 0.0);
+    flags.meetingSpot = new THREE.Vector3(-6.4, 0, -3.1);
+    flags.meetingRoom = room;
+
+    // ---- CASINO next door (neon, duck race, treasure chamber) --------------
+    if (SWYF.Casino) {
+      SWYF.Casino.build({ root: root, addCollider: addCollider, flags: flags, scene: scene, W: W });
+      interactables.push({ id: 'casino', label: 'دخول الكازينو 🎰 (خطر: البوس)', pos: new THREE.Vector3(W / 2 - 0.6, 1.0, 5), radius: 1.5, kind: 'casino' });
+      // neon doorway trim on the office side
+      var neonTrim = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.6, 1.7), ART.flat(0xff4fd8, { emissive: 0x8a1360, ei: 0.9 }));
+      neonTrim.position.set(W / 2 - 0.02, 1.3, 5); root.add(neonTrim);
+    }
+
     // ---- junk / props
     for (var b = 0; b < 7; b++) {
       var box = new THREE.Mesh(new THREE.BoxGeometry(U.rnd(0.3, 0.6), U.rnd(0.3, 0.5), U.rnd(0.3, 0.6)), new THREE.MeshStandardMaterial({ color: new THREE.Color().setHSL(0.09, 0.35, U.rnd(0.25, 0.5)), roughness: 0.95 }));
-      var bx = U.rnd(-7.5, 7.5), bz = U.rnd(-5, 5);
-      if (Math.abs(bx) < 4.5 && Math.abs(bz) < 3) bx += 5;      // keep the desk area clear
-      if (bx > -1 && bx < 3.2 && bz > -1.5 && bz < 2.6) bx -= 5; // keep the way to your desk clear
+      var bx = 0, bz = 0;
+      for (var tries = 0; tries < 20; tries++) {               // junk never lands in a doorway
+        bx = U.rnd(-7.5, 7.5); bz = U.rnd(-5, 5);
+        if (Math.abs(bx) < 4.5 && Math.abs(bz) < 3) continue;                       // the desk island
+        if (bx > -1 && bx < 3.2 && bz > -1.5 && bz < 2.6) continue;                 // your way to your desk
+        if (bx > -8.8 && bx < -4.0 && bz > -3.7 && bz < -2.0) continue;             // glass meeting room door
+        if (bx > W / 2 - 2.5 && bz > 3.2 && bz < 6.8) continue;                     // casino door
+        if (bx > -7.2 && bx < -6.0 && bz > 3.4 && bz < 4.9) continue;               // kitchen counter
+        break;
+      }
       box.position.set(bx, box.geometry.parameters.height / 2, bz);
       box.rotation.y = U.rnd(0, 6.28); box.castShadow = true; root.add(box);
       addCollider(bx, bz, 0.7, 0.7, 0.05);
     }
     // plants
-    [[-8.0, 4.6], [8.0, -5.0]].forEach(function (p) {
+    [[-8.2, 0.4], [8.0, -5.0]].forEach(function (p) {
       var pot = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.2, 0.4, 12), new THREE.MeshStandardMaterial({ color: 0x8a5a3b, roughness: 0.9 }));
       pot.position.set(p[0], 0.2, p[1]); root.add(pot);
       var leafMat = new THREE.MeshStandardMaterial({ color: 0x2f7d4f, roughness: 0.9, side: THREE.DoubleSide });
@@ -59600,13 +61484,26 @@ SWYF.nluModel = {
       };
     }
 
+    // ---- the real look: flat-shaded, big-headed, featureless characters with
+    //      floating name tags — exactly the reference art direction ------------
+    makeHuman = function (opts) {
+      opts = opts || {};
+      return ART.makeCharacter(opts);   // same surface: group / arms / legs / bubble / say
+    };
+
     // ---- coworkers walking
     var coopSpots = [
       new THREE.Vector3(-1.5, 0, -1.2), new THREE.Vector3(1.2, 0, 2.6), new THREE.Vector3(-5.5, 0, 3.2),
       new THREE.Vector3(5.6, 0, -0.6), new THREE.Vector3(-1.6, 0, 4.2), new THREE.Vector3(3.4, 0, 4.4)
     ];
+    var TAG_COLS = [0xffd447, 0x6ad0ff, 0xff8a3d, 0xff7ab8, 0x9b5cff, 0x8fd46a];
     SWYF.data.coworkers.forEach(function (cw, i) {
-      var hum = makeHuman({ hair: i % 2 ? 0x2a1a12 : 0x3a2a18 });
+      var hum = makeHuman({
+        name: cw.name, emoji: cw.emoji, tagColor: TAG_COLS[i % TAG_COLS.length],
+        skin: ART.SKINS[i % ART.SKINS.length], hair: ART.HAIRS[(i + 3) % ART.HAIRS.length],
+        shirt: ART.SHIRTS[i % ART.SHIRTS.length], pants: ART.PANTS[i % ART.PANTS.length],
+        hairTuft: i % 3 === 0
+      });
       hum.group.position.copy(coopSpots[i % coopSpots.length]);
       root.add(hum.group);
       var npc = {
@@ -59619,7 +61516,10 @@ SWYF.nluModel = {
     });
 
     // ---- boss npc
-    var bossHum = makeHuman({ tie: 0xd23b3b, hair: 0x101010 });
+    var bossHum = makeHuman({
+      tie: 0xd23b3b, hair: 0x101010, shirt: 0x21252e, skin: 0xd9a066, pants: 0x1f2430,
+      name: 'السيد بولعيد', emoji: '👔', tagColor: 0xff5d6c, mouth: false, headset: false
+    });
     bossHum.group.position.copy(flags.bossStand);
     bossHum.group.scale.set(1.06, 1.06, 1.06);
     root.add(bossHum.group);
@@ -59662,6 +61562,7 @@ SWYF.nluModel = {
       scene.background.setHex(on ? 0x0a0e16 : 0x05070c);
       scene.fog.color.setHex(on ? 0x0a0e16 : 0x05070c);
       monitors.forEach(function (m) { m.glare.intensity = on ? 0.25 : 0.06; });
+      if (flags.casinoEntry) flags.casinoEntry.intensity = on ? 0.8 : 0.15;
     }
     function setFire(on, pos) {
       if (on && !hazardFire) {
@@ -59693,7 +61594,20 @@ SWYF.nluModel = {
       firedPoster.material.needsUpdate = true;
     }
 
+    // ---- walkable bounds: office + the casino wing (through the neon door)
+    function inBounds(x, z) {
+      var half = 0.45;
+      if (x >= -W / 2 + half && x <= W / 2 - half && z >= -DP / 2 + half && z <= DP / 2 - half) return true;
+      var cs = SWYF.Casino && SWYF.Casino.built();
+      if (!cs) return false;
+      var cz1 = -cs.D / 2 + half, cz2 = cs.D / 2 - half;
+      if (x < W / 2 - half || x > cs.ox + cs.W / 2 - half || z < cz1 || z > cz2) return false;
+      if (x <= W / 2 + half && (z < 4.25 || z > 5.75)) return false;   // only the doorway
+      return true;
+    }
+
     // ---- simple NPC update
+    var api = { npcs: npcs, colliders: colliders, root: root, flags: flags, W: W, DP: DP, inBounds: inBounds };
     function update(dt, playerPos) {
       var t = performance.now() / 1000;
       npcs.forEach(function (n, i) {
@@ -59705,14 +61619,20 @@ SWYF.nluModel = {
           var vx = (dx / dist) * n.speed * dt, vz = (dz / dist) * n.speed * dt;
           g.position.x += vx; g.position.z += vz;
           g.rotation.y = Math.atan2(vx, vz);
-          var sw = Math.sin(t * 9 + i) * 0.6;
-          n.obj.legs[0].rotation.x = sw; n.obj.legs[1].rotation.x = -sw;
-          n.obj.arms[0].rotation.x = -sw * 0.7; n.obj.arms[1].rotation.x = sw * 0.7;
+          if (n.obj.walk) n.obj.walk(1, t + i);
+          else {
+            var sw = Math.sin(t * 9 + i) * 0.6;
+            n.obj.legs[0].rotation.x = sw; n.obj.legs[1].rotation.x = -sw;
+            n.obj.arms[0].rotation.x = -sw * 0.7; n.obj.arms[1].rotation.x = sw * 0.7;
+          }
         } else {
           n.waitT -= dt;
-          var sw2 = Math.sin(t * 2 + i) * 0.06;
-          n.obj.legs[0].rotation.x = 0; n.obj.legs[1].rotation.x = 0;
-          n.obj.arms[0].rotation.x = sw2; n.obj.arms[1].rotation.x = -sw2;
+          if (n.obj.idle) n.obj.idle(t + i);
+          else {
+            var sw2 = Math.sin(t * 2 + i) * 0.06;
+            n.obj.legs[0].rotation.x = 0; n.obj.legs[1].rotation.x = 0;
+            n.obj.arms[0].rotation.x = sw2; n.obj.arms[1].rotation.x = -sw2;
+          }
           if (n.waitT <= 0) {
             n.waitT = U.rnd(3, 9);
             n.target = coopSpots[U.irnd(0, coopSpots.length - 1)].clone();
@@ -59736,10 +61656,27 @@ SWYF.nluModel = {
         flags.boss.arms[0].rotation.x = Math.sin(t * 1.3) * 0.12;
         flags.boss.arms[1].rotation.x = -Math.sin(t * 1.3) * 0.12;
       }
-      // monitor sizzle (cheap flicker on the glare only)
+      // monitors: live in-world OS (clock, caller overlay) + glare flicker
+      var call = null;
+      try { call = SWYF.Calls && SWYF.Calls.active ? SWYF.Calls.active() : null; } catch (e) { call = null; }
+      var clockStr = '9:00';
+      try { clockStr = U.minutes(SWYF.Day.time()); } catch (e) {}
       monitors.forEach(function (m) {
+        m.t += dt;
+        if (m.t > (m.mine ? 0.66 : 1.6)) {
+          m.t = 0;
+          var want = (call && call.name ? 'CALL ' + call.name : '') + '|' + clockStr;
+          if (m.mine || want !== m.os.last) {
+            m.os.last = want;
+            drawOS(m.os.canvas.getContext('2d'), m.os.canvas.width, m.os.canvas.height, m.os.tag, { clock: clockStr, caller: (call && call.name) ? call.name : '' });
+            m.os.tex.needsUpdate = true;
+          }
+        }
         if (Math.random() < 0.01) m.glare.intensity = 0.18 + Math.random() * 0.2;
       });
+      // toy physics (knocked-over characters, bouncing props, stink clouds)
+      if (SWYF.physics) SWYF.physics.step(dt, api);
+      if (SWYF.Casino) SWYF.Casino.update(dt);
       if (hazardFire) {
         hazardFire.t += dt;
         var s = 1 + Math.sin(t * 12) * 0.12;
@@ -59754,7 +61691,9 @@ SWYF.nluModel = {
       update: update, setPower: setPower, setFire: setFire, setShift: setShift,
       setQuota: setQuota, setFired: setFired, virusCube: virusCube, fireball: fireball,
       signTexture: signTexture, screenTexture: screenTexture, makeHuman: makeHuman,
-      addCollider: addCollider, root: root
+      addCollider: addCollider, root: root, monitors: monitors, osScreen: osScreen,
+      inBounds: inBounds, ART: ART,
+      casino: flags.casinoEntry ? (SWYF.Casino && SWYF.Casino.built()) : null, api: api
     };
   }
 
@@ -59874,9 +61813,12 @@ SWYF.nluModel = {
         var b = c[i];
         if (x > b.x1 - r && x < b.x2 + r && z > b.z1 - r && z < b.z2 + r) return true;
       }
-      // room bounds
-      if (x < -world.W / 2 + 0.45 || x > world.W / 2 - 0.45) return true;
-      if (z < -world.DP / 2 + 0.45 || z > world.DP / 2 - 0.45) return true;
+      // room bounds (office + casino wing)
+      if (world.inBounds) { if (!world.inBounds(x, z)) return true; }
+      else {
+        if (x < -world.W / 2 + 0.45 || x > world.W / 2 - 0.45) return true;
+        if (z < -world.DP / 2 + 0.45 || z > world.DP / 2 - 0.45) return true;
+      }
       return false;
     }
 
@@ -59946,6 +61888,34 @@ SWYF.nluModel = {
     }
 
     // -------------------------------------------------------------- interactions
+    // ---- first-person hands holding the phone (reference look) -------------
+    var vm = null;
+    P.viewmodel = function (on) {
+      if (!vm) {
+        vm = new THREE.Group();
+        var skin = SWYF.art ? SWYF.art.flat(0xf0b189, { rough: 0.8 }) : new THREE.MeshStandardMaterial({ color: 0xf0b189 });
+        var dark = SWYF.art ? SWYF.art.flat(0x1b1f27, { rough: 0.5 }) : new THREE.MeshStandardMaterial({ color: 0x1b1f27 });
+        var hand = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 10), skin);
+        hand.scale.set(1, 0.8, 1.25); hand.position.set(0.19, -0.17, -0.32); vm.add(hand);
+        var phone = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.17, 0.02), dark);
+        phone.position.set(0.19, -0.10, -0.36); phone.rotation.set(-0.35, 0.18, 0.12); vm.add(phone);
+        var scr = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.14), new THREE.MeshBasicMaterial({ color: 0x2f7dff }));
+        scr.position.set(0.19, -0.10, -0.349); scr.rotation.copy(phone.rotation); vm.add(scr);
+        var hand2 = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), skin);
+        hand2.scale.set(1, 0.8, 1.2); hand2.position.set(0.10, -0.20, -0.34); vm.add(hand2);
+        vm.visible = false;
+        if (P.camera) P.camera.add(vm);
+        P.hands = vm;
+      }
+      vm.visible = !!on;
+    };
+    P.waveHands = function (t) {
+      if (!P.hands) return;
+      P.hands.position.y = Math.sin(t * 2.2) * 0.012;
+      P.hands.rotation.z = Math.sin(t * 1.4) * 0.05;
+    };
+
+    if (world.scene && camera.parent !== world.scene) world.scene.add(camera);
     P.free = function (x, z) { return !collide(x, z); };
     P.findFreeSpot = function (x, z) {
       for (var r = 0; r < 12; r++) {
@@ -60012,7 +61982,7 @@ SWYF.nluModel = {
     phase: 'menu',            // menu | brief | shift | review | shop | gameover | win
     day: 1, cash: 400, quota: D.boss.quotaStart, earnedToday: 0,
     shiftT: 0, shiftLen: 300,   // real seconds
-    upgrades: {}, nerves: 100,
+    upgrades: {}, nerves: 100, stinkBombs: 0, balls: 0, meeting: null,
     stats: { answered: 0, landed: 0, totalEarned: 0, daysSurvived: 0, viruses: 0, raids: 0, strikes: 0, lessons: 0 },
     handled: 0, scamsLanded: 0,
     ring: null, ringT: 8, nextIn: 0,
@@ -60027,7 +61997,8 @@ SWYF.nluModel = {
     { id: 'virus', weight: 14, min: 2, kind: 'hud' },
     { id: 'raid', weight: 11, min: 3, kind: 'hud' },
     { id: 'inspector', weight: 9, min: 3, kind: 'hud' },
-    { id: 'strike', weight: 9, min: 4, kind: 'walk' }
+    { id: 'strike', weight: 9, min: 4, kind: 'walk' },
+    { id: 'meeting', weight: 13, min: 1, kind: 'walk' }
   ];
 
   function hooks() { return SWYF.main.hooks; }
@@ -60068,6 +62039,7 @@ SWYF.nluModel = {
     S.quota = D.boss.quotaStart + (S.day - 1) * 700;
     S.earnedToday = 0; S.shiftT = 0; S.shiftLen = Math.max(220, 300 - (S.day - 1) * 12);
     S.handled = 0; S.scamsLanded = 0; S.nerves = U.clamp(S.nerves + 12, 0, 100);
+    S.meeting = null; SWYF.ui.meetingBanner('', '', false);
     S.ring = null; S.currentEvent = null; S.eventT = 0; S.virusT = 0;
     S.targets = []; S.ringT = U.rnd(6, 12); S.phase = 'brief';
     for (var i = 0; i < 4; i++) S.targets.push(planTarget(i));
@@ -60197,6 +62169,15 @@ SWYF.nluModel = {
         S.nerves = U.clamp(S.nerves - 6, 0, 100);
         break;
       }
+      case 'meeting': {
+        if (S.meeting) break;                    // one meeting at a time
+        // purple banner: walk to the conference room before the door closes
+        SWYF.ui.meetingBanner('Meeting is about to start!', 'الاجتماع غادي يبدا ف قاعة الاجتماعات — سير دابا (', true);
+        if (SWYF.audio.sfx) SWYF.audio.sfx('boss');
+        SWYF.Desktop.notify('boss', '🟣 Meeting is about to start in the conference room!');
+        S.meeting = { t: 28, done: false };
+        break;
+      }
       case 'coworker': {
         var cw = U.pick(SWYF.world.npcs);
         var line2 = U.pick([D.events.coworker_coffee, D.events.coworker_cover, D.events.coworker_tip]).replace('{co}', cw.name);
@@ -60322,6 +62303,36 @@ SWYF.nluModel = {
         if (S.eventAwait.type === 'strike' && S.eventAwait.done) S.eventAwait = null;
         if (S.eventAwait.t <= 0 && !S.eventAwait.done) { S.eventAwait = null; }
       }
+      // ---- the meeting: be in the conference room before it closes ----------
+      if (S.meeting && !S.meeting.done) {
+        S.meeting.t -= dt;
+        var ms = SWYF.world && SWYF.world.flags && SWYF.world.flags.meetingSpot;
+        var pl = SWYF.player;
+        var near = ms && pl && pl.pos && (Math.abs(pl.pos.x - ms.x) < 2.0 && Math.abs(pl.pos.z - ms.z) < 2.2);
+        var banner = document.getElementById('meeting');
+        if (banner && !banner.classList.contains('hidden')) {
+          var b2 = banner.querySelector('span');
+          if (b2) b2.textContent = 'الاجتماع غادي يبدا ف قاعة الاجتماعات — باقي ' + Math.max(0, Math.round(S.meeting.t)) + ' ثانية';
+        }
+        if (near) {
+          S.meeting.done = true;
+          SWYF.ui.meetingBanner('', '', false);
+          S.nerves = U.clamp(S.nerves + 10, 0, 100);
+          var bl = '«مبروك عليكم، جيتو ف الوقت. هاد شي فريق كيحترم.»';
+          if (SWYF.world.flags.boss && SWYF.world.flags.boss.say) SWYF.world.flags.boss.say(bl, 5000);
+          SWYF.Desktop.addLesson('📌 الاجتماع: الحضور ف الوقت كيرفع الثقة… و الغياب كيتسجل.');
+          SWYF.ui.toast('✅ حضرت الاجتماع — +10 أعصاب', 3200);
+          S.meeting = null;
+        } else if (S.meeting.t <= 0) {
+          S.meeting.done = true;
+          SWYF.ui.meetingBanner('', '', false);
+          S.nerves = U.clamp(S.nerves - 16, 0, 100);
+          SWYF.ui.toast('❌ فوتّي الاجتماع — البوس كتب عليك غياب (-16)', 3600);
+          SWYF.audio.sfx('boo');
+          if (SWYF.world.flags.boss && SWYF.world.flags.boss.say) SWYF.world.flags.boss.say('«الاجتماع… و نتا فين؟ هاد الغياب غادي نتفكر.»', 5200);
+          S.meeting = null;
+        }
+      }
       // nerves recovery
       S.nerves = U.clamp(S.nerves + dt * 0.25, 0, 100);
     }
@@ -60341,6 +62352,7 @@ SWYF.nluModel = {
 
   function endShift() {
     S.phase = 'review';
+    if (S.meeting) { S.meeting = null; SWYF.ui.meetingBanner('', '', false); }
     SWYF.ui.hud(false);
     SWYF.ui.hideRing();
     SWYF.audio.sfx('door');
@@ -60388,7 +62400,17 @@ SWYF.nluModel = {
   function buy(id) {
     var up = null;
     for (var i = 0; i < D.upgrades.length; i++) if (D.upgrades[i].id === id) up = D.upgrades[i];
-    if (!up || S.upgrades[id] || S.cash < up.price) return false;
+    if (!up || S.cash < up.price) return false;
+    if (up.consumable) {
+      S.cash -= up.price;
+      if (id === 'stink') S.stinkBombs = (S.stinkBombs || 0) + 3;
+      else if (id === 'balls') S.balls = (S.balls || 0) + 5;
+      else if (id === 'chips') S.cash += 800;
+      SWYF.audio.sfx('cash');
+      SWYF.ui.refreshHud();
+      return true;
+    }
+    if (S.upgrades[id]) return false;
     S.cash -= up.price;
     S.upgrades[id] = 1;
     SWYF.ui.refreshHud();
@@ -60465,6 +62487,7 @@ SWYF.nluModel = {
     // cinematic menu orbit
     player.setMode('cinematic', { r: 9 });
     if (world.flags.boss) world.flags.boss.say('مرحبا بيكم ف المكتب. الكوتا كتبدل.', 6000);
+    player.viewmodel(false);
 
     // ---- desktop api
     SWYF.Desktop.init({
@@ -60595,6 +62618,11 @@ SWYF.nluModel = {
     SWYF.audio.sfx('click');
     switch (it.kind) {
       case 'desk': seat(false); break;
+      case 'casino':
+        SWYF.audio.sfx('coins');
+        SWYF.ui.toast('🎰 مرحبا ف الكازينو — ربح ولا خسر، و البوس ماشي بعيد.', 4000);
+        SWYF.Casino.open('slots');
+        break;
       case 'coffee':
         SWYF.audio.sfx('success');
         buffs.patience = 20;
@@ -60670,6 +62698,10 @@ SWYF.nluModel = {
     if (!SWYF.Day.S.paused && !paused) {
       player.update(dt);
       world.update(dt, player.pos);
+    // first-person hands: phone up while you're on a call
+    var onCall = !!(SWYF.Calls.active() || (SWYF.Day.S.ring && SWYF.Day.state().phase === 'shift'));
+    player.viewmodel(onCall && player.mode !== 'cinematic');
+    if (player.waveHands && onCall) player.waveHands(performance.now() / 1000);
       SWYF.Calls.tick(dt);
       SWYF.Day.update(dt);
       // interaction prompt

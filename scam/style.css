@@ -337,3 +337,100 @@ button.big{font-size:17px;padding:16px}
 .writer .mic { min-width: 44px; padding: 0 10px; }
 .writer .mic.rec { background: rgba(255,90,90,.28); border-color: #ff6b6b; animation: micPulse 1.1s infinite; }
 @keyframes micPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,90,90,.5); } 50% { box-shadow: 0 0 0 8px rgba(255,90,90,0); } }
+
+/* ======================= CASINO + MEETING (reference look) ================= */
+#meeting {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 60; min-width: 340px; max-width: 82vw;
+  background: linear-gradient(180deg, #a05cff, #6a2bd0);
+  border: 2px solid #d9b3ff; border-radius: 10px;
+  padding: 10px 16px; box-shadow: 0 10px 30px rgba(120,60,255,.45);
+  display: flex; flex-direction: column; gap: 2px; text-align: center;
+  animation: meetPop .35s ease-out;
+}
+#meeting b { color: #fff; font-size: 15px; letter-spacing: .3px; }
+#meeting span { color: #f0e6ff; font-size: 12.5px; }
+@keyframes meetPop { from { transform: translate(-50%, -14px); opacity: 0; } }
+
+#casino-ui { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 40%, rgba(60,20,120,.55), rgba(4,4,10,.85)); }
+#casino-ui.hidden { display: none; }
+.cs-card { width: min(620px, 94vw); max-height: 88vh; overflow: auto;
+  background: linear-gradient(180deg, #1b1030, #120a24);
+  border: 2px solid #7a3bd0; border-radius: 16px; padding: 14px 16px 18px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.6), 0 0 0 4px rgba(122,59,208,.15) inset; color: #f2ecff; }
+.cs-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.cs-head b { font-size: 16px; color: #ffd447; }
+.cs-head .dim { font-size: 11.5px; }
+.cs-cash { margin-inline-start: auto; background: rgba(255,212,71,.14); border: 1px solid rgba(255,212,71,.4);
+  color: #ffe9a8; border-radius: 999px; padding: 3px 10px; font-size: 12px; }
+.cs-close { background: #3a2a5c; border: 1px solid #6a4bd0; color: #fff; border-radius: 8px;
+  width: 30px; height: 28px; cursor: pointer; }
+.cs-reels { display: flex; gap: 10px; justify-content: center; margin: 12px 0; }
+.cs-reel { width: 82px; height: 82px; display: grid; place-items: center; font-size: 40px;
+  background: #2a1240; border: 3px solid #ffd447; border-radius: 12px;
+  box-shadow: 0 0 22px rgba(255,212,71,.25) inset; }
+.cs-reel.spin { animation: reelSpin .18s linear infinite; }
+@keyframes reelSpin { 50% { transform: translateY(-4px) scale(1.03); } }
+.cs-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0; font-size: 13px; }
+.cs-row button, .cs-bet, .cs-rbet, .cs-cbet { background: #2f2350; border: 1px solid #6a4bd0; color: #e8dcff;
+  border-radius: 9px; padding: 7px 12px; cursor: pointer; font-family: inherit; }
+.cs-row button:hover { background: #3d2d68; }
+.cs-spin { background: linear-gradient(180deg, #27d17a, #12a35c) !important; border-color: #6ef0a8 !important;
+  color: #04210f !important; font-weight: 700; }
+.cs-spin[disabled] { opacity: .55; }
+.cs-msg { font-size: 12.5px; }
+.cs-lanes { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 10px 0; }
+.cs-lane { background: #241640; border: 2px solid #4a2f86; color: #eadcff; border-radius: 10px; padding: 9px;
+  cursor: pointer; font-family: inherit; }
+.cs-lane.sel { border-color: #ffd447; background: #3a2358; box-shadow: 0 0 0 3px rgba(255,212,71,.2); }
+.cs-lane .duck { font-size: 17px; }
+.cs-lane .duck.d0 { filter: none; } .cs-lane .duck.d1 { filter: hue-rotate(40deg); }
+.cs-lane .duck.d2 { filter: hue-rotate(180deg); } .cs-lane .duck.d3 { filter: hue-rotate(300deg); }
+.cs-lane .duck.d4 { filter: hue-rotate(90deg); }
+.cs-track { display: flex; flex-direction: column; gap: 5px; margin: 10px 0; }
+.cs-lanepos { position: relative; height: 18px; background: #1b2a4a; border-radius: 9px; overflow: hidden; }
+.cs-lanepos i.prog { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #27d17a, #6ef0a8); transition: width .1s linear; }
+.cs-lanepos span { position: absolute; top: -1px; inset-inline-end: 6px; font-size: 14px; }
+.cs-hand { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+.card { display: inline-grid; place-items: center; width: 40px; height: 56px; border-radius: 7px;
+  background: #fdfdff; color: #16202e; font-weight: 700; font-size: 15px; box-shadow: 0 3px 10px rgba(0,0,0,.4); }
+.card.red { color: #d0203a; }
+.card.hidden { background: repeating-linear-gradient(45deg, #3b2a6b, #3b2a6b 6px, #2a1c50 6px, #2a1c50 12px); color: transparent; }
+.cs-table { background: radial-gradient(circle at 50% 20%, #1c6b45, #0e3f29); border-radius: 12px; padding: 10px;
+  border: 2px solid #6b4b22; }
+
+/* ---- reference desktop apps: Caller Truth · browser · DuckTalk ------------ */
+#desktop .tb-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(180deg,#2a3552,#1b2338);
+  border:1px solid #3d4a70;color:#eaf1ff;font-size:16px;display:grid;place-items:center;cursor:pointer}
+#desktop .tb-icon:hover{background:#37456b}
+#desktop .tb-icon.run{outline:2px solid rgba(120,180,255,.6);background:#31406a}
+.ct{display:flex;gap:14px;padding:6px}
+.ct-left{display:flex;flex-direction:column;gap:6px;align-items:center;width:200px}
+.ct-face{border:2px solid #3d4a70;border-radius:10px;width:170px;height:170px}
+.ct-name{font-weight:700;font-size:14px}
+.ct-hang{margin-top:6px;width:100%}
+.ct-recall{width:100%}
+.ct-right{flex:1;display:flex;flex-direction:column;gap:6px}
+.ct-row{display:flex;justify-content:space-between;gap:8px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:6px 9px;font-size:12.5px}
+.ct-row b{color:#9fb6d8;font-weight:600}
+.ct-row .ok{color:#7fe6b5}.ct-row .bad{color:#ff9a9a}
+.ct-note{margin-top:auto;border-top:1px dashed #33405e;padding-top:8px}
+.br{display:flex;flex-direction:column;height:100%;gap:8px}
+.br-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.br-tab{background:#222b44;border:1px solid #384466;color:#cfe0ff;border-radius:8px 8px 0 0;padding:6px 10px;font-size:12px;cursor:pointer}
+.br-tab.on{background:#2f3f68;color:#fff}
+.br-bar{display:flex;gap:8px;align-items:center}
+.br-url{flex:1;background:#101728;border:1px solid #2b3552;border-radius:8px;padding:6px 9px;font-size:11.5px;color:#8fd9ff}
+.br-src,.br-page button{background:#3a2a6b;border:1px solid #6a4bd0;color:#e8dcff;border-radius:8px;padding:6px 10px;cursor:pointer;font-family:inherit}
+.br-page{background:#fff;color:#16202e;border-radius:8px;padding:14px;flex:1;overflow:auto;font-size:13.5px}
+.br-page h1{margin:.2em 0 .4em}
+.br-page input{display:block;width:min(320px,100%);margin:4px 0 10px;padding:6px 8px;border:1px solid #b9c3d4;border-radius:6px;font-family:inherit}
+.br-src-view{background:#0d1424;color:#9fe3ff;border:1px solid #2a3552;border-radius:8px;padding:12px;flex:1;overflow:auto;font-size:12px;white-space:pre-wrap;direction:ltr}
+.br-foot{border-top:1px dashed #33405e;padding-top:6px}
+.dt{display:flex;gap:12px;padding:4px}
+.dt-vid{width:320px;height:240px;border:2px solid #3d4a70;border-radius:10px;background:#101828}
+.dt-side{flex:1;display:flex;flex-direction:column;gap:8px}
+.dt-title{font-weight:700}
+.dt-msg{flex:1;background:rgba(255,255,255,.04);border-radius:8px;padding:8px}
