@@ -22,6 +22,7 @@
     { id: 'recorder', name: 'Recorder', icon: '🎥', w: 560, h: 420, hint: 'تسجيل الشاشة' },
     { id: 'camera', name: 'Camera', icon: '📷', w: 560, h: 420, hint: 'تصويرة' },
     { id: 'files', name: 'الملفات', icon: '📁', w: 600, h: 430, hint: 'حفظ / تصفير' },
+    { id: 'ai', name: 'الذكاء (AI)', icon: '🧠', w: 680, h: 540, hint: 'AI حقيقي / محلي' },
     { id: 'settings', name: 'الإعدادات', icon: '⚙️', w: 580, h: 480, hint: 'صوت و مساعدة' }
   ];
 
@@ -450,6 +451,93 @@
       if (confirm('واش متأكد؟ غادي يتمسح كلشي.')) { U.wipe(); location.reload(); }
     });
     return {};
+  };
+
+  // ---- AI (local model bridge + offline brain) --------------------------------
+  BUILDERS.ai = function (body) {
+    var o = {
+      render: function () {
+        U.clear(body);
+        var st = SWYF.ai ? SWYF.ai.status() : { mode: 'brain', online: false };
+        var nlu = SWYF.nlu ? SWYF.nlu.selfTest() : { ok: false, total: 0, pass: 0 };
+        var box = U.el('div', 'ai-box',
+          '<div class="row"><b>🧠 الحالة:</b> ' +
+            (st.online ? '<span class="ok">AI حقيقي شغّال — ' + (st.backend || '') + ' · ' + (st.model || '?') +
+              ' · ' + st.latency + 'ms</span>'
+              : '<span>محرّك محلي مدرّب (offline)</span>') +
+          '</div>' +
+          '<div class="row dim small">موديل اللغة العصبي: ' + (SWYF.nlu && SWYF.nlu.hasModel() ? 'شغّال ✅' : 'ما كاينش ❌') +
+            ' · اختبار: ' + nlu.pass + '/' + nlu.total + ' · كولات متذكّرة: ' + (SWYF.brain ? SWYF.brain.memory.calls.length : 0) +
+            ' · ردود AI: ' + (st.replies || 0) + ' · رجوع للمحلي: ' + (st.fallbacks || 0) + '</div>' +
+
+          '<h4>⚙️ اختيار محرّك الهضرة</h4>' +
+          '<div class="row">' +
+            '<label><input type="radio" name="aimode" value="auto" ' + (st.mode === 'auto' ? 'checked' : '') + '> تلقائي</label>' +
+            '<label><input type="radio" name="aimode" value="brain" ' + (st.mode === 'brain' ? 'checked' : '') + '> محلي فقط (offline 100%)</label>' +
+            '<label><input type="radio" name="aimode" value="llm" ' + (st.mode === 'llm' ? 'checked' : '') + '> AI الحقيقي</label>' +
+          '</div>' +
+          '<div class="row"><span class="dim small">العنوان:</span>' +
+            '<input type="text" class="ai-url" placeholder="فارغ = نفس السيرفر (api/ai)" value="' + (st.url === '(نفس السيرفر)' ? '' : st.url) + '">' +
+            '<button class="ai-save">حفظ و جرّب الاتصال</button></div>' +
+          '<div class="row dim small">' + (st.reason || '') + '</div>' +
+
+          '<h4>🗣️ جرّب الهضرة (بلا مكالمة)</h4>' +
+          '<div class="row"><input type="text" class="ai-probe" placeholder="مثال: السلام عليكم، شكون معايا؟">' +
+            '<button class="ai-send">صيفط</button></div>' +
+          '<div class="ai-think dim small">…</div>' +
+
+          '<h4>🔌 كيفاش تشغّل AI حقيقي بلا إنترنت</h4>' +
+          '<div class="dim small">ثبّت <b>Ollama</b> ولا <b>LM Studio</b> فالحاسوب ديالك، حمّل موديل صغير (مثال: ' +
+            '<span class="mono">ollama pull qwen2.5:3b</span>), من بعد شغّل السيرفر ديال اللعبة: ' +
+            '<span class="mono">node tools/scam-ai-server.mjs</span> — اللعبة غادي تلقاه بوحدها و كل شي كيبقى محلي.</div>' +
+          '<div class="dim small">بلا موديل محلي، اللعبة كتخدم ب <b>محرّك الحوار المدرّب</b> ديالها: كيفهم الدارجة/العربية و اللاتينية، عندو ذاكرة و كيردّ بجمل متجددة — و هادشي 100% offline.</div>');
+        body.appendChild(box);
+        var out = box.querySelector('.ai-think');
+        var pid = 'probe-in-' + Math.random().toString(36).slice(2);
+        box.querySelector('.ai-probe').id = pid;
+
+        U.on(box.querySelector('.ai-save'), 'click', function () {
+          var u = box.querySelector('.ai-url').value.trim();
+          out.innerHTML = '⏳ كنتحقق…';
+          SWYF.ai.setUrl(u).then(function (st2) {
+            out.innerHTML = st2.online
+              ? '<span class="ok">✅ لقيت الموديل: ' + (st2.model || '?') + ' (' + (st2.backend || '') + ')</span>'
+              : '<span class="bad">✖ ما لقيتش موديل. اللعبة غادي تخدم بالمحرّك المحلي.</span>';
+            o.render();
+          });
+        });
+
+        var send = function () {
+          var txt = box.querySelector('.ai-probe').value.trim();
+          if (!txt) return;
+          out.innerHTML = '⏳ كيجاوب…';
+          var c = SWYF.callers.createCaller({ day: SWYF.Day.state().day });
+          SWYF.brain && SWYF.brain.newCall(c);
+          var local = SWYF.brain ? SWYF.brain.respond(c, txt, {}) : null;
+          if (!SWYF.ai.isOnline()) {
+            out.innerHTML = '<b>🧠 محلي:</b> ' + (local ? local.text : '—') +
+              '<div class="dim">(' + (local ? local.move : '') + ')</div>';
+            return;
+          }
+          SWYF.ai.reply(c, txt, { timeout: 25000 }).then(function (r) {
+            if (!r) {
+              out.innerHTML = '<b>🧠 محلي (الAI ما جاوبش):</b> ' + (local ? local.text : '—') +
+                '<div class="dim mono">' + (SWYF.ai.status().reason || '') + '</div>';
+              return;
+            }
+            out.innerHTML = '<b>🧠 AI حقيقي:</b> ' + r.text + '<div class="dim">tags: ' + (r.tags || []).join(', ') + '</div>';
+          });
+        };
+        U.on(box.querySelector('.ai-send'), 'click', send);
+        U.on(box.querySelector('.ai-probe'), 'keydown', function (e) { if (e.key === 'Enter') send(); });
+
+        Array.prototype.forEach.call(body.querySelectorAll('input[name=aimode]'), function (r) {
+          U.on(r, 'change', function () { SWYF.ai.setMode(this.value); setTimeout(function () { o.render(); }, 900); });
+        });
+      }
+    };
+    o.render();
+    return o;
   };
 
   // ---- SETTINGS --------------------------------------------------------------

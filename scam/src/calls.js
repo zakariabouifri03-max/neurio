@@ -48,6 +48,8 @@
         '<div class="ch-name">' + c.name + ' <span class="dim">' + c.city + '</span></div>' +
         '<div class="ch-sub">' + c.job + ' · ' + c.persona.emoji + ' ' + c.persona.label + '</div>' +
       '</div>' +
+      '<div class="ch-ai" title="' + ((SWYF.ai && SWYF.ai.isOnline()) ? 'AI حقيقي محلي' : 'محرّك محلي مدرّب') + '">' +
+        ((SWYF.ai && SWYF.ai.isOnline()) ? '🧠 AI حقيقي' : '🧠 محلي') + '</div>' +
       '<div class="ch-meters">' +
         meter('ثقة', c.trust, 'trust') +
         meter('شك', c.suspicion, 'susp') +
@@ -102,6 +104,12 @@
       chips.appendChild(b);
       if (t.risky) b.title = 'خطر: كيزيد الشك إلا ما كانش الضحية خايف/طمّاع';
     });
+    var tip = SWYF.callers.advise ? SWYF.callers.advise(c, { facts: c.facts }) : null;
+    if (tip) {
+      var tb = U.el('button', 'chip tip ui-block', tip.label);
+      U.on(tb, 'click', function () { doAction({ type: 'tactic', id: tip.tacticId }); });
+      chips.appendChild(tb);
+    }
     wrap.appendChild(chips);
 
     // ---- writer
@@ -109,7 +117,8 @@
     writer.innerHTML =
       '<input class="ui-block talk" placeholder="كتب اللي بغيت تقول… (مثال: السلام عافاك، كاين ملف رسمي باسمك ف بنك…)" />' +
       '<button class="say ui-block primary">قول 🗣️</button>' +
-      '<button class="hang ui-block danger">📴 سد</button>';
+      '<button class="hang ui-block danger">📴 سد</button>' +
+      '<span class="ai-tag">' + ((SWYF.ai && SWYF.ai.isOnline()) ? '🧠 AI محلي: ' + (SWYF.ai.status().model || 'شغّال') : '🧠 محرّك محلي (offline)') + '</span>';
     var input = writer.querySelector('input');
     U.on(writer.querySelector('.say'), 'click', function () {
       var v = input.value.trim();
@@ -138,57 +147,92 @@
   // -------------------------------------------------------------------- actions
   function doAction(action) {
     if (!caller || busy) return;
-    busy = true;
     var c = caller;
+    // ── free text: if a local LLM is alive, let it answer (streamed) ─────────
+    if (action.type === 'text' && SWYF.ai && SWYF.ai.isOnline()) { doTextLLM(action, c); return; }
+
+    busy = true;
     var upg = SWYF.Day.upgrades();
     var res = SWYF.callers.act(c, action, { upgrades: upg, evidence: SWYF.Desktop.hasEvidence() });
-
-    if (res.playerLine) {
-      c.history.splice(c.history.length - 2, 0, { who: 'agent', text: res.playerLine });
-    }
     if (!holder) { busy = false; return; }
-    // append player bubble instantly, then "typing…"
+    pushTurnUI(res);
+    var delay = U.clamp(420 + (res.callerLine || '').length * 18 + U.rnd(0, 380), 620, 3200);
+    setTimeout(function () { applyResult(res); }, delay);
+  }
+
+  /** player bubble + "typing…" — shared by both paths */
+  function pushTurnUI(res) {
     var log = els.log;
-    if (log && res.playerLine) log.appendChild(U.el('div', 'bub me', res.playerLine));
+    if (log && res && res.playerLine) log.appendChild(U.el('div', 'bub me', res.playerLine));
     var typing = U.el('div', 'bub them typing', '<i></i><i></i><i></i>');
     if (log) { log.appendChild(typing); log.scrollTop = log.scrollHeight; }
     SWYF.audio.sfx('keypad');
     U.clear(document.querySelector('.chips'));
     U.clear(document.querySelector('.writer'));
+    return typing;
+  }
 
-    var delay = U.clamp(500 + (res.callerLine || '').length * 22 + U.rnd(0, 400), 700, 4200);
-    setTimeout(function () {
-      if (typing.parentNode) typing.remove();
-      if (!holder) { busy = false; return; }
-      if (res.callerLine) log.appendChild(U.el('div', 'bub them', res.callerLine));
-      if (log) log.scrollTop = log.scrollHeight;
+  /** The real-AI path: async, streamed, with an instant local fallback. */
+  function doTextLLM(action, c) {
+    busy = true;
+    var log = els.log;
+    if (log) log.appendChild(U.el('div', 'bub me', action.text));
+    var typing = U.el('div', 'bub them typing', '<i></i><i></i><i></i>');
+    if (log) { log.appendChild(typing); log.scrollTop = log.scrollHeight; }
+    SWYF.audio.sfx('keypad');
+    U.clear(document.querySelector('.chips'));
+    U.clear(document.querySelector('.writer'));
+    var settled = false;
+    function finish(llm) {
+      if (settled) return;
+      settled = true;
+      if (caller !== c) { busy = false; return; }
+      var res = SWYF.callers.act(c, { type: 'text', text: action.text, llm: llm },
+        { upgrades: SWYF.Day.upgrades(), evidence: SWYF.Desktop.hasEvidence() });
+      applyResult(res, typing);
+    }
+    SWYF.ai.reply(c, action.text, {
+      onToken: function (t) { if (typing && typing.parentNode) typing.textContent = '✍️ ' + String(t).slice(-150); }
+    }).then(function (llm) {
+      if (typing && typing.parentNode) typing.textContent = '<i></i><i></i><i></i>';
+      finish(llm);
+    }, function () { finish(null); });
+  }
 
-      // speak it
-      var v = personaVoice(c);
-      SWYF.audio.speak(res.callerLine || '…', { pitch: v.pitch, gender: v.gender, rate: rate(c) });
+  /** Render the outcome of a turn (bubbles, voice, rewards, next chips). */
+  function applyResult(res, typing) {
+    var c = caller;
+    if (!c) { busy = false; return; }
+    if (typing && typing.parentNode) typing.remove();
+    if (!holder) { busy = false; return; }
+    var log = els.log;
+    if (res.callerLine && log) log.appendChild(U.el('div', 'bub them' + (res.source === 'llm' ? ' llm' : ''), res.callerLine));
+    if (log) log.scrollTop = log.scrollHeight;
 
-      // rewards / lessons
-      if (res.money > 0) {
-        SWYF.audio.sfx('cash');
-        SWYF.Day.takeMoney(res.money, c);
-        var pop = U.el('div', 'money-pop', '+' + U.money(res.money));
-        holder.appendChild(pop);
-        setTimeout(function () { if (pop.parentNode) pop.remove(); }, 1900);
-      }
-      if (res.lesson) { SWYF.Desktop.addLesson(res.lesson); SWYF.Desktop.notify('lesson', res.lesson, 8000); }
-      if (res.kind === 'success') SWYF.audio.sfx('success');
-      if (res.virus) { SWYF.Day.infect('scambaiter'); }
+    // speak it
+    var v = personaVoice(c);
+    SWYF.audio.speak(res.callerLine || '…', { pitch: v.pitch, gender: v.gender, rate: rate(c) });
 
-      // refresh meters + chips
-      render();
+    // rewards / lessons
+    if (res.money > 0) {
+      SWYF.audio.sfx('cash');
+      SWYF.Day.takeMoney(res.money, c);
+      var pop = U.el('div', 'money-pop', '+' + U.money(res.money));
+      holder.appendChild(pop);
+      setTimeout(function () { if (pop.parentNode) pop.remove(); }, 1900);
+    }
+    if (res.lesson) { SWYF.Desktop.addLesson(res.lesson); SWYF.Desktop.notify('lesson', res.lesson, 8000); }
+    if (res.kind === 'success') SWYF.audio.sfx('success');
+    if (res.virus) { SWYF.Day.infect('scambaiter'); }
 
-      if (res.hangup || c.ended) {
-        busy = false;
-        setTimeout(function () { endCall(res); }, 1400);
-        return;
-      }
+    render();
+
+    if (res.hangup || c.ended) {
       busy = false;
-    }, delay);
+      setTimeout(function () { endCall(res); }, 1400);
+      return;
+    }
+    busy = false;
   }
 
   function endCall(res) {
@@ -222,11 +266,11 @@
     c.history.push({ who: 'sys', text: 'الكولاية بدات.' });
     render();
     var v = personaVoice(c);
+    var intro = SWYF.callers.openLine ? SWYF.callers.openLine(c) : 'ألو؟ السلام عليكم، شكون؟';
     setTimeout(function () {
-      SWYF.audio.speak('ألو؟ … ألو، السلام عليكم؟', { pitch: v.pitch, gender: v.gender, rate: rate(c) });
+      SWYF.audio.speak(intro, { pitch: v.pitch, gender: v.gender, rate: rate(c) });
       if (holder) {
         var log = els.log;
-        var intro = c.gender === 'f' ? 'ألو؟ نعم؟ شكون معايا؟' : 'ألو؟ السلام عليكم، شكون؟';
         c.history.push({ who: 'caller', text: intro });
         if (log) { log.appendChild(U.el('div', 'bub them', intro)); log.scrollTop = log.scrollHeight; }
       }

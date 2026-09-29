@@ -63,6 +63,13 @@
     });
 
     // ---- ui hooks
+    // ---- is there a local language model? (optional, never blocks the game) ----
+    if (SWYF.ai) {
+      setTimeout(function () {
+        SWYF.ai.init().then(function () { try { SWYF.ui.refreshHud(); } catch (e) {} });
+      }, 700);
+    }
+
     SWYF.ui.init({
       player: player,
       seat: function (forCall) { seat(forCall); },

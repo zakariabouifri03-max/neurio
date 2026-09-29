@@ -102,6 +102,8 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 نسخة كاملة 3D ف المتصفح، مستوحاة من لعبة ستيم **Scam With Your Friends**، ولكن **100% offline**: مكتب كول سنتر، كولات مع شخصيات AI محليين، كوتا يومية، بوس عصبي، فيروسات/مداهمات/ضربات جوية — بلا إنترنت و بلا سيرفر.
 
+🧠 **الذكاء**: موديل عصبي مدرّب محلياً كيتفهم الدارجة/العربية/العربيزي (`node tools/train-nlu.mjs`)، مخ حوار بذاكرة و تناقضات، و جسر اختياري لـ **LLM محلي** (Ollama/LM Studio) عبر `node tools/scam-ai-server.mjs` — AI حقيقي، و لكن بلا سحابة.
+
 **▶️ العب دابا:** حلّ `scam-baqi-offline.html` (ملف واحد، دوبل كليك) — ولا `cd scam && python3 -m http.server 8000` → `http://localhost:8000`
 
 📖 التفاصيل و التحكم: [`scam/README.md`](scam/README.md) · 📄 الدوسيي على اللعبة الأصلية: [`docs/scam-with-friends-9issa.html`](docs/scam-with-friends-9issa.html)

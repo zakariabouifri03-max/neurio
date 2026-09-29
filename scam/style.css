@@ -311,3 +311,25 @@ button.big{font-size:17px;padding:16px}
   #interact{bottom:150px}
   .call-head{flex-wrap:wrap}
 }
+
+/* ---- AI layer (brain / local LLM) ------------------------------------- */
+.hud-pill.ai { background: rgba(120,90,255,.18); border-color: rgba(150,120,255,.45); }
+.hud-pill.ai.on { background: rgba(40,220,150,.18); border-color: rgba(60,230,160,.55); color: #8ff0c8; }
+.ch-ai { font-size: 11px; padding: 3px 8px; border-radius: 999px; background: rgba(120,90,255,.16);
+  border: 1px solid rgba(150,120,255,.4); color: #cfc2ff; white-space: nowrap; align-self: center; }
+.bub.them.llm { border-inline-start: 3px solid #8b74ff; box-shadow: 0 0 0 1px rgba(139,116,255,.25) inset; }
+.bub.them.llm::after { content: '🧠'; font-size: 10px; opacity: .75; margin-inline-start: 6px; }
+.chip.tip { background: rgba(255,214,102,.14); border-color: rgba(255,214,102,.45); color: #ffe3a3; }
+.chip.tip:hover { background: rgba(255,214,102,.24); }
+.ai-tag { font-size: 11px; color: #9b93c9; align-self: center; padding-inline-start: 6px; }
+.ai-box { padding: 10px 12px; font-size: 13px; line-height: 1.7; }
+.ai-box h4 { margin: 10px 0 4px; font-size: 13px; color: #cfc2ff; }
+.ai-box .row { display: flex; gap: 8px; align-items: center; margin: 6px 0; flex-wrap: wrap; }
+.ai-box input[type=text] { flex: 1 1 220px; background: #101424; border: 1px solid #2b3350; color: #e7e9f5;
+  border-radius: 8px; padding: 7px 10px; font-family: inherit; direction: ltr; }
+.ai-box button { background: #262c46; border: 1px solid #3a4368; color: #e7e9f5; border-radius: 8px;
+  padding: 6px 12px; cursor: pointer; font-family: inherit; }
+.ai-box button:hover { background: #313a5c; }
+.ai-box .ok { color: #7fe6b5; } .ai-box .bad { color: #ff9a9a; }
+.ai-box .mono { font-family: ui-monospace, monospace; font-size: 11px; direction: ltr; }
+.ai-think { min-height: 34px; background: #0e1220; border: 1px dashed #333d61; border-radius: 8px; padding: 8px; }

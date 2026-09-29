@@ -1,5 +1,5 @@
 // Scam Baqi — service worker: كامل offline (100% offline, no network needed)
-const VERSION = 'swyf-baqi-v1';
+const VERSION = 'swyf-baqi-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,11 @@ const ASSETS = [
   './src/util.js',
   './src/audio.js',
   './src/data.js',
+  './src/nlu-text.js',
+  './src/nlu-model.js',
+  './src/nlu.js',
+  './src/brain.js',
+  './src/ai.js',
   './src/callers.js',
   './src/ui.js',
   './src/desktop.js',

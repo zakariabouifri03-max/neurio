@@ -116,6 +116,7 @@
     };
     caller.contact = 'MK-' + U.irnd(10000, 99999);
     caller.facts = factPool(caller);
+    if (SWYF.brain) SWYF.brain.newCall(caller);   // backstory + dialogue memory
     // A scambaiter's "blocklist" file is always present; otherwise random
     if (!scamb && Math.random() < 0.25) caller.flags.hasBlocklist = true;
     caller.scambaitFlag = scamb;
@@ -301,18 +302,37 @@
     if (action.type === 'text' && !isLeverage) {
       var raw = String(action.text || '');
       var clean = U.normAr(raw);
-      var hits = lexHits(clean);
-      var hitKeys = Object.keys(hits);
+      // ---- brain (offline neural NLU + dialogue planner) or the local LLM ----
+      var llm = action.llm || null;
+      var br = null;
+      if (llm && llm.text) {
+        var llmText = U.tpl(String(llm.text), {
+          name: caller.name, agent: caller.agent, city: caller.city, kid: caller.kid,
+          org: (caller.brand && (caller.brand.bank || caller.brand.net || caller.brand.prize)) || 'المصلحة',
+          empId: (caller.backstory && caller.backstory.empId) || '', fileId: (caller.backstory && caller.backstory.fileId) || ''
+        });
+        br = { text: llmText, tags: llm.tags || [], quality: llm.quality, ask: llm.ask || null,
+               trust: llm.trust, susp: llm.susp, move: llm.move || 'llm', source: 'llm',
+               nlu: SWYF.nlu ? SWYF.nlu.analyze(raw) : null };
+      } else if (SWYF.brain) {
+        br = SWYF.brain.respond(caller, raw, {});
+      }
+      var hitKeys = br ? br.tags.slice() : Object.keys(lexHits(clean));
       tags = hitKeys;
       if (!res.playerLine) res.playerLine = raw;
 
-      // quality: number of distinct matchable themes + length + personalisation
-      quality = U.clamp(0.55 + hitKeys.length * 0.22, 0.5, 2.0);
+      // quality: how well the move lands (neural confidence + personalisation)
+      quality = br ? br.quality : U.clamp(0.55 + hitKeys.length * 0.22, 0.5, 2.0);
       if (/\?|؟/.test(raw)) quality += 0.08;
       if (raw.length > 60) quality += 0.12;
       if (clean.indexOf(U.normAr(caller.name)) >= 0) quality += 0.35;             // used their name!
       if (clean.indexOf(U.normAr(caller.city)) >= 0) quality += 0.15;            // knew their town
       if (clean.indexOf(U.normAr(caller.kid)) >= 0) quality += 0.3;              // knew their kid
+      if (br && br.trust) trust += br.trust;
+      if (br && br.susp) susp += br.susp;
+      if (br && br.move === 'contradiction') res.lesson = '📌 الحقيقة: التناقض ف القصة هو أسرع طريقة باش يمسكوك. المحتال الحقيقي كيحفظ سكريبت، و نهار اللي كيخرج منو كيتفضح.';
+      if (br && br.move === 'leverage') res.lesson = res.lesson || '📌 الحقيقة: المعلومات المسروقة (ولدو، العنوان، الخدمة) كتخلّي الضحية تثق — و لهذا خاصك تخبّي المعطيات ديالك.';
+      res.source = br ? br.source : 'legacy';
       var usedFact = null;
       for (var f = 0; f < caller.facts.length; f++) {
         var fc = caller.facts[f];
@@ -321,6 +341,26 @@
       if (hitKeys.indexOf('insult') >= 0) { susp += 40; trust -= 20; quality *= 0.4; }
       if (hitKeys.indexOf('anticheat') >= 0) { susp += 26; trust -= 8; }
       if (hitKeys.length === 0) { quality *= 0.35; }
+      if (hitKeys.length === 1 && hitKeys[0] === 'chat') quality *= 0.75;  // pure small talk advances slowly
+
+      // ---- did the player ask for money in free text? -----------------------
+      var askedKind = null;
+      if (br && br.ask && br.ask.kind) {
+        var needAsk = ASK_THRESHOLD[br.ask.kind];
+        if (caller.trust < needAsk) {
+          susp += 16 + (needAsk - caller.trust) * 0.4;
+          trust -= 5;
+          quality *= 0.6;
+          br.text = (br.text ? br.text + ' ' : '') + U.pick([
+            'تسنى تسنى… علاش كتسول على الفلوس دابا؟ أنا ما عطيتكش حتى حاجة.',
+            'الفلوس؟ و شكون قال ليك بلي غادي نخلص؟ راك كتزرب.',
+            'لا لا، ما غاديش نخلص حتى نفهم كلشي. السيستم ديالكم كيخوف.'
+          ]);
+          res.kind = 'bad';
+        } else {
+          askedKind = br.ask.kind;
+        }
+      }
 
       // Base deltas from matched themes
       trust += hitKeys.reduce(function (a, k) { return a + (['polite', 'empathy', 'faith', 'proof', 'flattery', 'chat'].indexOf(k) >= 0 ? 4.2 : 0); }, 0);
@@ -405,14 +445,31 @@
     // -------- normal hangup conditions ---------------------------------------
     if (caller.suspicion >= 96 || caller.patience <= 0 || (tags.indexOf('insult') >= 0 && Math.random() < 0.7)) {
       caller.ended = true;
-      caller.outcome = caller.suspicion >= 96 ? 'hungup' : 'bored';
+      var insulted = tags.indexOf('insult') >= 0;
+      caller.outcome = (caller.suspicion >= 96 || insulted) ? 'hungup' : 'bored';
       res.hangup = true;
       res.kind = 'hangup';
-      res.callerLine = U.pick(D.reply.hangup) + (caller.patience <= 0 ? ' (عندي حاجة أخرى…)' : '');
+      res.callerLine = ((br && br.text) ? br.text + ' ' : '') + U.pick(D.reply.hangup) + (caller.patience <= 0 ? ' (عندي حاجة أخرى…)' : '');
       res.lesson = caller.suspicion >= 96 ? '📌 الحقيقة: إلا شك فيك الضحية، كيسد و كيبلوكي، و كيبلّغ. هادشي اللي كيوقف النصب.' : null;
       caller.history.push({ who: 'agent', text: res.playerLine });
       caller.history.push({ who: 'caller', text: res.callerLine });
       return res;
+    }
+
+    // -------- free-text payout (player asked for money in their own words) ----
+    if (typeof askedKind !== 'undefined' && askedKind) {
+      var rate2 = askedKind === 'small' ? 0.06 : (0.24 + Math.min(0.3, caller.trust / 300) + (ctx.evidence ? 0.06 : 0) + caller.leverageUsed.length * 0.03);
+      var take2 = Math.max(150, U.round(caller.savings * rate2, 50));
+      caller.money += take2;
+      res.money = take2;
+      res.success = true;
+      res.kind = 'success';
+      caller.askedSmall = caller.askedSmall || askedKind === 'small';
+      caller.askedBig = caller.askedBig || askedKind === 'big';
+      caller.phase = askedKind === 'small' ? 'big' : 'exit';
+      res.phase = caller.phase;
+      res.lesson = res.lesson || U.pick(D.lessons);
+      if (br) br.text = (br.text ? br.text + ' ' : '') + U.pick(BRAIN_PAYOFFS);
     }
 
     // -------- normal reply ---------------------------------------------------
@@ -420,10 +477,15 @@
     res.kind = reaction === 'warm' || reaction === 'excited' || reaction === 'scared' ? 'good' : (reaction === 'suspicious' || reaction === 'annoyed') ? 'bad' : 'neutral';
     caller.mood = reaction;
     var objection = (reaction === 'suspicious' && Math.random() < 0.7) || (tags.indexOf('urgency') >= 0 && caller.persona.id === 'savage');
-    res.callerLine = composeReply(caller, {
+    res.callerLine = (br && br.text) ? br.text : composeReply(caller, {
       reaction: reaction, quote: action.type === 'text' ? action.text : res.playerLine,
       objection: objection, question: reaction === 'cold' && Math.random() < 0.35
     });
+    if (br && br.hangupRisk && Math.random() < br.hangupRisk) {
+      caller.ended = true; caller.outcome = caller.money > 0 ? 'partial' : 'hungup';
+      res.hangup = true; res.kind = 'hangup';
+      res.callerLine = res.callerLine + ' ' + U.pick(D.reply.hangup);
+    }
     caller.history.push({ who: 'agent', text: res.playerLine });
     caller.history.push({ who: 'caller', text: res.callerLine });
     return res;
@@ -431,11 +493,18 @@
 
   function hitKeysLen(tags) { return tags ? tags.length : 0; }
 
+  var BRAIN_PAYOFFS = [
+    'صافي… غادي نحول. الله يستر.', 'واخا، عطيني غير الرقم و كندير التحويل دابا.',
+    'خلاص، ديت اللي بغيتي — الله يسهل.', 'كنت خايف من هاد اللحظة… صافي، غادي ندفع.'
+  ];
+
   SWYF.callers = {
     createCaller: createCaller,
     optionsFor: optionsFor,
     act: act,
     lexHits: function (text) { return lexHits(U.normAr(text)); },
+    openLine: function (caller) { return SWYF.brain ? SWYF.brain.openLine(caller) : U.pick(['ألو؟ السلام عليكم؟']); },
+    advise: function (caller, ctx) { return SWYF.brain ? SWYF.brain.advise(caller, optionsFor(caller, ctx)) : null; },
     ASK_THRESHOLD: ASK_THRESHOLD
   };
 })();

@@ -55,6 +55,10 @@ const dom = new JSDOM(htmlNoScripts, {
         createBiquadFilter: () => ({ type: '', frequency: { value: 0, setValueAtTime() {}, exponentialRampToValueAtTime() {} }, Q: { value: 0 }, connect() {} })
       };
     };
+    // ---- fetch + friends (jsdom has no fetch; the AI bridge needs them)
+    win.fetch = (...a) => fetch(...a);
+    win.Headers = Headers; win.Request = Request; win.Response = Response;
+    win.AbortController = AbortController; win.TextDecoder = TextDecoder; win.TextEncoder = TextEncoder;
     win.speechSynthesis = { getVoices: () => [], speak() {}, cancel() {}, onvoiceschanged: null };
     win.SpeechSynthesisUtterance = function (t) { this.text = t; };
     // ---- WebGL: pretend the renderer works, do nothing
@@ -83,7 +87,8 @@ T.WebGLRenderer = function () {
   };
 };
 // ---- load the game modules in the same order as index.html
-['src/util.js', 'src/audio.js', 'src/data.js', 'src/callers.js', 'src/ui.js',
+['src/util.js', 'src/audio.js', 'src/data.js', 'src/nlu-text.js', 'src/nlu-model.js', 'src/nlu.js',
+ 'src/brain.js', 'src/ai.js', 'src/callers.js', 'src/ui.js',
  'src/desktop.js', 'src/calls.js', 'src/world.js', 'src/player.js', 'src/day.js', 'src/main.js']
   .forEach((f) => runFile('scam/' + f));
 
@@ -287,6 +292,151 @@ check('world updates + hazards visuals', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ======================= AI layer: NLU · brain · LLM bridge =================
+check('nlu: neural model loads + self-test', () => {
+  if (!SWYF.nlu.hasModel()) throw new Error('no model loaded');
+  const t = SWYF.nlu.selfTest();
+  if (!t.total) throw new Error('no samples');
+  if (t.pass / t.total < 0.9) throw new Error('self-test ' + t.pass + '/' + t.total + ' → ' + (t.fails[0] || ''));
+});
+
+check('nlu: understands arabic, darija and arabizi', () => {
+  const cases = [
+    ['نتا كداب و نصاب', 'insult'],
+    ['غادي نعيط للشرطة دابا', 'threat'],
+    ['عالاش كتسول على الحساب ديالي؟', 'suspicion'],
+    ['salam khoya, labas?', 'greet'],
+    ['bghit n3ref chhal 3ndi f bank', 'ask_bank'],
+    ['السلام عليكم، شحال الرصيد ديالي فالبنك', 'ask_bank'],
+    ['عافاك كنفهمك، ما تخافش', 'empathy'],
+    ['والله ما كنكدب', 'faith'],
+    ['حول ليا 20000 درهم', 'ask_money_big'],
+    ['كيفاش حالك خويا، شنو كتدير ف الخدمة', 'chat']
+  ];
+  const bad = [];
+  for (const [txt, want] of cases) {
+    const a = SWYF.nlu.analyze(txt);
+    if (a.intent !== want && !(a.themes || []).length) bad.push(txt + ' → ' + a.intent);
+  }
+  if (bad.length > 1) throw new Error('misunderstood: ' + bad.join(' | '));
+});
+
+check('nlu: question / entity extraction', () => {
+  const a = SWYF.nlu.analyze('واش عندك وثيقة رسمية؟ خاصك 1500 درهم');
+  if (!a.isQuestion) throw new Error('question not detected');
+  if (a.money !== 1500) throw new Error('money=' + a.money);
+  const b = SWYF.nlu.analyze('الرمز هو 482913');
+  if (!b.codes.length) throw new Error('code not extracted');
+});
+
+check('brain: replies to 24 varied lines, never empty', () => {
+  const lines = [
+    'السلام عليكم', 'شكون معايا', 'عطيني دليل', 'لا ما بغيتش', 'واخا صافي',
+    'كيفاش حالك خويا', 'واش عندك الدراري', 'الجو سخون بزاف اليوم', 'شحال عمرك',
+    'ماتش الرجاء كان زوين', 'والله نقسم بلي غادي نخلص', 'علاش كتسول على ولدي',
+    'نتا نصاب', 'غادي نبلغ عليك', 'خاصك تحول 5000 درهم', 'دقيقة واحدة تسنى',
+    'مراتي مريضة و راني بوحدي', 'عافاك كنفهمك', 'واش هاد المكالمة مسجلة',
+    'عندي العنوان ديالك كامل', 'ههههه راك كتضحك', 'مكنعرفش', '………', 'منين جبتي الرقم ديالي'
+  ];
+  const c = SWYF.callers.createCaller({ day: 1 });
+  const seen = [];
+  for (const raw of lines) {
+    const r = SWYF.brain.respond(c, raw, {});
+    if (!r || !r.text || r.text.length < 3) throw new Error('empty reply for: ' + raw);
+    if (/undefined|NaN|\{name\}|\{agent\}/.test(r.text)) throw new Error('bad slots in: ' + r.text);
+    seen.push(r.text);
+  }
+  let dup = 0;
+  for (let i = 0; i < seen.length; i++) for (let j = i + 1; j < seen.length; j++) if (seen[i] === seen[j]) dup++;
+  if (dup > 1) throw new Error('repeated lines: ' + dup);
+});
+
+check('brain: backstory stays consistent when asked twice', () => {
+  const c = SWYF.callers.createCaller({ day: 2 });
+  const a1 = SWYF.brain.respond(c, 'شكون نتا عافاك', {});
+  const a2 = SWYF.brain.respond(c, 'شكون نتا من فضلك', {});
+  const id1 = (a1.text.match(/MK-\d{4}/) || [])[0];
+  const id2 = (a2.text.match(/MK-\d{4}/) || [])[0];
+  if (!id1 || !id2) throw new Error('no employee id: ' + a1.text + ' || ' + a2.text);
+  if (id1 !== id2 || id1 !== c.backstory.empId) throw new Error('identity drifted: ' + id1 + ' vs ' + id2);
+});
+
+check('brain: insult spikes suspicion, threat answered in character', () => {
+  const c = SWYF.callers.createCaller({ day: 1 });
+  const before = c.suspicion;
+  const r1 = SWYF.callers.act(c, { type: 'text', text: 'نتا نصاب و كداب' }, { upgrades: {}, evidence: false });
+  if (c.suspicion <= before) throw new Error('suspicion did not rise');
+  if (r1.kind !== 'bad' && r1.kind !== 'hangup') throw new Error('insult kind=' + r1.kind);
+  const c2 = SWYF.callers.createCaller({ day: 1 });
+  const r2 = SWYF.callers.act(c2, { type: 'text', text: 'غادي نعيط للشرطة و نبلغ عليك' }, { upgrades: {}, evidence: false });
+  if (!r2.callerLine || r2.callerLine.length < 5) throw new Error('no answer to the threat');
+});
+
+check('brain: money asked in free text goes through the ask maths', () => {
+  const c = SWYF.callers.createCaller({ day: 1 });
+  c.trust = 80;
+  const r = SWYF.callers.act(c, { type: 'text', text: 'خاصك تحول ليا 3000 درهم دابا' }, { upgrades: {}, evidence: false });
+  if (r.money <= 0) throw new Error('no payout, money=' + r.money);
+  if (!r.success) throw new Error('not marked as success');
+});
+
+check('brain: advice chip suggests a real tactic', () => {
+  const c = SWYF.callers.createCaller({ day: 1 });
+  c.trust = 70;
+  const tip = SWYF.callers.advise(c, { facts: c.facts });
+  if (!tip || !tip.tacticId) throw new Error('no advice');
+  if (!tip.label || tip.label.indexOf('جرّب') < 0) throw new Error('label=' + tip.label);
+});
+
+check('ai: offline by default, and falls back to the brain', async () => {
+  const st = await SWYF.ai.probe();
+  if (st.online) throw new Error('a local model answered without one being started');
+  const off = await SWYF.ai.reply(SWYF.callers.createCaller({ day: 1 }), 'السلام عليكم');
+  if (off !== null) throw new Error('expected null reply offline');
+});
+
+check('ai: parses the model control tail', () => {
+  const p = SWYF.ai.parseControl('واخا، غادي نحول.\n%%{"trust":6,"susp":2,"ask":"small","hangup":false}');
+  if (p.text.indexOf('%') >= 0) throw new Error('tag left in text: ' + p.text);
+  if (!p.ctl || p.ctl.trust !== 6 || p.ctl.ask !== 'small') throw new Error('ctl=' + JSON.stringify(p.ctl));
+});
+
+check('ai: talks to a local model over SSE and keeps the maths', async () => {
+  const http = require('node:http');
+  const srv = http.createServer((req, res) => {
+    if (req.url.indexOf('/status') >= 0) { res.setHeader('Content-Type', 'application/json'); return res.end(JSON.stringify({ online: true, backend: 'fake', model: 'test-1', streaming: true })); }
+    if (req.url.indexOf('/chat') >= 0) {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+      for (const t of ['ألو، ', 'السلام… ', 'شكون معايا؟', '\n%%{"trust":5,"susp":3,"ask":null,"hangup":false}']) res.write('data: ' + JSON.stringify({ t }) + '\n\n');
+      res.write('data: [DONE]\n\n');
+      return res.end();
+    }
+    res.statusCode = 404; res.end('no');
+  });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const port = srv.address().port;
+  SWYF.ai.setMode('llm');
+  SWYF.ai.setUrl('http://127.0.0.1:' + port);
+  const st = await SWYF.ai.probe();
+  if (!st.online) { srv.close(); throw new Error('probe failed on the fake backend'); }
+  const c = SWYF.callers.createCaller({ day: 1 });
+  const r = await SWYF.ai.reply(c, 'السلام عليكم، شكون معايا؟');
+  if (!r || !r.text) { srv.close(); throw new Error('no LLM reply'); }
+  if (r.source !== 'llm') { srv.close(); throw new Error('source=' + r.source); }
+  if (!/شكون/.test(r.text)) { srv.close(); throw new Error('stream lost: ' + r.text); }
+  const res = SWYF.callers.act(c, { type: 'text', text: 'السلام عليكم، شكون معايا؟', llm: r }, { upgrades: {}, evidence: false });
+  if (!res.callerLine) { srv.close(); throw new Error('caller said nothing'); }
+  if (res.source !== 'llm') { srv.close(); throw new Error('turn source=' + res.source); }
+  SWYF.ai.setUrl('http://127.0.0.1:1');
+  await SWYF.ai.probe();
+  const dead = await SWYF.ai.reply(c, 'واخا');
+  if (dead !== null) { srv.close(); throw new Error('dead backend did not fall back'); }
+  const local = SWYF.callers.act(c, { type: 'text', text: 'واخا', llm: null }, { upgrades: {}, evidence: false });
+  if (!local.callerLine) { srv.close(); throw new Error('local fallback said nothing'); }
+  srv.close();
+  SWYF.ai.setMode('brain');
+});
+
 // phase 2: the SINGLE-FILE build (scam-baqi-offline.html) must boot as well
 // ─────────────────────────────────────────────────────────────────────────────
 let single = 'skipped';

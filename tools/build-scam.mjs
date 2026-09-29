@@ -12,20 +12,9 @@ const scam = root + 'scam/';
 
 const read = (p) => readFileSync(scam + p, 'utf8');
 
-const JS_ORDER = [
-  'vendor/three.global.js',
-  'src/util.js',
-  'src/audio.js',
-  'src/data.js',
-  'src/callers.js',
-  'src/ui.js',
-  'src/desktop.js',
-  'src/calls.js',
-  'src/world.js',
-  'src/player.js',
-  'src/day.js',
-  'src/main.js'
-];
+// script order is taken straight from index.html so the two can never drift
+const JS_ORDER = [...read('index.html').matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1]);
+if (!JS_ORDER.length) { console.error('no scripts found in index.html'); process.exit(1); }
 
 let html = read('index.html');
 const css = read('style.css');

@@ -93,6 +93,12 @@
     $('#hud-cash').textContent = '💰 ' + U.money(st.cash);
     $('#hud-nerves i').style.width = st.nerves + '%';
     $('#hud-nerves').className = 'hud-nerves' + (st.nerves < 35 ? ' low' : '');
+    var ai = $('#hud-ai');
+    if (ai && SWYF.ai) {
+      var on = SWYF.ai.isOnline();
+      ai.textContent = on ? '🧠 AI حقيقي' : '🧠 محلي';
+      ai.className = 'hud-pill ai' + (on ? ' on' : '');
+    }
   }
   function flashQuota(amount) {
     var box = $('#hud-flash');
