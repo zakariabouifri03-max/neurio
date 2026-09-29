@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scam With Your Friends — القصة كاملة من A-Z</title>
+<style>
+  :root{
+    --bg:#0a0d14; --bg2:#111726; --card:#151c2c; --card2:#1b2438;
+    --line:#26314a; --txt:#e8edf7; --dim:#9aa8c2; --dim2:#6f7d98;
+    --green:#31d18b; --red:#ff5d6c; --yellow:#ffc93c; --blue:#4aa8ff; --purple:#a06bff; --orange:#ff8a3d;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:
+      radial-gradient(1100px 600px at 85% -10%, #1d2b4d 0%, transparent 60%),
+      radial-gradient(900px 500px at 10% 0%, #2a1533 0%, transparent 55%),
+      var(--bg);
+    color:var(--txt);
+    font-family:"Segoe UI","Noto Kufi Arabic","Noto Naskh Arabic",system-ui,-apple-system,Tahoma,Arial,sans-serif;
+    line-height:1.9; font-size:17px;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 90px}
+  /* HERO */
+  .hero{position:relative;border:1px solid var(--line);border-radius:24px;overflow:hidden;
+    background:linear-gradient(160deg,#1a2540 0%,#221534 45%,#0d1220 100%);padding:34px 28px}
+  .hero:after{content:"";position:absolute;inset:auto -40px -120px auto;width:340px;height:340px;
+    background:radial-gradient(circle, rgba(255,93,108,.35), transparent 65%);filter:blur(6px)}
+  .kicker{display:inline-block;font-size:13px;letter-spacing:.5px;color:#0a0d14;background:var(--yellow);
+    padding:4px 12px;border-radius:999px;font-weight:800}
+  h1{margin:14px 0 6px;font-size:clamp(26px,4.6vw,44px);line-height:1.35;font-weight:900}
+  h1 span{background:linear-gradient(90deg,#ff8a3d,#ff5d6c,#a06bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 18px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;position:relative;z-index:2}
+  .chip{font-size:13px;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:#0f1524;color:var(--dim)}
+  .chip b{color:var(--txt)}
+  /* NAV */
+  nav{margin:26px 0 6px;display:flex;flex-wrap:wrap;gap:8px}
+  nav a{font-size:13.5px;text-decoration:none;color:var(--dim);border:1px dashed var(--line);padding:6px 11px;border-radius:10px;background:#0e1421}
+  nav a:hover{color:var(--txt);border-color:var(--blue)}
+  /* SECTIONS */
+  section{margin-top:34px}
+  h2{font-size:clamp(21px,3vw,27px);margin:0 0 6px;display:flex;align-items:center;gap:10px;scroll-margin-top:20px}
+  h2 .n{font-size:14px;background:#0f1524;border:1px solid var(--line);color:var(--dim);border-radius:10px;padding:2px 9px;font-weight:700}
+  h3{font-size:19px;margin:22px 0 8px;color:#fff}
+  p{margin:10px 0;color:#d5ddee}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+  ul,ol{margin:10px 0;padding-inline-start:22px;color:#d5ddee}
+  li{margin:6px 0}
+  a{color:var(--blue)}
+  code{background:#0d1320;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:14px;color:#ffd9a0}
+  /* TABLE */
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15.6px}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:right;vertical-align:top}
+  th{background:#0f1626;color:#cbd6ec;font-weight:800;width:34%}
+  td{background:#101725}
+  /* CALLOUTS */
+  .note{border-radius:14px;padding:14px 16px;margin:16px 0;border:1px solid var(--line);background:#101725}
+  .ok{border-color:#1f6c4c;background:linear-gradient(180deg,#0f2a20,#0e1c19)}
+  .warn{border-color:#7a5a10;background:linear-gradient(180deg,#2a220c,#1a1608)}
+  .bad{border-color:#7a2530;background:linear-gradient(180deg,#2b1116,#1b0c10)}
+  .tip{border-color:#1c4a7a;background:linear-gradient(180deg,#0d2136,#0c1725)}
+  .note .t{font-weight:900;margin-bottom:4px;display:block}
+  /* TIMELINE */
+  .tl{position:relative;margin:18px 0 6px;padding-inline-start:26px}
+  .tl:before{content:"";position:absolute;inset-inline-start:7px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--purple),var(--blue),var(--green))}
+  .tl .it{position:relative;margin:0 0 16px}
+  .tl .it:before{content:"";position:absolute;inset-inline-start:-24px;top:9px;width:12px;height:12px;border-radius:50%;
+    background:var(--bg);border:2px solid var(--blue)}
+  .tl .d{font-weight:900;color:var(--yellow)}
+  .tl .x{color:#cfd8ea}
+  /* bad/good cols */
+  .col h4{margin:0 0 6px;font-size:17px}
+  .good h4{color:var(--green)} .badcol h4{color:var(--red)}
+  .big{font-size:clamp(22px,3.4vw,34px);font-weight:900;margin:0}
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:18px;color:var(--dim2);font-size:14.5px}
+  .quote{border-inline-start:4px solid var(--purple);padding:4px 14px;margin:14px 0;color:#e6dcff;background:#150f24;border-radius:0 12px 12px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <span class="kicker">STEAM · CO-OP · EARLY ACCESS</span>
+  <h1>لعبة <span>Scam With Your Friends</span><br>القصة والملف كامل من A-Z</h1>
+  <p class="sub">كول سنتر ديال السكام ف كولكاتا (الهند)، إنت وصحابك، بوس عصبي كيصرخ، وناس على الطرف الآخر ديال التيليفون… ذكاء اصطناعي حقيقي كيردّ عليك ف الوقت الحقيقي. هادشي خيال كامل — ماشي تعليمات.</p>
+  <div class="chips">
+    <span class="chip">🎮 <b>PC / Windows / Steam</b></span>
+    <span class="chip">👥 <b>Online Co-op + Public Lobbies</b></span>
+    <span class="chip">🧠 <b>AI حقيقي (OpenRouter)</b></span>
+    <span class="chip">🇲🇦 <b>العربية مدعومة (صوت + ترجمة)</b></span>
+    <span class="chip">📅 <b>أكتوبر/نونبر 2026</b></span>
+    <span class="chip">📊 <b>100,000+ wishlist</b></span>
+  </div>
+</header>
+
+<nav>
+  <a href="#fiche">① بطاقة التعريف</a>
+  <a href="#9issa">② القصة A-Z</a>
+  <a href="#jour">③ نهار كامل خطوة بخطوة</a>
+  <a href="#scams">④ السكامات ف اللعبة</a>
+  <a href="#khatar">⑤ المخاطر والأعداء</a>
+  <a href="#mods">⑥ المود والـAI</a>
+  <a href="#multi">⑦ المولتيبلاير</a>
+  <a href="#timeline">⑧ قصة اللعبة الحقيقية (تايم لاين)</a>
+  <a href="#flous">⑨ الفلوس والثمن</a>
+  <a href="#think">⑩ حسنات وعيوب</a>
+  <a href="#tips">⑪ نصائح للعب مع الصحاب</a>
+  <a href="#similaires">⑫ ألعاب شبيهة</a>
+  <a href="#sources">⑬ المصادر</a>
+</nav>
+
+<div class="note bad">
+  <span class="t">🚨 قبل كلشي — قرّي هاد السطر</span>
+  كلشي ف هاد الصفحة هو <b>خيال علمي/كوميدي داخل لعبة ڤيديو</b>: الضحايا شخصيات AI خيالية، والفلوس فلوس اللعبة.
+  هاد الدوسيي كيشرح <b>ميكانيكيات لعبة</b>، وماشي تعليمات ديال سكام حقيقي. السكام الحقيقي = الحبس + الموت ديال شي واحد.
+</div>
+
+<section class="card" id="fiche">
+  <h2><span class="n">01</span> بطاقة التعريف — Fiche technique</h2>
+  <table>
+    <tr><th>الاسم</th><td><b>Scam With Your Friends</b> (+ شعار اللعبة: <i>KOLKATA IS CALLING YOU AND YOUR FRIENDS!</i>)</td></tr>
+    <tr><th>المطورين</th><td><b>JakeHub</b> و <b>Metater</b></td></tr>
+    <tr><th>الناشر</th><td><b>Jatater Worldwide</b></td></tr>
+    <tr><th>المنصات</th><td>Windows (Steam) بوحدها<br><span style="color:var(--dim2)">ماشي معلن: PS، Xbox، Switch، Mac، Linux — Steam Deck: Unknown</span></td></tr>
+    <tr><th>الجينر</th><td>Action · Casual · Indie · Simulation · Party · Dark Comedy · Job Simulator · Villain Protagonist</td></tr>
+    <tr><th>النمط</th><td>لاعب وحد · Online Co-op · Public Lobbies (الحد الأقصى الرسمي ماشي معلن — التريلر كيهضر على <b>4 لاعبين</b>)</td></tr>
+    <tr><th>الحالة</th><td><b>Coming Soon — Early Access</b> (ماشي صدرات بعد)</td></tr>
+    <tr><th>تاريخ الإصدار</th><td>صفحة ستيم اليوم كتقول <b>October 2026</b> · مصادر و صفحات قديمة كتذكر <b>28 أكتوبر</b> · الترايلرز والويكي كيذكرو <b>5 نونبر 2026</b> · الوقت المسجل ف ستيم داتابيز: <b>18:00 UTC</b><br><span style="color:var(--dim2)">⏳ التاريخ تبدّل — ديما تأكد من صفحة ستيم قبل ما تسنّى.</span></td></tr>
+    <tr><th>الثمن</th><td>ماشي معلن، و ما كايناش pre-order. الشي الوحيد المدفوع الرسمي = <b>$8 ديال Unlimited AI للديمو/البلايتيست</b> فقط.</td></tr>
+    <tr><th>اللغات</th><td><b>23 لغة</b> — منها <b>العربية</b> بواجهة + صوت (Full Audio) + ترجمة (Subtitles) ✅</td></tr>
+    <tr><th>المتطلبات (Minimum)</th><td>Windows 10/11 64-bit · i5-8400 / Ryzen 5 2600 · <b>3 GB RAM</b> · GTX 1060 6GB / RX 580 · DirectX 11 · <b>إنترنت ضروري</b> · <b>5 GB</b> مساحة</td></tr>
+    <tr><th>الويشليست</th><td>10,000 (9 شتنبر) → <b>100,000+ (23 شتنبر 2026)</b></td></tr>
+    <tr><th>تقنية خاصة</th><td>كيتبلّج مع خدمة خارجية لتوليد المحتوى بالذكاء الاصطناعي: <b>OpenRouter</b></td></tr>
+  </table>
+</section>
+
+<section id="9issa">
+  <h2><span class="n">02</span> القصة — 9issa dyalha mn A-Z</h2>
+
+  <div class="quote">
+    «دير كول سنتر ديال السكام مع صحابك. استعمل خطط ومكايد سخيفة ومتزايدة باش تخدع أشخاص AI وتاخد منهم فلوس عمرهم كامل.
+    دير الكوتا اليومية، خرّب الجو فالبيت (المكتب)، ونجّي راسك من تقييم أداء وحشي ديال بوس عصبي.»
+    <br><span style="color:var(--dim2);font-size:14.5px">— الوصف الرسمي ديال اللعبة على Steam</span>
+  </div>
+
+  <h3>الفصل 1 — فين كاينة القصة؟</h3>
+  <p>
+    ف <b>كولكاتا، الهند</b>، داخل مكتب صغير ومخنوق: صفوف ديال ديسكات، تيليفونات، شاشات، وسكرينة كبيرة كتعلن على الأرباح.
+    إنت (وإلا كنتي مع صحابك: نتا و<u>حتى لـ3 صحاب</u>) خدّامين ف <b>كول سنتر ديال السكام</b> تحت إمرة بوس عصبي كيغضب بسرعة
+    (رسمياً: <i>«rageaholic boss»</i>). الهدف ديال كل نهار واضح: <b>كوتا ديال الفلوس</b>… وإلا ما دّيتيهاش، <b>GET FIRED!!!</b>
+  </p>
+
+  <h3>الفصل 2 — اليوم الأول: مشكل الشغل</h3>
+  <p>
+    المكتب عندو قواعد. أول حاجة كتتعلمها: التيليفون ما كيتوقّفش. كتجي كولاية، وتكون واقف قدام شخصية خيالية عندها اسمها،
+    قصتها، مشاكلها المالية، ومستوى ثقة (<b>Trust Meter</b>) كيتحرّك مع كل جملة كتقولها.
+    هضرتك هي السلاح ديالك — حرفياً <b>voice control</b> (كهضر ف الميكرو)، والشخصيات اللي على الطرف الآخر <b>AI</b> كيردّ ف الوقت الحقيقي، ماشي نص مكتوب.
+  </p>
+
+  <h3>الفصل 3 — القلب ديال اللعب: الكوتا</h3>
+  <p>
+    كل نهار عندو <b>كوتا (Daily Quota)</b>. باش توصلها عندك 3 أدوات معتمدة:
+  </p>
+  <div class="grid g3">
+    <div class="card"><b>🗣️ الكلام</b><br><span style="color:var(--dim)">تكلّم، أقنع، تلاعب — تقرأ الشخصية وتعدّل الطريقة حية.</span></div>
+    <div class="card"><b>💻 Remote Access</b><br><span style="color:var(--dim)">تنقّل ف حاسوب الضحية الخيالي، قلّب ف الملفات، جيب معلومة شخصية كتدعّم بها الكلام.</span></div>
+    <div class="card"><b>🧰 السكامات</b><br><span style="color:var(--dim)">كل نهار كتتقدم كتفتح «ترسانة» جديدة ديال السكامات — كل نهار أكثر جنون.</span></div>
+  </div>
+
+  <h3>الفصل 4 — بين الشيفتات: الترقيات</h3>
+  <p>
+    بين نهار ونهار كتشري <b>upgrades</b> (عتاد، تطبيقات، أدوات) اللي كتخليك تكمل ف الرَّن (run) ديال الأيام.
+    وكل نهار كيولي <b>أكثر فوضى</b>: من مكالمة صعيبة، لسمعة خرّابة، ل… عمليات مداهمة.
+  </p>
+
+  <h3>الفصل 5 — الأعداء: اللي كيقلبو عليك</h3>
+  <p>
+    ماشي كل المكالمات ضحايا. كاينين <b>Scambaiters</b> — ناس/شخصيات خيالية اللي كيقلبو الطابلة عليك، كيضيّعو ليك الوقت،
+    وكيخليوك تصيد <b>فيروس خطير</b> إسمه «the worst computer virus ever». و زيادة على هادشي كاينين كوارث المكتب:
+    <b>مداهمات الشرطة</b> و <b>ضربات جوية</b>! واصلين حد الفوضى.
+  </p>
+
+  <h3>الفصل 6 — نهاية النهار: التقييم</h3>
+  <p>
+    كل نهار كيسدّ ب <b>Performance Review</b>: البوس كيشوف الأرقام ديال النهار. إلا نجحت → نهار آخر، سكامات جديدة، فوضى أكبر.
+    إلا فشلت → <b>مطرود</b> وانتهت الرَّن (من هنا جاو tags: <i>Perma Death</i> و <i>Run-based progression</i> = اللعبة فيها روح roguelike).
+  </p>
+
+  <div class="note ok">
+    <span class="t">✅ خلاصة القصة ف جملة</span>
+    «مجموعة صحاب ف كول سنتر ديال السكام ف الهند، كل نهار خاصهم يخدعو شخصيات AI باش يوصلو الكوتا، وسط فيروسات،
+    scambaiters، وغضب بوس عصبي — والفايتة بين الحفاظ على الشغل والخسارة ديال كلشي.»
+  </div>
+
+  <div class="note warn">
+    <span class="t">⚠️ ملاحظة مهمة (الأمانة ف المعلومات)</span>
+    اللعبة <b>مازال ما صدراتش</b> وبزاف ديال التفاصيل ماشي معلنة رسمياً: أسماء السكامات، أرقام الكوتا، عدد الأيام ف الرَّن،
+    طريقة تنقيط التقييم، شنو موصّل للـ scambaiter… الويكي ديال اللعبة كيقول بصراحة: «الريجستري فارغ، وماشي نختارعو معلومات».
+    من هنا <b>ما غاديش نلقى ليك أرقام من راسي</b>: اللي مكتوب فوق هو المؤكد، والباقي كيتسنّى الإطلاق.
+  </div>
+</section>
+
+<section id="jour">
+  <h2><span class="n">03</span> نهار كامل ف الكال سنتر — خطوة بخطوة</h2>
+  <div class="tl">
+    <div class="it"><span class="d">1) بداية الشيفت</span><div class="x">كتفتح الـ Desktop ديال الشغل: تطبيقات، أهداف النهار، الكوتا المطلوبة، و اللوحة ديال الأحداث.</div></div>
+    <div class="it"><span class="d">2) كولاية كتجيك</span><div class="x">شخصية AI جديدة على الطرف الآخر — عندها ملف، شخصية، ومزاج.</div></div>
+    <div class="it"><span class="d">3) جمع المعلومات</span><div class="x">قبل ما تكمل الكلام، كتدخل للـ <b>Remote Access</b> ديال الحاسوب ديالها: ملفات، تفاصيل، حوايج تقدر تستعملها ف الـ pitch.</div></div>
+    <div class="it"><span class="d">4) المكالمة (الجزء الحقيقي)</span><div class="x">كهضر ف الميكرو؛ الـ AI كيردّ و كيتفاعل مع كل كلمة. <b>Trust Meter</b> كيطلع/kينزل. كلمة غالطة → كيسدّ التيليفون ف وجهك.</div></div>
+    <div class="it"><span class="d">5) الفلوس كتدخل</span><div class="x">المكالمة الناجحة كتزيد فلوس للكوتا (ف السكرينشوتات: مثال <b>+250$</b> و مؤشر الثقة مازال «Trusting»).</div></div>
+    <div class="it"><span class="d">6) الفوضى</span><div class="x">ف أي لحظة: scambaiter، فيروس كيبوّط الديسكتوب، صراخ ف المكتب، مداهمة شرطة، ولا ضربة جوية. 🚁</div></div>
+    <div class="it"><span class="d">7) تسدّ النهار</span><div class="x">كمل الكوتا وكتشري upgrades بين الشيفتات.</div></div>
+    <div class="it"><span class="d">8) Performance Review</span><div class="x">البوس كيحكم: ترقية ونهار جديد… ولا <b>YOU'RE FIRED</b>.</div></div>
+  </div>
+  <div class="note tip">
+    <span class="t">🎮 حاجة كتفهمها من الترايلر</span>
+    اللعب ماشي «اختر من القائمة»: <b>نتا كتهضر بصوتك</b> والـ AI كيردّ عليك بحرية، والثقة (Trust) هي مؤشر النجاح.
+    التقنية معتمدة على خدمة <b>OpenRouter</b> → علاش الإنترنت <b>إلزامي</b>.
+  </div>
+</section>
+
+<section id="scams">
+  <h2><span class="n">04</span> السكامات ف اللعبة (Scam Registry)</h2>
+  <p>
+    رسميا: «كل نهار كتتقدم، كتوسّع ترسانة السكامات ديالك» — واللعبة كتوصف <i>«schemes increasingly ridiculous»</i>.
+    ولكن <b>الأسماء الرسمية للسكامات ما تنشراتش</b> بعد. اللي كتشوف ف السكرينشوتات هو <b>باروديات</b> واضحة:
+  </p>
+  <div class="grid g2">
+    <div class="card"><b>🛒 Scamazon</b><br><span style="color:var(--dim)">باروديا ديال أمازون — تطبيق ف الديسكتوب ديال السكامر.</span></div>
+    <div class="card"><b>💬 Disscord</b><br><span style="color:var(--dim)">باروديا ديال ديسكورد — ف سكرينشوت كاين عرض <i>Nitro gift</i> مزيّف.</span></div>
+    <div class="card"><b>🖥️ AnyViewer — Remote Support</b><br><span style="color:var(--dim)">سيناريو «الدعم التقني»: كتطلب كود الدخول عن بعد (one-time code).</span></div>
+    <div class="card"><b>🎁 Sweepstakes / Fake Support</b><br><span style="color:var(--dim)">موصوفين ف الوصف الرسمي: «bizarre fake sweepstakes and counterfeit tech-support traps».</span></div>
+  </div>
+  <p style="color:var(--dim)">
+    ⚙️ زيادة على هذا، Steam كيذكر تطبيقات داخل اللعبة: <b>paint app</b> · <b>screen recorder</b> · <b>camera</b>
+    (تلاتة أدوات ديال «تصنيع الأدلة» والكوميديا). السلوك الدقيق ديالهم ماشي موثق — يتسنّى الإطلاق.
+  </p>
+</section>
+
+<section id="khatar">
+  <h2><span class="n">05</span> المخاطر والأعداء — شنو كيقدر يقتل النهار ديالك</h2>
+  <table>
+    <tr><th>🧑‍💻 Scambaiters</th><td>كولّارز خياليين كيقلبو عليك، «feisty»، و إلا طحت فيهم كتصيد <b>أخطر فيروس</b>. (كيفاش تعرفهم؟ ماشي مكتوب.)</td></tr>
+    <tr><th>🦠 Computer Viruses</th><td>فيروس كيخرب الديسكتوب و كيبلوكي الخدمة. مصدره الأول: الـ scambaiters. التأثيرات الدقيقة ماشي موثقة.</td></tr>
+    <tr><th>🚔 Police Raids</th><td>مداهمة شرطة = كارثة مكتب (مذكورة حرفياً ف الميزات ديال ستيم).</td></tr>
+    <tr><th>🚁 Air Strikes</th><td>ضربات جوية. نعم. ف لعبة ديال كول سنتر. 😅 (مكتوبة رسمياً ف الوصف.)</td></tr>
+    <tr><th>💥 Office Chaos</th><td>«سبّب الفوضى فالبيت» مكتوبة كواحدة من الأفعال ف اللوب، إلى جانب الكولات.</td></tr>
+    <tr><th>🪦 Getting Fired (Perma Death)</th><td>السيناريو الرسمي الوحيد المفهوم لإنهاء الـ run = الطرد من عند البوس.</td></tr>
+  </table>
+</section>
+
+<section id="mods">
+  <h2><span class="n">06</span> المودينغ والـAI — علاش هاد اللعبة غادي تعيش طويل</h2>
+  <p>ستيم كيوصف اللعبة رسمياً كـ <b>«heavily moddable»</b>، ومعطّي المعادلة واضحة:</p>
+  <div class="grid g2">
+    <div class="card"><b>📄 JSON ← الشخصية</b><br><span style="color:var(--dim)">كتعرّف شكون هي الشخصية: الاسم، الطبع، القصة. ملفات JSON.</span></div>
+    <div class="card"><b>🔊 WAV ← الصوت</b><br><span style="color:var(--dim)">Voice cloning بملفات WAV باش الشخصية تتكلم بصوت معيّن.</span></div>
+  </div>
+  <ul>
+    <li>المعنى: الكوميونيتي غادي تصنع <b>شخصياتها</b> (من الميمز، من الأنيمي، من صحابهم 😂) وتسمعها كتهضر.</li>
+    <li>كيفاش كتخدم بالضبط (schema، حدود، فين كتوضع الملفات) — <b>باقي ما تنشرش</b>.</li>
+    <li>⚠️ تحذير أخلاقي مهم: إلا كانت الويكي كتقول «clone فقط الأصوات اللي عندك الحق فيها»، دوك الشي أنا كنقولو ليك من دابا:
+      <b>متكلونيش صوت شي واحد بالبلا ما يرضى</b> — هادي فيها مشاكل قانونية وأخلاقية.</li>
+    <li>💸 ثمن الـ AI: ف اللعبة الكاملة = <b>AI غير محدود بلا زيادة فلوس</b>. الـ$8 هي غير للديمو/بلايتيست.</li>
+  </ul>
+</section>
+
+<section id="multi">
+  <h2><span class="n">07</span> اللعب مع الصحاب (Online Co-op)</h2>
+  <ul>
+    <li>👥 <b>البيتش الأول ديال اللعبة هو الملتيبلاير</b>: «Run a scam call center <i>with your friends</i>».</li>
+    <li>🌍 <b>Public Lobbies</b> مؤكدة: تقدر تلعب مع ناس ما تعرفهمش.</li>
+    <li>🎯 <b>Single-player</b> مؤكد هو الآخر — ماشي غير ملتي.</li>
+    <li>🔢 <b>الحد الأقصى الرسمي للاعيبة ماشي معلن</b>. الترايلرز كيهضرو على <b>4 لاعبين (نتا + 3)</b>، و البلايتيست كانو فيه invitations لـ3 صحاب — ولكن دوك «قواعد دعوة للبلايتيست»، ماشي عدد نهائي.</li>
+    <li>❓ ماشي معروف: واش الكوتا مشتركة؟ واش الصعوبة كتزيد بعدد اللاعبين؟ وكيفاش كيتوزع الدور ف المكالمة؟</li>
+    <li>🎮 كولاب Steam Family Sharing مدعوم (Family Sharing مؤكدة على الصفحة).</li>
+  </ul>
+</section>
+
+<section id="timeline">
+  <h2><span class="n">08</span> القصة الحقيقية ديال اللعبة — التايم لاين من 1 شتنبر 2026</h2>
+  <div class="tl">
+    <div class="it"><span class="d">1 شتنبر 2026</span><div class="x">🎉 الإعلان العام على ستيم — أول إدخال ف تاريخ اللعبة الرسمي.</div></div>
+    <div class="it"><span class="d">9 شتنبر 2026</span><div class="x">📈 <b>10,000 wishlist</b> — الفريق كيشكر المجتمع و كيقول «مازال بزاف جاي».</div></div>
+    <div class="it"><span class="d">~14 شتنبر</span><div class="x">🌐 صفحات ديال ألعاب كيبداو ينسخو الوصف (فيتنام، تركيا، إندونيسيا…) — اللعبة ولّات تريند.</div></div>
+    <div class="it"><span class="d">19 شتنبر 2026</span><div class="x">📱 موجة ديال الشورتس على تيك توك و يوتيوب: «أكثر لعبة كولاب ملعونة ف العام»، و كتظهر تفاصيل الـ Trust Meter و الـ4 لاعبين.</div></div>
+    <div class="it"><span class="d">20 شتنبر 2026</span><div class="x">🧪 <b>الـ Playtest</b> كيولي خدام — app مستقل على ستيم (5216930)، Windows فقط، محدود جداً.</div></div>
+    <div class="it"><span class="d">~22 شتنبر</span><div class="x">🔒 <b>12,000+ تسجيل</b> → الفريق كيسدّ باب التسجيل: «كفاية دابا، غادي نبداو نوزعو الدعوات، وكل واحد كيقدر يعيّط 3 صحابو».</div></div>
+    <div class="it"><span class="d">23 شتنبر 2026</span><div class="x">🚀 <b>100,000 WISHLIST</b> — بعد 13 يوم فقط من 10 آلاف. اللعبة كتولي واحد من أكبر المفاجآت المستقلة ديال 2026.</div></div>
+    <div class="it"><span class="d">26 شتنبر 2026</span><div class="x">📝 تأكيدات رسمية كتتكثّف: الـ AI كيمشي عبر <b>OpenRouter</b>، والـ modding بـ JSON + WAV، و الـ$8 ديال الديمو.</div></div>
+    <div class="it"><span class="d">28 أكتوبر ↔ 5 نونبر</span><div class="x">🗓️ تواريخ متداولة للإطلاق. صفحة ستيم اليوم كتقول <b>October 2026</b> بلا نهار محدد. الوقت المسجل: 18:00 UTC.</div></div>
+    <div class="it"><span class="d">المستقبل (Early Access)</span><div class="x">🧭 الوعود ديال الفريق: زيادة سيناريوهات السكام، ناس AI جداد، تحسين progression و تفاعلات المكتب، و تحسين تجربة الكولاب — على أساس feedback اللاعبين.</div></div>
+  </div>
+</section>
+
+<section id="flous">
+  <h2><span class="n">09</span> الفلوس — شنو معلن و شنو ماشي</h2>
+  <table>
+    <tr><th>ثمن اللعبة</th><td><b>ما تنشرش.</b> ما كايناش pre-order، وما كايناش نسخ مسبقة. إلا شفتي ثمن، شكّ فيه.</td></tr>
+    <tr><th>$8 Unlimited AI</th><td>شراء اختياري واحد (ماشي subscription): كيرفع الحد ديال رسائل الـAI ف <b>الديمو/البلايتيست</b> فقط.<br>
+      ✅ <b>واحد كيشتري = كامل اللوبي كيستافد</b> · ❌ ماشي key ديال اللعبة · ❌ ماشي دعوة للبلايتيست · ❌ ماشي ضروري للعبة الكاملة.</td></tr>
+    <tr><th>ف اللعبة الكاملة</th><td>AI بلا حدود، بلا زيادة فلوس. أي حاجة كتقال غير هذا = ماشي مؤكدة.</td></tr>
+    <tr><th>🚨 حذاري من السكام</th><td>اللعبة على ستيم بوحدها. طبيعي بزاف يكونو ناس كيبيعو «demo keys» ولا «AI credits» ولا «early access» على ديسكورد/تيليجرام/تيك توك —
+      <b>هادي سكام حقيقي</b>. شنو كاين رسمياً: صفحة ستيم + السيت ديال Jatater + الديسكورد الرسمي.</td></tr>
+  </table>
+</section>
+
+<section id="think">
+  <h2><span class="n">10</span> قبل ما تحمّس — الحسنات و العيوب</h2>
+  <div class="grid g2">
+    <div class="card col good">
+      <h4>✅ الحسنات</h4>
+      <ul>
+        <li>فكرة جديدة بزاف: كولاب كوميدي بدل الرعب (Lethal Company style ولكن بالسكام والضحك).</li>
+        <li>كلام حقيقي مع AI = كل مكالمة مختلفة، ماشي سكريبت مكرر.</li>
+        <li>مودينغ عميق (JSON + WAV) = عمر طويل و كوميونيتي ديال الشخصيات.</li>
+        <li>العربية مدعومة صوت + ترجمة (نادر ف ألعاب من هذا النوع).</li>
+        <li>ثمن الديمو/النموذج ديال الـ AI بصيط و ما كيتفرضش.</li>
+      </ul>
+    </div>
+    <div class="card col badcol">
+      <h4>⚠️ العيوب / المخاطر</h4>
+      <ul>
+        <li><b>Early Access</b>: bugs، توازن ماشي مضبوط، و محتوى ناقص (الفريق بنفسو كيقولها).</li>
+        <li><b>إنترنت إلزامي</b> + تكلفة الـ AI طرف ديال الناشر = خطر ف المستقبل (خدمة تتوقف، لاغ…) — هادشي حسبتقديرنا، ماشي معلن رسمياً.</li>
+        <li>تأخير ف رد الـ AI ممكن يقتل الكوميديا ف بعض اللحظات.</li>
+        <li>Roguelike مع <b>Perma Death</b> = تقدر تخسر run كامل بكلمة غالطة.</li>
+        <li>الموضوع حسّاس: لعبة على السكام… كوميديا سوداء، ماشي للجميع. (ومهم تكون واعي بلي ضحايا السكام الحقيقيين كاينين.)</li>
+        <li>عدد اللاعبين و بزاف ديال التفاصيل ماشي معلنين → متشريش على أساس وعود.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="tips">
+  <h2><span class="n">11</span> نصائح باش تلعبو 4 صحاب و متطردوش (Tips ديال الكولاب)</h2>
+  <ol>
+    <li><b>قسّمو الأدوار:</b> واحد «اللسان» (هو اللي كيتكلم ف الميكرو)، واحد «الهاكر» (كيقلّب ف الـ Remote Access)، واحد «الكاتب» (كيسجل المعلومة اللي خاصها تكون ف الـ pitch)، و واحد «الحارس» (كيشوف الفوضى، الفيروسات، و الوقت).</li>
+    <li><b>المعلومة قبل الكلام:</b> ما تبداوش المكالمة قبل ما يكون عندكم على الأقل تفصيلة وحدة من الحاسوب ديال الهدف — كترفع الثقة بشكل منطقي.</li>
+    <li><b>راقبو الـ Trust Meter كأنه صحّة:</b> كيطلع → كمّلو الـ pitch. كينزل → بدّلو الموضوع، اسكتو، خليو «اللسان» يهدر بهدوء.</li>
+    <li><b>الكلمات الغالطة = سدّ التيليفون.</b> تدريب قبل: حددو جمل موحدة ديال الافتتاح و ديال الطوارئ باش تخرجو من موقف محرج.</li>
+    <li><b>فيروس؟</b> وقفو الخدمة على دوك الديسك، و خلّيو واحد يمسح، و عيّطو على كولاية جديدة — الوقت هو العدو، ماشي الفيروس بوحدو.</li>
+    <li><b>خزّنو للترقيات بين الشيفتات</b> — الترقية ديال اليوم غادي تنقذ النهار اللي بعده.</li>
+    <li><b>سجّلو الكليبات:</b> هاد اللعبة مصممة للـ clips على تيك توك/يوتيوب — أحسن لحظات غادي تكون ف المكالمات اللي فشلت.</li>
+  </ol>
+</section>
+
+<section id="similaires">
+  <h2><span class="n">12</span> إلا عجباتك الفكرة — ألعاب قريبة منها</h2>
+  <table>
+    <tr><th>Scam Your Friends Tycoon</th><td>لعبة <b>Roblox</b>: قصة «ماما طرداتك، ونتا غادي تدير امبراطورية سكام على صحابك اللي دازو معاك العمر كامل». نفس الفكرة، جودة Roblox. (مجانية)</td></tr>
+    <tr><th>making scam calls to save your best friend tycoon</th><td>Roblox: «دخلت ف مشكل مع المافيا، خطفو صاحبك، خاصك تخلص» — نفس الثيم بكول سنتر ديال سكام.</td></tr>
+    <tr><th>Scam Center Simulator: UnderKingdom</th><td>نسخة فيتنامية/آسيوية من نفس الفكرة: كول سنتر، كوتا، ترقيات.</td></tr>
+    <tr><th>Lethal Company · R.E.P.O. · Content Warning</th><td>ماشي سكام، ولكن نفس الروح: كولاب فوضوي، لكن بضحك مع الصحاب (و حتى هادو كيتشبهو ل SWYF ف الـ vibe).</td></tr>
+    <tr><th>Dale &amp; Dawson Stationery Supplies</th><td>كوميديا مكتب + لعب أدوار مع الصحاب — أقرب شي «جو المكتب».</td></tr>
+  </table>
+</section>
+
+<section class="card" id="sources">
+  <h2><span class="n">13</span> المصادر الرسمية (كليك) — و تحقق بنفسك</h2>
+  <ul>
+    <li>🎮 <b>صفحة Steam الرسمية</b> (المصدر الأول): <a href="https://store.steampowered.com/app/4954910/Scam_With_Your_Friends/" target="_blank" rel="noopener">store.steampowered.com/app/4954910</a></li>
+    <li>🏢 <b>السيت الرسمي للناشر</b> Jatater Worldwide: <a href="https://jataterworldwide.com/scam-with-your-friends/" target="_blank" rel="noopener">jataterworldwide.com/scam-with-your-friends</a></li>
+    <li>💳 <b>صفحة Unlimited AI ($8)</b>: <a href="https://jataterworldwide.com/scam-with-your-friends/unlimited" target="_blank" rel="noopener">jataterworldwide.com/…/unlimited</a></li>
+    <li>💬 <b>الديسكورد الرسمي</b>: <a href="https://discord.gg/invite/jataterww" target="_blank" rel="noopener">discord.gg/invite/jataterww</a></li>
+    <li>▶️ <b>يوتيوب المطور</b>: <a href="https://www.youtube.com/@jakehubyt" target="_blank" rel="noopener">youtube.com/@jakehubyt</a></li>
+    <li>📚 <b>الويكي ديال اللعبة</b> (fan-made لكن مرتب و موثّق): <a href="https://scamwithyourfriends.wiki/" target="_blank" rel="noopener">scamwithyourfriends.wiki</a></li>
+    <li>🧪 <b>البلايتيست</b> (app 5216930، التسجيل مسدود دابا): <a href="https://steamdb.info/app/5216930/" target="_blank" rel="noopener">steamdb.info/app/5216930</a></li>
+    <li>📊 <b>ستيم داتابيز</b>: <a href="https://steamdb.info/app/4954910/" target="_blank" rel="noopener">steamdb.info/app/4954910</a></li>
+  </ul>
+  <p style="color:var(--dim);margin-bottom:0">
+    آخر تحقق من المعلومات: <b>29 شتنبر 2026</b>. اللعبة ف طور التطوير — الأرقام والتواريخ والتفاصيل كلها كتقدر تبدل، ديما رجع للصفحات الرسمية.
+  </p>
+</section>
+
+<footer>
+  📄 دوسيي معلوماتي على <b>Scam With Your Friends</b> — تحضير: Arena.ai Agent Mode · كل المحتوى وصف ديال <b>خيال لعبة ڤيديو</b>.
+  اللعبة كاملة fictional: الضحايا AI خيالي و الفلوس ف اللعبة. <b>ماشي تعليمات ديال سكام حقيقي — واللي كيفعل هادشي ف الواقع كيتحبس.</b>
+</footer>
+</div>
+</body>
+</html>
