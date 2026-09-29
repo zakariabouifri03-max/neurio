@@ -116,6 +116,7 @@
     var writer = U.el('div', 'writer');
     writer.innerHTML =
       '<input class="ui-block talk" placeholder="كتب اللي بغيت تقول… (مثال: السلام عافاك، كاين ملف رسمي باسمك ف بنك…)" />' +
+      '<button class="mic ui-block" title="هضر بالميكرو (كيدير التعرف على الصوت ديال المتصفح — كيحتاج إنترنت ف بعض المتصفحات)">🎙️</button>' +
       '<button class="say ui-block primary">قول 🗣️</button>' +
       '<button class="hang ui-block danger">📴 سد</button>' +
       '<span class="ai-tag">' + ((SWYF.ai && SWYF.ai.isOnline()) ? '🧠 AI محلي: ' + (SWYF.ai.status().model || 'شغّال') : '🧠 محرّك محلي (offline)') + '</span>';
@@ -131,6 +132,33 @@
       e.stopPropagation();
     });
     U.on(writer.querySelector('.hang'), 'click', function () { doAction({ type: 'hangup' }); });
+    // 🎙️ voice input — browser speech recognition (needs the browser's own STT service)
+    U.on(writer.querySelector('.mic'), 'click', function () {
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      var mic = writer.querySelector('.mic');
+      if (!SR) { SWYF.ui.toast('⚠️ هاد المتصفح ما كيدعمش التعرف على الصوت — كتب باليد.', 4000); return; }
+      try {
+        var rec = new SR();
+        rec.lang = 'ar-MA'; rec.interimResults = true; rec.continuous = false;
+        mic.classList.add('rec');
+        rec.onresult = function (e) {
+          var txt = '';
+          for (var i = 0; i < e.results.length; i++) txt += e.results[i][0].transcript;
+          input.value = txt;
+          if (e.results[e.results.length - 1].isFinal) {
+            mic.classList.remove('rec');
+            if (input.value.trim()) writer.querySelector('.say').click();
+          }
+        };
+        rec.onerror = function () { mic.classList.remove('rec'); SWYF.ui.toast('🎙️ ما سمعتش مزيان — عاود.', 3000); };
+        rec.onend = function () {
+          mic.classList.remove('rec');
+          if (input.value.trim()) writer.querySelector('.say').click();
+        };
+        rec.start();
+        SWYF.audio.sfx('beep');
+      } catch (err) { mic.classList.remove('rec'); }
+    });
     wrap.appendChild(writer);
     els.input = input;
 

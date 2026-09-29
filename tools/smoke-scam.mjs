@@ -374,7 +374,8 @@ check('brain: insult spikes suspicion, threat answered in character', () => {
 
 check('brain: money asked in free text goes through the ask maths', () => {
   const c = SWYF.callers.createCaller({ day: 1 });
-  c.trust = 80;
+  c.scambaiter = false; c.scambaiterObj = null;   // scambaiters never pay (that's the point)
+  c.trust = 80; c.suspicion = 5;
   const r = SWYF.callers.act(c, { type: 'text', text: 'خاصك تحول ليا 3000 درهم دابا' }, { upgrades: {}, evidence: false });
   if (r.money <= 0) throw new Error('no payout, money=' + r.money);
   if (!r.success) throw new Error('not marked as success');
