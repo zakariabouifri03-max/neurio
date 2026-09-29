@@ -90,10 +90,33 @@ export class UI {
     const n = $('#earnedNote');
     if (n) { const last = (this.p.history || [])[0]; n.textContent = last ? ' · ' + signed(last.chips) + ' last night' : ''; }
   }
+  /** offline / file:// mode: solo is the happy path, the room buttons dim out */
+  setOffline(on) {
+    this.offline = !!on;
+    document.body.classList.toggle('offline', !!on);
+    const pill = $('#offPill'); if (pill) pill.hidden = !on;
+    for (const id of ['#mCreate', '#mJoin', '#joinGo']) {
+      const b = $(id); if (!b) continue;
+      b.classList.toggle('dim', !!on);
+      b.title = on ? 'needs the house server — the solo table does not' : '';
+    }
+    const hero = $('#mQuick i'); if (hero) hero.textContent = on ? 'solo table with bots · works with no internet' : 'instant table with bots';
+    const hint = $('#joinHint'); if (hint) hint.textContent = on ? 'no network here — ask a friend later, or just PLAY NOW' : 'Ask a friend for their 5-letter code';
+    this.setStatus(on ? 'offline' : (this.netKind || 'idle'));
+  }
+  /** the lobby is a local (in-tab) table: nothing to invite, nothing to join */
+  setLocal(on) {
+    this.local = !!on;
+    const inv = $('#lbInvite'); if (inv) inv.hidden = !!on;
+    const leave = $('#lbLeave'); if (leave) leave.textContent = on ? 'QUIT' : 'LEAVE';
+    const k = document.querySelector ? null : null; void k;
+    const note = $('#lbHostNote'); if (note && on) note.textContent = 'in this tab · no server';
+  }
   setStatus(kind, text) {
+    if (kind) this.netKind = kind;
     const dot = $('#netDot'), lbl = $('#netLabel');
     dot.className = 'net dot' + (kind === 'online' || kind === 'local' ? ' on' : kind === 'connecting' || kind === 'reconnecting' ? ' mid' : '');
-    lbl.textContent = text || (kind === 'online' ? 'connected to the house' : kind === 'local' ? 'solo table — you are the authority in this tab' : kind === 'connecting' ? 'knocking on the door…' : kind === 'reconnecting' ? 'signal dropped — retrying…' : 'offline — solo table available');
+    lbl.textContent = text || (kind === 'idle' ? 'no room yet · PLAY NOW needs no server' : kind === 'online' ? 'connected to the house' : kind === 'local' ? 'solo table — you are the authority in this tab' : kind === 'connecting' ? 'knocking on the door…' : kind === 'reconnecting' ? 'signal dropped — retrying…' : 'offline — solo table available');
   }
 
   // ── in-game top bar / clock ────────────────────────────────────────────────
@@ -644,7 +667,9 @@ export class UI {
   bindLobby() {
     $('#lbReady').onclick = () => { this.p.ready = !this.p.ready; this.on.ready?.(this.p.ready); save(); };
     $('#lbStart').onclick = () => this.on.start?.();
+    $('#mOffline') && ($('#mOffline').onclick = () => this.on.download?.());
     $('#lbInvite').onclick = async () => {
+      if (this.local) { toast('This table lives in your tab — there is nothing to invite (yet)'); return; }
       const link = location.origin + location.pathname + '#join=' + (this.code || '');
       await copyText(link);
       this.openInvite(link);

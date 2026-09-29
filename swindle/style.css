@@ -304,6 +304,14 @@ input{font-family:var(--body)}
 #lobby{position:fixed;inset:auto 0 0 0;max-height:62vh;display:flex;flex-direction:column;
   background:linear-gradient(180deg,rgba(9,20,28,.4),rgba(6,14,20,.94) 40%);
   border-top:2px solid var(--line);backdrop-filter:blur(8px)}
+/* offline / file:// mode */
+.pill.off{background:rgba(255,61,127,.16);border-color:rgba(255,61,127,.5);color:#ffd7e5;
+  font-family:var(--disp);font-size:.58rem;letter-spacing:.1em;padding:.14rem .42rem;border-radius:20px;border-width:1px}
+.btn.dim{opacity:.42}
+.btn.dim:hover{transform:none;border-color:var(--line)}
+body.offline #mQuick{box-shadow:0 0 0 2px rgba(232,182,74,.35),0 6px 0 rgba(0,0,0,.45),0 0 26px rgba(255,61,127,.25)}
+#mOffline{display:flex;flex-direction:column;align-items:flex-start;gap:.05rem;padding:.3rem .55rem}
+#mOffline i{font-size:.54rem;opacity:.6;font-weight:600;letter-spacing:.04em}
 .lb-wallet{justify-content:flex-start;gap:.35rem;font-size:.62rem}
 .lb-wallet b{font-size:1rem}
 .lb-wallet i{font-style:normal;opacity:.62;font-size:.58rem;letter-spacing:.04em}

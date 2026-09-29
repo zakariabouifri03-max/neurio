@@ -20,8 +20,8 @@
 <link rel="stylesheet" href="style.css">
 <script type="importmap">
 { "imports": {
-  "three": "/vendor/three.module.js",
-  "three/addons/": "/vendor/"
+  "three": "../../vendor/three.module.js",
+  "three/addons/": "../../vendor/"
 } }
 </script>
 </head>
@@ -138,7 +138,9 @@
   </div>
   <div class="menu-foot">
     <span class="net dot" id="netDot"></span><span id="netLabel">offline — solo table available</span>
+    <span class="pill off" id="offPill" hidden>📴 OFFLINE COPY</span>
     <span class="sp"></span>
+    <button class="btn tiny" id="mOffline" hidden><b>⬇ SAVE OFFLINE COPY</b><i>one file, plays with no internet</i></button>
     <span class="ver">v1.0 · <span id="protoTag">proto</span></span>
   </div>
 </div>

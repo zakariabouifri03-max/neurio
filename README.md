@@ -15,8 +15,27 @@ node server/index.mjs            # → http://localhost:8099/swindle/
 Node 18+ is the only requirement — the server speaks raw `http` + a hand-written RFC6455 WebSocket layer, so there are
 **zero runtime dependencies** (Three.js r170 is vendored in `vendor/`).
 
-Solo play works with no server at all: **PLAY SOLO** opens a local table with bots in your own tab, using the exact same
+Solo play works with no server at all: **PLAY NOW** opens a local table with bots in your own tab, using the exact same
 authority code the server uses.
+
+## 📴 Offline — one file, no server, no internet
+
+```bash
+npm run offline        # → swindle/offline.html   (~1.7 MB, everything inlined)
+```
+
+That single file *is* the game: the bundler (`tools/build-offline.mjs`, zero dependencies) walks the real ES-module graph,
+inlines Three.js, all 11 client modules, the 4 shared authority modules and the stylesheet into one HTML document. **Double-click
+it** — a solo table with up to 7 bots plays exactly like the online game (same phases, same reveal, same chips), because the
+authority runs in the tab. No `node_modules`, no server, no CDN; webfonts are attached lazily and the CSS falls back to system
+faces when you are offline. The menu's **⬇ SAVE OFFLINE COPY** button hands you this file from a running server, and the online
+buttons politely dim out when there is no network (or when you opened the file from disk).
+
+`npm run offline:check` proves it: it loads the built file exactly as a browser would (one inline module, no fetches), boots the
+renderer, plays a whole night with bots and asserts the reveal, the awards and the final board all happened.
+
+> Progress is stored in `localStorage`. Some browsers refuse storage for `file://` pages — the game still plays, it just will not
+> remember your chips between openings (it tells you when that happens).
 
 ---
 
@@ -120,7 +139,9 @@ neurio/
     ├── smoke-3d.mjs                  # headless build of room/characters/FX/textures
     ├── smoke-client.mjs              # headless run of main.js+ui.js through a whole game
     ├── check-wiring.mjs              # DOM/three/import surface cross-check
-    ├── bench-frame.mjs              # per-preset js frame cost with 8 players
+    ├── build-offline.mjs           # ESM inliner → one self-contained offline HTML file
+    ├── check-offline.mjs           # boots that file headlessly and plays a full night
+    ├── bench-frame.mjs             # per-preset js frame cost with 8 players
     └── make-swindle-icons.mjs        # procedural PNG icons (own encoder, no deps)
 ```
 
@@ -131,6 +152,8 @@ npm run sim        # node tools/sim-rounds.mjs 4 6   — authority: rounds, phas
 npm run smoke3d    # headless room/characters/FX      → 3D SMOKE OK
 npm run smoke      # headless client plays a full game → CLIENT SMOKE OK
 npm run proto      # boots the server on a spare port and runs the live WS suite → PROTOCOL OK
+npm run offline    # rebuild the single-file offline build
+npm run offline:check  # boot + play the built offline file headlessly
 npm run wire       # ids/classes/three/imports/css cross-check
 npm run bench      # js frame cost with 8 players, per quality preset
 npm run icons      # regenerate swindle/icons/*.png

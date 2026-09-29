@@ -134,6 +134,7 @@ const ui = new UI({
   leave: () => leaveRoom(),
   skipReveal: () => client.skipReveal(),
   theatreBeat: () => {},
+  download: () => saveOfflineCopy(),
   modalClosed: () => ui.on.customizeOpen?.(false),
   customizeOpen: (open) => { customizing = open; },
 });
@@ -158,6 +159,7 @@ async function startOnline(action, code) {
   }
 }
 function enterSession(kind) {
+  ui.setLocal(kind === 'local');
   mode = 'lobby';
   ui.screen('lobby');
   for (const c of menuCrew) { scene.remove(c.root); }
@@ -587,7 +589,33 @@ function wrap(g, text, maxW, size) {
 // ── main loop ────────────────────────────────────────────────────────────────────
 applyQuality(quality); resize();
 ui.refreshWallet();
-ui.setStatus('offline');
+
+// ── network reality: the game never needs the house for a solo table ──────────
+const fromDisk = location.protocol === 'file:';
+const netOnline = () => !fromDisk && navigator.onLine !== false;
+function reflectNet() {
+  const on = !netOnline();
+  ui.setOffline(on);
+  if (!on && mode === 'menu') ui.setStatus('online', 'connected to the house');
+}
+let canStore = true;
+try { localStorage.setItem('__swindle_probe', '1'); localStorage.removeItem('__swindle_probe'); } catch (e) { canStore = false; }
+if (fromDisk && !canStore) setTimeout(() => toast('This browser will not save progress from a local file — the game still plays fine', 'bad', 5600), 1400);
+
+function saveOfflineCopy() {
+  const a = document.createElement('a');
+  a.href = 'offline.html'; a.download = 'swindle-squad-offline.html';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Saving swindle-squad-offline.html — double-click it later, no wifi needed', 'good', 4200);
+}
+addEventListener('online', () => { reflectNet(); if (mode === 'menu') toast('Back online — rooms are open again', 'good'); });
+addEventListener('offline', () => { reflectNet(); toast('Offline. The solo table keeps going — chips and all.', 'bad'); });
+$('#mOffline') && (fromDisk ? ($('#mOffline').hidden = true) : (check('offline.html')));
+async function check(u) {
+  try { const r = await fetch(u, { method: 'HEAD' }); $('#mOffline').hidden = !r.ok; } catch (e) { $('#mOffline').hidden = true; }
+}
+if (fromDisk) $('#offPill').hidden = false;
+reflectNet();
 ui.screen('menu');
 if (location.hash.startsWith('#join=')) {
   const code = location.hash.slice(6).toUpperCase().slice(0, 5);
