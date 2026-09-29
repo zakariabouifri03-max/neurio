@@ -169,7 +169,7 @@
     el.querySelector('.brief-body').innerHTML =
       '<div class="brief-boss">👔</div>' +
       '<h3>السيد بولعيد — اليوم ' + day + '</h3>' +
-      '<p class="boss-line">«' + U.pick(D.boss.lines.intro) + '»</p>' +
+      '<p class="boss-line">' + quote(U.pick(D.boss.lines.intro)) + '</p>' +
       '<div class="brief-quota">🎯 الكوتا ديال اليوم: <b>' + U.money(quota) + '</b></div>' +
       '<div class="brief-tips">' + D.tips.slice(0, 5).map(function (t) { return '<div>' + t + '</div>'; }).join('') + '</div>';
     show('brief', true);
@@ -177,9 +177,16 @@
   }
 
   // ------------------------------------------------------------------ review
+  // «juste guillemets» — jamais de guillemets doubles si la ligne en a déjà
+  function quote(t) {
+    t = String(t == null ? '' : t).replace(/[«»]/g, '').replace(/^\s*"|"\s*$/g, '').trim();
+    return '«' + t + '»';
+  }
+
   function showReview(outcome, cb) {
     var rating = outcome.rating;
     var bossLine = rating === 'fired' ? U.pick(D.boss.lines.fired) : rating === 'great' ? U.pick(D.boss.lines.great) : rating === 'ok' ? U.pick(D.boss.lines.ok) : U.pick(D.boss.lines.bad);
+    bossLine = quote(bossLine);
     var el = $('#review');
     el.querySelector('.review-body').innerHTML =
       '<div class="rev-boss">👔</div>' +
