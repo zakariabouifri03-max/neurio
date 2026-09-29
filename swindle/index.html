@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>🎭 Swindle Squad — deal · doubt · double-cross</title>
+<meta name="description" content="A 2–8 player 3D multiplayer deception party game. Dubious deals, secret roles, big reveals.">
+<meta name="theme-color" content="#12293a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Swindle Squad">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312293a'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle'%3E%F0%9F%8E%AD%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "/vendor/three.module.js",
+  "three/addons/": "/vendor/"
+} }
+</script>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="grade"></div>
+<div id="vignette"></div>
+
+<!-- ═══════════════ IN-GAME UI ═══════════════ -->
+<div id="ui" hidden>
+
+  <header id="topbar">
+    <div class="tb-left">
+      <div class="badge" id="roundBadge"><span class="k">ROUND</span><b id="roundNum">1</b><span class="slash">/</span><b id="roundTot">6</b></div>
+      <div class="badge phase" id="phaseBadge"><span id="phaseIcon">🎭</span><b id="phaseName">DEALS OPEN</b></div>
+      <div class="badge code" id="codeBadge" title="Room code — tap to copy"><span class="k">CODE</span><b id="roomCode">·····</b></div>
+    </div>
+    <div class="tb-right">
+      <button class="icobtn" id="btnChatTop" title="Table talk">💬</button>
+      <button class="icobtn" id="btnEmoteTop" title="Emote">🕺</button>
+      <button class="icobtn" id="btnSound" title="Sound">🔊</button>
+      <button class="icobtn" id="btnSettings" title="Settings">⚙</button>
+    </div>
+  </header>
+
+  <div id="clock">
+    <div class="clockRing"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="44"/><circle class="fg" id="clockArc" cx="50" cy="50" r="44"/></svg>
+      <b id="clockNum">45</b>
+    </div>
+    <div class="clockLabel" id="clockLabel">DEAL TIME</div>
+  </div>
+
+  <aside id="scoreRail" aria-label="players"></aside>
+
+  <section id="objCard">
+    <div class="oc-role" id="ocRole"><span class="ic">🎭</span><b>TRICKSTER</b></div>
+    <div class="oc-obj" id="ocObjective">—</div>
+    <div class="oc-secret" id="ocSecret"></div>
+    <div class="oc-foot"><span id="ocAbility"></span><i class="lockdot" id="ocLock"></i></div>
+  </section>
+
+  <section id="board">
+    <div id="feed"></div>
+    <div id="dealTray"></div>
+    <div id="accuseStrip"></div>
+    <div id="actionDock"></div>
+    <div id="decisionPad">
+      <div class="dp-head"><b id="dpTitle">YOUR MOVE</b><span id="dpSub">pick one, then lock it</span></div>
+      <div id="dpOptions" class="dp-grid"></div>
+      <div class="dp-foot">
+        <button class="btn ghost" id="btnPush">🎲 <span>PUSH IT</span></button>
+        <button class="btn primary big" id="btnLock">🔒 <span>LOCK MY CALL</span></button>
+      </div>
+    </div>
+  </section>
+
+  <div id="toasts"></div>
+  <div id="ticker"><div class="tk-track" id="tickerTrack"></div></div>
+
+  <button id="miniDock" class="mdock" title="More">⋯</button>
+  <div id="miniMenu">
+    <button data-a="chat">💬 Table talk</button>
+    <button data-a="emote">🕺 Emote</button>
+    <button data-a="offer">🤝 Make a deal</button>
+    <button data-a="spectate">👁 Spectate</button>
+    <button data-a="stats">📊 My record</button>
+    <button data-a="settings">⚙ Settings</button>
+  </div>
+</div>
+
+<!-- ═══════════════ REVEAL THEATRE ═══════════════ -->
+<div id="theatre" hidden>
+  <div id="thVignette"></div>
+  <div id="thCaption"></div>
+  <div id="thRow"></div>
+  <button id="thSkip">SKIP ▶</button>
+</div>
+
+<!-- ═══════════════ BIG BANNER ═══════════════ -->
+<div id="bigBanner" hidden><div class="bb-in"><b id="bbText">SCAM SUCCESS</b><span id="bbSub"></span></div></div>
+
+<!-- ═══════════════ MENUS ═══════════════ -->
+<div id="menu">
+  <div class="menu-grid">
+    <div class="brand">
+      <div class="brandMark">🎭</div>
+      <h1 class="brandTitle">SWINDLE<span>SQUAD</span></h1>
+      <p class="brandSub">a party game of <em>dubious deals</em> for 2–8 friends</p>
+      <div class="brandVenue" id="menuVenue">THE GILDED ALIBI · MEMBERS ONLY</div>
+    </div>
+    <div class="menu-actions">
+      <button class="btn hero" id="mQuick"><b>PLAY NOW</b><i>instant table with bots</i></button>
+      <div class="row2">
+        <button class="btn" id="mCreate"><b>CREATE ROOM</b><i>host for friends</i></button>
+        <button class="btn" id="mJoin"><b>JOIN CODE</b><i>5 letters</i></button>
+      </div>
+      <div class="row3">
+        <button class="btn tiny" id="mCustom"><b>🎨 LOOK</b></button>
+        <button class="btn tiny" id="mShop"><b>🛒 SHOP</b></button>
+        <button class="btn tiny" id="mStats"><b>📊 STATS</b></button>
+        <button class="btn tiny" id="mHelp"><b>❓ HOW</b></button>
+        <button class="btn tiny" id="mOpts"><b>⚙ OPTS</b></button>
+      </div>
+    </div>
+    <div class="menu-side">
+      <div class="wallet"><span class="k">CHIP WALLET</span><b id="menuChips">0</b> 🪙</div>
+      <div class="joinbox" id="joinBox" hidden>
+        <input id="joinInput" maxlength="5" placeholder="CODE" autocomplete="off" spellcheck="false">
+        <button class="btn primary" id="joinGo">ENTER</button>
+        <div class="hint" id="joinHint">Ask a friend for their 5-letter code</div>
+      </div>
+      <div class="marquee"><div class="mq-track" id="menuTips"></div></div>
+    </div>
+  </div>
+  <div class="menu-foot">
+    <span class="net dot" id="netDot"></span><span id="netLabel">offline — solo table available</span>
+    <span class="sp"></span>
+    <span class="ver">v1.0 · <span id="protoTag">proto</span></span>
+  </div>
+</div>
+
+<!-- ═══════════════ LOBBY PANEL (over the 3D lobby) ═══════════════ -->
+<div id="lobby" hidden>
+  <div class="lb-head">
+    <div><span class="k">ROOM CODE</span><b id="lbCode">·····</b></div>
+    <div class="wallet lb-wallet"><span class="k">WALLET</span><b id="earnedNow">0</b> 🪙 <i id="earnedNote"></i></div>
+    <div class="sp"></div>
+    <button class="btn tiny" id="lbInvite">✉ INVITE</button>
+    <button class="btn tiny" id="lbLeave">LEAVE</button>
+  </div>
+  <div class="lb-body">
+    <div class="lb-col">
+      <div class="lb-title">AT THE TABLE <i id="lbCount">0/8</i></div>
+      <div id="lbPlayers"></div>
+      <div class="lb-ready">
+        <button class="btn primary big" id="lbReady">READY</button>
+        <button class="btn" id="lbStart" hidden>START THE NIGHT</button>
+      </div>
+    </div>
+    <div class="lb-col">
+      <div class="lb-title">HOUSE RULES <i id="lbHostNote"></i></div>
+      <div id="lbSettings"></div>
+      <div class="lb-host" id="lbHost"></div>
+    </div>
+  </div>
+  <div class="lb-foot">
+    <button class="btn tiny" id="lbCustom">🎨 CUSTOMISE</button>
+    <button class="btn tiny" id="lbEmote">🕺 EMOTE</button>
+    <button class="btn tiny" id="lbBots">＋ BOT</button>
+    <button class="btn tiny" id="lbChat">💬 TALK</button>
+    <span class="sp"></span>
+    <span class="hint" id="lbHint">WASD / drag to walk around the room</span>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL ═══════════════ -->
+<div id="modal" hidden>
+  <div class="md-box">
+    <div class="md-head"><b id="mdTitle">TITLE</b><div class="sp"></div><div id="mdTabs"></div><button class="icobtn" id="mdClose">✕</button></div>
+    <div class="md-body" id="mdBody"></div>
+    <div class="md-foot" id="mdFoot"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ RESULT / REMATCH ═══════════════ -->
+<div id="finalCard" hidden>
+  <div class="fc-box">
+    <div class="fc-crown">👑</div>
+    <h2 id="fcWinner">NAME WINS</h2>
+    <div class="fc-quote" id="fcQuote"></div>
+    <div class="fc-board" id="fcBoard"></div>
+    <div class="fc-earned" id="fcEarned"></div>
+    <div class="fc-actions">
+      <button class="btn hero" id="fcRematch"><b>REMATCH</b><i>same table, fresh lies</i></button>
+      <button class="btn" id="fcLobby"><b>BACK TO LOBBY</b></button>
+      <button class="btn" id="fcQuit"><b>LEAVE</b></button>
+    </div>
+  </div>
+</div>
+
+<div id="emoteWheel" hidden></div>
+<div id="chatSheet" hidden>
+  <div class="cs-tabs" id="csTabs"></div>
+  <div class="cs-lines" id="csLines"></div>
+  <div class="cs-input"><input id="csInput" maxlength="80" placeholder="say something you'll deny later" autocomplete="off"><button class="btn primary" id="csSend">SAY</button></div>
+</div>
+<div id="offerSheet" hidden>
+  <div class="os-box" id="osBox"></div>
+</div>
+
+<div id="errLog"></div>
+<div id="fps"></div>
+
+<script type="module" src="js/main.js"></script>
+<script>
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  addEventListener('load', () => { navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {}); });
+}
+</script>
+<script>
+window.addEventListener('error', e => {
+  const d = document.getElementById('errLog');
+  if (!d) return;
+  d.hidden = false;
+  d.textContent = (d.textContent ? '\n' : '') + '[client] ' + (e.message || e.error);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "neurio",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Swindle Squad — a server-authoritative 3D multiplayer deception party game (plus Bash Baqi Racing).",
+  "scripts": {
+    "start": "node server/index.mjs",
+    "swindle": "node server/index.mjs",
+    "sim": "node tools/sim-rounds.mjs",
+    "smoke": "node tools/smoke-client.mjs",
+    "smoke3d": "node tools/smoke-3d.mjs",
+    "proto": "node tools/proto-run.mjs",
+    "wire": "node tools/check-wiring.mjs",
+    "icons": "node tools/make-swindle-icons.mjs && node tools/make-icons.mjs",
+    "check": "node tools/sim-rounds.mjs 4 6 && npm run smoke3d && npm run smoke && npm run wire",
+    "all": "npm run check && npm run proto"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

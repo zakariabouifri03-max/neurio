@@ -1,0 +1,25 @@
+{
+  "name": "Swindle Squad — deal · doubt · double-cross",
+  "short_name": "Swindle Squad",
+  "description": "A 2–8 player 3D multiplayer deception party game. Dubious deals, secret roles, big reveals, one very crooked back room.",
+  "id": "/swindle/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["window-controls-overlay", "fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#0b1620",
+  "theme_color": "#12293a",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["games", "multiplayer", "party"],
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Open my table", "url": "./#r=", "short_name": "Resume", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
