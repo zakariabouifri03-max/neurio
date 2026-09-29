@@ -1,0 +1,24 @@
+{
+  "name": "neurio-pool-hall",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "NEURIO Pool Hall \u2014 3D multiplayer billiards: huge social hall, real physics, authoritative server, coins, friends, cues.",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "serve": "node serve.mjs",
+    "build": "node tools/build.mjs",
+    "test": "node tools/selftest.mjs && node tools/gamestest.mjs",
+    "test:headless": "node tools/headless.mjs",
+    "test:online": "node tools/onlinetest.mjs",
+    "test:all": "node tools/selftest.mjs && node tools/gamestest.mjs && node tools/headless.mjs && node tools/onlinetest.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.5"
+  }
+}

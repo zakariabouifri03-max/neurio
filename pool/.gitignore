@@ -1,0 +1,7 @@
+# dependencies are never needed to run or deploy this project
+node_modules/
+
+# the server's account store: scrypt password hashes, wallets, ledgers.
+# It belongs on the machine that runs the server, never in the repository.
+server/data/
+server/data/*.tmp

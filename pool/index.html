@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>NEURIO Pool Hall — 3D Multiplayer Billiards</title>
+<meta name="theme-color" content="#08131a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-title" content="Pool Hall">
+<meta name="description" content="A huge 3D social pool hall: realistic billiards physics, 1v1 multiplayer, friends, coins, cue collection and ranked ladders.">
+<link rel="manifest" href="pool.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../vendor/three.module.js",
+    "three/addons/": "../vendor/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<canvas id="gl"></canvas>
+
+<!-- ══════════ BOOT / LOGIN ══════════ -->
+<div id="boot" class="screen show">
+  <div class="bootBg"></div>
+  <div class="bootBox">
+    <div class="logo">
+      <div class="logoBall"><span>8</span></div>
+      <div class="logoTxt"><b>NEURIO</b><i>POOL HALL</i></div>
+    </div>
+    <div class="loadBar"><div id="loadFill"></div></div>
+    <div id="loadTip" class="loadTip">warming up the felt…</div>
+
+    <div id="authBox" class="authBox hidden">
+      <div class="tabs">
+        <button id="tabLogin" class="tab on">SIGN IN</button>
+        <button id="tabReg" class="tab">CREATE ACCOUNT</button>
+      </div>
+      <input id="authUser" class="fld" maxlength="16" placeholder="Username" autocomplete="username" autocapitalize="off" spellcheck="false">
+      <input id="authPass" class="fld" maxlength="32" type="password" placeholder="Password" autocomplete="current-password">
+      <div id="authMsg" class="authMsg"></div>
+      <button id="authBtn" class="btn primary big">ENTER THE HALL</button>
+      <button id="guestBtn" class="btn ghost">Play as Guest</button>
+      <div class="authFoot">Coins, friends &amp; cues are stored on the server. Guest progress stays on this device.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN MENU (over the 3D hall) ══════════ -->
+<div id="menu" class="screen">
+  <div class="menuTop">
+    <div class="meChip">
+      <div class="ava" id="mAvatar">🎱</div>
+      <div class="meTxt"><b id="mName">Player</b><i id="mTitle">Rookie</i></div>
+      <div class="lvlRing" id="mLvlRing"><span id="mLvl">1</span></div>
+    </div>
+    <div class="wallet">
+      <div class="wChip" id="wFree" title="Free coins — earned by playing"><span>🪙</span><b>0</b><i>free</i></div>
+      <div class="wChip bought" id="wBought" title="Purchased coins"><span>💳</span><b>0</b><i>bought</i></div>
+      <div class="wChip bonus" id="wBonus" title="Bonus coins from packs &amp; events"><span>🎁</span><b>0</b><i>bonus</i></div>
+    </div>
+    <div class="netChip" id="netChip"><span class="dot"></span><b>offline</b></div>
+  </div>
+
+  <div class="menuCenter">
+    <div class="bigTitle">THE HALL IS OPEN</div>
+    <div class="bigSub" id="hallSub">16 tables · <span id="onlineCount">0</span> players online</div>
+  </div>
+
+  <div class="menuBottom">
+    <button class="mbtn play" data-panel="quickplay"><span>▶</span><b>PLAY</b><i>quick match</i></button>
+    <button class="mbtn" data-panel="friends"><span>🧑‍🤝‍🧑</span><b>FRIENDS</b><i id="friendBadge">0</i></button>
+    <button class="mbtn" data-panel="shop"><span>🛒</span><b>SHOP</b><i>coins</i></button>
+    <button class="mbtn" data-panel="cues"><span>🎱</span><b>CUES</b><i>collection</i></button>
+    <button class="mbtn" data-panel="profile"><span>👤</span><b>PROFILE</b><i>stats</i></button>
+    <button class="mbtn" data-panel="inbox"><span>✉️</span><b>INBOX</b><i id="inboxBadge">0</i></button>
+    <button class="mbtn" data-panel="tourney"><span>🏆</span><b>TOURNAMENTS</b><i>brackets</i></button>
+    <button class="mbtn" data-panel="settings"><span>⚙️</span><b>SETTINGS</b><i>graphics</i></button>
+  </div>
+
+  <div class="menuHint">
+    <b>WASD</b> walk · <b>mouse</b> look · walk up to any table to play · <b>E</b> interact · <b>F</b> wave
+  </div>
+</div>
+
+<!-- ══════════ SLIDE-IN PANELS ══════════ -->
+<div id="panelWrap" class="panelWrap">
+  <div class="panelScrim" id="panelScrim"></div>
+  <div class="panel" id="panel">
+    <div class="panelHead"><h2 id="panelTitle">Panel</h2><button class="x" id="panelClose">✕</button></div>
+    <div class="panelBody" id="panelBody"></div>
+  </div>
+</div>
+
+<!-- ══════════ HALL HUD ══════════ -->
+<div id="hallHud" class="hud hidden">
+  <div class="hudTL">
+    <button class="pill" id="btnMenu">☰ MENU</button>
+    <div class="pill zone" id="zoneName">MAIN POOL AREA</div>
+  </div>
+  <div class="hudTR">
+    <div class="pill coin"><span>🪙</span><b id="hudCoins">0</b></div>
+    <div class="pill fps" id="hudFps">60 fps</div>
+  </div>
+
+  <!-- proximity interaction -->
+  <div id="interact" class="interact hidden">
+    <div class="intTitle" id="intTitle">Table 3</div>
+    <div class="intSub" id="intSub">Open table · Casual</div>
+    <div class="intBtns" id="intBtns"></div>
+  </div>
+
+  <!-- joystick (touch) -->
+  <div id="stick" class="stick hidden"><div id="stickNub"></div></div>
+  <div id="touchBtns" class="touchBtns hidden">
+    <button class="tbtn" id="tWave">👋</button>
+    <button class="tbtn" id="tEmote">😄</button>
+    <button class="tbtn" id="tUse">E</button>
+  </div>
+</div>
+
+<!-- ══════════ MATCH HUD ══════════ -->
+<div id="matchHud" class="hud hidden">
+  <div class="scoreBar">
+    <div class="side p1" id="side1">
+      <div class="ava" id="s1ava">🎱</div>
+      <div class="sideTxt"><b id="s1name">Player 1</b><i id="s1group">—</i></div>
+      <div class="balls" id="s1balls"></div>
+      <div class="score" id="s1score">0</div>
+    </div>
+    <div class="mid">
+      <div class="turnDot" id="turnDot"></div>
+      <div class="clock" id="shotClock">30</div>
+      <div class="midTxt" id="matchInfo">8-BALL · CASUAL</div>
+    </div>
+    <div class="side p2" id="side2">
+      <div class="score" id="s2score">0</div>
+      <div class="balls" id="s2balls"></div>
+      <div class="sideTxt r"><b id="s2name">Player 2</b><i id="s2group">—</i></div>
+      <div class="ava" id="s2ava">🎱</div>
+    </div>
+  </div>
+
+  <div class="stakeBar" id="stakeBar">
+    <span>STAKE</span><b id="stakeAmt">0 🪙</b><span class="sep">|</span><span>POT</span><b id="potAmt">0 🪙</b>
+  </div>
+
+  <!-- shot controls -->
+  <div id="shotCtl" class="shotCtl hidden">
+    <div class="ctlLeft">
+      <div class="spinPad" id="spinPad">
+        <div class="spinBall"><div class="spinDot" id="spinDot"></div><div class="spinCrossV"></div><div class="spinCrossH"></div></div>
+        <div class="spinLbl">ENGLISH</div>
+      </div>
+    </div>
+    <div class="ctlRight">
+      <div class="pwrWrap">
+        <div class="pwrTrack" id="pwrTrack"><div class="pwrFill" id="pwrFill"></div><div class="pwrGrab" id="pwrGrab"></div></div>
+        <div class="pwrLbl">POWER <b id="pwrVal">50%</b></div>
+      </div>
+      <div class="ctlBtns">
+        <button class="cbtn" id="btnCam" title="Camera (C)">🎥</button>
+        <button class="cbtn" id="btnGuide" title="Guides (G)">📐</button>
+        <button class="cbtn" id="btnHand" title="Ball in hand">✋</button>
+        <button class="cbtn shoot" id="btnShoot" title="Shoot (Space)">SHOOT</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ballInHandBar" class="bih hidden">
+    <b>BALL IN HAND</b> — drag on the table to place the cue ball, then confirm
+    <button class="btn small primary" id="bihDone">PLACE</button>
+  </div>
+
+  <div class="matchBtns">
+    <button class="pill" id="btnLeave">🚪 LEAVE</button>
+    <button class="pill" id="btnSpecCam">🎥 VIEW</button>
+  </div>
+
+  <div id="centerMsg" class="centerMsg hidden"></div>
+  <div id="foulFlash" class="foulFlash hidden"></div>
+</div>
+
+<!-- ══════════ SPECTATOR BAR ══════════ -->
+<div id="specBar" class="specBar hidden">
+  <b>SPECTATING</b>
+  <button class="pill sm" data-sc="p1">Player 1</button>
+  <button class="pill sm" data-sc="p2">Player 2</button>
+  <button class="pill sm" data-sc="top">Overview</button>
+  <button class="pill sm" data-sc="close">Close-up</button>
+  <button class="pill sm" data-sc="free">Free cam</button>
+  <button class="pill sm" id="specLeave">Leave</button>
+</div>
+
+<!-- ══════════ TOASTS / NOTIFS ══════════ -->
+<div id="toasts" class="toasts"></div>
+<div id="notifs" class="notifs"></div>
+
+<!-- ══════════ MODAL ══════════ -->
+<div id="modalWrap" class="modalWrap hidden">
+  <div class="modalScrim" id="modalScrim"></div>
+  <div class="modal" id="modal">
+    <div class="modalHead" id="modalTitle">Title</div>
+    <div class="modalBody" id="modalBody"></div>
+    <div class="modalBtns" id="modalBtns"></div>
+  </div>
+</div>
+
+<!-- ══════════ RESULT ══════════ -->
+<div id="result" class="screen result hidden">
+  <div class="resBox" id="resBox">
+    <div class="resBig" id="resBig">VICTORY</div>
+    <div class="resSub" id="resSub"></div>
+    <div class="resRows" id="resRows"></div>
+    <div class="resBtns">
+      <button class="btn primary" id="resRematch">REMATCH</button>
+      <button class="btn ghost" id="resHall">BACK TO THE HALL</button>
+    </div>
+  </div>
+</div>
+
+<div id="errLog" class="errLog"></div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

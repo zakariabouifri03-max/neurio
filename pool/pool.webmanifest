@@ -1,0 +1,35 @@
+{
+  "name": "NEURIO Pool Hall \u2014 3D Multiplayer Billiards",
+  "short_name": "Pool Hall",
+  "description": "A huge walkable 3D pool hall: real billiards physics, 8-ball and 9-ball, online 1v1, friends, coins and collectible cues.",
+  "start_url": "./neurio-pool.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#08131a",
+  "theme_color": "#08131a",
+  "categories": [
+    "games",
+    "sports"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
