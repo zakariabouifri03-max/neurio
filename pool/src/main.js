@@ -23,6 +23,14 @@ import { $, el, toast, notify, modal, show, screen, txt, fmt, clamp, isModalOpen
 // ── error surface (there is no console on a phone) ──────────────────────────
 const errLog = $('errLog');
 let errCount = 0;
+/** a fatal error stays on screen — fading would hide the reason */
+function fatal(msg) {
+  console.error('[neurio] FATAL', msg);
+  if (!errLog) return;
+  errLog.textContent = `⚠ FATAL — ${msg}`;
+  errLog.style.opacity = '1';
+  clearTimeout(reportError._t);
+}
 function reportError(where, err) {
   errCount++;
   const msg = `${where}: ${err && err.message ? err.message : err}`;
@@ -112,6 +120,14 @@ async function boot() {
   }
 
   setProgress(1, 'ready');
+  if (!App.scene) {
+    // never pretend: a boot that lost its renderer cannot enter the hall
+    const why = errLog && errLog.textContent ? errLog.textContent : 'unknown error';
+    if (tip) tip.textContent = 'The 3D renderer could not start on this device.';
+    show($('authBox'), false);
+    fatal(`boot failed: ${why}`);
+    return;
+  }
   App.booted = true;
   startLoop();
   showAuth();
@@ -152,17 +168,30 @@ function showAuth() {
       else Profile.rename(name);
       enterHall();
     } catch (e) {
-      msg.textContent = String(e.message || e);
+      const why = String(e.message || e);
+      msg.textContent = why;
+      if (/no such account/i.test(why)) {
+        msg.textContent = `${why} — switch to CREATE ACCOUNT, or play as a guest.`;
+        setTab(true);
+      }
     }
   });
 
   $('guestBtn').addEventListener('click', () => {
-    Audio.click('confirm');
-    const name = $('authUser').value.trim();
-    if (name.length >= 2 && Profile.me.guest) Profile.rename(name);
-    Profile.set('guest', true);
-    enterHall();
+    try {
+      Audio.click('confirm');
+      const name = $('authUser').value.trim();
+      if (name.length >= 2 && Profile.me.guest) Profile.rename(name);
+      enterHall();
+    } catch (e) {
+      reportError('entering the hall', e);
+      msg.textContent = `Could not enter: ${e && e.message ? e.message : e}`;
+    }
   });
+  // pressing Enter in either field is the same as the big button
+  for (const id of ['authUser', 'authPass']) {
+    $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') btn.click(); });
+  }
 
   // try the server in the background either way — the chip tells the truth
   net.onStatus = (on, why) => { updateNetChip(on, why); if (on) pullProfile(); };

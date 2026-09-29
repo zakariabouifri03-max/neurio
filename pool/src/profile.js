@@ -280,4 +280,13 @@ export const Profile = {
   aiLevelName(id) { return (LEVELS.find((l) => l.id === id) || LEVELS[2]).name; },
 };
 
+// The profile has to exist before ANYTHING touches it: the boot screen reads
+// settings on its first line, the menu reads the wallet, the match controller
+// reads the name. Initialising here (instead of waiting for a caller) is what
+// keeps a cold start from dying silently on a null profile.
+if (!me) {
+  try { Profile.load(); }
+  catch (e) { me = freshProfile('Guest'); }
+}
+
 export default Profile;

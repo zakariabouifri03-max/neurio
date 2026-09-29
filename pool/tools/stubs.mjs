@@ -29,6 +29,20 @@ function fakeEl(id) {
     addEventListener(ev, fn) { listeners.push([this, ev, fn]); },
     removeEventListener(ev, fn) { const i = listeners.findIndex(([n, e, f]) => n === this && e === ev && f === fn); if (i >= 0) listeners.splice(i, 1); },
     getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100, right: 100, bottom: 100 }),
+    // a 2D context good enough for the procedural textures (faces, ball decals)
+    getContext(kind) {
+      if (this._ctx) return this._ctx;
+      const noop = () => {};
+      this._ctx = new Proxy({ canvas: this }, {
+        get(t, k) {
+          if (k in t) return t[k];
+          if (k === 'canvas') return t.canvas;
+          return noop;
+        },
+        set(t, k, v) { t[k] = v; return true; },
+      });
+      return this._ctx;
+    },
     setPointerCapture() {}, releasePointerCapture() {},
     get innerHTML() { return this._html; },
     set innerHTML(v) { this._html = v; if (v === '') this.children.length = 0; },
