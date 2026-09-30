@@ -3,17 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏁 Bash Baqi Racing</title>
-<meta name="theme-color" content="#0ea5e9">
+<title>🛣️ The Long Drive 3D — Desert Survival Road Trip</title>
+<meta name="theme-color" content="#d97706">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bash Baqi">
+<meta name="apple-mobile-web-app-title" content="Long Drive 3D">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="src/style.css">
 <script type="importmap">
 {
@@ -27,119 +25,436 @@
 <body>
 <div id="app"></div>
 
-<!-- error overlay -->
+<!-- Dev Error Overlay -->
 <div id="errLog"></div>
 
-<!-- loading -->
+<!-- Loading Screen -->
 <div id="loading">
   <div class="loadBox">
-    <div class="loadFlag">🏁</div>
-    <div class="loadTitle">BASH BAQI<br>RACING</div>
+    <div class="loadIcon">🛣️</div>
+    <div class="loadTitle">THE LONG DRIVE <span>3D</span></div>
+    <div class="loadSub">5,000 KILOMETERS OF DESERT ASPHALT, RUST &amp; MOTOR OIL</div>
     <div class="loadBar"><div></div></div>
-    <div class="loadTip">warming up the buggies…</div>
+    <div class="loadTip">Checking radiator water &amp; cranking the Zhiguli…</div>
   </div>
 </div>
 
-<!-- speed lines overlay -->
-<div id="speedLines"></div>
-<div id="coinPops"></div>
-
-<!-- ══════════ RACE HUD ══════════ -->
-<div id="hud">
-  <div class="hudTL">
-    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
-    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
-    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
-    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
-  </div>
-
-  <div id="progbar">
-    <span class="flagL">🏁</span>
-    <div class="track"><div id="progMarkers"></div></div>
-    <span class="flagR">🏆</span>
-  </div>
-
-  <button id="btnPauseTop" class="roundBtn">⏸</button>
-
-  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
-
-  <div id="powerSlot" class="powerSlot">
-    <span id="hudPower"></span>
-    <span class="keyHint">SPACE</span>
-  </div>
-
-  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
-
-  <div id="banner"></div>
-
-  <!-- touch controls -->
-  <div id="touchWrap">
-    <div class="tcol left">
-      <button id="tLeft" class="tbtn">◀</button>
-      <button id="tRight" class="tbtn">▶</button>
+<!-- ══════════ TOP SURVIVAL & TELEMETRY BAR ══════════ -->
+<header id="topHud">
+  <div class="odoGroup">
+    <div class="odoChip">
+      <span class="lbl">ODOMETER</span>
+      <b id="hudOdo">0000.0 KM</b>
     </div>
-    <div class="tcol right">
-      <button id="tBrake" class="tbtn brake">▼</button>
+    <div class="odoChip subtle">
+      <span class="lbl">TIME</span>
+      <b id="hudTime">☀️ 09:30</b>
+    </div>
+    <div class="odoChip poi">
+      <span class="lbl">HIGHWAY SCANNER</span>
+      <b id="hudPoi">📍 Home Garage (0.0 km)</b>
     </div>
   </div>
-</div>
 
-<!-- ══════════ GARAGE UI ══════════ -->
-<div id="garageUI">
-  <div id="topbar">
-    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
-    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
-    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
-    <div class="spacer"></div>
-    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
-    <button id="btnMusic" class="miniBtn">🎵</button>
-    <button id="btnSfx" class="miniBtn">🔊</button>
-    <button id="btnFull" class="miniBtn">⛶</button>
-  </div>
-
-  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
-  <div id="carNamePlate"></div>
-
-  <div id="menuBar">
-    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
-    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
-    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
-    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
-    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
-    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
-  </div>
-</div>
-
-<!-- ══════════ Shop / panels ══════════ -->
-<div id="panel">
-  <div class="panelBox">
-    <div class="panelHead">
-      <h2 id="panelTitle">SHOP</h2>
-      <div id="panelTabs"></div>
-      <button id="panelClose" class="roundBtn">✖</button>
+  <div class="vitalsGroup">
+    <div class="vitalBar" title="Health">
+      <span>❤️</span>
+      <div class="barTrack"><div id="barHp" class="barFill hp" style="width:100%"></div></div>
+      <small id="txtHp">100</small>
     </div>
-    <div id="panelBody"></div>
-  </div>
-</div>
-
-<!-- results -->
-<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
-<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
-
-<!-- pause -->
-<div id="pauseModal">
-  <div class="modalBox">
-    <div class="rtitle">⏸ PAUSED</div>
-    <div class="rbtns">
-      <button id="btnResume" class="big race">▶ RESUME</button>
-      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
+    <div class="vitalBar" title="Thirst (Water)">
+      <span>💧</span>
+      <div class="barTrack"><div id="barThirst" class="barFill thirst" style="width:90%"></div></div>
+      <small id="txtThirst">90</small>
+    </div>
+    <div class="vitalBar" title="Hunger (Food)">
+      <span>🍖</span>
+      <div class="barTrack"><div id="barHunger" class="barFill hunger" style="width:92%"></div></div>
+      <small id="txtHunger">92</small>
     </div>
   </div>
+
+  <div class="topActions">
+    <span id="fpsBadge" class="fpsChip" title="Live Render FPS &amp; Graphics Preset">60 FPS • HIGH</span>
+    <button id="btnQuickCar" class="topBtn accent" title="Drive / Enter Nearest Car">🚗 Drive</button>
+    <button id="btnInspector" class="topBtn" title="Car Mechanic & Trunk [Tab]">🔧 Mechanic <kbd>Tab</kbd></button>
+    <button id="btnSettings" class="topBtn" title="Graphics, 4K/HD &amp; Physics Settings">⚙️ Settings</button>
+    <button id="btnLetter" class="topBtn" title="Read Mom's Letter">✉️ Letter</button>
+    <button id="btnWaitTime" class="topBtn" title="Advance Time +3h [T]">⏩ +3h</button>
+    <button id="btnUnstuck" class="topBtn" title="Recover / Flip Car onto Road [U]">🔄 Flip</button>
+    <button id="btnSfx" class="topBtn iconOnly" title="Toggle Audio">🔊</button>
+    <button id="btnOpenMainMenu" class="topBtn iconOnly" title="Main Menu [Esc]">🏠</button>
+    <button id="btnPause" class="topBtn iconOnly" title="Pause / Controls">⏸</button>
+  </div>
+</header>
+
+<!-- ══════════ VEHICLE BUILD / REPAIR CHECKLIST WIDGET ══════════ -->
+<aside id="buildChecklist" class="hidden">
+  <div class="chkHead">
+    <span id="chkCarTitle">🔧 ASSEMBLE YOUR CAR</span>
+    <span id="chkStatusBadge" class="chkBadge warn">NEEDS ASSEMBLY</span>
+  </div>
+  <div id="chkItems" class="chkList"></div>
+  <button id="btnOpenMechFromChk" class="chkBtn">🔧 Open Mechanic / Quick Assemble [Tab]</button>
+</aside>
+
+<!-- ══════════ CENTER CROSSHAIR & INTERACTION TOOLTIP ══════════ -->
+<div id="crosshairWrap">
+  <div id="crosshair"></div>
+  <div id="inspectBox" class="hidden">
+    <div id="inspectTitle" class="insTitle"></div>
+    <div id="inspectMeta" class="insMeta"></div>
+    <div id="inspectActions" class="insActions"></div>
+  </div>
 </div>
 
+<!-- ══════════ DRIVING DASHBOARD OVERLAY ══════════ -->
+<section id="driveHud" class="hidden">
+  <div class="dashPanel">
+    <div class="speedCluster">
+      <div class="spdVal" id="hudKmh">0</div>
+      <div class="spdUnit">KM/H</div>
+      <div class="carBadges">
+        <span id="badgeGear" class="badge on">⚙️ GEAR N</span>
+        <span id="badgeIgn" class="badge on">🔑 IGN ON</span>
+        <span id="badgeBrk" class="badge">🅿️ BRAKE</span>
+        <span id="badgeLights" class="badge">💡 LIGHTS</span>
+      </div>
+    </div>
+
+    <div class="fluidsCluster">
+      <div class="fluidRow">
+        <span class="fLbl">⛽ FUEL</span>
+        <div class="fTrack"><div id="fBarGas" class="fFill gas"></div></div>
+        <b id="fTxtGas">18.5/42L</b>
+      </div>
+      <div class="fluidRow">
+        <span class="fLbl">🛢️ OIL</span>
+        <div class="fTrack"><div id="fBarOil" class="fFill oil"></div></div>
+        <b id="fTxtOil">2.4/3.5L</b>
+      </div>
+      <div class="fluidRow">
+        <span class="fLbl">💧 WATER</span>
+        <div class="fTrack"><div id="fBarWater" class="fFill water"></div></div>
+        <b id="fTxtWater">5.8/8.0L</b>
+      </div>
+      <div class="fluidRow">
+        <span class="fLbl">🌡️ TEMP</span>
+        <div class="fTrack"><div id="fBarTemp" class="fFill temp"></div></div>
+        <b id="fTxtTemp">35°C</b>
+      </div>
+    </div>
+
+    <div class="radioCluster">
+      <div class="radioHeader">
+        <span>📻 CAR RADIO</span>
+        <b id="hudRadioFreq">88.7 FM</b>
+      </div>
+      <div id="hudRadioName" class="radioStation">MIRAGE SYNTH</div>
+      <div class="cockpitBtns">
+        <button id="btnExitCar" class="cBtn warn">🚪 Exit [E]</button>
+        <button id="btnCamToggle" class="cBtn">🎥 Cam [V]</button>
+        <button id="btnIgnToggle" class="cBtn">🔑 Ign [I]</button>
+        <button id="btnLightsToggle" class="cBtn">💡 Beam [L]</button>
+        <button id="btnRadioNext" class="cBtn">📻 Tune [F]</button>
+        <button id="btnHorn" class="cBtn">📯 Horn [H]</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 5-SLOT BELT HOTBAR & CONTROLS HINT ══════════ -->
+<footer id="bottomHud">
+  <div id="hotbar"></div>
+  <div id="controlsHint">
+    <span><kbd>WASD</kbd> Move/Drive</span>
+    <span><kbd>Mouse</kbd> Look (Click view to lock)</span>
+    <span><kbd>E</kbd> Interact / Open / Drive</span>
+    <span><kbd>F</kbd> / <kbd>Click</kbd> Pour / Use / Eat / Swap</span>
+    <span><kbd>G</kbd> Drop</span>
+    <span><kbd>V</kbd> Camera</span>
+    <span><kbd>L</kbd> Lights</span>
+    <span><kbd>Tab</kbd> Mechanic &amp; Trunk</span>
+  </div>
+</footer>
+
+<!-- ══════════ MOBILE TOUCH CONTROLS ══════════ -->
+<div id="touchControls">
+  <div class="touchLeft">
+    <button id="tUp" class="tBtn">▲</button>
+    <div class="tRow">
+      <button id="tLeft" class="tBtn">◀</button>
+      <button id="tRight" class="tBtn">▶</button>
+    </div>
+    <button id="tDown" class="tBtn">▼</button>
+  </div>
+  <div class="touchRight">
+    <button id="tInteract" class="tBtn act">🖐️ E</button>
+    <button id="tUse" class="tBtn act2">⚡ F/Use</button>
+    <button id="tJumpBrk" class="tBtn">🅿️/⬆</button>
+  </div>
+</div>
+
+<!-- ══════════ MECHANIC, FLUIDS & TRUNK MODAL [TAB] ══════════ -->
+<div id="inspectorModal" class="modalOverlay hidden">
+  <div class="modalCard wide">
+    <div class="modalHeader">
+      <h2>🔧 VEHICLE MECHANIC, FLUIDS &amp; TRUNK STORAGE</h2>
+      <button id="btnCloseInspector" class="closeBtn">✖</button>
+    </div>
+    <div id="inspectorBody" class="modalBody"></div>
+  </div>
+</div>
+
+<!-- ══════════ MOM'S LETTER MODAL ══════════ -->
+<div id="letterModal" class="modalOverlay hidden">
+  <div class="modalCard letterCard">
+    <div class="modalHeader">
+      <h2>✉️ LETTER FROM MOM (0.0 KM)</h2>
+      <button id="btnCloseLetter" class="closeBtn">✖</button>
+    </div>
+    <div id="letterBody" class="letterContent"></div>
+    <div class="modalFooter">
+      <button id="btnStartFromLetter" class="primaryBtn">🛣️ Pocket Letter &amp; Hit the Road</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PAUSE & HELP MODAL [ESC] ══════════ -->
+<div id="pauseModal" class="modalOverlay hidden">
+  <div class="modalCard">
+    <div class="modalHeader">
+      <h2>⏸ THE LONG DRIVE 3D — GUIDE &amp; OPTIONS</h2>
+      <button id="btnClosePause" class="closeBtn">✖</button>
+    </div>
+    <div class="modalBody guideBody">
+      <div class="guideGrid">
+        <div>
+          <h3>🚶 On-Foot Controls</h3>
+          <ul>
+            <li><b>WASD / Arrows</b>: Walk (Hold <b>Shift</b> to Sprint, <b>C</b> to Crouch, <b>Space</b> to Jump)</li>
+            <li><b>Click 3D View</b>: Lock Mouse Look (Press <b>Esc</b> to unlock cursor)</li>
+            <li><b>[E]</b>: Pick Up Item / Open Door, Hood, Trunk / Sit in Driver's Seat</li>
+            <li><b>[F] or Left-Click</b>: Pour Held Fluid into Cap / Eat or Drink / Scrub Rust / Spray Paint / Swap Engine, Radiator, or Wheel</li>
+            <li><b>[1–5] or Scroll</b>: Select Hotbar Slot • <b>[G]</b>: Drop Held Item</li>
+            <li><b>[L]</b>: Toggle Flashlight</li>
+          </ul>
+        </div>
+        <div>
+          <h3>🚗 Driving Controls</h3>
+          <ul>
+            <li><b>[W / S]</b>: Throttle / Brake &amp; Reverse</li>
+            <li><b>[A / D]</b>: Steer Left / Right</li>
+            <li><b>[Space]</b>: Handbrake (Hold to drift, releases automatically on gas)</li>
+            <li><b>[E]</b>: Step Out of Vehicle</li>
+            <li><b>[V]</b>: Toggle 1st-Person Cockpit / 3rd-Person Chase Camera</li>
+            <li><b>[I]</b>: Ignition Start/Stop • <b>[L]</b>: Headlights (Off/Low/High)</li>
+            <li><b>[R]</b>: Radio On/Off • <b>[F / N]</b>: Next Radio Station • <b>[H]</b>: Horn</li>
+            <li><b>[U]</b>: Recover / Flip Car Upright onto Highway</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="modalFooter split">
+      <button id="btnNewTrip" class="dangerBtn">🔄 New Road Trip (Reset to 0.0 KM)</button>
+      <button id="btnOpenSettingsFromPause" class="topBtn">⚙️ Graphics &amp; Settings</button>
+      <button id="btnResumeGame" class="primaryBtn">▶ Resume Road Trip</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PROFESSIONAL 3D INTERACTIVE MAIN MENU ══════════ -->
+<div id="mainMenu" class="mainMenuOverlay">
+  <div class="menuContainer">
+    <div class="menuHero">
+      <div class="menuTag">🏜️ ENDLESS 5,000 KM DESERT SURVIVAL SIMULATOR</div>
+      <h1 class="menuTitle">THE LONG DRIVE <span>3D</span></h1>
+      <p class="menuSub">
+        Build and repair your disassembled starter car in the garage, scavenge roadside <b>Houses (Dyor)</b>,
+        <b>Royal Desert Palaces (Qosor)</b>, <b>Kasbah Oasis Forts</b>, and <b>Ikarus Bus Terminals</b> separated
+        by long random stretches of desert highway, and discover rare cars &amp; giant buses to restore.
+      </p>
+      <div class="menuStatsRow">
+        <div class="mStat"><small>ODOMETER</small><b id="menuStatOdo">0.0 KM</b></div>
+        <div class="mStat"><small>BEST RUN</small><b id="menuStatBest">0.0 KM</b></div>
+        <div class="mStat"><small>GRAPHICS</small><b id="menuStatGfx">HIGH (1080p HD)</b></div>
+      </div>
+    </div>
+
+    <div class="menuNav">
+      <button id="btnMenuStart" class="menuBtn primary">
+        <span class="mIcon">▶</span>
+        <div>
+          <b>ENTER THE DESERT HIGHWAY</b>
+          <small id="menuStartSub">Assemble your car at 0.0 KM &amp; begin the journey</small>
+        </div>
+      </button>
+      <button id="btnMenuSettings" class="menuBtn">
+        <span class="mIcon">⚙️</span>
+        <div>
+          <b>GRAPHICS, 4K / HD &amp; PHYSICS SETTINGS</b>
+          <small>Low • Medium • High • Very High • Ultra • Extreme • Shadows</small>
+        </div>
+      </button>
+      <button id="btnMenuShowroom" class="menuBtn">
+        <span class="mIcon">🚌</span>
+        <div>
+          <b>VEHICLE &amp; IKARUS BUS FLEET SHOWROOM</b>
+          <small>Inspect all 8 cars, trucks &amp; giant buses or test-spawn one</small>
+        </div>
+      </button>
+      <button id="btnMenuGuide" class="menuBtn">
+        <span class="mIcon">✉️</span>
+        <div>
+          <b>MOM'S LETTER &amp; SURVIVAL MANUAL</b>
+          <small>Read the 5,000 KM story letter &amp; mechanic controls</small>
+        </div>
+      </button>
+      <button id="btnMenuNew" class="menuBtn danger">
+        <span class="mIcon">🔄</span>
+        <div>
+          <b>NEW ROAD TRIP (RESET TO 0.0 KM)</b>
+          <small>Generate a fresh disassembled starter car in the garage</small>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ GRAPHICS, DISPLAY (4K/HD), SHADOWS & PHYSICS STUDIO ══════════ -->
+<div id="settingsModal" class="modalOverlay hidden">
+  <div class="modalCard wide">
+    <div class="modalHeader">
+      <h2>⚙️ GRAPHICS QUALITY, 4K / HD DISPLAY, SHADOWS &amp; PHYSICS STUDIO</h2>
+      <button id="btnCloseSettings" class="closeBtn">✖</button>
+    </div>
+    <div class="modalBody">
+      <div class="settingsSection">
+        <div class="secTitle">🎨 MASTER GRAPHICS QUALITY PRESET</div>
+        <div id="presetBtns" class="presetBar">
+          <button data-preset="low" class="presetBtn">LOW<span>720p Fast</span></button>
+          <button data-preset="medium" class="presetBtn">MEDIUM<span>900p Balanced</span></button>
+          <button data-preset="high" class="presetBtn active">HIGH<span>1080p Full HD</span></button>
+          <button data-preset="very_high" class="presetBtn">VERY HIGH<span>1440p QHD</span></button>
+          <button data-preset="ultra" class="presetBtn">ULTRA<span>4K UHD</span></button>
+          <button data-preset="extreme" class="presetBtn">EXTREME<span>4K Max Cinema</span></button>
+        </div>
+        <div id="presetDesc" class="presetHint">1080p Full HD, 1024px Shadows &amp; ACES Filmic Bloom</div>
+      </div>
+
+      <div class="settingsGrid">
+        <div class="setCard">
+          <h3>🖥️ Display &amp; Resolution</h3>
+          <label class="setRow">
+            <span>Render Resolution</span>
+            <select id="selResolution">
+              <option value="preset">Auto (Match Preset)</option>
+              <option value="720p">HD 720p (Performance)</option>
+              <option value="1080p">Full HD 1080p (1.0x)</option>
+              <option value="1440p">QHD 1440p (1.35x)</option>
+              <option value="4k">4K Ultra HD (2.0x Supersampled)</option>
+            </select>
+          </label>
+          <label class="setRow">
+            <span>Camera FOV (<b id="lblFov">74°</b>)</span>
+            <input id="rngFov" type="range" min="62" max="95" step="1" value="74">
+          </label>
+          <label class="setRow">
+            <span>Horizon Draw Distance (<b id="lblDrawDist">1.4 KM</b>)</span>
+            <input id="rngDrawDist" type="range" min="4" max="15" step="1" value="9">
+          </label>
+          <label class="setRow">
+            <span>Show Live FPS &amp; Preset Badge</span>
+            <input id="chkShowFps" type="checkbox" checked>
+          </label>
+        </div>
+
+        <div class="setCard">
+          <h3>☀️ Dynamic Shadows &amp; Lighting</h3>
+          <label class="setRow">
+            <span>Real-Time Sun Shadows</span>
+            <input id="chkShadows" type="checkbox" checked>
+          </label>
+          <label class="setRow">
+            <span>Shadow Map Resolution</span>
+            <select id="selShadowSize">
+              <option value="512">512px (Soft / Fast)</option>
+              <option value="1024" selected>1024px (High Standard)</option>
+              <option value="2048">2048px (Very High Crisp)</option>
+              <option value="3072">3072px (Ultra Sharp)</option>
+              <option value="4096">4096px (Extreme 4K Shadows)</option>
+            </select>
+          </label>
+          <label class="setRow">
+            <span>HDR Exposure (<b id="lblExposure">1.05</b>)</span>
+            <input id="rngExposure" type="range" min="0.75" max="1.45" step="0.05" value="1.05">
+          </label>
+        </div>
+
+        <div class="setCard">
+          <h3>✨ Post-Processing &amp; Realism</h3>
+          <label class="setRow">
+            <span>HDR Sun &amp; Headlight Bloom</span>
+            <input id="chkBloom" type="checkbox" checked>
+          </label>
+          <label class="setRow">
+            <span>Chromatic Aberration Lens</span>
+            <input id="chkChromatic" type="checkbox">
+          </label>
+          <label class="setRow">
+            <span>Cinema Film Grain</span>
+            <input id="chkGrain" type="checkbox">
+          </label>
+          <label class="setRow">
+            <span>Driving Physics Realism</span>
+            <select id="selPhysics">
+              <option value="simulation" selected>Realistic Simulation (Mass + 5-Gear + Skid)</option>
+              <option value="arcade">Arcade Assisted (High Grip)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="modalFooter split">
+      <button id="btnResetSettings" class="topBtn">↺ Reset Defaults (High HD)</button>
+      <button id="btnApplySettings" class="primaryBtn">✔ Apply &amp; Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ VEHICLE & IKARUS BUS FLEET SHOWROOM MODAL ══════════ -->
+<div id="showroomModal" class="modalOverlay hidden">
+  <div class="modalCard wide">
+    <div class="modalHeader">
+      <h2>🚌 VEHICLE &amp; GIANT IKARUS BUS FLEET SHOWROOM (8 MODELS)</h2>
+      <button id="btnCloseShowroom" class="closeBtn">✖</button>
+    </div>
+    <div id="showroomBody" class="modalBody"></div>
+  </div>
+</div>
+
+<!-- Toast Banner -->
 <div id="toast"></div>
-<div id="confetti"></div>
 
+<!-- Early fatal-error catcher (runs before module scripts so parse errors are visible) -->
+<script>
+window.addEventListener('error', function (e) {
+  var el = document.getElementById('errLog');
+  if (el) {
+    el.style.display = 'block';
+    el.textContent =
+      '⚠️ ' + (e.message || 'Error') +
+      (e.filename ? '\n' + e.filename.split('/').pop() + ':' + e.lineno : '');
+  }
+});
+window.addEventListener('unhandledrejection', function (e) {
+  var el = document.getElementById('errLog');
+  if (el) {
+    el.style.display = 'block';
+    el.textContent = '⚠️ ' + ((e.reason && e.reason.message) || 'Promise error');
+  }
+});
+</script>
 <script type="module" src="src/main.js"></script>
 <script>
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {

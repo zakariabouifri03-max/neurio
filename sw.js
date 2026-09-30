@@ -1,12 +1,14 @@
-// Bash Baqi Racing — service worker: full offline support
-const VERSION = 'bbr-v1';
+// ── The Long Drive 3D — service worker: offline support + always-fresh updates ──
+// Network-first strategy so code updates apply immediately; cache is only an
+// offline fallback. Bump VERSION whenever the asset list changes.
+const VERSION = 'tld3d-v3';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
   './src/main.js',
-  './src/race.js',
-  './src/menu.js',
+  './src/game.js',
+  './src/world.js',
   './src/builders.js',
   './src/data.js',
   './src/tex.js',
@@ -37,16 +39,20 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+
+  // Network-first: always prefer the fresh server copy (so game updates load
+  // instantly), falling back to the cache only when offline.
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then((hit) => {
-      if (hit) return hit;
-      return fetch(e.request).then((res) => {
+    fetch(e.request)
+      .then((res) => {
         if (res.ok && new URL(e.request.url).origin === location.origin) {
           const copy = res.clone();
           caches.open(VERSION).then((c) => c.put(e.request, copy));
         }
         return res;
-      }).catch(() => caches.match('./index.html'));
-    })
+      })
+      .catch(() =>
+        caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || caches.match('./index.html'))
+      )
   );
 });

@@ -1,16 +1,19 @@
-// ── All-synthesized audio: engine, sfx, horns, island music ─────────────────
+// ── Synthesized Web Audio Engine for The Long Drive 3D ───────────────────────
+import { RADIO_STATIONS } from './data.js';
 
 class AudioSys {
   constructor() {
     this.ctx = null;
     this.master = null;
-    this.musicGain = null;
-    this.engine = null;
-    this.musicTimer = null;
-    this.musicOn = true;
+    this.radioGain = null;
     this.sfxOn = true;
+    this.radioOn = true;
+    this.stationIdx = 0;
     this._unlocked = false;
-    this._musicStep = 0;
+    this._radioTimer = null;
+    this._radioStep = 0;
+    this.engineRunning = false;
+    this._knockTimer = 0;
   }
 
   unlock() {
@@ -18,140 +21,277 @@ class AudioSys {
     try {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
       this.master = this.ctx.createGain();
-      this.master.gain.value = 0.8;
+      this.master.gain.value = 0.82;
       this.master.connect(this.ctx.destination);
-      this.musicGain = this.ctx.createGain();
-      this.musicGain.gain.value = 0.16;
-      this.musicGain.connect(this.master);
+
+      this.radioGain = this.ctx.createGain();
+      this.radioGain.gain.value = 0.16;
+      this.radioGain.connect(this.master);
+
       this._unlocked = true;
-      this._startEngine();
-      if (this.musicOn) this._startMusic();
-    } catch (e) { /* no audio available */ }
+      this._initEngineNodes();
+      this._startRadioLoop();
+    } catch (e) {
+      /* AudioContext blocked or unavailable */
+    }
   }
 
-  setMusic(on) {
-    this.musicOn = on;
-    if (!this.ctx) return;
-    if (on && !this.musicTimer) this._startMusic();
-    if (!on && this.musicTimer) { clearInterval(this.musicTimer); this.musicTimer = null; }
+  setSfx(on) {
+    this.sfxOn = on;
+    if (this.master && this.ctx) {
+      this.master.gain.setTargetAtTime(on ? 0.82 : 0.0, this.ctx.currentTime, 0.05);
+    }
   }
-  setSfx(on) { this.sfxOn = on; }
 
-  _tone(freq, dur, type = 'square', vol = 0.2, when = 0, slideTo = null) {
-    if (!this.ctx) return;
+  _tone(freq, dur, type = 'square', vol = 0.18, when = 0, slideTo = null) {
+    if (!this.ctx || !this.sfxOn) return;
     const t = this.ctx.currentTime + when;
     const o = this.ctx.createOscillator();
     const g = this.ctx.createGain();
     o.type = type;
-    o.frequency.setValueAtTime(freq, t);
-    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    o.frequency.setValueAtTime(Math.max(20, freq), t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(20, slideTo), t + dur);
     g.gain.setValueAtTime(vol, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    o.connect(g); g.connect(this.master);
-    o.start(t); o.stop(t + dur + 0.02);
+    o.connect(g);
+    g.connect(this.master);
+    o.start(t);
+    o.stop(t + dur + 0.02);
   }
 
-  _noise(dur, vol = 0.3, freq = 1200, when = 0) {
-    if (!this.ctx) return;
+  _noise(dur, vol = 0.25, freq = 1000, q = 1.0, when = 0) {
+    if (!this.ctx || !this.sfxOn) return;
     const t = this.ctx.currentTime + when;
     const len = Math.max(1, (dur * this.ctx.sampleRate) | 0);
     const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
     const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    for (let i = 0; i < len; i++) {
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 0.7);
+    }
     const src = this.ctx.createBufferSource();
     src.buffer = buf;
     const f = this.ctx.createBiquadFilter();
-    f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 0.8;
-    const g = this.ctx.createGain(); g.gain.value = vol;
-    src.connect(f); f.connect(g); g.connect(this.master);
+    f.type = 'bandpass';
+    f.frequency.value = freq;
+    f.Q.value = q;
+    const g = this.ctx.createGain();
+    g.gain.value = vol;
+    src.connect(f);
+    f.connect(g);
+    g.connect(this.master);
     src.start(t);
   }
 
-  // ── engine loop ──
-  _startEngine() {
+  // ── Continuous Car Engine & Overheat Steam ──
+  _initEngineNodes() {
     const c = this.ctx;
-    this.engOsc1 = c.createOscillator(); this.engOsc1.type = 'sawtooth';
-    this.engOsc2 = c.createOscillator(); this.engOsc2.type = 'square';
+    this.engOsc1 = c.createOscillator();
+    this.engOsc1.type = 'sawtooth';
+    this.engOsc2 = c.createOscillator();
+    this.engOsc2.type = 'triangle';
     this.engFilter = c.createBiquadFilter();
-    this.engFilter.type = 'lowpass'; this.engFilter.frequency.value = 400;
-    this.engGain = c.createGain(); this.engGain.gain.value = 0;
+    this.engFilter.type = 'lowpass';
+    this.engFilter.frequency.value = 280;
+    this.engGain = c.createGain();
+    this.engGain.gain.value = 0;
+
     this.engOsc1.connect(this.engFilter);
     this.engOsc2.connect(this.engFilter);
     this.engFilter.connect(this.engGain);
     this.engGain.connect(this.master);
-    this.engOsc1.start(); this.engOsc2.start();
-    this.engineOn = false;
+    this.engOsc1.start();
+    this.engOsc2.start();
   }
 
-  engine(rpm01, boosting) {
+  updateEngine(running, rpm01, pitchScale = 1.0, lowOil = false, overheating = false, inCar = true) {
     if (!this.ctx || !this.engGain) return;
-    const f = 55 + rpm01 * 210 + (boosting ? 70 : 0);
-    this.engOsc1.frequency.setTargetAtTime(f, this.ctx.currentTime, 0.05);
-    this.engOsc2.frequency.setTargetAtTime(f * 0.5 + 3, this.ctx.currentTime, 0.05);
-    this.engFilter.frequency.setTargetAtTime(300 + rpm01 * 1400, this.ctx.currentTime, 0.08);
-    this.engGain.gain.setTargetAtTime(this.engineOn ? 0.055 + rpm01 * 0.05 : 0, this.ctx.currentTime, 0.1);
+    this.engineRunning = running;
+    if (!running || !this.sfxOn) {
+      this.engGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.08);
+      return;
+    }
+    const baseFreq = (38 + rpm01 * 155) * pitchScale;
+    const flutter = lowOil ? Math.sin(performance.now() * 0.045) * 9 : 0;
+    this.engOsc1.frequency.setTargetAtTime(baseFreq + flutter, this.ctx.currentTime, 0.04);
+    this.engOsc2.frequency.setTargetAtTime(baseFreq * 0.5 + 2, this.ctx.currentTime, 0.04);
+    this.engFilter.frequency.setTargetAtTime(220 + rpm01 * 1250, this.ctx.currentTime, 0.06);
+
+    const distAtten = inCar ? 1.0 : 0.42;
+    this.engGain.gain.setTargetAtTime((0.05 + rpm01 * 0.065) * distAtten, this.ctx.currentTime, 0.08);
+
+    // Metallic knock if low oil, or steam hiss if overheating
+    const now = performance.now();
+    if (lowOil && now - this._knockTimer > 240 - rpm01 * 130) {
+      this._knockTimer = now;
+      this._tone(520, 0.03, 'square', 0.05 * distAtten);
+    }
+    if (overheating && Math.random() < 0.12) {
+      this._noise(0.14, 0.06 * distAtten, 3200, 0.7);
+    }
   }
 
-  // ── one-shots ──
-  click() { if (this.sfxOn) this._tone(700, 0.06, 'square', 0.12); }
-  beep(final) { if (this.sfxOn) this._tone(final ? 880 : 440, final ? 0.5 : 0.18, 'square', 0.22); }
-  coin() { if (this.sfxOn) { this._tone(988, 0.08, 'square', 0.14); this._tone(1319, 0.22, 'square', 0.14, 0.07); } }
-  pickup() { if (this.sfxOn) { this._tone(660, 0.07, 'triangle', 0.2); this._tone(880, 0.07, 'triangle', 0.2, 0.06); this._tone(1320, 0.12, 'triangle', 0.2, 0.12); } }
-  boost() { if (this.sfxOn) { this._tone(160, 0.5, 'sawtooth', 0.22, 0, 760); this._noise(0.45, 0.2, 2400); } }
-  rocket() { if (this.sfxOn) { this._tone(900, 0.35, 'sawtooth', 0.16, 0, 240); this._noise(0.3, 0.15, 3000); } }
-  hit() { if (this.sfxOn) { this._noise(0.3, 0.4, 500); this._tone(180, 0.25, 'square', 0.2, 0, 60); } }
-  spin() { if (this.sfxOn) this._tone(300, 0.5, 'sawtooth', 0.15, 0, 1300); }
-  shieldHit() { if (this.sfxOn) this._tone(500, 0.2, 'sine', 0.25, 0, 900); }
-  bump() { if (this.sfxOn) this._noise(0.12, 0.14, 700); }
-  splash() { if (this.sfxOn) this._noise(0.4, 0.3, 900); }
-  deny() { if (this.sfxOn) { this._tone(220, 0.15, 'square', 0.15); this._tone(160, 0.25, 'square', 0.15, 0.12); } }
-  buy() {
-    if (!this.sfxOn) return;
-    [523, 659, 784, 1046].forEach((f, i) => this._tone(f, 0.14, 'triangle', 0.18, i * 0.07));
-    this.coin();
-  }
-  fanfare() {
-    if (!this.sfxOn) return;
-    const seq = [523, 523, 523, 659, 784, 784, 1046];
-    const dt = [0, 0.12, 0.24, 0.36, 0.55, 0.67, 0.85];
-    seq.forEach((f, i) => this._tone(f, i === seq.length - 1 ? 0.6 : 0.13, 'triangle', 0.22, dt[i]));
-  }
-  horn(idx) {
+  // ── Starter Crank ──
+  starterCrank(success = true) {
     if (!this.ctx || !this.sfxOn) return;
-    if (idx === 0) { this._tone(392, 0.16, 'square', 0.25); this._tone(392, 0.22, 'square', 0.25, 0.2); }
-    else if (idx === 1) { this._tone(280, 0.3, 'sawtooth', 0.22, 0, 500); this._tone(520, 0.25, 'sawtooth', 0.18, 0.28, 260); }
-    else if (idx === 2) { [523, 659, 784].forEach((f, i) => this._tone(f, 0.12, 'square', 0.2, i * 0.1)); }
-    else { this._tone(660, 0.3, 'sawtooth', 0.16, 0, 990); this._tone(990, 0.3, 'sawtooth', 0.16, 0.3, 660); }
+    for (let i = 0; i < 3; i++) {
+      this._tone(95, 0.11, 'sawtooth', 0.18, i * 0.14, 135);
+      this._noise(0.08, 0.12, 600, 1.2, i * 0.14);
+    }
+    if (success) {
+      this._tone(70, 0.28, 'sawtooth', 0.22, 0.44, 180);
+    } else {
+      this._tone(110, 0.18, 'square', 0.12, 0.45, 55);
+    }
   }
 
-  // ── tiny island music loop ──
-  _startMusic() {
-    if (!this.ctx || this.musicTimer) return;
-    const bass = [130.8, 130.8, 98, 110, 130.8, 130.8, 146.8, 98];
-    const mel = [523, 0, 659, 0, 784, 659, 523, 0, 440, 0, 523, 587, 659, 0, 392, 0];
-    this._musicStep = 0;
-    this.musicTimer = setInterval(() => {
-      if (!this.ctx) return;
-      const s = this._musicStep++;
-      const b = bass[(s >> 1) % bass.length];
-      if (s % 2 === 0) {
-        const o = this.ctx.createOscillator(); const g = this.ctx.createGain();
-        o.type = 'triangle'; o.frequency.value = b;
-        g.gain.setValueAtTime(0.5, this.ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.42);
-        o.connect(g); g.connect(this.musicGain);
-        o.start(); o.stop(this.ctx.currentTime + 0.45);
+  // ── One-Shot Sound Effects ──
+  click() {
+    this._tone(680, 0.045, 'triangle', 0.11);
+  }
+
+  step(onAsphalt = false) {
+    if (onAsphalt) {
+      this._noise(0.055, 0.07, 1400, 1.5);
+    } else {
+      this._noise(0.075, 0.09, 850, 0.9);
+    }
+  }
+
+  door(open = true) {
+    if (open) {
+      this._tone(240, 0.08, 'square', 0.12, 0, 320);
+      this._noise(0.07, 0.14, 900, 1.2, 0.04);
+    } else {
+      this._noise(0.11, 0.24, 380, 0.9);
+      this._tone(115, 0.12, 'triangle', 0.22, 0, 65);
+    }
+  }
+
+  glug() {
+    this._tone(260 + Math.random() * 80, 0.09, 'sine', 0.16, 0, 420);
+  }
+
+  scrub() {
+    this._noise(0.11, 0.18, 2400, 0.8);
+  }
+
+  spray() {
+    this._noise(0.12, 0.15, 4200, 0.6);
+  }
+
+  wrench() {
+    this._tone(820, 0.05, 'square', 0.14, 0, 1180);
+    this._tone(980, 0.06, 'square', 0.14, 0.07, 1340);
+  }
+
+  pickup() {
+    this._tone(520, 0.06, 'triangle', 0.14);
+    this._tone(740, 0.08, 'triangle', 0.14, 0.05);
+  }
+
+  eat() {
+    this._noise(0.09, 0.22, 950, 1.1, 0);
+    this._noise(0.09, 0.20, 820, 1.1, 0.14);
+    this._tone(320, 0.12, 'triangle', 0.12, 0.26, 480);
+  }
+
+  drink() {
+    this._tone(310, 0.11, 'sine', 0.18, 0, 460);
+    this._tone(340, 0.12, 'sine', 0.18, 0.16, 510);
+  }
+
+  shoot() {
+    this._noise(0.26, 0.48, 750, 0.6);
+    this._tone(190, 0.18, 'sawtooth', 0.32, 0, 48);
+  }
+
+  horn() {
+    this._tone(340, 0.28, 'sawtooth', 0.20);
+    this._tone(425, 0.28, 'sawtooth', 0.18);
+  }
+
+  crash(intensity = 0.5) {
+    const v = Math.min(0.45, 0.12 + intensity * 0.35);
+    this._noise(0.24, v, 480, 0.7);
+    this._tone(130, 0.2, 'square', v * 0.7, 0, 45);
+  }
+
+  rabbitHit() {
+    this._tone(780, 0.14, 'sawtooth', 0.16, 0, 320);
+  }
+
+  radioStaticBurst() {
+    this._noise(0.18, 0.18, 1800, 0.5);
+  }
+
+  // ── Multi-Station Car Radio Synthesizer ──
+  nextStation() {
+    this.stationIdx = (this.stationIdx + 1) % RADIO_STATIONS.length;
+    this.radioStaticBurst();
+    return RADIO_STATIONS[this.stationIdx];
+  }
+
+  toggleRadio() {
+    this.radioOn = !this.radioOn;
+    this.click();
+    return this.radioOn;
+  }
+
+  _startRadioLoop() {
+    if (!this.ctx || this._radioTimer) return;
+    const synthBass = [110, 110, 130.8, 146.8, 98, 98, 110, 130.8];
+    const synthArp = [440, 523.2, 659.2, 880, 659.2, 523.2, 440, 392];
+
+    const countryBass = [146.8, 110, 146.8, 164.8, 196, 146.8, 110, 146.8];
+    const countryLead = [293.6, 329.6, 370, 440, 0, 370, 329.6, 293.6, 246.9, 0, 293.6, 370, 440, 0, 293.6, 0];
+
+    const chillChords = [
+      [261.6, 329.6, 392, 493.8],
+      [220, 261.6, 329.6, 392],
+      [174.6, 220, 261.6, 349.2],
+      [196, 246.9, 293.6, 392],
+    ];
+
+    this._radioStep = 0;
+    this._radioTimer = setInterval(() => {
+      if (!this.ctx || !this.sfxOn || !this.radioOn || !this.radioAudible) return;
+      const st = RADIO_STATIONS[this.stationIdx];
+      const s = this._radioStep++;
+      const now = this.ctx.currentTime;
+
+      const playRadioNote = (freq, dur, type, vol) => {
+        if (!freq) return;
+        const o = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(freq, now);
+        g.gain.setValueAtTime(vol, now);
+        g.gain.exponentialRampToValueAtTime(0.002, now + dur);
+        o.connect(g);
+        g.connect(this.radioGain);
+        o.start(now);
+        o.stop(now + dur + 0.02);
+      };
+
+      if (st.mode === 'synthwave') {
+        if (s % 2 === 0) playRadioNote(synthBass[(s >> 1) % synthBass.length], 0.32, 'sawtooth', 0.28);
+        playRadioNote(synthArp[s % synthArp.length], 0.16, 'triangle', 0.22);
+      } else if (st.mode === 'country') {
+        if (s % 2 === 0) playRadioNote(countryBass[(s >> 1) % countryBass.length], 0.28, 'triangle', 0.34);
+        const m = countryLead[s % countryLead.length];
+        if (m) playRadioNote(m, 0.22, 'sawtooth', 0.18);
+      } else if (st.mode === 'chill') {
+        if (s % 4 === 0) {
+          const chord = chillChords[(s >> 2) % chillChords.length];
+          chord.forEach((f) => playRadioNote(f, 0.78, 'sine', 0.14));
+        }
+      } else if (st.mode === 'numbers') {
+        // Eerie Morse / Numbers station bleeps
+        if (s % 3 === 0) {
+          playRadioNote(780 + ((s * 137) % 420), 0.12, 'sine', 0.22);
+        }
       }
-      const m = mel[s % mel.length];
-      if (m) {
-        const o = this.ctx.createOscillator(); const g = this.ctx.createGain();
-        o.type = 'sine'; o.frequency.value = m;
-        g.gain.setValueAtTime(0.30, this.ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.24);
-        o.connect(g); g.connect(this.musicGain);
-        o.start(); o.stop(this.ctx.currentTime + 0.26);
-      }
-    }, 210);
+    }, 215);
   }
 }
 

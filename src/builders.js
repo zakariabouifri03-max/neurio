@@ -1,1127 +1,1605 @@
-// ── 3D builders: cars, drivers, tracks, garage ───────────────────────────────
+// ── 3D Procedural Builders for The Long Drive 3D ─────────────────────────────
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { ARCH, THEMES } from './data.js';
-import { mulberry32, clamp, lerp } from './util.js';
-import * as TEX from './tex.js';
+import {
+  CAR_BY_ID,
+  ENGINES,
+  RADIATORS,
+  ITEM_DEFS,
+} from './data.js';
+import {
+  rustMetalTexture,
+  corrugatedTexture,
+  stuccoWallTexture,
+  palaceMarbleTexture,
+  woodPlankTexture,
+  carShadowTexture,
+  dashGaugeTexture,
+  licensePlateTexture,
+  signTexture,
+  letterPaperTexture,
+  glowTexture,
+} from './tex.js';
+import { mulberry32, rand, pick, clamp } from './util.js';
 
-// tiny helpers ───────────────────────────────────────────────────────────────
-function tint(geo, hex) {
-  const c = new THREE.Color(hex);
-  const n = geo.attributes.position.count;
-  const arr = new Float32Array(n * 3);
-  for (let i = 0; i < n; i++) { arr[i * 3] = c.r; arr[i * 3 + 1] = c.g; arr[i * 3 + 2] = c.b; }
-  geo.setAttribute('color', new THREE.BufferAttribute(arr, 3));
-  return geo;
+// Shared Materials
+const matDarkMetal = new THREE.MeshStandardMaterial({ color: 0x22262c, roughness: 0.65, metalness: 0.6 });
+const matChrome = new THREE.MeshStandardMaterial({ color: 0xdbe4ee, roughness: 0.18, metalness: 0.92 });
+const matRubber = new THREE.MeshStandardMaterial({ color: 0x18191c, roughness: 0.88, metalness: 0.05 });
+const matGlass = new THREE.MeshStandardMaterial({
+  color: 0xa5d8ff,
+  roughness: 0.12,
+  metalness: 0.1,
+  transparent: true,
+  opacity: 0.34,
+  depthWrite: false,
+});
+const matSeatVinyl = new THREE.MeshStandardMaterial({ color: 0x3b281e, roughness: 0.78, metalness: 0.05 });
+const matDashPlastic = new THREE.MeshStandardMaterial({ color: 0x1c1f24, roughness: 0.75, metalness: 0.15 });
+const matCopper = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.35, metalness: 0.82 });
+const matWood = new THREE.MeshStandardMaterial({ color: 0x7c5333, roughness: 0.85, metalness: 0.05 });
+
+function tagInteractable(obj, info) {
+  obj.traverse((c) => {
+    c.userData.interact = info;
+  });
+  obj.userData.interact = info;
 }
 
-function xform(geo, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0, s = 1) {
-  const m = new THREE.Matrix4();
-  const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, ry, rz));
-  m.compose(new THREE.Vector3(x, y, z), q, new THREE.Vector3(s, s, s));
-  geo.applyMatrix4(m);
-  return geo;
-}
-
-function tube(p1, p2, r, mat, seg = 6) {
-  const dir = new THREE.Vector3().subVectors(p2, p1);
-  const len = dir.length();
-  const geo = new THREE.CylinderGeometry(r, r, len, seg);
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.copy(p1).addScaledVector(dir, 0.5);
-  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
-  return mesh;
-}
-
-const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
-
-// ═══════════════════════════ CARS ═══════════════════════════════════════════
-
-export function buildCar(car, opts = {}) {
-  const A = ARCH[car.arch];
+// ══════════════════════════════════════════════════════════════════════════════
+// 1. 3D ITEM & CAR PART BUILDER (World Loot, Trunk Cargo & 1st-Person Viewmodel)
+// ══════════════════════════════════════════════════════════════════════════════
+export function buildItemMesh(item) {
   const g = new THREE.Group();
-  const paint = new THREE.MeshStandardMaterial({ color: new THREE.Color(opts.paint || car.paint), roughness: 0.32, metalness: 0.22 });
-  const accent = new THREE.MeshStandardMaterial({ color: new THREE.Color(car.accent), roughness: 0.5, metalness: 0.05 });
-  const dark = new THREE.MeshStandardMaterial({ color: 0x1b1e26, roughness: 0.85 });
-  const glass = new THREE.MeshStandardMaterial({ color: 0xbfe8ff, roughness: 0.08, metalness: 0.55 });
-  const chrome = new THREE.MeshStandardMaterial({ color: 0xd7dde8, roughness: 0.18, metalness: 0.9 });
-  const lightF = new THREE.MeshStandardMaterial({ color: 0xfff6c9, emissive: 0xffe9a0, emissiveIntensity: 0.9 });
-  const lightR = new THREE.MeshStandardMaterial({ color: 0xff4455, emissive: 0xaa1122, emissiveIntensity: 0.7 });
+  const id = item.defId;
 
-  const wheels = { all: [], front: [] };
-  const wheelMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(opts.wheelColor || '#23262e'), roughness: 0.9 });
-  const hubMat = new THREE.MeshStandardMaterial({ color: 0xc8ccd6, roughness: 0.3, metalness: 0.7 });
-
-  function wheel(x, z, r, steerable) {
-    const pivot = new THREE.Group();
-    pivot.position.set(x, r, z);
-    const w = new THREE.Group();
-    const tire = new THREE.Mesh(new THREE.CylinderGeometry(r, r, A.wheelW, 18), wheelMat);
-    tire.rotation.z = Math.PI / 2;
-    tire.castShadow = true;
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.55, r * 0.55, A.wheelW + 0.04, 12), hubMat);
-    hub.rotation.z = Math.PI / 2;
-    w.add(tire, hub);
-    pivot.add(w);
-    g.add(pivot);
-    wheels.all.push(w);
-    if (steerable) wheels.front.push(pivot);
-    return pivot;
-  }
-  wheel(-A.track, A.wb, A.wheelR, true);
-  wheel(A.track, A.wb, A.wheelR, true);
-  wheel(-A.track, -A.wb, A.wheelRr, false);
-  wheel(A.track, -A.wb, A.wheelRr, false);
-
-  const bodyY = A.clear + A.bodyH / 2;
-  const chassis = new THREE.Mesh(new THREE.BoxGeometry(A.W, A.bodyH, A.L), paint);
-  chassis.position.y = bodyY;
-  chassis.castShadow = true;
-  g.add(chassis);
-
-  // hood stripe
-  const stripe = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.3, 0.03, A.L * 0.94), accent);
-  stripe.position.set(0, A.clear + A.bodyH + 0.005, 0.04);
-  g.add(stripe);
-
-  // bumpers
-  const bf = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.9, 0.16, 0.3), chrome);
-  bf.position.set(0, A.clear + 0.05, A.L / 2 + 0.06);
-  const bb = bf.clone(); bb.position.z = -A.L / 2 - 0.06;
-  g.add(bf, bb);
-
-  const flames = [];
-  const flameMat = new THREE.MeshBasicMaterial({ color: 0xffa133, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false });
-  function exhaust(x, y, z) {
-    const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 0.5, 8), chrome);
-    pipe.rotation.x = Math.PI / 2;
-    pipe.position.set(x, y, z);
-    const fl = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.9, 8), flameMat);
-    fl.rotation.x = -Math.PI / 2;
-    fl.position.set(x, y, z - 0.55);
-    fl.visible = false;
-    g.add(pipe, fl);
-    flames.push(fl);
-  }
-  exhaust(-A.W * 0.25, A.clear + 0.1, -A.L / 2 - 0.1);
-  exhaust(A.W * 0.25, A.clear + 0.1, -A.L / 2 - 0.1);
-
-  // headlights / taillights
-  const hl1 = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 8), lightF);
-  hl1.position.set(-A.W * 0.3, bodyY + A.bodyH * 0.25, A.L / 2 + 0.01);
-  const hl2 = hl1.clone(); hl2.position.x *= -1;
-  const tl1 = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.1, 0.06), lightR);
-  tl1.position.set(-A.W * 0.3, bodyY + A.bodyH * 0.25, -A.L / 2 - 0.01);
-  const tl2 = tl1.clone(); tl2.position.x *= -1;
-  g.add(hl1, hl2, tl1, tl2);
-
-  // seat + steering
-  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.45, 0.55), dark);
-  const seatZ = A.cab === 'truck' || A.cab === 'fastback' ? -0.2 : -0.35;
-  seat.position.set(0, A.clear + A.bodyH + 0.2, seatZ);
-  g.add(seat);
-  const swheel = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.045, 8, 14), dark);
-  swheel.position.set(0, A.clear + A.bodyH + 0.42, seatZ + 0.7);
-  swheel.rotation.x = -0.9;
-  g.add(swheel);
-
-  // cab styles ────────────────────────────────────────────────
-  if (A.cab === 'bubble') {
-    const cab = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.86, 0.5, A.L * 0.42), paint);
-    cab.position.set(0, A.clear + A.bodyH + 0.25, -0.35);
-    g.add(cab);
-    const win = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.8, 0.42, A.L * 0.2), glass);
-    win.position.set(0, A.clear + A.bodyH + 0.28, 0.32);
-    g.add(win);
-  } else if (A.cab === 'fastback') {
-    const cab = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.8, 0.48, A.L * 0.4), paint);
-    cab.position.set(0, A.clear + A.bodyH + 0.26, -0.55);
-    g.add(cab);
-    const win = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.74, 0.4, 0.5), glass);
-    win.position.set(0, A.clear + A.bodyH + 0.26, 0.02);
-    win.rotation.x = 0.35;
-    g.add(win);
-  } else if (A.cab === 'truck') {
-    const cab = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.88, 0.78, A.L * 0.34), paint);
-    cab.position.set(0, A.clear + A.bodyH + 0.38, A.L * 0.18);
-    g.add(cab);
-    const win = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.8, 0.5, 0.1), glass);
-    win.position.set(0, A.clear + A.bodyH + 0.42, A.L * 0.18 + A.L * 0.17 + 0.03);
-    g.add(win);
-    // bed walls
-    const bw = 0.09, bedL = A.L * 0.42, bedY = A.clear + A.bodyH + 0.22;
-    const w1 = new THREE.Mesh(new THREE.BoxGeometry(bw, 0.45, bedL), paint);
-    w1.position.set(-A.W / 2 + bw / 2, bedY, -A.L * 0.27);
-    const w2 = w1.clone(); w2.position.x *= -1;
-    const w3 = new THREE.Mesh(new THREE.BoxGeometry(A.W - 0.1, 0.45, bw), paint);
-    w3.position.set(0, bedY, -A.L * 0.27 - bedL / 2);
-    g.add(w1, w2, w3);
-    // rollbar
-    g.add(tube(V3(-A.W * 0.4, bedY + 0.15, -A.L * 0.12), V3(-A.W * 0.4, bedY + 0.75, -A.L * 0.12), 0.05, dark));
-    g.add(tube(V3(A.W * 0.4, bedY + 0.15, -A.L * 0.12), V3(A.W * 0.4, bedY + 0.75, -A.L * 0.12), 0.05, dark));
-    g.add(tube(V3(-A.W * 0.4, bedY + 0.75, -A.L * 0.12), V3(A.W * 0.4, bedY + 0.75, -A.L * 0.12), 0.05, dark, 4));
-  } else if (A.cab === 'convert') {
-    const win = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.8, 0.4, 0.08), glass);
-    win.position.set(0, A.clear + A.bodyH + 0.3, seatZ + 0.85);
-    win.rotation.x = -0.25;
-    g.add(win);
-    const boot = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.9, 0.18, A.L * 0.3), accent);
-    boot.position.set(0, A.clear + A.bodyH + 0.03, -A.L * 0.36);
-    g.add(boot);
-    // tail fins
-    const fin1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.22, 0.7), paint);
-    fin1.position.set(-A.W * 0.48, A.clear + A.bodyH + 0.1, -A.L * 0.38);
-    const fin2 = fin1.clone(); fin2.position.x *= -1;
-    g.add(fin1, fin2);
-  } else if (A.cab === 'sports') {
-    const cowl = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.5, 0.35, 0.6), paint);
-    cowl.position.set(0, A.clear + A.bodyH + 0.15, -0.75);
-    g.add(cowl);
-    const win = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.6, 0.28, 0.08), glass);
-    win.position.set(0, A.clear + A.bodyH + 0.24, seatZ + 0.9);
-    win.rotation.x = -0.35;
-    g.add(win);
-  } else if (A.cab === 'open') {
-    const win = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.66, 0.32, 0.06), glass);
-    win.position.set(0, A.clear + A.bodyH + 0.3, seatZ + 0.95);
-    win.rotation.x = -0.3;
-    g.add(win);
-  }
-
-  // roll cage (buggy)
-  if (A.cage) {
-    const t = 0.055, top = A.clear + A.bodyH + 1.0;
-    g.add(
-      tube(V3(-A.W * 0.42, A.clear + A.bodyH, seatZ + 0.95), V3(-A.W * 0.42, top, seatZ + 0.3), t, dark),
-      tube(V3(A.W * 0.42, A.clear + A.bodyH, seatZ + 0.95), V3(A.W * 0.42, top, seatZ + 0.3), t, dark),
-      tube(V3(-A.W * 0.42, top, seatZ + 0.3), V3(A.W * 0.42, top, seatZ + 0.3), t, dark, 4),
-      tube(V3(-A.W * 0.42, A.clear + A.bodyH, seatZ - 0.75), V3(-A.W * 0.42, top, seatZ + 0.28), t, dark),
-      tube(V3(A.W * 0.42, A.clear + A.bodyH, seatZ - 0.75), V3(A.W * 0.42, top, seatZ + 0.28), t, dark),
-      tube(V3(-A.W * 0.42, top, seatZ + 0.3), V3(-A.W * 0.42, top, seatZ - 0.6), t, dark, 4),
-      tube(V3(A.W * 0.42, top, seatZ + 0.3), V3(A.W * 0.42, top, seatZ - 0.6), t, dark, 4),
+  if (id === 'jerrycan_gas') {
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.52, metalness: 0.45 });
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.46, 0.34), bodyMat);
+    body.position.y = 0.23;
+    body.castShadow = true;
+    g.add(body);
+    // Cross indentation bars
+    const cross = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.28, 0.22), matDarkMetal);
+    cross.position.y = 0.22;
+    g.add(cross);
+    // Handle & spout
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.05, 0.20), bodyMat);
+    handle.position.set(0, 0.49, -0.03);
+    g.add(handle);
+    const spout = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.038, 0.09, 10), matChrome);
+    spout.position.set(0, 0.49, 0.11);
+    spout.rotation.x = 0.35;
+    g.add(spout);
+  } else if (id === 'oil_can') {
+    const oilMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.45, metalness: 0.5 });
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.32, 0.24), oilMat);
+    body.position.y = 0.16;
+    body.castShadow = true;
+    g.add(body);
+    const label = new THREE.Mesh(
+      new THREE.BoxGeometry(0.19, 0.14, 0.18),
+      new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.6 })
     );
-  }
-  // engine block (buggy/hotrod)
-  if (A.engine) {
-    const eb = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.55, 0.7), chrome);
-    eb.position.set(0, A.clear + A.bodyH + 0.28, -A.L * 0.38);
-    g.add(eb);
-    for (let i = 0; i < 3; i++) {
-      const stack = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.5, 6), chrome);
-      stack.position.set(-0.22 + i * 0.22, A.clear + A.bodyH + 0.75, -A.L * 0.38);
-      g.add(stack);
-    }
-    const scoop = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.2, 0.5), dark);
-    scoop.position.set(0, A.clear + A.bodyH + 0.65, -A.L * 0.3);
-    g.add(scoop);
-  }
-  // spoiler (muscle/sport)
-  if (A.spoiler) {
-    const wing = new THREE.Mesh(new THREE.BoxGeometry(A.W * 0.95, 0.07, 0.5), accent);
-    const wy = A.clear + A.bodyH + (A.cab === 'sports' ? 0.75 : 0.55);
-    wing.position.set(0, wy, -A.L / 2 + 0.1);
-    const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.08, wy - A.clear - A.bodyH, 0.2), dark);
-    p1.position.set(-A.W * 0.35, (A.clear + A.bodyH + wy) / 2, -A.L / 2 + 0.1);
-    const p2 = p1.clone(); p2.position.x *= -1;
-    g.add(wing, p1, p2);
-  }
-  // monster suspension
-  if (car.arch === 'monster') {
-    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
-      g.add(tube(V3(sx * A.track * 0.8, A.wheelR, sz * A.wb), V3(sx * A.W * 0.4, A.clear + 0.1, sz * A.wb * 0.75), 0.07, chrome));
-    }
-  }
-
-  // driver (open cockpits only — enclosed cabs hide the driver)
-  let driver = null;
-  if (opts.driver && A.cab !== 'bubble' && A.cab !== 'fastback') {
-    driver = buildDriver(opts.driver, 'sit');
-    driver.group.position.set(0, A.clear + A.bodyH + 0.28, seatZ);
-    driver.group.scale.setScalar(0.72);
-    g.add(driver.group);
-  }
-
-  const shield = new THREE.Mesh(
-    new THREE.SphereGeometry(Math.max(A.L, A.W) * 0.62, 18, 14),
-    new THREE.MeshBasicMaterial({ color: 0x66ccff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })
-  );
-  shield.position.y = bodyY + 0.4;
-  shield.visible = false;
-  g.add(shield);
-
-  return { group: g, wheels, flames, shield, paintMat: paint, wheelMat, driver };
-}
-
-// ═══════════════════════════ DRIVERS ════════════════════════════════════════
-
-export function buildDriver(d, pose = 'stand') {
-  const g = new THREE.Group();
-  const skin = new THREE.MeshStandardMaterial({ color: new THREE.Color(d.skin), roughness: 0.7 });
-  const shirt = new THREE.MeshStandardMaterial({ color: new THREE.Color(d.shirt), roughness: 0.75 });
-  const pants = new THREE.MeshStandardMaterial({ color: new THREE.Color(d.pants), roughness: 0.75 });
-  const hairM = new THREE.MeshStandardMaterial({ color: 0x5b3a1e, roughness: 0.9 });
-  const blondM = new THREE.MeshStandardMaterial({ color: 0xf7d154, roughness: 0.9 });
-
-  const sit = pose === 'sit';
-
-  // body
-  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.30, 0.35, 4, 10), shirt);
-  body.position.y = sit ? 0.42 : 0.68;
-  body.castShadow = true;
-  g.add(body);
-  const hips = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.26, 0.3, 10), pants);
-  hips.position.y = sit ? 0.16 : 0.36;
-  g.add(hips);
-
-  // arms
-  const armGeo = new THREE.CapsuleGeometry(0.09, 0.34, 4, 8);
-  const aL = new THREE.Mesh(armGeo, shirt);
-  const aR = aL.clone();
-  if (sit) {
-    aL.position.set(-0.36, 0.5, 0.25); aL.rotation.set(-1.1, 0, 0.25);
-    aR.position.set(0.36, 0.5, 0.25); aR.rotation.set(-1.1, 0, -0.25);
-  } else {
-    aL.position.set(-0.4, 0.72, 0); aL.rotation.z = 0.35;
-    aR.position.set(0.4, 0.72, 0); aR.rotation.z = -0.35;
-  }
-  g.add(aL, aR);
-
-  // legs (standing only)
-  let legL, legR;
-  if (!sit) {
-    const legGeo = new THREE.CapsuleGeometry(0.11, 0.3, 4, 8);
-    legL = new THREE.Mesh(legGeo, pants); legL.position.set(-0.14, 0.13, 0);
-    legR = legL.clone(); legR.position.x = 0.14;
-    g.add(legL, legR);
-    const shoeGeo = new THREE.BoxGeometry(0.18, 0.1, 0.3);
-    const sL = new THREE.Mesh(shoeGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 }));
-    sL.position.set(-0.14, 0.03, 0.05);
-    const sR = sL.clone(); sR.position.x = 0.14;
-    g.add(sL, sR);
-  }
-
-  // head + emoji face
-  const head = new THREE.Group();
-  const skull = new THREE.Mesh(new THREE.SphereGeometry(0.40, 18, 14), skin);
-  skull.castShadow = true;
-  head.add(skull);
-  const face = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.46, 0.46),
-    new THREE.MeshBasicMaterial({ map: TEX.faceTexture(d.emoji), transparent: true })
-  );
-  face.position.set(0, 0.02, 0.385);
-  head.add(face);
-  head.position.y = sit ? 0.88 : 1.22;
-  g.add(head);
-
-  // ── hats ──
-  const H = d.hat, hy = 0.3;
-  if (H === 'goggles') {
-    for (let i = 0; i < 5; i++) {
-      const spike = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.28, 6), hairM);
-      spike.position.set(-0.18 + i * 0.09, hy + 0.12 + Math.sin(i) * 0.02, 0.02);
-      spike.rotation.z = (i - 2) * 0.22;
-      head.add(spike);
-    }
-    const strap = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.045, 8, 18), new THREE.MeshStandardMaterial({ color: 0xd64545, roughness: 0.6 }));
-    strap.rotation.x = Math.PI / 2; strap.position.y = hy + 0.05;
-    head.add(strap);
-    const lens = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.045, 8, 14), new THREE.MeshStandardMaterial({ color: 0x222831, roughness: 0.4 }));
-    lens.position.set(-0.13, hy + 0.05, 0.36);
-    const lens2 = lens.clone(); lens2.position.x = 0.13;
-    head.add(lens, lens2);
-  } else if (H === 'pigtails') {
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.41, 14, 10, 0, Math.PI * 2, 0, 1.35), blondM);
-    cap.position.y = 0.04; head.add(cap);
-    for (const sx of [-1, 1]) {
-      const tail = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), blondM);
-      tail.position.set(sx * 0.4, 0.12, -0.1); head.add(tail);
-      const bow = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.08, 0.06), new THREE.MeshStandardMaterial({ color: 0xff70a6 }));
-      bow.position.set(sx * 0.38, 0.26, -0.05); bow.rotation.z = sx * 0.5; head.add(bow);
-    }
-  } else if (H === 'flower') {
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.41, 14, 10, 0, Math.PI * 2, 0, 1.3), hairM);
-    cap.position.y = 0.03; head.add(cap);
-    for (let i = 0; i < 5; i++) {
-      const petal = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), new THREE.MeshStandardMaterial({ color: 0xff8fa3 }));
-      petal.position.set(0.32 + Math.cos(i * 1.256) * 0.08, 0.32 + Math.sin(i * 1.256) * 0.08, 0.15);
-      head.add(petal);
-    }
-    const center = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), new THREE.MeshStandardMaterial({ color: 0xffd23f }));
-    center.position.set(0.32, 0.32, 0.16); head.add(center);
-  } else if (H === 'straw') {
-    const straw = new THREE.MeshStandardMaterial({ color: 0xe8c46a, roughness: 0.95 });
-    const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.58, 0.06, 14), straw);
-    brim.position.y = hy; head.add(brim);
-    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.32, 0.24, 12), straw);
-    top.position.y = hy + 0.14; head.add(top);
-    const band = new THREE.Mesh(new THREE.CylinderGeometry(0.335, 0.335, 0.07, 12), new THREE.MeshStandardMaterial({ color: 0xd64545 }));
-    band.position.y = hy + 0.05; head.add(band);
-  } else if (H === 'bunny') {
-    const earGeo = new THREE.CapsuleGeometry(0.09, 0.4, 4, 8);
-    const earM = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85 });
-    const inM = new THREE.MeshStandardMaterial({ color: 0xffc6ff, roughness: 0.85 });
-    for (const sx of [-1, 1]) {
-      const ear = new THREE.Mesh(earGeo, earM);
-      ear.position.set(sx * 0.14, hy + 0.35, 0); ear.rotation.z = -sx * 0.15; head.add(ear);
-      const inner = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.28, 4, 6), inM);
-      inner.position.set(sx * 0.14, hy + 0.35, 0.06); inner.rotation.z = -sx * 0.15; head.add(inner);
-    }
-  } else if (H === 'frog') {
-    const froM = new THREE.MeshStandardMaterial({ color: 0x57cc5f, roughness: 0.8 });
-    const band = new THREE.Mesh(new THREE.SphereGeometry(0.405, 14, 10, 0, Math.PI * 2, 0, 1.1), froM);
-    band.position.y = 0.05; head.add(band);
-    for (const sx of [-1, 1]) {
-      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 8), froM);
-      eye.position.set(sx * 0.18, hy + 0.18, 0.12); head.add(eye);
-      const pup = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), new THREE.MeshBasicMaterial({ color: 0x111111 }));
-      pup.position.set(sx * 0.18, hy + 0.2, 0.23); head.add(pup);
-    }
-  } else if (H === 'mohawk') {
-    const mo = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.34, 0.6), new THREE.MeshStandardMaterial({ color: 0xff3355, roughness: 0.7 }));
-    mo.position.set(0, hy + 0.16, 0); head.add(mo);
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.405, 14, 10, 0, Math.PI * 2, 0, 1.2), hairM);
-    cap.position.y = 0.02; head.add(cap);
-  } else if (H === 'clown') {
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2;
-      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 6),
-        new THREE.MeshStandardMaterial({ color: [0xff3355, 0xffd23f, 0x38bdf8, 0x84cc16][i % 4], roughness: 0.8 }));
-      ball.position.set(Math.cos(a) * 0.34, hy + Math.sin(a) * 0.12 + 0.1, Math.sin(a) * 0.34);
-      head.add(ball);
-    }
-  } else if (H === 'bandana') {
-    const band = new THREE.Mesh(new THREE.SphereGeometry(0.405, 14, 10, 0, Math.PI * 2, 0, 1.1), new THREE.MeshStandardMaterial({ color: 0x3f88c5, roughness: 0.85 }));
-    band.position.y = 0.06; head.add(band);
-    const knot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 6), band.material);
-    knot.position.set(0, 0.18, -0.36); head.add(knot);
-  } else if (H === 'nightcap') {
-    const cap = new THREE.Mesh(new THREE.ConeGeometry(0.34, 0.75, 10), new THREE.MeshStandardMaterial({ color: 0x7b2cbf, roughness: 0.85 }));
-    cap.position.set(0, hy + 0.3, -0.1); cap.rotation.x = -0.5; head.add(cap);
-    const pom = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshStandardMaterial({ color: 0xfff6c9 }));
-    pom.position.set(0, hy + 0.52, -0.42); head.add(pom);
-  } else if (H === 'fin') {
-    const fin = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.45, 4), new THREE.MeshStandardMaterial({ color: 0x6b7c93, roughness: 0.6, flatShading: true }));
-    fin.position.set(0, hy + 0.25, -0.02); fin.rotation.y = Math.PI / 4; fin.scale.z = 0.35; head.add(fin);
-  } else if (H === 'pirate') {
-    const band = new THREE.Mesh(new THREE.SphereGeometry(0.41, 14, 10, 0, Math.PI * 2, 0, 1.15), new THREE.MeshStandardMaterial({ color: 0x8f1d1d, roughness: 0.85 }));
-    band.position.y = 0.05; head.add(band);
-    for (const sx of [-1, 1]) {
-      const tail = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.3, 0.05), band.material);
-      tail.position.set(sx * 0.1, 0.12, -0.4); tail.rotation.z = sx * 0.3; head.add(tail);
-    }
-  } else if (H === 'antenna') {
-    const helm = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 10, 0, Math.PI * 2, 0, 1.6), new THREE.MeshStandardMaterial({ color: 0xadb5bd, metalness: 0.7, roughness: 0.35 }));
-    helm.position.y = 0.02; head.add(helm);
-    const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.35, 6), helm.material);
-    ant.position.y = hy + 0.35; head.add(ant);
-    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), new THREE.MeshStandardMaterial({ color: 0xff3355, emissive: 0xff3355, emissiveIntensity: 1.2 }));
-    tip.position.y = hy + 0.55; head.add(tip);
-  } else if (H === 'mermaid') {
-    const hairBack = new THREE.Mesh(new THREE.SphereGeometry(0.43, 14, 10, 0, Math.PI * 2, 0, 1.9), new THREE.MeshStandardMaterial({ color: 0x2ec4b6, roughness: 0.85 }));
-    hairBack.position.y = -0.02; head.add(hairBack);
-    for (let i = 0; i < 3; i++) {
-      const shell = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), new THREE.MeshStandardMaterial({ color: 0xff8fa3 }));
-      shell.position.set(-0.15 + i * 0.15, hy + 0.12, 0.28); head.add(shell);
-    }
-  } else if (H === 'crown') {
-    const gold = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.25 });
-    const band = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.32, 0.16, 12), gold);
-    band.position.y = hy + 0.1; head.add(band);
-    for (let i = 0; i < 5; i++) {
-      const spike = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.18, 4), gold);
-      const a = (i / 5) * Math.PI * 2;
-      spike.position.set(Math.cos(a) * 0.29, hy + 0.26, Math.sin(a) * 0.29);
-      head.add(spike);
-    }
-  } else if (H === 'alien') {
-    const dome = new THREE.Mesh(new THREE.SphereGeometry(0.44, 14, 10),
-      new THREE.MeshStandardMaterial({ color: 0xbfe8ff, transparent: true, opacity: 0.35, roughness: 0.1, metalness: 0.3 }));
-    dome.position.y = 0.02; head.add(dome);
-    const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.3, 6), new THREE.MeshStandardMaterial({ color: 0x57cc5f }));
-    ant.position.y = hy + 0.4; head.add(ant);
-    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), new THREE.MeshStandardMaterial({ color: 0x84ff6a, emissive: 0x84ff6a, emissiveIntensity: 1.5 }));
-    tip.position.y = hy + 0.58; head.add(tip);
-  }
-
-  return { group: g, head, body };
-}
-
-// ═══════════════════════════ PROPS (decor) ══════════════════════════════════
-
-// each returns array of geometries, translated to origin, ready for merging
-const PROPS = {
-  palm: (r) => {
-    const g = [], lean = (r() - 0.5) * 0.3, h = 5 + r() * 3;
-    g.push(xform(tint(new THREE.CylinderGeometry(0.22, 0.4, h, 7), 0x8a5a2b), lean * 2, h / 2, 0, 0, 0, lean));
-    const topX = lean * 4;
-    for (let i = 0; i < 6; i++) {
-      const a = (i / 6) * Math.PI * 2;
-      g.push(xform(tint(new THREE.ConeGeometry(0.5, 3.2, 4), 0x2e9e4f),
-        topX + Math.cos(a) * 1.5, h + 0.3, Math.sin(a) * 1.5, Math.PI * 0.62, -a + Math.PI / 2, 0, 1));
-    }
-    g.push(xform(tint(new THREE.SphereGeometry(0.28, 6, 5), 0x6f4a1e), topX + 0.3, h - 0.2, 0.3));
-    g.push(xform(tint(new THREE.SphereGeometry(0.24, 6, 5), 0x6f4a1e), topX - 0.3, h - 0.3, -0.1));
-    return g;
-  },
-  bigtree: (r) => {
-    const g = [], h = 6 + r() * 4;
-    g.push(xform(tint(new THREE.CylinderGeometry(0.5, 0.9, h, 7), 0x6b4a26), 0, h / 2, 0));
-    for (let i = 0; i < 3; i++) {
-      const s = 3.2 - i * 0.7;
-      g.push(xform(tint(new THREE.IcosahedronGeometry(s, 0), [0x2e7d32, 0x388e3c, 0x43a047][i]),
-        (r() - 0.5) * 1.5, h - 0.5 + i * 1.6, (r() - 0.5) * 1.5));
-    }
-    return g;
-  },
-  fern: (r) => {
-    const g = [];
-    for (let i = 0; i < 5; i++) {
-      const a = (i / 5) * Math.PI * 2 + r();
-      g.push(xform(tint(new THREE.ConeGeometry(0.28, 1.6, 4), 0x3f9e46), Math.cos(a) * 0.5, 0.5, Math.sin(a) * 0.5, 0.9, -a, 0));
-    }
-    return g;
-  },
-  totem: (r) => {
-    const g = [], cols = [0xe63946, 0xf4a261, 0x2a9d8f, 0xe9c46a];
-    for (let i = 0; i < 4; i++) {
-      g.push(xform(tint(new THREE.BoxGeometry(1.1 - i * 0.08, 1.1, 1.1 - i * 0.08), cols[(r() * 4) | 0]), 0, 0.55 + i * 1.1, 0, 0, r() * 0.5, 0));
-    }
-    return g;
-  },
-  rock: (r) => [xform(tint(new THREE.IcosahedronGeometry(1 + r() * 1.5, 0), 0x8d99ae), 0, 0.4, 0, r(), r(), 0, 1)],
-  rockmoss: (r) => [xform(tint(new THREE.IcosahedronGeometry(1 + r() * 1.6, 0), 0x6b8f5e), 0, 0.4, 0, r(), r(), 0, 1)],
-  rockred: (r) => [xform(tint(new THREE.IcosahedronGeometry(1 + r() * 1.8, 0), 0xb25a3a), 0, 0.4, 0, r(), r(), 0, 1)],
-  basalt: (r) => [xform(tint(new THREE.CylinderGeometry(0.8 + r(), 1 + r(), 3 + r() * 5, 6), 0x2b2320), 0, 1.5, 0, 0, r() * 3, 0)],
-  obsidian: (r) => [xform(tint(new THREE.ConeGeometry(0.8, 3.5 + r() * 2, 5), 0x1a1418), 0, 1.7, 0, 0, r(), 0)],
-  deadtree: (r) => {
-    const g = [xform(tint(new THREE.CylinderGeometry(0.18, 0.35, 3.5, 6), 0x4a3a30), 0, 1.75, 0, 0, 0, (r() - 0.5) * 0.4)];
-    g.push(xform(tint(new THREE.CylinderGeometry(0.08, 0.14, 2, 5), 0x4a3a30), 0.6, 3.4, 0, 0, 0, -0.8));
-    g.push(xform(tint(new THREE.CylinderGeometry(0.06, 0.12, 1.6, 5), 0x4a3a30), -0.5, 3.2, 0.2, 0.4, 0, 0.7));
-    return g;
-  },
-  lavavent: (r) => {
-    const g = [xform(tint(new THREE.ConeGeometry(1.2, 1.6, 7), 0x3a2f2a), 0, 0.8, 0)];
-    g.push(xform(tint(new THREE.ConeGeometry(0.55, 0.8, 7), 0xff7733), 0, 1.4, 0));
-    return g;
-  },
-  cactus: (r) => {
-    const h = 2 + r() * 2, c = 0x4f9e4f;
-    const g = [xform(tint(new THREE.CylinderGeometry(0.35, 0.4, h, 8), c), 0, h / 2, 0)];
-    g.push(xform(tint(new THREE.CylinderGeometry(0.18, 0.18, 0.9, 6), c), 0.55, h * 0.55, 0, 0, 0, Math.PI / 2));
-    g.push(xform(tint(new THREE.CylinderGeometry(0.18, 0.18, 1, 6), c), 0.95, h * 0.55 + 0.45, 0));
-    if (r() > 0.5) {
-      g.push(xform(tint(new THREE.CylinderGeometry(0.16, 0.16, 0.8, 6), c), -0.5, h * 0.7, 0, 0, 0, Math.PI / 2));
-      g.push(xform(tint(new THREE.CylinderGeometry(0.16, 0.16, 0.8, 6), c), -0.85, h * 0.7 + 0.35, 0));
-    }
-    return g;
-  },
-  bones: (r) => {
-    const g = [];
-    for (let i = 0; i < 4; i++) {
-      g.push(xform(tint(new THREE.TorusGeometry(1 + i * 0.28, 0.12, 5, 10, Math.PI), 0xf4f1de), 0, 0.1 + i * 0.05, i * 0.9 - 1.4, 0, 0, 0));
-    }
-    g.push(xform(tint(new THREE.CylinderGeometry(0.12, 0.12, 3.4, 6), 0xf4f1de), 0, 0.25, 0, Math.PI / 2));
-    return g;
-  },
-  tumbleweed: (r) => [xform(tint(new THREE.IcosahedronGeometry(0.7 + r() * 0.4, 0), 0x9a7b4f), 0, 0.6, 0, r() * 3, r() * 3, 0)],
-  house: (r) => {
-    const g = [], w = 4 + r() * 2, d = 3.5 + r() * 1.5, h = 2.6 + r() * 0.8;
-    const wall = [0xf5e6c8, 0xf0e0d0, 0xe8d5b5][(r() * 3) | 0];
-    g.push(xform(tint(new THREE.BoxGeometry(w, h, d), wall), 0, h / 2, 0));
-    g.push(xform(tint(new THREE.ConeGeometry(Math.max(w, d) * 0.78, 1.8, 4), 0xc1440e), 0, h + 0.9, 0, 0, Math.PI / 4, 0));
-    g.push(xform(tint(new THREE.BoxGeometry(0.9, 1.6, 0.15), 0x6f4a26), 0, 0.8, d / 2 + 0.05));
-    g.push(xform(tint(new THREE.BoxGeometry(0.7, 0.7, 0.15), 0x87ceeb), -w * 0.28, h * 0.6, d / 2 + 0.05));
-    g.push(xform(tint(new THREE.BoxGeometry(0.7, 0.7, 0.15), 0x87ceeb), w * 0.28, h * 0.6, d / 2 + 0.05));
-    return g;
-  },
-  awning: (r) => {
-    const g = [], c1 = [0xe63946, 0x2a9d8f, 0xe9c46a][(r() * 3) | 0];
-    g.push(xform(tint(new THREE.BoxGeometry(2.6, 0.8, 1.2), 0x8a5a2b), 0, 0.4, 0));
-    for (let i = 0; i < 5; i++) {
-      g.push(xform(tint(new THREE.BoxGeometry(0.52, 0.06, 1.6), i % 2 ? c1 : 0xffffff), -1.04 + i * 0.52, 1.85, 0.3, 0.35, 0, 0));
-    }
-    g.push(xform(tint(new THREE.CylinderGeometry(0.05, 0.05, 1.8, 5), 0x6f4a26), -1.2, 0.9, 0.9));
-    g.push(xform(tint(new THREE.CylinderGeometry(0.05, 0.05, 1.8, 5), 0x6f4a26), 1.2, 0.9, 0.9));
-    return g;
-  },
-  lantern: (r) => {
-    const g = [xform(tint(new THREE.CylinderGeometry(0.08, 0.1, 3.4, 6), 0x4a3728), 0, 1.7, 0)];
-    g.push(xform(tint(new THREE.BoxGeometry(0.45, 0.6, 0.45), 0xffb347), 0, 3.2, 0));
-    g.push(xform(tint(new THREE.ConeGeometry(0.4, 0.3, 4), 0x4a3728), 0, 3.65, 0));
-    return g;
-  },
-  crate: (r) => {
-    const g = [];
-    const n = 1 + (r() * 2 | 0);
-    for (let i = 0; i < n; i++) {
-      g.push(xform(tint(new THREE.BoxGeometry(1, 1, 1), i ? 0xa07850 : 0x8a5a2b), (r() - 0.5) * 0.5, 0.5 + i * 1.02, (r() - 0.5) * 0.5, 0, r(), 0));
-    }
-    return g;
-  },
-  surf: (r) => {
-    const c = [0xff70a6, 0x38bdf8, 0xffd23f, 0x84cc16][(r() * 4) | 0];
-    return [xform(tint(new THREE.CapsuleGeometry(0.28, 1.7, 4, 8), c), 0, 0.9, 0, 0.25, 0, 0.15)];
-  },
-  pine: (r) => {
-    const g = [], h = 3.2 + r() * 2;
-    g.push(xform(tint(new THREE.CylinderGeometry(0.2, 0.35, 1.4, 6), 0x6b4a26), 0, 0.7, 0));
-    for (let i = 0; i < 3; i++) {
-      const s = 1.9 - i * 0.5;
-      g.push(xform(tint(new THREE.ConeGeometry(s, 2.2, 7), 0x2d6a4f), 0, 1.5 + i * 1.5, 0));
-      g.push(xform(tint(new THREE.ConeGeometry(s * 0.7, 0.7, 7), 0xffffff), 0, 2.25 + i * 1.5, 0));
-    }
-    return g;
-  },
-  pinedark: (r) => {
-    const g = [], h = 3 + r() * 2;
-    g.push(xform(tint(new THREE.CylinderGeometry(0.2, 0.35, 1.4, 6), 0x2a2018), 0, 0.7, 0));
-    for (let i = 0; i < 3; i++) {
-      g.push(xform(tint(new THREE.ConeGeometry(1.9 - i * 0.5, 2.2, 7), 0x1e3a4f), 0, 1.5 + i * 1.5, 0));
-    }
-    return g;
-  },
-  icerock: (r) => [xform(tint(new THREE.IcosahedronGeometry(0.9 + r() * 1.4, 0), 0xbfe3ff), 0, 0.5, 0, r(), r(), 0, 1)],
-  snowman: (r) => {
-    const g = [];
-    g.push(xform(tint(new THREE.SphereGeometry(0.8, 10, 8), 0xffffff), 0, 0.75, 0));
-    g.push(xform(tint(new THREE.SphereGeometry(0.55, 10, 8), 0xffffff), 0, 1.8, 0));
-    g.push(xform(tint(new THREE.SphereGeometry(0.4, 10, 8), 0xffffff), 0, 2.6, 0));
-    g.push(xform(tint(new THREE.ConeGeometry(0.1, 0.5, 6), 0xff7733), 0, 2.6, 0.5, Math.PI / 2, 0, 0));
-    g.push(xform(tint(new THREE.CylinderGeometry(0.26, 0.26, 0.12, 10), 0x232323), 0, 3.05, 0));
-    g.push(xform(tint(new THREE.CylinderGeometry(0.18, 0.18, 0.3, 10), 0x232323), 0, 3.25, 0));
-    return g;
-  },
-  candycane: () => {
-    const g = [];
-    for (let i = 0; i < 6; i++) {
-      g.push(xform(tint(new THREE.CylinderGeometry(0.14, 0.14, 0.5, 8), i % 2 ? 0xe63946 : 0xffffff), 0, 0.25 + i * 0.5, 0));
-    }
-    g.push(xform(tint(new THREE.TorusGeometry(0.3, 0.14, 6, 10, Math.PI), 0xe63946), 0.3, 2.95, 0, 0, 0, 0));
-    return g;
-  },
-  mangrove: (r) => {
-    const g = [];
-    for (let i = 0; i < 4; i++) {
-      const a = (i / 4) * Math.PI * 2 + r();
-      g.push(xform(tint(new THREE.CylinderGeometry(0.12, 0.2, 2.6, 5), 0x5a4632), Math.cos(a) * 0.9, 1.1, Math.sin(a) * 0.9, Math.cos(a) * 0.5, 0, -Math.sin(a) * 0.5));
-    }
-    const s = 1.6 + r();
-    g.push(xform(tint(new THREE.IcosahedronGeometry(s, 0), 0x3a5f2a), 0, 3 + s * 0.4, 0));
-    g.push(xform(tint(new THREE.IcosahedronGeometry(s * 0.7, 0), 0x466e33), 0.8, 2.6 + s * 0.5, 0.5));
-    return g;
-  },
-  mushroom: (r) => {
-    const g = [], c = r() > 0.5 ? 0xe63946 : 0xf4a261;
-    g.push(xform(tint(new THREE.CylinderGeometry(0.16, 0.24, 0.9, 7), 0xf5e6c8), 0, 0.45, 0));
-    g.push(xform(tint(new THREE.SphereGeometry(0.55, 10, 8, 0, Math.PI * 2, 0, 1.6), c), 0, 0.85, 0));
-    return g;
-  },
-  glowshroom: (r) => {
-    const g = [], c = [0x66ffd9, 0xff8ae2, 0x8ab6ff][(r() * 3) | 0];
-    g.push(xform(tint(new THREE.CylinderGeometry(0.14, 0.22, 0.8, 7), 0xd8e4ff), 0, 0.4, 0));
-    g.push(xform(tint(new THREE.SphereGeometry(0.5, 10, 8, 0, Math.PI * 2, 0, 1.6), c), 0, 0.75, 0));
-    return g;
-  },
-  crystal: (r) => {
-    const c = [0xb892ff, 0x8ab6ff, 0x66ffd9][(r() * 3) | 0];
-    const g = [xform(tint(new THREE.OctahedronGeometry(0.8 + r() * 0.6, 0), c), 0, 1, 0, 0, r() * 3, 0, 1)];
-    g[0].scale(new THREE.Vector3(1, 1.8, 1));
-    g[0].translate(0, 0.2, 0);
-    return g;
-  },
-  starpole: (r) => {
-    const g = [xform(tint(new THREE.CylinderGeometry(0.06, 0.08, 3.2, 6), 0x2b3252), 0, 1.6, 0)];
-    g.push(xform(tint(new THREE.OctahedronGeometry(0.4, 0), 0xffe95e), 0, 3.4, 0));
-    return g;
-  },
-  logwood: (r) => [xform(tint(new THREE.CylinderGeometry(0.45, 0.5, 2.6 + r() * 1.5, 7), 0x5a4632), 0, 0.45, 0, 0, r() * 3, Math.PI / 2)],
-  cattail: (r) => {
-    const g = [];
-    for (let i = 0; i < 4; i++) {
-      const x = (r() - 0.5) * 0.8, z = (r() - 0.5) * 0.8;
-      g.push(xform(tint(new THREE.CylinderGeometry(0.03, 0.04, 1.6, 4), 0x5a7a3a), x, 0.8, z));
-      g.push(xform(tint(new THREE.CapsuleGeometry(0.08, 0.3, 4, 6), 0x6f4a26), x, 1.6, z));
-    }
-    return g;
-  },
-  mesa: (r) => {
-    const h = 8 + r() * 6, w = 6 + r() * 5;
-    return [xform(tint(new THREE.CylinderGeometry(w, w * 1.3, h, 9), [0xb25a3a, 0xc96f4a][(r() * 2) | 0]), 0, h / 2, 0, 0, r() * 3, 0)];
-  },
-  arch: (r) => {
-    const c = 0xc96f4a;
-    const g = [
-      xform(tint(new THREE.BoxGeometry(2, 7, 2), c), -3.5, 3.5, 0, 0, 0, 0.08),
-      xform(tint(new THREE.BoxGeometry(2, 6.2, 2), c), 3.5, 3.1, 0, 0, 0, -0.1),
-      xform(tint(new THREE.BoxGeometry(8.6, 1.6, 2.2), c), 0, 6.6, 0, 0, 0, 0.03),
-    ];
-    return g;
-  },
-  barn: (r) => {
-    const g = [];
-    g.push(xform(tint(new THREE.BoxGeometry(5, 3, 4), 0xc0392b), 0, 1.5, 0));
-    g.push(xform(tint(new THREE.ConeGeometry(3.9, 2, 4), 0x7f8c8d), 0, 4, 0, 0, Math.PI / 4, 0));
-    g.push(xform(tint(new THREE.BoxGeometry(1.6, 2.2, 0.16), 0xffffff), 0, 1.1, 2.02));
-    g.push(xform(tint(new THREE.BoxGeometry(1.2, 1.5, 0.2), 0x6f4a26), 0, 0.75, 2.06));
-    return g;
-  },
-  hay: (r) => [xform(tint(new THREE.CylinderGeometry(0.8, 0.8, 1.4, 10), 0xe0c068), 0, 0.8, 0, 0, 0, Math.PI / 2)],
-  sunflower: (r) => {
-    const g = [xform(tint(new THREE.CylinderGeometry(0.04, 0.05, 1.7, 4), 0x4a7a2a), 0, 0.85, 0)];
-    g.push(xform(tint(new THREE.CylinderGeometry(0.35, 0.35, 0.08, 10), 0xffd23f), 0, 1.7, 0.05, Math.PI / 2 - 0.2, 0, 0));
-    g.push(xform(tint(new THREE.CylinderGeometry(0.16, 0.16, 0.1, 8), 0x6f4a26), 0, 1.7, 0.1, Math.PI / 2 - 0.2, 0, 0));
-    return g;
-  },
-  windmill: (r) => {
-    const g = [];
-    g.push(xform(tint(new THREE.CylinderGeometry(0.5, 0.9, 6, 4), 0xa07850), 0, 3, 0, 0, Math.PI / 4, 0));
-    g.push(xform(tint(new THREE.ConeGeometry(1, 1, 4), 0xc0392b), 0, 6.4, 0, 0, Math.PI / 4, 0));
-    return g;
-  },
-};
-
-// ═══════════════════════════ TRACK WORLD ════════════════════════════════════
-
-export function buildTrackWorld(map) {
-  const theme = THEMES[map.theme];
-  const rng = mulberry32(map.seed);
-  const group = new THREE.Group();
-  const userData = { balloons: [], clouds: [], itemBoxes: [], coins: [], theme };
-
-  // ── 1. control points + curve ──
-  const nc = 13 + Math.floor(rng() * 5);
-  const baseR = 95 + rng() * 35;
-  const hillAmp = { 0: 0.35, 1: 0.8, 2: 0.5, 3: 0.3, 4: 1.1, 5: 0.9, 6: 0.4, 7: 1.0, 8: 0.6, 9: 0.7 }[map.theme] || 0.6;
-  const pts = [];
-  for (let i = 0; i < nc; i++) {
-    const a = (i / nc) * Math.PI * 2;
-    const rad = baseR + (rng() - 0.5) * 2 * 42;
-    const y = Math.max(0, (rng() - 0.35) * 14 * hillAmp);
-    pts.push(V3(Math.cos(a) * rad, y, Math.sin(a) * rad));
-  }
-  const curve = new THREE.CatmullRomCurve3(pts, true, 'catmullrom', 0.5);
-
-  // ── 2. samples ──
-  const N = 480;
-  const samples = [];
-  for (let i = 0; i < N; i++) {
-    const t = i / N;
-    const p = curve.getPointAt(t);
-    const tan = curve.getTangentAt(t);
-    tan.y = 0; tan.normalize();
-    const right = V3(tan.z, 0, -tan.x).normalize().negate(); // right side of forward
-    samples.push({ p, tan, right, y: p.y });
-  }
-  const length = curve.getLength();
-
-  // ── 3. road ribbon ──
-  const roadHalf = 7.5;
-  {
-    const pos = [], uv = [], idx = [];
-    let dist = 0;
-    for (let i = 0; i <= N; i++) {
-      const s = samples[i % N];
-      if (i > 0) dist += samples[(i - 1) % N].p.distanceTo(samples[i % N].p);
-      const c = s.p, r = s.right;
-      const lift = 0.14;
-      pos.push(
-        c.x - r.x * (roadHalf + 2.6), s.y - 0.45, c.z - r.z * (roadHalf + 2.6),
-        c.x - r.x * roadHalf, s.y + lift, c.z - r.z * roadHalf,
-        c.x + r.x * roadHalf, s.y + lift, c.z + r.z * roadHalf,
-        c.x + r.x * (roadHalf + 2.6), s.y - 0.45, c.z + r.z * (roadHalf + 2.6),
-      );
-      const v = dist / 16;
-      uv.push(-0.18, v, 0, v, 1, v, 1.18, v);
-    }
-    for (let i = 0; i < N; i++) {
-      const a = i * 4, b = (i + 1) * 4;
-      // CCW winding = faces UP
-      idx.push(a, a + 1, b, b, a + 1, b + 1);             // left skirt
-      idx.push(a + 1, a + 2, b + 1, b + 1, a + 2, b + 2); // road
-      idx.push(a + 2, a + 3, b + 2, b + 2, a + 3, b + 3); // right skirt
-    }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-    geo.setIndex(idx);
-    geo.computeVertexNormals();
-    const roadTex = TEX.roadTexture(theme.road, map.seed);
-    const road = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ map: roadTex }));
-    road.receiveShadow = true;
-    group.add(road);
-  }
-
-  // finish line
-  {
-    const s = samples[0];
-    const geo = new THREE.PlaneGeometry(roadHalf * 2, 3);
-    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: TEX.checkerTexture() }));
-    m.position.set(s.p.x, s.y + 0.17, s.p.z);
-    m.rotation.x = -Math.PI / 2;
-    m.rotation.z = Math.atan2(s.tan.x, s.tan.z);
-    group.add(m);
-  }
-
-  // ── 4. terrain ──
-  const SIZE = 1500;
-  {
-    const geo = new THREE.PlaneGeometry(SIZE, SIZE, 100, 100);
-    geo.rotateX(-Math.PI / 2);
-    const posA = geo.attributes.position;
-    const colors = new Float32Array(posA.count * 3);
-    const c1 = new THREE.Color(theme.ground[0]), c2 = new THREE.Color(theme.ground[1]);
-    const sand = new THREE.Color('#f2e3b0');
-    const nrRng = mulberry32(map.seed + 9);
-    const no1 = nrRng() * 10, no2 = nrRng() * 10, no3 = nrRng() * 10;
-    const isIsland = !!theme.water && map.theme !== 6;
-    const islandR = baseR + 90;
-    const heightsAtSamples = samples.filter((_, i) => i % 4 === 0).map((s) => s.p);
-
-    const amp = { 0: 5, 1: 9, 2: 9, 3: 3, 4: 10, 5: 10, 6: 3.5, 7: 11, 8: 5, 9: 6 }[map.theme] || 6;
-    for (let i = 0; i < posA.count; i++) {
-      const x = posA.getX(i), z = posA.getZ(i);
-      let h = (Math.sin(x * 0.021 + no1) * Math.cos(z * 0.019 + no2) * 0.55 +
-        Math.sin(x * 0.053 + no3) * Math.sin(z * 0.047 + no1) * 0.3 +
-        Math.sin((x + z) * 0.013 + no2) * 0.35) * amp;
-      // distance to track (coarse)
-      let dmin = 1e9, nearY = 0;
-      for (let j = 0; j < heightsAtSamples.length; j++) {
-        const dx = heightsAtSamples[j].x - x, dz = heightsAtSamples[j].z - z;
-        const d2 = dx * dx + dz * dz;
-        if (d2 < dmin) { dmin = d2; nearY = heightsAtSamples[j].y; }
-      }
-      const d = Math.sqrt(dmin);
-      const mask = THREE.MathUtils.smoothstep(d, 14, 60);
-      h = lerp(nearY - 0.55, h, mask);
-      if (isIsland) {
-        const rr = Math.sqrt(x * x + z * z);
-        const w = 1 - THREE.MathUtils.smoothstep(rr, islandR, islandR + 90);
-        if (w < 1) h = lerp(-9, Math.max(h, -9), w) - (1 - w) * 2;
-      }
-      posA.setY(i, h);
-      // colors
-      const nz = 0.5 + 0.5 * Math.sin(x * 0.09 + no3) * Math.cos(z * 0.08 + no1);
-      const col = c1.clone().lerp(c2, nz);
-      if (theme.water && h < 0.35) col.lerp(sand, clamp((0.35 - h) * 2.2, 0, 1) * 0.85);
-      if (map.theme === 4 && nz < 0.3) col.lerp(new THREE.Color('#cfe0ee'), 0.4);
-      colors[i * 3] = col.r; colors[i * 3 + 1] = col.g; colors[i * 3 + 2] = col.b;
-    }
-    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geo.computeVertexNormals();
-    const terr = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ vertexColors: true }));
-    terr.receiveShadow = true;
-    group.add(terr);
-  }
-
-  // ── 5. water / lava ──
-  if (theme.water) {
-    const isLava = map.theme === 5;
-    const wmat = new THREE.MeshPhongMaterial({
-      color: new THREE.Color(theme.water), shininess: 90, transparent: true, opacity: 0.9,
-      emissive: isLava ? new THREE.Color(0xff4400) : new THREE.Color(0x003355),
-      emissiveIntensity: isLava ? 0.9 : 0.25,
+    label.position.y = 0.16;
+    g.add(label);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.06, 8), matDarkMetal);
+    cap.position.set(0, 0.35, 0.06);
+    g.add(cap);
+  } else if (id === 'water_jug') {
+    const jugMat = new THREE.MeshStandardMaterial({
+      color: 0x38bdf8,
+      roughness: 0.25,
+      metalness: 0.05,
+      transparent: true,
+      opacity: 0.82,
     });
-    const water = new THREE.Mesh(new THREE.PlaneGeometry(2400, 2400), wmat);
-    water.rotation.x = -Math.PI / 2;
-    water.position.y = -0.75;
-    group.add(water);
-    userData.water = water;
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.17, 0.38, 12), jugMat);
+    body.position.y = 0.19;
+    body.castShadow = true;
+    g.add(body);
+    const cap = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.04, 0.04, 0.06, 10),
+      new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4 })
+    );
+    cap.position.y = 0.41;
+    g.add(cap);
+  } else if (id === 'canteen') {
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x4d5d3b, roughness: 0.65, metalness: 0.2 });
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.11, 0.24, 10), bodyMat);
+    body.scale.set(1, 1, 0.65);
+    body.position.y = 0.12;
+    g.add(body);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.05, 8), matDarkMetal);
+    cap.position.y = 0.26;
+    g.add(cap);
+  } else if (id === 'salami') {
+    const sMat = new THREE.MeshStandardMaterial({ color: 0x88291c, roughness: 0.65 });
+    const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.34, 10), sMat);
+    stick.rotation.z = Math.PI / 2;
+    stick.position.y = 0.05;
+    g.add(stick);
+    const band = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.048, 0.048, 0.08, 10),
+      new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.7 })
+    );
+    band.rotation.z = Math.PI / 2;
+    band.position.y = 0.05;
+    g.add(band);
+  } else if (id === 'beans') {
+    const can = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.16, 12), matChrome);
+    can.position.y = 0.08;
+    g.add(can);
+    const lbl = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.067, 0.067, 0.10, 12),
+      new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.6 })
+    );
+    lbl.position.y = 0.08;
+    g.add(lbl);
+  } else if (id === 'chocolate') {
+    const bar = new THREE.Mesh(
+      new THREE.BoxGeometry(0.18, 0.03, 0.10),
+      new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.5 })
+    );
+    bar.position.y = 0.02;
+    g.add(bar);
+    const wrap = new THREE.Mesh(
+      new THREE.BoxGeometry(0.11, 0.034, 0.104),
+      new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.3, metalness: 0.6 })
+    );
+    wrap.position.set(-0.02, 0.02, 0);
+    g.add(wrap);
+  } else if (id === 'soda') {
+    const bottle = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.032, 0.048, 0.24, 10),
+      new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.2, metalness: 0.1 })
+    );
+    bottle.position.y = 0.12;
+    g.add(bottle);
+    const lbl = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.049, 0.049, 0.07, 10),
+      new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.5 })
+    );
+    lbl.position.y = 0.10;
+    g.add(lbl);
+  } else if (id === 'medkit') {
+    const box = new THREE.Mesh(
+      new THREE.BoxGeometry(0.28, 0.18, 0.22),
+      new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 })
+    );
+    box.position.y = 0.09;
+    g.add(box);
+    const crossMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.5 });
+    const c1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.04), crossMat);
+    c1.position.y = 0.185;
+    const c2 = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.02, 0.12), crossMat);
+    c2.position.y = 0.185;
+    g.add(c1, c2);
+  } else if (id === 'repair_kit') {
+    const box = new THREE.Mesh(
+      new THREE.BoxGeometry(0.32, 0.16, 0.20),
+      new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.45, metalness: 0.5 })
+    );
+    box.position.y = 0.08;
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.04), matChrome);
+    handle.position.y = 0.18;
+    const wrench = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.025, 0.045), matChrome);
+    wrench.position.set(0, 0.17, 0.05);
+    wrench.rotation.y = 0.35;
+    g.add(box, handle, wrench);
+  } else if (id === 'wire_brush') {
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.035, 0.28), matWood);
+    handle.position.y = 0.04;
+    g.add(handle);
+    const bristles = new THREE.Mesh(
+      new THREE.BoxGeometry(0.05, 0.04, 0.14),
+      new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.7, metalness: 0.8 })
+    );
+    bristles.position.set(0, 0.015, 0.07);
+    g.add(bristles);
+  } else if (id === 'spray_paint') {
+    const can = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.048, 0.22, 12), matChrome);
+    can.position.y = 0.11;
+    g.add(can);
+    const capCol = item.paintHex || '#c94a38';
+    const cap = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.047, 0.047, 0.07, 12),
+      new THREE.MeshStandardMaterial({ color: capCol, roughness: 0.3 })
+    );
+    cap.position.y = 0.24;
+    g.add(cap);
+  } else if (id === 'siphon_hose') {
+    const torus = new THREE.Mesh(
+      new THREE.TorusGeometry(0.14, 0.022, 8, 20),
+      new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.6 })
+    );
+    torus.rotation.x = Math.PI / 2;
+    torus.position.y = 0.03;
+    g.add(torus);
+  } else if (id === 'revolver') {
+    const barrel = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.045, 0.24), matChrome);
+    barrel.position.set(0, 0.12, 0.06);
+    const cyl = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.065, 8), matDarkMetal);
+    cyl.rotation.x = Math.PI / 2;
+    cyl.position.set(0, 0.11, -0.02);
+    const grip = new THREE.Mesh(new THREE.BoxGeometry(0.034, 0.11, 0.05), matWood);
+    grip.position.set(0, 0.05, -0.07);
+    grip.rotation.x = -0.3;
+    g.add(barrel, cyl, grip);
+  } else if (id === 'binoculars') {
+    const b1 = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.16, 10), matDarkMetal);
+    b1.rotation.x = Math.PI / 2;
+    b1.position.set(-0.045, 0.06, 0);
+    const b2 = b1.clone();
+    b2.position.x = 0.045;
+    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.02, 0.06), matDarkMetal);
+    bridge.position.set(0, 0.06, 0);
+    g.add(b1, b2, bridge);
+  } else if (id === 'part_wheel') {
+    const wg = buildWheelAssembly(0.34, item.condition ?? 0.85);
+    wg.rotation.z = Math.PI / 2;
+    wg.position.y = 0.14;
+    g.add(wg);
+  } else if (id === 'part_engine_std' || id === 'part_engine_i4' || id === 'part_engine_diesel' || id === 'part_engine_v8') {
+    const engId = item.engineId || (id === 'part_engine_v8' ? 'eng_v8_5000' : id === 'part_engine_diesel' ? 'eng_diesel_6500' : id === 'part_engine_i4' ? 'eng_i4_1800' : 'eng_i4_1200');
+    const eg = buildEngineBlockMesh(engId, item.condition ?? 0.85);
+    eg.position.y = 0.22;
+    g.add(eg);
+  } else if (id === 'part_radiator_std' || id === 'part_radiator_heavy') {
+    const isHeavy = id === 'part_radiator_heavy';
+    const rg = buildRadiatorCoreMesh(isHeavy ? 'rad_heavy' : 'rad_std', item.condition ?? 0.85);
+    rg.position.y = 0.22;
+    g.add(rg);
+  } else {
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.24, 0.24), matWood);
+    box.position.y = 0.12;
+    g.add(box);
   }
 
-  // ── 6. sky, sun, clouds, stars ──
-  {
-    const skyGeo = new THREE.SphereGeometry(1100, 20, 14);
-    const sky = new THREE.Mesh(skyGeo, new THREE.MeshBasicMaterial({ map: TEX.skyTexture(theme), side: THREE.BackSide, fog: false, depthWrite: false }));
-    group.add(sky);
-    if (theme.night) {
-      const stars = new THREE.Mesh(new THREE.SphereGeometry(1050, 20, 14),
-        new THREE.MeshBasicMaterial({ map: TEX.starsTexture(), side: THREE.BackSide, transparent: true, fog: false, depthWrite: false, blending: THREE.AdditiveBlending }));
-      group.add(stars);
-    }
-    const sunDir = V3(0.5, 0.7, 0.35).normalize();
-    const sun = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: TEX.glowTexture(), color: new THREE.Color(theme.sun[0]), transparent: true, fog: false, depthWrite: false, blending: THREE.AdditiveBlending,
-    }));
-    sun.position.copy(sunDir).multiplyScalar(950);
-    sun.scale.setScalar(theme.night ? 90 : 220);
-    group.add(sun);
-    userData.sunDirWorld = sunDir;
-    // clouds
-    const cloudTex = TEX.cloudTexture();
-    const nc2 = theme.night ? 4 : 9;
-    for (let i = 0; i < nc2; i++) {
-      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, transparent: true, opacity: theme.night ? 0.25 : 0.85, fog: false, depthWrite: false }));
-      const a = rng() * Math.PI * 2, rr = 250 + rng() * 500;
-      sp.position.set(Math.cos(a) * rr, 90 + rng() * 90, Math.sin(a) * rr);
-      sp.scale.set(140 + rng() * 160, 60 + rng() * 60, 1);
-      sp.userData.drift = 1.2 + rng() * 2;
-      group.add(sp);
-      userData.clouds.push(sp);
-    }
-  }
-
-  // ── 7. decor (merged) ──
-  {
-    const geos = [];
-    const decorList = theme.decor;
-    const place = (propFn, x, y, z, s, ry) => {
-      for (const gg of propFn(rng)) {
-        gg.scale(new THREE.Vector3(s, s, s));
-        gg.rotateY(ry);
-        gg.translate(x, y, z);
-        geos.push(gg);
-      }
-    };
-    // along track
-    const step = Math.floor(N / 42);
-    for (let i = 6; i < N; i += step) {
-      const s = samples[i];
-      const propName = decorList[(rng() * decorList.length) | 0];
-      const side = rng() > 0.5 ? 1 : -1;
-      const off = roadHalf + 5 + rng() * 26;
-      const x = s.p.x + s.right.x * off * side;
-      const z = s.p.z + s.right.z * off * side;
-      const big = propName === 'mesa' || propName === 'house' || propName === 'barn' || propName === 'bigtree' || propName === 'arch' || propName === 'bones';
-      place(PROPS[propName] || PROPS.rock, x, s.y - 0.3, z, big ? 1 + rng() * 0.7 : 0.7 + rng() * 0.9, rng() * Math.PI * 2);
-      // sometimes a second item opposite side
-      if (rng() > 0.55) {
-        const p2 = decorList[(rng() * decorList.length) | 0];
-        const off2 = roadHalf + 5 + rng() * 22;
-        place(PROPS[p2] || PROPS.rock, s.p.x - s.right.x * off2 * side, s.y - 0.3, s.p.z - s.right.z * off2 * side, 0.7 + rng() * 0.8, rng() * Math.PI * 2);
-      }
-    }
-    // far scatter
-    for (let i = 0; i < 60; i++) {
-      const a = rng() * Math.PI * 2;
-      const rr = baseR + 90 + rng() * 260;
-      const x = Math.cos(a) * rr, z = Math.sin(a) * rr;
-      const propName = decorList[(rng() * decorList.length) | 0];
-      place(PROPS[propName] || PROPS.rock, x, Math.max(0, (rng() - 0.4) * 6) - 0.4, z, 0.8 + rng() * 1.4, rng() * Math.PI * 2);
-    }
-    // mountain ring
-    for (let i = 0; i < 11; i++) {
-      const a = (i / 11) * Math.PI * 2 + rng() * 0.4;
-      const rr = 420 + rng() * 160;
-      const mCol = new THREE.Color(theme.ground[1]).multiplyScalar(0.8).getHex();
-      const hh = 90 + rng() * 130, ww = 90 + rng() * 90;
-      geos.push(xform(tint(new THREE.ConeGeometry(ww, hh, 7), mCol), Math.cos(a) * rr, hh / 2 - 12, Math.sin(a) * rr));
-      if (map.theme === 4) {
-        geos.push(xform(tint(new THREE.ConeGeometry(ww * 0.35, hh * 0.35, 7), 0xffffff), Math.cos(a) * rr, hh * 0.83 - 12, Math.sin(a) * rr));
-      }
-    }
-    const merged = mergeGeometries(geos, false);
-    const mesh = new THREE.Mesh(merged, new THREE.MeshLambertMaterial({ vertexColors: true }));
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    group.add(mesh);
-  }
-
-  // ── 8. start arch + banner + flags ──
-  {
-    const s = samples[0];
-    const archG = new THREE.Group();
-    const poleMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
-    for (const side of [-1, 1]) {
-      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 9, 8), poleMat);
-      pole.position.set(s.right.x * side * (roadHalf + 1), 4.5, s.right.z * side * (roadHalf + 1));
-      pole.castShadow = true;
-      archG.add(pole);
-      const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.1), new THREE.MeshBasicMaterial({ map: TEX.flagTexture(), side: THREE.DoubleSide }));
-      flag.position.set(s.right.x * side * (roadHalf + 1), 8.6, s.right.z * side * (roadHalf + 1));
-      flag.rotation.y = Math.atan2(s.tan.x, s.tan.z) + 0.5;
-      archG.add(flag);
-      userData['flag' + side] = flag;
-    }
-    const banner = new THREE.Mesh(new THREE.PlaneGeometry(roadHalf * 2 + 2, 2.2),
-      new THREE.MeshBasicMaterial({ map: TEX.bannerTexture(map.name), side: THREE.DoubleSide }));
-    banner.position.set(0, 8.2, 0);
-    banner.rotation.y = Math.atan2(s.tan.x, s.tan.z);
-    archG.add(banner);
-    archG.position.set(s.p.x, s.y, s.p.z);
-    group.add(archG);
-  }
-
-  // ── 9. item boxes ──
-  {
-    const boxTex = TEX.itemBoxTexture();
-    const glowTex = TEX.glowTexture('rgba(255,140,255,1)', 'rgba(200,60,255,0)');
-    const boxMat = new THREE.MeshStandardMaterial({ map: boxTex, emissive: 0xa64ddb, emissiveIntensity: 0.55 });
-    const rows = [0.14, 0.28, 0.45, 0.60, 0.76, 0.90];
-    for (const f of rows) {
-      const idxAt = Math.floor(f * N);
-      for (const lat of [-3.6, 0, 3.6]) {
-        if (rng() < 0.18) continue;
-        const s = samples[idxAt];
-        const bg = new THREE.Group();
-        const cube = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.5, 1.5), boxMat);
-        const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false }));
-        glow.scale.setScalar(4);
-        bg.add(cube, glow);
-        bg.position.set(s.p.x + s.right.x * lat, s.y + 1.6, s.p.z + s.right.z * lat);
-        bg.userData = { idx: idxAt, lat, takenT: 0, baseY: s.y + 1.6 };
-        group.add(bg);
-        userData.itemBoxes.push(bg);
-      }
-    }
-  }
-
-  // ── 10. coins ──
-  {
-    const coinMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.85, roughness: 0.2, emissive: 0x8a6d00, emissiveIntensity: 0.4 });
-    const coinGeo = new THREE.CylinderGeometry(0.75, 0.75, 0.14, 18);
-    for (let r2 = 0; r2 < 6; r2++) {
-      const startIdx = Math.floor((0.08 + r2 * 0.155) * N);
-      const lat = [-3, 0, 3][(rng() * 3) | 0];
-      for (let k = 0; k < 5; k++) {
-        const idxAt = (startIdx + k * 3) % N;
-        const s = samples[idxAt];
-        const c = new THREE.Mesh(coinGeo, coinMat);
-        c.rotation.x = Math.PI / 2;
-        const cg = new THREE.Group();
-        cg.add(c);
-        cg.position.set(s.p.x + s.right.x * lat, s.y + 1.1, s.p.z + s.right.z * lat);
-        cg.userData = { idx: idxAt, lat, takenT: 0 };
-        group.add(cg);
-        userData.coins.push(cg);
-      }
-    }
-  }
-
-  // ── 11. hot air balloons ──
-  {
-    const nBal = 2 + Math.floor(rng() * 2);
-    const cols = ['#e63946', '#38bdf8', '#ffd23f', '#84cc16', '#ff70a6'];
-    for (let i = 0; i < nBal; i++) {
-      const bg = new THREE.Group();
-      const tex = TEX.balloonTexture(cols[(rng() * 5) | 0], cols[(rng() * 5) | 0]);
-      const env = new THREE.Mesh(new THREE.SphereGeometry(5, 16, 12), new THREE.MeshLambertMaterial({ map: tex }));
-      env.scale.y = 1.15;
-      const basket = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.4, 1.6), new THREE.MeshLambertMaterial({ color: 0x8a5a2b }));
-      basket.position.y = -7;
-      for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
-        bg.add(tube(V3(sx * 0.7, -6.3, sz * 0.7), V3(sx * 2.4, -3.4, sz * 2.4), 0.05, new THREE.MeshLambertMaterial({ color: 0x4a3728 }), 4));
-      }
-      bg.add(env, basket);
-      const a = rng() * Math.PI * 2;
-      bg.position.set(Math.cos(a) * (baseR * 0.5 + rng() * baseR), 45 + rng() * 35, Math.sin(a) * (baseR * 0.5 + rng() * baseR));
-      bg.userData = { bobPhase: rng() * 9, driftA: a, baseY: bg.position.y };
-      group.add(bg);
-      userData.balloons.push(bg);
-    }
-  }
-
-  return { group, samples, N, roadHalf, length, curve, userData, theme, sunDir: V3(0.5, 0.7, 0.35).normalize() };
+  return g;
 }
 
-// ═══════════════════════════ GARAGE ═════════════════════════════════════════
-
-export function buildGarageWorld() {
+export function buildWheelAssembly(radius = 0.34, condition = 0.85) {
   const g = new THREE.Group();
-  const userData = { balloons: [], clouds: [] };
-  const rng = mulberry32(12345);
+  const tire = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 0.22, 18), matRubber);
+  tire.rotation.z = Math.PI / 2;
+  tire.castShadow = true;
+  g.add(tire);
 
-  // sand
-  const sand = new THREE.Mesh(new THREE.CircleGeometry(700, 48), new THREE.MeshLambertMaterial({ color: 0xecd9a0 }));
-  sand.rotation.x = -Math.PI / 2;
-  sand.position.y = -0.05;
-  sand.receiveShadow = true;
-  g.add(sand);
-
-  // sea
-  const sea = new THREE.Mesh(new THREE.PlaneGeometry(2600, 2600), new THREE.MeshPhongMaterial({ color: 0x1e90c8, shininess: 90, transparent: true, opacity: 0.92 }));
-  sea.rotation.x = -Math.PI / 2;
-  sea.position.y = -0.7;
-  g.add(sea);
-
-  // cobble platform
-  const plat = new THREE.Mesh(new THREE.CylinderGeometry(6.4, 6.8, 0.55, 36),
-    new THREE.MeshLambertMaterial({ map: TEX.roadTexture({ type: 'cobble', base: '#b7a58c', edge: '#d6c9ae', line: '#b7a58c' }, 7) }));
-  plat.position.y = 0.27;
-  plat.receiveShadow = true;
-  g.add(plat);
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(6.6, 0.28, 10, 36), new THREE.MeshLambertMaterial({ color: 0x8f8168 }));
-  rim.rotation.x = Math.PI / 2;
-  rim.position.y = 0.5;
+  const rimMat = condition > 0.7 ? matChrome : matDarkMetal;
+  const rim = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.58, radius * 0.58, 0.23, 14), rimMat);
+  rim.rotation.z = Math.PI / 2;
   g.add(rim);
 
-  // car & driver anchors
-  const carAnchor = new THREE.Group();
-  carAnchor.position.y = 0.55;
-  g.add(carAnchor);
-  const driverAnchor = new THREE.Group();
-  driverAnchor.position.set(4.6, 0.55, 2.2);
-  driverAnchor.rotation.y = -0.6;
-  g.add(driverAnchor);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.26, radius * 0.26, 0.25, 10), matChrome);
+  cap.rotation.z = Math.PI / 2;
+  g.add(cap);
 
-  // palms
-  const palmGeos = [];
-  for (let i = 0; i < 7; i++) {
-    const a = (i / 7) * Math.PI * 2 + 0.4;
-    const rr = 10 + rng() * 14;
-    for (const gg of PROPS.palm(rng)) {
-      gg.scale(new THREE.Vector3(1.1, 1.1, 1.1));
-      gg.translate(Math.cos(a) * rr, 0, Math.sin(a) * rr);
-      palmGeos.push(gg);
+  return g;
+}
+
+export function buildEngineBlockMesh(engineId = 'eng_i4_1200', condition = 0.85) {
+  const g = new THREE.Group();
+  const isV8 = engineId === 'eng_v8_5000';
+  const isDiesel = engineId === 'eng_diesel_6500';
+  const blockMat = new THREE.MeshStandardMaterial({
+    color: isV8 ? 0xb91c1c : isDiesel ? 0x0369a1 : 0x475569,
+    roughness: clamp(0.85 - condition * 0.45, 0.25, 0.9),
+    metalness: 0.7,
+  });
+
+  // Main engine block
+  const block = new THREE.Mesh(
+    new THREE.BoxGeometry(isV8 ? 0.52 : isDiesel ? 0.48 : 0.36, isDiesel ? 0.42 : 0.36, isDiesel ? 0.62 : 0.52),
+    blockMat
+  );
+  block.castShadow = true;
+  g.add(block);
+
+  if (isV8) {
+    // Dual angled V8 cylinder banks + chrome air scoop
+    const bankL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.18, 0.48), matChrome);
+    bankL.position.set(-0.18, 0.14, 0);
+    bankL.rotation.z = 0.45;
+    const bankR = bankL.clone();
+    bankR.position.x = 0.18;
+    bankR.rotation.z = -0.45;
+    const scoop = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.11, 14), matChrome);
+    scoop.position.set(0, 0.26, 0);
+    g.add(bankL, bankR, scoop);
+  } else if (isDiesel) {
+    // Heavy 6-cylinder Bus Turbo-Diesel manifold & turbo snail
+    const cover = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.12, 0.56), matChrome);
+    cover.position.set(0, 0.24, 0);
+    const turbo = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.14, 12), matChrome);
+    turbo.rotation.z = Math.PI / 2;
+    turbo.position.set(0.22, 0.18, 0.12);
+    g.add(cover, turbo);
+  } else {
+    // Inline-4 valve cover + round air filter
+    const cover = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.10, 0.46), matChrome);
+    cover.position.set(0, 0.22, 0);
+    const airFilter = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.08, 12), matDarkMetal);
+    airFilter.position.set(0.08, 0.28, 0.04);
+    g.add(cover, airFilter);
+  }
+
+  // Yellow/Orange Oil Filler Cap on top of engine
+  const oilCap = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.038, 0.038, 0.05, 10),
+    new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.3 })
+  );
+  oilCap.position.set(-0.06, 0.29, 0.16);
+  oilCap.name = 'oilCap';
+  g.add(oilCap);
+
+  // Belt pulley at front (+Z)
+  const pulley = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.05, 12), matDarkMetal);
+  pulley.rotation.x = Math.PI / 2;
+  pulley.position.set(0, -0.04, 0.28);
+  g.add(pulley);
+
+  return g;
+}
+
+export function buildRadiatorCoreMesh(radiatorId = 'rad_std', condition = 0.85) {
+  const g = new THREE.Group();
+  const isHeavy = radiatorId === 'rad_heavy';
+  const coreMat = isHeavy
+    ? matCopper
+    : new THREE.MeshStandardMaterial({
+        color: radiatorId === 'rad_rusty' ? 0x78350f : 0x334155,
+        roughness: 0.75,
+        metalness: 0.65,
+      });
+
+  const core = new THREE.Mesh(new THREE.BoxGeometry(isHeavy ? 0.68 : 0.56, 0.42, 0.09), coreMat);
+  core.castShadow = true;
+  g.add(core);
+
+  const topTank = new THREE.Mesh(new THREE.BoxGeometry(isHeavy ? 0.70 : 0.58, 0.07, 0.11), matDarkMetal);
+  topTank.position.y = 0.23;
+  g.add(topTank);
+
+  // Silver Radiator Pressure Cap on top
+  const radCap = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.05, 10), matChrome);
+  radCap.position.set(0, 0.28, 0);
+  radCap.name = 'radCap';
+  g.add(radCap);
+
+  return g;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 2. ARTICULATED 3D VEHICLE BUILDER (Doors, Hood, Trunk, Engine Bay, Cockpit)
+// ══════════════════════════════════════════════════════════════════════════════
+export function buildVehicle(carState) {
+  const arch = CAR_BY_ID[carState.archId] || CAR_BY_ID.sedan;
+  const root = new THREE.Group();
+  const bodyGroup = new THREE.Group();
+  root.add(bodyGroup);
+
+  const W = arch.width;
+  const L = arch.length;
+  const cy = arch.chassisY;
+  const cabH = arch.cabinHeight;
+  const isBus = arch.id === 'bus' || arch.id === 'megabus';
+
+  // ── Underbody Ambient Occlusion Contact Shadow ──
+  const aoShadowMat = new THREE.MeshBasicMaterial({
+    map: carShadowTexture(),
+    transparent: true,
+    opacity: 0.72,
+    depthWrite: false,
+  });
+  const aoShadow = new THREE.Mesh(new THREE.PlaneGeometry(W * 1.42, L * 1.24), aoShadowMat);
+  aoShadow.rotation.x = -Math.PI / 2;
+  aoShadow.position.set(0, 0.03, 0);
+  root.add(aoShadow);
+
+  const paintMats = [];
+  const makePaintMat = () => {
+    const m = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(carState.paintHex || arch.defaultColor),
+      map: rustMetalTexture(1 - (carState.condition ?? 0.65)),
+      roughness: clamp(0.75 - (carState.condition ?? 0.65) * 0.48, 0.22, 0.85),
+      metalness: clamp(0.18 + (carState.condition ?? 0.65) * 0.35, 0.15, 0.6),
+    });
+    paintMats.push(m);
+    return m;
+  };
+  const bodyPaintMat = makePaintMat();
+
+  // ── Underbody Frame & Floor Pan ──
+  const floorPan = new THREE.Mesh(new THREE.BoxGeometry(W * 0.94, 0.14, L * 0.94), matDarkMetal);
+  floorPan.position.set(0, cy, 0);
+  floorPan.castShadow = true;
+  floorPan.receiveShadow = true;
+  bodyGroup.add(floorPan);
+
+  // ── Front Fenders (Left & Right of Engine Bay) ──
+  const frontLen = L * 0.31;
+  const frontZ = L * 0.5 - frontLen * 0.5;
+  const fenderH = 0.50;
+
+  const fenderL = new THREE.Mesh(new THREE.BoxGeometry(0.22, fenderH, frontLen), bodyPaintMat);
+  fenderL.position.set(W * 0.5 - 0.11, cy + fenderH * 0.5 + 0.04, frontZ);
+  fenderL.castShadow = true;
+  const fenderR = fenderL.clone();
+  fenderR.position.x = -(W * 0.5 - 0.11);
+  bodyGroup.add(fenderL, fenderR);
+
+  // Front Grille & Chrome Slat Bars
+  const grille = new THREE.Mesh(new THREE.BoxGeometry(W - 0.12, 0.36, 0.10), matDarkMetal);
+  grille.position.set(0, cy + 0.28, L * 0.5 - 0.04);
+  bodyGroup.add(grille);
+  for (let s = -2; s <= 2; s++) {
+    const slat = new THREE.Mesh(new THREE.BoxGeometry(W - 0.22, 0.025, 0.12), matChrome);
+    slat.position.set(0, cy + 0.28 + s * 0.055, L * 0.5 - 0.035);
+    bodyGroup.add(slat);
+  }
+
+  // Dual Exhaust Tailpipes at Rear (-Z)
+  const exhL = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.36, 10), matChrome);
+  exhL.rotation.x = Math.PI / 2;
+  exhL.position.set(W * 0.28, cy - 0.03, -L * 0.5 - 0.06);
+  const exhR = exhL.clone();
+  exhR.position.x = -W * 0.28;
+  bodyGroup.add(exhL, exhR);
+
+  // Side Chrome Trim Molding Strips & Wing Mirrors
+  const trimL = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.035, L * 0.92), matChrome);
+  trimL.position.set(W * 0.5 + 0.005, cy + 0.30, 0);
+  const trimR = trimL.clone();
+  trimR.position.x = -(W * 0.5 + 0.005);
+  bodyGroup.add(trimL, trimR);
+
+  // Chrome Bumpers
+  const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(W + 0.08, 0.13, 0.14), matChrome);
+  frontBumper.position.set(0, cy + 0.08, L * 0.5 + 0.04);
+  const rearBumper = frontBumper.clone();
+  rearBumper.position.z = -(L * 0.5 + 0.04);
+  bodyGroup.add(frontBumper, rearBumper);
+
+  // License plates
+  const plateMat = new THREE.MeshStandardMaterial({ map: licensePlateTexture('TLD-1979'), roughness: 0.4 });
+  const plateF = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.11, 0.02), plateMat);
+  plateF.position.set(0, cy + 0.08, L * 0.5 + 0.115);
+  const plateR = plateF.clone();
+  plateR.position.z = -(L * 0.5 + 0.115);
+  bodyGroup.add(plateF, plateR);
+
+  // ── Rear Quarter Panels & Trunk Well ──
+  const rearLen = arch.id === 'pickup' ? L * 0.38 : L * 0.28;
+  const rearZ = -(L * 0.5 - rearLen * 0.5);
+  const qPanelL = new THREE.Mesh(new THREE.BoxGeometry(0.20, fenderH, rearLen), bodyPaintMat);
+  qPanelL.position.set(W * 0.5 - 0.10, cy + fenderH * 0.5 + 0.04, rearZ);
+  qPanelL.castShadow = true;
+  const qPanelR = qPanelL.clone();
+  qPanelR.position.x = -(W * 0.5 - 0.10);
+  const rearBackWall = new THREE.Mesh(new THREE.BoxGeometry(W - 0.12, fenderH * 0.85, 0.12), bodyPaintMat);
+  rearBackWall.position.set(0, cy + fenderH * 0.42 + 0.04, -L * 0.5 + 0.06);
+  bodyGroup.add(qPanelL, qPanelR, rearBackWall);
+
+  // External Fuel Filler Cap on Rear-Left Quarter Panel
+  const fuelCapMesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.065, 0.065, 0.04, 12),
+    new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.35, metalness: 0.6 })
+  );
+  fuelCapMesh.rotation.z = Math.PI / 2;
+  fuelCapMesh.position.set(W * 0.5 + 0.01, cy + 0.44, rearZ + 0.12);
+  bodyGroup.add(fuelCapMesh);
+  tagInteractable(fuelCapMesh, { type: 'car_fuel_cap', car: carState });
+
+  // ── Cabin Pillars, Roof & Windshield ──
+  const cabLen = L - frontLen - rearLen;
+  const cabCenterZ = (L * 0.5 - frontLen) - cabLen * 0.5;
+  const beltY = cy + fenderH + 0.04;
+  const roofY = beltY + cabH;
+
+  // Firewall between engine bay & cabin
+  const firewall = new THREE.Mesh(new THREE.BoxGeometry(W - 0.16, fenderH + 0.08, 0.10), matDarkMetal);
+  firewall.position.set(0, cy + fenderH * 0.5 + 0.04, L * 0.5 - frontLen);
+  bodyGroup.add(firewall);
+
+  // Roof panel
+  const roofLen = isBus ? L * 0.94 : arch.id === 'pickup' || arch.id === 'truck' ? cabLen * 0.78 : cabLen * 0.86;
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(W * 0.92, 0.11, roofLen), bodyPaintMat);
+  roof.position.set(0, roofY, isBus ? 0 : cabCenterZ);
+  roof.castShadow = true;
+  bodyGroup.add(roof);
+
+  // Side-View Wing Mirrors & Windshield Wipers
+  const mirrorL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.10, 0.06), matChrome);
+  mirrorL.position.set(W * 0.5 + 0.08, beltY + 0.12, cabCenterZ + roofLen * 0.44);
+  const mirrorR = mirrorL.clone();
+  mirrorR.position.x = -(W * 0.5 + 0.08);
+  bodyGroup.add(mirrorL, mirrorR);
+
+  // ── Archetype-Specific 3D Sculpted Features (Buses, Muscle V8, Cargo Truck, Camper Van, Buggy) ──
+  if (isBus) {
+    const busSideH = 0.96;
+    const sideWallL = new THREE.Mesh(new THREE.BoxGeometry(0.14, busSideH, L * 0.68), bodyPaintMat);
+    sideWallL.position.set(W * 0.5 - 0.07, cy + busSideH * 0.5 + 0.04, -0.15);
+    const sideWallR = sideWallL.clone();
+    sideWallR.position.x = -(W * 0.5 - 0.07);
+    bodyGroup.add(sideWallL, sideWallR);
+
+    // Classic cream/white horizontal bus stripe + lower chrome skirt
+    const stripeMat = new THREE.MeshStandardMaterial({ color: 0xfef9c3, roughness: 0.35 });
+    const stripeL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.18, L * 0.95), stripeMat);
+    stripeL.position.set(W * 0.5 - 0.06, cy + 0.72, 0);
+    const stripeR = stripeL.clone();
+    stripeR.position.x = -(W * 0.5 - 0.06);
+    bodyGroup.add(stripeL, stripeR);
+
+    // Panoramic bus side windows + window pillars
+    const winStep = 1.25;
+    for (let wz = -L * 0.36; wz <= L * 0.28; wz += winStep) {
+      const winPillarL = new THREE.Mesh(new THREE.BoxGeometry(0.09, cabH, 0.12), bodyPaintMat);
+      winPillarL.position.set(W * 0.46, beltY + cabH * 0.5, wz);
+      const winPillarR = winPillarL.clone();
+      winPillarR.position.x = -W * 0.46;
+      const winGlassL = new THREE.Mesh(new THREE.BoxGeometry(0.03, cabH * 0.84, winStep - 0.16), matGlass);
+      winGlassL.position.set(W * 0.46, beltY + cabH * 0.48, wz + winStep * 0.48);
+      const winGlassR = winGlassL.clone();
+      winGlassR.position.x = -W * 0.46;
+      bodyGroup.add(winPillarL, winPillarR, winGlassL, winGlassR);
     }
-  }
-  // cabana house
-  for (const gg of PROPS.house(rng)) { gg.scale(new THREE.Vector3(1.5, 1.5, 1.5)); gg.rotateY(2.4); gg.translate(-14, 0, -10); palmGeos.push(gg); }
-  for (const gg of PROPS.awning(rng)) { gg.rotateY(-2.2); gg.translate(-9.5, 0, -4); palmGeos.push(gg); }
-  for (const gg of PROPS.crate(rng)) { gg.translate(-7, 0, -3); palmGeos.push(gg); }
-  for (const gg of PROPS.surf(rng)) { gg.translate(-6.6, 0, -8.6); palmGeos.push(gg); }
-  for (const gg of PROPS.surf(rng)) { gg.translate(8.5, 0, -7.5); palmGeos.push(gg); }
-  for (const gg of PROPS.lantern(rng)) { gg.translate(5, 0, -7); palmGeos.push(gg); }
-  for (const gg of PROPS.lantern(rng)) { gg.translate(-5, 0, 7); palmGeos.push(gg); }
-  for (const gg of PROPS.palm(rng)) { gg.translate(12, 0, -14); palmGeos.push(gg); }
-  const decor = new THREE.Mesh(mergeGeometries(palmGeos, false), new THREE.MeshLambertMaterial({ vertexColors: true }));
-  decor.castShadow = true;
-  decor.receiveShadow = true;
-  g.add(decor);
 
-  // string lights between poles
-  const lightMat = new THREE.MeshBasicMaterial({ color: 0xffe9a0 });
-  for (let i = 0; i <= 14; i++) {
-    const t = i / 14;
-    const x = lerp(5, -5, t), z = lerp(-7, 7, t);
-    const y = 3.2 - Math.sin(t * Math.PI) * 0.8;
-    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 5), lightMat);
-    bulb.position.set(x, y, z);
-    g.add(bulb);
+    // Bus Rooftop AC Unit, Ventilation Hatches & Illuminated Destination Board
+    const acPod = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.24, 2.2), matChrome);
+    acPod.position.set(0, roofY + 0.14, 0);
+    bodyGroup.add(acPod);
+    for (const hz of [-L * 0.28, L * 0.28]) {
+      const hatch = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.14, 0.78), matDarkMetal);
+      hatch.position.set(0, roofY + 0.08, hz);
+      bodyGroup.add(hatch);
+    }
+    const destLabel = arch.id === 'megabus' ? 'ROYAL LINER 5000KM' : '5000 KM EXPRESS';
+    const destBoard = new THREE.Mesh(
+      new THREE.BoxGeometry(1.75, 0.32, 0.08),
+      new THREE.MeshStandardMaterial({
+        map: signTexture(destLabel, '#0f172a', '#fde047'),
+        emissive: new THREE.Color(0xfef08a),
+        emissiveIntensity: 0.45,
+      })
+    );
+    destBoard.position.set(0, roofY - 0.15, L * 0.47);
+    bodyGroup.add(destBoard);
+
+    // Passenger Seat Rows & Yellow Handrails inside the Bus
+    for (let sz = -L * 0.32; sz <= L * 0.20; sz += 1.05) {
+      const rowL = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.58, 0.48), matSeatVinyl);
+      rowL.position.set(W * 0.27, cy + 0.44, sz);
+      const rowR = rowL.clone();
+      rowR.position.x = -W * 0.27;
+      bodyGroup.add(rowL, rowR);
+    }
+  } else if (arch.id === 'muscle') {
+    // Hood V8 Power-Scoop & Rear Aerodynamic Spoiler Wing
+    const scoop = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.14, 0.75), matDarkMetal);
+    scoop.position.set(0, beltY + 0.08, frontZ);
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(W * 0.92, 0.06, 0.24), matDarkMetal);
+    wing.position.set(0, beltY + 0.22, -L * 0.46);
+    const strutL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.20, 0.12), matDarkMetal);
+    strutL.position.set(W * 0.32, beltY + 0.12, -L * 0.46);
+    const strutR = strutL.clone();
+    strutR.position.x = -W * 0.32;
+    bodyGroup.add(scoop, wing, strutL, strutR);
+  } else if (arch.id === 'truck' || arch.id === 'pickup') {
+    // Front Steel Bullbar, Cab Rollbar with Spotlights & Wooden Cargo Bed Sides
+    const bullbar = new THREE.Mesh(new THREE.BoxGeometry(W * 0.85, 0.42, 0.08), matDarkMetal);
+    bullbar.position.set(0, cy + 0.32, L * 0.5 + 0.12);
+    const rollbar = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, W * 0.88, 10), matDarkMetal);
+    rollbar.rotation.z = Math.PI / 2;
+    rollbar.position.set(0, roofY + 0.14, cabCenterZ - roofLen * 0.45);
+    const bedSideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.38, rearLen * 0.92), matWood);
+    bedSideL.position.set(W * 0.46, beltY + 0.18, rearZ);
+    const bedSideR = bedSideL.clone();
+    bedSideR.position.x = -W * 0.46;
+    bodyGroup.add(bullbar, rollbar, bedSideL, bedSideR);
+  } else if (arch.id === 'van') {
+    // Rooftop Expedition Rack with Spare Wheel
+    const rack = new THREE.Mesh(new THREE.BoxGeometry(W * 0.78, 0.08, roofLen * 0.68), matDarkMetal);
+    rack.position.set(0, roofY + 0.09, cabCenterZ - 0.2);
+    const roofSpare = buildWheelAssembly(0.30, 0.9);
+    roofSpare.rotation.z = Math.PI / 2;
+    roofSpare.position.set(0, roofY + 0.22, cabCenterZ - 0.3);
+    bodyGroup.add(rack, roofSpare);
+  } else if (arch.id === 'buggy') {
+    // Exposed Tubular Roll-Cage & Roof LED Lightbar
+    const ledBar = new THREE.Mesh(new THREE.BoxGeometry(W * 0.68, 0.08, 0.10), matChrome);
+    ledBar.position.set(0, roofY + 0.08, cabCenterZ + roofLen * 0.45);
+    bodyGroup.add(ledBar);
   }
 
-  // sky
-  const sky = new THREE.Mesh(new THREE.SphereGeometry(1000, 20, 14),
-    new THREE.MeshBasicMaterial({ map: TEX.skyTexture(THEMES[0]), side: THREE.BackSide, fog: false, depthWrite: false }));
-  g.add(sky);
-  const sun = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX.glowTexture(), color: 0xfff2c0, transparent: true, fog: false, depthWrite: false, blending: THREE.AdditiveBlending }));
-  sun.position.set(300, 380, 200);
-  sun.scale.setScalar(200);
-  g.add(sun);
-  const cloudTex = TEX.cloudTexture();
-  for (let i = 0; i < 8; i++) {
-    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, transparent: true, opacity: 0.85, fog: false, depthWrite: false }));
-    const a = rng() * Math.PI * 2;
-    sp.position.set(Math.cos(a) * (200 + rng() * 300), 70 + rng() * 90, Math.sin(a) * (200 + rng() * 300));
-    sp.scale.set(120 + rng() * 120, 50 + rng() * 50, 1);
-    sp.userData.drift = 1 + rng() * 1.5;
-    g.add(sp);
-    userData.clouds.push(sp);
-  }
-  // balloons
-  for (let i = 0; i < 2; i++) {
-    const bg = new THREE.Group();
-    const tex = TEX.balloonTexture(i ? '#e63946' : '#38bdf8', '#ffd23f');
-    const env = new THREE.Mesh(new THREE.SphereGeometry(4, 14, 10), new THREE.MeshLambertMaterial({ map: tex }));
-    env.scale.y = 1.15;
-    const basket = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.1, 1.3), new THREE.MeshLambertMaterial({ color: 0x8a5a2b }));
-    basket.position.y = -5.6;
-    bg.add(env, basket);
-    bg.position.set(i ? -120 : 150, 40 + i * 14, i ? -140 : -90);
-    bg.userData = { bobPhase: i * 3, baseY: bg.position.y };
-    g.add(bg);
-    userData.balloons.push(bg);
+  // 4 Cabin Pillars (A-pillars & C-pillars)
+  const pillarGeo = new THREE.BoxGeometry(0.08, cabH + 0.06, 0.08);
+  const pFL = new THREE.Mesh(pillarGeo, bodyPaintMat);
+  pFL.position.set(W * 0.43, beltY + cabH * 0.5, cabCenterZ + roofLen * 0.48);
+  const pFR = pFL.clone();
+  pFR.position.x = -W * 0.43;
+  const pRL = pFL.clone();
+  pRL.position.z = cabCenterZ - roofLen * 0.48;
+  const pRR = pFR.clone();
+  pRR.position.z = cabCenterZ - roofLen * 0.48;
+  bodyGroup.add(pFL, pFR, pRL, pRR);
+
+  // Front & Rear Windshields
+  const wsFront = new THREE.Mesh(new THREE.BoxGeometry(W * 0.84, cabH * 0.92, 0.03), matGlass);
+  wsFront.position.set(0, beltY + cabH * 0.48, cabCenterZ + roofLen * 0.50);
+  wsFront.rotation.x = -0.22;
+  const wsRear = new THREE.Mesh(new THREE.BoxGeometry(W * 0.82, cabH * 0.88, 0.03), matGlass);
+  wsRear.position.set(0, beltY + cabH * 0.48, cabCenterZ - roofLen * 0.50);
+  wsRear.rotation.x = 0.20;
+  bodyGroup.add(wsFront, wsRear);
+
+  // ── Hinged Left & Right Doors ──
+  // Note: Driver sits on Left side (+X in our car local coordinate system where +Z is forward, +X is Left, -X is Right)
+  // Wait: in Three.js right-handed coords: if +Z is forward and +Y is up, then cross(up, forward) = (+X) is LEFT!
+  // Let's verify: thumb = +X (Left), index = +Y (Up), middle = +Z (Forward). Yes! +X is Left (Driver's side), -X is Right (Passenger side).
+  const doorLen = cabLen * 0.72;
+  const doorH = fenderH;
+
+  const doorLGroup = new THREE.Group();
+  doorLGroup.position.set(W * 0.5 - 0.06, cy + 0.06, cabCenterZ + doorLen * 0.5); // hinge at front of door
+  const doorLPanel = new THREE.Mesh(new THREE.BoxGeometry(0.09, doorH, doorLen), bodyPaintMat);
+  doorLPanel.position.set(0, doorH * 0.5, -doorLen * 0.5);
+  doorLPanel.castShadow = true;
+  const doorLHandle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.04, 0.14), matChrome);
+  doorLHandle.position.set(0.05, doorH * 0.78, -doorLen * 0.82);
+  const doorLFrame = new THREE.Mesh(new THREE.BoxGeometry(0.05, cabH * 0.86, doorLen * 0.92), matGlass);
+  doorLFrame.position.set(-0.02, doorH + cabH * 0.42, -doorLen * 0.5);
+  doorLGroup.add(doorLPanel, doorLHandle, doorLFrame);
+  bodyGroup.add(doorLGroup);
+  tagInteractable(doorLGroup, { type: 'car_door', side: 'L', car: carState });
+
+  const doorRGroup = new THREE.Group();
+  doorRGroup.position.set(-(W * 0.5 - 0.06), cy + 0.06, cabCenterZ + doorLen * 0.5);
+  const doorRPanel = doorLPanel.clone();
+  const doorRHandle = doorLHandle.clone();
+  doorRHandle.position.x = -0.05;
+  const doorRFrame = doorLFrame.clone();
+  doorRGroup.add(doorRPanel, doorRHandle, doorRFrame);
+  bodyGroup.add(doorRGroup);
+  tagInteractable(doorRGroup, { type: 'car_door', side: 'R', car: carState });
+
+  // ── Hinged Front Hood (Bonnet) ──
+  const hoodGroup = new THREE.Group();
+  // Hinge near windshield, lifts up from the front
+  hoodGroup.position.set(0, beltY, L * 0.5 - frontLen + 0.05);
+  const hoodPanel = new THREE.Mesh(new THREE.BoxGeometry(W - 0.36, 0.07, frontLen - 0.08), bodyPaintMat);
+  hoodPanel.position.set(0, 0.02, (frontLen - 0.08) * 0.5);
+  hoodPanel.castShadow = true;
+  hoodGroup.add(hoodPanel);
+  bodyGroup.add(hoodGroup);
+  tagInteractable(hoodGroup, { type: 'car_hood', car: carState });
+
+  // ── Hinged Rear Trunk Lid (Boot) ──
+  const trunkGroup = new THREE.Group();
+  trunkGroup.position.set(0, beltY, -(L * 0.5 - rearLen + 0.04));
+  const trunkPanel = new THREE.Mesh(
+    new THREE.BoxGeometry(W - 0.36, 0.07, rearLen - 0.08),
+    arch.id === 'pickup' ? matWood : bodyPaintMat
+  );
+  trunkPanel.position.set(0, 0.02, -(rearLen - 0.08) * 0.5);
+  trunkPanel.castShadow = true;
+  trunkGroup.add(trunkPanel);
+  bodyGroup.add(trunkGroup);
+  tagInteractable(trunkGroup, { type: 'car_trunk', car: carState });
+
+  // ── 3D Engine Bay (Under the Hood) ──
+  const engineBay = new THREE.Group();
+  engineBay.position.set(0, cy + 0.28, frontZ);
+  bodyGroup.add(engineBay);
+
+  const engineMount = new THREE.Group();
+  engineMount.position.set(0, 0.02, -0.10);
+  engineBay.add(engineMount);
+
+  const radiatorMount = new THREE.Group();
+  radiatorMount.position.set(0, 0.02, frontLen * 0.38);
+  engineBay.add(radiatorMount);
+
+  // 12V Car Battery in Engine Bay
+  const batteryMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(0.24, 0.20, 0.18),
+    new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 })
+  );
+  batteryMesh.position.set(W * 0.24, 0.02, -0.16);
+  engineBay.add(batteryMesh);
+
+  // ── 3D Trunk Cargo Bay (6-8 Physical Mount Slots) ──
+  const cargoMountGroup = new THREE.Group();
+  cargoMountGroup.position.set(0, cy + 0.10, rearZ);
+  bodyGroup.add(cargoMountGroup);
+
+  // Invisible interactive hit-box inside the trunk floor so player can look at trunk bay and press [F]/[G] to stow
+  const trunkBayHitbox = new THREE.Mesh(
+    new THREE.BoxGeometry(W - 0.38, 0.34, rearLen - 0.16),
+    new THREE.MeshStandardMaterial({ color: 0x1e2126, roughness: 0.9 })
+  );
+  trunkBayHitbox.position.set(0, 0.05, 0);
+  cargoMountGroup.add(trunkBayHitbox);
+  tagInteractable(trunkBayHitbox, { type: 'car_trunk_bay', car: carState });
+
+  // ── 3D Interior Cockpit (Seats, Dashboard, Gauges, Steering Wheel, Radio, Handbrake) ──
+  const driverX = W * 0.23; // Left side (+X)
+  const seatZ = cabCenterZ - 0.05;
+
+  // Driver & Passenger Seats
+  const makeSeat = (xPos, isDriver) => {
+    const sg = new THREE.Group();
+    sg.position.set(xPos, cy + 0.10, seatZ);
+    const cushion = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.14, 0.50), matSeatVinyl);
+    cushion.position.y = 0.10;
+    const backrest = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.56, 0.11), matSeatVinyl);
+    backrest.position.set(0, 0.42, -0.20);
+    backrest.rotation.x = -0.12;
+    const headrest = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.16, 0.09), matSeatVinyl);
+    headrest.position.set(0, 0.76, -0.24);
+    sg.add(cushion, backrest, headrest);
+    if (isDriver) {
+      tagInteractable(sg, { type: 'car_seat', car: carState });
+    }
+    return sg;
+  };
+  const seatDriver = makeSeat(driverX, true);
+  const seatPass = makeSeat(-driverX, false);
+  bodyGroup.add(seatDriver, seatPass);
+
+  // Dashboard Beam
+  const dashZ = cabCenterZ + cabLen * 0.36;
+  const dashY = beltY - 0.05;
+  const dash = new THREE.Mesh(new THREE.BoxGeometry(W - 0.20, 0.26, 0.34), matDashPlastic);
+  dash.position.set(0, dashY, dashZ);
+  bodyGroup.add(dash);
+
+  // Illuminated Gauge Cluster on Driver's Side (+X)
+  const gaugeTex = dashGaugeTexture();
+  const gaugeFaceMat = new THREE.MeshStandardMaterial({
+    map: gaugeTex,
+    emissive: new THREE.Color(0xfffbeb),
+    emissiveMap: gaugeTex,
+    emissiveIntensity: 0.55,
+    roughness: 0.3,
+  });
+  const gaugeCluster = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.20), gaugeFaceMat);
+  // Face towards the driver (-Z direction, since driver looks toward +Z)
+  gaugeCluster.rotation.y = Math.PI;
+  gaugeCluster.position.set(driverX, dashY + 0.04, dashZ - 0.172);
+  bodyGroup.add(gaugeCluster);
+
+  // 3D Gauge Needles (Speed, Temp, Fuel)
+  const makeNeedle = (offsetX, color = 0xef4444, len = 0.058) => {
+    const pivot = new THREE.Group();
+    // Note: in gaugeCluster's frame (facing -Z), left on texture is +X in world
+    pivot.position.set(driverX + offsetX, dashY + 0.04, dashZ - 0.175);
+    const bar = new THREE.Mesh(
+      new THREE.BoxGeometry(0.008, len, 0.006),
+      new THREE.MeshBasicMaterial({ color })
+    );
+    bar.position.y = len * 0.42;
+    pivot.add(bar);
+    bodyGroup.add(pivot);
+    return pivot;
+  };
+  const dashNeedles = {
+    speed: makeNeedle(0.105, 0xef4444, 0.062),
+    temp: makeNeedle(-0.055, 0xfbbf24, 0.045),
+    fuel: makeNeedle(-0.165, 0x38bdf8, 0.038),
+  };
+
+  // Interactive Car Radio in Center Console
+  const radioMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(0.28, 0.10, 0.06),
+    new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      emissive: new THREE.Color(0x10b981),
+      emissiveIntensity: 0.45,
+      roughness: 0.35,
+    })
+  );
+  radioMesh.position.set(0, dashY + 0.02, dashZ - 0.16);
+  bodyGroup.add(radioMesh);
+  tagInteractable(radioMesh, { type: 'car_radio', car: carState });
+
+  // Steering Column & Rotating 3D Steering Wheel
+  const steeringWheel = new THREE.Group();
+  steeringWheel.position.set(driverX, dashY + 0.03, dashZ - 0.30);
+  steeringWheel.rotation.x = 0.32;
+  const wheelRim = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.020, 10, 24), matRubber);
+  const spokeH = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.028, 0.02), matChrome);
+  const spokeV = new THREE.Mesh(new THREE.BoxGeometry(0.032, 0.17, 0.02), matChrome);
+  spokeV.position.y = -0.08;
+  const hornPad = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 12), matDashPlastic);
+  hornPad.rotation.x = Math.PI / 2;
+  steeringWheel.add(wheelRim, spokeH, spokeV, hornPad);
+  bodyGroup.add(steeringWheel);
+  tagInteractable(steeringWheel, { type: 'car_seat', car: carState });
+
+  // Handbrake Lever & Gear Shifter between seats
+  const handbrakeLever = new THREE.Group();
+  handbrakeLever.position.set(0, cy + 0.16, seatZ + 0.12);
+  const hbRod = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.018, 0.32, 8), matDarkMetal);
+  hbRod.rotation.x = Math.PI / 3;
+  hbRod.position.set(0, 0.10, 0.10);
+  handbrakeLever.add(hbRod);
+  bodyGroup.add(handbrakeLever);
+
+  // ── Headlights (Lenses, Volumetric Cones & Real SpotLight) + Taillights ──
+  const headLampMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    emissive: new THREE.Color(0xfff6cc),
+    emissiveIntensity: 0,
+    roughness: 0.1,
+  });
+  const tailLampMat = new THREE.MeshStandardMaterial({
+    color: 0x991b1b,
+    emissive: new THREE.Color(0xef4444),
+    emissiveIntensity: 0.15,
+    roughness: 0.3,
+  });
+
+  const hlL = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.05, 14), headLampMat);
+  hlL.rotation.x = Math.PI / 2;
+  hlL.position.set(W * 0.35, cy + 0.32, L * 0.5 + 0.01);
+  const hlR = hlL.clone();
+  hlR.position.x = -W * 0.35;
+  bodyGroup.add(hlL, hlR);
+
+  // Volumetric light cones (visible when headlights are ON)
+  const coneGeo = new THREE.ConeGeometry(1.6, 12.0, 16, 1, true);
+  coneGeo.translate(0, -6.0, 0);
+  coneGeo.rotateX(-Math.PI / 2);
+  const coneMat = new THREE.MeshBasicMaterial({
+    color: 0xfff3c4,
+    transparent: true,
+    opacity: 0.11,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const beamL = new THREE.Mesh(coneGeo, coneMat);
+  beamL.position.copy(hlL.position);
+  beamL.visible = false;
+  const beamR = beamL.clone();
+  beamR.position.copy(hlR.position);
+  beamR.visible = false;
+  bodyGroup.add(beamL, beamR);
+
+  // Real Three.js SpotLight for illuminating the dark desert road at night
+  const headlightSpot = new THREE.SpotLight(0xfff4d2, 0, 95, Math.PI / 3.4, 0.48, 1.1);
+  headlightSpot.position.set(0, cy + 0.45, L * 0.5 + 0.1);
+  headlightSpot.target.position.set(0, cy - 0.3, L * 0.5 + 32);
+  bodyGroup.add(headlightSpot);
+  bodyGroup.add(headlightSpot.target);
+
+  // Rear Taillights
+  const tlL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.11, 0.04), tailLampMat);
+  tlL.position.set(W * 0.34, cy + 0.32, -L * 0.5 - 0.01);
+  const tlR = tlL.clone();
+  tlR.position.x = -W * 0.34;
+  bodyGroup.add(tlL, tlR);
+
+  // ── 4 Wheel Hubs & Detachable Tire Assemblies + Sculpted Wheel Arch Flares ──
+  const wheelRadius = isBus ? 0.44 : arch.id === 'truck' ? 0.40 : 0.34;
+  const halfWB = arch.wheelBase * 0.5;
+  const halfTrack = arch.trackWidth * 0.5;
+  const wheelCoords = [
+    { x: halfTrack, y: wheelRadius, z: halfWB, idx: 0, label: 'Front-Left' },
+    { x: -halfTrack, y: wheelRadius, z: halfWB, idx: 1, label: 'Front-Right' },
+    { x: halfTrack, y: wheelRadius, z: -halfWB, idx: 2, label: 'Rear-Left' },
+    { x: -halfTrack, y: wheelRadius, z: -halfWB, idx: 3, label: 'Rear-Right' },
+  ];
+
+  // Sculpted Wheel-Arch Fender Flares over each wheel
+  for (const wc of wheelCoords) {
+    const flare = new THREE.Mesh(
+      new THREE.CylinderGeometry(wheelRadius + 0.08, wheelRadius + 0.08, 0.26, 14, 1, false, 0, Math.PI),
+      matDarkMetal
+    );
+    flare.rotation.z = Math.PI / 2;
+    flare.rotation.y = Math.PI / 2;
+    flare.position.set(wc.x, wc.y + 0.02, wc.z);
+    bodyGroup.add(flare);
   }
 
-  return { group: g, carAnchor, driverAnchor, userData, theme: THEMES[0], sunDir: V3(0.5, 0.7, 0.35).normalize() };
+  const wheelHubs = wheelCoords.map((wc) => {
+    const steerPivot = new THREE.Group();
+    steerPivot.position.set(wc.x, wc.y, wc.z);
+    root.add(steerPivot);
+
+    const spinGroup = new THREE.Group();
+    steerPivot.add(spinGroup);
+
+    // Brake disc rotor (always present even if wheel is detached)
+    const rotor = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.06, 12), matDarkMetal);
+    rotor.rotation.z = Math.PI / 2;
+    spinGroup.add(rotor);
+
+    // Hitbox on hub so you can attach a wheel when empty
+    const hubHitbox = new THREE.Mesh(
+      new THREE.BoxGeometry(0.32, 0.62, 0.62),
+      new THREE.MeshBasicMaterial({ visible: false })
+    );
+    steerPivot.add(hubHitbox);
+    tagInteractable(hubHitbox, { type: 'car_wheel', wheelIndex: wc.idx, label: wc.label, car: carState });
+
+    return { steerPivot, spinGroup, tireMesh: null, wc };
+  });
+
+  // ── Helper to sync visual parts (Engine, Radiator, 4 Wheels, Trunk Cargo, Paint/Rust) ──
+  const syncParts = () => {
+    // Paint & Rust
+    const rustTex = rustMetalTexture(1 - (carState.condition ?? 0.65));
+    const col = new THREE.Color(carState.paintHex || arch.defaultColor);
+    for (const m of paintMats) {
+      m.color.copy(col);
+      m.map = rustTex;
+      m.roughness = clamp(0.75 - (carState.condition ?? 0.65) * 0.48, 0.22, 0.85);
+      m.metalness = clamp(0.18 + (carState.condition ?? 0.65) * 0.35, 0.15, 0.6);
+      m.needsUpdate = true;
+    }
+
+    // Engine Block in Engine Bay
+    while (engineMount.children.length) engineMount.remove(engineMount.children[0]);
+    if (carState.engineId) {
+      const em = buildEngineBlockMesh(carState.engineId, carState.engineCondition ?? 0.8);
+      tagInteractable(em, { type: 'car_engine', car: carState });
+      engineMount.add(em);
+    } else {
+      // Empty engine bay hitbox so player can install an engine
+      const emptyBox = new THREE.Mesh(
+        new THREE.BoxGeometry(0.48, 0.38, 0.52),
+        new THREE.MeshBasicMaterial({ color: 0x334155, wireframe: true, transparent: true, opacity: 0.25 })
+      );
+      tagInteractable(emptyBox, { type: 'car_engine', car: carState });
+      engineMount.add(emptyBox);
+    }
+
+    // Radiator in Engine Bay
+    while (radiatorMount.children.length) radiatorMount.remove(radiatorMount.children[0]);
+    if (carState.radiatorId) {
+      const rm = buildRadiatorCoreMesh(carState.radiatorId, carState.radiatorCondition ?? 0.8);
+      tagInteractable(rm, { type: 'car_radiator', car: carState });
+      radiatorMount.add(rm);
+    } else {
+      const emptyRad = new THREE.Mesh(
+        new THREE.BoxGeometry(0.60, 0.42, 0.14),
+        new THREE.MeshBasicMaterial({ color: 0x334155, wireframe: true, transparent: true, opacity: 0.25 })
+      );
+      tagInteractable(emptyRad, { type: 'car_radiator', car: carState });
+      radiatorMount.add(emptyRad);
+    }
+
+    // 4 Wheels
+    wheelHubs.forEach((wh, idx) => {
+      if (wh.tireMesh) {
+        wh.spinGroup.remove(wh.tireMesh);
+        wh.tireMesh = null;
+      }
+      const wState = carState.wheels[idx];
+      if (wState && wState.installed) {
+        const wm = buildWheelAssembly(wheelRadius, wState.condition ?? 0.85);
+        tagInteractable(wm, { type: 'car_wheel', wheelIndex: idx, label: wh.wc.label, car: carState });
+        wh.spinGroup.add(wm);
+        wh.tireMesh = wm;
+      }
+    });
+
+    // Trunk Stowed Cargo Visuals
+    // Keep index 0 (trunkBayHitbox), rebuild stowed items
+    while (cargoMountGroup.children.length > 1) {
+      cargoMountGroup.remove(cargoMountGroup.children[cargoMountGroup.children.length - 1]);
+    }
+    const trunkItems = carState.trunk || [];
+    trunkItems.forEach((itm, idx) => {
+      const im = buildItemMesh(itm);
+      const colIdx = idx % 3;
+      const rowIdx = Math.floor(idx / 3);
+      im.position.set((colIdx - 1) * 0.38, 0.08, (rowIdx - 0.5) * 0.36);
+      im.scale.setScalar(0.85);
+      tagInteractable(im, { type: 'trunk_item', item: itm, trunkIndex: idx, car: carState });
+      cargoMountGroup.add(im);
+    });
+  };
+
+  const meshRefs = {
+    root,
+    bodyGroup,
+    doorLGroup,
+    doorRGroup,
+    hoodGroup,
+    trunkGroup,
+    steeringWheel,
+    dashNeedles,
+    handbrakeLever,
+    headLampMat,
+    tailLampMat,
+    headlightSpot,
+    beamL,
+    beamR,
+    wheelHubs,
+    syncParts,
+  };
+
+  carState.mesh = meshRefs;
+  syncParts();
+  return meshRefs;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 3. STARTER HOUSE & GARAGE COMPOUND (0.0 KM — Mom's Letter, Workbench, Bed)
+// ══════════════════════════════════════════════════════════════════════════════
+export function buildStarterCompound() {
+  const g = new THREE.Group();
+  const stuccoMat = new THREE.MeshStandardMaterial({ map: stuccoWallTexture(), roughness: 0.9 });
+  const roofMat = new THREE.MeshStandardMaterial({ map: corrugatedTexture(), roughness: 0.75, metalness: 0.35 });
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x57534e, roughness: 0.92 });
+
+  // Concrete foundation pad for house + garage + driveway apron
+  const pad = new THREE.Mesh(new THREE.BoxGeometry(24, 0.16, 20), floorMat);
+  pad.position.set(-16, 0.02, 10);
+  pad.receiveShadow = true;
+  g.add(pad);
+
+  // Garage walls (open on +X side facing the highway so you can drive straight out!)
+  // Center of garage: x = -14, z = 14 (width 10, depth 9, height 4.2)
+  const garBack = new THREE.Mesh(new THREE.BoxGeometry(0.35, 4.2, 9.2), stuccoMat);
+  garBack.position.set(-19, 2.1, 14);
+  garBack.castShadow = true;
+  garBack.receiveShadow = true;
+
+  const garNorth = new THREE.Mesh(new THREE.BoxGeometry(10.2, 4.2, 0.35), stuccoMat);
+  garNorth.position.set(-14, 2.1, 18.5);
+  garNorth.castShadow = true;
+
+  const garRoof = new THREE.Mesh(new THREE.BoxGeometry(10.8, 0.25, 9.8), roofMat);
+  garRoof.position.set(-14, 4.3, 14);
+  garRoof.rotation.z = 0.05;
+  garRoof.castShadow = true;
+  g.add(garBack, garNorth, garRoof);
+
+  // Garage Workbench along North wall (x = -15, z = 17.6)
+  const benchTop = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.12, 1.1), matWood);
+  benchTop.position.set(-15, 0.95, 17.6);
+  benchTop.castShadow = true;
+  const leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.95, 0.95), matDarkMetal);
+  leg1.position.set(-17.3, 0.47, 17.6);
+  const leg2 = leg1.clone();
+  leg2.position.x = -12.7;
+  g.add(benchTop, leg1, leg2);
+
+  // Attached Living Quarters (South side of Garage: x = -15, z = 5.5, width 8, depth 8)
+  const houseBack = new THREE.Mesh(new THREE.BoxGeometry(0.35, 3.8, 8.2), stuccoMat);
+  houseBack.position.set(-19, 1.9, 5.5);
+  const houseSouth = new THREE.Mesh(new THREE.BoxGeometry(8.2, 3.8, 0.35), stuccoMat);
+  houseSouth.position.set(-15, 1.9, 1.5);
+  const houseFront = new THREE.Mesh(new THREE.BoxGeometry(0.35, 3.8, 5.2), stuccoMat);
+  houseFront.position.set(-11, 1.9, 4.0); // Leaves a 3m doorway opening at z = 6.6..9.5
+  const houseRoof = new THREE.Mesh(new THREE.BoxGeometry(8.8, 0.25, 8.6), roofMat);
+  houseRoof.position.set(-15, 3.9, 5.5);
+  houseRoof.castShadow = true;
+  g.add(houseBack, houseSouth, houseFront, houseRoof);
+
+  // Kitchen Table with Mom's Letter (x = -15.2, z = 5.2)
+  const tableTop = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.09, 1.2), matWood);
+  tableTop.position.set(-15.2, 0.82, 5.2);
+  const tableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 0.82, 8), matWood);
+  tableLeg.position.set(-15.2, 0.41, 5.2);
+  g.add(tableTop, tableLeg);
+
+  // Mom's Letter on the table!
+  const letterMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(0.36, 0.02, 0.44),
+    new THREE.MeshStandardMaterial({ map: letterPaperTexture(), roughness: 0.6 })
+  );
+  letterMesh.position.set(-14.9, 0.88, 5.2);
+  letterMesh.rotation.y = 0.25;
+  g.add(letterMesh);
+  tagInteractable(letterMesh, { type: 'mom_letter', name: "Mom's Letter (Read)" });
+
+  // Bed in the corner of the house (x = -17.4, z = 3.2) — press [E] to sleep & advance time!
+  const bedFrame = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.35, 1.3), matWood);
+  bedFrame.position.set(-17.4, 0.20, 3.0);
+  const mattress = new THREE.Mesh(
+    new THREE.BoxGeometry(2.1, 0.18, 1.2),
+    new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.85 })
+  );
+  mattress.position.set(-17.4, 0.42, 3.0);
+  const pillow = new THREE.Mesh(
+    new THREE.BoxGeometry(0.45, 0.12, 0.9),
+    new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.8 })
+  );
+  pillow.position.set(-18.1, 0.54, 3.0);
+  const bedGroup = new THREE.Group();
+  bedGroup.add(bedFrame, mattress, pillow);
+  g.add(bedGroup);
+  tagInteractable(bedGroup, { type: 'bed', name: 'Desert Cot (Rest 6 Hours & Heal)' });
+
+  // Outdoor Water Well / Spigot at x = -9.5, z = 2.5 (infinite water source!)
+  const wellGroup = buildWaterSpigot();
+  wellGroup.position.set(-9.5, 0, 2.5);
+  g.add(wellGroup);
+
+  // Highway Direction Signpost at driveway exit (x = -5.8, z = 18.0) pointing NORTH (+Z)
+  const signPole = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.12, 3.4, 8), matChrome);
+  signPole.position.set(-5.8, 1.7, 18.0);
+  const dirBoard = new THREE.Mesh(
+    new THREE.BoxGeometry(2.8, 0.95, 0.10),
+    new THREE.MeshStandardMaterial({
+      map: signTexture('HIGHWAY NORTH ↑', '#155e3b', '#fef08a'),
+      roughness: 0.4,
+    })
+  );
+  dirBoard.position.set(-5.8, 3.1, 18.0);
+  g.add(signPole, dirBoard);
+
+  // Warm interior point light inside garage
+  const garLight = new THREE.PointLight(0xffe4b5, 8, 18);
+  garLight.position.set(-14, 3.8, 14);
+  g.add(garLight);
+
+  // Colliders list for simple AABB / cylinder collision
+  const colliders = [
+    { minX: -19.3, maxX: -18.6, minZ: 1.3, maxZ: 18.7 }, // West back wall
+    { minX: -19.2, maxX: -9.0, minZ: 18.2, maxZ: 18.8 }, // North garage wall
+    { minX: -19.2, maxX: -10.8, minZ: 1.2, maxZ: 1.8 },  // South house wall
+    { minX: -11.3, maxX: -10.7, minZ: 1.4, maxZ: 6.6 },  // East house front wall
+  ];
+
+  return { group: g, colliders };
+}
+
+function buildWaterSpigot() {
+  const wg = new THREE.Group();
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.52, 0.5, 10), matDarkMetal);
+  base.position.y = 0.25;
+  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.2, 8), matChrome);
+  pipe.position.y = 0.85;
+  const spout = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.35, 8), matChrome);
+  spout.rotation.z = Math.PI / 2;
+  spout.position.set(0.16, 1.32, 0);
+  const wheel = new THREE.Mesh(
+    new THREE.TorusGeometry(0.12, 0.025, 6, 12),
+    new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.4 })
+  );
+  wheel.rotation.x = Math.PI / 2;
+  wheel.position.set(0, 1.46, 0);
+  wg.add(base, pipe, spout, wheel);
+  tagInteractable(wg, { type: 'water_pump', name: 'Desert Well Spigot (Drink / Fill Water Container)' });
+  return wg;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 4. ROADSIDE POIs (Gas Station, Diner + Water Tower, Garage, Radio Tower)
+// ══════════════════════════════════════════════════════════════════════════════
+export function buildRoadsidePOI(poiDef, seed) {
+  const r = mulberry32(seed);
+  const g = new THREE.Group();
+  const stuccoMat = new THREE.MeshStandardMaterial({ map: stuccoWallTexture(), roughness: 0.9 });
+  const marbleMat = new THREE.MeshStandardMaterial({ map: palaceMarbleTexture(), roughness: 0.48, metalness: 0.12 });
+  const woodWallMat = new THREE.MeshStandardMaterial({ map: woodPlankTexture(), roughness: 0.85 });
+  const goldDomeMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.25, metalness: 0.78 });
+  const roofMat = new THREE.MeshStandardMaterial({ map: corrugatedTexture(), roughness: 0.75, metalness: 0.35 });
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, roughness: 0.92 });
+  const colliders = [];
+  const lootSpots = []; // local (x, y, z) coordinates where items spawn
+  const archStyle = poiDef.archStyle || 'station';
+
+  // Concrete / Stone Courtyard Apron Pad
+  const padW = archStyle === 'palace' ? 24 : 19;
+  const padD = archStyle === 'palace' ? 28 : 23;
+  const pad = new THREE.Mesh(
+    new THREE.BoxGeometry(padW, 0.16, padD),
+    archStyle === 'palace' ? marbleMat : floorMat
+  );
+  pad.position.set(0, 0.02, 0);
+  pad.receiveShadow = true;
+  g.add(pad);
+
+  // Tall Roadside Signpost near highway edge
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 6.8, 8), matDarkMetal);
+  pole.position.set(-7.2, 3.4, 9.2);
+  const signBg = archStyle === 'palace' ? '#78350f' : archStyle === 'house' ? '#1e3a8a' : '#991b1b';
+  const signBoard = new THREE.Mesh(
+    new THREE.BoxGeometry(3.6, 1.55, 0.18),
+    new THREE.MeshStandardMaterial({
+      map: signTexture(poiDef.signText, signBg, '#fef08a'),
+      roughness: 0.4,
+    })
+  );
+  signBoard.position.set(-7.2, 6.2, 9.2);
+  g.add(pole, signBoard);
+
+  // Optional Fuel Pump Island (for gas stations, bus depots, and royal palaces with private pumps)
+  if (poiDef.hasFuelPump) {
+    if (archStyle === 'station' || archStyle === 'depot') {
+      const canopy = new THREE.Mesh(new THREE.BoxGeometry(8.5, 0.35, 10.5), roofMat);
+      canopy.position.set(-2.8, 4.8, 0);
+      canopy.castShadow = true;
+      const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 4.8, 8), matChrome);
+      p1.position.set(-2.8, 2.4, 3.8);
+      const p2 = p1.clone();
+      p2.position.z = -3.8;
+      g.add(canopy, p1, p2);
+    }
+
+    const pumpGroup = new THREE.Group();
+    pumpGroup.position.set(-2.8, 0, 0);
+    const pumpBody = new THREE.Mesh(
+      new THREE.BoxGeometry(0.75, 1.65, 0.95),
+      new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.45, metalness: 0.3 })
+    );
+    pumpBody.position.y = 0.85;
+    pumpBody.castShadow = true;
+    const pumpDial = new THREE.Mesh(
+      new THREE.BoxGeometry(0.78, 0.42, 0.65),
+      new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 })
+    );
+    pumpDial.position.y = 1.28;
+    pumpGroup.add(pumpBody, pumpDial);
+    g.add(pumpGroup);
+    tagInteractable(pumpGroup, {
+      type: 'fuel_pump',
+      fuelLeft: Math.round(rand(r, 18, 45) * 10) / 10,
+      name: archStyle === 'palace' ? 'Royal Courtyard Fuel Pump' : 'Vintage Gasoline Pump',
+    });
+  }
+
+  // ── Architecture Style 1: DESERT PALACE / MANSION ('palace' — Qasr Al-Sahra) ──
+  if (archStyle === 'palace') {
+    const pW = 9.6, pD = 16.0, pH = 6.4;
+    const backW = new THREE.Mesh(new THREE.BoxGeometry(0.45, pH, pD), marbleMat);
+    backW.position.set(4.2 + pW * 0.5, pH * 0.5, 0);
+    backW.castShadow = true;
+    const northW = new THREE.Mesh(new THREE.BoxGeometry(pW, pH, 0.45), marbleMat);
+    northW.position.set(4.2, pH * 0.5, pD * 0.5);
+    const southW = northW.clone();
+    southW.position.z = -pD * 0.5;
+    const palaceRoof = new THREE.Mesh(new THREE.BoxGeometry(pW + 0.8, 0.42, pD + 0.8), marbleMat);
+    palaceRoof.position.set(4.2, pH + 0.2, 0);
+    palaceRoof.castShadow = true;
+    g.add(backW, northW, southW, palaceRoof);
+
+    // 4 Grand Marble Colonnade Pillars at the Front Entrance Portico
+    for (const pz of [-5.8, -2.0, 2.0, 5.8]) {
+      const col = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.38, pH, 12), marbleMat);
+      col.position.set(4.2 - pW * 0.46, pH * 0.5, pz);
+      col.castShadow = true;
+      g.add(col);
+    }
+
+    // Golden Central Royal Dome + 2 Corner Minaret Cupolas
+    const mainDome = new THREE.Mesh(new THREE.SphereGeometry(2.8, 18, 14, 0, Math.PI * 2, 0, Math.PI * 0.55), goldDomeMat);
+    mainDome.position.set(4.2, pH + 0.35, 0);
+    mainDome.castShadow = true;
+    const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.14, 1.8, 8), goldDomeMat);
+    spire.position.set(4.2, pH + 3.4, 0);
+    g.add(mainDome, spire);
+
+    for (const cz of [-6.2, 6.2]) {
+      const turret = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.3, 2.2, 12), marbleMat);
+      turret.position.set(4.2 - pW * 0.35, pH + 1.1, cz);
+      const smallDome = new THREE.Mesh(new THREE.SphereGeometry(1.25, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55), goldDomeMat);
+      smallDome.position.set(4.2 - pW * 0.35, pH + 2.1, cz);
+      g.add(turret, smallDome);
+    }
+
+    // Crenellated Parapet Merlons along the Palace Roofline
+    for (let mz = -7.2; mz <= 7.2; mz += 1.6) {
+      const merlon = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.65, 0.72), marbleMat);
+      merlon.position.set(4.2 - pW * 0.48, pH + 0.72, mz);
+      g.add(merlon);
+    }
+
+    // Courtyard Marble Water Fountain (interactive clean water source!)
+    const fountain = new THREE.Group();
+    fountain.position.set(-1.5, 0, -5.2);
+    const basin = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.4, 0.72, 14), marbleMat);
+    basin.position.y = 0.36;
+    const waterPool = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.38, 1.38, 0.12, 14),
+      new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.15, metalness: 0.4 })
+    );
+    waterPool.position.y = 0.68;
+    fountain.add(basin, waterPool, buildWaterSpigot());
+    g.add(fountain);
+
+    // Royal Banquet Table inside the Palace Hall
+    const table = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.95, 9.5), matWood);
+    table.position.set(6.4, 0.48, 0);
+    table.castShadow = true;
+    g.add(table);
+
+    colliders.push(
+      { minX: 4.2 + pW * 0.5 - 0.35, maxX: 4.2 + pW * 0.5 + 0.35, minZ: -pD * 0.5, maxZ: pD * 0.5 },
+      { minX: 4.2 - pW * 0.5, maxX: 4.2 + pW * 0.5, minZ: pD * 0.5 - 0.35, maxZ: pD * 0.5 + 0.35 },
+      { minX: 4.2 - pW * 0.5, maxX: 4.2 + pW * 0.5, minZ: -pD * 0.5 - 0.35, maxZ: -pD * 0.5 + 0.35 }
+    );
+
+    // Rich Palace Loot Spots (8 spots)
+    lootSpots.push(
+      { x: 6.3, y: 0.98, z: -3.6 },
+      { x: 6.3, y: 0.98, z: -1.8 },
+      { x: 6.3, y: 0.98, z: 0.0 },
+      { x: 6.3, y: 0.98, z: 1.8 },
+      { x: 6.3, y: 0.98, z: 3.6 },
+      { x: 3.8, y: 0.12, z: -4.5 },
+      { x: 3.8, y: 0.12, z: 0.0 },
+      { x: 3.8, y: 0.12, z: 4.5 }
+    );
+  } else if (archStyle === 'house') {
+    // ── Architecture Style 2: TWO-STORY DESERT HOUSE & WOODEN BARN ('house' — Dar) ──
+    const hW = 7.4, hD = 10.5, hH = 5.4;
+    const backW = new THREE.Mesh(new THREE.BoxGeometry(0.34, hH, hD), stuccoMat);
+    backW.position.set(3.6 + hW * 0.5, hH * 0.5, -2.2);
+    backW.castShadow = true;
+    const northW = new THREE.Mesh(new THREE.BoxGeometry(hW, hH, 0.34), stuccoMat);
+    northW.position.set(3.6, hH * 0.5, -2.2 + hD * 0.5);
+    const southW = northW.clone();
+    southW.position.z = -2.2 - hD * 0.5;
+    // Pitched Gable Wooden Roof + Upper Balcony
+    const roofSlope = new THREE.Mesh(new THREE.ConeGeometry(6.8, 2.2, 4), woodWallMat);
+    roofSlope.rotation.y = Math.PI * 0.25;
+    roofSlope.position.set(3.6, hH + 1.0, -2.2);
+    roofSlope.castShadow = true;
+    const balcony = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.18, hD * 0.88), woodWallMat);
+    balcony.position.set(3.6 - hW * 0.45, 2.85, -2.2);
+    g.add(backW, northW, southW, roofSlope, balcony);
+
+    // Adjacent Rustic Timber Barn Shed (+Z side)
+    const barn = new THREE.Mesh(new THREE.BoxGeometry(6.2, 3.8, 6.4), woodWallMat);
+    barn.position.set(4.0, 1.9, 6.8);
+    barn.castShadow = true;
+    g.add(barn);
+
+    const counter = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.92, 6.8), matWood);
+    counter.position.set(5.6, 0.46, -2.2);
+    g.add(counter);
+
+    colliders.push(
+      { minX: 3.6 + hW * 0.5 - 0.3, maxX: 3.6 + hW * 0.5 + 0.3, minZ: -2.2 - hD * 0.5, maxZ: -2.2 + hD * 0.5 },
+      { minX: 3.6 - hW * 0.5, maxX: 3.6 + hW * 0.5, minZ: -2.2 + hD * 0.5 - 0.3, maxZ: -2.2 + hD * 0.5 + 0.3 },
+      { minX: 3.6 - hW * 0.5, maxX: 3.6 + hW * 0.5, minZ: -2.2 - hD * 0.5 - 0.3, maxZ: -2.2 - hD * 0.5 + 0.3 }
+    );
+
+    lootSpots.push(
+      { x: 5.5, y: 0.94, z: -4.6 },
+      { x: 5.5, y: 0.94, z: -2.8 },
+      { x: 5.5, y: 0.94, z: -1.0 },
+      { x: 5.5, y: 0.94, z: 0.6 },
+      { x: 3.2, y: 0.10, z: -4.2 },
+      { x: 3.2, y: 0.10, z: 1.2 },
+      { x: 0.4, y: 0.10, z: 6.5 }
+    );
+  } else if (archStyle === 'kasbah') {
+    // ── Architecture Style 3: ANCIENT KASBAH WATCHTOWER & PALM OASIS ('kasbah') ──
+    const kW = 7.8, kD = 11.2, kH = 4.5;
+    const backW = new THREE.Mesh(new THREE.BoxGeometry(0.42, kH, kD), stuccoMat);
+    backW.position.set(3.8 + kW * 0.5, kH * 0.5, 0);
+    backW.castShadow = true;
+    const northW = new THREE.Mesh(new THREE.BoxGeometry(kW, kH, 0.42), stuccoMat);
+    northW.position.set(3.8, kH * 0.5, kD * 0.5);
+    const southW = northW.clone();
+    southW.position.z = -kD * 0.5;
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(kW + 0.5, 0.32, kD + 0.5), stuccoMat);
+    roof.position.set(3.8, kH + 0.15, 0);
+    // Tall 12.5m Fortified Watchtower Bastion
+    const tower = new THREE.Mesh(new THREE.BoxGeometry(3.8, 12.5, 3.8), stuccoMat);
+    tower.position.set(5.5, 6.25, -4.8);
+    tower.castShadow = true;
+    g.add(backW, northW, southW, roof, tower);
+
+    // Desert Oasis Palm Trees
+    const palmLeafMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.75 });
+    for (const [px, pz] of [[-4.8, -6.5], [-5.2, 5.5], [1.2, 8.2]]) {
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.26, 6.4, 8), woodWallMat);
+      trunk.position.set(px, 3.2, pz);
+      trunk.castShadow = true;
+      g.add(trunk);
+      for (let a = 0; a < 5; a++) {
+        const frond = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.08, 0.48), palmLeafMat);
+        frond.position.set(px + Math.cos(a * 1.25) * 1.0, 6.3, pz + Math.sin(a * 1.25) * 1.0);
+        frond.rotation.y = -a * 1.25;
+        frond.rotation.z = -0.28;
+        g.add(frond);
+      }
+    }
+
+    const counter = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.92, 6.8), matWood);
+    counter.position.set(5.6, 0.46, 0);
+    g.add(counter);
+
+    colliders.push(
+      { minX: 3.8 + kW * 0.5 - 0.3, maxX: 3.8 + kW * 0.5 + 0.3, minZ: -kD * 0.5, maxZ: kD * 0.5 },
+      { minX: 3.8 - kW * 0.5, maxX: 3.8 + kW * 0.5, minZ: kD * 0.5 - 0.3, maxZ: kD * 0.5 + 0.3 },
+      { minX: 3.8 - kW * 0.5, maxX: 3.8 + kW * 0.5, minZ: -kD * 0.5 - 0.3, maxZ: -kD * 0.5 + 0.3 }
+    );
+
+    lootSpots.push(
+      { x: 5.5, y: 0.94, z: -2.4 },
+      { x: 5.5, y: 0.94, z: -0.8 },
+      { x: 5.5, y: 0.94, z: 0.8 },
+      { x: 5.5, y: 0.94, z: 2.4 },
+      { x: 3.2, y: 0.10, z: -3.2 },
+      { x: 3.2, y: 0.10, z: 3.2 }
+    );
+  } else {
+    // ── Architecture Style 4 & 5: BUS DEPOT HANGAR / GAS STATION / SALVAGE GARAGE ──
+    const bW = archStyle === 'depot' ? 8.6 : 7.2;
+    const bD = archStyle === 'depot' ? 13.5 : 11.0;
+    const bH = archStyle === 'depot' ? 5.6 : 3.8;
+    const backW = new THREE.Mesh(new THREE.BoxGeometry(0.32, bH, bD), stuccoMat);
+    backW.position.set(3.5 + bW * 0.5, bH * 0.5, 0);
+    backW.castShadow = true;
+    const northW = new THREE.Mesh(new THREE.BoxGeometry(bW, bH, 0.32), stuccoMat);
+    northW.position.set(3.5, bH * 0.5, bD * 0.5);
+    const southW = northW.clone();
+    southW.position.z = -bD * 0.5;
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(bW + 0.6, 0.28, bD + 0.6), roofMat);
+    roof.position.set(3.5, bH + 0.1, 0);
+    roof.castShadow = true;
+    g.add(backW, northW, southW, roof);
+
+    colliders.push(
+      { minX: 3.5 + bW * 0.5 - 0.3, maxX: 3.5 + bW * 0.5 + 0.3, minZ: -bD * 0.5, maxZ: bD * 0.5 },
+      { minX: 3.5 - bW * 0.5, maxX: 3.5 + bW * 0.5, minZ: bD * 0.5 - 0.3, maxZ: bD * 0.5 + 0.3 },
+      { minX: 3.5 - bW * 0.5, maxX: 3.5 + bW * 0.5, minZ: -bD * 0.5 - 0.3, maxZ: -bD * 0.5 + 0.3 }
+    );
+
+    const counter = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.92, 6.8), matWood);
+    counter.position.set(5.6, 0.46, 0);
+    counter.castShadow = true;
+    g.add(counter);
+
+    lootSpots.push(
+      { x: 5.5, y: 0.94, z: -2.4 },
+      { x: 5.5, y: 0.94, z: -0.8 },
+      { x: 5.5, y: 0.94, z: 0.8 },
+      { x: 5.5, y: 0.94, z: 2.4 },
+      { x: 3.2, y: 0.10, z: -3.5 },
+      { x: 3.2, y: 0.10, z: 3.5 }
+    );
+  }
+
+  // Optional Tall Water Tower
+  if (poiDef.hasWaterTower) {
+    const wt = new THREE.Group();
+    wt.position.set(3.5, 0, -8.5);
+    for (const [lx, lz] of [[-1.4, -1.4], [1.4, -1.4], [-1.4, 1.4], [1.4, 1.4]]) {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 9.5, 8), matDarkMetal);
+      leg.position.set(lx, 4.75, lz);
+      wt.add(leg);
+    }
+    const tank = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.3, 3.6, 14), roofMat);
+    tank.position.y = 10.8;
+    tank.castShadow = true;
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(2.5, 1.4, 14), roofMat);
+    cone.position.y = 13.3;
+    wt.add(tank, cone);
+
+    const spigot = buildWaterSpigot();
+    spigot.position.set(-1.8, 0, 0);
+    wt.add(spigot);
+    g.add(wt);
+  }
+
+  // Optional Tall Radio Relay Tower with blinking red beacon
+  if (poiDef.hasRadioTower) {
+    const rt = new THREE.Group();
+    rt.position.set(4.5, 0, 8.5);
+    const mast = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.25, 1.1, 22, 6, 4, true),
+      new THREE.MeshStandardMaterial({ color: 0xdc2626, wireframe: true })
+    );
+    mast.position.y = 11;
+    const beacon = new THREE.Mesh(
+      new THREE.SphereGeometry(0.38, 10, 10),
+      new THREE.MeshBasicMaterial({ color: 0xff2222 })
+    );
+    beacon.position.y = 22.3;
+    rt.add(mast, beacon);
+    g.add(rt);
+  }
+
+  return { group: g, colliders, lootSpots };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 5. TELEPHONE POLES, MILEPOSTS, CACTI, BOULDERS & MUTANT DESERT HARES
+// ══════════════════════════════════════════════════════════════════════════════
+export function buildTelephonePole() {
+  const g = new THREE.Group();
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.15, 7.8, 8), matWood);
+  pole.position.y = 3.9;
+  pole.castShadow = true;
+  const crossArm = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.14, 0.14), matWood);
+  crossArm.position.y = 7.2;
+  const insL = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.18, 6), matGlass);
+  insL.position.set(-0.78, 7.34, 0);
+  const insR = insL.clone();
+  insR.position.x = 0.78;
+  g.add(pole, crossArm, insL, insR);
+  return g;
+}
+
+export function buildMilepost(km) {
+  const g = new THREE.Group();
+  const post = new THREE.Mesh(new THREE.BoxGeometry(0.10, 1.6, 0.10), matChrome);
+  post.position.y = 0.8;
+  const sign = new THREE.Mesh(
+    new THREE.BoxGeometry(0.95, 0.48, 0.06),
+    new THREE.MeshStandardMaterial({
+      map: signTexture(`${km} KM`, '#155e3b', '#ffffff'),
+      roughness: 0.4,
+    })
+  );
+  sign.position.y = 1.45;
+  g.add(post, sign);
+  return g;
+}
+
+const matCactus = new THREE.MeshStandardMaterial({ color: 0x3f6212, roughness: 0.85 });
+export function buildCactus(seed) {
+  const r = mulberry32(seed);
+  const g = new THREE.Group();
+  const h = 1.8 + r() * 2.2;
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, h, 8), matCactus);
+  trunk.position.y = h * 0.5;
+  trunk.castShadow = true;
+  g.add(trunk);
+
+  if (r() > 0.2) {
+    const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.14, h * 0.45, 8), matCactus);
+    armL.position.set(0.32, h * 0.58, 0);
+    const jointL = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.22, 0.22), matCactus);
+    jointL.position.set(0.18, h * 0.38, 0);
+    g.add(armL, jointL);
+  }
+  if (r() > 0.35) {
+    const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.14, h * 0.38, 8), matCactus);
+    armR.position.set(-0.32, h * 0.65, 0);
+    const jointR = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.22, 0.22), matCactus);
+    jointR.position.set(-0.18, h * 0.48, 0);
+    g.add(armR, jointR);
+  }
+  return g;
+}
+
+const matRock = new THREE.MeshStandardMaterial({ color: 0x9a7b56, roughness: 0.92 });
+export function buildBoulder(seed) {
+  const r = mulberry32(seed);
+  const sz = 0.7 + r() * 1.9;
+  const m = new THREE.Mesh(new THREE.DodecahedronGeometry(sz, 1), matRock);
+  m.scale.set(1 + r() * 0.5, 0.55 + r() * 0.45, 1 + r() * 0.5);
+  m.position.y = sz * 0.32;
+  m.rotation.y = r() * Math.PI * 2;
+  m.castShadow = true;
+  m.receiveShadow = true;
+  return { mesh: m, radius: sz * 0.9 };
+}
+
+// Mutant Desert Hare (Hostile / Targetable pest in The Long Drive)
+const matFur = new THREE.MeshStandardMaterial({ color: 0x786856, roughness: 0.9 });
+const matRedEye = new THREE.MeshBasicMaterial({ color: 0xff1111 });
+export function buildDesertHare() {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.24, 0.44), matFur);
+  body.position.y = 0.18;
+  body.castShadow = true;
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.20, 0.22), matFur);
+  head.position.set(0, 0.30, 0.22);
+  const earL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.28, 0.05), matFur);
+  earL.position.set(0.06, 0.48, 0.18);
+  earL.rotation.x = -0.2;
+  const earR = earL.clone();
+  earR.position.x = -0.06;
+  const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.04), matRedEye);
+  eyeL.position.set(0.08, 0.33, 0.33);
+  const eyeR = eyeL.clone();
+  eyeR.position.x = -0.08;
+  g.add(body, head, earL, earR, eyeL, eyeR);
+  return g;
 }
