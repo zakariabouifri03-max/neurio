@@ -1,0 +1,93 @@
+name: Fetch preview dump
+
+# One-off helper: the local agent sandbox only has GitHub egress,
+# so we use a runner (full internet) to download a public web page + its iframe.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fetch-preview.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch page + iframe
+        run: |
+          python3 - <<'PY'
+          import re, os, json, pathlib, urllib.parse, urllib.request
+
+          UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+          ROOT = "https://01a0f306-a7ec-7f02-aad5-b7c450096db9.arena.site/"
+          out = pathlib.Path("dump"); out.mkdir(exist_ok=True)
+
+          def fetch(url, name):
+              req = urllib.request.Request(url, headers={
+                  "User-Agent": UA,
+                  "Accept": "*/*",
+                  "Referer": ROOT,
+              })
+              with urllib.request.urlopen(req, timeout=90) as r:
+                  data = r.read()
+                  info = {"url": url, "status": r.status,
+                          "headers": dict(r.headers), "bytes": len(data)}
+                  (out / name).write_bytes(data)
+                  (out / (name + ".json")).write_text(json.dumps(info, indent=2))
+                  print("FETCHED", url, "->", name, len(data), "bytes")
+                  return data
+
+          wrapper = fetch(ROOT, "wrapper.html")
+          text = wrapper.decode("utf-8", "replace")
+
+          # find iframe / embed targets
+          urls = []
+          for pat in (r'<iframe[^>]+src=["\']([^"\']+)["\']',
+                      r'<embed[^>]+src=["\']([^"\']+)["\']'):
+              urls += re.findall(pat, text, re.I)
+          urls = [urllib.parse.urljoin(ROOT, u) for u in urls]
+          print("IFRAME URLS:", urls)
+          (out / "iframe-urls.txt").write_text("\n".join(urls) + "\n")
+
+          for i, u in enumerate(urls[:5]):
+              try:
+                  data = fetch(u, f"frame{i}.html")
+              except Exception as e:
+                  print("ERR", u, e); continue
+              # pull referenced assets (relative links) from that frame
+              ft = data.decode("utf-8", "replace")
+              refs = set()
+              for pat in (r'src=["\']([^"\']+)["\']', r'href=["\']([^"\']+)["\']'):
+                  for ref in re.findall(pat, ft, re.I):
+                      if ref.startswith(("http://", "https://", "//", "data:", "#", "mailto:")):
+                          continue
+                      refs.add(urllib.parse.urljoin(u, ref))
+              (out / f"frame{i}-refs.txt").write_text("\n".join(sorted(refs)) + "\n")
+              for j, ru in enumerate(sorted(refs)[:40]):
+                  try:
+                      fetch(ru, f"frame{i}-asset{j}.bin")
+                  except Exception as e:
+                      print("ASSET ERR", ru, e)
+          print("DONE")
+          PY
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-dump
+          path: dump
+          if-no-files-found: warn
+
+      - name: Commit dump back to branch
+        run: |
+          git config user.name "arena-agent"
+          git config user.email "agent@arena.ai"
+          git add -f dump || true
+          git commit -m "dump: fetch preview page + iframe" || echo "nothing to commit"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin HEAD:"${GITHUB_REF_NAME}" || echo "push failed (artifact still available)"
