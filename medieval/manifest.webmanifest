@@ -1,0 +1,16 @@
+{
+  "name": "IRONVOW — a duel of steel and wind",
+  "short_name": "Ironvow",
+  "description": "A first-person medieval melee duel: physics-driven steel, directional cuts and thrusts, wind, guards that can be beaten open, and harness that has to be defeated.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0b0a09",
+  "theme_color": "#0b0a09",
+  "categories": ["games"],
+  "icons": [
+    { "src": "icons/ironvow.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/ironvow-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

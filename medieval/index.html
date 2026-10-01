@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IRONVOW — a duel of steel and wind</title>
+<meta name="description" content="A realistic first-person medieval melee duel: physics-driven steel, directional cuts and thrusts, stamina, guards that can be beaten open, and armour that has to be defeated.">
+<meta name="theme-color" content="#0b0a09">
+<meta name="color-scheme" content="dark">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230b0a09'/%3E%3Cpath d='M50 10 L86 28 V56 C86 76 70 88 50 94 C30 88 14 76 14 56 V28 Z' fill='none' stroke='%23c8a86a' stroke-width='6'/%3E%3Cpath d='M50 26 V78 M32 40 L50 56 L68 40 M32 68 L50 52 L68 68' fill='none' stroke='%23d8cfc0' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <div id="app" aria-label="the hall"></div>
+  <div id="hud" class="hud off"></div>
+  <div id="menu" class="menu"></div>
+
+  <div id="boot" class="boot">
+    <div class="boot-inner">
+      <svg class="crest" viewBox="0 0 120 120" aria-hidden="true">
+        <path d="M60 8 L104 30 V64 C104 90 84 106 60 114 C36 106 16 90 16 64 V30 Z" fill="none" stroke="currentColor" stroke-width="4"/>
+        <path d="M60 26 V94 M38 44 L60 62 L82 44 M38 76 L60 58 L82 76" fill="none" stroke="currentColor" stroke-width="3"/>
+      </svg>
+      <h1>IRONVOW</h1>
+      <p class="tag">A vow kept at the point of a sword.</p>
+      <ul class="keys">
+        <li><b>WASD</b> walk — <b>Shift</b> run into the fight</li>
+        <li><b>Mouse</b> look, and shape the blow</li>
+        <li><b>Left button</b> wind a cut, release to let it go — hold to charge it</li>
+        <li><b>Right button</b> raise the guard, tap to parry inside the half-second</li>
+        <li><b>Space</b> shove · <b>E</b> feint · <b>Q</b> change the guard · <b>Tab</b> lock on</li>
+        <li><b>Esc</b> pause</li>
+      </ul>
+      <button id="boot-enter" class="btn primary">Enter the hall</button>
+      <p class="small">Everything here — the men, the steel, the stone, the sound — is generated in the browser. No downloads, no external assets.</p>
+    </div>
+  </div>
+
+  <noscript><p style="color:#d8cfc0;font:16px serif;padding:2rem">IRONVOW needs JavaScript: the duel is simulated, not filmed.</p></noscript>
+
+  <!-- Bare specifiers resolve to the vendored copy: IRONVOW loads nothing from
+       the network — no CDN, no fonts, no analytics. Everything it shows, it
+       draws. The map has to come before the first module load. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.module.js",
+      "three/addons/utils/BufferGeometryUtils.js": "./vendor/utils/BufferGeometryUtils.js"
+    }
+  }
+  </script>
+  <script type="module" src="src/main.js"></script>
+  <script>
+    // The boot card is a real screen, not a splash: the browser needs a gesture
+    // before it will let the hall make any noise at all.
+    (function () {
+      var boot = document.getElementById('boot');
+      var enter = document.getElementById('boot-enter');
+      function go() {
+        boot.classList.add('gone');
+        setTimeout(function () { boot.style.display = 'none'; }, 700);
+        window.dispatchEvent(new Event('ironvow:enter'));
+      }
+      enter.addEventListener('click', go);
+      document.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') go(); }, { once: true });
+      if (!('serviceWorker' in navigator)) return;
+      addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () { /* offline play is optional */ });
+      });
+    })();
+  </script>
+</body>
+</html>
