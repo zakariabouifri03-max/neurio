@@ -1,47 +1,89 @@
-// ── Persistence (localStorage) ───────────────────────────────────────────────
-
-const KEY = 'bashbaqi_save_v1';
+// Persistence for Creator Life Simulator.
+const KEY = 'creator_life_simulator_v1';
 
 export function defaultSave() {
   return {
-    v: 1,
-    coins: 500,
-    gems: 5,
-    trophies: 0,
-    ownedCars: ['c01'],
-    selectedCar: 'c01',
-    ownedDrivers: ['dr01'],
-    selectedDriver: 'dr01',
-    upgrades: {},          // carId -> {spd,acc,hnd} levels 0..5
-    paints: {},            // carId -> hex color
-    ownedPaints: [0, 1, 2, 3, 4, 5, 6, 7],
-    wheelColor: '#23262e',
-    ownedHorns: [0],
-    horn: 0,
-    standings: null,       // {player:pts, riv0..riv4:pts}
-    seasonRace: 0,
-    seasonNum: 1,
-    wins: 0,
-    races: 0,
-    music: true,
-    sfx: true,
+    version: 1,
+    cash: 120,
+    day: 1,
+    dayTime: 8.15,
+    weather: 'clear',
+    subscribers: 0,
+    followers: 0,
+    totalViews: 0,
+    totalLikes: 0,
+    totalComments: 0,
+    watchMinutes: 0,
+    donations: 0,
+    engagement: 0.04,
+    installedApps: ['browser', 'files', 'settings', 'games'],
+    ownedGames: ['sunny-shores'],
+    selectedGame: 'sunny-shores',
+    ownedGear: ['basic-mic', 'weak-router'],
+    placedGear: ['basic-mic', 'weak-router'],
+    cameras: [],
+    webcams: [],
+    furniture: ['starter-bed', 'starter-desk', 'starter-chair'],
+    placedFurniture: ['starter-bed', 'starter-desk', 'starter-chair'],
+    internetPlan: 'island-basic',
+    router: 'weak-router',
+    pc: {
+      components: {
+        cpu: 'cpu-basic', gpu: 'gpu-basic', ram: 'ram-basic', storage: 'storage-hdd',
+        motherboard: 'board-basic', psu: 'psu-basic', cooler: 'cooler-basic', case: 'case-basic',
+      },
+      monitor: 'Old monitor', keyboard: 'Cheap keyboard', mouse: 'Cheap mouse', microphone: 'Basic microphone',
+    },
+    orders: [],
+    clips: [],
+    renderedVideos: [],
+    history: [],
+    messages: [
+      { from: 'Island Network', text: 'Welcome to your new creator life. Your first free game is ready to stream.', time: 'Day 1 · 08:00', unread: true },
+    ],
+    music: ['harbor-morning'],
+    settings: {
+      quality: 'HIGH', resolution: 'native', fullscreen: false, shadows: true, reflections: true,
+      motionBlur: false, depthOfField: true, fov: 62, fpsLimit: 60, volume: 65, ambience: 80,
+      language: 'English', networkMode: 'online', cameraSensitivity: 1,
+    },
+    tutorial: { seenIntro: false, steps: 0 },
+    stats: { streams: 0, videos: 0, playTime: 0, moneyEarned: 0, deliveries: 0 },
+    room: { code: '', role: '' },
+    lastSaved: 0,
   };
+}
+
+function merge(base, incoming) {
+  if (!incoming || typeof incoming !== 'object') return base;
+  for (const [key, value] of Object.entries(incoming)) {
+    if (value && typeof value === 'object' && !Array.isArray(value) && base[key] && typeof base[key] === 'object') {
+      base[key] = merge(base[key], value);
+    } else if (value !== undefined) base[key] = value;
+  }
+  return base;
 }
 
 export function loadSave() {
   try {
-    const s = JSON.parse(localStorage.getItem(KEY));
-    if (s && typeof s === 'object') {
-      const d = defaultSave();
-      const out = Object.assign(d, s);
-      out.v = 1;
-      return out;
-    }
-  } catch (e) { /* corrupted save → fresh start */ }
-  return defaultSave();
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return defaultSave();
+    return merge(defaultSave(), JSON.parse(raw));
+  } catch (_) {
+    return defaultSave();
+  }
 }
 
-export function persist(s) {
-  s.v = 1;
-  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { /* private mode */ }
+export function persist(save) {
+  save.version = 1;
+  save.lastSaved = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (_) { /* private browsing */ }
+}
+
+export function clearSave() {
+  try { localStorage.removeItem(KEY); } catch (_) { /* noop */ }
+}
+
+export function hasSave() {
+  try { return !!localStorage.getItem(KEY); } catch (_) { return false; }
 }

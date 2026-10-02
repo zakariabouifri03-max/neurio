@@ -1,97 +1,44 @@
-# 🏁 Bash Baqi Racing
+# Creator Life — Tidebound Island
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+A playable browser prototype of a **3D creator-life simulator**. Start in a tiny beach house with a weak PC, slow internet and $120. Explore a compact living island, build a channel, and grow the home and studio over time.
 
-**▶ Play:** serve the folder with any static server and open it:
+## Play locally
 
 ```bash
 python3 -m http.server 8000
-# → http://localhost:8000
+# open http://localhost:8000
 ```
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+The project is static and offline-friendly. Three.js is vendored in `vendor/`; no runtime CDN or build step is required.
 
----
+## What is implemented
 
-## 📱 Install on your phone — كأنها APK!
+- Intro cinematic showing Tidebound Island, the beach and starter house, then a third-person playable island
+- Single-player mode plus a 2-player online-room flow with room codes and same-origin `BroadcastChannel` position sync when two tabs share a room
+- Compact 3D island with beach, ocean, forest, hills, village, shops, ferry dock, viewpoint, roads, house interior, water/wind animation, animals, NPCs, boats and a day/night cycle
+- Physical movement, interaction prompts, NPC conversations, delivery beach and carry-home loop
+- Starter house with worn bed, cheap desk, old chair, weak PC, old monitor, keyboard, mouse, microphone and slow router
+- Tide OS desktop that starts with only Browser, File Manager, Basic Settings and Game Store; other creator applications are downloaded individually
+- Stream Desk, Cutroom Editor, Pulse Analytics, Tip Jar, Creator Studio, Harbor Bank, Messenger, Cloud Locker, Sound Library, Camera Manager, Task Monitor and Calendar apps
+- A real component lab showing the PC case and installed CPU, GPU, RAM, storage, motherboard, PSU, cooler and case; upgrades are ordered, delivered by boat, carried home and installed
+- Download speed, upload speed, ping, stability, Wi-Fi coverage and monthly cost simulation
+- 25 original games with price, genre, popularity, graphics requirement, trend and viewer potential
+- Creator gear with webcams, outdoor cameras, microphones, lights, monitors, keyboards, mice and routers; webcams switch streams from avatar mode to face-camera mode
+- A generated catalog of **1,000 furniture items** with product cards, specifications, prices and delivery orders
+- Streaming, audience growth, comments, donations, returning viewers and dynamically simulated country RPM shown per 100 and 1,000 views
+- Outdoor clips, camera stats, editing/render time tied to PC performance, uploads and analytics history
+- Save, load, settings, graphics presets, audio, controls, network settings, pause and exit-to-menu flows
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
-
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
-
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
-**Offline play** is built-in: a service worker caches all game files on first visit.
-
----
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
+## Controls
 
 | Action | Keys |
-|---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
+| --- | --- |
+| Move | `W A S D` / arrow keys |
+| Run | `SHIFT` |
+| Interact / pick up / place | `E` |
 | Pause | `ESC` |
+| Save | `F2` |
+| Open Messenger | `M` |
+| Skip intro | `SPACE` |
 
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
-```
-
-Made with ❤️ and Three.js
-
----
-
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
-
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
-
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
-
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+All money, RPM and audience numbers are **game simulation values**, not real-world creator payment claims.

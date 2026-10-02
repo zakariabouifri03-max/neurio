@@ -1,150 +1,119 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏁 Bash Baqi Racing</title>
-<meta name="theme-color" content="#0ea5e9">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bash Baqi">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/style.css">
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
-</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07151d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Creator Life — Tidebound Island</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="stylesheet" href="src/style.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.js" } }
+  </script>
 </head>
 <body>
-<div id="app"></div>
+  <main id="app" aria-label="Creator Life 3D world"></main>
+  <div id="vignette"></div>
 
-<!-- error overlay -->
-<div id="errLog"></div>
-
-<!-- loading -->
-<div id="loading">
-  <div class="loadBox">
-    <div class="loadFlag">🏁</div>
-    <div class="loadTitle">BASH BAQI<br>RACING</div>
-    <div class="loadBar"><div></div></div>
-    <div class="loadTip">warming up the buggies…</div>
-  </div>
-</div>
-
-<!-- speed lines overlay -->
-<div id="speedLines"></div>
-<div id="coinPops"></div>
-
-<!-- ══════════ RACE HUD ══════════ -->
-<div id="hud">
-  <div class="hudTL">
-    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
-    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
-    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
-    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
-  </div>
-
-  <div id="progbar">
-    <span class="flagL">🏁</span>
-    <div class="track"><div id="progMarkers"></div></div>
-    <span class="flagR">🏆</span>
-  </div>
-
-  <button id="btnPauseTop" class="roundBtn">⏸</button>
-
-  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
-
-  <div id="powerSlot" class="powerSlot">
-    <span id="hudPower"></span>
-    <span class="keyHint">SPACE</span>
-  </div>
-
-  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
-
-  <div id="banner"></div>
-
-  <!-- touch controls -->
-  <div id="touchWrap">
-    <div class="tcol left">
-      <button id="tLeft" class="tbtn">◀</button>
-      <button id="tRight" class="tbtn">▶</button>
+  <section id="boot" class="screen active">
+    <div class="boot-card">
+      <div class="brand-mark"><span class="brand-ring"></span><span class="brand-dot"></span></div>
+      <p class="eyebrow">TIDEBound / creator life simulator</p>
+      <h1>CREATOR<br><em>LIFE</em></h1>
+      <div class="boot-line"><span></span></div>
+      <p class="boot-copy">Loading island systems, weather and community data…</p>
     </div>
-    <div class="tcol right">
-      <button id="tBrake" class="tbtn brake">▼</button>
+  </section>
+
+  <section id="mainMenu" class="screen hidden">
+    <div class="menu-noise"></div>
+    <header class="menu-header">
+      <div class="wordmark"><span class="wordmark-icon"></span><span>CREATOR <b>LIFE</b></span></div>
+      <div class="menu-version">EARLY ACCESS <span>0.9.4</span></div>
+    </header>
+    <div class="menu-layout">
+      <div class="menu-copy">
+        <p class="eyebrow accent">A SMALL ISLAND. A REAL START.</p>
+        <h2>Build a life<br><span>worth sharing.</span></h2>
+        <p class="lead">Begin with a weak PC, a quiet beach house and almost no money. Explore Tidebound, make something honest, and grow one decision at a time.</p>
+        <div class="menu-actions">
+          <button class="button button-primary button-wide" data-menu="single"><span class="button-kicker">START YOUR STORY</span> SINGLE PLAYER <i>→</i></button>
+          <button class="button button-secondary button-wide" data-menu="multi"><span class="button-kicker">SHARE THE ISLAND</span> 2-PLAYER ONLINE <i>↗</i></button>
+          <div class="menu-row">
+            <button class="button button-quiet" data-menu="continue">CONTINUE <small>F2</small></button>
+            <button class="button button-quiet" data-menu="load">LOAD GAME</button>
+            <button class="button button-quiet" data-menu="new">NEW GAME</button>
+            <button class="button button-quiet" data-menu="settings">SETTINGS</button>
+          </div>
+        </div>
+        <div class="menu-foot"><span class="status-dot"></span> ONLINE SERVICES READY <span class="foot-sep">·</span> SINGLE PLAYER WORKS OFFLINE</div>
+      </div>
+      <div class="menu-hero-info">
+        <div class="hero-card glass-card">
+          <div class="hero-card-top"><span>ISLAND / 01</span><span class="live-pill">LIVE WORLD</span></div>
+          <div class="hero-lines"><span></span><span></span><span></span></div>
+          <div class="hero-card-bottom"><strong>TIDEBOUND</strong><small>Explore · Create · Connect</small></div>
+        </div>
+        <div class="menu-stat-grid">
+          <div><strong>01</strong><span>compact island</span></div><div><strong>24h</strong><span>living cycle</span></div><div><strong>∞</strong><span>your stories</span></div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+    <div class="menu-watermark">TIDEBOUND ISLAND <span>34° 02′ N / 7° 41′ W</span></div>
+  </section>
 
-<!-- ══════════ GARAGE UI ══════════ -->
-<div id="garageUI">
-  <div id="topbar">
-    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
-    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
-    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
-    <div class="spacer"></div>
-    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
-    <button id="btnMusic" class="miniBtn">🎵</button>
-    <button id="btnSfx" class="miniBtn">🔊</button>
-    <button id="btnFull" class="miniBtn">⛶</button>
-  </div>
+  <section id="intro" class="screen hidden">
+    <div class="cinematic-top"><span class="cine-mark">CREATOR LIFE</span><span>CHAPTER 01 / ARRIVAL</span></div>
+    <div class="cine-caption"><p id="cineKicker">TIDEBOUND ISLAND</p><h2 id="cineTitle">A place to begin.</h2><p id="cineBody">The tide is coming in. Your new life is waiting on the other side of the water.</p></div>
+    <div class="cine-progress"><span id="cineProgress"></span></div>
+    <button id="skipIntro" class="button button-quiet">SKIP CINEMATIC <small>SPACE</small></button>
+  </section>
 
-  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
-  <div id="carNamePlate"></div>
-
-  <div id="menuBar">
-    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
-    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
-    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
-    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
-    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
-    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
-  </div>
-</div>
-
-<!-- ══════════ Shop / panels ══════════ -->
-<div id="panel">
-  <div class="panelBox">
-    <div class="panelHead">
-      <h2 id="panelTitle">SHOP</h2>
-      <div id="panelTabs"></div>
-      <button id="panelClose" class="roundBtn">✖</button>
+  <section id="hud" class="hidden">
+    <header class="hud-top">
+      <div class="hud-brand"><span class="hud-brand-dot"></span><span>CREATOR <b>LIFE</b></span></div>
+      <div class="hud-status">
+        <div class="hud-chip"><span class="chip-label">DAY</span><strong id="hudDay">01</strong><span id="hudTime">08:15</span></div>
+        <div class="hud-chip weather-chip"><span class="weather-glyph" id="weatherGlyph">CLEAR</span><span id="weatherLabel">CALM</span></div>
+        <div class="hud-chip"><span class="chip-label">WALLET</span><strong id="hudCash">$120</strong></div>
+        <div class="hud-chip creator-chip"><span class="chip-label">CHANNEL</span><strong id="hudSubs">0</strong><span>SUBS</span></div>
+      </div>
+      <div class="hud-actions"><button class="icon-button" data-action="desktop" title="Open PC desktop">PC</button><button class="icon-button" data-action="save" title="Save game">SAVE</button><button class="icon-button" data-action="pause" title="Pause">Ⅱ</button></div>
+    </header>
+    <div class="hud-left">
+      <div class="objective-card glass-card"><p class="eyebrow">CURRENT OBJECTIVE</p><strong id="objectiveTitle">Make yourself at home</strong><span id="objectiveBody">Walk to the little house and meet your weak PC.</span><div class="objective-meter"><span id="objectiveMeter"></span></div></div>
+      <div class="wifi-card glass-card"><span class="wifi-symbol"><i></i><i></i><i></i></span><div><small>HOME NETWORK</small><strong id="wifiName">ISLAND BASIC</strong><span id="wifiStats">12 Mbps · 82 ms</span></div></div>
     </div>
-    <div id="panelBody"></div>
-  </div>
-</div>
+    <div id="streamHud" class="stream-hud glass-card hidden"><span class="stream-live-dot"></span><div><strong>LIVE SESSION</strong><small id="streamHudInfo">AVATAR CAM · 0 viewers</small></div><button data-stream="stop">END</button></div>
+    <div id="interactPrompt" class="interact-prompt hidden"><span class="keycap">E</span><div><strong id="interactTitle">INTERACT</strong><small id="interactDetail">Open</small></div></div>
+    <div class="hud-bottom"><div class="control-hint"><span>WASD</span> MOVE <span>SHIFT</span> RUN <span>E</span> INTERACT <span>ESC</span> PAUSE</div><div class="hud-location"><span class="location-pin"></span><span id="locationName">SOUTH BEACH</span></div></div>
+    <div id="toast" class="toast"></div>
+    <div id="notificationStack" class="notification-stack"></div>
+  </section>
 
-<!-- results -->
-<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
-<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
-
-<!-- pause -->
-<div id="pauseModal">
-  <div class="modalBox">
-    <div class="rtitle">⏸ PAUSED</div>
-    <div class="rbtns">
-      <button id="btnResume" class="big race">▶ RESUME</button>
-      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
+  <section id="desktopOverlay" class="modal-layer hidden">
+    <div class="desktop-shell">
+      <header class="desktop-topbar"><div class="desktop-brand"><span class="desktop-dot"></span>TIDE OS <small>CREATOR EDITION</small></div><div class="desktop-network"><span class="network-bars"><i></i><i></i><i></i><i></i></span><span id="desktopWifi">12 Mbps</span><span class="desktop-clock" id="desktopClock">08:15</span></div></header>
+      <div id="desktopIcons" class="desktop-icons"></div>
+      <div id="desktopWindow" class="desktop-window hidden"><header class="window-bar"><div><span id="windowAppDot" class="window-dot"></span><strong id="windowTitle">Application</strong><small id="windowSubtitle">Tide OS</small></div><div class="window-controls"><button data-window="min">—</button><button data-window="close">×</button></div></header><div id="windowBody" class="window-body"></div></div>
+      <footer class="desktop-taskbar"><div class="task-start"><span class="desktop-dot"></span></div><div id="taskbarApps" class="taskbar-apps"></div><div class="taskbar-right"><span id="taskbarUpload">STORAGE 14%</span><span id="taskbarClock">08:15</span></div></footer>
+      <button class="desktop-close button button-quiet" data-action="close-desktop">RETURN TO ISLAND <small>ESC</small></button>
     </div>
-  </div>
-</div>
+  </section>
 
-<div id="toast"></div>
-<div id="confetti"></div>
+  <section id="storeOverlay" class="modal-layer hidden"><div class="modal-panel store-panel"><header class="modal-header"><div><p class="eyebrow">TIDEBOUND MARKET</p><h2>Equip the life.</h2><p class="modal-subtitle">Every item arrives by boat. Nothing teleports into your home.</p></div><button class="close-button" data-action="close-modal">×</button></header><div id="storeTabs" class="tab-row"></div><div id="storeContent" class="store-content"></div></div></section>
 
-<script type="module" src="src/main.js"></script>
-<script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-</script>
+  <section id="caseOverlay" class="modal-layer hidden"><div class="modal-panel case-panel"><header class="modal-header"><div><p class="eyebrow">HARDWARE LAB</p><h2>Inside the case.</h2><p class="modal-subtitle">Installed components are real objects in your PC. Upgrade one part at a time.</p></div><button class="close-button" data-action="close-modal">×</button></header><div id="caseContent" class="case-layout"></div></div></section>
+
+  <section id="settingsOverlay" class="modal-layer hidden"><div class="modal-panel settings-panel"><header class="modal-header"><div><p class="eyebrow">SYSTEM CONFIGURATION</p><h2>Settings</h2></div><button class="close-button" data-action="close-modal">×</button></header><div class="settings-layout"><nav id="settingsTabs" class="settings-tabs"><button class="active" data-settings-tab="graphics">GRAPHICS</button><button data-settings-tab="audio">AUDIO</button><button data-settings-tab="controls">CONTROLS</button><button data-settings-tab="network">NETWORK</button><button data-settings-tab="language">LANGUAGE</button></nav><div id="settingsContent" class="settings-content"></div></div></div></section>
+
+  <section id="multiOverlay" class="modal-layer hidden"><div class="modal-panel multi-panel"><header class="modal-header"><div><p class="eyebrow">SHARED WORLD</p><h2>Bring a friend.</h2><p class="modal-subtitle">Two creators. One island. Record, explore and build the studio together.</p></div><button class="close-button" data-action="close-modal">×</button></header><div class="multi-columns"><div class="room-card"><span class="room-icon">01</span><h3>Host an island</h3><p>Create a room and invite another player with a short room code.</p><button class="button button-primary" data-multi="host">HOST NEW ROOM <i>→</i></button><div id="hostCode" class="room-code hidden"></div></div><div class="room-card"><span class="room-icon">↗</span><h3>Join a friend</h3><p>Enter the room code shared by the host. Online co-op syncs your island state.</p><input id="roomCodeInput" class="text-input" placeholder="ROOM CODE" maxlength="6"><button class="button button-secondary" data-multi="join">JOIN ROOM <i>→</i></button></div></div><div class="multi-note"><span class="status-dot"></span> Online room sync is ready. Single-player remains fully playable offline.</div></div></section>
+
+  <section id="pauseOverlay" class="modal-layer hidden"><div class="pause-card"><p class="eyebrow">TIDE OS / PAUSED</p><h2>Take a breath.</h2><div class="pause-actions"><button class="button button-primary" data-action="resume">RESUME <i>→</i></button><button class="button button-secondary" data-action="save">SAVE GAME</button><button class="button button-quiet" data-action="menu">EXIT TO MAIN MENU</button><button class="button button-quiet" data-action="exit">EXIT TO DESKTOP</button></div></div></section>
+
+  <script type="module" src="src/main.js"></script>
+  <script>if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(() => {});</script>
 </body>
 </html>
