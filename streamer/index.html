@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Streamer Life Sim 2</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": { "three": "../vendor/three.module.js" } }
+</script>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<!-- ============ MAIN MENU ============ -->
+<div id="menu" class="screen">
+  <div class="menu-vignette"></div>
+  <div class="menu-logo">
+    <div class="logo-cam">📷</div>
+    <h1>STREAMER<span> LIFE</span></h1>
+    <h2>SIMULATOR <b class="logo2">2</b></h2>
+    <div class="logo-sub">DARIJA EDITION · SMALL TOWN · BIG DREAMS</div>
+  </div>
+  <div class="menu-buttons">
+    <button id="m-play" class="mbtn">▶ PLAY</button>
+    <button id="m-mp" class="mbtn">🌐 MULTIPLAYER</button>
+    <button id="m-settings" class="mbtn">⚙️ SETTINGS</button>
+    <button id="m-quit" class="mbtn">⏻ QUIT</button>
+  </div>
+  <div class="menu-foot">Walk around town · buy houses & cars · upgrade your PC · go live on OPS<br>
+    <span class="keys">WASD move · E interact · Shift run · Enter chat · Esc pause</span></div>
+</div>
+
+<!-- ============ MULTIPLAYER ============ -->
+<div id="mp" class="screen panel-screen" style="display:none">
+  <div class="panel">
+    <h3>🌐 MULTIPLAYER — play together online / LAN</h3>
+    <p class="dim">One player creates a room and shares the code. The other joins with it.<br>Walk around together, chat, buy houses & cars together!</p>
+    <label>Server</label>
+    <input id="mp-server" class="tin" type="text">
+    <label>Your name</label>
+    <input id="mp-name" class="tin" type="text" placeholder="Streamer name (set in Settings)">
+    <div class="row">
+      <button id="mp-create" class="mbtn small">🎮 CREATE ROOM</button>
+    </div>
+    <label>Room code</label>
+    <div class="row">
+      <input id="mp-code" class="tin" type="text" placeholder="ABCDE" maxlength="5">
+      <button id="mp-join" class="mbtn small">🚪 JOIN</button>
+    </div>
+    <button id="mp-back" class="mbtn small ghost">← BACK</button>
+  </div>
+</div>
+
+<!-- ============ SETTINGS ============ -->
+<div id="settings" class="screen panel-screen" style="display:none">
+  <div class="panel">
+    <h3>⚙️ SETTINGS</h3>
+    <label>Graphics quality</label>
+    <select id="set-quality" class="tin"><option value="low">Low (potato PC)</option><option value="medium">Medium</option><option value="high">High</option></select>
+    <label class="chk"><input type="checkbox" id="set-shadows"> Shadows</label>
+    <label>Volume <span id="set-volv"></span></label>
+    <input type="range" id="set-vol" min="0" max="1" step="0.05">
+    <label>Mouse sensitivity</label>
+    <input type="range" id="set-sens" min="0.3" max="2.5" step="0.1">
+    <label class="chk"><input type="checkbox" id="set-invert"> Invert Y</label>
+    <label>Streamer name</label>
+    <input id="set-name" class="tin" type="text" maxlength="14">
+    <div class="row">
+      <button id="set-apply" class="mbtn small">✔ APPLY</button>
+      <button id="set-close" class="mbtn small ghost">← BACK</button>
+      <button id="set-reset" class="mbtn small danger">🗑 RESET SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAUSE ============ -->
+<div id="pause" class="screen panel-screen" style="display:none">
+  <div class="panel">
+    <h3>⏸ PAUSED</h3>
+    <button id="p-resume" class="mbtn">▶ RESUME</button>
+    <button id="p-settings" class="mbtn">⚙️ SETTINGS</button>
+    <button id="p-save" class="mbtn">💾 SAVE</button>
+    <button id="p-quit" class="mbtn">🏠 QUIT TO MENU</button>
+  </div>
+</div>
+
+<!-- ============ QUIT ============ -->
+<div id="quit" class="screen" style="display:none">
+  <h1 class="quit-t">Thanks for playing! 👋</h1>
+  <div class="dim">You can close this tab now.<br>(Browsers don't let games close themselves 😉)</div>
+</div>
+
+<!-- ============ HUD ============ -->
+<div id="hud" style="display:none">
+  <div class="hud-top">
+    <div class="hud-chip" id="hud-money">$15</div>
+    <div class="hud-chip" id="hud-fol">❤️ 0</div>
+    <div class="hud-chip" id="hud-clock">🕐 09:00</div>
+    <div class="hud-chip" id="hud-room" style="display:none"></div>
+  </div>
+  <div id="hud-live"><span class="dot">●</span> LIVE · <span id="hud-viewers">0</span> 👁️</div>
+  <div id="prompt"></div>
+  <div id="speedo"></div>
+  <div id="chat-msgs"></div>
+  <input id="chat-input" type="text" placeholder="Type message + Enter…" style="display:none">
+  <div id="toast"></div>
+</div>
+
+<!-- ============ PC UI ============ -->
+<div id="pcui"></div>
+
+<!-- ============ TOUCH ============ -->
+<div id="touch" style="display:none">
+  <div id="lookzone"></div>
+  <div id="stick"><div id="stick-knob"></div></div>
+  <button id="t-e" class="tbtn">E</button>
+  <button id="t-run" class="tbtn">🏃</button>
+  <button id="t-chat" class="tbtn">💬</button>
+  <button id="t-gas" class="tbtn drv">▲</button>
+  <button id="t-brake" class="tbtn drv">▼</button>
+  <button id="t-left" class="tbtn drv">◀</button>
+  <button id="t-right" class="tbtn drv">▶</button>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,3 +1,11 @@
+# 📷 NEW: Streamer Life Sim 2 — Darija Edition
+
+لعبة جديدة كاملة! A full 3D streamer life-sim (small town, houses, PC with streaming apps, shop, cars, multiplayer).
+➡️ Everything lives in **[`streamer/`](streamer/README.md)** — play with `node streamer/server.mjs 8080`.
+Deliverables in repo root: **`StreamerLife2.apk`** (Android, offline) · **`StreamerLife2.exe`** (Windows) · **`streamer-life.html`** (single file).
+
+---
+
 # 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
