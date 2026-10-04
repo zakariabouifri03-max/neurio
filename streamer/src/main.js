@@ -90,8 +90,9 @@ const pc = new PC($('pcui'), save, {
   cleanVirus: () => { G.virus = false; pc.setVirus(false); toast('🧹 Virus removed!'); },
   toggleStream: () => {
     G.live = !G.live;
+    if (G.live) G.everLive = true;
     pc.setLive(G.live);
-    if (G.live) { A.sLive(); toast('🔴 You are LIVE!'); mpChat('📡 went live!'); }
+    if (G.live) { A.sLive(); toast('🔴 You are LIVE!'); mpChat('📡 went live!'); hud(); }
     else { A.sBack(); toast('⬛ Stream ended. +' + fmt$(0)); }
   },
   getStats: () => ({ viewers: G.viewers, followers: save.followers }),
@@ -141,6 +142,12 @@ function hud() {
   $('hud-fol').textContent = '❤️ ' + Math.floor(save.followers);
   $('hud-live').style.display = G.live ? 'flex' : 'none';
   if (G.live) $('hud-viewers').textContent = Math.floor(G.viewers);
+  const ever = G.everLive || save.followers > 0;
+  $('hud-goal').textContent = !ever
+    ? '🎯 Use your PC (E) → OPS → START STREAMING'
+    : save.ownedHouses.length === 1
+      ? '🎯 Save $1,500 → buy the Wooden Cabin (FOR SALE sign)'
+      : '🎯 Upgrade gear on Zamazor → grow your stream!';
 }
 function mpChat(msg) { if (G.mp) G.mp.chatMsg(msg); }
 
@@ -228,9 +235,9 @@ function touchCarMode(on) {
 }
 
 // ---------- interact ----------
-function nearestInteract() {
+function nearestInteract(radius) {
   const p = player.mode === 'car' ? player.car.group.position : player.pos;
-  let best = null, bd = player.mode === 'car' ? 4.2 : 2.6;
+  let best = null, bd = radius ?? (player.mode === 'car' ? 4.2 : 2.6);
   for (const it of W.interact) {
     const d = p.distanceTo(it.pos);
     if (d < bd) {
@@ -240,6 +247,20 @@ function nearestInteract() {
   }
   return best;
 }
+
+// floating E marker (helps you spot interactables from far away)
+const eMarker = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d');
+  g.fillStyle = '#f4c818'; g.beginPath(); g.arc(64, 64, 56, 0, 7); g.fill();
+  g.strokeStyle = '#111'; g.lineWidth = 10; g.stroke();
+  g.fillStyle = '#111'; g.font = '900 78px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('E', 64, 70);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthTest: false }));
+  s.scale.set(0.8, 0.8, 1); s.visible = false; s.renderOrder = 5;
+  scene.add(s);
+  return s;
+})();
 function interactLabel(it) {
   switch (it.type) {
     case 'door': {
@@ -591,9 +612,14 @@ function loop(now) {
         $('speedo').style.display = 'block';
         $('speedo').textContent = Math.floor(Math.abs(player.car.speed) * 3.6) + ' km/h';
       } else $('speedo').style.display = 'none';
-      // interact prompt
+      // interact prompt + floating E marker
       const it = nearestInteract();
       G.interactTarget = it;
+      const mk = nearestInteract(11);
+      if (mk) {
+        eMarker.visible = true;
+        eMarker.position.set(mk.pos.x, 2.3 + Math.sin(now / 300) * 0.12, mk.pos.z);
+      } else eMarker.visible = false;
       if (player.mode === 'car') {
         $('prompt').textContent = '🚪 Exit car [E]';
         $('prompt').style.display = 'block';
