@@ -199,6 +199,7 @@ export class Game {
     this.mode = mode;
     if (!cont) { this.save = defaultSave(); this.sync(); }
     this.ui.hideMenu();
+    $('objective').style.display = 'block';
     this.insideHouse = 0;
     this.player.pos.set(-60, 0, -55);
     this.refreshCars(); this.applyFurniture();
@@ -529,7 +530,11 @@ export class Game {
   tryInteract() {
     if (this.paused || this.pc.open) return;
     const near = this.nearest();
-    if (near) near.fn();
+    if (near) return near.fn();
+    // forgiving fallback: if something is close-ish, just use it
+    const any = this.nearestAny();
+    if (any && any.d < 11) return any.it.fn();
+    this.toast('🔎 Nothing here — follow the green marker 🚪');
   }
   tryCar() {
     const p = this.player;
@@ -593,6 +598,23 @@ export class Game {
     this.toast('🧭 Unstuck!');
   }
 
+  /** top-of-screen goal line so the player always knows what to do next */
+  updateObjective() {
+    const s = this.save, o = $('objective');
+    let text = null;
+    if (this.stream.live) text = '🔴 You are LIVE — keep the hype up, then END STREAM';
+    else if (!this.insideHouse) {
+      const p = this.player.pos;
+      const d = Math.round(Math.hypot(p.x - (-60), p.z - (-70 + 4.5 + 3.2)));
+      text = `🎯 Go to your house <b>🚪 HOUSE 1</b> — ${d} m · press <b>E</b> at the green marker`;
+      if (s.streams > 0) text = '🎯 Explore: 🛒 market · 💻 tech · 🚗 cars · 🏠 real estate — or go home and stream';
+    } else if (s.stats.energy < 20) text = '😴 Low energy — use the 🛏️ bed';
+    else if (s.stats.hunger < 20) text = '🍔 Hungry — use the 🧊 fridge';
+    else text = '🎯 Sit at the <b>🖥️ PC</b> → open <b>OPS</b> → START STREAMING';
+    o.style.display = 'block';
+    o.innerHTML = text;
+  }
+
   setPaused(v) {
     this.paused = v;
     this.ui.pause(v);
@@ -638,6 +660,16 @@ export class Game {
       this.tickStream(dt);
       this.net.update(dt, this.player);
       this.npcs.update(dt, this.player);
+      if (this.world.markers && this.settings.markers) {
+        const t = performance.now() * .002;
+        for (const mk of this.world.markers) {
+          const d = Math.hypot(mk.pos.x - this.player.pos.x, mk.pos.z - this.player.pos.z);
+          const vis = !this.insideHouse && d < 90;
+          mk.m.visible = mk.ring.visible = vis;
+          if (mk.tag) { mk.tag.visible = vis && d < 42; mk.tag.position.y = 3.4 + Math.sin(t + mk.pos.x) * .15; }
+          if (vis) { mk.m.material.opacity = .10 + .10 * Math.sin(t * 2); mk.ring.material.opacity = .35 + .25 * Math.sin(t * 2); }
+        }
+      }
       this.updateSky();
       // interaction prompt (with a "walk closer" hint so nothing feels hidden)
       if (!this.player.inCar) {
@@ -648,6 +680,7 @@ export class Game {
           this.ui.prompt(near ? `${near.it.label} — ${Math.round(near.d)} m` : null, true);
         }
       } else this.ui.prompt(null);
+      this.updateObjective();
       this._mmT = (this._mmT || 0) + dt;
       if (this._mmT > .12 && this.settings.minimap) { this._mmT = 0; this.ui.drawMinimap(this.player, this.insideHouse); }
       if (this.player.inCar) this.ui.carHud(Math.abs(this.player.carSpeed || 0) * 3.6);

@@ -6,5 +6,19 @@ addEventListener('error', e => {
 });
 window.GAME = new Game();
 document.getElementById('loading').style.display = 'none';
-if ('serviceWorker' in navigator && location.protocol.startsWith('http'))
-  addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+export const BUILD = 'v1.3';
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  addEventListener('load', async () => {
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const r of regs) r.update();
+      const reg = await navigator.serviceWorker.register('./sw.js');
+      reg.addEventListener('updatefound', () => {
+        const w = reg.installing;
+        w && w.addEventListener('statechange', () => {
+          if (w.state === 'installed' && navigator.serviceWorker.controller) location.reload();
+        });
+      });
+    } catch { }
+  });
+}

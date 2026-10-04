@@ -308,15 +308,28 @@ export class World {
   }
 
   /** soft glowing pillar that shows an interaction point from far away */
-  marker(g, pos, color) {
+  marker(g, pos, color, label) {
     const m = new THREE.Mesh(new THREE.CylinderGeometry(.55, .55, 7, 12, 1, true),
       new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .16, side: THREE.DoubleSide, depthWrite: false }));
     m.position.set(pos.x, 3.5, pos.z); g.add(m);
     const ring = new THREE.Mesh(new THREE.RingGeometry(.8, 1.15, 24),
       new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }));
     ring.rotation.x = -Math.PI / 2; ring.position.set(pos.x, .12, pos.z); g.add(ring);
+    let tag = null;
+    if (label) {
+      const cv = document.createElement('canvas'); cv.width = 512; cv.height = 128;
+      const x = cv.getContext('2d');
+      x.fillStyle = 'rgba(8,14,26,.85)'; x.roundRect?.(0, 0, 512, 128, 26); x.fill();
+      x.fillStyle = '#4ade80'; x.font = 'bold 56px sans-serif'; x.textAlign = 'center';
+      x.fillText(label, 256, 58);
+      x.fillStyle = '#fff'; x.font = 'bold 44px sans-serif';
+      x.fillText('press  E', 256, 110);
+      const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+      tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+      tag.scale.set(5.2, 1.3, 1); tag.position.set(pos.x, 3.4, pos.z); g.add(tag);
+    }
     this.markers = this.markers || [];
-    this.markers.push({ m, ring });
+    this.markers.push({ m, ring, tag, pos: pos.clone() });
   }
 
   tree(g, x, z) {
@@ -383,7 +396,7 @@ export class World {
     const dir = new THREE.Vector3(0, 0, d / 2 + 3).applyAxisAngle(new THREE.Vector3(0, 1, 0), rot);
     const ip = new THREE.Vector3(x + dir.x, 1, z + dir.z);
     this.interact(ip, 6, title, () => this.game.openShop(key));
-    this.marker(g, ip, 0x60a5fa);
+    this.marker(g, ip, 0x60a5fa, label);
   }
 
   homePlot(g, id, x, z, wallHex) {
@@ -444,7 +457,7 @@ export class World {
 
     const ip = new THREE.Vector3(x, 1, z + d / 2 + 3.2);
     this.interact(ip, 7, `🚪 Enter House #${id}`, () => this.game.enterHouse(id), { houseId: id, sign });
-    this.marker(g, ip, 0x22c55e);
+    this.marker(g, ip, 0x22c55e, 'HOUSE ' + id);
     // doormat
     const mat2 = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.3), mat({ color: 0x5a4733, roughness: 1 }));
     mat2.rotation.x = -Math.PI / 2; mat2.position.set(x, .08, z + d / 2 + 1.4); g.add(mat2);

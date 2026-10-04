@@ -251,3 +251,9 @@ h4{margin:10px 0 4px;font-size:14px;opacity:.85}
 .helpGrid>div{background:#0a1120;border:1px solid #ffffff18;border-radius:10px;padding:9px;display:flex;gap:9px;align-items:center}
 .helpGrid b{background:#fff;color:#111;border-radius:6px;padding:2px 9px;font-size:13px;min-width:54px;text-align:center}
 .helpGrid span{font-size:13px;opacity:.85}
+
+#objective{position:absolute;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);
+  background:#0b1020cc;border:1px solid #ffffff22;border-radius:10px;padding:6px 14px;font-size:13px;
+  display:none;max-width:70vw;text-align:center}
+#objective b{color:#4ade80}
+#buildTag{position:absolute;right:8px;top:calc(2px + env(safe-area-inset-top));font-size:10px;opacity:.35}
