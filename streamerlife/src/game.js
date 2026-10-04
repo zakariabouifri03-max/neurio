@@ -32,7 +32,8 @@ export class Game {
   constructor() {
     this.save = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null') || defaultSave();
     this.settings = JSON.parse(localStorage.getItem('slm2_settings') || 'null') ||
-      { sens: 1, fov: 78, quality: 'high', shadows: true, music: .4, sfx: .7, invertY: false, touch: 'ontouchstart' in window };
+      { sens: .6, fov: 78, quality: 'high', shadows: true, music: .4, sfx: .7, invertY: false,
+        touch: 'ontouchstart' in window, easy: true, minimap: true, markers: true };
     this.stream = { live: false, viewers: 0, time: 0, hype: 1, earned: 0, newFollowers: 0, ui: null };
     this.insideHouse = 0;
     this.paused = false;
@@ -49,6 +50,12 @@ export class Game {
     this.scene.add(this.net.group);
     this.npcs = new NPCs(this);
     this.scene.add(this.npcs.group);
+    this.ui.initMinimap([
+      { x: -60, z: -70, icon: '🏚️' }, { x: 0, z: -70, icon: '🏡' }, { x: 60, z: -70, icon: '🏰' },
+      { x: -30, z: -30, icon: '🛒' }, { x: 30, z: -30, icon: '💻' }, { x: -30, z: 30, icon: '🚗' },
+      { x: 30, z: 30, icon: '🛋️' }, { x: -90, z: 30, icon: '🏦' }, { x: 90, z: -30, icon: '🏠' },
+      { x: 90, z: 30, icon: '👕' }, { x: -90, z: -30, icon: '🏋️' },
+    ]);
     this.bindInput();
     this.applySettings();
     this.spawnCars();
@@ -100,6 +107,8 @@ export class Game {
     this.renderer.setPixelRatio(s.quality === 'low' ? 0.7 : s.quality === 'med' ? Math.min(devicePixelRatio, 1.2) : Math.min(devicePixelRatio, 2));
     this.scene.traverse(o => { if (o.isMesh) o.material.needsUpdate = true; });
     $('touch').classList.toggle('on', !!s.touch);
+    $('minimapBox').style.display = s.minimap ? 'block' : 'none';
+    if (this.world?.markers) for (const mk of this.world.markers) { mk.m.visible = !!s.markers; mk.ring.visible = !!s.markers; }
     localStorage.setItem('slm2_settings', JSON.stringify(s));
   }
 
@@ -194,8 +203,9 @@ export class Game {
     this.player.pos.set(-60, 0, -55);
     this.refreshCars(); this.applyFurniture();
     if (mode === 'multi' && net) this.net.connect(net.srv, net.room, this.save.name);
-    this.toast('👋 Salam ' + this.save.name + '! Enter your house (🚪) and start streaming.');
-    this.grabMouse();
+    this.toast('👋 Salam ' + this.save.name + '! Follow the green marker 🚪');
+    if (!localStorage.getItem('slm2_seen_help')) { localStorage.setItem('slm2_seen_help', '1'); this.ui.howTo(); }
+    else this.grabMouse();
   }
 
   enterHouse(id) {
@@ -214,8 +224,9 @@ export class Game {
     this.insideHouse = id;
     const o = HOUSE_ORIGIN[id];
     const d = id === 1 ? 9 : id === 2 ? 13 : 18;
-    this.player.pos.set(o.x, 0, o.z + d / 2 - 2);
-    this.player.yaw = Math.PI;
+    this.player.pos.set(o.x, 0, o.z + d / 2 - 2.6);
+    this.player.yaw = Math.PI; this.player.vel.set(0, 0, 0);
+    this.toast('🏠 You are home — 🖥️ PC, 🛏️ bed, 🚿 shower, 🍔 fridge');
     this.scene.fog.density = .0001;
     this.grabMouse();
   }
@@ -224,7 +235,8 @@ export class Game {
     this.insideHouse = 0;
     const plots = { 1: [-60, -70], 2: [0, -70], 3: [60, -70] };
     const sizes = { 1: 9, 2: 12, 3: 17 };
-    this.player.pos.set(plots[id][0], 0, plots[id][1] + sizes[id] / 2 + 3);
+    this.player.pos.set(plots[id][0], 0, plots[id][1] + sizes[id] / 2 + 4);
+    this.player.vel.set(0, 0, 0);
     this.scene.fog.density = .0045;
   }
 
@@ -440,6 +452,7 @@ export class Game {
       p.keys[e.code] = true;
       if (e.code === 'KeyE') this.tryInteract();
       if (e.code === 'KeyF') this.tryCar();
+      if (e.code === 'KeyR') this.unstuck();
       if (e.code === 'KeyV' && this.player.inCar) {
         this.player.firstPersonCar = !this.player.firstPersonCar;
         this.toast(this.player.firstPersonCar ? '🎥 Cockpit view' : '🎥 Chase view');
@@ -531,22 +544,53 @@ export class Game {
     if (best) p.enterCar(best);
     else if (this.save.cars.length === 0) this.toast('🚗 You have no car — buy one at the Car Dealer');
   }
+  /** valid interactables for the place the player is standing in */
+  *candidates() {
+    for (const it of this.world.interactables) {
+      const interior = it.pos.z > 900;
+      if (interior !== !!this.insideHouse) continue;
+      if (interior && Math.abs(it.pos.z - (900 + this.insideHouse * 100)) > 60) continue;
+      yield it;
+    }
+  }
   nearest() {
     const p = this.player.pos;
+    const bonus = this.settings.easy ? 1.6 : 0;
     let best = null, bd = 1e9;
-    for (const it of this.world.interactables) {
-      if (it.houseId && it.houseId !== (this.insideHouse || it.houseId)) { }
+    for (const it of this.candidates()) {
       const d = it.pos.distanceTo(p);
-      if (d < it.r && d < bd) {
-        // interior interactables only when inside matching house
-        const interior = it.pos.z > 900;
-        if (interior && !this.insideHouse) continue;
-        if (interior && Math.abs(it.pos.z - (900 + this.insideHouse * 100)) > 60) continue;
-        if (!interior && this.insideHouse) continue;
-        bd = d; best = it;
-      }
+      if (d < it.r + bonus && d < bd) { bd = d; best = it; }
     }
     return best;
+  }
+  /** closest interactable even if out of range — used for the "get closer" hint */
+  nearestAny() {
+    const p = this.player.pos;
+    let best = null, bd = 1e9;
+    for (const it of this.candidates()) {
+      const d = it.pos.distanceTo(p);
+      if (d < bd) { bd = d; best = it; bd = d; }
+    }
+    return best && bd < 22 ? { it: best, d: bd } : null;
+  }
+
+  /** teleport out of geometry if the player ever gets stuck */
+  unstuck() {
+    const p = this.player;
+    if (p.inCar) { p.exitCar(); return; }
+    if (this.insideHouse) {
+      const o = HOUSE_ORIGIN[this.insideHouse];
+      const d = this.insideHouse === 1 ? 9 : this.insideHouse === 2 ? 13 : 18;
+      p.pos.set(o.x, 0, o.z + d / 2 - 2.4);
+    } else {
+      for (let i = 0; i < 40; i++) {
+        const a = Math.random() * Math.PI * 2, r = 3 + i * .9;
+        const x = p.pos.x + Math.cos(a) * r, z = p.pos.z + Math.sin(a) * r;
+        const [cx, cz] = p.collide(x, z);
+        if (Math.hypot(cx - x, cz - z) < .01) { p.pos.set(x, 0, z); break; }
+      }
+    }
+    this.toast('🧭 Unstuck!');
   }
 
   setPaused(v) {
@@ -586,17 +630,26 @@ export class Game {
       if (!this.pc.open) this.player.update(dt);
       this.advanceTime(dt * this.timeScale() / 60);
       // needs decay
-      this.addStat('hunger', -dt * .35);
-      this.addStat('hygiene', -dt * .22);
-      this.addStat('energy', -dt * (this.pc.open ? .25 : .18));
+      const ez = this.settings.easy ? .5 : 1;
+      this.addStat('hunger', -dt * .35 * ez);
+      this.addStat('hygiene', -dt * .22 * ez);
+      this.addStat('energy', -dt * (this.pc.open ? .25 : .18) * ez);
       if (this.save.stats.hunger < 12 || this.save.stats.hygiene < 12) this.addStat('mood', -dt * .3);
       this.tickStream(dt);
       this.net.update(dt, this.player);
       this.npcs.update(dt, this.player);
       this.updateSky();
-      // interaction prompt
-      const n = this.nearest();
-      this.ui.prompt(n ? n.label : (this.player.inCar ? '' : null));
+      // interaction prompt (with a "walk closer" hint so nothing feels hidden)
+      if (!this.player.inCar) {
+        const n = this.nearest();
+        if (n) this.ui.prompt(n.label);
+        else {
+          const near = this.nearestAny();
+          this.ui.prompt(near ? `${near.it.label} — ${Math.round(near.d)} m` : null, true);
+        }
+      } else this.ui.prompt(null);
+      this._mmT = (this._mmT || 0) + dt;
+      if (this._mmT > .12 && this.settings.minimap) { this._mmT = 0; this.ui.drawMinimap(this.player, this.insideHouse); }
       if (this.player.inCar) this.ui.carHud(Math.abs(this.player.carSpeed || 0) * 3.6);
       else this.ui.carHud(null);
       this._hudT = (this._hudT || 0) + dt;

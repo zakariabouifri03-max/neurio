@@ -22,6 +22,25 @@ export class UI {
     $('btnContinue').onclick = () => g.startGame('solo', true);
     if (!localStorage.getItem('slm2_save')) $('btnContinue').style.display = 'none';
   }
+  howTo() {
+    this.openPanel('🎮 How to play — kifach tl3ab', `
+      <div class="helpGrid">
+        <div><b>W A S D</b><span>tmchi / move</span></div>
+        <div><b>Mouse</b><span>tchouf / look (click once to lock)</span></div>
+        <div><b>Shift</b><span>tjri / run</span></div>
+        <div><b>E</b><span>interact — wla klick 3la lbar l5dra</span></div>
+        <div><b>F</b><span>tdkhol / tkhroj tomobil</span></div>
+        <div><b>V</b><span>camera dyal tomobil</span></div>
+        <div><b>R</b><span>unstuck ila t3alaqti</span></div>
+        <div><b>Tab</b><span>kharita · <b>Esc</b> pause</span></div>
+      </div>
+      <p class="muted">Lawwel 7aja: mchi l <b>🚪 bab dyal dar #1</b> (l3alama khadra), dghat <b>E</b>, mn be3d
+      mchi l <b>🖥️ PC</b> ou 7el <b>OPS</b> → START STREAMING.</p>
+      <button class="btn big" id="helpOk">LET'S GO 🚀</button>`, () => {
+      $('helpOk').onclick = () => { this.closePanel(); this.game.grabMouse(); };
+    });
+  }
+
   showMenu() { this.menu.classList.add('on'); this.hud.classList.remove('on'); }
   hideMenu() { this.menu.classList.remove('on'); this.hud.classList.add('on'); }
 
@@ -56,14 +75,19 @@ export class UI {
       <label>Music <input type="range" id="sMus" min="0" max="100" value="${s.music * 100}"></label>
       <label>SFX <input type="range" id="sSfx" min="0" max="100" value="${s.sfx * 100}"></label>
       <label>Invert Y <input type="checkbox" id="sInv" ${s.invertY ? 'checked' : ''}></label>
+      <label>Easy mode (slower needs, bigger interaction zones) <input type="checkbox" id="sEasy" ${s.easy ? 'checked' : ''}></label>
+      <label>Show minimap <input type="checkbox" id="sMap" ${s.minimap ? 'checked' : ''}></label>
+      <label>Show guide markers <input type="checkbox" id="sMark" ${s.markers ? 'checked' : ''}></label>
       <label>Show touch controls <input type="checkbox" id="sTouch" ${s.touch ? 'checked' : ''}></label>
-      <p class="muted">Controls: WASD move · Shift run · Mouse look · E interact · F enter/exit car · Tab map · Esc pause · Enter chat (multiplayer)</p>
+      <p class="muted">Controls: WASD move · Shift run · Mouse look · <b>E</b> interact (or click the green bar) ·
+      F enter/exit car · V car camera · Tab map · <b>R</b> unstuck · Esc pause · Enter chat (multiplayer)</p>
       <button class="btn" id="sApply">Apply</button>`, () => {
       $('sQual').value = s.quality;
       $('sApply').onclick = () => {
         s.sens = +$('sSens').value / 100; s.fov = +$('sFov').value; s.quality = $('sQual').value;
         s.shadows = $('sShadow').checked; s.music = +$('sMus').value / 100; s.sfx = +$('sSfx').value / 100;
         s.invertY = $('sInv').checked; s.touch = $('sTouch').checked;
+        s.easy = $('sEasy').checked; s.minimap = $('sMap').checked; s.markers = $('sMark').checked;
         this.game.applySettings(); this.closePanel(); this.toast('⚙️ Settings applied');
       };
     });
@@ -193,11 +217,52 @@ export class UI {
       <span><b>V</b> camera</span><span><b>F</b> exit</span></div>`;
   }
 
-  prompt(text) {
+  prompt(text, far) {
     const p = $('prompt');
     if (!text) { p.style.display = 'none'; return; }
     p.style.display = 'block';
-    p.innerHTML = `<b>E</b> ${text}`;
+    p.className = far ? 'far' : '';
+    p.innerHTML = far ? `<i>${text}</i>` : `<b>E</b> ${text}`;
+    p.onclick = far ? null : () => this.game.tryInteract();
+  }
+
+  // ── minimap ────────────────────────────────────────────────────────────
+  initMinimap(pois) {
+    this.mm = $('minimap');
+    this.mmCtx = this.mm.getContext('2d');
+    this.pois = pois;
+  }
+  drawMinimap(player, insideHouse) {
+    if (!this.mmCtx) return;
+    const c = this.mmCtx, S = this.mm.width, R = 170;          // world radius shown
+    c.clearRect(0, 0, S, S);
+    c.fillStyle = '#0b1020'; c.fillRect(0, 0, S, S);
+    const toPx = (x, z) => [S / 2 + (x - player.pos.x) / R * (S / 2), S / 2 + (z - player.pos.z) / R * (S / 2)];
+    if (insideHouse) {
+      c.fillStyle = '#8b94a7'; c.font = '12px sans-serif'; c.textAlign = 'center';
+      c.fillText('inside the house', S / 2, S / 2);
+      return;
+    }
+    // roads
+    c.strokeStyle = '#2a3346'; c.lineWidth = 7;
+    for (const r of [-120, -60, 0, 60, 120]) {
+      let [x1, y1] = toPx(-200, r), [x2, y2] = toPx(200, r);
+      c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+      [x1, y1] = toPx(r, -200); [x2, y2] = toPx(r, 200);
+      c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+    }
+    // points of interest
+    c.font = '11px sans-serif'; c.textAlign = 'center';
+    for (const p of this.pois) {
+      const [x, y] = toPx(p.x, p.z);
+      if (x < -20 || y < -20 || x > S + 20 || y > S + 20) continue;
+      c.fillText(p.icon, x, y + 4);
+    }
+    // player arrow
+    c.save(); c.translate(S / 2, S / 2); c.rotate(-player.yaw + Math.PI);
+    c.fillStyle = '#22d3ee'; c.beginPath(); c.moveTo(0, -8); c.lineTo(6, 7); c.lineTo(0, 4); c.lineTo(-6, 7);
+    c.closePath(); c.fill(); c.restore();
+    c.strokeStyle = '#ffffff22'; c.strokeRect(.5, .5, S - 1, S - 1);
   }
 
   toast(msg) {
@@ -211,6 +276,7 @@ export class UI {
     if (on) {
       $('pResume').onclick = () => this.game.setPaused(false);
       $('pSettings').onclick = () => this.openSettings();
+      const hb = $('pHelp'); if (hb) hb.onclick = () => this.howTo();
       $('pSave').onclick = () => { this.game.saveNow(); this.toast('💾 Saved'); };
       $('pMenu').onclick = () => { this.game.saveNow(); location.reload(); };
     }

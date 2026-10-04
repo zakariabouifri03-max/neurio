@@ -31,6 +31,11 @@ export class World {
     this.colliders.push({ minx: b.min.x - pad, maxx: b.max.x + pad, minz: b.min.z - pad, maxz: b.max.z + pad, miny: b.min.y, maxy: b.max.y });
     return mesh;
   }
+  /** explicit AABB collider (world space) — avoids "whole group" collider bugs */
+  solidBox(x, z, w, d, maxy = 20, miny = 0) {
+    this.colliders.push({ minx: x - w / 2, maxx: x + w / 2, minz: z - d / 2, maxz: z + d / 2, miny, maxy });
+  }
+
   interact(pos, r, label, fn, opts = {}) {
     const it = { pos: pos.clone(), r, label, fn, ...opts };
     this.interactables.push(it);
@@ -53,33 +58,83 @@ export class World {
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), mat({ map: T.grass(60), roughness: 1 }));
     ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; g.add(ground);
 
-    // road grid
+    // road grid — clean asphalt, curbs with gaps, crosswalks at junctions
     const roadMat = mat({ map: T.asphalt(20), roughness: .95 });
     const lineMat = mat({ color: 0xf2e9c8, roughness: .8 });
+    const crossMat = mat({ color: 0xf5f2e6, roughness: .85 });
     const sideMat = mat({ map: T.sidewalk(14), roughness: 1 });
     const ROADS = [-120, -60, 0, 60, 120];
+    const HALF = 7, SIDE = 10.2, JUNC = 11;          // road half-width / curb centre / junction clear
+    const atJunction = (v) => ROADS.some(r => Math.abs(v - r) < JUNC);
+
+    const flat = (w, d, m, x, y, z) => {
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(w, d), m);
+      p.rotation.x = -Math.PI / 2; p.position.set(x, y, z); p.receiveShadow = true; return p;
+    };
+
     for (const z of ROADS) {
-      const r = new THREE.Mesh(new THREE.PlaneGeometry(400, 14), roadMat);
-      r.rotation.x = -Math.PI / 2; r.position.set(0, .02, z); r.receiveShadow = true; g.add(r);
-      for (let x = -190; x < 190; x += 12) {
-        const l = new THREE.Mesh(new THREE.PlaneGeometry(6, .4), lineMat);
-        l.rotation.x = -Math.PI / 2; l.position.set(x, .04, z); g.add(l);
+      g.add(flat(400, HALF * 2, roadMat, 0, .02, z));
+      for (let x = -194; x < 194; x += 11) {                      // dashed centre line
+        if (atJunction(x)) continue;
+        g.add(flat(6, .35, lineMat, x, .05, z));
       }
-      for (const s of [-1, 1]) {
-        const w = new THREE.Mesh(new THREE.BoxGeometry(400, .3, 3), sideMat);
-        w.position.set(0, .15, z + s * 8.5); w.receiveShadow = true; g.add(w);
+      for (const sgn of [-1, 1]) {                                // lane edge lines
+        for (let x = -194; x < 194; x += 8) {
+          if (atJunction(x)) continue;
+          g.add(flat(7, .22, lineMat, x, .045, z + sgn * (HALF - .7)));
+        }
+      }
+      // curbs, cut at junctions
+      for (const sgn of [-1, 1]) {
+        let seg = -200;
+        for (const r of [...ROADS, 999]) {
+          const a = seg, b = Math.min(r - JUNC, 200);
+          if (b > a) {
+            const c = new THREE.Mesh(new THREE.BoxGeometry(b - a, .32, 3.4), sideMat);
+            c.position.set((a + b) / 2, .16, z + sgn * SIDE); c.receiveShadow = true; g.add(c);
+          }
+          seg = r + JUNC;
+          if (seg > 200) break;
+        }
       }
     }
     for (const x of ROADS) {
-      const r = new THREE.Mesh(new THREE.PlaneGeometry(14, 400), roadMat);
-      r.rotation.x = -Math.PI / 2; r.position.set(x, .025, 0); r.receiveShadow = true; g.add(r);
-      for (let z = -190; z < 190; z += 12) {
-        const l = new THREE.Mesh(new THREE.PlaneGeometry(.4, 6), lineMat);
-        l.rotation.x = -Math.PI / 2; l.position.set(x, .045, z); g.add(l);
+      g.add(flat(HALF * 2, 400, roadMat, x, .025, 0));
+      for (let z = -194; z < 194; z += 11) {
+        if (atJunction(z)) continue;
+        g.add(flat(.35, 6, lineMat, x, .05, z));
       }
-      for (const s of [-1, 1]) {
-        const w = new THREE.Mesh(new THREE.BoxGeometry(3, .3, 400), sideMat);
-        w.position.set(x + s * 8.5, .15, 0); w.receiveShadow = true; g.add(w);
+      for (const sgn of [-1, 1]) {
+        for (let z = -194; z < 194; z += 8) {
+          if (atJunction(z)) continue;
+          g.add(flat(.22, 7, lineMat, x + sgn * (HALF - .7), .045, z));
+        }
+      }
+      for (const sgn of [-1, 1]) {
+        let seg = -200;
+        for (const r of [...ROADS, 999]) {
+          const a = seg, b = Math.min(r - JUNC, 200);
+          if (b > a) {
+            const c = new THREE.Mesh(new THREE.BoxGeometry(3.4, .32, b - a), sideMat);
+            c.position.set(x + sgn * SIDE, .16, (a + b) / 2); c.receiveShadow = true; g.add(c);
+          }
+          seg = r + JUNC;
+          if (seg > 200) break;
+        }
+      }
+    }
+    // junction pads + crosswalks + corner curbs
+    for (const x of ROADS) for (const z of ROADS) {
+      g.add(flat(HALF * 2 + .2, HALF * 2 + .2, roadMat, x, .035, z));
+      for (const sgn of [-1, 1]) {
+        for (let i = -3; i <= 3; i++) {                            // zebra crossings
+          g.add(flat(.55, 4.4, crossMat, x + i * 1.6, .06, z + sgn * (HALF + 2.4)));
+          g.add(flat(4.4, .55, crossMat, x + sgn * (HALF + 2.4), .06, z + i * 1.6));
+        }
+      }
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) {        // corner sidewalk blocks
+        const c = new THREE.Mesh(new THREE.BoxGeometry(6.6, .32, 6.6), sideMat);
+        c.position.set(x + sx * (SIDE + 1.6), .16, z + sz * (SIDE + 1.6)); c.receiveShadow = true; g.add(c);
       }
     }
 
@@ -252,6 +307,18 @@ export class World {
     }
   }
 
+  /** soft glowing pillar that shows an interaction point from far away */
+  marker(g, pos, color) {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(.55, .55, 7, 12, 1, true),
+      new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .16, side: THREE.DoubleSide, depthWrite: false }));
+    m.position.set(pos.x, 3.5, pos.z); g.add(m);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(.8, 1.15, 24),
+      new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }));
+    ring.rotation.x = -Math.PI / 2; ring.position.set(pos.x, .12, pos.z); g.add(ring);
+    this.markers = this.markers || [];
+    this.markers.push({ m, ring });
+  }
+
   tree(g, x, z) {
     const t = new THREE.Group();
     const h = rnd(7, 4);
@@ -309,9 +376,14 @@ export class World {
     const door = box(2.6, 4.4, .3, mat({ color: 0x2c3e50, metalness: .4, roughness: .4 }), 0, 2.2, d / 2 + .15);
     s.add(door);
     s.position.set(x, 0, z); s.rotation.y = rot;
-    g.add(s); this.solid(s);
-    const dir = new THREE.Vector3(0, 0, d / 2 + 2.6).applyAxisAngle(new THREE.Vector3(0, 1, 0), rot);
-    this.interact(new THREE.Vector3(x + dir.x, 1, z + dir.z), 3.5, title, () => this.game.openShop(key));
+    s.traverse(o => { o.castShadow = true; o.receiveShadow = true; });
+    g.add(s);
+    const ww = Math.abs(Math.cos(rot)) > .5 ? w : d, dd = Math.abs(Math.cos(rot)) > .5 ? d : w;
+    this.solidBox(x, z, ww, dd, 20);
+    const dir = new THREE.Vector3(0, 0, d / 2 + 3).applyAxisAngle(new THREE.Vector3(0, 1, 0), rot);
+    const ip = new THREE.Vector3(x + dir.x, 1, z + dir.z);
+    this.interact(ip, 6, title, () => this.game.openShop(key));
+    this.marker(g, ip, 0x60a5fa);
   }
 
   homePlot(g, id, x, z, wallHex) {
@@ -365,10 +437,17 @@ export class World {
     const sgt = new THREE.CanvasTexture(cv); sgt.colorSpace = THREE.SRGBColorSpace;
     const sign = box(3, 1.6, .15, new THREE.MeshBasicMaterial({ map: sgt }), -w / 2 - 2, 2.2, d / 2 + 3);
     hgrp.add(sign); sign.userData.saleSign = id;
-    hgrp.position.set(x, 0, z); g.add(hgrp); this.solid(hgrp);
+    hgrp.position.set(x, 0, z); g.add(hgrp);
     hgrp.traverse(o => { o.castShadow = true; o.receiveShadow = true; });
+    // collider = the building body only (the yard, steps, bike… stay walkable)
+    this.solidBox(x, z, w, d, 20);
 
-    this.interact(new THREE.Vector3(x, 1, z + d / 2 + 2.4), 3.2, `🚪 Enter House #${id}`, () => this.game.enterHouse(id), { houseId: id, sign });
+    const ip = new THREE.Vector3(x, 1, z + d / 2 + 3.2);
+    this.interact(ip, 7, `🚪 Enter House #${id}`, () => this.game.enterHouse(id), { houseId: id, sign });
+    this.marker(g, ip, 0x22c55e);
+    // doormat
+    const mat2 = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.3), mat({ color: 0x5a4733, roughness: 1 }));
+    mat2.rotation.x = -Math.PI / 2; mat2.position.set(x, .08, z + d / 2 + 1.4); g.add(mat2);
   }
 
   // ───────────────────────────── HOUSE INTERIOR ────────────────────────────
@@ -401,7 +480,7 @@ export class World {
     // ── exit door
     const door = box(2.2, 2.8, .25, mat({ map: T.wood(1, true), roughness: .8 }), 0, 1.4, d / 2 - .1);
     g.add(door);
-    this.interact(wp(0, 1, d / 2 - 1.6), 2.2, '🚪 Go outside', () => this.game.exitHouse(), { houseId: id });
+    this.interact(wp(0, 1, d / 2 - 1.8), 3.4, '🚪 Go outside', () => this.game.exitHouse(), { houseId: id });
 
     // ── streaming desk + PC
     const deskX = -w / 2 + 2.6, deskZ = -d / 2 + 2.2;
@@ -437,7 +516,7 @@ export class World {
     desk.traverse(o2 => { o2.castShadow = true; o2.receiveShadow = true; });
     this.game.pcDesk = this.game.pcDesk || {};
     this.game.pcDesk[id] = { desk, rgb, screens: [desk.children[6], desk.children[8], desk.children[10]] };
-    this.interact(wp(deskX, 1, deskZ + 1.6), 2, '🖥️ Use PC', () => this.game.openPC());
+    this.interact(wp(deskX, 1, deskZ + 1.8), 3.2, '🖥️ Use PC', () => this.game.openPC());
 
     // ── bed
     const bedX = w / 2 - 2.2, bedZ = -d / 2 + 2.4;
@@ -449,14 +528,14 @@ export class World {
     bed.add(box(2.2, 1.4, .18, mat({ map: T.wood(1, true) }), 0, .9, -1.6));
     bed.position.set(bedX, 0, bedZ); furn.add(bed);
     bed.traverse(o2 => { o2.castShadow = true; o2.receiveShadow = true; });
-    this.interact(wp(bedX - 1.6, 1, bedZ), 2, '🛏️ Sleep', () => this.game.sleep());
+    this.interact(wp(bedX - 1.6, 1, bedZ), 3, '🛏️ Sleep', () => this.game.sleep());
 
     // ── kitchen (fridge + counter)
     const kx = -w / 2 + 1.2, kz = d / 2 - 2.6;
     const fridge = box(1.1, 2.2, 1, mat({ color: 0xd8dce2, metalness: .7, roughness: .25 }), kx, 1.1, kz);
     furn.add(fridge);
     furn.add(box(.06, 1.9, .06, mat({ color: 0x8b9099, metalness: .9 }), kx + .5, 1.2, kz + .52));
-    this.interact(wp(kx + 1.6, 1, kz), 2.1, '🍔 Eat', () => this.game.eat());
+    this.interact(wp(kx + 1.6, 1, kz), 3, '🍔 Eat', () => this.game.eat());
     const counter = box(3.2, .95, 1, mat({ color: 0xc9cfd6, roughness: .5 }), kx + 2.8, .475, kz);
     furn.add(counter);
     furn.add(box(3.2, .08, 1, mat({ color: 0x2f3338, roughness: .3, metalness: .4 }), kx + 2.8, .99, kz));
@@ -468,7 +547,7 @@ export class World {
     shower.add(box(2, .2, 2, mat({ map: T.tile(2), roughness: .6 }), 0, .1, 0));
     shower.add(box(.3, .1, .3, mat({ color: 0xc0c6cc, metalness: .8 }), 0, 2.3, 0));
     shower.position.set(sx, 0, sz); furn.add(shower);
-    this.interact(wp(sx - 1.8, 1, sz), 2.1, '🚿 Shower', () => this.game.shower());
+    this.interact(wp(sx - 1.8, 1, sz), 3, '🚿 Shower', () => this.game.shower());
 
     // ── sofa + TV (living)
     const lz = d / 2 - 4.5;
@@ -480,8 +559,44 @@ export class World {
     const tv = box(3.2, 1.8, .12, new THREE.MeshBasicMaterial({ color: 0x0a0d14 }), 0, 1.8, lz - 4.5);
     furn.add(tv);
     furn.add(box(3.6, .5, .9, mat({ map: T.wood(1, true) }), 0, .25, lz - 4.4));
-    this.interact(wp(0, 1, lz - .3), 2.2, '📺 Watch TV / relax', () => this.game.relax());
+    this.interact(wp(0, 1, lz - .3), 3.2, '📺 Watch TV / relax', () => this.game.relax());
     this.game.tvScreen = this.game.tvScreen || {}; this.game.tvScreen[id] = tv;
+
+    // ── kitchen upper cabinets + sink ──────────────────────────────────
+    furn.add(box(3.2, .8, .6, mat({ map: T.wood(2, true), roughness: .7 }), kx + 2.8, 2.3, kz - .2));
+    furn.add(box(.9, .1, .6, mat({ color: 0xaeb6bd, metalness: .8, roughness: .25 }), kx + 2.2, 1.0, kz));
+    const tap = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, .45, 8), mat({ color: 0xc8ced4, metalness: .9, roughness: .2 }));
+    tap.position.set(kx + 2.2, 1.2, kz - .25); furn.add(tap);
+
+    // ── bathroom partition (bigger houses) + toilet + sink ─────────────
+    if (id > 1) {
+      const pw = box(.22, H, 4.6, mat({ map: T.tile(2), roughness: .7 }), sx - 2.3, H / 2, sz - .6);
+      g.add(pw); this.solid(pw);
+      // leave a 1.4 m doorway next to the outer wall so the bathroom is reachable
+      const pw2 = box(2.5, H, .22, mat({ map: T.tile(2), roughness: .7 }), sx - 1.05, H / 2, sz - 2.9);
+      g.add(pw2); this.solid(pw2);
+    }
+    const toilet = new THREE.Group();
+    toilet.add(box(.6, .45, .8, mat({ color: 0xf2f5f8, roughness: .35 }), 0, .25, 0));
+    toilet.add(box(.6, .75, .25, mat({ color: 0xf2f5f8, roughness: .35 }), 0, .5, -.4));
+    toilet.position.set(sx - 1.3, 0, sz - 2.2); furn.add(toilet);
+    const bsink = box(.9, .25, .55, mat({ color: 0xf2f5f8, roughness: .3 }), sx - 1.3, 1, sz - 3.4);
+    furn.add(bsink);
+    furn.add(box(.9, 1.1, .08, mat({ color: 0xcfe3ef, metalness: .6, roughness: .08 }), sx - 1.3, 1.9, sz - 3.7));
+
+    // ── windows that actually let light in ─────────────────────────────
+    const glassMat = mat({ color: 0xcfe9ff, emissive: 0x9fc6e8, emissiveIntensity: .55, transparent: true, opacity: .55, roughness: .05, metalness: .3 });
+    for (const [wx, wz, ry] of [[-w / 2 + .2, d / 4, Math.PI / 2], [w / 2 - .2, -d / 4, Math.PI / 2], [0, -d / 2 + .2, 0]]) {
+      const win = box(2.6, 1.5, .12, glassMat, wx, 2, wz); win.rotation.y = ry; furn.add(win);
+      const frame = box(2.9, 1.8, .08, mat({ map: T.wood(1, true), roughness: .8 }), wx + (ry ? .04 : 0), 2, wz + (ry ? 0 : .04));
+      frame.rotation.y = ry; furn.add(frame);
+      const wl = new THREE.PointLight(0xbcd8ff, .5, 10, 2); wl.position.set(wx, 2, wz); furn.add(wl);
+    }
+
+    // ── nightstand + lamp near the bed ─────────────────────────────────
+    furn.add(box(.7, .6, .7, mat({ map: T.wood(1, true) }), bedX - 1.6, .3, bedZ - 1.2));
+    const lampS = box(.35, .45, .35, mat({ color: 0xfff2cc, emissive: 0xffe9a8, emissiveIntensity: 1.1 }), bedX - 1.6, .82, bedZ - 1.2);
+    furn.add(lampS);
 
     // rug
     const rug = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 3), mat({ map: T.carpet('#7b2b3a', 2), roughness: 1 }));

@@ -49,9 +49,16 @@ hr{border:none;border-top:1px solid #ffffff22;margin:8px 0}
 .barBg{width:120px;height:9px;background:#0008;border:1px solid #ffffff22;border-radius:6px;overflow:hidden}
 .bar{height:100%;width:50%;background:#22c55e;transition:width .25s,background .25s}
 #cross{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:.5;font-size:20px}
-#prompt{position:absolute;left:50%;top:58%;transform:translateX(-50%);background:#0b1020d9;border:1px solid #ffffff28;
-  padding:8px 14px;border-radius:10px;font-size:15px;display:none}
-#prompt b{background:#fff;color:#111;border-radius:5px;padding:1px 7px;margin-right:6px}
+#prompt{position:absolute;left:50%;top:60%;transform:translateX(-50%);background:#16a34ae0;border:1px solid #ffffff44;
+  padding:10px 18px;border-radius:12px;font-size:16px;font-weight:700;display:none;pointer-events:auto;cursor:pointer;
+  box-shadow:0 8px 26px #0007;animation:rise .18s ease}
+#prompt:hover{background:#15803d}
+#prompt.far{background:#0b1020cc;border-color:#ffffff22;font-weight:500;font-size:13px;opacity:.8;cursor:default}
+#prompt b{background:#fff;color:#111;border-radius:5px;padding:1px 8px;margin-right:8px}
+#minimapBox{position:absolute;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));
+  border:2px solid #ffffff22;border-radius:12px;overflow:hidden;background:#0b1020cc;line-height:0}
+#minimap{width:150px;height:150px}
+@media(max-width:760px){#minimap{width:104px;height:104px}#minimapBox{bottom:auto;top:calc(120px + env(safe-area-inset-top))}}
 
 /* multiplayer */
 #mpBar{position:absolute;right:12px;top:calc(10px + env(safe-area-inset-top));width:270px;background:#0b1020cc;
@@ -196,7 +203,7 @@ h4{margin:10px 0 4px;font-size:14px;opacity:.85}
 .opsStats b{float:right;color:#fbbf24}
 
 /* car HUD */
-#carHud{position:absolute;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));display:none;text-align:right}
+#carHud{position:absolute;right:16px;bottom:calc(180px + env(safe-area-inset-bottom));display:none;text-align:right}
 #carHud .spd{font-size:14px;background:#0b1020cc;border:1px solid #ffffff22;border-radius:10px;padding:6px 12px;display:inline-block}
 #carHud .spd b{font-size:24px;color:#fbbf24}
 #carHud .keys{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:11px;opacity:.75}
@@ -239,3 +246,8 @@ h4{margin:10px 0 4px;font-size:14px;opacity:.85}
   .chatBox{height:200px}
   .hNeeds{bottom:auto;top:calc(52px + env(safe-area-inset-top))}
 }
+
+.helpGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:10px}
+.helpGrid>div{background:#0a1120;border:1px solid #ffffff18;border-radius:10px;padding:9px;display:flex;gap:9px;align-items:center}
+.helpGrid b{background:#fff;color:#111;border-radius:6px;padding:2px 9px;font-size:13px;min-width:54px;text-align:center}
+.helpGrid span{font-size:13px;opacity:.85}

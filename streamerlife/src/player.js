@@ -58,7 +58,7 @@ export class Player {
     fw += this.move.y; st += this.move.x;
     fw = clamp(fw, -1, 1); st = clamp(st, -1, 1);
     const run = (k['ShiftLeft'] || this.sprinting) && g.save.stats.energy > 8;
-    const base = (run ? 7.2 : 3.6) * this.speedMul;
+    const base = (run ? 8.2 : 4.4) * this.speedMul;
     const dir = new THREE.Vector3(Math.sin(this.yaw) * -fw + Math.cos(this.yaw) * st, 0,
       -Math.cos(this.yaw) * -fw - Math.sin(this.yaw) * st);
     if (dir.lengthSq() > 0) dir.normalize();
@@ -92,11 +92,16 @@ export class Player {
     const brk = (k['KeyS'] || k['ArrowDown'] ? 1 : 0) + Math.max(0, -this.move.y);
     const steer = (k['KeyA'] || k['ArrowLeft'] ? 1 : 0) - (k['KeyD'] || k['ArrowRight'] ? 1 : 0) - this.move.x;
     const max = c.userData.topSpeed || 22;
-    this.carSpeed += (gas * max * .55 - brk * max * .9) * dt;
-    this.carSpeed *= Math.pow(.55, dt);
-    this.carSpeed = clamp(this.carSpeed, -max * .35, max);
-    this.steerVis = lerp(this.steerVis || 0, clamp(steer, -1, 1), 1 - Math.pow(.01, dt));
-    c.rotation.y += steer * dt * 1.5 * clamp(Math.abs(this.carSpeed) / 8, 0, 1) * Math.sign(this.carSpeed || 1);
+    // forgiving arcade handling: strong brakes, assisted steering, no spin-outs
+    this.carSpeed += (gas * max * .6 - brk * max * 1.4) * dt;
+    if (!gas && !brk) this.carSpeed *= Math.pow(.45, dt);        // engine brake
+    this.carSpeed *= Math.pow(.75, dt);
+    this.carSpeed = clamp(this.carSpeed, -max * .3, max);
+    if (Math.abs(this.carSpeed) < .15) this.carSpeed = 0;
+    const st = clamp(steer, -1, 1);
+    this.steerVis = lerp(this.steerVis || 0, st, 1 - Math.pow(.004, dt));
+    const grip = clamp(Math.abs(this.carSpeed) / 6, 0, 1) * (1 - clamp(Math.abs(this.carSpeed) / (max * 2.2), 0, .45));
+    c.rotation.y += this.steerVis * dt * 1.7 * grip * Math.sign(this.carSpeed || 1);
     const dx = -Math.sin(c.rotation.y) * this.carSpeed * dt;
     const dz = -Math.cos(c.rotation.y) * this.carSpeed * dt;
     const r = 1.6;
