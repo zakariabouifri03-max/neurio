@@ -17,11 +17,18 @@ const MIME = {
 
 const server = createServer((req, res) => {
   let p = decodeURIComponent(req.url.split('?')[0]);
-  if (p === '/' || p === '') p = '/streamer/index.html';
-  if (p === '/streamer' || p === '/streamer/') p = '/streamer/index.html';
-  const file = normalize(join(ROOT, p));
+  if (p === '/' || p === '' || p === '/streamer' || p === '/streamer/') {
+    // redirect so the browser resolves relative assets (style.css, src/, icons/) correctly
+    res.writeHead(302, { Location: '/streamer/index.html' });
+    res.end();
+    return;
+  }
+  let file = normalize(join(ROOT, p));
   if (!file.startsWith(ROOT) || !existsSync(file) || statSync(file).isDirectory()) {
-    res.writeHead(404); res.end('404'); return;
+    // fallback: try under streamer/ (covers previews that strip the prefix)
+    const alt = normalize(join(ROOT, 'streamer', p));
+    if (alt.startsWith(ROOT) && existsSync(alt) && !statSync(alt).isDirectory()) file = alt;
+    else { res.writeHead(404); res.end('404'); return; }
   }
   res.writeHead(200, { 'Content-Type': MIME[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
   res.end(readFileSync(file));
