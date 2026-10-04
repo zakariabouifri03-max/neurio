@@ -68,7 +68,7 @@ let zamApp = 'computers';
 function stars(t) { return '★'.repeat(Math.min(5, t)) + '☆'.repeat(Math.max(0, 5 - t)); }
 
 function renderZamazor(body) {
-  const HW = ['cpu', 'gpu', 'ram', 'monitor'];
+  const HW = ['cpu', 'cooler', 'gpu', 'ram', 'hdd', 'cdrom', 'monitor'];
   const catList = zamApp === 'computers' ? PART_CATS.filter((c) => HW.includes(c.id)) : PART_CATS;
   if (zamApp === 'computers' && !HW.includes(zamCat)) zamCat = 'gpu';
   if (zamApp === 'zamazor' && HW.includes(zamCat)) zamCat = 'mic';
@@ -83,12 +83,15 @@ function renderZamazor(body) {
       <div class="zamGrid">
         ${items.map((it, i) => {
           const owned = isFurn ? (G.save.furniture.includes(it.id) || Object.values(G.save.placed).some((p) => Object.values(p).includes(it.id))) : G.save.parts[zamCat] >= it.t;
+          const disc = !owned && (i + G.save.day) % 5 === 0 ? (i % 2 ? 10 : 7) : 0;
+          const price = Math.ceil(it.price * (1 - disc / 100));
           return `<div class="prodCard">
+            ${disc ? `<span class="discBadge">%${disc}</span>` : ''}
             <div class="prodImg">${isFurn ? it.emoji : (PART_CATS.find((c) => c.id === zamCat)?.emoji || '⚙️')}</div>
             <div class="prodName">${it.name}</div>
             <div class="prodStars">${isFurn ? '★★★' : stars(it.t + 1)}</div>
             <div class="prodDesc">${it.desc}</div>
-            <div class="prodPrice">${fmtMoney(it.price)}</div>
+            <div class="prodPrice">${disc ? `<s class="dim">${fmtMoney(it.price)}</s> ` : ''}${fmtMoney(price)}</div>
             <button class="addBasket" data-i="${i}" ${owned ? 'disabled' : ''}>${owned ? '✓ owned' : 'Add to basket!'}</button>
           </div>`;
         }).join('')}
@@ -103,8 +106,11 @@ function renderZamazor(body) {
     </div>`;
   body.querySelectorAll('.catBtn').forEach((b) => (b.onclick = () => { zamCat = b.dataset.cat; renderZamazor(body); }));
   body.querySelectorAll('.addBasket').forEach((b) => (b.onclick = () => {
-    const it = items[+b.dataset.i];
-    basket.push(isFurn ? { kind: 'furn', id: it.id, name: it.emoji + ' ' + it.name, price: it.price } : { kind: 'part', cat: zamCat, t: it.t, name: it.name, price: it.price });
+    const i = +b.dataset.i;
+    const it = items[i];
+    const disc = (i + G.save.day) % 5 === 0 ? (i % 2 ? 10 : 7) : 0;
+    const price = Math.ceil(it.price * (1 - disc / 100));
+    basket.push(isFurn ? { kind: 'furn', id: it.id, name: it.emoji + ' ' + it.name, price } : { kind: 'part', cat: zamCat, t: it.t, name: it.name, price });
     audio.click(); renderZamazor(body);
   }));
   body.querySelectorAll('[data-rm]').forEach((b) => (b.onclick = () => { basket.splice(+b.dataset.rm, 1); renderZamazor(body); }));

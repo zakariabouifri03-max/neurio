@@ -7,10 +7,15 @@ export const PART_CATS = [
   { id: 'mic',      name: 'Microphone',  emoji: '🎙️', start: 0 },
   { id: 'webcam',   name: 'Webcam',      emoji: '📷', start: 0 },
   { id: 'cpu',      name: 'CPU',         emoji: '🧠', start: 1 },
+  { id: 'cooler',   name: 'CPU Cooler',  emoji: '❄️', start: 0 },
   { id: 'gpu',      name: 'Graphics Card', emoji: '🎮', start: 1 },
   { id: 'ram',      name: 'RAM',         emoji: '💾', start: 1 },
+  { id: 'hdd',      name: 'HDD / SSD',   emoji: '💽', start: 0 },
+  { id: 'cdrom',    name: 'CD-ROM',      emoji: '💿', start: 0 },
   { id: 'monitor',  name: 'Monitor',     emoji: '🖥️', start: 1 },
   { id: 'keyboard', name: 'Keyboard',    emoji: '⌨️', start: 1 },
+  { id: 'mouse',    name: 'Mouse',       emoji: '🖱️', start: 1 },
+  { id: 'router',   name: 'Router',      emoji: '📡', start: 1 },
   { id: 'chair',    name: 'Gamer Chair', emoji: '🪑', start: 1 },
   { id: 'rgb',      name: 'RGB Lighting', emoji: '🌈', start: 0 },
 ];
@@ -56,6 +61,23 @@ export const PARTS = {
     { t: 2, name: 'Nano Panels', price: 280, power: 4, vibe: 8,  desc: 'Wall triangles of power.' },
     { t: 3, name: 'Full RGB Kit', price: 720, power: 6, vibe: 14, desc: 'Your room is now a spaceship.' },
   ],
+  mouse: [
+    { t: 2, name: 'Gaming Mouse RGB', price: 95, power: 3, desc: '16,000 DPI of pure aim.' },
+  ],
+  cooler: [
+    { t: 1, name: 'Air Tower',   price: 60,  power: 3, desc: 'Keeps the potato cool.' },
+    { t: 2, name: 'Liquid 240',  price: 240, power: 7, desc: 'Water in the PC. What could go wrong.' },
+  ],
+  hdd: [
+    { t: 1, name: 'SSD 1TB',     price: 90,  power: 3, desc: 'Games load before you do.' },
+    { t: 2, name: 'NVMe 2TB',    price: 260, power: 6, desc: 'Blink and it is installed.' },
+  ],
+  cdrom: [
+    { t: 1, name: 'CD-ROM Drive', price: 20, power: 0, vibe: 1, desc: 'For the memes. Reads nothing made after 2004.' },
+  ],
+  router: [
+    { t: 2, name: 'WiFi 6 Router', price: 190, power: 5, desc: 'Ping so low it is philosophical.' },
+  ],
 };
 
 export function partById(cat, t) {
@@ -76,6 +98,8 @@ export const FURNITURE = [
   { id: 'arcade',   name: 'Arcade Cab',    emoji: '🕹️', price: 1500, slot: 'floor', desc: 'Retro cred for the stream.' },
   { id: 'disco',    name: 'Disco Ball',    emoji: '🪩', price: 420,  slot: 'wall',  desc: 'Every stream is a party.' },
   { id: 'goldpc',   name: 'Gold PC Case',  emoji: '🏆', price: 3000, slot: 'floor', desc: '24-karat flex. Purely cosmetic. Purely worth it.' },
+  { id: 'painting', name: 'Painting',      emoji: '🖼️', price: 120,  slot: 'wall',  desc: 'A moody forest. Very artistic.' },
+  { id: 'pool',     name: 'Inflatable Pool', emoji: '🏊', price: 350, slot: 'floor', desc: 'The legend. The meme. The pool.' },
 ];
 
 // ── Food ────────────────────────────────────────────────────────────────────

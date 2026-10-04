@@ -73,6 +73,13 @@ export function buildFurniture(id) {
   } else if (id === 'goldpc') {
     add(new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.9, 0.8), new THREE.MeshStandardMaterial({ color: 0xd8b23a, metalness: 1, roughness: 0.25 })), 0, 0.45, 0);
     add(new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.1, 0.5), new THREE.MeshStandardMaterial({ color: 0x111, emissive: 0x40ff80, emissiveIntensity: 1.2 })), 0, 0.7, 0);
+  } else if (id === 'painting') {
+    const t = posterTexture('🌄', '#5a7a9c');
+    add(new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.8), new THREE.MeshBasicMaterial({ map: t })), 0, 1.7, 0.02);
+    add(new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.9, 0.04), std(0xb08d4a, 0.4)), 0, 1.7, 0.0);
+  } else if (id === 'pool') {
+    add(new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.22, 10, 22), std(0x2a7fd8, 0.6)), 0, 0.22, 0).rotation.x = Math.PI / 2;
+    add(new THREE.Mesh(new THREE.CircleGeometry(0.78, 20), new THREE.MeshStandardMaterial({ color: 0x37b8d8, roughness: 0.15 })), 0, 0.2, 0).rotation.x = -Math.PI / 2;
   }
   return g;
 }
@@ -112,8 +119,20 @@ export function buildSetup(parts) {
     side.position.set(-0.95, 1.05, -0.15); side.rotation.y = 0.5; g.add(side);
   }
 
-  // PC tower with RGB
-  const tower = add(new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.55, 0.5), std(0x181c22, 0.4)), 0.75, 0.28, 0.1);
+  // PC tower with RGB (beige potato tower at first, like the original)
+  const fancy = parts.rgb >= 1 || parts.gpu >= 3;
+  const tower = add(new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.55, 0.5), std(fancy ? 0x181c22 : 0xd8d0c0, 0.5)), 0.75, 0.28, 0.1);
+  if (parts.cdrom >= 1) add(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.05, 0.3), std(0x8a8a84)), 0.62, 0.44, 0.1);
+  if (parts.hdd >= 1) add(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.05, 0.3), std(0x6a6a64)), 0.62, 0.34, 0.1);
+  if (parts.cooler >= 1) {
+    const fanMat = parts.cooler >= 2 ? new THREE.MeshStandardMaterial({ color: 0x111, emissive: 0x40e0d0, emissiveIntensity: 1 }) : std(0x9a9a94, 0.5);
+    add(new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.04, 12), fanMat), 0.75, 0.58, 0.1);
+  }
+  if (parts.router >= 1) {
+    add(new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, 0.12), std(0x22262c)), -0.75, 0.79, -0.2);
+    add(new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.1, 0.012), std(0x22262c)), -0.7, 0.86, -0.2);
+    const led = add(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.015, 0.015), new THREE.MeshStandardMaterial({ color: 0x111, emissive: 0x40ff80, emissiveIntensity: 1.5 })), -0.75, 0.815, -0.14);
+  }
   if (parts.rgb >= 1) {
     const rgbMat = new THREE.MeshStandardMaterial({ color: 0x111, emissive: 0xb44dff, emissiveIntensity: 1.6 });
     add(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.5, 0.45), rgbMat), 0.62, 0.28, 0.1);
@@ -134,7 +153,7 @@ export function buildSetup(parts) {
   // keyboard + mouse
   const kb = parts.keyboard >= 2 ? new THREE.MeshStandardMaterial({ color: 0x111, emissive: 0xff4fd8, emissiveIntensity: 0.5 }) : std(0xd8d8d0);
   add(new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.03, 0.15), kb), -0.05, 0.79, 0.15);
-  add(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.02, 0.1), std(0x222)), 0.3, 0.79, 0.15);
+  add(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.02, 0.1), parts.mouse >= 2 ? new THREE.MeshStandardMaterial({ color: 0x111, emissive: 0xff4fd8, emissiveIntensity: 0.8 }) : std(0x222)), 0.3, 0.79, 0.15);
 
   // mic by tier
   if (parts.mic >= 1) {
@@ -186,6 +205,9 @@ export function makeInterior(houseId) {
   door.position.set(w / 4, 1, d / 2 - 0.04); g.add(door);
   const knob = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), new THREE.MeshStandardMaterial({ color: 0xd8b23a, metalness: 0.8 }));
   knob.position.set(w / 4 + 0.35, 1, d / 2 - 0.1); g.add(knob);
+  // little window in the door (like the original room)
+  const dwin = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.55), new THREE.MeshBasicMaterial({ color: 0x9fc6d8 }));
+  dwin.position.set(w / 4, 1.5, d / 2 - 0.095); dwin.rotation.y = Math.PI; g.add(dwin);
   interact.push({ id: 'exit', icon: '🚪', label: 'Go outside', x: ox + w / 4, z: d / 2 - 0.8, r: 1.6 });
 
   // fake window on -z wall

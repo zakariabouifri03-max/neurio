@@ -274,6 +274,31 @@ export function buildCity() {
   group.add(van);
   colliders.push({ x: 18, z: -8.5, hx: 2.6, hz: 1.6 });
 
+  // green bicycles (like the reference shots)
+  function bike(x, z, ry) {
+    const g = new THREE.Group();
+    const frame = new THREE.MeshStandardMaterial({ color: 0x6fd83a, roughness: 0.5 });
+    const dark = new THREE.MeshStandardMaterial({ color: 0x1a1d22, roughness: 0.7 });
+    const wGeo = new THREE.TorusGeometry(0.34, 0.045, 8, 18);
+    const w1 = new THREE.Mesh(wGeo, dark); w1.position.set(0, 0.34, 0.55); g.add(w1);
+    const w2 = new THREE.Mesh(wGeo, dark); w2.position.set(0, 0.34, -0.55); g.add(w2);
+    const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.1, 6), frame);
+    bar.rotation.x = Math.PI / 2; bar.position.y = 0.62; g.add(bar);
+    const bar2 = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.7, 6), frame);
+    bar2.rotation.x = Math.PI / 2 + 0.5; bar2.position.set(0, 0.5, 0.35); g.add(bar2);
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.05, 0.22), dark);
+    seat.position.set(0, 0.82, -0.28); g.add(seat);
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.25, 6), frame);
+    post.position.set(0, 0.7, -0.3); g.add(post);
+    const hb = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.4, 6), dark);
+    hb.rotation.z = Math.PI / 2; hb.position.set(0, 0.85, 0.55); g.add(hb);
+    g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+    g.position.set(x, 0, z); g.rotation.y = ry;
+    group.add(g);
+  }
+  bike(-11.2, 15.2, 0.6);
+  bike(77.5, -41.5, 2.2);
+
   // ── clouds ──
   const clouds = [];
   const cloudTex = (() => {

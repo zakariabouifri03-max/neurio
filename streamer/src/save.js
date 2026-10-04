@@ -15,7 +15,7 @@ export function defaultSave() {
     skill: 1,
     home: 'room',
     ownedHouses: ['room'],
-    parts: { mic: 0, webcam: 0, cpu: 1, gpu: 1, ram: 1, monitor: 1, keyboard: 1, chair: 1, rgb: 0 },
+    parts: { mic: 0, webcam: 0, cpu: 1, cooler: 0, gpu: 1, ram: 1, hdd: 0, cdrom: 0, monitor: 1, keyboard: 1, mouse: 1, router: 1, chair: 1, rgb: 0 },
     food: ['noodles', 'noodles'],       // fridge contents (ids)
     furniture: [],                       // owned, unplaced item ids
     placed: {},                          // houseId -> { slotIdx -> itemId }
