@@ -111,7 +111,11 @@ export class Player {
         car.mesh.position.x = nx; car.mesh.position.z = nz;
       }
       car.mesh.userData.wheels.forEach((w) => (w.rotation.x += this.carSpeed * dt * 2.6));
-      if (this.cockpit) this.cockpit.userData.wheel.rotation.z = -this.steer * 1.9;
+      if (this.cockpit) {
+        this.cockpit.userData.wheel.rotation.z = -this.steer * 1.9;
+        const nd = this.cockpit.userData.needles;
+        if (nd) { nd[0].rotation.z = -1.1 + spdN * 2.2; nd[1].rotation.z = 0.9 - spdN * 1.4; }
+      }
       // camera in cockpit
       cam.position.set(
         car.mesh.position.x - fx * 0.35,

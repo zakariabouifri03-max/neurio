@@ -299,6 +299,112 @@ export function buildCity() {
   bike(-11.2, 15.2, 0.6);
   bike(77.5, -41.5, 2.2);
 
+  // ── power poles + wires (like the reference town) ──
+  const poleGeos = [], wireGeos = [];
+  const poleXs = [-80, -48, -16, 16, 48, 80], poleZs = [-64, -32, 32, 64];
+  const addPole = (x, z, alongX) => {
+    const p = new THREE.CylinderGeometry(0.09, 0.12, 6, 6); p.translate(x, 3, z); poleGeos.push(p);
+    const ca = new THREE.BoxGeometry(alongX ? 0.07 : 1.5, 0.07, alongX ? 1.5 : 0.07); ca.translate(x, 5.7, z); poleGeos.push(ca);
+    const ca2 = ca.clone(); ca2.translate(0, -0.5, 0); poleGeos.push(ca2);
+  };
+  poleXs.forEach((x) => addPole(x, 7.4, true));
+  poleZs.forEach((z) => addPole(7.4, z, false));
+  for (let i = 0; i < poleXs.length - 1; i++) {
+    const len = poleXs[i + 1] - poleXs[i];
+    const w = new THREE.CylinderGeometry(0.014, 0.014, len, 4);
+    w.rotateZ(Math.PI / 2); w.translate((poleXs[i] + poleXs[i + 1]) / 2, 5.7, 7.4);
+    wireGeos.push(w);
+  }
+  for (let i = 0; i < poleZs.length - 1; i++) {
+    const len = poleZs[i + 1] - poleZs[i];
+    const w = new THREE.CylinderGeometry(0.014, 0.014, len, 4);
+    w.rotateX(Math.PI / 2); w.translate(7.4, 5.7, (poleZs[i] + poleZs[i + 1]) / 2);
+    wireGeos.push(w);
+  }
+  const poles = new THREE.Mesh(mergeGeometries(poleGeos), new THREE.MeshStandardMaterial({ color: 0x4a3b2a, roughness: 1 }));
+  const wires = new THREE.Mesh(mergeGeometries(wireGeos), new THREE.MeshStandardMaterial({ color: 0x14161a, roughness: 0.8 }));
+  poles.castShadow = true;
+  group.add(poles, wires);
+
+  // ── benches ──
+  const benchGeos = [];
+  const addBench = (x, z, ry) => {
+    const seat = new THREE.BoxGeometry(1.6, 0.07, 0.5); seat.translate(0, 0.45, 0);
+    const back = new THREE.BoxGeometry(1.6, 0.5, 0.06); back.translate(0, 0.75, -0.24); back.rotateX(-0.15);
+    const l1 = new THREE.BoxGeometry(0.08, 0.45, 0.45); l1.translate(-0.7, 0.22, 0);
+    const l2 = l1.clone(); l2.translate(1.4, 0, 0);
+    [seat, back, l1, l2].forEach((geo) => {
+      geo.rotateY(ry); geo.translate(x, 0, z); benchGeos.push(geo);
+    });
+  };
+  addBench(12, -7.2, 0); addBench(-20, 7.4, Math.PI); addBench(33, 7.4, Math.PI);
+  const benches = new THREE.Mesh(mergeGeometries(benchGeos), new THREE.MeshStandardMaterial({ color: 0x7a5a36, roughness: 0.9 }));
+  benches.castShadow = true;
+  group.add(benches);
+
+  // ── ferns / bushes ground cover ──
+  const bushGeos = [];
+  for (let i = 0; i < 150; i++) {
+    const a = r() * Math.PI * 2, rad = 88 + r() * 40;
+    let x = Math.cos(a) * rad, z = Math.sin(a) * rad * 0.85;
+    if (i % 3 === 0) { x = rand(r, -70, 90); z = (r() < 0.5 ? -1 : 1) * rand(r, 26, 60); }
+    if (Math.abs(z) < 10 && Math.abs(x) < 95) continue;
+    if (Math.abs(x) < 10 && Math.abs(z) < 75) continue;
+    const s = 0.5 + r() * 0.9;
+    const b = new THREE.IcosahedronGeometry(s, 0);
+    b.scale(1, 0.4, 1); b.translate(x, s * 0.28, z);
+    bushGeos.push(b);
+  }
+  const bushes = new THREE.Mesh(mergeGeometries(bushGeos), new THREE.MeshStandardMaterial({ color: 0x2f4f2b, roughness: 1 }));
+  bushes.castShadow = true;
+  group.add(bushes);
+
+  // ── camper / RV with orange stripe (trailer park) ──
+  const rv = new THREE.Group();
+  const rvBody = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.5, 5.8), new THREE.MeshStandardMaterial({ color: 0xd8d4c8, roughness: 0.6 }));
+  rvBody.position.y = 1.6; rv.add(rvBody);
+  const rvStripe = new THREE.Mesh(new THREE.BoxGeometry(2.54, 0.3, 5.84), new THREE.MeshStandardMaterial({ color: 0xd8712f, roughness: 0.6 }));
+  rvStripe.position.y = 1.3; rv.add(rvStripe);
+  const rvRoof = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.25, 5.4), new THREE.MeshStandardMaterial({ color: 0xb8b4a8 }));
+  rvRoof.position.y = 2.95; rv.add(rvRoof);
+  [[-1.1, 1.9], [1.1, 1.9], [-1.1, -1.9], [1.1, -1.9]].forEach(([x, z]) => {
+    const w = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.3, 12), new THREE.MeshStandardMaterial({ color: 0x14171c }));
+    w.rotation.z = Math.PI / 2; w.position.set(x, 0.42, z); rv.add(w);
+  });
+  const rvWin = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.7), new THREE.MeshStandardMaterial({ color: 0x20262e, roughness: 0.3 }));
+  rvWin.position.set(1.26, 1.9, 0.8); rvWin.rotation.y = Math.PI / 2; rv.add(rvWin);
+  const rvWin2 = rvWin.clone(); rvWin2.position.z = -0.9; rv.add(rvWin2);
+  rv.position.set(72, 0, -52); rv.rotation.y = 0.35;
+  rv.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+  group.add(rv);
+  colliders.push({ x: 72, z: -52, hx: 3.2, hz: 1.8 });
+
+  // red cabin in the trailer park
+  woodHouse(88, -38, 5, 4, 3, '#8f3b2f', -0.4, { win: 1 });
+
+  // porch steps + railing at the mobile home door
+  const porchMat = new THREE.MeshStandardMaterial({ color: 0x6b5233, roughness: 0.9 });
+  box(1.1, 0.16, 0.7, porchMat, 76.5, 0.08, -44);
+  box(1.1, 0.16, 0.7, porchMat, 77.3, 0.08, -44);
+  box(0.06, 0.8, 0.06, porchMat, 76.9, 0.5, -43.6);
+  box(0.06, 0.8, 0.06, porchMat, 76.9, 0.5, -44.4);
+  box(0.05, 0.05, 1.0, porchMat, 76.9, 0.9, -44);
+  // satellite dish on the trailer
+  const dish = new THREE.Mesh(new THREE.SphereGeometry(0.4, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2.4), new THREE.MeshStandardMaterial({ color: 0xcfd4da, side: THREE.DoubleSide }));
+  dish.position.set(75.5, 3.2, -47); dish.rotation.x = -0.9; group.add(dish);
+  // lawn mower
+  const mower = new THREE.Group();
+  const mBody = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.28, 0.7), new THREE.MeshStandardMaterial({ color: 0xb03028, roughness: 0.5 }));
+  mBody.position.y = 0.28; mower.add(mBody);
+  [[-0.24, 0.28], [0.24, 0.28], [-0.24, -0.28], [0.24, -0.28]].forEach(([x, z]) => {
+    const w = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.06, 8), new THREE.MeshStandardMaterial({ color: 0x111 }));
+    w.rotation.z = Math.PI / 2; w.position.set(x, 0.12, z); mower.add(w);
+  });
+  const mHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.9, 6), new THREE.MeshStandardMaterial({ color: 0x222 }));
+  mHandle.position.set(0, 0.6, -0.6); mHandle.rotation.x = 0.7; mower.add(mHandle);
+  mower.position.set(78.6, 0, -41.2); mower.rotation.y = 1.1;
+  group.add(mower);
+
   // ── clouds ──
   const clouds = [];
   const cloudTex = (() => {

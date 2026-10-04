@@ -34,6 +34,12 @@ export function buildHuman(seed = 1, name = null) {
   const head = new THREE.Mesh(new THREE.SphereGeometry(0.19, 14, 12), new THREE.MeshStandardMaterial({ color: skin, roughness: 0.8, map: faceTex(seed) }));
   head.position.y = 1.12; g.add(head);
 
+  // some pedestrians carry a backpack (like the reference shots)
+  if (seed % 3 === 0) {
+    const bp = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.34, 0.12), new THREE.MeshStandardMaterial({ color: pick(r, [0xd8712f, 0x8f3b2f, 0x37475a, 0x4aa34a]), roughness: 0.9 }));
+    bp.position.set(0, 0.78, -0.24); g.add(bp);
+  }
+
   if (hat) {
     const cap = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2.2), new THREE.MeshStandardMaterial({ color: hat, roughness: 0.9 }));
     cap.position.y = 1.16; g.add(cap);
@@ -168,6 +174,22 @@ export function buildCockpit() {
   const sm = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.09, 0.14), new THREE.MeshStandardMaterial({ color: 0x27313c, roughness: 0.25, metalness: 0.5 }));
   const sml = sm.clone(); sml.position.set(-0.95, 0.02, -0.5); g.add(sml);
   const smr = sm.clone(); smr.position.set(0.95, 0.02, -0.5); g.add(smr);
+  // gauges: two analog dials with moving needles
+  const dialMat = new THREE.MeshStandardMaterial({ color: 0x0a0c10, emissive: 0xff9a3c, emissiveIntensity: 0.25 });
+  const dial1 = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.02, 16), dialMat);
+  dial1.rotation.x = Math.PI / 2 - 0.3; dial1.position.set(-0.13, -0.22, -0.46); g.add(dial1);
+  const dial2 = dial1.clone(); dial2.position.x = 0.13; g.add(dial2);
+  const needleMat = new THREE.MeshStandardMaterial({ color: 0xff5030, emissive: 0xff3010, emissiveIntensity: 1.2 });
+  const needle = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.075, 0.006), needleMat);
+  needle.geometry.translate(0, 0.03, 0);
+  needle.position.set(-0.13, -0.225, -0.45); needle.rotation.x = -0.3; g.add(needle);
+  const needle2 = needle.clone(); needle2.position.x = 0.13; g.add(needle2);
+  // windshield wipers
+  const wiperMat = new THREE.MeshStandardMaterial({ color: 0x0c0e12, roughness: 0.6 });
+  const w1 = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.5, 0.01), wiperMat);
+  w1.position.set(-0.35, -0.02, -0.86); w1.rotation.z = 0.9; w1.rotation.x = -0.25; g.add(w1);
+  const w2 = w1.clone(); w2.position.x = 0.3; g.add(w2);
   g.userData.wheel = wheel;
+  g.userData.needles = [needle, needle2];
   return g;
 }

@@ -54,12 +54,43 @@ export function showApp(id) {
   $('pcWinTitle').textContent = APPS.find((a) => a.id === id).name;
   document.querySelectorAll('.taskBtn').forEach((b) => b.classList.toggle('act', b.dataset.app === id));
   audio.click();
-  if (id === 'zamazor' || id === 'computers') { zamApp = id; renderZamazor(body); }
+  if (id === 'computers') renderComputers(body);
+  else if (id === 'zamazor') { zamApp = id; renderZamazor(body); }
   else if (id === 'ops') renderOPS(body);
   else if (id === 'web') renderWeb(body);
   else if (id === 'wall') renderWall(body);
   else if (id === 'virus') renderVirus(body);
   else if (id === 'bank') renderBank(body);
+}
+
+// ── Computers app (component list like the original) ──
+function renderComputers(body) {
+  const HW = ['cpu', 'cooler', 'gpu', 'ram', 'hdd', 'cdrom', 'monitor'];
+  body.innerHTML = `
+    <div class="compWrap">
+      <div class="compHead">💻 COMPUTERS <span class="dim">— your rig</span> <span class="compPower">⚡ ${G.power()}</span></div>
+      ${HW.map((cat) => {
+        const c = PART_CATS.find((x) => x.id === cat);
+        const owned = partById(cat, G.save.parts[cat]);
+        const next = (PARTS[cat] || []).find((p) => p.t > G.save.parts[cat]);
+        return `<div class="compRow">
+          <span class="compCat">${c.emoji} ${c.name}</span>
+          <span class="compState">${owned ? `✅ ${owned.name}` : '<b class="noComp">NO COMPONENT FOUND</b>'}</span>
+          <span class="compBuy">${next ? `<i class="compPrice">💵 ${fmtMoney(next.price)}</i><button data-cbuy="${cat}:${next.t}">ADD TO CART</button>` : '<i class="dim">MAX</i>'}</span>
+        </div>`;
+      }).join('')}
+      <div class="zamNote">📦 parts arrive tomorrow · instant install at the Tech Shack (+8%)</div>
+    </div>`;
+  body.querySelectorAll('[data-cbuy]').forEach((b) => (b.onclick = () => {
+    const [cat, t] = b.dataset.cbuy.split(':');
+    const it = partById(cat, +t);
+    if (!G.spend(it.price)) return;
+    G.save.deliveries.push({ kind: 'part', cat, t: +t, day: G.save.day + 1 });
+    G.persist(); G.refreshHUD();
+    G.toast(`💻 ${it.name} ordered! 📦 arrives tomorrow`);
+    audio.buy();
+    renderComputers(body);
+  }));
 }
 
 // ── Zamazor / Computers shop ──
@@ -68,11 +99,10 @@ let zamApp = 'computers';
 function stars(t) { return '★'.repeat(Math.min(5, t)) + '☆'.repeat(Math.max(0, 5 - t)); }
 
 function renderZamazor(body) {
-  const HW = ['cpu', 'cooler', 'gpu', 'ram', 'hdd', 'cdrom', 'monitor'];
-  const catList = zamApp === 'computers' ? PART_CATS.filter((c) => HW.includes(c.id)) : PART_CATS;
-  if (zamApp === 'computers' && !HW.includes(zamCat)) zamCat = 'gpu';
-  if (zamApp === 'zamazor' && HW.includes(zamCat)) zamCat = 'mic';
-  const isFurn = zamApp === 'zamazor' && zamCat === 'furn';
+  const HW = ['cpu', 'cooler', 'gpu', 'ram', 'hdd', 'cdrom'];
+  const catList = PART_CATS.filter((c) => !HW.includes(c.id));
+  if (HW.includes(zamCat)) zamCat = 'mic';
+  const isFurn = zamCat === 'furn';
   const items = isFurn ? FURNITURE : (PARTS[zamCat] || []);
   body.innerHTML = `
     <div class="zamWrap">
