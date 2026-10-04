@@ -5,9 +5,11 @@ import { Player } from './player.js';
 import { PCDesktop } from './pc.js';
 import { UI } from './ui.js';
 import { Net } from './net.js';
+import { NPCs } from './npc.js';
 import { T } from './tex.js';
 import { clamp, lerp, rnd, ri, pick, money, short, $, el } from './util.js';
-import { HOUSES, PCS, GEAR, CARS, FOOD, CLOTHES, FURNITURE, GAMES, CHAT_LINES, DON_MSG, SPONSORS } from './data.js';
+import { HOUSES, PCS, GEAR, CARS, FOOD, CLOTHES, FURNITURE, GAMES, CHAT_LINES, DON_MSG, SPONSORS,
+  COMPONENTS, CATS, compById, STREAM_QUALITY } from './data.js';
 
 const SAVE_KEY = 'slm2_save';
 
@@ -16,6 +18,11 @@ const defaultSave = () => ({
   followers: 12, subs: 0, day: 1, time: 9 * 60,
   house: 1, houses: [1], cars: [], car: null, pc: 'pc0',
   gear: [], games: ['g1', 'g2'], clothes: ['c1'], furniture: [], sponsors: [],
+  // PC build (Zamazor components)
+  parts: ['cpu1', 'gpu1', 'ram1', 'mb1', 'hdd1', 'mon1', 'kb1', 'ms1', 'ch1', 'dsk1'],
+  rig: { cpu: 'cpu1', gpu: 'gpu1', ram: 'ram1', mb: 'mb1', hdd: 'hdd1', monitor: 'mon1', kb: 'kb1', mouse: 'ms1', chair: 'ch1', desk: 'dsk1' },
+  streamKey: String(Math.floor(100000 + Math.random() * 899999)),
+  bitrate: 2500, fps: 30, quality: '480p', viruses: 0, antivirus: false, wallpaper: null,
   stats: { energy: 90, hunger: 80, hygiene: 85, mood: 75 },
   posts: [], mail: [], clips: 0, videos: 0, fridge: 2, fitness: 0,
   streams: 0, bestViewers: 0, totalEarned: 0, hoursStreamed: 0,
@@ -31,6 +38,7 @@ export class Game {
     this.paused = false;
     this.mode = 'solo';
     this.clock = new THREE.Clock();
+    this.migrate();
     this.ui = new UI(this);
     this.initThree();
     this.world = new World(this);
@@ -39,6 +47,8 @@ export class Game {
     this.pc = new PCDesktop(this);
     this.net = new Net(this);
     this.scene.add(this.net.group);
+    this.npcs = new NPCs(this);
+    this.scene.add(this.npcs.group);
     this.bindInput();
     this.applySettings();
     this.spawnCars();
@@ -126,8 +136,32 @@ export class Game {
       const t = new THREE.Mesh(new THREE.BoxGeometry(.1, .2, .45), new THREE.MeshStandardMaterial({ color: 0xff3b30, emissive: 0xff2010, emissiveIntensity: .8 }));
       t.position.set(-2.2, .95, s * .6); g.add(t);
     }
+    // ── cockpit interior (visible in first-person driving) ──────────────
+    const dark = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: .8, side: THREE.DoubleSide });
+    const dash = new THREE.Mesh(new THREE.BoxGeometry(1.9, .42, .55), dark(0x1a1d24));
+    dash.position.set(.55, 1.3, 0); g.add(dash);
+    const wheel = new THREE.Mesh(new THREE.TorusGeometry(.26, .045, 10, 22), dark(0x23262c));
+    wheel.position.set(.22, 1.3, -.42); wheel.rotation.y = Math.PI / 2; wheel.rotation.x = .5;
+    g.add(wheel);
+    for (let i = 0; i < 3; i++) {
+      const spoke = new THREE.Mesh(new THREE.BoxGeometry(.04, .24, .03), dark(0x2a2e36));
+      spoke.position.set(0, 0, 0); spoke.rotation.z = i * 2.1; wheel.add(spoke);
+    }
+    const cluster = new THREE.Mesh(new THREE.BoxGeometry(.5, .2, .04),
+      new THREE.MeshStandardMaterial({ color: 0x0a1018, emissive: 0x16304a, emissiveIntensity: .8 }));
+    cluster.position.set(.3, 1.44, -.42); cluster.rotation.y = Math.PI / 2; g.add(cluster);
+    const seatM = dark(0x2b2f38);
+    for (const sz of [-.42, .42]) {
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(.5, .12, .52), seatM);
+      seat.position.set(-.1, 1.05, sz); g.add(seat);
+      const back = new THREE.Mesh(new THREE.BoxGeometry(.12, .66, .5), seatM);
+      back.position.set(-.42, 1.35, sz); g.add(back);
+    }
+    const mirror = new THREE.Mesh(new THREE.BoxGeometry(.5, .13, .05), dark(0x12151a));
+    mirror.position.set(.7, 1.78, 0); g.add(mirror);
+
     g.traverse(o => { o.castShadow = true; o.receiveShadow = true; });
-    g.userData = { topSpeed: def.speed, id: def.id };
+    g.userData = { topSpeed: def.speed, id: def.id, wheelMesh: wheel };
     return g;
   }
 
@@ -214,28 +248,64 @@ export class Game {
     else if (kind === 'car') { s.cars.push(it.id); this.refreshCars(); }
     else if (kind === 'furn') { s.furniture.push(it.id); this.applyFurniture(); }
     else if (kind === 'clothes') s.clothes.push(it.id);
+    else if (kind === 'part') { s.parts.push(it.id); this.autoInstall(it.id); }
     this.toast(`${it.icon} Bought ${it.name}`);
     this.sync(); return true;
   }
 
-  pcPower() { return PCS.find(p => p.id === this.save.pc)?.power || 1; }
+  migrate() {
+    const s = this.save, d = defaultSave();
+    for (const k in d) if (s[k] === undefined) s[k] = d[k];
+    if (!s.rig || typeof s.rig !== 'object') s.rig = d.rig;
+    for (const k in d.rig) if (s.rig[k] === undefined && d.rig[k]) s.rig[k] = d.rig[k];
+    if (!Array.isArray(s.parts)) s.parts = d.parts;
+  }
+
+  /** sum of installed core components (cpu/gpu/ram/mb/hdd + small bonuses) */
+  pcPower() {
+    const s = this.save;
+    let core = 0, missing = false;
+    for (const c of CATS) {
+      const inst = compById(s.rig[c.id]);
+      if (c.core && !inst) missing = true;
+      core += inst?.perf || 0;
+    }
+    if (missing) core = Math.max(0, core * .35);               // incomplete build = unstable
+    const virus = 1 - Math.min(.6, (s.viruses || 0) * .12);
+    return Math.max(1, Math.round(core * virus));
+  }
+  /** stream quality from monitor / mic / cam / light / router */
   gearQuality() {
-    const q = this.save.gear.reduce((a, id) => a + (GEAR.find(g => g.id === id)?.qual || 0), 0);
+    const s = this.save;
+    let q = 0;
+    for (const c of CATS) q += compById(s.rig[c.id])?.qual || 0;
     return 1 + q * .8;
+  }
+  maxQuality() {
+    const p = this.pcPower();
+    return [...STREAM_QUALITY].reverse().find(q => q.need <= p) || STREAM_QUALITY[0];
+  }
+  maxBitrate() { return Math.round(1500 + this.gearQuality() * 1400); }
+  qualityMult() { return (STREAM_QUALITY.find(q => q.id === this.save.quality) || STREAM_QUALITY[0]).mult; }
+  autoInstall(id) {
+    const c = compById(id); if (!c) return;
+    const cur = compById(this.save.rig[c.cat]);
+    if (!cur || (c.perf + c.qual) >= (cur.perf + cur.qual)) this.save.rig[c.cat] = id;
   }
   decorBonus() { return this.save.furniture.reduce((a, id) => a + (FURNITURE.find(f => f.id === id)?.viewers || 0), 0); }
   styleBonus() { return 1 + this.save.clothes.reduce((a, id) => a + (CLOTHES.find(c => c.id === id)?.style || 0), 0) * .01; }
   level() { return Math.max(1, Math.floor(Math.log10(Math.max(10, this.save.followers)) * 4)); }
   passiveIncome() { return Math.round(this.save.videos * 35 + this.save.subs * 2.5); }
 
-  estimateViewers(type, game) {
+  estimateViewers(type, game, qualityId) {
     const s = this.save;
     const base = 6 + Math.pow(s.followers, .78) * .55;
     const hype = (game?.hype || 1) * (type?.mult || 1);
     const q = (this.pcPower() * .6 + this.gearQuality() * .9) / 6 + .6;
     const houseB = HOUSES.find(h => h.id === s.house)?.viewerBonus || 1;
     const mood = .6 + s.stats.mood / 160;
-    return Math.max(1, Math.round(base * hype * q * houseB * mood * (1 + this.decorBonus()) * this.styleBonus()));
+    const qm = (STREAM_QUALITY.find(x => x.id === (qualityId || s.quality)) || STREAM_QUALITY[0]).mult;
+    return Math.max(1, Math.round(base * hype * q * houseB * mood * qm * (1 + this.decorBonus()) * this.styleBonus()));
   }
 
   startStream(type, game, title) {
@@ -259,11 +329,8 @@ export class Game {
     this.pushChat(line);
   }
   pushChat(msg, cls = '') {
-    const ui = this.stream.ui; if (!ui?.chat) return;
     const name = pick(['xX_amine_Xx', 'noor_22', 'simo', 'GamerDZ', 'tanja_boy', 'kawtar', 'mehdi_tv', 'anonymous', 'najwa', 'rayan7']);
-    ui.chat.appendChild(el('div', 'chatMsg ' + cls, `<b style="color:hsl(${(name.length * 47) % 360},70%,65%)">${name}</b> ${msg}`));
-    while (ui.chat.children.length > 60) ui.chat.firstChild.remove();
-    ui.chat.scrollTop = ui.chat.scrollHeight;
+    this.pc.pushChatLine(`<b style="color:hsl(${(name.length * 47) % 360},70%,65%)">${name}</b> ${msg}`, cls);
   }
 
   endStream() {
@@ -343,6 +410,7 @@ export class Game {
     if (passive) { this.earn(passive); s.mail.push({ from: 'StreamerHub', subj: 'Daily payout', body: `You earned ${money(passive)} from subs & videos.` }); }
     const bills = Math.round(60 + s.houses.reduce((a, h) => a + h * 90, 0));
     s.money -= bills;
+    if (!s.antivirus && Math.random() < .35) { s.viruses++; this.toast('🦠 Your PC caught a virus — run the Virus Scanner'); }
     this.toast(`🌅 Day ${s.day} · payout ${money(passive)} · bills -${money(bills)}`);
     this.sync();
   }
@@ -372,6 +440,10 @@ export class Game {
       p.keys[e.code] = true;
       if (e.code === 'KeyE') this.tryInteract();
       if (e.code === 'KeyF') this.tryCar();
+      if (e.code === 'KeyV' && this.player.inCar) {
+        this.player.firstPersonCar = !this.player.firstPersonCar;
+        this.toast(this.player.firstPersonCar ? '🎥 Cockpit view' : '🎥 Chase view');
+      }
       if (e.code === 'Tab') { e.preventDefault(); $('map').classList.toggle('on'); }
       if (e.code === 'Escape') {
         if (this.pc.open) this.closePC();
@@ -520,11 +592,13 @@ export class Game {
       if (this.save.stats.hunger < 12 || this.save.stats.hygiene < 12) this.addStat('mood', -dt * .3);
       this.tickStream(dt);
       this.net.update(dt, this.player);
+      this.npcs.update(dt, this.player);
       this.updateSky();
       // interaction prompt
       const n = this.nearest();
       this.ui.prompt(n ? n.label : (this.player.inCar ? '' : null));
-      if (this.player.inCar) this.ui.prompt('F to exit the car');
+      if (this.player.inCar) this.ui.carHud(Math.abs(this.player.carSpeed || 0) * 3.6);
+      else this.ui.carHud(null);
       this._hudT = (this._hudT || 0) + dt;
       if (this._hudT > .2) { this._hudT = 0; this.ui.updateHUD(); }
       this._saveT = (this._saveT || 0) + dt;

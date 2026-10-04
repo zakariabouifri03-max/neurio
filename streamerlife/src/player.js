@@ -12,7 +12,7 @@ export class Player {
     this.yaw = Math.PI; this.pitch = 0;
     this.height = 1.72; this.radius = .42;
     this.bob = 0; this.speedMul = 1;
-    this.inCar = false; this.car = null;
+    this.inCar = false; this.car = null; this.firstPersonCar = true;
     this.keys = {};
     this.look = { x: 0, y: 0 };
     this.move = { x: 0, y: 0 };
@@ -41,7 +41,13 @@ export class Player {
   update(dt) {
     const g = this.game;
     // look
-    this.yaw -= this.look.x; this.pitch = clamp(this.pitch - this.look.y, -1.35, 1.35);
+    if (this.inCar && this.firstPersonCar) {
+      this.camYaw = clamp((this.camYaw || 0) - this.look.x, -1.1, 1.1);
+      this.camYaw *= Math.pow(.2, dt);                       // snap back to the road
+    } else {
+      this.yaw -= this.look.x;
+    }
+    this.pitch = clamp(this.pitch - this.look.y, -1.35, 1.35);
     this.look.x = this.look.y = 0;
 
     if (this.inCar) { this.updateCar(dt); return; }
@@ -69,11 +75,12 @@ export class Player {
   // ── car ───────────────────────────────────────────────────────────────
   enterCar(car) {
     this.inCar = true; this.car = car;
-    this.carSpeed = 0;
-    this.game.toast('🚗 Driving — W/S gas & brake, A/D steer, F to exit');
+    this.carSpeed = 0; this.camYaw = 0; this.pitch = 0;
+    this.yaw = car.rotation.y;
+    this.game.toast('🚗 W/S gas & brake · A/D steer · V camera · F exit');
   }
   exitCar() {
-    this.inCar = false;
+    this.inCar = false; this.yaw = this.car.rotation.y;
     const c = this.car;
     this.pos.set(c.position.x + Math.cos(c.rotation.y) * 2.4, 0, c.position.z - Math.sin(c.rotation.y) * 2.4);
     const [x, z] = this.collide(this.pos.x, this.pos.z); this.pos.x = x; this.pos.z = z;
@@ -88,6 +95,7 @@ export class Player {
     this.carSpeed += (gas * max * .55 - brk * max * .9) * dt;
     this.carSpeed *= Math.pow(.55, dt);
     this.carSpeed = clamp(this.carSpeed, -max * .35, max);
+    this.steerVis = lerp(this.steerVis || 0, clamp(steer, -1, 1), 1 - Math.pow(.01, dt));
     c.rotation.y += steer * dt * 1.5 * clamp(Math.abs(this.carSpeed) / 8, 0, 1) * Math.sign(this.carSpeed || 1);
     const dx = -Math.sin(c.rotation.y) * this.carSpeed * dt;
     const dz = -Math.cos(c.rotation.y) * this.carSpeed * dt;
@@ -106,12 +114,18 @@ export class Player {
   applyCamera(cam) {
     if (this.inCar) {
       const c = this.car;
-      const back = new THREE.Vector3(Math.sin(c.rotation.y) * 8.5, 4.2, Math.cos(c.rotation.y) * 8.5);
-      const target = c.position.clone().add(back);
-      cam.position.lerp(target, .16);
-      const look = c.position.clone().add(new THREE.Vector3(0, 1.4, 0));
-      cam.lookAt(look);
-      cam.rotateY(0); // keep behind-car view
+      if (this.firstPersonCar) {
+        // sit behind the wheel
+        const off = new THREE.Vector3(-0.42, 1.42, 0.25).applyAxisAngle(new THREE.Vector3(0, 1, 0), c.rotation.y);
+        cam.position.copy(c.position).add(off);
+        cam.rotation.order = 'YXZ';
+        cam.rotation.set(clamp(this.pitch, -.6, .5), c.rotation.y + clamp(this.camYaw || 0, -1.1, 1.1), 0);
+        if (c.userData.wheelMesh) c.userData.wheelMesh.rotation.z = -(this.steerVis || 0) * 1.6;
+      } else {
+        const back = new THREE.Vector3(Math.sin(c.rotation.y) * 8.5, 4.2, Math.cos(c.rotation.y) * 8.5);
+        cam.position.lerp(c.position.clone().add(back), .16);
+        cam.lookAt(c.position.clone().add(new THREE.Vector3(0, 1.4, 0)));
+      }
       return;
     }
     cam.position.copy(this.eye);

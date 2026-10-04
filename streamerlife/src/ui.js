@@ -1,6 +1,6 @@
 // ── menus, HUD, in-world shops, settings ───────────────────────────────────
 import { money, short, el, $, pick } from './util.js';
-import { HOUSES, CARS, FOOD, CLOTHES, FURNITURE, PCS, GEAR } from './data.js';
+import { HOUSES, CARS, FOOD, CLOTHES, FURNITURE, COMPONENTS, CATS, compById } from './data.js';
 
 export class UI {
   constructor(game) {
@@ -96,7 +96,7 @@ export class UI {
       let h = '<div class="grid">';
       items.forEach((it, i) => {
         const owned = ownedOf ? ownedOf(it) : false;
-        const sub = it.hunger ? `+${it.hunger} hunger` : it.speed ? `speed ${it.speed}` : it.style ? `style +${it.style}`
+        const sub = it.cat ? `${CATS.find(c => c.id === it.cat).name} · ${'★'.repeat(it.stars)}` : it.hunger ? `+${it.hunger} hunger` : it.speed ? `speed ${it.speed}` : it.style ? `style +${it.style}`
           : it.viewers ? `+${(it.viewers * 100) | 0}% viewers` : it.power ? `power ${it.power}` : it.qual ? `quality ${it.qual}` : it.desc || '';
         h += `<div class="card ${owned ? 'owned' : ''}"><div class="cIco">${it.icon}</div><div class="cName">${it.name}</div>
           <div class="muted">${sub}</div><div class="cPrice">${money(it.price)}</div>
@@ -117,10 +117,11 @@ export class UI {
         });
       });
     } else if (kind === 'shop_tech') {
-      this.openPanel('💻 Tech Store', grid([...PCS, ...GEAR], null, it => s.pc === it.id || s.gear.includes(it.id)), () => {
-        const items = [...PCS, ...GEAR];
-        wire(this.panel, items, it => { if (g.buy(it.power ? 'pc' : 'gear', it)) this.shop('shop_tech'); });
-      });
+      const items = COMPONENTS.slice().sort((a, b) => a.price - b.price);
+      const body = `<p class="muted">Walk-in prices — or order from home on <b>Zamazor</b> (your PC).</p>` +
+        grid(items.map(it => ({ ...it, icon: CATS.find(c => c.id === it.cat).icon })), null, it => s.parts.includes(it.id));
+      this.openPanel('💻 Tech Store', body, () =>
+        wire(this.panel, items, it => { if (g.buy('part', it)) this.shop('shop_tech'); }));
     } else if (kind === 'shop_car') {
       this.openPanel('🚗 Car Dealer', grid(CARS, null, it => s.cars.includes(it.id)), () =>
         wire(this.panel, CARS, it => { if (g.buy('car', it)) this.shop('shop_car'); }));
@@ -181,6 +182,15 @@ export class UI {
     }
     $('hLive').style.display = g.stream.live ? 'flex' : 'none';
     if (g.stream.live) $('hLiveV').textContent = short(g.stream.viewers);
+  }
+
+  carHud(kmh) {
+    const h = $('carHud');
+    if (kmh == null) { h.style.display = 'none'; return; }
+    h.style.display = 'block';
+    h.innerHTML = `<div class="spd"><b>${Math.round(kmh)}</b> km/h</div>
+      <div class="keys"><span><b>W/S</b> gas · brake</span><span><b>A/D</b> steer</span>
+      <span><b>V</b> camera</span><span><b>F</b> exit</span></div>`;
   }
 
   prompt(text) {

@@ -39,6 +39,7 @@ export class World {
 
   build() {
     this.buildCity();
+    this.buildNature();
     this.buildHouse(1, { w: 11, d: 9, name: 'Studio' });
     this.buildHouse(2, { w: 16, d: 13, name: 'Villa' });
     this.buildHouse(3, { w: 22, d: 18, name: 'Mansion' });
@@ -148,6 +149,82 @@ export class World {
     g.add(bb); g.add(box(1.2, 24, 1.2, mat({ color: 0x3a3a3a }), -8, 12, -160)); g.add(box(1.2, 24, 1.2, mat({ color: 0x3a3a3a }), 8, 12, -160));
   }
 
+  // ── lake, pine forest and mountains (Streamer-Life vibe) ────────────────
+  buildNature() {
+    const g = new THREE.Group(); this.root.add(g);
+
+    // big lake on the north side
+    const lake = new THREE.Mesh(new THREE.CircleGeometry(120, 48),
+      mat({ color: 0x2f6f9e, metalness: .5, roughness: .12, transparent: true, opacity: .92 }));
+    lake.rotation.x = -Math.PI / 2; lake.position.set(-40, .12, -260); g.add(lake);
+    this.lake = lake;
+    const shore = new THREE.Mesh(new THREE.RingGeometry(118, 136, 48),
+      mat({ color: 0xbfae8c, roughness: 1 }));
+    shore.rotation.x = -Math.PI / 2; shore.position.set(-40, .1, -260); g.add(shore);
+
+    // wooden pier
+    const pier = new THREE.Group();
+    for (let i = 0; i < 9; i++) {
+      pier.add(box(3.4, .22, 1.6, mat({ map: T.wood(1, true), roughness: .9 }), 0, 1.1, -i * 1.7));
+      if (i % 3 === 0) for (const sx of [-1.4, 1.4]) pier.add(box(.3, 2.2, .3, mat({ color: 0x4a3524 }), sx, 0, -i * 1.7));
+    }
+    pier.position.set(-40, 0, -150); g.add(pier);
+
+    // mountains on the horizon
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      const r = 330 + hash(i) * 50;
+      const h = 60 + hash(i * 3) * 90;
+      const m = new THREE.Mesh(new THREE.ConeGeometry(55 + hash(i * 7) * 50, h, 5),
+        mat({ color: new THREE.Color().setHSL(.33, .12, .3 + hash(i * 5) * .12), flatShading: true, roughness: 1 }));
+      m.position.set(Math.cos(a) * r, h / 2 - 6, Math.sin(a) * r); g.add(m);
+      if (h > 110) {
+        const cap = new THREE.Mesh(new THREE.ConeGeometry(22, h * .22, 5), mat({ color: 0xeef3f8, flatShading: true }));
+        cap.position.set(m.position.x, h - h * .11 - 6, m.position.z); g.add(cap);
+      }
+    }
+
+    // pine belt around the town
+    for (let i = 0; i < 260; i++) {
+      const a = Math.random() * Math.PI * 2, r = 165 + Math.random() * 130;
+      const x = Math.cos(a) * r, z = Math.sin(a) * r;
+      if (Math.hypot(x + 40, z + 260) < 140) continue;   // not in the lake
+      this.pine(g, x, z);
+    }
+    for (let i = 0; i < 70; i++) {
+      const x = rnd(190, -190), z = rnd(190, -190);
+      if (this.nearRoad(x, z, 13)) continue;
+      this.pine(g, x, z);
+    }
+
+    // power poles along the main road
+    for (let x = -180; x <= 180; x += 30) this.pole(g, x, 10.5);
+  }
+
+  pine(g, x, z) {
+    const t = new THREE.Group();
+    const h = rnd(16, 8);
+    t.add(box(.6, h * .35, .6, mat({ color: 0x4a3626, roughness: 1 }), 0, h * .17, 0));
+    const col = new THREE.Color().setHSL(.33, .45, rnd(.26, .14));
+    for (let i = 0; i < 4; i++) {
+      const c = new THREE.Mesh(new THREE.ConeGeometry(h * (.26 - i * .045), h * .34, 7),
+        mat({ color: col, flatShading: true, roughness: 1 }));
+      c.position.y = h * (.3 + i * .18); c.castShadow = true; t.add(c);
+    }
+    t.position.set(x, 0, z); t.rotation.y = Math.random() * 3;
+    g.add(t);
+  }
+
+  pole(g, x, z) {
+    const p = new THREE.Group();
+    p.add(box(.4, 11, .4, mat({ map: T.wood(1, true), roughness: 1 }), 0, 5.5, 0));
+    p.add(box(4.5, .3, .3, mat({ map: T.wood(1, true) }), 0, 10.2, 0));
+    p.add(box(3.4, .22, .22, mat({ map: T.wood(1, true) }), 0, 9.3, 0));
+    const wire = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, 30, 5), mat({ color: 0x15171c }));
+    wire.rotation.z = Math.PI / 2; wire.position.set(15, 10.2, 0); p.add(wire);
+    p.position.set(x, 0, z); g.add(p); this.solid(p);
+  }
+
   nearRoad(x, z, m) {
     for (const r of [-120, -60, 0, 60, 120]) if (Math.abs(x - r) < m || Math.abs(z - r) < m) return true;
     return false;
@@ -241,10 +318,36 @@ export class World {
     const sizes = { 1: [10, 6, 9], 2: [15, 7.5, 12], 3: [21, 10, 17] };
     const [w, h, d] = sizes[id];
     const hgrp = new THREE.Group();
-    hgrp.add(box(w, h, d, mat({ map: T.wall(wallHex, 3), roughness: .9 }), 0, h / 2, 0));
-    // roof
-    const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(w, d) * .78, 3.6, 4), mat({ color: 0x8e3b2f, roughness: .9 }));
-    roof.rotation.y = Math.PI / 4; roof.position.y = h + 1.7; roof.castShadow = true; hgrp.add(roof);
+    if (id === 1) {
+      // starter mobile home / trailer (SLS2 vibe)
+      hgrp.add(box(w, h * .82, d, mat({ map: T.wood(3, true), roughness: .95 }), 0, h * .55, 0));
+      hgrp.add(box(w + .5, .7, d + .5, mat({ color: 0x6b6a66, roughness: 1 }), 0, .35, 0));      // skirt
+      const roofT = box(w + .8, .45, d + .8, mat({ color: 0x9aa0a6, metalness: .3, roughness: .6 }), 0, h * .96, 0);
+      hgrp.add(roofT);
+      // steps + porch rail
+      for (let i = 0; i < 3; i++) hgrp.add(box(2.4, .25, .5, mat({ map: T.wood(1, true) }), 0, .3 + i * .3, d / 2 + 1.3 - i * .45));
+      for (const sx of [-1.2, 1.2]) hgrp.add(box(.14, 1.2, .14, mat({ map: T.wood(1, true) }), sx, 1.3, d / 2 + .6));
+      // satellite dish + AC unit
+      const dish = new THREE.Mesh(new THREE.SphereGeometry(.7, 12, 8, 0, Math.PI * 2, 0, 1),
+        mat({ color: 0xdfe3e8, roughness: .7, side: THREE.DoubleSide }));
+      dish.position.set(w / 2 - 1, h * 1.15, -d / 4); dish.rotation.x = -1; hgrp.add(dish);
+      hgrp.add(box(1.1, .7, 1.1, mat({ color: 0xb8bcc2, metalness: .4 }), -w / 3, h * 1.1, 0));
+      // bike leaning outside
+      const bike = new THREE.Group();
+      for (const bx of [-.6, .6]) {
+        const wl = new THREE.Mesh(new THREE.TorusGeometry(.33, .05, 8, 16), mat({ color: 0x15171a }));
+        wl.position.set(bx, .33, 0); bike.add(wl);
+      }
+      bike.add(box(1.2, .07, .07, mat({ color: 0x7ed957, metalness: .5 }), 0, .62, 0));
+      bike.position.set(-w / 2 - 1.6, 0, d / 2 - 1); bike.rotation.y = .4; hgrp.add(bike);
+    } else {
+      hgrp.add(box(w, h, d, mat({ map: id === 2 ? T.wood(4, true) : T.wall(wallHex, 3), roughness: .9 }), 0, h / 2, 0));
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(w, d) * .78, 3.6, 4), mat({ color: 0x4e5a46, roughness: .95 }));
+      roof.rotation.y = Math.PI / 4; roof.position.y = h + 1.7; roof.castShadow = true; hgrp.add(roof);
+      // porch
+      hgrp.add(box(w + 2, .3, 3, mat({ map: T.wood(2, true), roughness: .9 }), 0, .2, d / 2 + 1.4));
+      for (const sx of [-w / 2, w / 2]) hgrp.add(box(.25, 3.4, .25, mat({ map: T.wood(1, true) }), sx, 1.9, d / 2 + 2.6));
+    }
     // windows
     for (const sx of [-w / 3.2, w / 3.2]) hgrp.add(box(2.4, 2, .2, mat({ color: 0x8fd0ef, emissive: 0x335577, emissiveIntensity: .5, metalness: .3, roughness: .1 }), sx, h * .58, d / 2 + .05));
     // door

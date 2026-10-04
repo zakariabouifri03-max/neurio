@@ -42,6 +42,18 @@ F telephone: joystick lisar + boutons limin (🏃 / 🚗 / E).
 Kat bda f **studio sghir** b PC dyal batata ou 350$. Katbda tstreami, katkber lviewers ou
 lfollowers, katchri gear ou PC jdid, mn be3d **villa**, ou f lakhir **mansion** (viewers ×1.8).
 
+### Jdid f had version (9rib l SLS2)
+- 🌲 **Blad 7da daya**: lake + pier dyal lkhchb, ghaba dyal sanawbar, jbal f lkhlfiya, poteaux dyal daw
+- 🏚️ **Trailer / mobile home** bhal lbdaya dyal SLS2 (skirt, steps, parabole, bicyclette barra)
+- 🚶 **NPCs** kaytmachaw f tro6oirat b animation dyal lmchi
+- 🚗 **Vue dakhel tomobil**: volant kaydour, tableau de bord, sièges, rétroviseur + compteur km/h (`V` tbeddel caméra)
+- 🖥️ **NovaOS b windows**: tqder tjbed/tjme3 bzaf dyal fenêtres f wqt wa7ed + taskbar
+- 🛒 **Zamazor**: shop bhal li f lo3ba — catégories (CPU, GPU, RAM, Mainboards, HDD, Screens, Microphones, Cameras,
+  Lamps, Routers, Keyboards, Mouses, Chairs, Tables), étoiles, descriptions, **basket** ou "Complete Purchase"
+- 🧩 **PC building 7a9i9i**: 47 composants, "NO COMPONENT FOUND" ila nqes chi haja, lpower kayji mn CPU+GPU+RAM+MB+HDD
+- 🔴 **OPS**: stream key, bitrate (limité b router), FPS, catégorie, résolution (480p→4K 7sab PC)
+- 🛡️ **Virus Scanner**: viruses kay-bat6o PC, scan wla premium 50$
+
 ### Chno kayn f lmdina
 - 🛒 Supermarket (makla) · 💻 Tech Store (PC + micro + camera + fiber…) · 🚗 Car Dealer (5 tomobilat)
 - 🛋️ Furniture (decor = viewers) · 👕 Clothes · 🏦 Bank (deposit / loan) · 🏋️ Gym · 🏠 Real Estate (3 dyour)

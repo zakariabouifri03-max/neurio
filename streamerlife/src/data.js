@@ -107,3 +107,94 @@ export const SPONSORS = [
   { id: 's4', name: 'NovaGPU', need: 250000, pay: 90000, icon: '🎮' },
   { id: 's5', name: 'Atlas Telecom', need: 1000000, pay: 500000, icon: '📡' },
 ];
+
+// ── Zamazor component catalog (PC building, SLS2-style) ────────────────────
+// perf → raw PC power · qual → stream quality (mic/cam/light/net/monitor)
+export const CATS = [
+  { id: 'cpu', name: 'CPU', icon: '🧠', core: true },
+  { id: 'gpu', name: 'Graphics Cards', icon: '🎮', core: true },
+  { id: 'ram', name: 'RAM', icon: '🧩', core: true },
+  { id: 'mb', name: 'Mainboards', icon: '🔌', core: true },
+  { id: 'hdd', name: 'HDD / SSD', icon: '💾', core: true },
+  { id: 'monitor', name: 'Screens', icon: '🖥️' },
+  { id: 'mic', name: 'Microphones', icon: '🎤' },
+  { id: 'cam', name: 'Cameras', icon: '📷' },
+  { id: 'light', name: 'Lamps', icon: '💡' },
+  { id: 'net', name: 'Routers', icon: '📶' },
+  { id: 'kb', name: 'Keyboards', icon: '⌨️' },
+  { id: 'mouse', name: 'Mouses', icon: '🖱️' },
+  { id: 'chair', name: 'Computer Chair', icon: '🪑' },
+  { id: 'desk', name: 'Computer Tables', icon: '🪵' },
+];
+
+const C = (cat, id, name, price, perf, qual, stars, desc) => ({ cat, id, name, price, perf, qual, stars, desc });
+export const COMPONENTS = [
+  // CPU
+  C('cpu', 'cpu1', 'Zintel A1 1.1GHz', 180, 1, 0, 1, 'Entry-level. It boots. Barely.'),
+  C('cpu', 'cpu2', 'Zintel i3 3.0GHz', 650, 3, 0, 2, 'Good price/performance for starters.'),
+  C('cpu', 'cpu3', 'Zyzen 5 4.2GHz', 2400, 7, 0, 3, 'Streaming + gaming without drops.'),
+  C('cpu', 'cpu4', 'Zyzen 9 5.1GHz', 9800, 14, 0, 4, 'Encoding beast.'),
+  C('cpu', 'cpu5', 'Zintel i9 Extreme', 32000, 26, 0, 5, 'Overkill. Exactly what you need.'),
+  // GPU
+  C('gpu', 'gpu1', 'TX 950 U', 300, 1, 0, 1, 'Can run 2012 games on low.'),
+  C('gpu', 'gpu2', 'TX 1660 S', 1600, 4, 1, 2, 'Solid 1080p card.'),
+  C('gpu', 'gpu3', 'RTZ 3070', 7200, 9, 2, 3, 'Ray tracing on, chat happy.'),
+  C('gpu', 'gpu4', 'RTZ 4080 Ti', 26000, 18, 3, 4, '4K 120fps streaming.'),
+  C('gpu', 'gpu5', 'RTZ 5090 Titan', 95000, 34, 5, 5, 'The flex card.'),
+  // RAM
+  C('ram', 'ram1', 'Zorsair 1GB', 60, 1, 0, 1, 'One tab at a time.'),
+  C('ram', 'ram2', 'Zorsair 8GB', 420, 3, 0, 2, 'Normal people RAM.'),
+  C('ram', 'ram3', 'Zorsair 16GB RGB', 1300, 6, 0, 3, 'RGB = +5 fps (fake).'),
+  C('ram', 'ram4', 'Zorsair 32GB DDR5', 4800, 11, 0, 4, 'Editing + streaming together.'),
+  C('ram', 'ram5', 'Zorsair 64GB Pro', 15000, 20, 0, 5, 'Chrome approved.'),
+  // Mainboard
+  C('mb', 'mb1', 'Zarus Basic AM4', 220, 1, 0, 1, 'It has slots. That is all.'),
+  C('mb', 'mb2', 'Zarus Gamer AM4', 980, 3, 0, 2, 'More ports, more RGB.'),
+  C('mb', 'mb3', 'Zarus Hero X670', 3600, 7, 0, 4, 'Serious build base.'),
+  C('mb', 'mb4', 'Zarus Legendary', 12000, 13, 0, 5, 'Gold plated, obviously.'),
+  // Storage
+  C('hdd', 'hdd1', 'Mzung Zero 3 60GB', 90, 1, 0, 1, 'Loading… still loading.'),
+  C('hdd', 'hdd2', 'Mzung 1TB HDD', 350, 2, 0, 2, 'Space for clips.'),
+  C('hdd', 'hdd3', 'Mzung 1TB NVMe', 1400, 5, 0, 3, 'Fast boots, fast edits.'),
+  C('hdd', 'hdd4', 'Mzung 4TB NVMe Pro', 6200, 10, 0, 5, 'Never delete anything again.'),
+  // Monitor
+  C('monitor', 'mon1', '20 LED Screen', 190, 0, 1, 1, '60Hz, 1080p… kind of.'),
+  C('monitor', 'mon2', 'Zarus Gamer Pro 144Hz', 990, 1, 2, 3, 'Smooth gameplay for viewers.'),
+  C('monitor', 'mon3', 'Legendary Monitor 4K', 4300, 2, 5, 5, '4K 240Hz. Chat sees everything.'),
+  // Mic
+  C('mic', 'mic1', 'BuzzMic USB', 285, 0, 1, 1, 'Entry-level microphone.'),
+  C('mic', 'mic2', 'SoundClash XR', 1340, 0, 3, 3, 'Clean price/performance sound.'),
+  C('mic', 'mic3', 'ToneFusion Studio', 7420, 0, 7, 5, 'Very high quality broadcast mic.'),
+  // Cam
+  C('cam', 'cam1', 'ClearVoice HD Cam', 435, 0, 1, 2, '720p webcam, honest work.'),
+  C('cam', 'cam2', 'VocalForge 4K Cam', 3850, 0, 4, 4, 'Crisp facecam.'),
+  C('cam', 'cam3', 'CrystalCine Rig', 18600, 0, 8, 5, 'Cinema-grade IRL setup.'),
+  // Light
+  C('light', 'lt1', 'Ring Light', 160, 0, 1, 2, 'No more cave look.'),
+  C('light', 'lt2', 'RGB Studio Lights', 1850, 0, 3, 4, 'Vibe + color grading.'),
+  // Router
+  C('net', 'net1', 'ADSL Router', 120, 0, 1, 1, '3900 kbps if you are lucky.'),
+  C('net', 'net2', 'Fiber 300Mb Router', 870, 0, 3, 3, 'Stable 1080p60 upload.'),
+  C('net', 'net3', 'Fiber 1Gb Router', 4200, 0, 6, 5, 'Never drop a frame.'),
+  // Peripherals / furniture
+  C('kb', 'kb1', 'Zarus Membrane KB', 70, 0, 0, 1, 'Clack-less.'),
+  C('kb', 'kb2', 'Zarus Mechanical RGB', 560, 1, 1, 4, 'ASMR clacking, chat loves it.'),
+  C('mouse', 'ms1', 'Office Mouse', 45, 0, 0, 1, 'It moves the cursor.'),
+  C('mouse', 'ms2', 'Zarus Pro 20K DPI', 480, 1, 1, 4, 'Aim excuse removed.'),
+  C('chair', 'ch1', 'Plastic Chair', 90, 0, 0, 1, 'Your back will remember.'),
+  C('chair', 'ch2', 'Gaming Chair', 1250, 0, 1, 3, 'Longer streams, less pain.'),
+  C('chair', 'ch3', 'Ergo Throne', 7900, 0, 2, 5, 'The 12-hour-stream throne.'),
+  C('desk', 'dsk1', 'Zarus Small Desk', 230, 0, 0, 1, 'Fits one monitor. Maybe.'),
+  C('desk', 'dsk2', 'Zarus Big Desk', 1100, 0, 1, 3, 'Room for the whole setup.'),
+  C('desk', 'dsk3', 'Zarus Studio Desk', 5400, 0, 2, 5, 'Streamer flex furniture.'),
+];
+export const compById = (id) => COMPONENTS.find(c => c.id === id);
+
+export const STREAM_QUALITY = [
+  { id: '480p', name: '480p', need: 2, mult: .7 },
+  { id: '720p', name: '720p', need: 6, mult: 1 },
+  { id: '1080p', name: '1080p', need: 14, mult: 1.3 },
+  { id: '1440p', name: '1440p', need: 28, mult: 1.55 },
+  { id: '4k', name: '4K', need: 50, mult: 1.9 },
+];
+export const NPC_NAMES = ['Hamid', 'Fatima', 'Youssef', 'Imane', 'Said', 'Khadija', 'Tarik', 'Nadia', 'Jamal', 'Samira'];
