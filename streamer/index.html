@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎥 Streamer Life 2</title>
+<meta name="theme-color" content="#20303f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Streamer Life 2">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div id="errLog"></div>
+
+<div id="loading">
+  <div class="loadBox">
+    <div class="loadCam">🎥</div>
+    <div class="loadTitle">STREAMER<br>LIFE <span>2</span></div>
+    <div class="loadBar"><div></div></div>
+    <div class="loadTip">moving into Cedar Creek…</div>
+  </div>
+</div>
+
+<!-- ═══════ MAIN MENU ═══════ -->
+<div id="mainMenu" class="menu">
+  <div class="mmLeft">
+    <div class="mmLogo">🎥 STREAMER<br>LIFE <span class="two">2</span></div>
+    <div class="mmTag">CEDAR CREEK EDITION · a life-sim about going live</div>
+    <div class="mmBtns">
+      <button id="btnPlay" class="mmBtn gold">▶ PLAY</button>
+      <button id="btnNew" class="mmBtn">✨ NEW GAME</button>
+      <button id="btnMP" class="mmBtn"> MULTIPLAYER</button>
+      <button id="btnSettings" class="mmBtn">⚙️ SETTINGS</button>
+      <button id="btnQuit" class="mmBtn">🚪 QUIT</button>
+    </div>
+    <div id="quitNote" class="mmNote">you can close the tab now 🙂</div>
+    <div class="mmFoot">WASD move · mouse look · E interact · Q exit car · B decorate · T chat<br>🌲 same town, same PC, same dream — now with a friend</div>
+  </div>
+</div>
+
+<!-- ═══════ MULTIPLAYER MENU ═══════ -->
+<div id="mpMenu" class="menu">
+  <div class="mpBox">
+    <div class="mpTitle">👥 MULTIPLAYER — co-op (2 players, LAN & online)</div>
+    <div class="mpHow">No servers needed: one player HOSTS and sends an invite code, the other JOINS with it. Codes are long — use the copy buttons and paste in your chat app.</div>
+    <div class="mpRow">
+      <button id="mpHost" class="mmBtn gold"> HOST a session</button>
+      <button id="mpJoin" class="mmBtn">🔑 JOIN with a code</button>
+    </div>
+    <div id="mpHostPanel" class="mpPanel">
+      <div class="mpStep">1️⃣ your invite code:</div>
+      <textarea id="mpInvite" readonly spellcheck="false"></textarea>
+      <button id="mpCopy" class="mmBtn">📋 copy</button>
+      <div class="mpStep">2️⃣ paste your friend's answer code:</div>
+      <textarea id="mpAnswer" spellcheck="false" placeholder="paste answer code here…"></textarea>
+      <button id="mpAccept" class="mmBtn gold">🔗 connect</button>
+    </div>
+    <div id="mpJoinPanel" class="mpPanel">
+      <div class="mpStep">1️⃣ paste the invite code:</div>
+      <textarea id="mpInviteIn" spellcheck="false" placeholder="paste invite code…"></textarea>
+      <button id="mpMakeAnswer" class="mmBtn gold">🔑 generate answer</button>
+      <div class="mpStep">2️⃣ send this answer code back:</div>
+      <textarea id="mpAnswerOut" readonly spellcheck="false"></textarea>
+      <button id="mpCopyAns" class="mmBtn">📋 copy</button>
+    </div>
+    <div id="mpStatus" class="mpStatus"></div>
+    <button id="mpBack" class="mmBtn">← back</button>
+  </div>
+</div>
+
+<!-- ═══════ SETTINGS ═══════ -->
+<div id="settingsMenu" class="menu">
+  <div class="setBox">
+    <div class="mpTitle">⚙️ SETTINGS</div>
+    <label>🔊 master volume <input type="range" id="setMaster" min="0" max="1" step="0.05"></label>
+    <label>🎵 music <input type="range" id="setMusic" min="0" max="1" step="0.05"></label>
+    <label>🔔 sfx <input type="range" id="setSfx" min="0" max="1" step="0.05"></label>
+    <label>🖱️ look sensitivity <input type="range" id="setSens" min="0.3" max="2.5" step="0.1"></label>
+    <label>👁️ field of view <input type="range" id="setFov" min="60" max="100" step="1"></label>
+    <label>⚡ graphics
+      <select id="setQuality"><option value="high">high (shadows)</option><option value="low">low (potato PC)</option></select>
+    </label>
+    <button id="setBack" class="mmBtn gold">← back</button>
+  </div>
+</div>
+
+<!-- ═══════ HUD ═══════ -->
+<div id="hud">
+  <div class="hudTL">
+    <div class="chip money" id="hudMoney">$0</div>
+    <div class="chip" id="hudFol">👥 0</div>
+    <div class="chip" id="hudDay">Day 1 · 08:00</div>
+  </div>
+  <div class="hudTR">
+    <div class="chip" id="hudLvl">⭐ Lv 1</div>
+    <div class="questBox" id="hudQuest"></div>
+  </div>
+  <div class="hudBL">
+    <div class="barWrap">⚡<div class="bar"><div id="hudEnergy"></div></div></div>
+    <div class="barWrap">🍔<div class="bar hunger"><div id="hudHunger"></div></div></div>
+  </div>
+  <div class="hudBR">
+    <button id="chatToggle" class="miniBtn">💬</button>
+    <button id="btnDecorate" class="miniBtn touchOnly">🎨</button>
+  </div>
+  <div id="chatLog" class="chatLog"></div>
+  <div id="chatRow" class="chatRow"><input id="chatInput" placeholder="say something… (Enter)"><button id="chatSend">➤</button></div>
+</div>
+
+<div id="prompt"></div>
+<div id="toast"></div>
+
+<!-- ═══════ generic modal ═══════ -->
+<div id="modal">
+  <div class="modalBox">
+    <div id="modalTitle" class="modalTitle"></div>
+    <div id="modalBody" class="modalBody"></div>
+    <div id="modalBtns" class="modalBtns"></div>
+  </div>
+</div>
+
+<!-- ═══════ PC OS ═══════ -->
+<div id="pcOS">
+  <div class="pcDesktop" id="pcDesktop">
+    <div class="pcWin">
+      <div class="pcTitleBar"><span id="pcWinTitle">OPS</span><button id="pcClose">✕</button></div>
+      <div class="pcWinBody" id="pcWinBody"></div>
+    </div>
+    <div class="pcTaskbar">
+      <button class="taskBtn" data-app="computers" onclick="window.__showApp('computers')">💻 Computers</button>
+      <button class="taskBtn" data-app="zamazor" onclick="window.__showApp('zamazor')">🛍️ Zamazor</button>
+      <button class="taskBtn" data-app="ops" onclick="window.__showApp('ops')">🎥 OPS</button>
+      <button class="taskBtn" data-app="web" onclick="window.__showApp('web')">🌐 Web</button>
+      <button class="taskBtn" data-app="wall" onclick="window.__showApp('wall')">🖼️ Wallpapers</button>
+      <button class="taskBtn" data-app="virus" onclick="window.__showApp('virus')">🐞 Virus Scanner</button>
+      <button class="taskBtn" data-app="bank" onclick="window.__showApp('bank')">🏦 Bank</button>
+      <div class="pcClock" id="pcClock">08:00</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ STREAM OVERLAY ═══════ -->
+<div id="streamUI">
+  <div class="stHead">
+    <span class="liveBadge">● LIVE</span>
+    <span id="streamGame">🎮 …</span>
+    <span id="streamViral" class="viralBadge">🚀 VIRAL</span>
+    <span class="stViewers">👁 <b id="streamViewers">0</b></span>
+    <button id="streamEnd" class="miniBtn">END</button>
+  </div>
+  <div class="stTimer"><div id="streamTimer"></div></div>
+  <div id="streamPops"></div>
+  <div id="streamChat" class="streamChat"></div>
+  <div id="streamResults" class="streamResults"></div>
+</div>
+
+<!-- ═══════ PAUSE ═══════ -->
+<div id="pauseMenu" class="menu">
+  <div class="setBox">
+    <div class="mpTitle">⏸ PAUSED</div>
+    <button id="btnResume" class="mmBtn gold">▶ resume</button>
+    <button id="btnPSettings" class="mmBtn">⚙️ settings</button>
+    <button id="btnSaveQuit" class="mmBtn">💾 save & quit to menu</button>
+  </div>
+</div>
+
+<!-- ═══════ TOUCH ═══════ -->
+<div id="touch">
+  <div id="joyBase"><div id="joyKnob"></div></div>
+  <div class="touchBtns">
+    <button id="btnE" class="tBtn big">E</button>
+    <button id="btnRun" class="tBtn">🏃</button>
+    <button id="btnBrake" class="tBtn">🛑</button>
+    <button id="btnPause" class="tBtn">⏸</button>
+  </div>
+</div>
+
+<div id="fade"></div>
+
+<script type="module" src="src/main.js"></script>
+<script>
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
