@@ -171,8 +171,13 @@ addEventListener('keyup', (e) => keys[e.code] = false);
 function lockPointer() {
   try { renderer.domElement.requestPointerLock(); } catch {}
 }
+// look around: pointer lock when available, otherwise click-drag (works in iframes/preview)
+let mouseDrag = false;
+renderer.domElement.addEventListener('mousedown', () => { mouseDrag = true; });
+addEventListener('mouseup', () => { mouseDrag = false; });
 document.addEventListener('mousemove', (e) => {
-  if (document.pointerLockElement === renderer.domElement && G.state === 'play') {
+  if (G.state !== 'play' || G.chatOpen) return;
+  if (document.pointerLockElement === renderer.domElement || mouseDrag) {
     player.look(e.movementX, e.movementY);
   }
 });
