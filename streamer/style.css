@@ -3,6 +3,7 @@
 html, body { width: 100%; height: 100%; overflow: hidden; background: #0a1020; font-family: 'Segoe UI', Arial, sans-serif; touch-action: none; }
 #gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 button { font-family: inherit; cursor: pointer; }
+#err { position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 99; background: #802020; color: #fff; padding: 10px 16px; border-radius: 10px; display: none; max-width: 90vw; font-size: 13px; white-space: pre-wrap; }
 .dim { color: #9aa8c0; font-size: 13px; line-height: 1.5; }
 
 /* ---------- screens ---------- */

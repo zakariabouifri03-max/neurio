@@ -1,5 +1,5 @@
 // ---------- procedural canvas textures ----------
-import * as THREE from 'three';
+import * as THREE from './threejs.js';
 import { mulberry32 } from './util.js';
 
 function ctex(size, draw, rx = 1, ry = 1) {

@@ -1,5 +1,5 @@
 // ---------- world: town, houses, interiors, cars, NPCs ----------
-import * as THREE from 'three';
+import * as THREE from './threejs.js';
 import { mulberry32 } from './util.js';
 import * as TX from './tex.js';
 import { HOUSES, CARS } from './data.js';

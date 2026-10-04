@@ -1,8 +1,6 @@
 // Streamer Life Sim 2 — offline service worker
-const C = 'sls2-v1';
-const CORE = ['index.html', 'style.css', 'manifest.webmanifest', 'icons/icon-192.png',
-  'src/main.js', 'src/world.js', 'src/player.js', 'src/pc.js', 'src/net.js', 'src/save.js',
-  'src/audio.js', 'src/tex.js', 'src/util.js', 'src/data.js', '../vendor/three.module.js'];
+const C = 'sls2-v2';
+const CORE = ['index.html', 'style.css', 'bundle.js', 'manifest.webmanifest', 'icons/icon-192.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(C).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));

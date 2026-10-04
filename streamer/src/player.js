@@ -1,5 +1,5 @@
 // ---------- first-person controller + driving ----------
-import * as THREE from 'three';
+import * as THREE from './threejs.js';
 import { clamp, damp } from './util.js';
 import { engineStart, engineUpdate, engineStop, sDoor } from './audio.js';
 

@@ -1,5 +1,5 @@
 // ---------- Streamer Life Sim 2 — main ----------
-import * as THREE from 'three';
+import * as THREE from './threejs.js';
 import { buildWorld } from './world.js';
 import { Player } from './player.js';
 import { PC } from './pc.js';
@@ -10,6 +10,11 @@ import { fmt$, clamp, damp, el, isTouch, mulberry32 } from './util.js';
 import { HOUSES, CARS, itemById, STREAM_CATS } from './data.js';
 
 const $ = (id) => document.getElementById(id);
+// on-screen error banner (helps debug on phones)
+addEventListener('error', (e) => {
+  const d = document.getElementById('err');
+  if (d) { d.style.display = 'block'; d.textContent = '⚠️ ' + (e.message || e); }
+});
 const save = loadSave();
 const TOUCH = isTouch();
 
