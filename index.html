@@ -1,150 +1,137 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏁 Bash Baqi Racing</title>
-<meta name="theme-color" content="#0ea5e9">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bash Baqi">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/style.css">
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
-</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#13251f">
+  <meta name="description" content="Neurio Blocks — عالم مكعبات مفتوح، بناء وصناعة وبقاء، كيخدم أوفلاين وعلى نفس الواي فاي.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Neurio Blocks">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="src/style.css">
+  <title>Neurio Blocks — عالم المكعبات</title>
 </head>
 <body>
-<div id="app"></div>
+  <div id="app">
+    <div id="viewport" aria-hidden="true"></div>
 
-<!-- error overlay -->
-<div id="errLog"></div>
+    <main id="menu" class="menu-screen">
+      <div class="menu-sun"></div><div class="menu-ground"></div>
+      <header class="brand-bar">
+        <div class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div class="brand-name"><strong>NEURIO</strong><span>BLOCKS</span></div>
+        <div class="brand-actions">
+          <button id="btnInstall" class="icon-btn" hidden aria-label="تثبيت اللعبة">⬇</button>
+          <button id="btnFullscreenMenu" class="icon-btn" aria-label="ملء الشاشة">⛶</button>
+        </div>
+      </header>
 
-<!-- loading -->
-<div id="loading">
-  <div class="loadBox">
-    <div class="loadFlag">🏁</div>
-    <div class="loadTitle">BASH BAQI<br>RACING</div>
-    <div class="loadBar"><div></div></div>
-    <div class="loadTip">warming up the buggies…</div>
-  </div>
-</div>
+      <section class="hero-card">
+        <div class="eyebrow"><span class="live-dot"></span> عالم مفتوح · لعب بلا نت · صناعة وبناء</div>
+        <h1>صايب عالمك،<br><span>وابنيه بطريقتك.</span></h1>
+        <p class="hero-copy">حفر، جمع الموارد، صنع الأدوات، واستكشف غابات وصحاري وجبال. عالمك محفوظ فالتلفون، وحتى بلا إنترنت.</p>
 
-<!-- speed lines overlay -->
-<div id="speedLines"></div>
-<div id="coinPops"></div>
+        <div id="continueCard" class="continue-card" hidden>
+          <div class="world-icon">▦</div>
+          <div class="world-summary"><span class="small-label">آخر عالم</span><strong id="lastWorldName">عالمي</strong><span id="lastWorldMeta">Seed · Survival</span></div>
+          <button id="btnContinue" class="primary-btn">كمّل اللعب <span>←</span></button>
+        </div>
 
-<!-- ══════════ RACE HUD ══════════ -->
-<div id="hud">
-  <div class="hudTL">
-    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
-    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
-    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
-    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
-  </div>
+        <div class="menu-actions">
+          <button id="btnNewWorld" class="primary-btn large"><span class="btn-emoji">✦</span> صايب عالم جديد <span class="btn-arrow">←</span></button>
+          <button id="btnWorlds" class="secondary-btn"><span>▤</span> العوالم المحفوظة</button>
+          <button id="btnJoinLan" class="secondary-btn lan-btn"><span>⌁</span> دخل للّعب عبر LAN</button>
+          <button id="btnSettingsMenu" class="secondary-btn"><span>⚙</span> الإعدادات</button>
+        </div>
 
-  <div id="progbar">
-    <span class="flagL">🏁</span>
-    <div class="track"><div id="progMarkers"></div></div>
-    <span class="flagR">🏆</span>
-  </div>
+        <div class="feature-row">
+          <div><span class="feature-icon">⛏</span><b>اجمع وصنع</b><small>موارد وأدوات</small></div>
+          <div><span class="feature-icon">▦</span><b>ابني بحرّية</b><small>عالم فوكسل لا نهائي</small></div>
+          <div><span class="feature-icon">◐</span><b>ليل ونهار</b><small>كائنات ونجاة</small></div>
+        </div>
+        <p class="fine-print">صنع مستقل ومستلهم من ألعاب البناء بالمكعبات — ماشي لعبة Minecraft رسمية.</p>
+      </section>
 
-  <button id="btnPauseTop" class="roundBtn">⏸</button>
+      <footer class="menu-footer"><span>NEURIO BLOCKS <b>0.1</b></span><span>عالَمك كيبقى فالجهاز ديالك</span></footer>
+    </main>
 
-  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
+    <section id="game" class="game-screen" hidden aria-label="اللعبة">
+      <div id="lookArea" aria-label="حرّك باش تشوف حولك"></div>
+      <div class="crosshair" aria-hidden="true"><i></i><b></b></div>
 
-  <div id="powerSlot" class="powerSlot">
-    <span id="hudPower"></span>
-    <span class="keyHint">SPACE</span>
-  </div>
+      <header class="game-topbar">
+        <div class="stat-cluster">
+          <div class="stat-pill health-pill"><span>♥</span><div class="bar"><i id="healthFill"></i></div><b id="healthText">20</b></div>
+          <div class="stat-pill food-pill"><span>🍗</span><div class="bar"><i id="hungerFill"></i></div><b id="hungerText">20</b></div>
+          <div class="stat-pill time-pill"><span id="weatherIcon">☀</span><b id="timeText">12:00</b></div>
+        </div>
+        <div class="game-top-actions">
+          <span id="coordsText" class="coords-pill">X 0 · Y 0 · Z 0</span>
+          <button id="btnChat" class="hud-icon-btn" aria-label="دردشة LAN" hidden>☰</button>
+          <button id="btnInventory" class="hud-icon-btn" aria-label="الحقيبة">▤</button>
+          <button id="btnPause" class="hud-icon-btn" aria-label="إيقاف مؤقت">Ⅱ</button>
+        </div>
+      </header>
 
-  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
+      <div id="targetBadge" class="target-badge" hidden></div>
+      <div id="mineMeter" class="mine-meter" hidden><span></span><i id="mineProgress"></i></div>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <div id="banner"></div>
+      <div id="hotbar" class="hotbar" aria-label="الأغراض المختارة"></div>
+      <div id="selectedHint" class="selected-hint"></div>
 
-  <!-- touch controls -->
-  <div id="touchWrap">
-    <div class="tcol left">
-      <button id="tLeft" class="tbtn">◀</button>
-      <button id="tRight" class="tbtn">▶</button>
+      <div id="mobileControls" class="mobile-controls">
+        <div id="stickBase" class="stick-base" aria-label="عصا الحركة"><div id="stickKnob" class="stick-knob"></div><span class="stick-arrow up">▲</span><span class="stick-arrow left">◀</span><span class="stick-arrow right">▶</span><span class="stick-arrow down">▼</span></div>
+        <div class="action-pad">
+          <button id="btnJump" class="action-button jump-button" aria-label="قفز">↑<small>قفز</small></button>
+          <button id="btnMine" class="action-button mine-button" aria-label="حفر">⛏<small>حفر</small></button>
+          <button id="btnPlace" class="action-button place-button" aria-label="بناء">▦<small>بناء</small></button>
+          <button id="btnAttack" class="action-button attack-button" aria-label="هجوم">⚔<small>ضرب</small></button>
+          <button id="btnUse" class="action-button use-button" aria-label="استعمال أو أكل">✦<small>استعمل</small></button>
+        </div>
+        <div class="touch-tip">حرّك العصا للمشي · اسحب الشاشة للنظر</div>
+      </div>
+
+      <aside id="chatPanel" class="chat-panel" hidden>
+        <div id="chatMessages" class="chat-messages"></div>
+        <form id="chatForm"><input id="chatInput" maxlength="120" placeholder="كتب رسالة قصيرة…" autocomplete="off"><button>إرسال</button></form>
+      </aside>
+
+      <div id="pauseOverlay" class="screen-dimmer" hidden>
+        <section class="pause-card">
+          <div class="panel-eyebrow">العالم محفوظ تلقائياً</div>
+          <h2>استراحة قصيرة</h2>
+          <p id="pauseWorldName">عالمك باقي كيتسناك.</p>
+          <button id="btnResume" class="primary-btn large">▶ كمّل اللعب</button>
+          <button id="btnCraft" class="secondary-btn">⚒ الصناعة والوصفات</button>
+          <button id="btnLanHost" class="secondary-btn">⌁ استضف لاعباً على LAN</button>
+          <button id="btnLanJoinGame" class="secondary-btn">⌁ دخل بكود LAN</button>
+          <button id="btnSettingsGame" class="secondary-btn">⚙ الإعدادات</button>
+          <button id="btnToMenu" class="text-btn">حفظ وخروج للقائمة الرئيسية</button>
+        </section>
+      </div>
+    </section>
+
+    <div id="dialogOverlay" class="dialog-overlay" hidden>
+      <section id="dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+        <header class="dialog-header"><div><span class="dialog-eyebrow">NEURIO BLOCKS</span><h2 id="dialogTitle">الإعدادات</h2></div><button id="dialogClose" class="dialog-close" aria-label="إغلاق">×</button></header>
+        <div id="dialogBody" class="dialog-body"></div>
+      </section>
     </div>
-    <div class="tcol right">
-      <button id="tBrake" class="tbtn brake">▼</button>
-    </div>
-  </div>
-</div>
 
-<!-- ══════════ GARAGE UI ══════════ -->
-<div id="garageUI">
-  <div id="topbar">
-    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
-    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
-    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
-    <div class="spacer"></div>
-    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
-    <button id="btnMusic" class="miniBtn">🎵</button>
-    <button id="btnSfx" class="miniBtn">🔊</button>
-    <button id="btnFull" class="miniBtn">⛶</button>
+    <div id="errorBox" class="error-box" hidden></div>
+    <div id="loadingCover" class="loading-cover"><div class="loading-mark">▦</div><b>NEURIO BLOCKS</b><span>كنوجدّو عالمك…</span><div class="loading-track"><i></i></div></div>
   </div>
 
-  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
-  <div id="carNamePlate"></div>
-
-  <div id="menuBar">
-    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
-    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
-    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
-    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
-    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
-    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
-  </div>
-</div>
-
-<!-- ══════════ Shop / panels ══════════ -->
-<div id="panel">
-  <div class="panelBox">
-    <div class="panelHead">
-      <h2 id="panelTitle">SHOP</h2>
-      <div id="panelTabs"></div>
-      <button id="panelClose" class="roundBtn">✖</button>
-    </div>
-    <div id="panelBody"></div>
-  </div>
-</div>
-
-<!-- results -->
-<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
-<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
-
-<!-- pause -->
-<div id="pauseModal">
-  <div class="modalBox">
-    <div class="rtitle">⏸ PAUSED</div>
-    <div class="rbtns">
-      <button id="btnResume" class="big race">▶ RESUME</button>
-      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
-<div id="confetti"></div>
-
-<script type="module" src="src/main.js"></script>
-<script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-</script>
+  <script type="module" src="src/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+  </script>
 </body>
 </html>

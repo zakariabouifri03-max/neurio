@@ -1,52 +1,29 @@
-// Bash Baqi Racing — service worker: full offline support
-const VERSION = 'bbr-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './src/main.js',
-  './src/race.js',
-  './src/menu.js',
-  './src/builders.js',
-  './src/data.js',
-  './src/tex.js',
-  './src/audio.js',
-  './src/util.js',
-  './src/save.js',
-  './src/post.js',
-  './src/style.css',
-  './vendor/three.module.js',
-  './vendor/utils/BufferGeometryUtils.js',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
+// Offline cache for Neurio Blocks (all game code and Three.js are local).
+const VERSION = 'neurio-blocks-v1';
+const CORE = [
+  './', './index.html', './manifest.webmanifest', './src/style.css',
+  './src/main.js', './src/game.js', './src/world.js', './src/blocks.js',
+  './src/inventory.js', './src/entities.js', './src/network.js', './src/storage.js', './src/audio.js',
+  './vendor/three.module.js', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())
-  );
+self.addEventListener('install', (event) => {
+  event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(CORE)).then(() => self.skipWaiting()));
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
+self.addEventListener('activate', (event) => {
+  event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== VERSION).map((key) => caches.delete(key)))).then(() => self.clients.claim()));
 });
 
-self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then((hit) => {
-      if (hit) return hit;
-      return fetch(e.request).then((res) => {
-        if (res.ok && new URL(e.request.url).origin === location.origin) {
-          const copy = res.clone();
-          caches.open(VERSION).then((c) => c.put(e.request, copy));
-        }
-        return res;
-      }).catch(() => caches.match('./index.html'));
-    })
-  );
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+  event.respondWith(caches.match(event.request, { ignoreSearch: true }).then((cached) => {
+    if (cached) return cached;
+    return fetch(event.request).then((response) => {
+      if (response.ok) caches.open(VERSION).then((cache) => cache.put(event.request, response.clone()));
+      return response;
+    }).catch(() => caches.match('./index.html'));
+  }));
 });

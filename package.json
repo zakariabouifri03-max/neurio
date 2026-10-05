@@ -1,0 +1,14 @@
+{
+  "name": "neurio-blocks",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build-singlefile.mjs",
+    "build:apk": "npm run build && python3 tools/build-apk.py",
+    "check": "node tools/check-game.mjs && npm run build"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}
