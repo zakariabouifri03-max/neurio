@@ -186,12 +186,254 @@ def draw_ingredient_col(c, items: list[str], x: float, y: float, width: float,
     return y
 
 
+def draw_food_mark(c, kind: str, x: float, y: float, scale: float = 1.0):
+    """Tiny original vector food illustration, drawn in a 40 x 34 unit box."""
+    c.saveState()
+    c.translate(x, y)
+    c.scale(scale, scale)
+    gold = HexColor("#E7B958")
+    bun = HexColor("#D9A15C")
+    meat = HexColor("#8B4F35")
+    cheese = HexColor("#F2CC58")
+    green = HexColor("#6B9564")
+    red = HexColor("#CF6548")
+    white = WHITE
+
+    if kind in {"burger", "sandwich", "sub", "grilled_cheese"}:
+        c.setFillColor(bun if kind != "grilled_cheese" else HexColor("#D69A4E"))
+        c.roundRect(5, 21, 30, 7, 3, fill=1, stroke=0)
+        c.setFillColor(meat if kind in {"burger", "sub"} else cheese)
+        c.roundRect(6, 15, 28, 5, 1.5, fill=1, stroke=0)
+        c.setFillColor(cheese if kind != "grilled_cheese" else bun)
+        c.roundRect(7, 12, 26, 3.5, 1, fill=1, stroke=0)
+        c.setFillColor(green)
+        c.roundRect(8, 10, 24, 2, 1, fill=1, stroke=0)
+        c.setFillColor(bun if kind != "grilled_cheese" else HexColor("#D69A4E"))
+        c.roundRect(7, 5, 26, 4, 2, fill=1, stroke=0)
+    elif kind in {"pasta", "mac"}:
+        c.setFillColor(HexColor("#E7DDC7"))
+        c.ellipse(4, 5, 36, 29, fill=1, stroke=0)
+        c.setStrokeColor(gold)
+        c.setLineWidth(2.2)
+        for offset in (0, 4, 8):
+            path = c.beginPath()
+            path.moveTo(10, 17 + offset * 0.25)
+            path.curveTo(14, 27, 17, 8, 21, 18)
+            path.curveTo(25, 27, 28, 10, 31, 18)
+            c.drawPath(path, stroke=1, fill=0)
+        c.setFillColor(green)
+        c.circle(19, 21, 1.7, fill=1, stroke=0)
+    elif kind == "taco":
+        path = c.beginPath()
+        path.moveTo(5, 9)
+        path.curveTo(8, 28, 31, 30, 35, 9)
+        path.curveTo(25, 4, 14, 4, 5, 9)
+        path.close()
+        c.setFillColor(gold)
+        c.drawPath(path, fill=1, stroke=0)
+        c.setFillColor(meat)
+        c.ellipse(10, 13, 30, 21, fill=1, stroke=0)
+        c.setFillColor(green)
+        for px, py in ((14, 21), (21, 23), (27, 20)):
+            c.circle(px, py, 1.8, fill=1, stroke=0)
+        c.setFillColor(red)
+        c.circle(18, 16, 1.2, fill=1, stroke=0)
+    elif kind in {"pizza", "pizza_bread"}:
+        path = c.beginPath()
+        path.moveTo(7, 7)
+        path.lineTo(34, 7)
+        path.lineTo(19, 29)
+        path.close()
+        c.setFillColor(HexColor("#C98944"))
+        c.drawPath(path, fill=1, stroke=0)
+        path2 = c.beginPath()
+        path2.moveTo(10, 10)
+        path2.lineTo(31, 10)
+        path2.lineTo(19, 26)
+        path2.close()
+        c.setFillColor(cheese)
+        c.drawPath(path2, fill=1, stroke=0)
+        c.setFillColor(red)
+        for px, py in ((17, 15), (22, 19), (19, 22)):
+            c.circle(px, py, 1.8, fill=1, stroke=0)
+    elif kind == "fries":
+        c.setFillColor(HexColor("#D9A15C"))
+        c.roundRect(7, 5, 27, 11, 3, fill=1, stroke=0)
+        c.setFillColor(gold)
+        for px, ht in ((10, 17), (15, 21), (20, 18), (25, 22), (30, 17)):
+            c.roundRect(px, 12, 3.2, ht, 1.2, fill=1, stroke=0)
+    elif kind == "pancakes":
+        c.setFillColor(bun)
+        c.ellipse(5, 6, 35, 15, fill=1, stroke=0)
+        c.ellipse(7, 12, 33, 21, fill=1, stroke=0)
+        c.ellipse(9, 18, 31, 27, fill=1, stroke=0)
+        c.setFillColor(cheese)
+        c.roundRect(16, 23, 9, 5, 2, fill=1, stroke=0)
+    elif kind == "tenders":
+        c.setFillColor(HexColor("#E5B15A"))
+        for px, py, ang in ((7, 7, 0), (14, 15, 0), (21, 8, 0)):
+            c.saveState()
+            c.translate(px, py)
+            c.rotate(ang)
+            c.roundRect(0, 0, 15, 6, 3, fill=1, stroke=0)
+            c.restoreState()
+        c.setFillColor(gold)
+        c.circle(29, 25, 4, fill=1, stroke=0)
+    elif kind in {"wrap", "burrito"}:
+        c.setFillColor(HexColor("#E6D2A4"))
+        c.roundRect(5, 9, 31, 17, 8, fill=1, stroke=0)
+        c.setStrokeColor(HexColor("#C79A4D"))
+        c.setLineWidth(1)
+        c.line(13, 10, 13, 25)
+        c.line(25, 10, 25, 25)
+        c.setFillColor(red)
+        c.circle(9, 17, 1.4, fill=1, stroke=0)
+        c.setFillColor(green)
+        c.circle(31, 17, 1.4, fill=1, stroke=0)
+    elif kind == "potato":
+        c.setFillColor(HexColor("#B97A46"))
+        c.ellipse(5, 7, 35, 27, fill=1, stroke=0)
+        c.setFillColor(white)
+        c.ellipse(10, 12, 30, 24, fill=1, stroke=0)
+        c.setFillColor(cheese)
+        c.circle(16, 19, 3, fill=1, stroke=0)
+        c.circle(24, 17, 3, fill=1, stroke=0)
+        c.setFillColor(green)
+        c.circle(20, 23, 1.5, fill=1, stroke=0)
+    elif kind == "cookies":
+        c.setFillColor(HexColor("#D6A05B"))
+        for px, py in ((11, 12), (25, 13), (19, 24)):
+            c.circle(px, py, 8, fill=1, stroke=0)
+            c.setFillColor(meat)
+            c.circle(px - 2, py + 2, 1, fill=1, stroke=0)
+            c.circle(px + 3, py - 2, 1, fill=1, stroke=0)
+            c.setFillColor(HexColor("#D6A05B"))
+    elif kind == "brownie":
+        c.setFillColor(HexColor("#6C3E31"))
+        for px, py in ((7, 8), (21, 8), (14, 20)):
+            c.roundRect(px, py, 12, 11, 1.5, fill=1, stroke=0)
+        c.setFillColor(cheese)
+        c.circle(12, 13, 1, fill=1, stroke=0)
+        c.circle(25, 13, 1, fill=1, stroke=0)
+    elif kind == "pb_cup":
+        c.setFillColor(meat)
+        for px in (7, 18, 29):
+            c.roundRect(px, 7, 8, 15, 2, fill=1, stroke=0)
+            c.setFillColor(cheese)
+            c.ellipse(px + 1, 14, px + 7, 20, fill=1, stroke=0)
+            c.setFillColor(meat)
+    elif kind == "cheesecake":
+        c.setFillColor(HexColor("#9E744A"))
+        c.roundRect(8, 5, 24, 24, 3, fill=1, stroke=0)
+        c.setFillColor(HexColor("#F3E4C5"))
+        c.rect(10, 9, 20, 15, fill=1, stroke=0)
+        c.setFillColor(HexColor("#D87C66"))
+        c.ellipse(16, 23, 24, 30, fill=1, stroke=0)
+        c.setFillColor(green)
+        c.ellipse(20, 28, 24, 31, fill=1, stroke=0)
+    else:
+        c.setFillColor(gold)
+        c.ellipse(7, 8, 33, 28, fill=1, stroke=0)
+    c.restoreState()
+
+
+def draw_stage_icon(c, stage_index: int, label: str, kind: str, x: float, y: float):
+    """Draw prep, cooking, or plated-food pictograms for the visual recipe sequence."""
+    c.saveState()
+    c.translate(x, y)
+    c.setStrokeColor(INK)
+    c.setLineWidth(1.25)
+    if stage_index == 0:
+        c.setFillColor(PAPER_DARK)
+        c.roundRect(3, 5, 35, 25, 4, fill=1, stroke=0)
+        c.setFillColor(HexColor("#D96E50"))
+        c.circle(12, 19, 3, fill=1, stroke=0)
+        c.setFillColor(HONEY)
+        c.circle(21, 14, 3.4, fill=1, stroke=0)
+        c.setFillColor(HexColor("#77946A"))
+        c.circle(30, 21, 3, fill=1, stroke=0)
+        c.setStrokeColor(INK_SOFT)
+        c.setLineWidth(1.4)
+        c.line(8, 9, 22, 27)
+        c.line(7, 8, 11, 9)
+    elif stage_index == 1:
+        word = label.upper()
+        if "BAKE" in word or "AIR-FRY" in word:
+            c.setFillColor(PAPER_DARK)
+            c.roundRect(5, 3, 31, 35, 4, fill=1, stroke=1)
+            c.setFillColor(WHITE)
+            c.roundRect(10, 12, 21, 17, 3, fill=1, stroke=0)
+            c.setStrokeColor(LINE)
+            c.line(11, 20, 30, 20)
+            c.setFillColor(HONEY)
+            c.circle(14, 33, 1.4, fill=1, stroke=0)
+            c.setFillColor(TOMATO)
+            c.circle(21, 33, 1.4, fill=1, stroke=0)
+            draw_food_mark(c, kind, 13, 15, 0.38)
+        elif "CHILL" in word or "SET" in word:
+            c.setFillColor(PAPER_DARK)
+            c.roundRect(7, 2, 27, 37, 4, fill=1, stroke=1)
+            c.setStrokeColor(LINE)
+            c.line(8, 22, 33, 22)
+            c.setStrokeColor(INK_SOFT)
+            c.line(28, 27, 28, 32)
+            c.line(28, 10, 28, 16)
+            c.setFillColor(HexColor("#D6B877"))
+            c.roundRect(12, 7, 11, 8, 2, fill=1, stroke=0)
+        else:
+            c.setFillColor(INK_SOFT)
+            c.roundRect(1, 14, 12, 4, 2, fill=1, stroke=0)
+            c.setFillColor(PAPER_DARK)
+            c.roundRect(10, 7, 27, 15, 5, fill=1, stroke=1)
+            c.setFillColor(HexColor("#D7A352"))
+            c.ellipse(14, 11, 32, 20, fill=1, stroke=0)
+            draw_food_mark(c, kind, 16, 12, 0.32)
+            c.setStrokeColor(TOMATO)
+            c.setLineWidth(1.1)
+            for sx in (17, 25, 33):
+                path = c.beginPath()
+                path.moveTo(sx, 24)
+                path.curveTo(sx - 3, 28, sx + 3, 31, sx, 36)
+                c.drawPath(path, stroke=1, fill=0)
+    else:
+        c.setFillColor(WHITE)
+        c.ellipse(2, 3, 39, 37, fill=1, stroke=1)
+        c.setStrokeColor(LINE)
+        c.ellipse(7, 8, 34, 32, fill=0, stroke=1)
+        draw_food_mark(c, kind, 7, 8, 0.68)
+    c.restoreState()
+
+
+def draw_visual_flow(c, recipe: dict, x: float, y: float, width: float, height: float):
+    stages = recipe.get("visual_steps", [])
+    if not stages:
+        return
+    gap = 7
+    card_w = (width - gap * 2) / 3
+    accents = [TOMATO, HONEY, HexColor("#6E8B68")]
+    for i, stage in enumerate(stages[:3]):
+        card_x = x + i * (card_w + gap)
+        c.setFillColor(WHITE)
+        c.setStrokeColor(LINE)
+        c.setLineWidth(0.65)
+        c.roundRect(card_x, y, card_w, height, 8, fill=1, stroke=1)
+        c.setFillColor(accents[i])
+        c.roundRect(card_x, y + height - 4, card_w, 4, 2, fill=1, stroke=0)
+        draw_stage_icon(c, i, stage["label"], recipe.get("visual_icon", "dish"), card_x + 7, y + 14)
+        text_x = card_x + 49
+        c.setFillColor(accents[i])
+        c.setFont(SANS_BOLD, 6.8)
+        c.drawString(text_x, y + height - 15, stage["label"].upper())
+        draw_wrapped(c, stage["text"], text_x, y + height - 28, card_w - 55,
+                     font=SANS, size=6.9, leading=8.1, color=INK_SOFT, max_lines=3)
+
+
 def draw_recipe_opening(c, recipe: dict, page_number: int):
     draw_bg(c)
     draw_header(c, recipe["category"])
     photo_path = HERE / recipe["image"]
-    img = make_image_reader(photo_path, ratio=1.78)
-    img_x, img_y, img_w, img_h = M, 433, CONTENT_W, 297
+    img = make_image_reader(photo_path, ratio=CONTENT_W / 248)
+    img_x, img_y, img_w, img_h = M, 481, CONTENT_W, 248
     c.drawImage(img, img_x, img_y, width=img_w, height=img_h, mask="auto")
 
     # Small category badge over the photograph.
@@ -206,18 +448,19 @@ def draw_recipe_opening(c, recipe: dict, page_number: int):
     c.setFillColor(INK_SOFT)
     c.setFont(SANS, 7.1)
     c.drawRightString(PAGE_W - M, img_y - 12, recipe["photo_caption"])
+    draw_visual_flow(c, recipe, M, 394, CONTENT_W, 66)
 
     title = recipe["title"]
     title_size = fitted_size(title, SERIF_BOLD, 25, 19, CONTENT_W)
     c.setFillColor(INK)
     c.setFont(SERIF_BOLD, title_size)
-    c.drawString(M, 397, title)
+    c.drawString(M, 363, title)
 
-    tagline_y = 378
+    tagline_y = 344
     tagline_end = draw_wrapped(c, recipe["tagline"], M, tagline_y, CONTENT_W,
                                 font=SERIF, size=10.2, leading=13.5, color=INK_SOFT, max_lines=2)
 
-    pill_y = min(340, tagline_end - 6)
+    pill_y = min(306, tagline_end - 6)
     gap = 7
     widths = [100, 100, 105, CONTENT_W - 100 - 100 - 105 - 3 * gap]
     labels = [f"PREP  {recipe['prep']}", f"COOK  {recipe['cook']}",
@@ -371,7 +614,7 @@ def draw_welcome(c, page_number):
     y = 588
     paragraphs = [
         "This book is the cook-at-home companion to the Grandma Rosie recipe series: twenty familiar American favorites, written for real kitchens and hungry people. You will find crisp burgers, creamy pasta, breakfast sandwiches, quick snacks, and a few sweet reasons to preheat the oven.",
-        "Every recipe starts with a finished-dish image, then gives you the yield, timing, equipment, measured ingredients, clear steps, and a practical storage note. The photos are visual inspiration; ingredients, brands, ovens, and plating can change the final look.",
+        "Every recipe starts with a finished-dish image and a three-panel prep, cook, and finish illustration. You will also find the yield, timing, equipment, measured ingredients, clear steps, and a practical storage note. The photos are visual inspiration; ingredients, brands, ovens, and plating can change the final look.",
         "Rosie's rule is simple: no long introductions, no mystery measurements, and no shame in using a shortcut when the day is busy. Read the recipe through once, gather what you need, and let the skillet do the talking."
     ]
     for para in paragraphs:
@@ -502,7 +745,8 @@ def draw_credits(c, page_number):
     c.setFillColor(INK)
     c.setFont(SERIF_BOLD, 29)
     c.drawString(M, 674, "Image credits & use.")
-    intro = ("Recipes 01–10 use original AI-generated food images created for this edition. "
+    intro = ("Every recipe includes three original vector illustrations for the prep, cooking, and serving stages. "
+             "Recipes 01–10 use original AI-generated finished-dish images created for this edition. "
              "Recipes 11–20 use stock food photographs for serving inspiration; these images were cropped for the page layout. "
              "Pexels attribution is optional under its license. The recipe 14 image is separately credited below.")
     y = draw_wrapped(c, intro, M, 642, CONTENT_W, font=SANS, size=9.5, leading=14, color=INK_SOFT)
@@ -624,6 +868,53 @@ def html_steps(steps: list[dict]) -> str:
     return "\n".join(parts)
 
 
+def html_stage_svg(stage_index: int, label: str, kind: str) -> str:
+    if stage_index == 0:
+        body = '<rect x="5" y="19" width="46" height="28" rx="6" fill="#eee6d7"/><circle cx="17" cy="32" r="5" fill="#c65c43"/><circle cx="30" cy="39" r="5" fill="#c79a4d"/><circle cx="42" cy="29" r="5" fill="#6e8b68"/><path d="M12 45 33 18m-23 29 7-1" stroke="#20372f" stroke-width="2" stroke-linecap="round"/>'
+    elif stage_index == 1:
+        if "BAKE" in label.upper() or "AIR-FRY" in label.upper():
+            body = '<rect x="12" y="5" width="32" height="48" rx="6" fill="#eee6d7" stroke="#20372f" stroke-width="2"/><rect x="18" y="20" width="20" height="21" rx="3" fill="#fffdf8"/><path d="M18 31h20" stroke="#dcd2c0" stroke-width="2"/><circle cx="22" cy="12" r="2" fill="#c65c43"/><circle cx="32" cy="12" r="2" fill="#c79a4d"/><path d="M23 34c2-7 9-7 11 0" fill="#e7b958"/>'
+        elif "CHILL" in label.upper() or "SET" in label.upper():
+            body = '<rect x="15" y="4" width="26" height="50" rx="5" fill="#eee6d7" stroke="#20372f" stroke-width="2"/><path d="M16 27h24" stroke="#dcd2c0" stroke-width="2"/><path d="M36 13v8m0 12v8" stroke="#52645b" stroke-width="2" stroke-linecap="round"/><rect x="21" y="34" width="10" height="7" rx="2" fill="#d9a15c"/>'
+        else:
+            body = '<path d="M4 28h10" stroke="#20372f" stroke-width="4" stroke-linecap="round"/><path d="M12 25h37l-4 17a6 6 0 0 1-6 5H21a6 6 0 0 1-6-5z" fill="#eee6d7" stroke="#20372f" stroke-width="2"/><ellipse cx="30" cy="34" rx="13" ry="7" fill="#e7b958"/><path d="M20 19c-4-5 4-6 1-11m10 12c-4-5 4-6 1-11m9 15c-3-4 3-6 1-9" fill="none" stroke="#c65c43" stroke-width="2" stroke-linecap="round"/>'
+    else:
+        plate = '<ellipse cx="29" cy="30" rx="25" ry="22" fill="#fffdf8" stroke="#20372f" stroke-width="2"/><ellipse cx="29" cy="30" rx="18" ry="15" fill="none" stroke="#dcd2c0" stroke-width="2"/>'
+        foods = {
+            'burger':'<path d="M16 28q13-15 26 0" fill="#d9a15c"/><rect x="16" y="29" width="26" height="6" rx="2" fill="#8b4f35"/><path d="m16 34 7 3 3-3 7 3 3-3 6 2" fill="#f2cc58"/><rect x="17" y="37" width="24" height="4" rx="2" fill="#d9a15c"/>',
+            'pasta':'<path d="M14 27c4-12 10 15 15 2s10 10 16-2M14 33c4-12 10 15 15 2s10 10 16-2" fill="none" stroke="#e7b958" stroke-width="4" stroke-linecap="round"/>',
+            'mac':'<path d="M14 27c4-12 10 15 15 2s10 10 16-2M14 34c4-12 10 15 15 2s10 10 16-2" fill="none" stroke="#e7b958" stroke-width="4" stroke-linecap="round"/>',
+            'taco':'<path d="M14 38q4-24 30-18l-4 21q-11-8-26-3" fill="#e7b958"/><circle cx="23" cy="29" r="3" fill="#8b4f35"/><circle cx="31" cy="27" r="3" fill="#6e8b68"/><circle cx="37" cy="32" r="3" fill="#c65c43"/>',
+            'pizza':'<path d="m16 42 26-2-13-23z" fill="#e7b958" stroke="#c98944" stroke-width="3"/><circle cx="27" cy="29" r="2" fill="#c65c43"/><circle cx="33" cy="35" r="2" fill="#c65c43"/>',
+            'pizza_bread':'<path d="M15 25q14-9 29 0v15q-15 8-29 0z" fill="#d9a15c"/><path d="M18 28q11-7 23 0v8q-11 6-23 0z" fill="#e7b958"/><circle cx="25" cy="31" r="2" fill="#c65c43"/><circle cx="34" cy="34" r="2" fill="#c65c43"/>',
+            'fries':'<path d="M17 31h25l-3 13H20z" fill="#c65c43"/><path d="M20 31V17h4v14m3 0V13h4v18m3 0V18h4v13" fill="#e7b958"/>',
+            'pancakes':'<ellipse cx="29" cy="39" rx="16" ry="5" fill="#d9a15c"/><ellipse cx="29" cy="33" rx="15" ry="5" fill="#e7b958"/><ellipse cx="29" cy="27" rx="13" ry="5" fill="#d9a15c"/><rect x="25" y="22" width="8" height="5" rx="2" fill="#f2cc58"/>',
+            'tenders':'<rect x="15" y="25" width="20" height="7" rx="4" transform="rotate(-18 15 25)" fill="#e7b958"/><rect x="25" y="34" width="19" height="7" rx="4" transform="rotate(16 25 34)" fill="#d9a15c"/>',
+            'wrap':'<rect x="15" y="23" width="29" height="14" rx="7" fill="#e6d2a4"/><path d="M23 24v12m12-12v12" stroke="#c79a4d" stroke-width="2"/>',
+            'burrito':'<rect x="15" y="23" width="29" height="14" rx="7" fill="#e6d2a4"/><path d="M23 24v12m12-12v12" stroke="#c79a4d" stroke-width="2"/>',
+            'potato':'<ellipse cx="29" cy="31" rx="17" ry="11" fill="#b97a46"/><path d="M18 31q11-13 23 0" fill="#fffdf8"/><circle cx="25" cy="28" r="3" fill="#f2cc58"/><circle cx="34" cy="30" r="3" fill="#6e8b68"/>',
+            'cookies':'<circle cx="22" cy="31" r="9" fill="#d6a05b"/><circle cx="36" cy="33" r="8" fill="#d6a05b"/><circle cx="19" cy="29" r="1.5" fill="#8b4f35"/><circle cx="25" cy="34" r="1.5" fill="#8b4f35"/><circle cx="35" cy="30" r="1.5" fill="#8b4f35"/>',
+            'brownie':'<rect x="18" y="23" width="12" height="13" rx="2" fill="#6c3e31"/><rect x="31" y="29" width="13" height="12" rx="2" fill="#6c3e31"/>',
+            'pb_cup':'<rect x="17" y="25" width="10" height="15" rx="3" fill="#6c3e31"/><rect x="30" y="25" width="10" height="15" rx="3" fill="#6c3e31"/><ellipse cx="22" cy="28" rx="4" ry="2" fill="#e7b958"/><ellipse cx="35" cy="28" rx="4" ry="2" fill="#e7b958"/>',
+            'cheesecake':'<rect x="18" y="21" width="24" height="20" rx="4" fill="#9e744a"/><rect x="20" y="23" width="20" height="14" rx="2" fill="#f3e4c5"/><circle cx="31" cy="22" r="4" fill="#d87c66"/>',
+            'sandwich':'<path d="M16 26 30 20l13 7-1 15-25-1z" fill="#d9a15c"/><rect x="19" y="31" width="21" height="4" rx="2" fill="#8b4f35"/><rect x="20" y="36" width="19" height="4" rx="2" fill="#f2cc58"/>',
+            'sub':'<rect x="14" y="25" width="31" height="14" rx="7" fill="#d9a15c"/><path d="M18 31h24" stroke="#8b4f35" stroke-width="5"/><path d="M20 27h18" stroke="#f2cc58" stroke-width="3"/>',
+            'grilled_cheese':'<path d="M17 23h25v18H17z" fill="#d69a4e"/><path d="M20 27h19v10H20z" fill="#f2cc58"/>',
+        }
+        body = plate + foods.get(kind, foods['sandwich'])
+    return f'<svg class="stage-svg" viewBox="0 0 58 58" aria-hidden="true">{body}</svg>'
+
+
+def html_visual_flow(recipe: dict) -> str:
+    cards = []
+    for i, stage in enumerate(recipe.get("visual_steps", [])[:3]):
+        cards.append(
+            f'<div class="visual-card">{html_stage_svg(i, stage["label"], recipe.get("visual_icon", "dish"))}'
+            f'<div><b>{html.escape(stage["label"].upper())}</b><p>{html.escape(stage["text"])}</p></div></div>'
+        )
+    return ''.join(cards)
+
+
 def render_html() -> str:
     toc = []
     articles = []
@@ -640,6 +931,7 @@ def render_html() -> str:
       <img src="{html.escape(recipe['image'])}" alt="{html.escape(recipe['photo_caption'])}">
       <figcaption>{html.escape(recipe['photo_caption'])}</figcaption>
     </figure>
+    <div class="visual-flow" aria-label="Illustrated preparation, cooking, and serving stages">{html_visual_flow(recipe)}</div>
     <p class="eyebrow">RECIPE {recipe['number']:02d} · {html.escape(recipe['category'].upper())}</p>
     <h2>{html.escape(recipe['title'])}</h2>
     <p class="tagline">{html.escape(recipe['tagline'])}</p>
@@ -717,6 +1009,12 @@ main {{ max-width:1080px; margin:auto; background:var(--paper); box-shadow:0 10p
 .recipe-opening .hero {{ height:390px; margin:22px 0 0; position:relative; }}
 .hero img {{ display:block; width:100%; height:100%; object-fit:cover; border-radius:16px; }}
 .hero figcaption {{ position:absolute; bottom:11px; right:13px; color:white; background:#20372fdd; padding:6px 9px; border-radius:8px; font:9px Arial,sans-serif; max-width:72%; }}
+.visual-flow {{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin:12px 0 14px; }}
+.visual-card {{ display:grid; grid-template-columns:42px 1fr; gap:8px; align-items:center; background:var(--white); border:1px solid var(--line); border-radius:10px; padding:8px; min-height:76px; }}
+.visual-card:nth-child(1) {{ border-top:3px solid var(--tomato); }} .visual-card:nth-child(2) {{ border-top:3px solid var(--honey); }} .visual-card:nth-child(3) {{ border-top:3px solid #6e8b68; }}
+.stage-svg {{ width:40px; height:40px; display:block; }}
+.visual-card b {{ display:block; color:var(--tomato); font:700 8px Arial,sans-serif; letter-spacing:.08em; }}
+.visual-card p {{ margin:5px 0 0; color:var(--muted); font:9px/1.32 Arial,sans-serif; }}
 .recipe-opening .eyebrow {{ margin-top:18px; }}
 .recipe-opening h2 {{ margin:0; font-size:31px; line-height:1.12; letter-spacing:-.025em; }}
 .tagline {{ margin:10px 0 15px; color:var(--muted); font-size:15px; line-height:1.45; }}
@@ -754,8 +1052,8 @@ main {{ max-width:1080px; margin:auto; background:var(--paper); box-shadow:0 10p
 .credits-list a {{ color:var(--tomato); }}
 .disclaimer {{ background:var(--paper-dark); border-radius:11px; padding:16px; margin-top:25px; font:11px/1.6 Arial,sans-serif; color:var(--muted); }}
 .notes-lines {{ margin-top:38px; }} .notes-lines div {{ height:57px; border-bottom:1px solid var(--line); }}
-@media (max-width:720px) {{ main {{ box-shadow:none; }} .page {{ padding:28px 22px 48px; min-height:auto; }} .cover {{ min-height:900px; }} .cover h1 {{ font-size:39px; }} .cover h1 span {{ font-size:27px; }} .cover img {{ height:300px; }} .recipe-opening .hero {{ height:260px; }} .recipe-opening h2 {{ font-size:26px; }} .meta {{ grid-template-columns:repeat(2,1fr); }} .ingredients {{ columns:1; }} .toc {{ columns:1 !important; }} .folio {{ left:22px; right:22px; }} }}
-@media print {{ body {{ background:white; }} main {{ max-width:none; box-shadow:none; }} .page {{ width:8.5in; min-height:11in; height:11in; padding:.52in .58in .55in; break-after:page; page-break-after:always; }} .recipe-opening .hero {{ height:3.65in; }} .folio {{ left:.58in; right:.58in; }} a {{ color:inherit; }} @page {{ size:letter; margin:0; }} }}
+@media (max-width:720px) {{ main {{ box-shadow:none; }} .page {{ padding:28px 22px 48px; min-height:auto; }} .cover {{ min-height:900px; }} .cover h1 {{ font-size:39px; }} .cover h1 span {{ font-size:27px; }} .cover img {{ height:300px; }} .recipe-opening .hero {{ height:260px; }} .recipe-opening h2 {{ font-size:26px; }} .meta {{ grid-template-columns:repeat(2,1fr); }} .visual-flow {{ grid-template-columns:1fr; }} .ingredients {{ columns:1; }} .toc {{ columns:1 !important; }} .folio {{ left:22px; right:22px; }} }}
+@media print {{ body {{ background:white; }} main {{ max-width:none; box-shadow:none; }} .page {{ width:8.5in; min-height:11in; height:11in; padding:.52in .58in .55in; break-after:page; page-break-after:always; }} .recipe-opening .hero {{ height:3.43in; }} .visual-flow {{ gap:.06in; margin:.08in 0 .1in; }} .visual-card {{ min-height:.68in; padding:.05in; }} .stage-svg {{ width:.37in; height:.37in; }} .folio {{ left:.58in; right:.58in; }} a {{ color:inherit; }} @page {{ size:letter; margin:0; }} }}
 </style>
 </head>
 <body>
@@ -773,7 +1071,7 @@ main {{ max-width:1080px; margin:auto; background:var(--paper); box-shadow:0 10p
   <p class="eyebrow">PULL UP A CHAIR</p><h2>Welcome to Rosie's kitchen.</h2>
   <p class="lead">The videos may be 15 seconds. Dinner still takes the time it takes.</p>
   <p>This book is the cook-at-home companion to the Grandma Rosie recipe series: twenty familiar American favorites, written for real kitchens and hungry people. You will find crisp burgers, creamy pasta, breakfast sandwiches, quick snacks, and a few sweet reasons to preheat the oven.</p>
-  <p>Every recipe starts with a finished-dish image, then gives you the yield, timing, equipment, measured ingredients, clear steps, and a practical storage note. The photos are visual inspiration; ingredients, brands, ovens, and plating can change the final look.</p>
+  <p>Every recipe starts with a finished-dish image and a three-panel prep, cook, and finish illustration. You will also find the yield, timing, equipment, measured ingredients, clear steps, and a practical storage note. The photos are visual inspiration; ingredients, brands, ovens, and plating can change the final look.</p>
   <p>Rosie's rule is simple: no long introductions, no mystery measurements, and no shame in using a shortcut when the day is busy. Read the recipe through once, gather what you need, and let the skillet do the talking.</p>
   <div class="quote"><b>GRANDMA ROSIE SAYS</b><strong>Good food doesn't need a long speech.<br>It needs a hot pan, a little patience, and enough cheese.</strong></div>
   <p class="fine-print">Grandma Rosie is a fictional cooking persona created for this collection.</p>
@@ -800,7 +1098,7 @@ main {{ max-width:1080px; margin:auto; background:var(--paper); box-shadow:0 10p
 {recipes_html}
 <section class="page credits"><header class="running"><b>GRANDMA ROSIE</b><span>IMAGE CREDITS</span></header>
   <p class="eyebrow">A NOTE ABOUT THE PHOTOGRAPHS</p><h2>Image credits & use.</h2>
-  <p class="tagline">Recipes 01–10 use original AI-generated food images created for this edition. Recipes 11–20 use stock food photographs for serving inspiration; these images were cropped for the page layout.</p>
+  <p class="tagline">Every recipe includes three original vector illustrations for the prep, cooking, and serving stages. Recipes 01–10 use original AI-generated finished-dish images; recipes 11–20 use stock food photographs for serving inspiration.</p>
   <div class="credits-list">{''.join(f'<section><b>{r["number"]:02d} · {html.escape(r["title"])}</b><span>{html.escape(r["image_credit"])}</span>' + (f'<span>Pexels photo ID {html.escape(r["photo_id"])}</span>' if r.get("photo_id") else '') + (f'<a href="{html.escape(r["source_url"])}" target="_blank" rel="noreferrer">Open source photo page</a>' if r.get("source_url") else '') + '</section>' for r in DATA if r['number'] >= 11)}</div>
   <div class="disclaimer">Pexels photos are used under the <a href="https://www.pexels.com/license/">Pexels License</a> (free use; attribution not required). Recipe 14: “Philly cheesesteak sandwich.jpg” by jeffreyw, licensed <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a> via Wikimedia Commons; cropped for layout. The photos are illustrative; your finished dish may look different. Grandma Rosie is a fictional cooking persona.</div>
   <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>45</b></footer>

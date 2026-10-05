@@ -1,6 +1,6 @@
 # Grandma Rosie's American Comfort Food
 
-A professional English-language cookbook built from the Grandma Rosie concept: 20 approachable American favorites, clear U.S. measurements with practical metric equivalents, detailed step-by-step methods, timing, equipment, storage guidance, and a finished-dish image before each recipe.
+A professional English-language cookbook built from the Grandma Rosie concept: 20 approachable American favorites, clear U.S. measurements with practical metric equivalents, detailed step-by-step methods, timing, equipment, storage guidance, a finished-dish image, and three illustrated prep/cook/finish stages for every recipe.
 
 ## Deliverables
 

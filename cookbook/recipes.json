@@ -49,7 +49,22 @@
     "storage": "Best eaten immediately. Refrigerate cooked patties in a sealed container for up to 3 days; reheat in a skillet until steaming hot.",
     "serve_with": "Serve with crinkle-cut fries, a dill pickle, and extra Rosie sauce.",
     "photo_caption": "The finished burger: browned edges, melted cheese, and a little Rosie sauce.",
-    "source_url": ""
+    "source_url": "",
+    "visual_icon": "burger",
+    "visual_steps": [
+      {
+        "label": "PREP",
+        "text": "Mix the quick sauce; portion cold beef."
+      },
+      {
+        "label": "SEAR",
+        "text": "Smash in a hot pan; add cheese."
+      },
+      {
+        "label": "BUILD",
+        "text": "Stack bun, patty, pickles, and sauce."
+      }
+    ]
   },
   {
     "number": 2,
@@ -91,7 +106,22 @@
     "storage": "Refrigerate for up to 3 days. Reheat gently on the stove with 1 to 2 tablespoons of milk per serving; do not boil.",
     "serve_with": "Add a green salad or roasted broccoli if you want to pretend this is a balanced dinner. I won't tell.",
     "photo_caption": "A spoonable bowl of creamy cheddar macaroni, ready to serve.",
-    "source_url": ""
+    "source_url": "",
+    "visual_icon": "mac",
+    "visual_steps": [
+      {
+        "label": "START",
+        "text": "Add dry pasta and milk to the pot."
+      },
+      {
+        "label": "SIMMER",
+        "text": "Stir often until just tender."
+      },
+      {
+        "label": "FINISH",
+        "text": "Fold in cheddar until glossy."
+      }
+    ]
   },
   {
     "number": 3,
@@ -140,7 +170,22 @@
     "storage": "Refrigerate for up to 3 days. Re-crisp in an air fryer at 350°F (175°C) for 3 to 5 minutes; avoid microwaving if you want to keep the crunch.",
     "serve_with": "Try honey mustard, ranch, barbecue sauce, or a squeeze of lemon with crunchy slaw.",
     "photo_caption": "Golden panko tenders with honey mustard for dipping.",
-    "source_url": ""
+    "source_url": "",
+    "visual_icon": "tenders",
+    "visual_steps": [
+      {
+        "label": "BREAD",
+        "text": "Set up flour, buttermilk, and panko."
+      },
+      {
+        "label": "AIR-FRY",
+        "text": "Cook in one layer until crisp."
+      },
+      {
+        "label": "SERVE",
+        "text": "Pair golden tenders with the dip."
+      }
+    ]
   },
   {
     "number": 4,
@@ -192,7 +237,22 @@
     "storage": "Refrigerate cooked pancakes for up to 3 days or freeze between parchment sheets for 2 months. Reheat in a toaster or a 300°F (150°C) oven.",
     "serve_with": "Fresh berries, sliced bananas, crisp bacon, or a spoonful of peanut butter all feel right at the breakfast table.",
     "photo_caption": "A tall stack with melting butter and maple syrup.",
-    "source_url": ""
+    "source_url": "",
+    "visual_icon": "pancakes",
+    "visual_steps": [
+      {
+        "label": "MIX",
+        "text": "Whisk wet and dry bowls separately."
+      },
+      {
+        "label": "GRIDDLE",
+        "text": "Flip when bubbles set on top."
+      },
+      {
+        "label": "STACK",
+        "text": "Add butter and warm maple syrup."
+      }
+    ]
   },
   {
     "number": 5,
@@ -237,7 +297,22 @@
     "storage": "For meal prep, cool the cooked eggs and bacon completely, then refrigerate separately for up to 3 days. Assemble and reheat just before eating.",
     "serve_with": "Add a sliced tomato, a little hot sauce, or a hash-brown patty tucked right inside.",
     "photo_caption": "Toasted muffin, folded egg, bacon, and melted American cheese.",
-    "source_url": ""
+    "source_url": "",
+    "visual_icon": "sandwich",
+    "visual_steps": [
+      {
+        "label": "PREP",
+        "text": "Cook bacon and toast the muffins."
+      },
+      {
+        "label": "FRY",
+        "text": "Set eggs gently in a skillet."
+      },
+      {
+        "label": "STACK",
+        "text": "Layer egg, cheese, and bacon."
+      }
+    ]
   },
   {
     "number": 6,
@@ -286,7 +361,22 @@
     "storage": "Refrigerate the beef separately for up to 3 days. Reheat until steaming hot, then fill freshly warmed shells so they stay crunchy.",
     "serve_with": "Set out salsa, lime wedges, pickled jalapeños, and guacamole so everyone can build their own.",
     "photo_caption": "Crunchy shells loaded with seasoned beef, cheddar, lettuce, and tomato.",
-    "source_url": ""
+    "source_url": "",
+    "visual_icon": "taco",
+    "visual_steps": [
+      {
+        "label": "BROWN",
+        "text": "Break beef into small crumbles."
+      },
+      {
+        "label": "SIMMER",
+        "text": "Add spices and a splash of water."
+      },
+      {
+        "label": "FILL",
+        "text": "Load warm shells with toppings."
+      }
+    ]
   },
   {
     "number": 7,
@@ -336,7 +426,22 @@
     "storage": "Store leftovers in the refrigerator for up to 2 days. Reheat on a sheet pan at 375°F (190°C) for 6 to 8 minutes; the microwave softens the crust.",
     "serve_with": "A bowl of marinara for dipping and a simple green salad make this a proper lunch.",
     "photo_caption": "Baguette halves with garlic butter, red sauce, and browned mozzarella.",
-    "source_url": ""
+    "source_url": "",
+    "visual_icon": "pizza_bread",
+    "visual_steps": [
+      {
+        "label": "PREP",
+        "text": "Split baguette and spread garlic butter."
+      },
+      {
+        "label": "BAKE",
+        "text": "Add sauce and cheese; bake bubbly."
+      },
+      {
+        "label": "SLICE",
+        "text": "Top with basil and cut to share."
+      }
+    ]
   },
   {
     "number": 8,
@@ -381,7 +486,22 @@
     "storage": "These are best straight from the oven. Refrigerate leftovers for up to 2 days and re-crisp uncovered at 400°F (200°C) for 8 to 10 minutes.",
     "serve_with": "Add ranch or barbecue sauce on the side. For a heartier plate, top with leftover taco beef or pulled chicken.",
     "photo_caption": "A shareable bowl of crisp fries with cheddar, bacon, sour cream, and chives.",
-    "source_url": ""
+    "source_url": "",
+    "visual_icon": "fries",
+    "visual_steps": [
+      {
+        "label": "CRISP",
+        "text": "Bake fries in one even layer."
+      },
+      {
+        "label": "MELT",
+        "text": "Add cheddar and bacon to hot fries."
+      },
+      {
+        "label": "FINISH",
+        "text": "Dollop sour cream; scatter onions."
+      }
+    ]
   },
   {
     "number": 9,
@@ -425,7 +545,22 @@
     "storage": "Grilled cheese is best fresh. If needed, cool and refrigerate for up to 1 day, then reheat in a dry skillet over low heat until crisp and hot.",
     "serve_with": "Classic tomato soup, dill pickles, or a handful of kettle chips.",
     "photo_caption": "Golden sourdough with melted cheese stretching between the halves.",
-    "source_url": ""
+    "source_url": "",
+    "visual_icon": "grilled_cheese",
+    "visual_steps": [
+      {
+        "label": "BUILD",
+        "text": "Butter bread; sandwich the cheese."
+      },
+      {
+        "label": "TOAST",
+        "text": "Cook low until both sides are golden."
+      },
+      {
+        "label": "SLICE",
+        "text": "Cut when the middle is stretchy."
+      }
+    ]
   },
   {
     "number": 10,
@@ -471,7 +606,22 @@
     "storage": "For meal prep, keep the warm chicken separate from the lettuce and dressing. Refrigerate up to 3 days; assemble and toast just before serving.",
     "serve_with": "Celery sticks, carrot ribbons, and extra ranch for dipping.",
     "photo_caption": "A crisped tortilla wrap showing Buffalo chicken, lettuce, and ranch.",
-    "source_url": ""
+    "source_url": "",
+    "visual_icon": "wrap",
+    "visual_steps": [
+      {
+        "label": "TOSS",
+        "text": "Warm chicken with Buffalo sauce."
+      },
+      {
+        "label": "TOAST",
+        "text": "Roll tight; sear seam-side down."
+      },
+      {
+        "label": "SERVE",
+        "text": "Cut across; add ranch and celery."
+      }
+    ]
   },
   {
     "number": 11,
@@ -523,7 +673,22 @@
     "serve_with": "A bowl of chili, a simple salad, or grilled chicken turns one potato into dinner.",
     "photo_caption": "Loaded potato with cheddar, bacon, sour cream, and fresh chives; serving inspiration.",
     "source_url": "https://www.pexels.com/search/loaded%20baked%20potato/",
-    "photo_id": "9203752"
+    "photo_id": "9203752",
+    "visual_icon": "potato",
+    "visual_steps": [
+      {
+        "label": "PREP",
+        "text": "Scrub, dry, oil, and salt russets."
+      },
+      {
+        "label": "BAKE",
+        "text": "Bake until skins crisp and centers fluff."
+      },
+      {
+        "label": "LOAD",
+        "text": "Top with cheddar, bacon, and chives."
+      }
+    ]
   },
   {
     "number": 12,
@@ -575,7 +740,22 @@
     "serve_with": "Garlic bread and a crisp green salad are the classic partners.",
     "photo_caption": "Creamy fettuccine finished with Parmesan and herbs; serving inspiration.",
     "source_url": "https://www.pexels.com/search/fettuccine%20alfredo/",
-    "photo_id": "14930758"
+    "photo_id": "14930758",
+    "visual_icon": "pasta",
+    "visual_steps": [
+      {
+        "label": "BOIL",
+        "text": "Cook fettuccine; reserve pasta water."
+      },
+      {
+        "label": "SIMMER",
+        "text": "Soften garlic; gently thicken cream."
+      },
+      {
+        "label": "TOSS",
+        "text": "Coat ribbons with Parmesan sauce."
+      }
+    ]
   },
   {
     "number": 13,
@@ -623,7 +803,22 @@
     "serve_with": "Shoestring fries, onion rings, or a crunchy dill-pickle spear.",
     "photo_caption": "A bacon cheeseburger stacked with cheddar and classic toppings; serving inspiration.",
     "source_url": "https://www.pexels.com/photo/person-holding-a-double-patty-cheese-burger-3826273/",
-    "photo_id": "3826273"
+    "photo_id": "3826273",
+    "visual_icon": "burger",
+    "visual_steps": [
+      {
+        "label": "PREP",
+        "text": "Shape thick patties; cook the bacon."
+      },
+      {
+        "label": "SEAR",
+        "text": "Cook beef safely; melt cheddar on top."
+      },
+      {
+        "label": "BUILD",
+        "text": "Stack lettuce, tomato, bacon, and sauce."
+      }
+    ]
   },
   {
     "number": 14,
@@ -673,7 +868,22 @@
     "storage": "Refrigerate the cooked beef and onions for up to 3 days. Reheat in a skillet until steaming hot and fill fresh rolls; the bread is better toasted at the last minute.",
     "serve_with": "Kettle chips, a sharp pickle, or a small cup of beef jus for dipping.",
     "photo_caption": "A classic cheesesteak with thin beef, onions, and melted cheese; serving inspiration.",
-    "source_url": "https://commons.wikimedia.org/wiki/File:Philly_cheesesteak_sandwich.jpg"
+    "source_url": "https://commons.wikimedia.org/wiki/File:Philly_cheesesteak_sandwich.jpg",
+    "visual_icon": "sub",
+    "visual_steps": [
+      {
+        "label": "SLICE",
+        "text": "Shave steak; slice onions thin."
+      },
+      {
+        "label": "SEAR",
+        "text": "Brown beef fast; melt provolone."
+      },
+      {
+        "label": "FILL",
+        "text": "Tuck the cheesy pile into warm rolls."
+      }
+    ]
   },
   {
     "number": 15,
@@ -726,7 +936,22 @@
     "serve_with": "A cold glass of milk, coffee, or a scoop of vanilla ice cream between two cookies.",
     "photo_caption": "Freshly baked chocolate chip cookies with soft, chocolatey centers; serving inspiration.",
     "source_url": "https://www.pexels.com/photo/selective-focus-photography-of-chocolate-cookies-1775283/",
-    "photo_id": "1775283"
+    "photo_id": "1775283",
+    "visual_icon": "cookies",
+    "visual_steps": [
+      {
+        "label": "MIX",
+        "text": "Cream butter and sugars; fold in chips."
+      },
+      {
+        "label": "BAKE",
+        "text": "Bake until the edges are golden."
+      },
+      {
+        "label": "COOL",
+        "text": "Let the centers set on a cooling rack."
+      }
+    ]
   },
   {
     "number": 16,
@@ -769,7 +994,22 @@
     "serve_with": "Warm brownies with vanilla ice cream, or a little espresso if the grown-ups are staying up.",
     "photo_caption": "Rich chocolate brownies cut into neat squares; serving inspiration.",
     "source_url": "https://www.pexels.com/search/brownies/",
-    "photo_id": "15033482"
+    "photo_id": "15033482",
+    "visual_icon": "brownie",
+    "visual_steps": [
+      {
+        "label": "MIX",
+        "text": "Whisk spread and eggs; fold in flour."
+      },
+      {
+        "label": "BAKE",
+        "text": "Stop at moist crumbs on the tester."
+      },
+      {
+        "label": "SLICE",
+        "text": "Cool fully; lift out and cut squares."
+      }
+    ]
   },
   {
     "number": 17,
@@ -817,7 +1057,22 @@
     "serve_with": "A little bowl of berries or a cup of coffee balances the sweet chocolate.",
     "photo_caption": "Chocolate shells filled with peanut butter; serving inspiration.",
     "source_url": "https://www.pexels.com/search/peanut%20butter%20cups/",
-    "photo_id": "5846197"
+    "photo_id": "5846197",
+    "visual_icon": "pb_cup",
+    "visual_steps": [
+      {
+        "label": "MELT",
+        "text": "Make a thin chocolate shell in liners."
+      },
+      {
+        "label": "FILL",
+        "text": "Add peanut filling; cap with chocolate."
+      },
+      {
+        "label": "SET",
+        "text": "Chill until firm, then peel the liners."
+      }
+    ]
   },
   {
     "number": 18,
@@ -869,7 +1124,22 @@
     "serve_with": "A little lemon zest or a crisp shortbread cookie on the side.",
     "photo_caption": "Layered strawberry dessert cups with cream and biscuit crumbs; serving inspiration.",
     "source_url": "https://www.pexels.com/search/strawberry%20dessert%20cups/",
-    "photo_id": "7552591"
+    "photo_id": "7552591",
+    "visual_icon": "cheesecake",
+    "visual_steps": [
+      {
+        "label": "CRUMB",
+        "text": "Press buttery graham crumbs into jars."
+      },
+      {
+        "label": "FOLD",
+        "text": "Fold whipped cream into cream cheese."
+      },
+      {
+        "label": "LAYER",
+        "text": "Add berries and cream; chill to set."
+      }
+    ]
   },
   {
     "number": 19,
@@ -921,7 +1191,22 @@
     "serve_with": "Salsa, avocado, hot sauce, or a few orange slices for a diner-style breakfast plate.",
     "photo_caption": "A breakfast burrito with egg, cheese, sausage, and crisp potatoes; serving inspiration.",
     "source_url": "https://www.pexels.com/photo/sandwich-and-burrito-cut-in-half-5848091/",
-    "photo_id": "5848083"
+    "photo_id": "5848083",
+    "visual_icon": "burrito",
+    "visual_steps": [
+      {
+        "label": "PREP",
+        "text": "Brown sausage; crisp the hash browns."
+      },
+      {
+        "label": "SCRAMBLE",
+        "text": "Cook eggs; warm the tortillas."
+      },
+      {
+        "label": "ROLL",
+        "text": "Fill, roll tight, toast the seam."
+      }
+    ]
   },
   {
     "number": 20,
@@ -972,6 +1257,21 @@
     "serve_with": "A simple Caesar salad or crunchy vegetables. For another variation, add cooked chicken and spinach.",
     "photo_caption": "A golden cheese pizza; the cottage-cheese crust is a homemade variation.",
     "source_url": "https://www.pexels.com/search/pizza/",
-    "photo_id": "33458021"
+    "photo_id": "33458021",
+    "visual_icon": "pizza",
+    "visual_steps": [
+      {
+        "label": "MIX",
+        "text": "Blend cottage cheese; mix soft dough."
+      },
+      {
+        "label": "BAKE",
+        "text": "Par-bake crust, top, then bake again."
+      },
+      {
+        "label": "SLICE",
+        "text": "Rest 3 minutes and cut into wedges."
+      }
+    ]
   }
 ]
