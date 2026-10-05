@@ -1,324 +1,141 @@
-// ── Bash Baqi Racing — bootstrap & game state machine ───────────────────────
+// ============================================================
+// main.js — Game Lifecycle & Architecture Coordinator
+// ============================================================
+
 import * as THREE from 'three';
-import { loadSave, persist } from './save.js';
-import { MAPS, RIVALS, REWARDS, UPGRADES, carById } from './data.js';
-import { Race } from './race.js';
-import { Garage, openShop, openCustomize, openUpgrades, openSeries, openHelp, showResults, showChampion, closePanel } from './menu.js';
-import { BloomFX } from './post.js';
-import { audio } from './audio.js';
-import { clamp, fmt } from './util.js';
+import { gameState } from './core/GameState.js';
+import { soundEngine } from './audio/SoundEngine.js';
+import { timeWeatherSystem } from './core/TimeWeatherSystem.js';
+import { needsSystem } from './core/NeedsSystem.js';
+import { economySystem } from './core/EconomySystem.js';
+import { streamEngine } from './streaming/StreamEngine.js';
+import { WorldBuilder } from './world/WorldBuilder.js';
+import { PlayerController } from './player/PlayerController.js';
+import { InteractionSystem } from './interactions/InteractionSystem.js';
+import { SmartPhone } from './phone/SmartPhone.js';
+import { NovaOS } from './pc/NovaOS.js';
+import { UIOverlay } from './ui/UIOverlay.js';
 
-const $ = (id) => document.getElementById(id);
+class GameApp {
+  constructor() {
+    this.container = document.getElementById('app');
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
+    this.clock = new THREE.Clock();
 
-// dev error overlay (helps the user report issues)
-addEventListener('error', (e) => {
-  const el = $('errLog');
-  el.style.display = 'block';
-  el.textContent = '⚠️ ' + (e.message || 'Error') + (e.filename ? `\n${e.filename.split('/').pop()}:${e.lineno}` : '');
+    // Subsystems
+    this.worldBuilder = null;
+    this.playerController = null;
+    this.interactionSystem = null;
+    this.smartPhone = null;
+    this.novaOS = null;
+    this.uiOverlay = null;
+
+    this.init();
+  }
+
+  init() {
+    // 1. Initialize State & Audio
+    gameState.init();
+    soundEngine.init();
+
+    // 2. Initialize Three.js Scene, Camera, Renderer
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x090d16);
+    this.scene.fog = new THREE.FogExp2(0x090d16, 0.025);
+
+    const aspect = window.innerWidth / window.innerHeight;
+    this.camera = new THREE.PerspectiveCamera(72, aspect, 0.1, 120);
+
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.05;
+
+    this.container.appendChild(this.renderer.domElement);
+
+    // 3. Build 3D World (Apartment, Setup, City)
+    this.worldBuilder = new WorldBuilder(this.scene);
+    this.worldBuilder.buildAll();
+
+    // 4. Initialize Player Controller & Full Body
+    this.playerController = new PlayerController(this.camera, this.renderer.domElement, this.worldBuilder);
+
+    // 5. Initialize Interactions System
+    this.interactionSystem = new InteractionSystem(this.worldBuilder, this.playerController);
+
+    // 6. Initialize UI Overlay (HUD, Reticle, Needs)
+    this.uiOverlay = new UIOverlay();
+
+    // 7. Initialize Smartphone UI
+    this.smartPhone = new SmartPhone();
+
+    // 8. Initialize Desktop Nova OS
+    this.novaOS = new NovaOS(this.playerController);
+
+    // 9. Window Resize Event
+    window.addEventListener('resize', () => this.onResize());
+
+    // 10. Hide loading splash if present
+    const loader = document.getElementById('loading');
+    if (loader) {
+      setTimeout(() => {
+        loader.style.opacity = '0';
+        setTimeout(() => loader.remove(), 500);
+      }, 300);
+    }
+
+    // Welcome notification to guide player
+    setTimeout(() => {
+      gameState.addNotification(
+        'Welcome to Metro City!',
+        'Explore your apartment, check the fridge for food, or sit at your PC desk to launch your first stream!'
+      );
+    }, 1500);
+
+    // Start Main Loop
+    this.animate();
+  }
+
+  onResize() {
+    if (!this.camera || !this.renderer) return;
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  animate() {
+    requestAnimationFrame(() => this.animate());
+
+    const delta = Math.min(0.1, this.clock.getDelta());
+
+    // Update Core Game Systems
+    timeWeatherSystem.update(delta);
+    const daylight = timeWeatherSystem.getDaylightFactor();
+
+    needsSystem.update(delta);
+    streamEngine.update(delta);
+    economySystem.checkMilestones();
+
+    // Update World & Dynamic Props
+    this.worldBuilder.update(delta, daylight);
+
+    // Update First-Person Controller & Physics
+    this.playerController.update(delta);
+
+    // Update HUD stats
+    this.uiOverlay.updateStats();
+
+    // Render 3D Scene
+    this.renderer.render(this.scene, this.camera);
+  }
+}
+
+// Start Game on page load
+window.addEventListener('DOMContentLoaded', () => {
+  window.gameApp = new GameApp();
 });
-
-const game = {
-  state: 'boot',
-  paused: false,
-  save: loadSave(),
-  persist: () => persist(game.save),
-  highQ: !(matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700),
-  touch: { left: false, right: false, gas: false, brake: false },
-  autoGas: 'ontouchstart' in window && !matchMedia('(pointer: fine)').matches,
-  race: null,
-  garage: null,
-  renderer: null,
-  fx: null,
-  _shake: 0,
-  _pendingSeason: null,
-  _fpsT: 0, _fpsN: 0, _fpsLow: 0,
-};
-window.GAME = game;
-
-// ── economy / stats ─────────────────────────────────────────────────────────
-game.spend = ({ coins = 0, gems = 0 }) => {
-  if (game.save.coins < coins || game.save.gems < gems) return false;
-  game.save.coins -= coins;
-  game.save.gems -= gems;
-  game.persist();
-  return true;
-};
-
-game.getUpgrades = (carId) => {
-  if (!game.save.upgrades[carId]) game.save.upgrades[carId] = { spd: 0, acc: 0, hnd: 0 };
-  return game.save.upgrades[carId];
-};
-
-game.carStats = (car) => {
-  const u = game.getUpgrades(car.id);
-  return {
-    topSpeed: (25 + car.spd * 0.235) * (1 + 0.04 * u.spd),
-    accel: (9 + car.acc * 0.155) * (1 + 0.04 * u.acc),
-    turn: (2.15 + car.hnd * 0.0105) * (1 + 0.04 * u.hnd),
-  };
-};
-
-game.getStandings = () => {
-  if (!game.save.standings) {
-    game.save.standings = { YOU: 0 };
-    for (const r of RIVALS) game.save.standings[r.name] = 0;
-  }
-  return game.save.standings;
-};
-
-game.refreshTopbar = () => {
-  $('statCoins').textContent = fmt(game.save.coins);
-  $('statGems').textContent = fmt(game.save.gems);
-  $('statTrophies').textContent = fmt(game.save.trophies);
-};
-
-// ── fx helpers ───────────────────────────────────────────────────────────────
-let toastT = null;
-game.toast = (html, warn = false) => {
-  const t = $('toast');
-  t.innerHTML = html;
-  t.classList.toggle('warn', warn);
-  t.classList.add('show');
-  clearTimeout(toastT);
-  toastT = setTimeout(() => t.classList.remove('show'), 2600);
-};
-
-game.coinPop = function (worldPos) {
-  if (!game.race) return;
-  const v = worldPos.clone().project(game.race.camera);
-  if (v.z > 1) return;
-  const x = (v.x * 0.5 + 0.5) * innerWidth, y = (-v.y * 0.5 + 0.5) * innerHeight;
-  const s = document.createElement('span');
-  s.className = 'coinPop';
-  s.textContent = '+5';
-  s.style.left = x + 'px'; s.style.top = y + 'px';
-  $('coinPops').appendChild(s);
-  setTimeout(() => s.remove(), 1100);
-};
-
-game.shake = () => { game._shake = 0.9; };
-game.speedLines = (on) => { $('speedLines').classList.toggle('on', !!on); };
-
-game.togglePause = () => {
-  if (game.state !== 'race') return;
-  game.paused = !game.paused;
-  $('pauseModal').classList.toggle('open', game.paused);
-  if (audio.ctx) { audio.engineOn = false; audio.engine(0, false); }
-  audio.click();
-};
-
-// ── state transitions ────────────────────────────────────────────────────────
-function disposeRace() {
-  if (game.race) { game.race.dispose(); game.race = null; }
-}
-
-game.startRace = () => {
-  closePanel();
-  $('results').classList.remove('open');
-  disposeRace();
-  game.paused = false;
-  $('pauseModal').classList.remove('open');
-  const map = MAPS[(Math.random() * MAPS.length) | 0];
-  game.race = new Race(game, map, onRaceFinish);
-  game.state = 'race';
-  $('hud').classList.add('on');
-  $('garageUI').classList.remove('on');
-};
-
-game.maybeSeasonModal = () => {
-  const p = game._pendingSeason;
-  if (!p) return false;
-  game._pendingSeason = null;
-  if (p.champIsPlayer) {
-    game.save.coins += REWARDS.champReward.coins;
-    game.save.gems += REWARDS.champReward.gems;
-    game.save.trophies += REWARDS.champReward.trophies;
-  } else {
-    game.save.coins += 200; // participation
-  }
-  game.save.standings = null;
-  game.save.seasonRace = 0;
-  game.save.seasonNum++;
-  game.persist();
-  game.refreshTopbar();
-  showChampion(game, p.standings, p.seasonNum, REWARDS.champReward);
-  return true;
-};
-
-game.showGarage = () => {
-  if (game.maybeSeasonModal()) return;
-  closePanel();
-  disposeRace();
-  game.state = 'garage';
-  $('hud').classList.remove('on');
-  $('garageUI').classList.add('on');
-  if (!game.garage) game.garage = new Garage(game);
-  else game.garage.refresh();
-  game.refreshTopbar();
-};
-
-function onRaceFinish(res) {
-  const save = game.save;
-  save.races++;
-  save.coins += res.coins;
-  save.gems += res.gems;
-  if (res.trophy) { save.trophies++; save.wins++; }
-  // championship points for everyone, in finishing order
-  const standings = game.getStandings();
-  res.order.forEach((k, i) => {
-    const name = k.isPlayer ? 'YOU' : k.rival.name;
-    standings[name] = (standings[name] || 0) + REWARDS.champPoints[i];
-  });
-  save.seasonRace++;
-  // season end?
-  if (save.seasonRace >= REWARDS.seasonRaces) {
-    const champ = Object.entries(standings).sort((a, b) => b[1] - a[1])[0];
-    game._pendingSeason = {
-      standings: { ...standings },
-      seasonNum: save.seasonNum,
-      champIsPlayer: champ[0] === 'YOU',
-    };
-  }
-  game.persist();
-  game.refreshTopbar();
-  showResults(game, res, () => {
-    if (!game.maybeSeasonModal()) game.startRace();
-  });
-}
-
-// ── renderer / loop ──────────────────────────────────────────────────────────
-function boot() {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.12;
-  $('app').appendChild(renderer.domElement);
-  game.renderer = renderer;
-  game.fx = new BloomFX(renderer);
-
-  const clock = new THREE.Clock();
-  renderer.setAnimationLoop(() => {
-    const dt = Math.min(clock.getDelta(), 0.08);
-    // auto quality: drop bloom if consistently slow
-    game._fpsT += dt; game._fpsN++;
-    if (game._fpsT > 3) {
-      const fps = game._fpsN / game._fpsT;
-      if (fps < 28 && game.fx.enabled) { game.fx.enabled = false; }
-      game._fpsT = 0; game._fpsN = 0;
-    }
-
-    if (game.state === 'race' && game.race) {
-      if (!game.paused) game.race.update(dt);
-      game._shake = Math.max(0, game._shake - dt * 2.2);
-      game.fx.render(game.race.scene, game.race.camera);
-    } else if (game.state === 'garage' && game.garage) {
-      game.garage.update(dt);
-      game.fx.render(game.garage.scene, game.garage.camera);
-    }
-  });
-
-  addEventListener('resize', () => {
-    renderer.setSize(innerWidth, innerHeight);
-    const a = innerWidth / innerHeight;
-    if (game.race) { game.race.camera.aspect = a; game.race.camera.updateProjectionMatrix(); }
-    if (game.garage) { game.garage.camera.aspect = a; game.garage.camera.updateProjectionMatrix(); }
-    game.fx.setSize(innerWidth, innerHeight);
-  });
-
-  wireUI();
-
-  // go! loading screen already visible; start the first race immediately
-  setTimeout(() => {
-    $('loading').classList.add('hide');
-    setTimeout(() => $('loading').remove(), 700);
-    game.startRace();
-  }, 900);
-}
-
-// ── UI wiring ────────────────────────────────────────────────────────────────
-function wireUI() {
-  game.refreshTopbar();
-
-  $('btnRace').onclick = () => { audio.click(); game.startRace(); };
-  $('btnShop').onclick = () => openShop(game);
-  $('btnCustom').onclick = () => openCustomize(game);
-  $('btnUpg').onclick = () => openUpgrades(game);
-  $('btnSeries').onclick = () => openSeries(game);
-  $('btnHelp').onclick = () => openHelp(game);
-  $('panelClose').onclick = () => { audio.click(); closePanel(); };
-
-  $('btnResume').onclick = () => game.togglePause();
-  $('btnQuitRace').onclick = () => {
-    game.paused = false;
-    $('pauseModal').classList.remove('open');
-    audio.click();
-    game.showGarage();
-  };
-
-  const musicBtn = $('btnMusic'), sfxBtn = $('btnSfx');
-  const syncAudioBtns = () => {
-    musicBtn.textContent = game.save.music ? '🎵' : '🔇';
-    sfxBtn.textContent = game.save.sfx ? '🔊' : '🔈';
-    musicBtn.classList.toggle('off', !game.save.music);
-    sfxBtn.classList.toggle('off', !game.save.sfx);
-  };
-  musicBtn.onclick = () => {
-    game.save.music = !game.save.music;
-    game.persist(); syncAudioBtns(); audio.setMusic(game.save.music); audio.click();
-  };
-  sfxBtn.onclick = () => {
-    game.save.sfx = !game.save.sfx;
-    game.persist(); syncAudioBtns(); audio.setSfx(game.save.sfx); audio.click();
-  };
-  audio.musicOn = game.save.music;
-  audio.sfxOn = game.save.sfx;
-  syncAudioBtns();
-
-  $('btnFull').onclick = () => {
-    audio.click();
-    if (document.fullscreenElement) document.exitFullscreen();
-    else document.documentElement.requestFullscreen().catch(() => {});
-  };
-
-  // 📱 PWA install prompt (Android/desktop Chrome)
-  let deferredPrompt = null;
-  addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    $('btnInstall').hidden = false;
-  });
-  $('btnInstall').onclick = async () => {
-    audio.click();
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice.catch(() => null);
-    deferredPrompt = null;
-    $('btnInstall').hidden = true;
-  };
-  addEventListener('appinstalled', () => {
-    $('btnInstall').hidden = true;
-    game.toast('📱 Installed! See you on the track 🏁');
-  });
-
-  // audio unlock + first gesture
-  const unlock = () => { audio.unlock(); };
-  addEventListener('pointerdown', unlock, { once: true });
-  addEventListener('keydown', unlock, { once: true });
-
-  // touch controls
-  const bind = (id, key) => {
-    const el = $(id);
-    const on = (e) => { e.preventDefault(); game.touch[key] = true; el.classList.add('held'); };
-    const off = () => { game.touch[key] = false; el.classList.remove('held'); };
-    el.addEventListener('pointerdown', on);
-    el.addEventListener('pointerup', off);
-    el.addEventListener('pointercancel', off);
-    el.addEventListener('pointerleave', off);
-  };
-  bind('tLeft', 'left'); bind('tRight', 'right'); bind('tBrake', 'brake');
-}
-
-boot();

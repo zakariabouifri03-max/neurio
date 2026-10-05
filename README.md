@@ -1,97 +1,101 @@
-# 🏁 Bash Baqi Racing
+# 🎙️ STREAMER LIFE: ZERO TO FAMOUS
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
-
-**▶ Play:** serve the folder with any static server and open it:
-
-```bash
-python3 -m http.server 8000
-# → http://localhost:8000
-```
-
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+A complete, playable 3D first-person life simulator about building a streaming career from zero.
 
 ---
 
-## 📱 Install on your phone — كأنها APK!
+## 🎮 Game Overview
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
+You begin as an unknown creator with **$15 cash**, **$73 in your bank account**, **12 followers**, **1 subscriber**, an old weak PC, a tiny starter apartment in Metro City, and cheap peripherals.
 
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
-
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
-**Offline play** is built-in: a service worker caches all game files on first visit.
+Through physical interactions, smart time management, hardware upgrades, live streaming, audience engagement, and side jobs, you climb the ranks to become a major streaming celebrity!
 
 ---
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
 
 ## 🕹️ Controls
 
-| Action | Keys |
+| Key | Action |
 |---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
-
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
-```
-
-Made with ❤️ and Three.js
+| **W, A, S, D** | Move Forward / Left / Backward / Right |
+| **Shift** | Sprint (Uses stamina) |
+| **Space** | Jump |
+| **C / Ctrl** | Crouch |
+| **E** | Context-Sensitive Physical Interaction |
+| **Tab** | Bring Up Smartphone |
+| **Esc** | Stand up from desk / Close current overlay |
+| **F1 / ~** | Developer Studio Debug Console |
 
 ---
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+## 🌟 Core Gameplay Systems
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+### 1. Physical World & Apartment
+- **Full-Body 3D Character**: Look down to see your torso, legs, shoes, and hands holding items.
+- **Detailed Starter Apartment**:
+  - Bedroom & streaming corner with gaming desk, dual monitors, PC tower, mic on boom arm, chair, cozy bed, wardrobe.
+  - Kitchen with interactive refrigerator, microwave oven, sink with tap water, and trash bin.
+  - Bathroom with functional walk-in shower, vanity, and mirror.
+  - Front door opening to outdoor hallway and Metro City street.
+  - Doorstep mat where physical delivery packages arrive from NovaMarket!
+- **City Street (Open-World Lite)**:
+  - Paved sidewalk with streetlamps, trees, and moving ambient traffic.
+  - Walking pedestrians with dialogues.
+  - **FreshMart Supermarket**: Buy fresh groceries and drinks.
+  - **SiliconTech Electronics**: In-person PC hardware store.
+  - **Pulse Cafe**: Buy espresso or work barista shifts for quick cash.
+  - **MetroVault ATM**: Deposit and withdraw physical cash.
 
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
+### 2. Daily Life & Needs System
+- **Hunger, Thirst, Energy, Hygiene, Stress & Mood**:
+  - Eat food from the fridge (Instant Noodles, Pizza, Bread, Deli Sandwiches).
+  - Use microwave to heat uncooked meals.
+  - Drink tap water or energy drinks (Volt Surge, Spark Cola).
+  - Sleep in bed (4h nap, 6h, 8h full rest, 10h deep sleep) with time acceleration and stamina restoration.
+  - Take warm showers to wash up and de-stress.
 
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+### 3. Nova OS & PC System
+- Sit in the gaming chair and turn on the PC to enter Nova OS:
+  - **StreamForge**: Streaming software suite (Configure title, game, category, resolution, bitrate, mic/cam).
+  - **GameHub**: Playable games including **Velocity Rush** (neon arcade racer with steering, boosts, and crashes that trigger viewer hype and donations).
+  - **NovaMarket**: Order PC parts with priority delivery.
+  - **Benchmark 3D Studio**: Run stress tests to benchmark CPU, GPU, and cooling performance.
+  - **MetroVault**: Online banking with live transaction ledger.
+
+### 4. Physical PC Building & Hardware Upgrades
+- Buy components on NovaMarket or SiliconTech (RTX Nova 3060, RTX Nova 4080 Extreme, DDR5 RAM, Liquid Cooling, Studio Mic, 4K Cam).
+- Packages arrive at your apartment door.
+- Pick up the box, carry it to the desk, and unbox the hardware.
+- Open the PC case side panel, install components into the motherboard, and watch your benchmark score leap from 850 to 4,000+ points!
+- Upgraded hardware unlocks 1080p 60fps and 4K broadcasts without dropped frames.
+
+### 5. Live Streaming & Audience Simulation
+- Over 40 persistent viewer personas with unique badges (VIP, SUB, MOD), colors, and memories.
+- Real-time contextual chat reactions to minigame clutches, fails, crashes, and new hardware.
+- Follower alerts and spontaneous donation fanfare with custom TTS messages.
+- Comprehensive post-stream analytics report with viewer averages, peak counts, follower growth, ad revenue, tips, and AI coaching insights.
+
+### 6. Smartphone System (TAB)
+- **Pulse**: Social feed with posting, likes, and viral engine chance.
+- **Messages**: Threads with Mom, Dave (PC Tech), and Sponsor representatives.
+- **MetroVault**: Balance, rent countdown, and transactions.
+- **NovaMarket**: Mobile hardware and food ordering.
+- **GigWork**: Immediate side jobs (Warehouse sorting, Barista shift, PC repair).
+- **Weather & Settings**: 24h forecast, save game, and cheats.
+
+---
+
+## 🛠️ Tech Architecture
+
+- **Engine**: Three.js r170 (ES Module, WebGL2, PBR Standard Materials, Soft Shadows).
+- **Audio**: Procedural Web Audio API sound synthesizer (Footsteps, PC fan hum, keyboard typing, donation chimes, rain ambience).
+- **Zero External Asset Dependencies**: All textures (wood planks, ceramic tiles, motherboard circuits, GPU shrouds, cardboard packages, neon signs, asphalt roads) are generated via procedural HTML5 Canvas PBR textures.
+- **Persistence**: Robust auto-saving to `localStorage` with deep state merging.
+
+---
+
+## 🚀 Running the Game
+
+```bash
+node server.js
+# Open http://localhost:8080 in your browser
+```
