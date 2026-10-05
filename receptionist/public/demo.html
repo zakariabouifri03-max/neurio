@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Voice Demo — Neurio Voice AI Receptionist</title>
+<meta name="description" content="Talk to a live AI receptionist right in your browser. No signup needed.">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="/"><span class="logo-mark">📞</span> Neurio Voice</a>
+    <div class="nav-links">
+      <a href="/#how">How it works</a>
+      <a href="/#features">Features</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/dashboard">Dashboard</a>
+    </div>
+    <a class="btn btn-sm" href="/#pricing" style="margin-left:auto">Get started</a>
+  </div>
+</nav>
+
+<div class="demo-shell">
+  <h2>🎙️ Talk to a live AI receptionist</h2>
+  <p class="sub">You're calling <b id="d-biz">Bright Smile Dental Studio</b> in Austin, TX. Press the mic and speak — or just type. No signup, no cost.</p>
+
+  <div class="demo-card">
+    <div class="demo-head">
+      <div class="demo-avatar" id="d-avatar">🤖</div>
+      <h3 style="margin:0" id="d-agent">Maya — AI Receptionist</h3>
+      <div class="demo-status" id="d-status">Tap the microphone and start talking…</div>
+    </div>
+    <div class="chat demo-chat" id="d-chat"></div>
+    <div class="demo-controls">
+      <button class="mic-btn" id="d-mic" title="Tap to talk">🎙️</button>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center">
+        <button class="btn btn-ghost btn-sm" id="d-auto">🔁 Auto-conversation: OFF</button>
+        <button class="btn btn-ghost btn-sm" id="d-mute">🔊 Voice: ON</button>
+        <button class="btn btn-ghost btn-sm" id="d-new">↺ New call</button>
+      </div>
+    </div>
+    <div class="demo-type">
+      <input id="d-input" type="text" placeholder='Or type here, e.g. "I need a cleaning tomorrow morning"' autocomplete="off">
+      <button class="btn btn-sm" id="d-send">Send</button>
+    </div>
+  </div>
+
+  <div class="demo-tips">
+    <div class="tip" data-say="What are your hours?"><b>🕘 Ask about hours</b>"What are your hours?"</div>
+    <div class="tip" data-say="How much is teeth whitening?"><b>💰 Ask the price</b>"How much is teeth whitening?"</div>
+    <div class="tip" data-say="I'd like to book a cleaning for tomorrow morning"><b>📅 Book a visit</b>"Book a cleaning for tomorrow morning"</div>
+  </div>
+
+  <p class="muted" style="text-align:center;margin-top:26px;font-size:14px">
+    Like what you hear? This demo runs on the same AI that answers real phone calls.<br>
+    <a href="/#pricing">Get your own AI receptionist →</a>
+  </p>
+</div>
+
+<script src="/js/demo.js"></script>
+</body>
+</html>

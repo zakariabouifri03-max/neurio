@@ -1,0 +1,39 @@
+{
+  "business": {
+    "id": "demo-dental",
+    "name": "Bright Smile Dental Studio",
+    "phone": "(512) 555-0148",
+    "address": "4200 Guadalupe St, Austin, TX 78751",
+    "timezone": "America/Chicago",
+    "bookingEnabled": true,
+    "hours": {
+      "mon": [540, 1020],
+      "tue": [540, 1020],
+      "wed": [540, 1020],
+      "thu": [540, 1020],
+      "fri": [540, 1020],
+      "sat": [540, 780],
+      "sun": null
+    },
+    "services": [
+      { "name": "Cleaning & Checkup", "price": "$129", "duration": "45 minutes", "keywords": ["cleaning", "checkup", "check-up", "check up", "exam", "hygiene"] },
+      { "name": "Teeth Whitening", "price": "$299", "duration": "1 hour", "keywords": ["whitening", "whiten", "bleaching", "brighten"] },
+      { "name": "Tooth Filling", "price": "$180", "duration": "45 minutes", "keywords": ["filling", "fillings", "cavity", "cavities"] },
+      { "name": "Emergency Visit", "price": "$99", "duration": "30 minutes", "keywords": ["emergency", "urgent", "pain", "toothache", "hurt", "hurts", "broken tooth", "chipped"] },
+      { "name": "Braces Consultation", "price": "Free", "duration": "30 minutes", "keywords": ["braces", "orthodontic", "aligners", "invisalign", "straighten"] }
+    ],
+    "faqs": [
+      { "q": "Do you accept insurance?", "a": "Yes — we accept most major PPO plans including Delta Dental, Cigna, and Aetna. Just bring your card to your visit.", "keywords": ["insurance", "ppo", "delta", "cigna", "aetna", "coverage"] },
+      { "q": "Are you taking new patients?", "a": "Absolutely! New patients are always welcome, and your first exam includes free X-rays.", "keywords": ["new patient", "new patients", "first visit", "x-ray", "xray"] },
+      { "q": "Is there parking?", "a": "Yes — free parking is available right behind our building on Guadalupe Street.", "keywords": ["parking", "park", "car"] },
+      { "q": "Do you offer payment plans?", "a": "Yes, we offer 0% financing for 12 months on treatments over $500 through CareCredit.", "keywords": ["payment plan", "financing", "carecredit", "installments", "finance"] }
+    ],
+    "agent": {
+      "name": "Maya",
+      "greeting": "Thanks for calling {business}! This is {agent} — how can I help you today?",
+      "handoff": "(512) 555-0100"
+    }
+  },
+  "calls": [],
+  "appointments": []
+}

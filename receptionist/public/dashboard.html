@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Neurio Voice</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📞</text></svg>">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="/"><span class="logo-mark">📞</span> Neurio Voice</a>
+    <span class="muted" style="font-size:13px" id="nav-brain"></span>
+    <a class="btn btn-ghost btn-sm" href="/demo" style="margin-left:auto">🎙️ Live demo</a>
+  </div>
+</nav>
+
+<div class="dash">
+  <aside class="side">
+    <button data-tab="overview" class="active">📊 Overview</button>
+    <button data-tab="business">🏢 Business profile</button>
+    <button data-tab="agent">🤖 AI agent</button>
+    <button data-tab="services">💼 Services & FAQs</button>
+    <button data-tab="calls">📞 Calls</button>
+    <button data-tab="appointments">📅 Appointments</button>
+    <button data-tab="golive">🚀 Go live</button>
+  </aside>
+
+  <main class="main">
+    <div id="save-msg"></div>
+
+    <!-- OVERVIEW -->
+    <div class="tab" id="tab-overview">
+      <h2>Overview</h2>
+      <p class="muted" id="ov-sub">Here's how your AI receptionist is doing.</p>
+      <div class="cards">
+        <div class="stat"><div class="v" id="st-calls">–</div><div class="l">Total calls</div></div>
+        <div class="stat"><div class="v" id="st-booked">–</div><div class="l">Appointments booked</div></div>
+        <div class="stat"><div class="v" id="st-rate">–</div><div class="l">Booking rate</div></div>
+        <div class="stat"><div class="v" id="st-upcoming">–</div><div class="l">Upcoming</div></div>
+      </div>
+      <div class="panel">
+        <h3>Recent calls</h3>
+        <div id="ov-recent"><p class="muted">Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="tab" id="tab-business" style="display:none">
+      <h2>Business profile</h2>
+      <p class="muted">This is what your AI receptionist knows about your business.</p>
+      <div class="panel">
+        <div class="row2">
+          <div><label class="f">Business name</label><input class="t" id="b-name"></div>
+          <div><label class="f">Phone</label><input class="t" id="b-phone"></div>
+        </div>
+        <label class="f">Address</label><input class="t" id="b-address">
+        <div class="row2">
+          <div><label class="f">Timezone</label>
+            <select class="t" id="b-tz">
+              <option>America/New_York</option><option>America/Chicago</option><option>America/Denver</option><option>America/Los_Angeles</option><option>America/Anchorage</option><option>Pacific/Honolulu</option>
+            </select>
+          </div>
+          <div><label class="f">Online booking</label>
+            <select class="t" id="b-booking"><option value="1">Enabled</option><option value="0">Disabled</option></select>
+          </div>
+        </div>
+        <label class="f">Opening hours (24h, e.g. 9:00 – 17:00 · empty = closed)</label>
+        <div class="hours-grid" id="b-hours"></div>
+        <button class="btn mt" id="b-save">💾 Save business profile</button>
+      </div>
+    </div>
+
+    <!-- AGENT -->
+    <div class="tab" id="tab-agent" style="display:none">
+      <h2>AI agent</h2>
+      <p class="muted">Give your receptionist a name and personality.</p>
+      <div class="panel">
+        <label class="f">Agent name</label><input class="t" id="a-name">
+        <label class="f">Greeting <span class="muted">(use {business} and {agent} as placeholders)</span></label>
+        <textarea class="t" id="a-greeting"></textarea>
+        <label class="f">Human handoff number <span class="muted">(callers asking for a human get transferred here)</span></label>
+        <input class="t" id="a-handoff">
+        <button class="btn mt" id="a-save">💾 Save agent</button>
+      </div>
+      <div class="panel">
+        <h3>Test your agent</h3>
+        <p class="muted" style="font-size:13.5px">Open the live demo — it always uses your current settings:</p>
+        <a class="btn btn-ghost btn-sm" href="/demo" target="_blank">🎙️ Open live demo</a>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="tab" id="tab-services" style="display:none">
+      <h2>Services & FAQs</h2>
+      <p class="muted">One per line. Format — services: <code>Name | Price | Duration | keyword1, keyword2</code> · FAQs: <code>Question | Answer</code></p>
+      <div class="panel">
+        <label class="f">Services</label>
+        <textarea class="t" id="s-services" style="min-height:130px"></textarea>
+        <label class="f">FAQs</label>
+        <textarea class="t" id="s-faqs" style="min-height:110px"></textarea>
+        <button class="btn mt" id="s-save">💾 Save services & FAQs</button>
+      </div>
+    </div>
+
+    <!-- CALLS -->
+    <div class="tab" id="tab-calls" style="display:none">
+      <h2>Calls</h2>
+      <p class="muted">Every conversation, transcribed. Click to expand.</p>
+      <div class="panel"><div id="calls-list"><p class="muted">Loading…</p></div></div>
+    </div>
+
+    <!-- APPOINTMENTS -->
+    <div class="tab" id="tab-appointments" style="display:none">
+      <h2>Appointments</h2>
+      <p class="muted">Booked by your AI receptionist.</p>
+      <div class="panel"><div id="appt-list"><p class="muted">Loading…</p></div></div>
+    </div>
+
+    <!-- GO LIVE -->
+    <div class="tab" id="tab-golive" style="display:none">
+      <h2>Go live checklist</h2>
+      <p class="muted">Take this AI receptionist from demo to answering real calls.</p>
+      <div class="panel">
+        <ul class="checklist" id="go-list">
+          <li>✅ <b>AI brain ready</b> — <span id="go-brain"></span></li>
+          <li>⬜ <b>Get a US phone number</b> — sign up at <a href="https://www.twilio.com" target="_blank">Twilio</a>, buy a local number (~$1.15/mo).</li>
+          <li>⬜ <b>Point Twilio at this server</b> — in your Twilio number's Voice settings set the webhook to <code id="go-webhook">POST https://YOUR-SERVER/voice/incoming</code></li>
+          <li>⬜ <b>Deploy this server</b> — Render, Railway, or any VPS with Node 20+. Set <code>PORT</code> and (optional) <code>OPENAI_API_KEY</code>.</li>
+          <li>⬜ <b>Connect payments</b> — create Stripe Payment Links and paste them into the pricing buttons on the landing page.</li>
+          <li>⬜ <b>Test with a real call</b> — dial your Twilio number and book an appointment by voice. Check it lands in the Appointments tab.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Demo data</h3>
+        <p class="muted" style="font-size:13.5px">Reset calls & appointments back to the sample demo content:</p>
+        <button class="btn btn-ghost btn-sm" id="demo-reset">↺ Reset demo data</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

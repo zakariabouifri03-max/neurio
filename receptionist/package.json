@@ -1,0 +1,13 @@
+{
+  "name": "neurio-voice",
+  "version": "1.0.0",
+  "description": "Neurio Voice — AI receptionist for US small businesses. Never miss another customer call.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
