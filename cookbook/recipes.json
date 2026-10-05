@@ -1,0 +1,977 @@
+[
+  {
+    "number": 1,
+    "title": "Grandma Rosie's Smash Burger",
+    "category": "Burgers & Sandwiches",
+    "tagline": "A crisp-edged, juicy burger with the kind of cheese pull that ends the conversation.",
+    "image": "assets/01-smash-burger.jpg",
+    "image_credit": "Original AI-generated food image created for this edition.",
+    "serves": "4 burgers",
+    "prep": "10 min",
+    "cook": "10 min",
+    "total": "20 min",
+    "equipment": "12-inch cast-iron or heavy skillet, sturdy spatula, parchment paper",
+    "ingredients": [
+      "1 lb (450 g) 80/20 ground beef, cold",
+      "4 soft burger buns, split",
+      "4 slices American cheese",
+      "1 tsp kosher salt, divided",
+      "1/2 tsp freshly ground black pepper",
+      "1 tsp neutral oil, for the pan",
+      "1/4 cup (60 g) mayonnaise",
+      "1 tbsp ketchup",
+      "1 tsp yellow mustard",
+      "1 tsp pickle brine, plus dill pickles to serve"
+    ],
+    "steps": [
+      {
+        "title": "Mix the Rosie sauce",
+        "text": "Stir the mayonnaise, ketchup, mustard, and pickle brine together. Set it near the stove so the burgers can be assembled while hot."
+      },
+      {
+        "title": "Toast the buns",
+        "text": "Heat the dry skillet over medium heat. Toast the cut sides of the buns until golden, about 45 seconds. Set aside."
+      },
+      {
+        "title": "Smash for the crust",
+        "text": "Raise the heat to high and add the oil. Divide beef into four loose balls. Working one at a time, place a ball in the pan, cover with parchment, and press firmly with a sturdy spatula until about 1/4 inch (6 mm) thick. Season with salt and pepper."
+      },
+      {
+        "title": "Flip and melt",
+        "text": "Cook without moving for 1 1/2 to 2 minutes, until the edges are deeply browned. Scrape underneath, flip, add a slice of cheese, and cook 45 to 60 seconds more, until the beef reaches 160°F (71°C) and the cheese melts."
+      },
+      {
+        "title": "Build the burger",
+        "text": "Spread sauce on the buns, add the hot patty and pickles, close the bun, and serve right away. For a double, stack two patties per bun."
+      }
+    ],
+    "rosie_tip": "Don't pack the beef into a tight meatball. Loose beef makes the lacy, crispy edges that a thick patty can only dream about.",
+    "storage": "Best eaten immediately. Refrigerate cooked patties in a sealed container for up to 3 days; reheat in a skillet until steaming hot.",
+    "serve_with": "Serve with crinkle-cut fries, a dill pickle, and extra Rosie sauce.",
+    "photo_caption": "The finished burger: browned edges, melted cheese, and a little Rosie sauce.",
+    "source_url": ""
+  },
+  {
+    "number": 2,
+    "title": "Three-Ingredient Stovetop Mac & Cheese",
+    "category": "Comfort Food",
+    "tagline": "Creamy, cozy, and made without a powdered orange packet in sight.",
+    "image": "assets/02-three-ingredient-mac.jpg",
+    "image_credit": "Original AI-generated food image created for this edition.",
+    "serves": "4",
+    "prep": "5 min",
+    "cook": "15 min",
+    "total": "20 min",
+    "equipment": "Medium heavy-bottomed saucepan, wooden spoon, box grater",
+    "ingredients": [
+      "8 oz (225 g) elbow macaroni",
+      "3 cups (720 ml) whole milk, plus a splash if needed",
+      "2 cups (200 g) sharp cheddar, freshly grated",
+      "Kosher salt, optional and not counted among the three main ingredients"
+    ],
+    "steps": [
+      {
+        "title": "Warm the pasta and milk",
+        "text": "Put the macaroni and milk in a heavy saucepan. Bring to a gentle simmer over medium heat, stirring often and scraping the corners so nothing sticks."
+      },
+      {
+        "title": "Cook until just tender",
+        "text": "Keep the milk at a quiet simmer, never a hard boil. Cook 9 to 12 minutes, stirring every 30 seconds, until the pasta is al dente and most of the milk has thickened around it."
+      },
+      {
+        "title": "Make it cheesy",
+        "text": "Turn off the heat. Add the cheddar in three handfuls, stirring until each addition melts before adding the next. Taste and add a small pinch of salt if the cheese needs it."
+      },
+      {
+        "title": "Rest and serve",
+        "text": "Let the pot stand for 2 minutes; the sauce will cling to the noodles as it settles. If it becomes too thick, stir in warm milk 1 tablespoon at a time."
+      }
+    ],
+    "rosie_tip": "Grate the cheese yourself. Pre-shredded cheese is coated to keep it separate, and that coating can make a silky sauce turn grainy.",
+    "storage": "Refrigerate for up to 3 days. Reheat gently on the stove with 1 to 2 tablespoons of milk per serving; do not boil.",
+    "serve_with": "Add a green salad or roasted broccoli if you want to pretend this is a balanced dinner. I won't tell.",
+    "photo_caption": "A spoonable bowl of creamy cheddar macaroni, ready to serve.",
+    "source_url": ""
+  },
+  {
+    "number": 3,
+    "title": "Air-Fryer Crispy Chicken Tenders",
+    "category": "Fast-Food Favorites",
+    "tagline": "Crunchy, tender, and ready for a dunk in honey mustard.",
+    "image": "assets/03-chicken-tenders.jpg",
+    "image_credit": "Original AI-generated food image created for this edition.",
+    "serves": "4",
+    "prep": "20 min",
+    "cook": "12 min",
+    "total": "32 min",
+    "equipment": "Air fryer, three shallow bowls, instant-read thermometer",
+    "ingredients": [
+      "1 1/2 lb (680 g) chicken tenderloins",
+      "1 cup (240 ml) buttermilk",
+      "1 large egg",
+      "3/4 cup (95 g) all-purpose flour",
+      "1 1/2 cups (90 g) panko breadcrumbs",
+      "1 tsp paprika",
+      "1 tsp garlic powder",
+      "1 tsp kosher salt",
+      "1/2 tsp black pepper",
+      "Neutral-oil spray",
+      "For dipping: 1/4 cup mayonnaise, 1 tbsp honey, and 1 tsp Dijon mustard"
+    ],
+    "steps": [
+      {
+        "title": "Season the chicken",
+        "text": "Pat the tenders dry. Whisk the buttermilk and egg in one bowl. In a second bowl, combine flour, paprika, garlic powder, salt, and pepper. Put panko in a third bowl."
+      },
+      {
+        "title": "Bread each tender",
+        "text": "Coat a piece of chicken in seasoned flour, dip it in the buttermilk mixture, then press it into the panko. Set on a rack and repeat. Let the coating sit for 5 minutes so it adheres."
+      },
+      {
+        "title": "Air-fry in batches",
+        "text": "Heat the air fryer to 400°F (200°C). Arrange tenders in one layer with space between them; spray the tops lightly with oil. Cook 10 to 12 minutes, turning once, until deeply golden and 165°F (74°C) inside."
+      },
+      {
+        "title": "Stir the dip",
+        "text": "While the chicken cooks, stir mayonnaise, honey, and Dijon together. Add a pinch of salt if desired. Serve the tenders hot with the dip."
+      }
+    ],
+    "rosie_tip": "If the basket is crowded, the coating steams instead of crisping. Give each tender a little personal space; even chicken needs boundaries.",
+    "storage": "Refrigerate for up to 3 days. Re-crisp in an air fryer at 350°F (175°C) for 3 to 5 minutes; avoid microwaving if you want to keep the crunch.",
+    "serve_with": "Try honey mustard, ranch, barbecue sauce, or a squeeze of lemon with crunchy slaw.",
+    "photo_caption": "Golden panko tenders with honey mustard for dipping.",
+    "source_url": ""
+  },
+  {
+    "number": 4,
+    "title": "Fluffy American Buttermilk Pancakes",
+    "category": "Breakfast & Brunch",
+    "tagline": "Tall, tender pancakes with crisp buttery edges and real maple syrup.",
+    "image": "assets/04-fluffy-pancakes.jpg",
+    "image_credit": "Original AI-generated food image created for this edition.",
+    "serves": "4 (about 8 pancakes)",
+    "prep": "10 min",
+    "cook": "15 min",
+    "total": "25 min",
+    "equipment": "Two mixing bowls, whisk, nonstick skillet or griddle",
+    "ingredients": [
+      "1 1/2 cups (188 g) all-purpose flour",
+      "2 tbsp (25 g) granulated sugar",
+      "2 tsp baking powder",
+      "1/2 tsp baking soda",
+      "1/2 tsp kosher salt",
+      "1 1/4 cups (300 ml) buttermilk",
+      "1 large egg",
+      "3 tbsp (42 g) unsalted butter, melted and cooled",
+      "1 tsp vanilla extract",
+      "Butter and maple syrup, for serving"
+    ],
+    "steps": [
+      {
+        "title": "Whisk the dry ingredients",
+        "text": "In a large bowl, whisk the flour, sugar, baking powder, baking soda, and salt until evenly combined."
+      },
+      {
+        "title": "Mix the wet ingredients",
+        "text": "In another bowl, whisk the buttermilk, egg, melted butter, and vanilla. Pour into the dry ingredients and fold just until no dry flour remains. A few small lumps are welcome."
+      },
+      {
+        "title": "Heat the griddle",
+        "text": "Warm a lightly buttered skillet over medium heat, about 350°F (175°C). A drop of water should dance and disappear, not smoke."
+      },
+      {
+        "title": "Cook the pancakes",
+        "text": "Pour 1/4 cup (60 ml) batter for each pancake. Cook until bubbles appear and the edges look set, about 2 minutes. Flip once and cook 1 to 2 minutes more until golden and springy."
+      },
+      {
+        "title": "Serve warm",
+        "text": "Stack the pancakes, add butter, and drizzle with maple syrup. Keep finished pancakes on a rack in a 200°F (95°C) oven while you cook the rest."
+      }
+    ],
+    "rosie_tip": "Stop mixing when the flour disappears. Smooth batter makes flat pancakes; a few lumps make the tall, fluffy ones.",
+    "storage": "Refrigerate cooked pancakes for up to 3 days or freeze between parchment sheets for 2 months. Reheat in a toaster or a 300°F (150°C) oven.",
+    "serve_with": "Fresh berries, sliced bananas, crisp bacon, or a spoonful of peanut butter all feel right at the breakfast table.",
+    "photo_caption": "A tall stack with melting butter and maple syrup.",
+    "source_url": ""
+  },
+  {
+    "number": 5,
+    "title": "Bacon, Egg & Cheese Breakfast Sandwich",
+    "category": "Breakfast & Brunch",
+    "tagline": "The diner-counter classic you can make before the coffee gets cold.",
+    "image": "assets/05-breakfast-sandwich.jpg",
+    "image_credit": "Original AI-generated food image created for this edition.",
+    "serves": "4 sandwiches",
+    "prep": "8 min",
+    "cook": "12 min",
+    "total": "20 min",
+    "equipment": "Large skillet, small nonstick skillet, paper towels",
+    "ingredients": [
+      "4 English muffins, split",
+      "8 slices bacon",
+      "4 large eggs",
+      "4 slices American cheese",
+      "1 tbsp (14 g) unsalted butter",
+      "Kosher salt and black pepper",
+      "Hot sauce or ketchup, optional"
+    ],
+    "steps": [
+      {
+        "title": "Cook the bacon",
+        "text": "Place bacon in a cold skillet and set over medium heat. Cook, turning as needed, until crisp, 8 to 10 minutes. Transfer to paper towels and pour off all but 1 teaspoon of the drippings."
+      },
+      {
+        "title": "Toast the muffins",
+        "text": "Toast the English muffins cut-side down in the same skillet until golden, 1 to 2 minutes. Keep warm."
+      },
+      {
+        "title": "Fry the eggs",
+        "text": "Melt the butter in a nonstick skillet over medium-low heat. Crack in the eggs, season lightly, and cook until the whites are fully set and the yolks are cooked to your preference. For a neat stack, break the yolks and fold each egg into a square; cook until no liquid egg remains."
+      },
+      {
+        "title": "Melt and stack",
+        "text": "Place a slice of cheese on each hot egg for 30 seconds. Set the eggs on the toasted muffin bottoms, add two bacon slices, close the sandwiches, and serve."
+      }
+    ],
+    "rosie_tip": "Low heat gives you tender eggs. High heat gives you a rubber coaster with ambitions.",
+    "storage": "For meal prep, cool the cooked eggs and bacon completely, then refrigerate separately for up to 3 days. Assemble and reheat just before eating.",
+    "serve_with": "Add a sliced tomato, a little hot sauce, or a hash-brown patty tucked right inside.",
+    "photo_caption": "Toasted muffin, folded egg, bacon, and melted American cheese.",
+    "source_url": ""
+  },
+  {
+    "number": 6,
+    "title": "Cheesy Weeknight Beef Tacos",
+    "category": "Fast-Food Favorites",
+    "tagline": "Seasoned beef, crunchy shells, and enough cheddar to make Tuesday feel festive.",
+    "image": "assets/06-cheesy-beef-tacos.jpg",
+    "image_credit": "Original AI-generated food image created for this edition.",
+    "serves": "4 (8 tacos)",
+    "prep": "10 min",
+    "cook": "15 min",
+    "total": "25 min",
+    "equipment": "Large skillet, sheet pan, small bowls for toppings",
+    "ingredients": [
+      "1 lb (450 g) lean ground beef",
+      "8 crunchy taco shells",
+      "1 tbsp neutral oil, if needed",
+      "2 tsp chili powder",
+      "1 tsp ground cumin",
+      "1 tsp smoked paprika",
+      "1/2 tsp garlic powder",
+      "3/4 tsp kosher salt",
+      "1/2 cup (120 ml) water",
+      "1 1/2 cups (150 g) shredded cheddar",
+      "1 cup shredded lettuce, 1 diced tomato, and sour cream, for topping"
+    ],
+    "steps": [
+      {
+        "title": "Brown the beef",
+        "text": "Heat a skillet over medium-high. Add the beef and cook, breaking it into small crumbles, until no pink remains and the meat reaches 160°F (71°C), about 6 to 8 minutes. Drain excess fat if needed."
+      },
+      {
+        "title": "Season and simmer",
+        "text": "Stir in chili powder, cumin, paprika, garlic powder, salt, and water. Simmer uncovered for 4 to 5 minutes, stirring occasionally, until glossy and lightly saucy."
+      },
+      {
+        "title": "Warm the shells",
+        "text": "Arrange taco shells on a sheet pan and warm according to the package directions, usually 3 to 5 minutes at 350°F (175°C)."
+      },
+      {
+        "title": "Fill and finish",
+        "text": "Divide the beef among the shells. Top with cheddar, lettuce, tomato, and sour cream. Serve at once while the shells are crisp."
+      }
+    ],
+    "rosie_tip": "Let the beef simmer with the spices for a few minutes. A packet dumped over dry meat is not a seasoning strategy; it's a cry for help.",
+    "storage": "Refrigerate the beef separately for up to 3 days. Reheat until steaming hot, then fill freshly warmed shells so they stay crunchy.",
+    "serve_with": "Set out salsa, lime wedges, pickled jalapeños, and guacamole so everyone can build their own.",
+    "photo_caption": "Crunchy shells loaded with seasoned beef, cheddar, lettuce, and tomato.",
+    "source_url": ""
+  },
+  {
+    "number": 7,
+    "title": "Garlic-Butter Pizza Bread",
+    "category": "Snacks & Sides",
+    "tagline": "Crispy baguette, garlicky butter, marinara, and bubbling mozzarella.",
+    "image": "assets/07-garlic-butter-pizza-bread.jpg",
+    "image_credit": "Original AI-generated food image created for this edition.",
+    "serves": "4 to 6",
+    "prep": "10 min",
+    "cook": "15 min",
+    "total": "25 min",
+    "equipment": "Rimmed sheet pan, small bowl, sharp bread knife",
+    "ingredients": [
+      "1 large French baguette (about 12 oz / 340 g)",
+      "4 tbsp (56 g) unsalted butter, softened",
+      "2 garlic cloves, finely grated",
+      "1/2 tsp Italian seasoning",
+      "1 cup (240 ml) marinara sauce",
+      "2 cups (200 g) shredded low-moisture mozzarella",
+      "2 tbsp grated Parmesan",
+      "Fresh basil, for finishing"
+    ],
+    "steps": [
+      {
+        "title": "Heat the oven",
+        "text": "Set a rack in the center and heat the oven to 425°F (220°C). Line a sheet pan with parchment."
+      },
+      {
+        "title": "Make garlic butter",
+        "text": "Stir the softened butter, grated garlic, and Italian seasoning together. Split the baguette lengthwise and place cut-side up on the pan."
+      },
+      {
+        "title": "Toast the bread",
+        "text": "Spread the garlic butter over the cut surfaces. Bake 4 to 5 minutes, just until the edges begin to crisp. This quick toast helps keep the bread from turning soggy."
+      },
+      {
+        "title": "Top and bake",
+        "text": "Spoon marinara over the bread, leaving a narrow border. Scatter mozzarella and Parmesan evenly. Bake 8 to 10 minutes, until the cheese bubbles and the edges are golden."
+      },
+      {
+        "title": "Slice and serve",
+        "text": "Rest 2 minutes, add basil, and cut into thick pieces with a serrated knife."
+      }
+    ],
+    "rosie_tip": "Toast the bread before adding sauce. Soggy pizza bread is just a very confused sponge.",
+    "storage": "Store leftovers in the refrigerator for up to 2 days. Reheat on a sheet pan at 375°F (190°C) for 6 to 8 minutes; the microwave softens the crust.",
+    "serve_with": "A bowl of marinara for dipping and a simple green salad make this a proper lunch.",
+    "photo_caption": "Baguette halves with garlic butter, red sauce, and browned mozzarella.",
+    "source_url": ""
+  },
+  {
+    "number": 8,
+    "title": "Loaded Cheesy Fries",
+    "category": "Snacks & Sides",
+    "tagline": "Crispy fries, melted cheddar, smoky bacon, cool sour cream, and green onion.",
+    "image": "assets/08-loaded-cheesy-fries.jpg",
+    "image_credit": "Original AI-generated food image created for this edition.",
+    "serves": "4 as a snack",
+    "prep": "10 min",
+    "cook": "30 min",
+    "total": "40 min",
+    "equipment": "Sheet pan or air fryer, oven-safe serving dish, skillet",
+    "ingredients": [
+      "1 1/2 lb (680 g) frozen straight-cut fries",
+      "1 cup (100 g) sharp cheddar, freshly grated",
+      "4 strips bacon, cooked crisp and crumbled",
+      "1/3 cup (80 g) sour cream",
+      "2 green onions, thinly sliced",
+      "1 small jalapeño, seeded and sliced, optional",
+      "Black pepper, to taste"
+    ],
+    "steps": [
+      {
+        "title": "Crisp the fries",
+        "text": "Heat the oven to the temperature on the fry package, usually 425°F (220°C). Spread fries in a single layer on a preheated sheet pan and bake, turning once, until deeply golden and crisp, about 25 to 30 minutes. Air-fry in batches if preferred."
+      },
+      {
+        "title": "Cook the bacon",
+        "text": "While the fries bake, cook bacon in a skillet over medium heat until crisp. Drain on paper towels, then crumble."
+      },
+      {
+        "title": "Melt the cheese",
+        "text": "Pile the hot fries in an oven-safe dish. Scatter cheddar and bacon over the top. Return to the oven for 2 to 3 minutes, just until the cheese melts."
+      },
+      {
+        "title": "Finish and share",
+        "text": "Dollop with sour cream and finish with green onions, jalapeño, and black pepper. Serve immediately with forks for the table."
+      }
+    ],
+    "rosie_tip": "Crisp the fries first and add cheese second. If you cover them from the start, you get steamed potato sticks. Nobody ordered that.",
+    "storage": "These are best straight from the oven. Refrigerate leftovers for up to 2 days and re-crisp uncovered at 400°F (200°C) for 8 to 10 minutes.",
+    "serve_with": "Add ranch or barbecue sauce on the side. For a heartier plate, top with leftover taco beef or pulled chicken.",
+    "photo_caption": "A shareable bowl of crisp fries with cheddar, bacon, sour cream, and chives.",
+    "source_url": ""
+  },
+  {
+    "number": 9,
+    "title": "Crispy Two-Cheese Grilled Cheese",
+    "category": "Comfort Food",
+    "tagline": "Buttery, golden bread around a blanket of stretchy cheddar and Monterey Jack.",
+    "image": "assets/09-crispy-grilled-cheese.jpg",
+    "image_credit": "Original AI-generated food image created for this edition.",
+    "serves": "4 sandwiches",
+    "prep": "8 min",
+    "cook": "12 min",
+    "total": "20 min",
+    "equipment": "Large skillet or griddle, spatula, box grater",
+    "ingredients": [
+      "8 slices sourdough or sturdy white bread",
+      "1 1/2 cups (150 g) sharp cheddar, grated",
+      "1 cup (100 g) Monterey Jack, grated",
+      "4 tbsp (56 g) softened butter",
+      "1 tsp Dijon mustard, optional",
+      "Tomato soup, for serving"
+    ],
+    "steps": [
+      {
+        "title": "Build the sandwiches",
+        "text": "Mix cheddar and Monterey Jack. Spread butter on one side of each bread slice. Turn four slices butter-side down; spread a thin swipe of Dijon on the inside if using and add the cheese. Close with the remaining bread, butter-side out."
+      },
+      {
+        "title": "Cook low and slow",
+        "text": "Heat a skillet over medium-low. Cook sandwiches in batches for 3 to 4 minutes per side, pressing gently with a spatula, until the bread is evenly golden."
+      },
+      {
+        "title": "Let the cheese catch up",
+        "text": "If the bread is browning before the cheese melts, lower the heat and cover the skillet for 1 minute. Remove the lid for the last 30 seconds to keep the crust crisp."
+      },
+      {
+        "title": "Slice and serve",
+        "text": "Rest each sandwich for 1 minute, then cut diagonally. Serve with hot tomato soup for dunking."
+      }
+    ],
+    "rosie_tip": "Low heat is the secret. A sandwich is not late for work; give the cheese time to melt before you rush it.",
+    "storage": "Grilled cheese is best fresh. If needed, cool and refrigerate for up to 1 day, then reheat in a dry skillet over low heat until crisp and hot.",
+    "serve_with": "Classic tomato soup, dill pickles, or a handful of kettle chips.",
+    "photo_caption": "Golden sourdough with melted cheese stretching between the halves.",
+    "source_url": ""
+  },
+  {
+    "number": 10,
+    "title": "Buffalo Chicken Crunch Wraps",
+    "category": "Fast-Food Favorites",
+    "tagline": "Spicy chicken, cool ranch, crunchy lettuce, and plenty of cheddar in a toasted wrap.",
+    "image": "assets/10-buffalo-chicken-wrap.jpg",
+    "image_credit": "Original AI-generated food image created for this edition.",
+    "serves": "4 wraps",
+    "prep": "12 min",
+    "cook": "8 min",
+    "total": "20 min",
+    "equipment": "Small saucepan, large skillet or griddle, tongs",
+    "ingredients": [
+      "2 cups (about 300 g) cooked shredded chicken",
+      "1/3 cup (80 ml) Buffalo wing sauce",
+      "4 large flour tortillas (10 inches / 25 cm)",
+      "1 cup (100 g) shredded cheddar",
+      "1 cup finely shredded romaine lettuce",
+      "1/2 cup (120 ml) ranch or blue-cheese dressing",
+      "1 tbsp unsalted butter",
+      "Celery sticks, to serve"
+    ],
+    "steps": [
+      {
+        "title": "Warm the Buffalo chicken",
+        "text": "Combine the cooked chicken and wing sauce in a small saucepan over medium-low heat. Stir until hot, about 3 minutes. Taste before adding extra salt; bottled sauce is already seasoned."
+      },
+      {
+        "title": "Fill the tortillas",
+        "text": "Warm tortillas briefly in a dry skillet so they bend without cracking. Place chicken down the center of each, then add cheddar, lettuce, and a drizzle of dressing."
+      },
+      {
+        "title": "Roll tightly",
+        "text": "Fold the sides inward, then roll from the bottom into a snug wrap. Keep the seam underneath."
+      },
+      {
+        "title": "Toast and serve",
+        "text": "Melt butter in a skillet over medium. Cook wraps seam-side down for 2 minutes, then turn and toast the other side until golden and the cheese melts. Cut in half and serve with celery."
+      }
+    ],
+    "rosie_tip": "Put the seam down first. Gravity is a free kitchen helper, and it keeps the good bits from escaping.",
+    "storage": "For meal prep, keep the warm chicken separate from the lettuce and dressing. Refrigerate up to 3 days; assemble and toast just before serving.",
+    "serve_with": "Celery sticks, carrot ribbons, and extra ranch for dipping.",
+    "photo_caption": "A crisped tortilla wrap showing Buffalo chicken, lettuce, and ranch.",
+    "source_url": ""
+  },
+  {
+    "number": 11,
+    "title": "Loaded Baked Potatoes",
+    "category": "Comfort Food",
+    "tagline": "Crisp skins, fluffy centers, melted cheddar, smoky bacon, and cool sour cream.",
+    "image": "assets/11-loaded-baked-potato.jpg",
+    "image_credit": "Pexels stock photo, used under the Pexels License; attribution is optional.",
+    "serves": "4",
+    "prep": "10 min",
+    "cook": "60 min",
+    "total": "70 min",
+    "equipment": "Rimmed baking sheet, fork, small skillet",
+    "ingredients": [
+      "4 medium russet potatoes (about 8 oz / 225 g each)",
+      "1 tbsp olive oil",
+      "1 tsp kosher salt, divided",
+      "4 tbsp (56 g) unsalted butter",
+      "1 cup (100 g) sharp cheddar, grated",
+      "4 strips bacon, cooked crisp and crumbled",
+      "1/2 cup (120 g) sour cream",
+      "2 tbsp sliced chives or green onions",
+      "Black pepper, to taste"
+    ],
+    "steps": [
+      {
+        "title": "Heat and prep",
+        "text": "Heat the oven to 425°F (220°C). Scrub and dry the potatoes. Pierce each one 6 to 8 times with a fork so steam can escape."
+      },
+      {
+        "title": "Bake until fluffy",
+        "text": "Rub the skins with olive oil and 1/2 teaspoon salt. Set potatoes directly on a rimmed baking sheet and bake 50 to 65 minutes, turning once, until a knife slides easily into the center."
+      },
+      {
+        "title": "Cook the bacon",
+        "text": "While the potatoes bake, cook bacon in a skillet until crisp. Drain, cool slightly, and crumble."
+      },
+      {
+        "title": "Fluff and load",
+        "text": "Cut a slit down each potato and squeeze the ends gently to open. Fluff the inside with a fork, add butter, then cheddar, bacon, sour cream, chives, the remaining salt, and pepper."
+      },
+      {
+        "title": "Serve hot",
+        "text": "Return the loaded potatoes to the oven for 2 minutes if you want the cheese extra melty. Bring them to the table while the centers are still steaming."
+      }
+    ],
+    "rosie_tip": "Dry the skins before oiling them. If the skin isn't crisp, the potato is still wearing its pajamas.",
+    "storage": "Refrigerate un-topped baked potatoes for up to 4 days. Reheat at 375°F (190°C) until hot, then add fresh toppings. Do not leave cooked potatoes at room temperature for more than 2 hours.",
+    "serve_with": "A bowl of chili, a simple salad, or grilled chicken turns one potato into dinner.",
+    "photo_caption": "Loaded potato with cheddar, bacon, sour cream, and fresh chives; serving inspiration.",
+    "source_url": "https://www.pexels.com/search/loaded%20baked%20potato/",
+    "photo_id": "9203752"
+  },
+  {
+    "number": 12,
+    "title": "Creamy Garlic Parmesan Pasta",
+    "category": "Comfort Food",
+    "tagline": "Silky fettuccine, mellow garlic, cream, and a snowfall of Parmesan.",
+    "image": "assets/12-creamy-garlic-pasta.jpg",
+    "image_credit": "Pexels stock photo, used under the Pexels License; attribution is optional.",
+    "serves": "4",
+    "prep": "10 min",
+    "cook": "20 min",
+    "total": "30 min",
+    "equipment": "Large pot, 12-inch skillet, tongs, measuring cup for pasta water",
+    "ingredients": [
+      "12 oz (340 g) fettuccine",
+      "3 tbsp (42 g) unsalted butter",
+      "4 garlic cloves, finely minced",
+      "1 1/2 cups (360 ml) heavy cream",
+      "1 cup (95 g) finely grated Parmesan, plus more to finish",
+      "1/2 cup (120 ml) reserved pasta water, as needed",
+      "1/2 tsp kosher salt, plus more for the pasta water",
+      "1/4 tsp black pepper",
+      "2 tbsp chopped parsley, optional"
+    ],
+    "steps": [
+      {
+        "title": "Boil the pasta",
+        "text": "Bring a large pot of water to a boil and salt it until it tastes pleasantly seasoned. Cook fettuccine according to the package, stopping 1 minute before fully tender. Reserve 1 cup pasta water, then drain."
+      },
+      {
+        "title": "Soften the garlic",
+        "text": "While the pasta cooks, melt butter in a large skillet over medium-low heat. Add garlic and cook 30 to 45 seconds, stirring constantly, until fragrant but not browned."
+      },
+      {
+        "title": "Make the cream sauce",
+        "text": "Pour in the cream and bring to a gentle simmer. Cook 3 to 4 minutes, stirring, until slightly thickened. Lower the heat and whisk in Parmesan, salt, and pepper."
+      },
+      {
+        "title": "Toss until glossy",
+        "text": "Add drained pasta and toss with tongs for 1 to 2 minutes. Add pasta water a splash at a time until the sauce coats every ribbon and looks silky."
+      },
+      {
+        "title": "Finish and serve",
+        "text": "Taste for salt, scatter with parsley and extra Parmesan, and serve immediately. The sauce thickens as it stands, so keep a little pasta water nearby."
+      }
+    ],
+    "rosie_tip": "Freshly grated Parmesan melts smoothly. The bagged stuff can clump up when it gets hot, and I don't need any more drama in this kitchen.",
+    "storage": "Refrigerate for up to 3 days. Reheat gently in a skillet with a splash of milk or water, stirring until hot; do not let the cream sauce boil hard.",
+    "serve_with": "Garlic bread and a crisp green salad are the classic partners.",
+    "photo_caption": "Creamy fettuccine finished with Parmesan and herbs; serving inspiration.",
+    "source_url": "https://www.pexels.com/search/fettuccine%20alfredo/",
+    "photo_id": "14930758"
+  },
+  {
+    "number": 13,
+    "title": "Diner-Style Bacon Cheeseburgers",
+    "category": "Burgers & Sandwiches",
+    "tagline": "A thick, juicy patty, crisp bacon, sharp cheddar, and a toasted bun.",
+    "image": "assets/13-bacon-cheeseburger.jpg",
+    "image_credit": "Pexels stock photo, used under the Pexels License; attribution is optional.",
+    "serves": "4 burgers",
+    "prep": "15 min",
+    "cook": "15 min",
+    "total": "30 min",
+    "equipment": "Large skillet or grill, instant-read thermometer, paper towels",
+    "ingredients": [
+      "1 1/4 lb (570 g) 80/20 ground beef",
+      "8 strips bacon",
+      "4 brioche buns, split",
+      "4 slices sharp cheddar",
+      "1 tsp kosher salt",
+      "1/2 tsp black pepper",
+      "4 lettuce leaves and 4 tomato slices",
+      "1/4 cup (60 g) mayonnaise",
+      "1 tbsp ketchup and 1 tsp yellow mustard"
+    ],
+    "steps": [
+      {
+        "title": "Cook the bacon",
+        "text": "Cook bacon in a cold skillet over medium heat, turning until crisp, 8 to 10 minutes. Transfer to paper towels. Pour off the grease and wipe the skillet carefully."
+      },
+      {
+        "title": "Shape the patties",
+        "text": "Divide beef into four portions and shape gently into patties about 4 1/2 inches (11 cm) wide. Press a shallow dimple in the center of each so it cooks evenly. Season both sides with salt and pepper."
+      },
+      {
+        "title": "Sear and melt",
+        "text": "Heat the skillet over medium-high. Cook patties 3 to 4 minutes per side, without pressing them, until the center reaches 160°F (71°C). Add cheddar during the last minute and cover briefly to melt."
+      },
+      {
+        "title": "Toast and assemble",
+        "text": "Toast the buns cut-side down in the skillet. Stir mayonnaise, ketchup, and mustard. Spread sauce on the buns, then add lettuce, tomato, the patty, and two bacon strips."
+      }
+    ],
+    "rosie_tip": "Don't press a thick patty with your spatula. You want the juices in the burger, not decorating the pan.",
+    "storage": "Refrigerate cooked patties and bacon separately for up to 3 days. Reheat patties to steaming hot and build fresh with lettuce and tomato.",
+    "serve_with": "Shoestring fries, onion rings, or a crunchy dill-pickle spear.",
+    "photo_caption": "A bacon cheeseburger stacked with cheddar and classic toppings; serving inspiration.",
+    "source_url": "https://www.pexels.com/photo/person-holding-a-double-patty-cheese-burger-3826273/",
+    "photo_id": "3826273"
+  },
+  {
+    "number": 14,
+    "title": "Philly-Style Cheesesteak Sandwiches",
+    "category": "Burgers & Sandwiches",
+    "tagline": "Thin-sliced beef, soft onions, and melted provolone tucked into warm rolls.",
+    "image": "assets/14-philly-cheesesteak.jpg",
+    "image_credit": "Photo by jeffreyw via Wikimedia Commons, licensed CC BY 2.0. Full attribution is on the Image Credits page.",
+    "serves": "4 sandwiches",
+    "prep": "20 min",
+    "cook": "15 min",
+    "total": "35 min",
+    "equipment": "Large griddle or wide skillet, sharp knife, tongs",
+    "ingredients": [
+      "1 lb (450 g) ribeye, very thinly sliced",
+      "1 large yellow onion, thinly sliced",
+      "1 green bell pepper, thinly sliced, optional Rosie-style addition",
+      "1 tbsp neutral oil",
+      "1/2 tsp kosher salt and 1/4 tsp black pepper",
+      "4 soft hoagie rolls",
+      "8 slices provolone cheese",
+      "1 tbsp butter, for the rolls"
+    ],
+    "steps": [
+      {
+        "title": "Make slicing easy",
+        "text": "If the steak is not already shaved, place it in the freezer for 20 to 25 minutes until firm but not frozen solid. Slice as thinly as possible across the grain."
+      },
+      {
+        "title": "Soften the vegetables",
+        "text": "Heat half the oil on a griddle or in a wide skillet over medium-high. Add onion and optional pepper. Cook 5 to 7 minutes, stirring, until soft and lightly browned. Transfer to a plate."
+      },
+      {
+        "title": "Sear the steak",
+        "text": "Add the remaining oil. Spread steak in a thin layer and season with salt and pepper. Sear 1 to 2 minutes, turn, then chop and fold with a spatula until just cooked through."
+      },
+      {
+        "title": "Melt the cheese",
+        "text": "Return the vegetables to the pan. Divide the mixture into four piles, cover each with two slices of provolone, and cover the pan for 30 to 60 seconds until melted."
+      },
+      {
+        "title": "Fill the rolls",
+        "text": "Butter and toast the rolls cut-side down. Use a spatula to lift each cheesy pile into a roll. Serve while the cheese is still stretchy."
+      }
+    ],
+    "rosie_tip": "The beef has to be thin and the pan has to be hot. Peppers are my house-style addition; leave them out for a more traditional order.",
+    "storage": "Refrigerate the cooked beef and onions for up to 3 days. Reheat in a skillet until steaming hot and fill fresh rolls; the bread is better toasted at the last minute.",
+    "serve_with": "Kettle chips, a sharp pickle, or a small cup of beef jus for dipping.",
+    "photo_caption": "A classic cheesesteak with thin beef, onions, and melted cheese; serving inspiration.",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Philly_cheesesteak_sandwich.jpg"
+  },
+  {
+    "number": 15,
+    "title": "Classic Chocolate Chip Cookies",
+    "category": "Sweet Things",
+    "tagline": "Crisp edges, soft centers, and chocolate in every bite.",
+    "image": "assets/15-chocolate-chip-cookies.jpg",
+    "image_credit": "Pexels stock photo, used under the Pexels License; attribution is optional.",
+    "serves": "24 cookies",
+    "prep": "20 min + chill",
+    "cook": "11 min / tray",
+    "total": "About 70 min",
+    "equipment": "Stand mixer or hand mixer, two baking sheets, parchment paper, cookie scoop",
+    "ingredients": [
+      "2 1/4 cups (270 g) all-purpose flour",
+      "1 tsp baking soda",
+      "1 tsp kosher salt",
+      "1 cup (226 g) unsalted butter, softened",
+      "3/4 cup (150 g) packed light brown sugar",
+      "3/4 cup (150 g) granulated sugar",
+      "2 large eggs, room temperature",
+      "2 tsp vanilla extract",
+      "2 cups (340 g) semisweet chocolate chips",
+      "Flaky salt, optional"
+    ],
+    "steps": [
+      {
+        "title": "Whisk the dry mix",
+        "text": "In a bowl, whisk flour, baking soda, and salt. Set aside. Heat the oven to 350°F (175°C) and line two baking sheets with parchment."
+      },
+      {
+        "title": "Cream butter and sugars",
+        "text": "Beat butter, brown sugar, and granulated sugar on medium speed for 2 minutes, until light and fluffy. Scrape the bowl. Beat in eggs one at a time, then vanilla."
+      },
+      {
+        "title": "Finish the dough",
+        "text": "Add the flour mixture on low speed and mix just until combined. Fold in chocolate chips. Cover and chill the dough for 30 minutes; this keeps the cookies thicker and improves the flavor."
+      },
+      {
+        "title": "Scoop and bake",
+        "text": "Scoop 2-tablespoon portions onto the sheets, leaving 2 inches (5 cm) between them. Bake one tray at a time for 10 to 12 minutes, until edges are golden and centers still look slightly soft."
+      },
+      {
+        "title": "Cool patiently",
+        "text": "Sprinkle with flaky salt if you like. Let cookies rest on the tray for 5 minutes, then move to a rack. The centers finish setting as they cool."
+      }
+    ],
+    "rosie_tip": "Pull the cookies while the centers still look a little underdone. Carryover heat finishes them; a clean toothpick would mean you waited too long.",
+    "storage": "Keep baked cookies airtight at room temperature for 4 days. Freeze scooped dough balls for up to 2 months and bake from frozen, adding 1 to 2 minutes.",
+    "serve_with": "A cold glass of milk, coffee, or a scoop of vanilla ice cream between two cookies.",
+    "photo_caption": "Freshly baked chocolate chip cookies with soft, chocolatey centers; serving inspiration.",
+    "source_url": "https://www.pexels.com/photo/selective-focus-photography-of-chocolate-cookies-1775283/",
+    "photo_id": "1775283"
+  },
+  {
+    "number": 16,
+    "title": "Three-Ingredient Fudgy Brownies",
+    "category": "Sweet Things",
+    "tagline": "A small-pan brownie with a shiny top and a rich, chewy center.",
+    "image": "assets/16-three-ingredient-brownies.jpg",
+    "image_credit": "Pexels stock photo, used under the Pexels License; attribution is optional.",
+    "serves": "9 to 12 squares",
+    "prep": "8 min",
+    "cook": "20 min",
+    "total": "28 min + cool",
+    "equipment": "8-inch (20 cm) square pan, parchment paper, mixing bowl, whisk",
+    "ingredients": [
+      "1 cup (about 300 g) chocolate-hazelnut spread",
+      "2 large eggs",
+      "1/2 cup (65 g) all-purpose flour",
+      "Flaky salt, optional; not counted among the three main ingredients"
+    ],
+    "steps": [
+      {
+        "title": "Prepare the pan",
+        "text": "Heat the oven to 350°F (175°C). Line an 8-inch square pan with parchment, leaving two paper handles so the brownies lift out easily."
+      },
+      {
+        "title": "Mix the batter",
+        "text": "Whisk the chocolate-hazelnut spread and eggs until glossy and smooth. Fold in the flour just until no dry streaks remain; overmixing makes a tougher brownie."
+      },
+      {
+        "title": "Bake",
+        "text": "Spread the batter evenly into the pan. Bake 18 to 22 minutes, until the edges are set and a toothpick inserted near the center comes out with a few moist crumbs."
+      },
+      {
+        "title": "Cool before slicing",
+        "text": "Sprinkle with flaky salt if desired. Cool in the pan for at least 30 minutes, then lift out and cut into 9 large or 12 smaller squares with a warm, clean knife."
+      }
+    ],
+    "rosie_tip": "Brownies keep baking as they cool. If the toothpick comes out completely clean, you've gone one minute too far, dear.",
+    "storage": "Store airtight at room temperature for 3 days or refrigerate for up to 1 week. For extra fudgy slices, chill for 30 minutes before cutting.",
+    "serve_with": "Warm brownies with vanilla ice cream, or a little espresso if the grown-ups are staying up.",
+    "photo_caption": "Rich chocolate brownies cut into neat squares; serving inspiration.",
+    "source_url": "https://www.pexels.com/search/brownies/",
+    "photo_id": "15033482"
+  },
+  {
+    "number": 17,
+    "title": "Chocolate Peanut Butter Cups",
+    "category": "Sweet Things",
+    "tagline": "A crisp chocolate shell and a soft, salty-sweet peanut center.",
+    "image": "assets/17-peanut-butter-cups.jpg",
+    "image_credit": "Pexels stock photo, used under the Pexels License; attribution is optional.",
+    "serves": "12 mini cups",
+    "prep": "20 min",
+    "cook": "No bake",
+    "total": "50 min",
+    "equipment": "12-cup mini muffin pan, paper liners, microwave-safe bowl, small spoon",
+    "ingredients": [
+      "10 oz (285 g) semisweet chocolate, finely chopped or chips",
+      "1/2 cup (130 g) creamy peanut butter",
+      "1/4 cup (30 g) powdered sugar",
+      "1/8 tsp fine salt, optional",
+      "Flaky salt, optional for the tops"
+    ],
+    "steps": [
+      {
+        "title": "Line the pan",
+        "text": "Place a paper liner in each cup of a mini muffin pan. Make room in the refrigerator or freezer for the pan to sit flat."
+      },
+      {
+        "title": "Melt the chocolate",
+        "text": "Microwave the chocolate in a dry bowl in 20-second bursts, stirring each time, until smooth. Spoon about 1 teaspoon into each liner and tilt or brush it partway up the sides. Chill 5 to 8 minutes until firm."
+      },
+      {
+        "title": "Mix the filling",
+        "text": "Stir peanut butter, powdered sugar, and optional fine salt until thick and smooth. Roll into 12 small balls and flatten each into a disk slightly smaller than the liners."
+      },
+      {
+        "title": "Fill and cap",
+        "text": "Place a peanut-butter disk in each chocolate shell. Spoon remaining chocolate over the top to cover the filling. Tap the pan gently to level the tops."
+      },
+      {
+        "title": "Chill until set",
+        "text": "Add a few flakes of salt if desired. Refrigerate 25 to 30 minutes, until firm. Peel away the liners and serve cool."
+      }
+    ],
+    "rosie_tip": "Make sure the first chocolate layer reaches partway up the liner, or the peanut butter will try to escape out the sides.",
+    "storage": "Keep covered in the refrigerator for up to 2 weeks, or freeze for up to 2 months. Let stand 5 minutes before eating for the softest center.",
+    "serve_with": "A little bowl of berries or a cup of coffee balances the sweet chocolate.",
+    "photo_caption": "Chocolate shells filled with peanut butter; serving inspiration.",
+    "source_url": "https://www.pexels.com/search/peanut%20butter%20cups/",
+    "photo_id": "5846197"
+  },
+  {
+    "number": 18,
+    "title": "No-Bake Strawberry Cheesecake Cups",
+    "category": "Sweet Things",
+    "tagline": "Cool cheesecake cream, buttery crumbs, and bright strawberries layered in little jars.",
+    "image": "assets/18-strawberry-cheesecake-cups.jpg",
+    "image_credit": "Pexels stock photo, used under the Pexels License; attribution is optional.",
+    "serves": "6 cups",
+    "prep": "25 min",
+    "cook": "No bake",
+    "total": "2 hr 25 min",
+    "equipment": "Six 6-oz (180 ml) jars or glasses, hand mixer, two mixing bowls",
+    "ingredients": [
+      "1 cup (100 g) graham-cracker crumbs",
+      "3 tbsp (42 g) unsalted butter, melted",
+      "8 oz (225 g) cream cheese, softened",
+      "1/2 cup (60 g) powdered sugar",
+      "1 tsp vanilla extract",
+      "3/4 cup (180 ml) cold heavy cream",
+      "1 1/2 cups (225 g) fresh strawberries, hulled and diced",
+      "2 tbsp strawberry jam",
+      "1 tsp lemon juice"
+    ],
+    "steps": [
+      {
+        "title": "Make the crumb base",
+        "text": "Stir graham crumbs and melted butter until the mixture resembles damp sand. Divide among six jars and press gently with the back of a spoon."
+      },
+      {
+        "title": "Whip the cheesecake cream",
+        "text": "Beat softened cream cheese, powdered sugar, and vanilla until smooth. In a second bowl, whip cold cream to medium-stiff peaks. Fold the whipped cream into the cream-cheese mixture in two additions."
+      },
+      {
+        "title": "Prepare the berries",
+        "text": "Stir diced strawberries with jam and lemon juice. Let stand 5 minutes so the berries turn glossy and release a little juice."
+      },
+      {
+        "title": "Layer the cups",
+        "text": "Spoon cheesecake cream over the crumb bases, add a layer of strawberries, then finish with another spoonful of cream and a few berries on top."
+      },
+      {
+        "title": "Chill and serve",
+        "text": "Cover and refrigerate at least 2 hours, until the filling is cool and softly set. Keep chilled until serving."
+      }
+    ],
+    "rosie_tip": "Use room-temperature cream cheese and cold heavy cream. One makes the filling smooth; the other gives it a lovely lift.",
+    "storage": "Cover and refrigerate for up to 2 days. Add the final fresh strawberry garnish just before serving. Do not freeze in glass jars.",
+    "serve_with": "A little lemon zest or a crisp shortbread cookie on the side.",
+    "photo_caption": "Layered strawberry dessert cups with cream and biscuit crumbs; serving inspiration.",
+    "source_url": "https://www.pexels.com/search/strawberry%20dessert%20cups/",
+    "photo_id": "7552591"
+  },
+  {
+    "number": 19,
+    "title": "Sausage, Egg & Cheese Breakfast Burritos",
+    "category": "Breakfast & Brunch",
+    "tagline": "A warm tortilla packed with fluffy eggs, breakfast sausage, crisp potatoes, and cheddar.",
+    "image": "assets/19-breakfast-burrito.jpg",
+    "image_credit": "Pexels stock photo, used under the Pexels License; attribution is optional.",
+    "serves": "4 burritos",
+    "prep": "10 min",
+    "cook": "20 min",
+    "total": "30 min",
+    "equipment": "Large skillet, nonstick skillet, spatula, foil for freezing",
+    "ingredients": [
+      "4 large flour tortillas (10 inches / 25 cm)",
+      "8 oz (225 g) breakfast sausage",
+      "1 1/2 cups (225 g) frozen hash browns",
+      "4 large eggs",
+      "1 tbsp (15 ml) milk",
+      "1 tbsp (14 g) unsalted butter",
+      "1 cup (100 g) shredded cheddar",
+      "1/2 cup (120 ml) salsa, plus more to serve",
+      "Kosher salt and black pepper"
+    ],
+    "steps": [
+      {
+        "title": "Brown the sausage",
+        "text": "Cook sausage in a large skillet over medium heat, breaking it into crumbles, until browned and 160°F (71°C), about 7 to 8 minutes. Transfer to a plate."
+      },
+      {
+        "title": "Crisp the potatoes",
+        "text": "Add hash browns to the same skillet. Spread them in a thin layer and cook undisturbed for 3 to 4 minutes, then turn and cook until crisp and golden."
+      },
+      {
+        "title": "Scramble the eggs",
+        "text": "Whisk eggs with milk, a pinch of salt, and pepper. Melt butter in a nonstick pan over medium-low. Add eggs and stir gently until soft curds form and no liquid egg remains."
+      },
+      {
+        "title": "Fill and roll",
+        "text": "Warm tortillas briefly so they bend easily. Divide sausage, potatoes, eggs, cheddar, and salsa down the center of each. Fold in the sides and roll tightly from the bottom."
+      },
+      {
+        "title": "Toast the seam",
+        "text": "Return burritos seam-side down to a dry skillet over medium heat. Toast 1 to 2 minutes per side until golden and sealed. Serve with extra salsa."
+      }
+    ],
+    "rosie_tip": "Warm tortillas roll without cracking. Cold tortillas have stage fright, and I can't blame them.",
+    "storage": "For freezing, leave out salsa, cool the fillings completely, roll, and wrap each burrito tightly in foil. Freeze up to 2 months. Reheat until the center reaches 165°F (74°C).",
+    "serve_with": "Salsa, avocado, hot sauce, or a few orange slices for a diner-style breakfast plate.",
+    "photo_caption": "A breakfast burrito with egg, cheese, sausage, and crisp potatoes; serving inspiration.",
+    "source_url": "https://www.pexels.com/photo/sandwich-and-burrito-cut-in-half-5848091/",
+    "photo_id": "5848083"
+  },
+  {
+    "number": 20,
+    "title": "Cottage Cheese Crust Pizza",
+    "category": "Comfort Food, with a Twist",
+    "tagline": "A tender, golden cottage-cheese dough topped with tomato sauce and bubbling mozzarella.",
+    "image": "assets/20-cottage-cheese-pizza.jpg",
+    "image_credit": "Pexels stock photo, used under the Pexels License; attribution is optional.",
+    "serves": "2 to 3",
+    "prep": "15 min",
+    "cook": "25 min",
+    "total": "40 min",
+    "equipment": "Fine-mesh sieve, food processor or blender, mixing bowl, parchment, sheet pan",
+    "ingredients": [
+      "1 cup (225 g) cottage cheese, drained 10 minutes",
+      "1 large egg",
+      "1 1/4 cups (160 g) self-rising flour, plus extra for dusting",
+      "1/2 tsp dried oregano",
+      "1/3 cup (80 ml) pizza sauce",
+      "1 cup (100 g) shredded low-moisture mozzarella",
+      "1/3 cup sliced mushrooms, bell pepper, or pepperoni",
+      "1 tbsp grated Parmesan, optional"
+    ],
+    "steps": [
+      {
+        "title": "Heat the oven and drain",
+        "text": "Heat the oven to 400°F (200°C). Set cottage cheese in a fine-mesh sieve for 10 minutes to remove excess liquid. Blend until smooth."
+      },
+      {
+        "title": "Mix the dough",
+        "text": "Whisk the blended cottage cheese and egg together. Add self-rising flour and oregano; stir until a shaggy dough forms. Turn onto a floured surface and knead gently for 1 to 2 minutes. If it is very sticky, add flour 1 tablespoon at a time."
+      },
+      {
+        "title": "Shape and par-bake",
+        "text": "Press or roll the dough on parchment into a 10-inch (25 cm) round, about 1/4 inch (6 mm) thick. Transfer parchment and dough to a sheet pan. Bake 14 to 16 minutes, until the surface looks set and the edge is lightly golden."
+      },
+      {
+        "title": "Add the toppings",
+        "text": "Spread on pizza sauce, leaving a small border. Add mozzarella, chosen toppings, and Parmesan. Return to the oven for 7 to 9 minutes, until the cheese bubbles and the crust is golden underneath."
+      },
+      {
+        "title": "Rest and slice",
+        "text": "Let the pizza stand for 3 minutes before slicing. The crust firms as it cools slightly. Add basil or red-pepper flakes if you like."
+      }
+    ],
+    "rosie_tip": "Drain the cottage cheese first. Extra water is the enemy of a crisp crust, and the sieve is a lot easier than arguing with the oven.",
+    "storage": "Refrigerate slices for up to 3 days. Reheat on a hot sheet pan or in a skillet until the crust is crisp and the center is steaming. Protein content varies by brand and serving size.",
+    "serve_with": "A simple Caesar salad or crunchy vegetables. For another variation, add cooked chicken and spinach.",
+    "photo_caption": "A golden cheese pizza; the cottage-cheese crust is a homemade variation.",
+    "source_url": "https://www.pexels.com/search/pizza/",
+    "photo_id": "33458021"
+  }
+]

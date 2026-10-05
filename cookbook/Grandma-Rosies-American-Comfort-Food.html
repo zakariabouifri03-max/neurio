@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Grandma Rosie's American Comfort Food: 20 detailed, illustrated home-cooking favorites.">
+<title>Grandma Rosie's American Comfort Food</title>
+<style>
+:root { --paper:#f7f2e8; --paper-dark:#eee6d7; --ink:#20372f; --muted:#52645b; --tomato:#c65c43; --honey:#c79a4d; --line:#dcd2c0; --white:#fffdf8; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; color:var(--ink); background:#e7dfd1; font-family:Georgia,'Times New Roman',serif; }
+main { max-width:1080px; margin:auto; background:var(--paper); box-shadow:0 10px 50px #24362f22; }
+.page { min-height:1056px; padding:50px 58px 48px; position:relative; page-break-after:always; break-after:page; background:var(--paper); overflow:hidden; }
+.cover { min-height:1056px; text-align:center; padding-top:64px; display:flex; flex-direction:column; align-items:center; }
+.cover .mark { font:700 11px/1.2 Arial,sans-serif; letter-spacing:.2em; }
+.cover .rule { width:120px; height:2px; background:var(--honey); margin:18px auto 35px; }
+.cover h1 { margin:0; font-size:56px; line-height:1.02; letter-spacing:-.04em; }
+.cover h1 span { display:block; color:var(--tomato); font-size:39px; margin-top:8px; letter-spacing:-.025em; }
+.cover .subtitle { font:15px/1.5 Arial,sans-serif; color:var(--muted); margin:16px 0 18px; }
+.cover .ribbon { background:var(--honey); color:white; padding:9px 18px; border-radius:99px; font:700 10px Arial,sans-serif; letter-spacing:.09em; }
+.cover img { width:100%; height:420px; object-fit:cover; border-radius:18px; margin-top:35px; }
+.cover .cover-quote { margin-top:-65px; z-index:2; background:var(--ink); color:white; width:92%; border-radius:14px; padding:17px; font-size:23px; }
+.cover .small { margin-top:35px; font:11px Arial,sans-serif; color:var(--muted); }
+.running { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:10px; font:700 9px Arial,sans-serif; letter-spacing:.1em; }
+.running span { color:var(--muted); font-weight:400; }
+.eyebrow { font:700 9px Arial,sans-serif; letter-spacing:.12em; color:var(--tomato); margin:24px 0 10px; }
+.welcome h2,.guide h2,.contents h2 { font-size:39px; line-height:1.1; margin:0 0 18px; }
+.welcome .lead { font-size:19px; color:var(--muted); }
+.welcome p,.guide p { font:15px/1.75 Arial,sans-serif; color:var(--muted); max-width:760px; }
+.quote { background:var(--ink); color:white; border-radius:14px; padding:25px; margin-top:46px; }
+.quote b { display:block; color:var(--honey); font:700 10px Arial,sans-serif; letter-spacing:.13em; margin-bottom:14px; }
+.quote strong { font-size:26px; line-height:1.3; }
+.note-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:35px; }
+.note-grid section { background:var(--white); border:1px solid var(--line); border-radius:13px; padding:20px; min-height:180px; }
+.note-grid h3 { font:700 11px Arial,sans-serif; letter-spacing:.1em; color:var(--tomato); margin:0 0 14px; }
+.note-grid ul { margin:0; padding-left:18px; font:13px/1.8 Arial,sans-serif; color:var(--muted); }
+.contents .toc { columns:2; column-gap:35px; margin-top:30px; }
+.toc a { break-inside:avoid; display:grid; grid-template-columns:28px 1fr 24px; gap:8px; align-items:start; text-decoration:none; color:var(--ink); border-bottom:1px solid var(--line); padding:11px 0; font:12px/1.3 Arial,sans-serif; }
+.toc a span { color:var(--tomato); font-weight:700; } .toc a em { font-style:normal; text-align:right; color:var(--muted); }
+.recipe-opening .hero { height:390px; margin:22px 0 0; position:relative; }
+.hero img { display:block; width:100%; height:100%; object-fit:cover; border-radius:16px; }
+.hero figcaption { position:absolute; bottom:11px; right:13px; color:white; background:#20372fdd; padding:6px 9px; border-radius:8px; font:9px Arial,sans-serif; max-width:72%; }
+.recipe-opening .eyebrow { margin-top:18px; }
+.recipe-opening h2 { margin:0; font-size:31px; line-height:1.12; letter-spacing:-.025em; }
+.tagline { margin:10px 0 15px; color:var(--muted); font-size:15px; line-height:1.45; }
+.meta { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin:16px 0 19px; }
+.meta span { background:var(--white); border:1px solid var(--line); border-radius:9px; padding:10px 12px; font:700 11px Arial,sans-serif; }
+.meta small { display:block; color:var(--tomato); font:700 8px Arial,sans-serif; letter-spacing:.1em; margin-bottom:4px; }
+.section-heading { display:flex; align-items:baseline; gap:12px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+.section-heading h3 { margin:0; font-size:21px; } .section-heading span { color:var(--muted); font:10px Arial,sans-serif; }
+.ingredients { columns:2; column-gap:30px; margin:16px 0 12px; padding-left:18px; font:12px/1.55 Arial,sans-serif; }
+.ingredients li { break-inside:avoid; padding:0 4px 9px 0; }
+.equipment { background:var(--paper-dark); border-radius:9px; padding:12px 14px; margin:15px 0 0; color:var(--muted); font:10px/1.5 Arial,sans-serif; }
+.equipment b { color:var(--tomato); letter-spacing:.08em; font-size:9px; margin-right:8px; }
+.method-title { font-size:33px; margin:25px 0 5px; }
+.method-recipe-name { margin:0 0 25px; color:var(--muted); font:12px Arial,sans-serif; display:flex; justify-content:space-between; }
+.method-recipe-name span { color:var(--tomato); font-weight:700; text-transform:uppercase; font-size:9px; letter-spacing:.08em; }
+.steps { list-style:none; padding:0; margin:0; }
+.steps li { display:grid; grid-template-columns:34px 1fr; gap:10px; padding:0 0 18px; }
+.step-number { border-radius:50%; background:var(--tomato); color:white; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font:700 10px Arial,sans-serif; }
+.steps h3 { margin:2px 0 5px; font:700 10px Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+.steps p { margin:0; font:12px/1.55 Arial,sans-serif; color:var(--muted); }
+.tip { background:var(--ink); color:white; border-radius:12px; padding:17px 20px; margin-top:5px; }
+.tip b,.bottom-cards b { color:var(--honey); font:700 9px Arial,sans-serif; letter-spacing:.1em; }
+.tip p,.bottom-cards p { margin:7px 0 0; color:inherit; font:11px/1.5 Arial,sans-serif; }
+.bottom-cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:13px; }
+.bottom-cards section { background:var(--white); border:1px solid var(--line); border-radius:10px; padding:14px; }
+.bottom-cards b { color:var(--tomato); }
+.bottom-cards p { color:var(--muted); font-size:10px; }
+.fine-print { color:var(--muted); font:9px Arial,sans-serif; margin-top:18px; }
+.folio { position:absolute; bottom:21px; left:58px; right:58px; border-top:1px solid var(--line); padding-top:9px; display:flex; justify-content:space-between; color:var(--muted); font:8px Arial,sans-serif; letter-spacing:.08em; }
+.folio b { color:var(--tomato); }
+.credits-list { display:grid; grid-template-columns:1fr 1fr; gap:15px 28px; margin-top:28px; }
+.credits-list section { border-bottom:1px solid var(--line); padding-bottom:12px; }
+.credits-list b { display:block; font:700 11px Arial,sans-serif; }
+.credits-list span,.credits-list a { display:block; color:var(--muted); font:10px/1.5 Arial,sans-serif; margin-top:4px; overflow-wrap:anywhere; }
+.credits-list a { color:var(--tomato); }
+.disclaimer { background:var(--paper-dark); border-radius:11px; padding:16px; margin-top:25px; font:11px/1.6 Arial,sans-serif; color:var(--muted); }
+.notes-lines { margin-top:38px; } .notes-lines div { height:57px; border-bottom:1px solid var(--line); }
+@media (max-width:720px) { main { box-shadow:none; } .page { padding:28px 22px 48px; min-height:auto; } .cover { min-height:900px; } .cover h1 { font-size:39px; } .cover h1 span { font-size:27px; } .cover img { height:300px; } .recipe-opening .hero { height:260px; } .recipe-opening h2 { font-size:26px; } .meta { grid-template-columns:repeat(2,1fr); } .ingredients { columns:1; } .toc { columns:1 !important; } .folio { left:22px; right:22px; } }
+@media print { body { background:white; } main { max-width:none; box-shadow:none; } .page { width:8.5in; min-height:11in; height:11in; padding:.52in .58in .55in; break-after:page; page-break-after:always; } .recipe-opening .hero { height:3.65in; } .folio { left:.58in; right:.58in; } a { color:inherit; } @page { size:letter; margin:0; } }
+</style>
+</head>
+<body>
+<main>
+<section class="page cover">
+  <p class="mark">A GRANDMA ROSIE COOKBOOK</p><div class="rule"></div>
+  <h1>GRANDMA ROSIE'S<span>AMERICAN COMFORT FOOD</span></h1>
+  <p class="subtitle">20 all-American favorites, made with a little more love</p>
+  <div class="ribbon">BIG FLAVOR · CLEAR STEPS · NO BORING BITES</div>
+  <img src="assets/01-smash-burger.jpg" alt="Juicy American smash burger with melted cheese">
+  <div class="cover-quote">The good stuff belongs at home.</div>
+  <p class="small">A cook-at-home companion to the Grandma Rosie 15-second recipe series</p>
+</section>
+<section class="page welcome"><header class="running"><b>GRANDMA ROSIE</b><span>A NOTE FROM ROSIE</span></header>
+  <p class="eyebrow">PULL UP A CHAIR</p><h2>Welcome to Rosie's kitchen.</h2>
+  <p class="lead">The videos may be 15 seconds. Dinner still takes the time it takes.</p>
+  <p>This book is the cook-at-home companion to the Grandma Rosie recipe series: twenty familiar American favorites, written for real kitchens and hungry people. You will find crisp burgers, creamy pasta, breakfast sandwiches, quick snacks, and a few sweet reasons to preheat the oven.</p>
+  <p>Every recipe starts with a finished-dish image, then gives you the yield, timing, equipment, measured ingredients, clear steps, and a practical storage note. The photos are visual inspiration; ingredients, brands, ovens, and plating can change the final look.</p>
+  <p>Rosie's rule is simple: no long introductions, no mystery measurements, and no shame in using a shortcut when the day is busy. Read the recipe through once, gather what you need, and let the skillet do the talking.</p>
+  <div class="quote"><b>GRANDMA ROSIE SAYS</b><strong>Good food doesn't need a long speech.<br>It needs a hot pan, a little patience, and enough cheese.</strong></div>
+  <p class="fine-print">Grandma Rosie is a fictional cooking persona created for this collection.</p>
+  <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>02</b></footer>
+</section>
+<section class="page guide"><header class="running"><b>GRANDMA ROSIE</b><span>BEFORE YOU COOK</span></header>
+  <p class="eyebrow">THE ROSIE KITCHEN GUIDE</p><h2>A few good things to know.</h2>
+  <p>The recipes use familiar U.S. kitchen measures first. Metric amounts are practical approximations; for baking, a scale is the surest way to get consistent results.</p>
+  <div class="note-grid">
+    <section><h3>MEASUREMENTS</h3><ul><li>1 cup liquid = 240 ml</li><li>1 tablespoon = 15 ml</li><li>1 teaspoon = 5 ml</li><li>1 ounce = about 28 g</li><li>Spoon flour into the cup and level it; don't pack it.</li></ul></section>
+    <section><h3>OVEN CONVERSIONS</h3><ul><li>325°F = 165°C</li><li>350°F = 175°C</li><li>375°F = 190°C</li><li>400°F = 200°C</li><li>425°F = 220°C</li></ul></section>
+    <section><h3>SAFE TEMPERATURES</h3><ul><li>Ground beef: 160°F / 71°C</li><li>Poultry: 165°F / 74°C</li><li>Reheated leftovers: 165°F / 74°C</li><li>Use an instant-read thermometer in the thickest part.</li></ul></section>
+    <section><h3>A FEW KITCHEN HABITS</h3><ul><li>Preheat the oven fully.</li><li>Grate cheese from a block for smoother melting.</li><li>Keep raw meat separate from ready-to-eat foods.</li><li>Refrigerate perishable leftovers within 2 hours.</li></ul></section>
+  </div>
+  <p class="fine-print">People with food allergies should check every package label and adapt the recipe safely.</p>
+  <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>03</b></footer>
+</section>
+<section class="page contents"><header class="running"><b>GRANDMA ROSIE</b><span>FIND YOUR FAVORITE</span></header>
+  <p class="eyebrow">THE RECIPE INDEX</p><h2>Twenty very good reasons to eat.</h2>
+  <p class="tagline">The page number points to the recipe's photo and ingredient list.</p>
+  <nav class="toc"><a href="#recipe-1"><span>01</span><b>Grandma Rosie&#x27;s Smash Burger</b><em>05</em></a>
+<a href="#recipe-2"><span>02</span><b>Three-Ingredient Stovetop Mac &amp; Cheese</b><em>07</em></a>
+<a href="#recipe-3"><span>03</span><b>Air-Fryer Crispy Chicken Tenders</b><em>09</em></a>
+<a href="#recipe-4"><span>04</span><b>Fluffy American Buttermilk Pancakes</b><em>11</em></a>
+<a href="#recipe-5"><span>05</span><b>Bacon, Egg &amp; Cheese Breakfast Sandwich</b><em>13</em></a>
+<a href="#recipe-6"><span>06</span><b>Cheesy Weeknight Beef Tacos</b><em>15</em></a>
+<a href="#recipe-7"><span>07</span><b>Garlic-Butter Pizza Bread</b><em>17</em></a>
+<a href="#recipe-8"><span>08</span><b>Loaded Cheesy Fries</b><em>19</em></a>
+<a href="#recipe-9"><span>09</span><b>Crispy Two-Cheese Grilled Cheese</b><em>21</em></a>
+<a href="#recipe-10"><span>10</span><b>Buffalo Chicken Crunch Wraps</b><em>23</em></a>
+<a href="#recipe-11"><span>11</span><b>Loaded Baked Potatoes</b><em>25</em></a>
+<a href="#recipe-12"><span>12</span><b>Creamy Garlic Parmesan Pasta</b><em>27</em></a>
+<a href="#recipe-13"><span>13</span><b>Diner-Style Bacon Cheeseburgers</b><em>29</em></a>
+<a href="#recipe-14"><span>14</span><b>Philly-Style Cheesesteak Sandwiches</b><em>31</em></a>
+<a href="#recipe-15"><span>15</span><b>Classic Chocolate Chip Cookies</b><em>33</em></a>
+<a href="#recipe-16"><span>16</span><b>Three-Ingredient Fudgy Brownies</b><em>35</em></a>
+<a href="#recipe-17"><span>17</span><b>Chocolate Peanut Butter Cups</b><em>37</em></a>
+<a href="#recipe-18"><span>18</span><b>No-Bake Strawberry Cheesecake Cups</b><em>39</em></a>
+<a href="#recipe-19"><span>19</span><b>Sausage, Egg &amp; Cheese Breakfast Burritos</b><em>41</em></a>
+<a href="#recipe-20"><span>20</span><b>Cottage Cheese Crust Pizza</b><em>43</em></a></nav>
+  <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>04</b></footer>
+</section>
+<article class="recipe" id="recipe-1">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>BURGERS &amp; SANDWICHES</span></header>
+    <figure class="hero">
+      <img src="assets/01-smash-burger.jpg" alt="The finished burger: browned edges, melted cheese, and a little Rosie sauce.">
+      <figcaption>The finished burger: browned edges, melted cheese, and a little Rosie sauce.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 01 · BURGERS &amp; SANDWICHES</p>
+    <h2>Grandma Rosie&#x27;s Smash Burger</h2>
+    <p class="tagline">A crisp-edged, juicy burger with the kind of cheese pull that ends the conversation.</p>
+    <div class="meta">
+      <span><small>PREP</small>10 min</span>
+      <span><small>COOK</small>10 min</span>
+      <span><small>TOTAL</small>20 min</span>
+      <span><small>MAKES</small>4 burgers</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 lb (450 g) 80/20 ground beef, cold</li>
+<li>4 soft burger buns, split</li>
+<li>4 slices American cheese</li>
+<li>1 tsp kosher salt, divided</li>
+<li>1/2 tsp freshly ground black pepper</li>
+<li>1 tsp neutral oil, for the pan</li>
+<li>1/4 cup (60 g) mayonnaise</li>
+<li>1 tbsp ketchup</li>
+<li>1 tsp yellow mustard</li>
+<li>1 tsp pickle brine, plus dill pickles to serve</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> 12-inch cast-iron or heavy skillet, sturdy spatula, parchment paper</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>05</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 01 · BURGERS &amp; SANDWICHES</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Grandma Rosie&#x27;s Smash Burger <span>20 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Mix the Rosie sauce</h3><p>Stir the mayonnaise, ketchup, mustard, and pickle brine together. Set it near the stove so the burgers can be assembled while hot.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Toast the buns</h3><p>Heat the dry skillet over medium heat. Toast the cut sides of the buns until golden, about 45 seconds. Set aside.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Smash for the crust</h3><p>Raise the heat to high and add the oil. Divide beef into four loose balls. Working one at a time, place a ball in the pan, cover with parchment, and press firmly with a sturdy spatula until about 1/4 inch (6 mm) thick. Season with salt and pepper.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Flip and melt</h3><p>Cook without moving for 1 1/2 to 2 minutes, until the edges are deeply browned. Scrape underneath, flip, add a slice of cheese, and cook 45 to 60 seconds more, until the beef reaches 160°F (71°C) and the cheese melts.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Build the burger</h3><p>Spread sauce on the buns, add the hot patty and pickles, close the bun, and serve right away. For a double, stack two patties per bun.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Don&#x27;t pack the beef into a tight meatball. Loose beef makes the lacy, crispy edges that a thick patty can only dream about.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Best eaten immediately. Refrigerate cooked patties in a sealed container for up to 3 days; reheat in a skillet until steaming hot.</p></section>
+      <section><b>SERVE IT WITH</b><p>Serve with crinkle-cut fries, a dill pickle, and extra Rosie sauce.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>06</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-2">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>COMFORT FOOD</span></header>
+    <figure class="hero">
+      <img src="assets/02-three-ingredient-mac.jpg" alt="A spoonable bowl of creamy cheddar macaroni, ready to serve.">
+      <figcaption>A spoonable bowl of creamy cheddar macaroni, ready to serve.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 02 · COMFORT FOOD</p>
+    <h2>Three-Ingredient Stovetop Mac &amp; Cheese</h2>
+    <p class="tagline">Creamy, cozy, and made without a powdered orange packet in sight.</p>
+    <div class="meta">
+      <span><small>PREP</small>5 min</span>
+      <span><small>COOK</small>15 min</span>
+      <span><small>TOTAL</small>20 min</span>
+      <span><small>MAKES</small>4</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>8 oz (225 g) elbow macaroni</li>
+<li>3 cups (720 ml) whole milk, plus a splash if needed</li>
+<li>2 cups (200 g) sharp cheddar, freshly grated</li>
+<li>Kosher salt, optional and not counted among the three main ingredients</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Medium heavy-bottomed saucepan, wooden spoon, box grater</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>07</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 02 · COMFORT FOOD</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Three-Ingredient Stovetop Mac &amp; Cheese <span>20 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Warm the pasta and milk</h3><p>Put the macaroni and milk in a heavy saucepan. Bring to a gentle simmer over medium heat, stirring often and scraping the corners so nothing sticks.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Cook until just tender</h3><p>Keep the milk at a quiet simmer, never a hard boil. Cook 9 to 12 minutes, stirring every 30 seconds, until the pasta is al dente and most of the milk has thickened around it.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Make it cheesy</h3><p>Turn off the heat. Add the cheddar in three handfuls, stirring until each addition melts before adding the next. Taste and add a small pinch of salt if the cheese needs it.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Rest and serve</h3><p>Let the pot stand for 2 minutes; the sauce will cling to the noodles as it settles. If it becomes too thick, stir in warm milk 1 tablespoon at a time.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Grate the cheese yourself. Pre-shredded cheese is coated to keep it separate, and that coating can make a silky sauce turn grainy.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Refrigerate for up to 3 days. Reheat gently on the stove with 1 to 2 tablespoons of milk per serving; do not boil.</p></section>
+      <section><b>SERVE IT WITH</b><p>Add a green salad or roasted broccoli if you want to pretend this is a balanced dinner. I won&#x27;t tell.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>08</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-3">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FAST-FOOD FAVORITES</span></header>
+    <figure class="hero">
+      <img src="assets/03-chicken-tenders.jpg" alt="Golden panko tenders with honey mustard for dipping.">
+      <figcaption>Golden panko tenders with honey mustard for dipping.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 03 · FAST-FOOD FAVORITES</p>
+    <h2>Air-Fryer Crispy Chicken Tenders</h2>
+    <p class="tagline">Crunchy, tender, and ready for a dunk in honey mustard.</p>
+    <div class="meta">
+      <span><small>PREP</small>20 min</span>
+      <span><small>COOK</small>12 min</span>
+      <span><small>TOTAL</small>32 min</span>
+      <span><small>MAKES</small>4</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 1/2 lb (680 g) chicken tenderloins</li>
+<li>1 cup (240 ml) buttermilk</li>
+<li>1 large egg</li>
+<li>3/4 cup (95 g) all-purpose flour</li>
+<li>1 1/2 cups (90 g) panko breadcrumbs</li>
+<li>1 tsp paprika</li>
+<li>1 tsp garlic powder</li>
+<li>1 tsp kosher salt</li>
+<li>1/2 tsp black pepper</li>
+<li>Neutral-oil spray</li>
+<li>For dipping: 1/4 cup mayonnaise, 1 tbsp honey, and 1 tsp Dijon mustard</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Air fryer, three shallow bowls, instant-read thermometer</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>09</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 03 · FAST-FOOD FAVORITES</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Air-Fryer Crispy Chicken Tenders <span>32 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Season the chicken</h3><p>Pat the tenders dry. Whisk the buttermilk and egg in one bowl. In a second bowl, combine flour, paprika, garlic powder, salt, and pepper. Put panko in a third bowl.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Bread each tender</h3><p>Coat a piece of chicken in seasoned flour, dip it in the buttermilk mixture, then press it into the panko. Set on a rack and repeat. Let the coating sit for 5 minutes so it adheres.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Air-fry in batches</h3><p>Heat the air fryer to 400°F (200°C). Arrange tenders in one layer with space between them; spray the tops lightly with oil. Cook 10 to 12 minutes, turning once, until deeply golden and 165°F (74°C) inside.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Stir the dip</h3><p>While the chicken cooks, stir mayonnaise, honey, and Dijon together. Add a pinch of salt if desired. Serve the tenders hot with the dip.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>If the basket is crowded, the coating steams instead of crisping. Give each tender a little personal space; even chicken needs boundaries.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Refrigerate for up to 3 days. Re-crisp in an air fryer at 350°F (175°C) for 3 to 5 minutes; avoid microwaving if you want to keep the crunch.</p></section>
+      <section><b>SERVE IT WITH</b><p>Try honey mustard, ranch, barbecue sauce, or a squeeze of lemon with crunchy slaw.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>10</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-4">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>BREAKFAST &amp; BRUNCH</span></header>
+    <figure class="hero">
+      <img src="assets/04-fluffy-pancakes.jpg" alt="A tall stack with melting butter and maple syrup.">
+      <figcaption>A tall stack with melting butter and maple syrup.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 04 · BREAKFAST &amp; BRUNCH</p>
+    <h2>Fluffy American Buttermilk Pancakes</h2>
+    <p class="tagline">Tall, tender pancakes with crisp buttery edges and real maple syrup.</p>
+    <div class="meta">
+      <span><small>PREP</small>10 min</span>
+      <span><small>COOK</small>15 min</span>
+      <span><small>TOTAL</small>25 min</span>
+      <span><small>MAKES</small>4 (about 8 pancakes)</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 1/2 cups (188 g) all-purpose flour</li>
+<li>2 tbsp (25 g) granulated sugar</li>
+<li>2 tsp baking powder</li>
+<li>1/2 tsp baking soda</li>
+<li>1/2 tsp kosher salt</li>
+<li>1 1/4 cups (300 ml) buttermilk</li>
+<li>1 large egg</li>
+<li>3 tbsp (42 g) unsalted butter, melted and cooled</li>
+<li>1 tsp vanilla extract</li>
+<li>Butter and maple syrup, for serving</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Two mixing bowls, whisk, nonstick skillet or griddle</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>11</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 04 · BREAKFAST &amp; BRUNCH</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Fluffy American Buttermilk Pancakes <span>25 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Whisk the dry ingredients</h3><p>In a large bowl, whisk the flour, sugar, baking powder, baking soda, and salt until evenly combined.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Mix the wet ingredients</h3><p>In another bowl, whisk the buttermilk, egg, melted butter, and vanilla. Pour into the dry ingredients and fold just until no dry flour remains. A few small lumps are welcome.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Heat the griddle</h3><p>Warm a lightly buttered skillet over medium heat, about 350°F (175°C). A drop of water should dance and disappear, not smoke.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Cook the pancakes</h3><p>Pour 1/4 cup (60 ml) batter for each pancake. Cook until bubbles appear and the edges look set, about 2 minutes. Flip once and cook 1 to 2 minutes more until golden and springy.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Serve warm</h3><p>Stack the pancakes, add butter, and drizzle with maple syrup. Keep finished pancakes on a rack in a 200°F (95°C) oven while you cook the rest.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Stop mixing when the flour disappears. Smooth batter makes flat pancakes; a few lumps make the tall, fluffy ones.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Refrigerate cooked pancakes for up to 3 days or freeze between parchment sheets for 2 months. Reheat in a toaster or a 300°F (150°C) oven.</p></section>
+      <section><b>SERVE IT WITH</b><p>Fresh berries, sliced bananas, crisp bacon, or a spoonful of peanut butter all feel right at the breakfast table.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>12</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-5">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>BREAKFAST &amp; BRUNCH</span></header>
+    <figure class="hero">
+      <img src="assets/05-breakfast-sandwich.jpg" alt="Toasted muffin, folded egg, bacon, and melted American cheese.">
+      <figcaption>Toasted muffin, folded egg, bacon, and melted American cheese.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 05 · BREAKFAST &amp; BRUNCH</p>
+    <h2>Bacon, Egg &amp; Cheese Breakfast Sandwich</h2>
+    <p class="tagline">The diner-counter classic you can make before the coffee gets cold.</p>
+    <div class="meta">
+      <span><small>PREP</small>8 min</span>
+      <span><small>COOK</small>12 min</span>
+      <span><small>TOTAL</small>20 min</span>
+      <span><small>MAKES</small>4 sandwiches</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>4 English muffins, split</li>
+<li>8 slices bacon</li>
+<li>4 large eggs</li>
+<li>4 slices American cheese</li>
+<li>1 tbsp (14 g) unsalted butter</li>
+<li>Kosher salt and black pepper</li>
+<li>Hot sauce or ketchup, optional</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Large skillet, small nonstick skillet, paper towels</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>13</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 05 · BREAKFAST &amp; BRUNCH</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Bacon, Egg &amp; Cheese Breakfast Sandwich <span>20 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Cook the bacon</h3><p>Place bacon in a cold skillet and set over medium heat. Cook, turning as needed, until crisp, 8 to 10 minutes. Transfer to paper towels and pour off all but 1 teaspoon of the drippings.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Toast the muffins</h3><p>Toast the English muffins cut-side down in the same skillet until golden, 1 to 2 minutes. Keep warm.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Fry the eggs</h3><p>Melt the butter in a nonstick skillet over medium-low heat. Crack in the eggs, season lightly, and cook until the whites are fully set and the yolks are cooked to your preference. For a neat stack, break the yolks and fold each egg into a square; cook until no liquid egg remains.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Melt and stack</h3><p>Place a slice of cheese on each hot egg for 30 seconds. Set the eggs on the toasted muffin bottoms, add two bacon slices, close the sandwiches, and serve.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Low heat gives you tender eggs. High heat gives you a rubber coaster with ambitions.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>For meal prep, cool the cooked eggs and bacon completely, then refrigerate separately for up to 3 days. Assemble and reheat just before eating.</p></section>
+      <section><b>SERVE IT WITH</b><p>Add a sliced tomato, a little hot sauce, or a hash-brown patty tucked right inside.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>14</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-6">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FAST-FOOD FAVORITES</span></header>
+    <figure class="hero">
+      <img src="assets/06-cheesy-beef-tacos.jpg" alt="Crunchy shells loaded with seasoned beef, cheddar, lettuce, and tomato.">
+      <figcaption>Crunchy shells loaded with seasoned beef, cheddar, lettuce, and tomato.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 06 · FAST-FOOD FAVORITES</p>
+    <h2>Cheesy Weeknight Beef Tacos</h2>
+    <p class="tagline">Seasoned beef, crunchy shells, and enough cheddar to make Tuesday feel festive.</p>
+    <div class="meta">
+      <span><small>PREP</small>10 min</span>
+      <span><small>COOK</small>15 min</span>
+      <span><small>TOTAL</small>25 min</span>
+      <span><small>MAKES</small>4 (8 tacos)</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 lb (450 g) lean ground beef</li>
+<li>8 crunchy taco shells</li>
+<li>1 tbsp neutral oil, if needed</li>
+<li>2 tsp chili powder</li>
+<li>1 tsp ground cumin</li>
+<li>1 tsp smoked paprika</li>
+<li>1/2 tsp garlic powder</li>
+<li>3/4 tsp kosher salt</li>
+<li>1/2 cup (120 ml) water</li>
+<li>1 1/2 cups (150 g) shredded cheddar</li>
+<li>1 cup shredded lettuce, 1 diced tomato, and sour cream, for topping</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Large skillet, sheet pan, small bowls for toppings</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>15</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 06 · FAST-FOOD FAVORITES</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Cheesy Weeknight Beef Tacos <span>25 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Brown the beef</h3><p>Heat a skillet over medium-high. Add the beef and cook, breaking it into small crumbles, until no pink remains and the meat reaches 160°F (71°C), about 6 to 8 minutes. Drain excess fat if needed.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Season and simmer</h3><p>Stir in chili powder, cumin, paprika, garlic powder, salt, and water. Simmer uncovered for 4 to 5 minutes, stirring occasionally, until glossy and lightly saucy.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Warm the shells</h3><p>Arrange taco shells on a sheet pan and warm according to the package directions, usually 3 to 5 minutes at 350°F (175°C).</p></div></li>
+<li><span class="step-number">04</span><div><h3>Fill and finish</h3><p>Divide the beef among the shells. Top with cheddar, lettuce, tomato, and sour cream. Serve at once while the shells are crisp.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Let the beef simmer with the spices for a few minutes. A packet dumped over dry meat is not a seasoning strategy; it&#x27;s a cry for help.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Refrigerate the beef separately for up to 3 days. Reheat until steaming hot, then fill freshly warmed shells so they stay crunchy.</p></section>
+      <section><b>SERVE IT WITH</b><p>Set out salsa, lime wedges, pickled jalapeños, and guacamole so everyone can build their own.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>16</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-7">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>SNACKS &amp; SIDES</span></header>
+    <figure class="hero">
+      <img src="assets/07-garlic-butter-pizza-bread.jpg" alt="Baguette halves with garlic butter, red sauce, and browned mozzarella.">
+      <figcaption>Baguette halves with garlic butter, red sauce, and browned mozzarella.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 07 · SNACKS &amp; SIDES</p>
+    <h2>Garlic-Butter Pizza Bread</h2>
+    <p class="tagline">Crispy baguette, garlicky butter, marinara, and bubbling mozzarella.</p>
+    <div class="meta">
+      <span><small>PREP</small>10 min</span>
+      <span><small>COOK</small>15 min</span>
+      <span><small>TOTAL</small>25 min</span>
+      <span><small>MAKES</small>4 to 6</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 large French baguette (about 12 oz / 340 g)</li>
+<li>4 tbsp (56 g) unsalted butter, softened</li>
+<li>2 garlic cloves, finely grated</li>
+<li>1/2 tsp Italian seasoning</li>
+<li>1 cup (240 ml) marinara sauce</li>
+<li>2 cups (200 g) shredded low-moisture mozzarella</li>
+<li>2 tbsp grated Parmesan</li>
+<li>Fresh basil, for finishing</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Rimmed sheet pan, small bowl, sharp bread knife</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>17</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 07 · SNACKS &amp; SIDES</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Garlic-Butter Pizza Bread <span>25 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Heat the oven</h3><p>Set a rack in the center and heat the oven to 425°F (220°C). Line a sheet pan with parchment.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Make garlic butter</h3><p>Stir the softened butter, grated garlic, and Italian seasoning together. Split the baguette lengthwise and place cut-side up on the pan.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Toast the bread</h3><p>Spread the garlic butter over the cut surfaces. Bake 4 to 5 minutes, just until the edges begin to crisp. This quick toast helps keep the bread from turning soggy.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Top and bake</h3><p>Spoon marinara over the bread, leaving a narrow border. Scatter mozzarella and Parmesan evenly. Bake 8 to 10 minutes, until the cheese bubbles and the edges are golden.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Slice and serve</h3><p>Rest 2 minutes, add basil, and cut into thick pieces with a serrated knife.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Toast the bread before adding sauce. Soggy pizza bread is just a very confused sponge.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Store leftovers in the refrigerator for up to 2 days. Reheat on a sheet pan at 375°F (190°C) for 6 to 8 minutes; the microwave softens the crust.</p></section>
+      <section><b>SERVE IT WITH</b><p>A bowl of marinara for dipping and a simple green salad make this a proper lunch.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>18</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-8">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>SNACKS &amp; SIDES</span></header>
+    <figure class="hero">
+      <img src="assets/08-loaded-cheesy-fries.jpg" alt="A shareable bowl of crisp fries with cheddar, bacon, sour cream, and chives.">
+      <figcaption>A shareable bowl of crisp fries with cheddar, bacon, sour cream, and chives.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 08 · SNACKS &amp; SIDES</p>
+    <h2>Loaded Cheesy Fries</h2>
+    <p class="tagline">Crispy fries, melted cheddar, smoky bacon, cool sour cream, and green onion.</p>
+    <div class="meta">
+      <span><small>PREP</small>10 min</span>
+      <span><small>COOK</small>30 min</span>
+      <span><small>TOTAL</small>40 min</span>
+      <span><small>MAKES</small>4 as a snack</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 1/2 lb (680 g) frozen straight-cut fries</li>
+<li>1 cup (100 g) sharp cheddar, freshly grated</li>
+<li>4 strips bacon, cooked crisp and crumbled</li>
+<li>1/3 cup (80 g) sour cream</li>
+<li>2 green onions, thinly sliced</li>
+<li>1 small jalapeño, seeded and sliced, optional</li>
+<li>Black pepper, to taste</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Sheet pan or air fryer, oven-safe serving dish, skillet</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>19</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 08 · SNACKS &amp; SIDES</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Loaded Cheesy Fries <span>40 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Crisp the fries</h3><p>Heat the oven to the temperature on the fry package, usually 425°F (220°C). Spread fries in a single layer on a preheated sheet pan and bake, turning once, until deeply golden and crisp, about 25 to 30 minutes. Air-fry in batches if preferred.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Cook the bacon</h3><p>While the fries bake, cook bacon in a skillet over medium heat until crisp. Drain on paper towels, then crumble.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Melt the cheese</h3><p>Pile the hot fries in an oven-safe dish. Scatter cheddar and bacon over the top. Return to the oven for 2 to 3 minutes, just until the cheese melts.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Finish and share</h3><p>Dollop with sour cream and finish with green onions, jalapeño, and black pepper. Serve immediately with forks for the table.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Crisp the fries first and add cheese second. If you cover them from the start, you get steamed potato sticks. Nobody ordered that.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>These are best straight from the oven. Refrigerate leftovers for up to 2 days and re-crisp uncovered at 400°F (200°C) for 8 to 10 minutes.</p></section>
+      <section><b>SERVE IT WITH</b><p>Add ranch or barbecue sauce on the side. For a heartier plate, top with leftover taco beef or pulled chicken.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>20</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-9">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>COMFORT FOOD</span></header>
+    <figure class="hero">
+      <img src="assets/09-crispy-grilled-cheese.jpg" alt="Golden sourdough with melted cheese stretching between the halves.">
+      <figcaption>Golden sourdough with melted cheese stretching between the halves.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 09 · COMFORT FOOD</p>
+    <h2>Crispy Two-Cheese Grilled Cheese</h2>
+    <p class="tagline">Buttery, golden bread around a blanket of stretchy cheddar and Monterey Jack.</p>
+    <div class="meta">
+      <span><small>PREP</small>8 min</span>
+      <span><small>COOK</small>12 min</span>
+      <span><small>TOTAL</small>20 min</span>
+      <span><small>MAKES</small>4 sandwiches</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>8 slices sourdough or sturdy white bread</li>
+<li>1 1/2 cups (150 g) sharp cheddar, grated</li>
+<li>1 cup (100 g) Monterey Jack, grated</li>
+<li>4 tbsp (56 g) softened butter</li>
+<li>1 tsp Dijon mustard, optional</li>
+<li>Tomato soup, for serving</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Large skillet or griddle, spatula, box grater</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>21</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 09 · COMFORT FOOD</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Crispy Two-Cheese Grilled Cheese <span>20 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Build the sandwiches</h3><p>Mix cheddar and Monterey Jack. Spread butter on one side of each bread slice. Turn four slices butter-side down; spread a thin swipe of Dijon on the inside if using and add the cheese. Close with the remaining bread, butter-side out.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Cook low and slow</h3><p>Heat a skillet over medium-low. Cook sandwiches in batches for 3 to 4 minutes per side, pressing gently with a spatula, until the bread is evenly golden.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Let the cheese catch up</h3><p>If the bread is browning before the cheese melts, lower the heat and cover the skillet for 1 minute. Remove the lid for the last 30 seconds to keep the crust crisp.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Slice and serve</h3><p>Rest each sandwich for 1 minute, then cut diagonally. Serve with hot tomato soup for dunking.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Low heat is the secret. A sandwich is not late for work; give the cheese time to melt before you rush it.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Grilled cheese is best fresh. If needed, cool and refrigerate for up to 1 day, then reheat in a dry skillet over low heat until crisp and hot.</p></section>
+      <section><b>SERVE IT WITH</b><p>Classic tomato soup, dill pickles, or a handful of kettle chips.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>22</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-10">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FAST-FOOD FAVORITES</span></header>
+    <figure class="hero">
+      <img src="assets/10-buffalo-chicken-wrap.jpg" alt="A crisped tortilla wrap showing Buffalo chicken, lettuce, and ranch.">
+      <figcaption>A crisped tortilla wrap showing Buffalo chicken, lettuce, and ranch.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 10 · FAST-FOOD FAVORITES</p>
+    <h2>Buffalo Chicken Crunch Wraps</h2>
+    <p class="tagline">Spicy chicken, cool ranch, crunchy lettuce, and plenty of cheddar in a toasted wrap.</p>
+    <div class="meta">
+      <span><small>PREP</small>12 min</span>
+      <span><small>COOK</small>8 min</span>
+      <span><small>TOTAL</small>20 min</span>
+      <span><small>MAKES</small>4 wraps</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>2 cups (about 300 g) cooked shredded chicken</li>
+<li>1/3 cup (80 ml) Buffalo wing sauce</li>
+<li>4 large flour tortillas (10 inches / 25 cm)</li>
+<li>1 cup (100 g) shredded cheddar</li>
+<li>1 cup finely shredded romaine lettuce</li>
+<li>1/2 cup (120 ml) ranch or blue-cheese dressing</li>
+<li>1 tbsp unsalted butter</li>
+<li>Celery sticks, to serve</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Small saucepan, large skillet or griddle, tongs</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>23</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 10 · FAST-FOOD FAVORITES</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Buffalo Chicken Crunch Wraps <span>20 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Warm the Buffalo chicken</h3><p>Combine the cooked chicken and wing sauce in a small saucepan over medium-low heat. Stir until hot, about 3 minutes. Taste before adding extra salt; bottled sauce is already seasoned.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Fill the tortillas</h3><p>Warm tortillas briefly in a dry skillet so they bend without cracking. Place chicken down the center of each, then add cheddar, lettuce, and a drizzle of dressing.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Roll tightly</h3><p>Fold the sides inward, then roll from the bottom into a snug wrap. Keep the seam underneath.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Toast and serve</h3><p>Melt butter in a skillet over medium. Cook wraps seam-side down for 2 minutes, then turn and toast the other side until golden and the cheese melts. Cut in half and serve with celery.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Put the seam down first. Gravity is a free kitchen helper, and it keeps the good bits from escaping.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>For meal prep, keep the warm chicken separate from the lettuce and dressing. Refrigerate up to 3 days; assemble and toast just before serving.</p></section>
+      <section><b>SERVE IT WITH</b><p>Celery sticks, carrot ribbons, and extra ranch for dipping.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>24</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-11">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>COMFORT FOOD</span></header>
+    <figure class="hero">
+      <img src="assets/11-loaded-baked-potato.jpg" alt="Loaded potato with cheddar, bacon, sour cream, and fresh chives; serving inspiration.">
+      <figcaption>Loaded potato with cheddar, bacon, sour cream, and fresh chives; serving inspiration.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 11 · COMFORT FOOD</p>
+    <h2>Loaded Baked Potatoes</h2>
+    <p class="tagline">Crisp skins, fluffy centers, melted cheddar, smoky bacon, and cool sour cream.</p>
+    <div class="meta">
+      <span><small>PREP</small>10 min</span>
+      <span><small>COOK</small>60 min</span>
+      <span><small>TOTAL</small>70 min</span>
+      <span><small>MAKES</small>4</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>4 medium russet potatoes (about 8 oz / 225 g each)</li>
+<li>1 tbsp olive oil</li>
+<li>1 tsp kosher salt, divided</li>
+<li>4 tbsp (56 g) unsalted butter</li>
+<li>1 cup (100 g) sharp cheddar, grated</li>
+<li>4 strips bacon, cooked crisp and crumbled</li>
+<li>1/2 cup (120 g) sour cream</li>
+<li>2 tbsp sliced chives or green onions</li>
+<li>Black pepper, to taste</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Rimmed baking sheet, fork, small skillet</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>25</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 11 · COMFORT FOOD</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Loaded Baked Potatoes <span>70 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Heat and prep</h3><p>Heat the oven to 425°F (220°C). Scrub and dry the potatoes. Pierce each one 6 to 8 times with a fork so steam can escape.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Bake until fluffy</h3><p>Rub the skins with olive oil and 1/2 teaspoon salt. Set potatoes directly on a rimmed baking sheet and bake 50 to 65 minutes, turning once, until a knife slides easily into the center.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Cook the bacon</h3><p>While the potatoes bake, cook bacon in a skillet until crisp. Drain, cool slightly, and crumble.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Fluff and load</h3><p>Cut a slit down each potato and squeeze the ends gently to open. Fluff the inside with a fork, add butter, then cheddar, bacon, sour cream, chives, the remaining salt, and pepper.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Serve hot</h3><p>Return the loaded potatoes to the oven for 2 minutes if you want the cheese extra melty. Bring them to the table while the centers are still steaming.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Dry the skins before oiling them. If the skin isn&#x27;t crisp, the potato is still wearing its pajamas.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Refrigerate un-topped baked potatoes for up to 4 days. Reheat at 375°F (190°C) until hot, then add fresh toppings. Do not leave cooked potatoes at room temperature for more than 2 hours.</p></section>
+      <section><b>SERVE IT WITH</b><p>A bowl of chili, a simple salad, or grilled chicken turns one potato into dinner.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>26</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-12">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>COMFORT FOOD</span></header>
+    <figure class="hero">
+      <img src="assets/12-creamy-garlic-pasta.jpg" alt="Creamy fettuccine finished with Parmesan and herbs; serving inspiration.">
+      <figcaption>Creamy fettuccine finished with Parmesan and herbs; serving inspiration.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 12 · COMFORT FOOD</p>
+    <h2>Creamy Garlic Parmesan Pasta</h2>
+    <p class="tagline">Silky fettuccine, mellow garlic, cream, and a snowfall of Parmesan.</p>
+    <div class="meta">
+      <span><small>PREP</small>10 min</span>
+      <span><small>COOK</small>20 min</span>
+      <span><small>TOTAL</small>30 min</span>
+      <span><small>MAKES</small>4</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>12 oz (340 g) fettuccine</li>
+<li>3 tbsp (42 g) unsalted butter</li>
+<li>4 garlic cloves, finely minced</li>
+<li>1 1/2 cups (360 ml) heavy cream</li>
+<li>1 cup (95 g) finely grated Parmesan, plus more to finish</li>
+<li>1/2 cup (120 ml) reserved pasta water, as needed</li>
+<li>1/2 tsp kosher salt, plus more for the pasta water</li>
+<li>1/4 tsp black pepper</li>
+<li>2 tbsp chopped parsley, optional</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Large pot, 12-inch skillet, tongs, measuring cup for pasta water</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>27</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 12 · COMFORT FOOD</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Creamy Garlic Parmesan Pasta <span>30 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Boil the pasta</h3><p>Bring a large pot of water to a boil and salt it until it tastes pleasantly seasoned. Cook fettuccine according to the package, stopping 1 minute before fully tender. Reserve 1 cup pasta water, then drain.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Soften the garlic</h3><p>While the pasta cooks, melt butter in a large skillet over medium-low heat. Add garlic and cook 30 to 45 seconds, stirring constantly, until fragrant but not browned.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Make the cream sauce</h3><p>Pour in the cream and bring to a gentle simmer. Cook 3 to 4 minutes, stirring, until slightly thickened. Lower the heat and whisk in Parmesan, salt, and pepper.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Toss until glossy</h3><p>Add drained pasta and toss with tongs for 1 to 2 minutes. Add pasta water a splash at a time until the sauce coats every ribbon and looks silky.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Finish and serve</h3><p>Taste for salt, scatter with parsley and extra Parmesan, and serve immediately. The sauce thickens as it stands, so keep a little pasta water nearby.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Freshly grated Parmesan melts smoothly. The bagged stuff can clump up when it gets hot, and I don&#x27;t need any more drama in this kitchen.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Refrigerate for up to 3 days. Reheat gently in a skillet with a splash of milk or water, stirring until hot; do not let the cream sauce boil hard.</p></section>
+      <section><b>SERVE IT WITH</b><p>Garlic bread and a crisp green salad are the classic partners.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>28</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-13">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>BURGERS &amp; SANDWICHES</span></header>
+    <figure class="hero">
+      <img src="assets/13-bacon-cheeseburger.jpg" alt="A bacon cheeseburger stacked with cheddar and classic toppings; serving inspiration.">
+      <figcaption>A bacon cheeseburger stacked with cheddar and classic toppings; serving inspiration.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 13 · BURGERS &amp; SANDWICHES</p>
+    <h2>Diner-Style Bacon Cheeseburgers</h2>
+    <p class="tagline">A thick, juicy patty, crisp bacon, sharp cheddar, and a toasted bun.</p>
+    <div class="meta">
+      <span><small>PREP</small>15 min</span>
+      <span><small>COOK</small>15 min</span>
+      <span><small>TOTAL</small>30 min</span>
+      <span><small>MAKES</small>4 burgers</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 1/4 lb (570 g) 80/20 ground beef</li>
+<li>8 strips bacon</li>
+<li>4 brioche buns, split</li>
+<li>4 slices sharp cheddar</li>
+<li>1 tsp kosher salt</li>
+<li>1/2 tsp black pepper</li>
+<li>4 lettuce leaves and 4 tomato slices</li>
+<li>1/4 cup (60 g) mayonnaise</li>
+<li>1 tbsp ketchup and 1 tsp yellow mustard</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Large skillet or grill, instant-read thermometer, paper towels</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>29</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 13 · BURGERS &amp; SANDWICHES</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Diner-Style Bacon Cheeseburgers <span>30 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Cook the bacon</h3><p>Cook bacon in a cold skillet over medium heat, turning until crisp, 8 to 10 minutes. Transfer to paper towels. Pour off the grease and wipe the skillet carefully.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Shape the patties</h3><p>Divide beef into four portions and shape gently into patties about 4 1/2 inches (11 cm) wide. Press a shallow dimple in the center of each so it cooks evenly. Season both sides with salt and pepper.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Sear and melt</h3><p>Heat the skillet over medium-high. Cook patties 3 to 4 minutes per side, without pressing them, until the center reaches 160°F (71°C). Add cheddar during the last minute and cover briefly to melt.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Toast and assemble</h3><p>Toast the buns cut-side down in the skillet. Stir mayonnaise, ketchup, and mustard. Spread sauce on the buns, then add lettuce, tomato, the patty, and two bacon strips.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Don&#x27;t press a thick patty with your spatula. You want the juices in the burger, not decorating the pan.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Refrigerate cooked patties and bacon separately for up to 3 days. Reheat patties to steaming hot and build fresh with lettuce and tomato.</p></section>
+      <section><b>SERVE IT WITH</b><p>Shoestring fries, onion rings, or a crunchy dill-pickle spear.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>30</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-14">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>BURGERS &amp; SANDWICHES</span></header>
+    <figure class="hero">
+      <img src="assets/14-philly-cheesesteak.jpg" alt="A classic cheesesteak with thin beef, onions, and melted cheese; serving inspiration.">
+      <figcaption>A classic cheesesteak with thin beef, onions, and melted cheese; serving inspiration.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 14 · BURGERS &amp; SANDWICHES</p>
+    <h2>Philly-Style Cheesesteak Sandwiches</h2>
+    <p class="tagline">Thin-sliced beef, soft onions, and melted provolone tucked into warm rolls.</p>
+    <div class="meta">
+      <span><small>PREP</small>20 min</span>
+      <span><small>COOK</small>15 min</span>
+      <span><small>TOTAL</small>35 min</span>
+      <span><small>MAKES</small>4 sandwiches</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 lb (450 g) ribeye, very thinly sliced</li>
+<li>1 large yellow onion, thinly sliced</li>
+<li>1 green bell pepper, thinly sliced, optional Rosie-style addition</li>
+<li>1 tbsp neutral oil</li>
+<li>1/2 tsp kosher salt and 1/4 tsp black pepper</li>
+<li>4 soft hoagie rolls</li>
+<li>8 slices provolone cheese</li>
+<li>1 tbsp butter, for the rolls</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Large griddle or wide skillet, sharp knife, tongs</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>31</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 14 · BURGERS &amp; SANDWICHES</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Philly-Style Cheesesteak Sandwiches <span>35 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Make slicing easy</h3><p>If the steak is not already shaved, place it in the freezer for 20 to 25 minutes until firm but not frozen solid. Slice as thinly as possible across the grain.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Soften the vegetables</h3><p>Heat half the oil on a griddle or in a wide skillet over medium-high. Add onion and optional pepper. Cook 5 to 7 minutes, stirring, until soft and lightly browned. Transfer to a plate.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Sear the steak</h3><p>Add the remaining oil. Spread steak in a thin layer and season with salt and pepper. Sear 1 to 2 minutes, turn, then chop and fold with a spatula until just cooked through.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Melt the cheese</h3><p>Return the vegetables to the pan. Divide the mixture into four piles, cover each with two slices of provolone, and cover the pan for 30 to 60 seconds until melted.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Fill the rolls</h3><p>Butter and toast the rolls cut-side down. Use a spatula to lift each cheesy pile into a roll. Serve while the cheese is still stretchy.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>The beef has to be thin and the pan has to be hot. Peppers are my house-style addition; leave them out for a more traditional order.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Refrigerate the cooked beef and onions for up to 3 days. Reheat in a skillet until steaming hot and fill fresh rolls; the bread is better toasted at the last minute.</p></section>
+      <section><b>SERVE IT WITH</b><p>Kettle chips, a sharp pickle, or a small cup of beef jus for dipping.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>32</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-15">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>SWEET THINGS</span></header>
+    <figure class="hero">
+      <img src="assets/15-chocolate-chip-cookies.jpg" alt="Freshly baked chocolate chip cookies with soft, chocolatey centers; serving inspiration.">
+      <figcaption>Freshly baked chocolate chip cookies with soft, chocolatey centers; serving inspiration.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 15 · SWEET THINGS</p>
+    <h2>Classic Chocolate Chip Cookies</h2>
+    <p class="tagline">Crisp edges, soft centers, and chocolate in every bite.</p>
+    <div class="meta">
+      <span><small>PREP</small>20 min + chill</span>
+      <span><small>COOK</small>11 min / tray</span>
+      <span><small>TOTAL</small>About 70 min</span>
+      <span><small>MAKES</small>24 cookies</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>2 1/4 cups (270 g) all-purpose flour</li>
+<li>1 tsp baking soda</li>
+<li>1 tsp kosher salt</li>
+<li>1 cup (226 g) unsalted butter, softened</li>
+<li>3/4 cup (150 g) packed light brown sugar</li>
+<li>3/4 cup (150 g) granulated sugar</li>
+<li>2 large eggs, room temperature</li>
+<li>2 tsp vanilla extract</li>
+<li>2 cups (340 g) semisweet chocolate chips</li>
+<li>Flaky salt, optional</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Stand mixer or hand mixer, two baking sheets, parchment paper, cookie scoop</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>33</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 15 · SWEET THINGS</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Classic Chocolate Chip Cookies <span>About 70 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Whisk the dry mix</h3><p>In a bowl, whisk flour, baking soda, and salt. Set aside. Heat the oven to 350°F (175°C) and line two baking sheets with parchment.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Cream butter and sugars</h3><p>Beat butter, brown sugar, and granulated sugar on medium speed for 2 minutes, until light and fluffy. Scrape the bowl. Beat in eggs one at a time, then vanilla.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Finish the dough</h3><p>Add the flour mixture on low speed and mix just until combined. Fold in chocolate chips. Cover and chill the dough for 30 minutes; this keeps the cookies thicker and improves the flavor.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Scoop and bake</h3><p>Scoop 2-tablespoon portions onto the sheets, leaving 2 inches (5 cm) between them. Bake one tray at a time for 10 to 12 minutes, until edges are golden and centers still look slightly soft.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Cool patiently</h3><p>Sprinkle with flaky salt if you like. Let cookies rest on the tray for 5 minutes, then move to a rack. The centers finish setting as they cool.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Pull the cookies while the centers still look a little underdone. Carryover heat finishes them; a clean toothpick would mean you waited too long.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Keep baked cookies airtight at room temperature for 4 days. Freeze scooped dough balls for up to 2 months and bake from frozen, adding 1 to 2 minutes.</p></section>
+      <section><b>SERVE IT WITH</b><p>A cold glass of milk, coffee, or a scoop of vanilla ice cream between two cookies.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>34</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-16">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>SWEET THINGS</span></header>
+    <figure class="hero">
+      <img src="assets/16-three-ingredient-brownies.jpg" alt="Rich chocolate brownies cut into neat squares; serving inspiration.">
+      <figcaption>Rich chocolate brownies cut into neat squares; serving inspiration.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 16 · SWEET THINGS</p>
+    <h2>Three-Ingredient Fudgy Brownies</h2>
+    <p class="tagline">A small-pan brownie with a shiny top and a rich, chewy center.</p>
+    <div class="meta">
+      <span><small>PREP</small>8 min</span>
+      <span><small>COOK</small>20 min</span>
+      <span><small>TOTAL</small>28 min + cool</span>
+      <span><small>MAKES</small>9 to 12 squares</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 cup (about 300 g) chocolate-hazelnut spread</li>
+<li>2 large eggs</li>
+<li>1/2 cup (65 g) all-purpose flour</li>
+<li>Flaky salt, optional; not counted among the three main ingredients</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> 8-inch (20 cm) square pan, parchment paper, mixing bowl, whisk</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>35</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 16 · SWEET THINGS</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Three-Ingredient Fudgy Brownies <span>28 min + cool total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Prepare the pan</h3><p>Heat the oven to 350°F (175°C). Line an 8-inch square pan with parchment, leaving two paper handles so the brownies lift out easily.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Mix the batter</h3><p>Whisk the chocolate-hazelnut spread and eggs until glossy and smooth. Fold in the flour just until no dry streaks remain; overmixing makes a tougher brownie.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Bake</h3><p>Spread the batter evenly into the pan. Bake 18 to 22 minutes, until the edges are set and a toothpick inserted near the center comes out with a few moist crumbs.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Cool before slicing</h3><p>Sprinkle with flaky salt if desired. Cool in the pan for at least 30 minutes, then lift out and cut into 9 large or 12 smaller squares with a warm, clean knife.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Brownies keep baking as they cool. If the toothpick comes out completely clean, you&#x27;ve gone one minute too far, dear.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Store airtight at room temperature for 3 days or refrigerate for up to 1 week. For extra fudgy slices, chill for 30 minutes before cutting.</p></section>
+      <section><b>SERVE IT WITH</b><p>Warm brownies with vanilla ice cream, or a little espresso if the grown-ups are staying up.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>36</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-17">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>SWEET THINGS</span></header>
+    <figure class="hero">
+      <img src="assets/17-peanut-butter-cups.jpg" alt="Chocolate shells filled with peanut butter; serving inspiration.">
+      <figcaption>Chocolate shells filled with peanut butter; serving inspiration.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 17 · SWEET THINGS</p>
+    <h2>Chocolate Peanut Butter Cups</h2>
+    <p class="tagline">A crisp chocolate shell and a soft, salty-sweet peanut center.</p>
+    <div class="meta">
+      <span><small>PREP</small>20 min</span>
+      <span><small>COOK</small>No bake</span>
+      <span><small>TOTAL</small>50 min</span>
+      <span><small>MAKES</small>12 mini cups</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>10 oz (285 g) semisweet chocolate, finely chopped or chips</li>
+<li>1/2 cup (130 g) creamy peanut butter</li>
+<li>1/4 cup (30 g) powdered sugar</li>
+<li>1/8 tsp fine salt, optional</li>
+<li>Flaky salt, optional for the tops</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> 12-cup mini muffin pan, paper liners, microwave-safe bowl, small spoon</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>37</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 17 · SWEET THINGS</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Chocolate Peanut Butter Cups <span>50 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Line the pan</h3><p>Place a paper liner in each cup of a mini muffin pan. Make room in the refrigerator or freezer for the pan to sit flat.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Melt the chocolate</h3><p>Microwave the chocolate in a dry bowl in 20-second bursts, stirring each time, until smooth. Spoon about 1 teaspoon into each liner and tilt or brush it partway up the sides. Chill 5 to 8 minutes until firm.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Mix the filling</h3><p>Stir peanut butter, powdered sugar, and optional fine salt until thick and smooth. Roll into 12 small balls and flatten each into a disk slightly smaller than the liners.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Fill and cap</h3><p>Place a peanut-butter disk in each chocolate shell. Spoon remaining chocolate over the top to cover the filling. Tap the pan gently to level the tops.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Chill until set</h3><p>Add a few flakes of salt if desired. Refrigerate 25 to 30 minutes, until firm. Peel away the liners and serve cool.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Make sure the first chocolate layer reaches partway up the liner, or the peanut butter will try to escape out the sides.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Keep covered in the refrigerator for up to 2 weeks, or freeze for up to 2 months. Let stand 5 minutes before eating for the softest center.</p></section>
+      <section><b>SERVE IT WITH</b><p>A little bowl of berries or a cup of coffee balances the sweet chocolate.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>38</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-18">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>SWEET THINGS</span></header>
+    <figure class="hero">
+      <img src="assets/18-strawberry-cheesecake-cups.jpg" alt="Layered strawberry dessert cups with cream and biscuit crumbs; serving inspiration.">
+      <figcaption>Layered strawberry dessert cups with cream and biscuit crumbs; serving inspiration.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 18 · SWEET THINGS</p>
+    <h2>No-Bake Strawberry Cheesecake Cups</h2>
+    <p class="tagline">Cool cheesecake cream, buttery crumbs, and bright strawberries layered in little jars.</p>
+    <div class="meta">
+      <span><small>PREP</small>25 min</span>
+      <span><small>COOK</small>No bake</span>
+      <span><small>TOTAL</small>2 hr 25 min</span>
+      <span><small>MAKES</small>6 cups</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 cup (100 g) graham-cracker crumbs</li>
+<li>3 tbsp (42 g) unsalted butter, melted</li>
+<li>8 oz (225 g) cream cheese, softened</li>
+<li>1/2 cup (60 g) powdered sugar</li>
+<li>1 tsp vanilla extract</li>
+<li>3/4 cup (180 ml) cold heavy cream</li>
+<li>1 1/2 cups (225 g) fresh strawberries, hulled and diced</li>
+<li>2 tbsp strawberry jam</li>
+<li>1 tsp lemon juice</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Six 6-oz (180 ml) jars or glasses, hand mixer, two mixing bowls</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>39</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 18 · SWEET THINGS</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">No-Bake Strawberry Cheesecake Cups <span>2 hr 25 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Make the crumb base</h3><p>Stir graham crumbs and melted butter until the mixture resembles damp sand. Divide among six jars and press gently with the back of a spoon.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Whip the cheesecake cream</h3><p>Beat softened cream cheese, powdered sugar, and vanilla until smooth. In a second bowl, whip cold cream to medium-stiff peaks. Fold the whipped cream into the cream-cheese mixture in two additions.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Prepare the berries</h3><p>Stir diced strawberries with jam and lemon juice. Let stand 5 minutes so the berries turn glossy and release a little juice.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Layer the cups</h3><p>Spoon cheesecake cream over the crumb bases, add a layer of strawberries, then finish with another spoonful of cream and a few berries on top.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Chill and serve</h3><p>Cover and refrigerate at least 2 hours, until the filling is cool and softly set. Keep chilled until serving.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Use room-temperature cream cheese and cold heavy cream. One makes the filling smooth; the other gives it a lovely lift.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Cover and refrigerate for up to 2 days. Add the final fresh strawberry garnish just before serving. Do not freeze in glass jars.</p></section>
+      <section><b>SERVE IT WITH</b><p>A little lemon zest or a crisp shortbread cookie on the side.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>40</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-19">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>BREAKFAST &amp; BRUNCH</span></header>
+    <figure class="hero">
+      <img src="assets/19-breakfast-burrito.jpg" alt="A breakfast burrito with egg, cheese, sausage, and crisp potatoes; serving inspiration.">
+      <figcaption>A breakfast burrito with egg, cheese, sausage, and crisp potatoes; serving inspiration.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 19 · BREAKFAST &amp; BRUNCH</p>
+    <h2>Sausage, Egg &amp; Cheese Breakfast Burritos</h2>
+    <p class="tagline">A warm tortilla packed with fluffy eggs, breakfast sausage, crisp potatoes, and cheddar.</p>
+    <div class="meta">
+      <span><small>PREP</small>10 min</span>
+      <span><small>COOK</small>20 min</span>
+      <span><small>TOTAL</small>30 min</span>
+      <span><small>MAKES</small>4 burritos</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>4 large flour tortillas (10 inches / 25 cm)</li>
+<li>8 oz (225 g) breakfast sausage</li>
+<li>1 1/2 cups (225 g) frozen hash browns</li>
+<li>4 large eggs</li>
+<li>1 tbsp (15 ml) milk</li>
+<li>1 tbsp (14 g) unsalted butter</li>
+<li>1 cup (100 g) shredded cheddar</li>
+<li>1/2 cup (120 ml) salsa, plus more to serve</li>
+<li>Kosher salt and black pepper</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Large skillet, nonstick skillet, spatula, foil for freezing</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>41</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 19 · BREAKFAST &amp; BRUNCH</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Sausage, Egg &amp; Cheese Breakfast Burritos <span>30 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Brown the sausage</h3><p>Cook sausage in a large skillet over medium heat, breaking it into crumbles, until browned and 160°F (71°C), about 7 to 8 minutes. Transfer to a plate.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Crisp the potatoes</h3><p>Add hash browns to the same skillet. Spread them in a thin layer and cook undisturbed for 3 to 4 minutes, then turn and cook until crisp and golden.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Scramble the eggs</h3><p>Whisk eggs with milk, a pinch of salt, and pepper. Melt butter in a nonstick pan over medium-low. Add eggs and stir gently until soft curds form and no liquid egg remains.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Fill and roll</h3><p>Warm tortillas briefly so they bend easily. Divide sausage, potatoes, eggs, cheddar, and salsa down the center of each. Fold in the sides and roll tightly from the bottom.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Toast the seam</h3><p>Return burritos seam-side down to a dry skillet over medium heat. Toast 1 to 2 minutes per side until golden and sealed. Serve with extra salsa.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Warm tortillas roll without cracking. Cold tortillas have stage fright, and I can&#x27;t blame them.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>For freezing, leave out salsa, cool the fillings completely, roll, and wrap each burrito tightly in foil. Freeze up to 2 months. Reheat until the center reaches 165°F (74°C).</p></section>
+      <section><b>SERVE IT WITH</b><p>Salsa, avocado, hot sauce, or a few orange slices for a diner-style breakfast plate.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>42</b></footer>
+  </section>
+</article>
+<article class="recipe" id="recipe-20">
+  <section class="page recipe-opening">
+    <header class="running"><b>GRANDMA ROSIE</b><span>COMFORT FOOD, WITH A TWIST</span></header>
+    <figure class="hero">
+      <img src="assets/20-cottage-cheese-pizza.jpg" alt="A golden cheese pizza; the cottage-cheese crust is a homemade variation.">
+      <figcaption>A golden cheese pizza; the cottage-cheese crust is a homemade variation.</figcaption>
+    </figure>
+    <p class="eyebrow">RECIPE 20 · COMFORT FOOD, WITH A TWIST</p>
+    <h2>Cottage Cheese Crust Pizza</h2>
+    <p class="tagline">A tender, golden cottage-cheese dough topped with tomato sauce and bubbling mozzarella.</p>
+    <div class="meta">
+      <span><small>PREP</small>15 min</span>
+      <span><small>COOK</small>25 min</span>
+      <span><small>TOTAL</small>40 min</span>
+      <span><small>MAKES</small>2 to 3</span>
+    </div>
+    <div class="ingredients-wrap">
+      <div class="section-heading"><h3>Ingredients</h3><span>Gather these first</span></div>
+      <ul class="ingredients"><li>1 cup (225 g) cottage cheese, drained 10 minutes</li>
+<li>1 large egg</li>
+<li>1 1/4 cups (160 g) self-rising flour, plus extra for dusting</li>
+<li>1/2 tsp dried oregano</li>
+<li>1/3 cup (80 ml) pizza sauce</li>
+<li>1 cup (100 g) shredded low-moisture mozzarella</li>
+<li>1/3 cup sliced mushrooms, bell pepper, or pepperoni</li>
+<li>1 tbsp grated Parmesan, optional</li></ul>
+      <p class="equipment"><b>YOU'LL NEED</b> Fine-mesh sieve, food processor or blender, mixing bowl, parchment, sheet pan</p>
+    </div>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>43</b></footer>
+  </section>
+  <section class="page method-page">
+    <header class="running"><b>GRANDMA ROSIE</b><span>FROM ROSIE'S KITCHEN</span></header>
+    <p class="eyebrow">RECIPE 20 · COMFORT FOOD, WITH A TWIST</p>
+    <h2 class="method-title">Let's make it.</h2>
+    <p class="method-recipe-name">Cottage Cheese Crust Pizza <span>40 min total</span></p>
+    <ol class="steps"><li><span class="step-number">01</span><div><h3>Heat the oven and drain</h3><p>Heat the oven to 400°F (200°C). Set cottage cheese in a fine-mesh sieve for 10 minutes to remove excess liquid. Blend until smooth.</p></div></li>
+<li><span class="step-number">02</span><div><h3>Mix the dough</h3><p>Whisk the blended cottage cheese and egg together. Add self-rising flour and oregano; stir until a shaggy dough forms. Turn onto a floured surface and knead gently for 1 to 2 minutes. If it is very sticky, add flour 1 tablespoon at a time.</p></div></li>
+<li><span class="step-number">03</span><div><h3>Shape and par-bake</h3><p>Press or roll the dough on parchment into a 10-inch (25 cm) round, about 1/4 inch (6 mm) thick. Transfer parchment and dough to a sheet pan. Bake 14 to 16 minutes, until the surface looks set and the edge is lightly golden.</p></div></li>
+<li><span class="step-number">04</span><div><h3>Add the toppings</h3><p>Spread on pizza sauce, leaving a small border. Add mozzarella, chosen toppings, and Parmesan. Return to the oven for 7 to 9 minutes, until the cheese bubbles and the crust is golden underneath.</p></div></li>
+<li><span class="step-number">05</span><div><h3>Rest and slice</h3><p>Let the pizza stand for 3 minutes before slicing. The crust firms as it cools slightly. Add basil or red-pepper flakes if you like.</p></div></li></ol>
+    <div class="tip"><b>ROSIE'S TIP</b><p>Drain the cottage cheese first. Extra water is the enemy of a crisp crust, and the sieve is a lot easier than arguing with the oven.</p></div>
+    <div class="bottom-cards">
+      <section><b>MAKE AHEAD & STORAGE</b><p>Refrigerate slices for up to 3 days. Reheat on a hot sheet pan or in a skillet until the crust is crisp and the center is steaming. Protein content varies by brand and serving size.</p></section>
+      <section><b>SERVE IT WITH</b><p>A simple Caesar salad or crunchy vegetables. For another variation, add cooked chicken and spinach.</p></section>
+    </div>
+    <p class="fine-print">Times are estimates. Oven and air-fryer performance varies by model.</p>
+    <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>44</b></footer>
+  </section>
+</article>
+<section class="page credits"><header class="running"><b>GRANDMA ROSIE</b><span>IMAGE CREDITS</span></header>
+  <p class="eyebrow">A NOTE ABOUT THE PHOTOGRAPHS</p><h2>Image credits & use.</h2>
+  <p class="tagline">Recipes 01–10 use original AI-generated food images created for this edition. Recipes 11–20 use stock food photographs for serving inspiration; these images were cropped for the page layout.</p>
+  <div class="credits-list"><section><b>11 · Loaded Baked Potatoes</b><span>Pexels stock photo, used under the Pexels License; attribution is optional.</span><span>Pexels photo ID 9203752</span><a href="https://www.pexels.com/search/loaded%20baked%20potato/" target="_blank" rel="noreferrer">Open source photo page</a></section><section><b>12 · Creamy Garlic Parmesan Pasta</b><span>Pexels stock photo, used under the Pexels License; attribution is optional.</span><span>Pexels photo ID 14930758</span><a href="https://www.pexels.com/search/fettuccine%20alfredo/" target="_blank" rel="noreferrer">Open source photo page</a></section><section><b>13 · Diner-Style Bacon Cheeseburgers</b><span>Pexels stock photo, used under the Pexels License; attribution is optional.</span><span>Pexels photo ID 3826273</span><a href="https://www.pexels.com/photo/person-holding-a-double-patty-cheese-burger-3826273/" target="_blank" rel="noreferrer">Open source photo page</a></section><section><b>14 · Philly-Style Cheesesteak Sandwiches</b><span>Photo by jeffreyw via Wikimedia Commons, licensed CC BY 2.0. Full attribution is on the Image Credits page.</span><a href="https://commons.wikimedia.org/wiki/File:Philly_cheesesteak_sandwich.jpg" target="_blank" rel="noreferrer">Open source photo page</a></section><section><b>15 · Classic Chocolate Chip Cookies</b><span>Pexels stock photo, used under the Pexels License; attribution is optional.</span><span>Pexels photo ID 1775283</span><a href="https://www.pexels.com/photo/selective-focus-photography-of-chocolate-cookies-1775283/" target="_blank" rel="noreferrer">Open source photo page</a></section><section><b>16 · Three-Ingredient Fudgy Brownies</b><span>Pexels stock photo, used under the Pexels License; attribution is optional.</span><span>Pexels photo ID 15033482</span><a href="https://www.pexels.com/search/brownies/" target="_blank" rel="noreferrer">Open source photo page</a></section><section><b>17 · Chocolate Peanut Butter Cups</b><span>Pexels stock photo, used under the Pexels License; attribution is optional.</span><span>Pexels photo ID 5846197</span><a href="https://www.pexels.com/search/peanut%20butter%20cups/" target="_blank" rel="noreferrer">Open source photo page</a></section><section><b>18 · No-Bake Strawberry Cheesecake Cups</b><span>Pexels stock photo, used under the Pexels License; attribution is optional.</span><span>Pexels photo ID 7552591</span><a href="https://www.pexels.com/search/strawberry%20dessert%20cups/" target="_blank" rel="noreferrer">Open source photo page</a></section><section><b>19 · Sausage, Egg &amp; Cheese Breakfast Burritos</b><span>Pexels stock photo, used under the Pexels License; attribution is optional.</span><span>Pexels photo ID 5848083</span><a href="https://www.pexels.com/photo/sandwich-and-burrito-cut-in-half-5848091/" target="_blank" rel="noreferrer">Open source photo page</a></section><section><b>20 · Cottage Cheese Crust Pizza</b><span>Pexels stock photo, used under the Pexels License; attribution is optional.</span><span>Pexels photo ID 33458021</span><a href="https://www.pexels.com/search/pizza/" target="_blank" rel="noreferrer">Open source photo page</a></section></div>
+  <div class="disclaimer">Pexels photos are used under the <a href="https://www.pexels.com/license/">Pexels License</a> (free use; attribution not required). Recipe 14: “Philly cheesesteak sandwich.jpg” by jeffreyw, licensed <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a> via Wikimedia Commons; cropped for layout. The photos are illustrative; your finished dish may look different. Grandma Rosie is a fictional cooking persona.</div>
+  <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>45</b></footer>
+</section>
+<section class="page notes"><header class="running"><b>GRANDMA ROSIE</b><span>ONE LAST THING</span></header>
+  <p class="eyebrow">FROM ROSIE'S TABLE</p><h2>Make it yours.</h2>
+  <p class="tagline">Swap a topping, make the sauce a little spicier, or write down the change that made everyone ask for seconds. The best family recipe is the one that gets cooked again.</p>
+  <p class="eyebrow" style="margin-top:55px">MY KITCHEN NOTES</p><div class="notes-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  <p class="fine-print">Cook times are estimates. Use safe internal temperatures and follow your appliance instructions.<br>Created in English for the Grandma Rosie American comfort-food collection · 2026</p>
+  <footer class="folio"><span>AMERICAN COMFORT FOOD</span><b>46</b></footer>
+</section>
+</main>
+</body></html>
