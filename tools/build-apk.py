@@ -212,42 +212,50 @@ def icon_bytes(size: int) -> bytes:
     return module.draw(size)
 
 
-def manifest_bytes(entries: list[tuple[str, bytes]]) -> tuple[bytes, bytes]:
-    sections = []
-    for name, data in entries:
-        digest = base64.b64encode(hashlib.sha256(data).digest()).decode('ascii')
-        sections.append(f'Name: {name}\r\nSHA-256-Digest: {digest}\r\n\r\n'.encode('utf-8'))
-    manifest = b'Manifest-Version: 1.0\r\nCreated-By: Neurio Blocks\r\n\r\n' + b''.join(sections)
-    sf_main = (
-        'Signature-Version: 1.0\r\nCreated-By: Neurio Blocks\r\n'
-        f'SHA-256-Digest-Manifest: {base64.b64encode(hashlib.sha256(manifest).digest()).decode()}\r\n\r\n'
-    ).encode('utf-8')
-    sf_sections = []
-    for section in sections:
-        digest = base64.b64encode(hashlib.sha256(section).digest()).decode('ascii')
-        name_line = section.split(b'\r\n', 1)[0]
-        sf_sections.append(name_line + b'\r\nSHA-256-Digest: ' + digest.encode('ascii') + b'\r\n\r\n')
-    return manifest, sf_main + b''.join(sf_sections)
+def manifest_attributes(section: bytes) -> dict[str, str]:
+    attributes = {}
+    for line in section.split(b'\r\n'):
+        if b': ' in line:
+            key, value = line.split(b': ', 1)
+            attributes[key.decode('utf-8')] = value.decode('utf-8')
+    return attributes
 
 
-def generate_signature(sf_path: Path, out_path: Path, key_path: Path, cert_path: Path, temp: Path):
+def verify_v1_signature(apk_path: Path, temp: Path) -> None:
+    with zipfile.ZipFile(apk_path, 'r') as apk:
+        manifest = apk.read('META-INF/MANIFEST.MF')
+        signature_file = apk.read('META-INF/CERT.SF')
+        signature_block = apk.read('META-INF/CERT.RSA')
+        sections = [section for section in manifest.split(b'\r\n\r\n') if section]
+        sf_sections = [section for section in signature_file.split(b'\r\n\r\n') if section]
+        sf_main = manifest_attributes(sf_sections[0])
+        expected_manifest_digest = base64.b64encode(hashlib.sha256(manifest).digest()).decode('ascii')
+        if sf_main.get('SHA-256-Digest-Manifest') != expected_manifest_digest:
+            raise RuntimeError('APK v1 signature does not cover the complete manifest.')
+
+        signed_entries = set()
+        for section in sections[1:]:
+            attributes = manifest_attributes(section)
+            name = attributes.get('Name')
+            if not name or name not in apk.namelist():
+                raise RuntimeError(f'APK v1 manifest references a missing entry: {name!r}.')
+            digest = base64.b64encode(hashlib.sha256(apk.read(name)).digest()).decode('ascii')
+            if attributes.get('SHA-256-Digest') != digest:
+                raise RuntimeError(f'APK v1 content digest failed for {name}.')
+            signed_entries.add(name)
+        expected_entries = {info.filename for info in apk.infolist() if not info.is_dir() and not info.filename.startswith('META-INF/')}
+        if signed_entries != expected_entries:
+            raise RuntimeError('APK v1 manifest does not cover every non-signature entry.')
+
+    sf_path, rsa_path, verified_path = temp / 'CERT.SF', temp / 'CERT.RSA', temp / 'verified.sf'
+    sf_path.write_bytes(signature_file)
+    rsa_path.write_bytes(signature_block)
     subprocess.run([
-        'openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-keyout', str(key_path),
-        '-out', str(cert_path), '-nodes', '-days', '3650', '-subj', '/CN=Neurio Blocks Debug/',
-        '-addext', 'basicConstraints=CA:FALSE', '-addext', 'keyUsage=digitalSignature',
+        'openssl', 'smime', '-verify', '-binary', '-inform', 'DER', '-in', str(rsa_path),
+        '-content', str(sf_path), '-noverify', '-out', str(verified_path),
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    subprocess.run([
-        'openssl', 'smime', '-sign', '-binary', '-noattr', '-md', 'sha256',
-        '-in', str(sf_path), '-signer', str(cert_path), '-inkey', str(key_path),
-        '-out', str(out_path), '-outform', 'DER',
-    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-    verified = temp / 'verified.sf'
-    subprocess.run([
-        'openssl', 'smime', '-verify', '-binary', '-inform', 'DER', '-in', str(out_path),
-        '-content', str(sf_path), '-noverify', '-out', str(verified),
-    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if verified.read_bytes() != sf_path.read_bytes():
-        raise RuntimeError('The v1 APK signature did not verify.')
+    if verified_path.read_bytes() != signature_file:
+        raise RuntimeError('APK v1 PKCS#7 signature failed independent verification.')
 
 
 def main():
@@ -270,15 +278,14 @@ def main():
         'res/mipmap-xxxhdpi-v4/ic_launcher.png': 192,
     }
     replacements.update({name: icon_bytes(size) for name, size in density_icons.items()})
-    signature_names = {'META-INF/MANIFEST.MF', 'META-INF/BASHBAQI.SF', 'META-INF/BASHBAQI.RSA'}
-
     with tempfile.TemporaryDirectory(prefix='neurio-apk-') as temp_name:
         temp = Path(temp_name)
         key_path, cert_path = temp / 'debug-key.pem', temp / 'debug-cert.pem'
         unsigned = temp / 'unsigned.apk'
+        signed = temp / 'signed.apk'
         with zipfile.ZipFile(TEMPLATE, 'r') as source, zipfile.ZipFile(unsigned, 'w') as target:
             for info in source.infolist():
-                if info.filename in signature_names or info.filename.startswith('META-INF/'):
+                if info.filename.startswith('META-INF/'):
                     continue
                 content = replacements.pop(info.filename, source.read(info.filename))
                 copy = zipfile.ZipInfo(info.filename, info.date_time)
@@ -291,25 +298,32 @@ def main():
                 target.writestr(copy, content)
             if replacements:
                 raise RuntimeError(f'Unmatched APK template entries: {sorted(replacements)}')
-        with zipfile.ZipFile(unsigned, 'r') as zf:
-            entries = [(info.filename, zf.read(info.filename)) for info in zf.infolist() if not info.is_dir()]
-        manifest, sf = manifest_bytes(entries)
-        sf_path, signature_path = temp / 'CERT.SF', temp / 'CERT.RSA'
-        sf_path.write_bytes(sf)
-        generate_signature(sf_path, signature_path, key_path, cert_path, temp)
-        with zipfile.ZipFile(unsigned, 'a') as zf:
-            for name, data in [('META-INF/MANIFEST.MF', manifest), ('META-INF/CERT.SF', sf), ('META-INF/CERT.RSA', signature_path.read_bytes())]:
-                info = zipfile.ZipInfo(name, (2026, 10, 5, 0, 0, 0))
-                info.compress_type = zipfile.ZIP_STORED
-                zf.writestr(info, data)
-        OUTPUT.write_bytes(unsigned.read_bytes())
+
+        subprocess.run([
+            'openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-keyout', str(key_path),
+            '-out', str(cert_path), '-nodes', '-days', '3650', '-subj', '/CN=Neurio Blocks Debug/',
+            '-addext', 'basicConstraints=CA:FALSE', '-addext', 'keyUsage=digitalSignature',
+        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([
+            'node', str(ROOT / 'tools' / 'sign-apk.mjs'), str(unsigned),
+            str(key_path), str(cert_path), str(signed),
+        ], check=True)
+        OUTPUT.write_bytes(signed.read_bytes())
+        verify_v1_signature(OUTPUT, temp)
 
     with zipfile.ZipFile(OUTPUT, 'r') as apk:
+        assert apk.testzip() is None
         assert 'assets/game.html' in apk.namelist()
         assert len(apk.read('assets/game.html')) > 50000
         assert 'android.permission.INTERNET'.encode('utf-16le') in apk.read('AndroidManifest.xml')
+        resources = apk.getinfo('resources.arsc')
+        apk_data = OUTPUT.read_bytes()
+        name_length, extra_length = struct.unpack_from('<HH', apk_data, resources.header_offset + 26)
+        resources_offset = resources.header_offset + 30 + name_length + extra_length
+        if resources.compress_type != zipfile.ZIP_STORED or resources_offset % 4 != 0:
+            raise RuntimeError('The generated APK resource table is not stored and 4-byte aligned.')
     print(f'Built {OUTPUT} ({OUTPUT.stat().st_size / 1024 / 1024:.2f} MiB).')
-    print('Signed with a temporary local debug key (sideload only; not a Play Store signing key).')
+    print('Verified v1/v2/v3 debug signatures and Android resource-table alignment (sideload only).')
 
 
 if __name__ == '__main__':

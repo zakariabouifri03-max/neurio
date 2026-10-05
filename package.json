@@ -9,6 +9,7 @@
     "check": "node tools/check-game.mjs && npm run build"
   },
   "devDependencies": {
+    "apk_sign_ts": "1.0.1",
     "esbuild": "0.28.2"
   }
 }

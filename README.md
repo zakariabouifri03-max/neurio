@@ -57,7 +57,7 @@ npm run build
 npm run build:apk
 ```
 
-`npm run build` كينتج ملف HTML واحد مستقل `neurio-blocks.html`. `npm run build:apk` كيدمج هاد اللعبة فغلاف Android WebView الصغير الموجود فـ `tools/android-webview-shell.apk` وكيوقّع APK محلياً عبر OpenSSL، بلا Android Studio أو Gradle. الـAPK المرفق sideload/debug للتجربة، **ماشي إصدار Play Store**؛ مفتاح التوقيع المؤقت كيتبدل فكل build، وبالتالي خاص حذف النسخة المثبتة قبل التثبيت فوقها.
+`npm run build` كينتج ملف HTML واحد مستقل `neurio-blocks.html`. `npm run build:apk` كيدمج هاد اللعبة فغلاف Android WebView الصغير الموجود فـ `tools/android-webview-shell.apk`، كيدير محاذاة جدول الموارد، وكيوقّع APK بتواقيع Android v1/v2/v3 عبر `apk_sign_ts`؛ OpenSSL غير كينشئ شهادة debug المؤقتة. ما كاين لا Android Studio لا Gradle. الـAPK المرفق sideload/debug للتجربة، **ماشي إصدار Play Store**؛ مفتاح التوقيع كيتبدل فكل build، وبالتالي خاص حذف النسخة المثبتة قبل التثبيت فوقها.
 
 ## هيكلة المشروع
 
