@@ -95,3 +95,19 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## ⚽ Pro Career 27 — مسيرة لاعب (لعبة تانية فالريبو)
+
+A second, standalone game lives in [`pro-career/`](pro-career/): a full **player-career**
+football game — 12 leagues, 192 clubs, ~4500 generated players, a live decision-based
+match engine, transfers, awards, national team and World Cups. Everything is generated
+from scratch (no licensed data), it is a PWA and works offline.
+
+```bash
+python3 -m http.server 8000
+# → http://localhost:8000/pro-career/
+```
+
+See [`pro-career/README.md`](pro-career/README.md) for the full feature list.
