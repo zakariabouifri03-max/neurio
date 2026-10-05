@@ -1,3 +1,44 @@
+# NEURIO — browser 3D playground
+
+Two zero-dependency, 100% procedural Three.js projects live in this repo:
+
+| Project | Path | What it is |
+|---|---|---|
+| 👕 **NEURIO Tee Studio** | [`/tshirt/`](tshirt/) | Professional 3D T-shirt store & live configurator |
+| 🏁 **Bash Baqi Racing** | [`/`](index.html) | Full 3D kart-racing game |
+
+Serve the repo root with any static server (`python3 -m http.server 8000`, or
+`node tools/tee-server.mjs 8000` which lands you on the Tee Studio) — no build
+step, no CDN, everything vendored & procedural.
+
+---
+
+# 👕 NEURIO Tee Studio
+
+A professional e-commerce page for a single perfect T-shirt — **the tee itself is
+generated procedurally in Three.js** (lofted superellipse torso, sleeves, knitted
+collar, cuffs & hem) and rendered with a physical fabric material (sheen + knit
+bump map) under a PMREM studio lightbox.
+
+- 🎨 **Live configurator** — 12 colorways + custom picker, 6 chest prints
+  (canvas-drawn, projected onto the fabric with `DecalGeometry`, size slider),
+  3 fabric presets (Heavyweight 240 GSM / Vintage Wash / Performance Knit), sizes & quantity
+- 🎥 **Studio camera** — inertial orbit + pinch zoom, auto-rotate, Front / Back / Side / Print presets
+- 🛍️ **Full storefront chrome** — spec sheet & size guide, fabric section with a
+  live knit swatch matching your colorway, reviews, CTA, toasts & bag counter
+- 📱 Responsive, `prefers-reduced-motion` aware, zero image assets
+
+```
+tshirt/
+├── index.html   # page & configurator markup
+├── style.css    # design system
+├── main.js      # scene, camera rig, decal system, UI wiring
+├── tee.js       # procedural T-shirt geometry + studio environment
+└── tex.js       # knit bump map, print designs, contact shadow
+```
+
+---
+
 # 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!

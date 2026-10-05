@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEURIO — The Classic Tee · 3D Studio</title>
+<meta name="description" content="Design your perfect tee in real-time 3D. 240 GSM organic cotton, 12 colorways, custom prints — rendered live in your browser.">
+<meta name="theme-color" content="#f5f2ec">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2315171c'/%3E%3Ctext x='16' y='22' font-family='Arial' font-size='16' font-weight='bold' fill='%23f5f2ec' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../vendor/three.module.js",
+    "three/addons/": "../vendor/"
+  }
+}
+</script>
+</head>
+<body>
+
+<!-- loader -->
+<div id="loader"><div class="spin"></div><span>NEURIO</span></div>
+
+<!-- ══════════ nav ══════════ -->
+<header id="nav">
+  <a class="brand" href="#studio">NEURIO<span>®</span><em>TEE STUDIO</em></a>
+  <nav class="links">
+    <a href="#studio">Studio</a>
+    <a href="#fabric">Fabric</a>
+    <a href="#details">Details</a>
+    <a href="#reviews">Reviews</a>
+  </nav>
+  <button id="bagBtn" aria-label="Shopping bag">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <b id="bagCount">0</b>
+  </button>
+</header>
+
+<main>
+<!-- ══════════ hero / studio ══════════ -->
+<section id="studio">
+  <div class="stageWrap">
+    <div id="stage"></div>
+    <div class="stageUI">
+      <div class="views">
+        <button class="viewBtn" data-view="front">Front</button>
+        <button class="viewBtn" data-view="back">Back</button>
+        <button class="viewBtn" data-view="side">Side</button>
+        <button class="viewBtn" data-view="detail">Print</button>
+        <button id="autoBtn" title="Auto-rotate">⟳</button>
+      </div>
+      <div class="hint">Drag to rotate · scroll to zoom</div>
+    </div>
+  </div>
+
+  <aside class="panel">
+    <p class="eyebrow">New Season · FW 2026</p>
+    <h1>The Classic Tee</h1>
+    <div class="rating">
+      <span class="stars" aria-hidden="true">★★★★★</span>
+      <b>4.9</b> · 1,284 reviews
+    </div>
+    <div class="priceRow"><span class="price">$32</span><span class="ship">Free carbon-neutral shipping</span></div>
+    <p class="blurb">One perfect T-shirt, engineered in 3D before it's ever cut. Pick your colorway, drop a print, choose the cloth — we knit the rest.</p>
+
+    <div class="field">
+      <label>Color — <b id="colorName">Carbon</b></label>
+      <div class="swatches" id="swatches"></div>
+    </div>
+
+    <div class="field">
+      <label>Chest print</label>
+      <div class="prints" id="prints"></div>
+      <div class="rangeRow" id="printSizeWrap">
+        <input type="range" id="printSize" min="10" max="24" step="1" value="16">
+        <span id="printSizeVal">16 cm</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Fabric</label>
+      <div class="fabrics">
+        <button class="fabricCard on" data-id="heavy"><b>Heavyweight</b><span>240 GSM · structured drape</span></button>
+        <button class="fabricCard" data-id="vintage"><b>Vintage Wash</b><span>200 GSM · broken-in feel</span></button>
+        <button class="fabricCard" data-id="perf"><b>Performance</b><span>180 GSM · cooling knit</span></button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Size <a class="sizeGuide" href="#details">size guide ↓</a></label>
+      <div class="sizes">
+        <button class="sizePill" data-size="XS">XS</button>
+        <button class="sizePill" data-size="S">S</button>
+        <button class="sizePill on" data-size="M">M</button>
+        <button class="sizePill" data-size="L">L</button>
+        <button class="sizePill" data-size="XL">XL</button>
+        <button class="sizePill" data-size="XXL">XXL</button>
+      </div>
+    </div>
+
+    <div class="buyRow">
+      <div class="qty">
+        <button id="qtyMinus" aria-label="Decrease quantity">−</button>
+        <b id="qtyVal">1</b>
+        <button id="qtyPlus" aria-label="Increase quantity">+</button>
+      </div>
+      <button id="addBag">Add to bag — $<span id="total">32</span></button>
+    </div>
+
+    <details class="acc"><summary>Fabric &amp; care</summary><p>100% GOTS-certified organic cotton, ring-spun and enzyme-washed. Pre-shrunk ±1%. Machine wash cold, inside-out; tumble low or hang dry. The ribbed collar is knitted, not cut — it keeps its shape wash after wash.</p></details>
+    <details class="acc"><summary>Shipping &amp; returns</summary><p>Cut-to-order in 48h, delivered in 3–6 days. Free shipping worldwide, free 60-day returns — even on printed pieces.</p></details>
+    <details class="acc"><summary>Impact</summary><p>Organic cotton saves ~2,400 L of water per tee vs. conventional. Offcuts are re-spun, packaging is compostable, and every order funds 1 m² of restored wetland.</p></details>
+  </aside>
+</section>
+
+<!-- ══════════ ticker ══════════ -->
+<div class="ticker" aria-hidden="true"><div class="tickerTrack">
+  <span>100% organic cotton</span><i>●</i><span>240 GSM heavyweight</span><i>●</i><span>Knitted rib collar</span><i>●</i><span>Pre-shrunk</span><i>●</i><span>Cut-to-order</span><i>●</i><span>Carbon-neutral shipping</span><i>●</i><span>60-day returns</span><i>●</i>
+  <span>100% organic cotton</span><i>●</i><span>240 GSM heavyweight</span><i>●</i><span>Knitted rib collar</span><i>●</i><span>Pre-shrunk</span><i>●</i><span>Cut-to-order</span><i>●</i><span>Carbon-neutral shipping</span><i>●</i><span>60-day returns</span><i>●</i>
+</div></div>
+
+<!-- ══════════ fabric ══════════ -->
+<section id="fabric" class="section">
+  <p class="eyebrow reveal">The cloth</p>
+  <h2 class="reveal">Fabric you can feel<br>through the screen.</h2>
+  <div class="fabricGrid">
+    <div class="knitCard reveal">
+      <canvas id="knitCanvas" width="640" height="640"></canvas>
+      <div class="knitTag">Live preview — matches your selected colorway</div>
+    </div>
+    <div class="fabricList">
+      <div class="fItem reveal"><b>Ring-spun, long-staple cotton</b><p>Combed twice for a face that stays smooth after 100+ washes.</p></div>
+      <div class="fItem reveal"><b>Knitted rib collar</b><p>1×1 rib, set with steam — no bacon neck, ever.</p></div>
+      <div class="fItem reveal"><b>Enzyme washed</b><p>Broken-in from day one, zero pilling, zero itch.</p></div>
+      <div class="fItem reveal"><b>Side-seam free</b><p>Tubular knit body means nothing twists around your waist.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ details / specs ══════════ -->
+<section id="details" class="section alt">
+  <p class="eyebrow reveal">Spec sheet</p>
+  <h2 class="reveal">Every millimetre, measured.</h2>
+  <div class="specGrid">
+    <div class="specCard reveal"><b>Fit</b><p>Regular — true to size with a clean, boxy shoulder.</p></div>
+    <div class="specCard reveal"><b>Weight</b><p>240 GSM heavyweight jersey (200 &amp; 180 available above).</p></div>
+    <div class="specCard reveal"><b>Collar</b><p>2.1 cm knitted 1×1 rib, taped neck seam.</p></div>
+    <div class="specCard reveal"><b>Print</b><p>Water-based inks, cured soft — zero plastic hand-feel.</p></div>
+    <div class="specCard reveal"><b>Shrinkage</b><p>±1% after wash. We cut to spec, not to hope.</p></div>
+    <div class="specCard reveal"><b>Origin</b><p>Knit, dyed &amp; sewn in one solar-powered facility.</p></div>
+  </div>
+
+  <table class="sizeTable reveal">
+    <thead><tr><th>Size</th><th>Chest (cm)</th><th>Length (cm)</th><th>Sleeve (cm)</th></tr></thead>
+    <tbody>
+      <tr><td>XS</td><td>96</td><td>66</td><td>19</td></tr>
+      <tr><td>S</td><td>102</td><td>68</td><td>20</td></tr>
+      <tr><td>M</td><td>108</td><td>70</td><td>21</td></tr>
+      <tr><td>L</td><td>114</td><td>72</td><td>22</td></tr>
+      <tr><td>XL</td><td>120</td><td>74</td><td>23</td></tr>
+      <tr><td>XXL</td><td>128</td><td>76</td><td>24</td></tr>
+    </tbody>
+  </table>
+
+  <div class="stats reveal">
+    <div><b>240<span>GSM</span></b><em>heavyweight jersey</em></div>
+    <div><b>4.9<span>★</span></b><em>1,284 verified reviews</em></div>
+    <div><b>60<span>days</span></b><em>free returns</em></div>
+    <div><b>0<span>L</span></b><em>wasted water vs. conventional</em></div>
+  </div>
+</section>
+
+<!-- ══════════ reviews ══════════ -->
+<section id="reviews" class="section">
+  <p class="eyebrow reveal">Reviews</p>
+  <h2 class="reveal">Worn daily. Rated 4.9.</h2>
+  <div class="reviewGrid">
+    <figure class="review reveal">
+      <div class="stars">★★★★★</div>
+      <blockquote>“The 3D preview is scary accurate — the shade I picked on screen is exactly what arrived. Heaviest, softest tee I own.”</blockquote>
+      <figcaption><b>Maya R.</b><span>Verified buyer · Forest, M</span></figcaption>
+    </figure>
+    <figure class="review reveal">
+      <div class="stars">★★★★★</div>
+      <blockquote>“Collar still perfect after 40 washes. I've replaced every other T-shirt in my drawer with these.”</blockquote>
+      <figcaption><b>Daniel K.</b><span>Verified buyer · Carbon, L</span></figcaption>
+    </figure>
+    <figure class="review reveal">
+      <div class="stars">★★★★★</div>
+      <blockquote>“Dropped the bolt print on the burgundy one. It prints exactly where the configurator shows it. Wild.”</blockquote>
+      <figcaption><b>Sara T.</b><span>Verified buyer · Burgundy, S</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ══════════ CTA ══════════ -->
+<section id="cta">
+  <div class="ctaInner reveal">
+    <h2>Design yours in 60 seconds.</h2>
+    <p>Pick a colorway, drop a print, watch it render live. Cut-to-order, shipped in 48 hours.</p>
+    <a href="#studio" class="ctaBtn">Open the 3D studio ↑</a>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="footGrid">
+    <div>
+      <div class="brand light">NEURIO<span>®</span></div>
+      <p class="footTag">The last T-shirt you'll ever configure.<br>Knit, dyed &amp; sewn to order.</p>
+    </div>
+    <div><h4>Shop</h4><a href="#studio">The Classic Tee</a><a href="#fabric">Fabric library</a><a href="#details">Size guide</a></div>
+    <div><h4>Company</h4><a href="#reviews">Reviews</a><a href="#fabric">Sustainability</a><a href="#studio">3D Studio</a></div>
+    <div><h4>Help</h4><a href="#details">Shipping</a><a href="#details">Returns</a><a href="#studio">Contact</a></div>
+  </div>
+  <div class="footBase"><span>© 2026 NEURIO Studio. All rights reserved.</span><span>Rendered live with Three.js — no photos were harmed.</span></div>
+</footer>
+
+<div id="toast" role="status"></div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
