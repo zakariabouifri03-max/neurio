@@ -80,6 +80,8 @@ public class StreamActivity extends Activity
     private boolean keyMode;
     /** True while we deliberately keep the session alive across an onStop. */
     private boolean keepAlive;
+    /** Game name used to scope controller layouts; empty until the session names one. */
+    private String gameKey = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,6 +190,7 @@ public class StreamActivity extends Activity
     @Override
     protected void onStart() {
         super.onStart();
+        keepAlive = false;
         if (client == null) {
             connect();
         }
@@ -208,12 +211,6 @@ public class StreamActivity extends Activity
         super.onStop();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        keepAlive = false;
-    }
-
     private void connect() {
         if (client != null) {
             client.close();
@@ -228,6 +225,25 @@ public class StreamActivity extends Activity
     /* ------------------------------------------------------------------ *
      *  Controller
      * ------------------------------------------------------------------ */
+
+    /**
+     * Loads the layout saved for this game (if any) once the host tells us which game
+     * is running, so a per-game mapper result is applied automatically.
+     */
+    private void adoptGameKey(String name) {
+        if (name == null || name.isEmpty() || name.equals(gameKey)) {
+            return;
+        }
+        gameKey = name;
+        String json = settings.controllerLayoutJsonFor(gameKey);
+        if (!json.isEmpty()) {
+            ControllerLayout perGame = ControllerLayout.deserialize(json);
+            if (perGame != null) {
+                rebuildController(perGame, -1);
+                UiKit.toast(this, "Controls restored for " + gameKey);
+            }
+        }
+    }
 
     private void rebuildController(ControllerLayout newLayout, int preset) {
         this.layout = newLayout;
@@ -280,7 +296,11 @@ public class StreamActivity extends Activity
     }
 
     private void saveLayout() {
-        settings.setControllerLayoutJson(layout.serialize());
+        if (layout == null) {
+            return;
+        }
+        String json = layout.serialize();
+        settings.setControllerLayoutJsonFor(gameKey, json);
     }
 
     private void showLayoutDialog() {
@@ -437,6 +457,7 @@ public class StreamActivity extends Activity
     public void onState(StreamClient.State state, String message) {
         if (state == StreamClient.State.STREAMING) {
             UiKit.setVisible(messageView, false);
+            adoptGameKey(client.stats().gameName);
             gameView.setText(client.stats().gameName.isEmpty()
                     ? getString(R.string.unknown_game) : client.stats().gameName);
             updateVideoRect(surfaceView.getWidth(), surfaceView.getHeight());
@@ -456,6 +477,7 @@ public class StreamActivity extends Activity
 
     @Override
     public void onSessionReady(PairingService.HandshakeResult session) {
+        adoptGameKey(session.gameName);
         gameView.setText(session.gameName.isEmpty()
                 ? getString(R.string.unknown_game) : session.gameName);
         qualityView.setText(session.profile == null ? "" : session.profile.shortLabel());

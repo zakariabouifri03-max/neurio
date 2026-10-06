@@ -130,8 +130,10 @@ where discovery is blocked; public addresses are refused.
 
 ## 8. Known rough edges in this prototype
 
-* Per-game controller layouts are stored per device, not per game; a host-side
-  layout suggestion protocol is on the roadmap.
+* Controller layouts are stored **per game** (the host tells the client which game
+  is running, and the matching layout is restored automatically). A host-authored
+  zone mapper that pushes its layout to the client over the control channel is still
+  future work.
 * The microphone fallback records from the phone's own mic, so it also picks up
   the game's speaker output (nothing isolates it in this prototype).
 * `LOCAL_SELFTEST` exists purely to verify the input pipeline without touching

@@ -12,9 +12,10 @@ prerequisite.
 2. **Bluetooth HID device profile.** `BluetoothHidDevice` exists in the framework
    but is a system API; a device-owner/privileged build could pair the client as a
    real controller. Prerequisite: platform signature or OEM partnership.
-3. **Per-game input profiles on the host.** Ship/collect a layout per game package
-   (touch zones, key mappings) and send the recommended layout to the client in the
-   handshake, so the player does not have to position controls manually.
+3. **Host-authored per-game layouts.** The client already stores a layout per game
+   name, so switching games restores the right controls; the next step is letting the
+   host author one (its own zone mapper), persist it per package, and send it to the
+   client in the handshake or a control message.
 4. **Input latency instrumentation in the game loop.** Compare the client's event
    timestamps with the host's applied timestamps and the encoder's PTS to report a
    true input-to-photon number instead of a budget estimate.

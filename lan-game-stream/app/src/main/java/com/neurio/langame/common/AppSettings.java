@@ -3,6 +3,8 @@ package com.neurio.langame.common;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Locale;
+
 /**
  * SharedPreferences wrapper for every user-tunable knob.
  *
@@ -145,5 +147,40 @@ public final class AppSettings {
             return new StreamProfile(codec, 1280, 720, Math.min(fps, 60), 8_000_000);
         }
         return new StreamProfile(codec, 1920, 1080, Math.min(fps, 60), 15_000_000);
+    }
+
+    /* ------------------------ controller layouts ------------------------ */
+
+    /**
+     * The layout saved for one game, falling back to the shared layout.
+     *
+     * <p>Per-game storage is what makes the mapper useful: once a player has placed
+     * the controls over eFootball's own on-screen buttons, switching to another game
+     * no longer drags that layout along.</p>
+     */
+    public String controllerLayoutJsonFor(String gameName) {
+        if (gameName == null || gameName.trim().isEmpty()) {
+            return controllerLayoutJson();
+        }
+        String value = prefs.getString(layoutKey(gameName), "");
+        return value == null || value.isEmpty() ? controllerLayoutJson() : value;
+    }
+
+    public void setControllerLayoutJsonFor(String gameName, String json) {
+        if (gameName == null || gameName.trim().isEmpty()) {
+            setControllerLayoutJson(json);
+            return;
+        }
+        prefs.edit().putString(layoutKey(gameName), json).apply();
+    }
+
+    public boolean hasLayoutFor(String gameName) {
+        return gameName != null && !gameName.trim().isEmpty()
+                && !prefs.getString(layoutKey(gameName), "").isEmpty();
+    }
+
+    private static String layoutKey(String gameName) {
+        String slug = gameName.trim().toLowerCase(Locale.US).replaceAll("[^a-z0-9]+", "_");
+        return Configuration.KEY_CONTROLLER_LAYOUT + "_" + slug;
     }
 }

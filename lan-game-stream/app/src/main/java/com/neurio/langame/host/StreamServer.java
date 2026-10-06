@@ -365,7 +365,7 @@ public final class StreamServer {
             audioEncoder = new AudioEncoder(new AudioEncoderListener());
             audioEncoder.start();
 
-            AudioCaptureSource preferred = AudioCapture.supportsPlaybackCapture()
+            AudioCapture.Source preferred = AudioCapture.supportsPlaybackCapture()
                     ? AudioCapture.Source.PLAYBACK_CAPTURE : AudioCapture.Source.MICROPHONE;
             audioCapture = new AudioCapture(context, preferred, new AudioCaptureListener());
             if (audioCapture.start(preferred == AudioCapture.Source.PLAYBACK_CAPTURE
