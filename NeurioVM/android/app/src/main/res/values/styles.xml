@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="NeurioTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorPrimary">@color/primary_dark</item>
+        <item name="android:colorPrimaryDark">@color/bg</item>
+        <item name="android:colorAccent">@color/primary</item>
+        <item name="android:textColorPrimary">@color/text</item>
+        <item name="android:textColorSecondary">@color/text_dim</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:statusBarColor">@color/bg</item>
+    </style>
+
+    <!-- Full-bleed variant for the browser: no padding, edge to edge WebView. -->
+    <style name="NeurioTheme.Browser">
+        <item name="android:windowBackground">@color/bg</item>
+    </style>
+
+    <style name="Header">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@color/bg_elevated</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <style name="HeaderTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="HeaderSub">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/text_dim</item>
+        <item name="android:paddingTop">4dp</item>
+    </style>
+
+    <style name="Card">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@drawable/bg_card</item>
+        <item name="android:padding">14dp</item>
+        <item name="android:layout_marginLeft">14dp</item>
+        <item name="android:layout_marginRight">14dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+    </style>
+
+    <style name="CardTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <!-- Every identifier is monospace and dim: long hex strings must scan well. -->
+    <style name="Mono">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/mono</item>
+        <item name="android:textIsSelectable">true</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+    </style>
+
+    <style name="Body">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/text_dim</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+
+    <style name="Log">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/text_dim</item>
+        <item name="android:textIsSelectable">true</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:background">@color/bg</item>
+    </style>
+
+    <style name="Btn">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:paddingLeft">14dp</item>
+        <item name="android:paddingRight">14dp</item>
+        <item name="android:minWidth">0dp</item>
+    </style>
+
+    <style name="Btn.Primary">
+        <item name="android:backgroundTint">@color/primary_dark</item>
+        <item name="android:textColor">#FF06120D</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Btn.Danger">
+        <item name="android:backgroundTint">@color/danger</item>
+        <item name="android:textColor">#FF1A0606</item>
+    </style>
+
+    <style name="Field">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textColorHint">@color/text_faint</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:inputType">text</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+    </style>
+
+    <style name="FieldLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/text_faint</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="android:paddingTop">8dp</item>
+    </style>
+
+    <style name="Row">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingTop">6dp</item>
+    </style>
+</resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
+
+    <LinearLayout style="@style/Header">
+
+        <TextView
+            style="@style/HeaderTitle"
+            android:text="@string/hook_title"
+            android:textColor="@color/primary" />
+
+        <TextView
+            style="@style/HeaderSub"
+            android:text="@string/hook_subtitle" />
+
+        <TextView
+            android:id="@+id/k_status"
+            style="@style/HeaderSub"
+            android:fontFamily="monospace"
+            android:textColor="@color/warn"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/k_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="14dp"
+        android:layout_marginRight="14dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_input"
+        android:hint="@string/hook_search"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:maxLines="1"
+        android:padding="10dp"
+        android:textColor="@color/text"
+        android:textColorHint="@color/text_faint"
+        android:textSize="13sp" />
+
+    <ListView
+        android:id="@+id/k_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:clipToPadding="false" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/bg_elevated"
+        android:gravity="center_vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/k_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/text_dim"
+            android:textSize="12sp" />
+
+        <Button android:id="@+id/k_all" style="@style/Btn" android:text="@string/hook_all" />
+        <Button android:id="@+id/k_none" style="@style/Btn" android:layout_marginLeft="8dp" android:text="@string/hook_none" />
+        <Button android:id="@+id/k_save" style="@style/Btn.Primary" android:layout_marginLeft="8dp" android:text="@string/editor_save" />
+    </LinearLayout>
+</LinearLayout>

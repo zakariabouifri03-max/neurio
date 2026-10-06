@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/bg_card"
+    android:layout_marginLeft="14dp"
+    android:layout_marginRight="14dp"
+    android:layout_marginTop="8dp"
+    android:padding="12dp"
+    android:gravity="center_vertical">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/d_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/text" />
+
+        <TextView
+            android:id="@+id/d_model"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/text_dim"
+            android:paddingTop="2dp" />
+
+        <TextView
+            android:id="@+id/d_fp"
+            style="@style/Mono"
+            android:textColor="@color/text_faint"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/d_android"
+            style="@style/Mono"
+            android:textColor="@color/mono"
+            android:maxLines="1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="6dp">
+
+            <TextView
+                android:id="@+id/d_badge_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_badge"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:textSize="10sp"
+                android:textColor="@color/text_dim" />
+
+            <TextView
+                android:id="@+id/d_badge_slot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:background="@drawable/bg_badge"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:textColor="@color/accent" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/d_active"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
+        android:text="●"
+        android:textSize="18sp"
+        android:textColor="@color/primary"
+        android:visibility="invisible" />
+</LinearLayout>

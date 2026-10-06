@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
+
+    <LinearLayout style="@style/Header">
+
+        <TextView
+            android:id="@+id/h_title"
+            style="@style/HeaderTitle"
+            android:textColor="@color/primary" />
+
+        <TextView
+            android:id="@+id/h_sub"
+            style="@style/HeaderSub" />
+
+        <TextView
+            android:id="@+id/h_fp"
+            style="@style/HeaderSub"
+            android:fontFamily="monospace"
+            android:textColor="@color/text_faint" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="20dp"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- ── runtime status ─────────────────────────────────────── -->
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/device_sandbox" />
+
+                <TextView android:id="@+id/s_backend" style="@style/Body" />
+                <TextView android:id="@+id/s_state" style="@style/Body" />
+                <TextView android:id="@+id/s_uptime" style="@style/Body" />
+                <TextView android:id="@+id/s_slot" style="@style/Body" />
+                <TextView android:id="@+id/s_size" style="@style/Body" />
+
+                <LinearLayout style="@style/Row">
+                    <Button android:id="@+id/b_start" style="@style/Btn.Primary" android:text="@string/device_start" />
+                    <Button android:id="@+id/b_stop" style="@style/Btn.Danger" android:layout_marginLeft="8dp" android:text="@string/device_stop" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── actions ───────────────────────────────────────────── -->
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/device_title" />
+
+                <LinearLayout style="@style/Row">
+                    <Button android:id="@+id/b_browser" style="@style/Btn" android:text="@string/device_browser" />
+                    <Button android:id="@+id/b_terminal" style="@style/Btn" android:layout_marginLeft="8dp" android:text="@string/device_terminal" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Row">
+                    <Button android:id="@+id/b_edit" style="@style/Btn" android:text="@string/device_edit" />
+                    <Button android:id="@+id/b_reissue" style="@style/Btn" android:layout_marginLeft="8dp" android:text="@string/device_reissue" />
+                    <Button android:id="@+id/b_clone" style="@style/Btn" android:layout_marginLeft="8dp" android:text="@string/device_clone" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Row">
+                    <Button android:id="@+id/b_export" style="@style/Btn" android:text="@string/device_export" />
+                    <Button android:id="@+id/b_delete" style="@style/Btn.Danger" android:layout_marginLeft="8dp" android:text="@string/device_delete" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── native hooking ─────────────────────────────────────── -->
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/device_hook_title" />
+
+                <TextView android:id="@+id/hook_note" style="@style/Body" />
+
+                <Switch
+                    android:id="@+id/hook_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"
+                    android:text="@string/device_hook_enable"
+                    android:textColor="@color/text"
+                    android:textSize="13sp" />
+
+                <LinearLayout style="@style/Row">
+                    <Button android:id="@+id/b_hook_apps" style="@style/Btn" android:text="@string/device_hook_apps" />
+                </LinearLayout>
+
+                <TextView android:id="@+id/hook_status" style="@style/Mono" />
+            </LinearLayout>
+
+            <!-- ── identity ───────────────────────────────────────────── -->
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/device_identity" />
+                <TextView android:id="@+id/i_build" style="@style/Mono" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/device_identifiers" />
+                <TextView android:id="@+id/i_ids" style="@style/Mono" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/device_display" />
+                <TextView android:id="@+id/i_display" style="@style/Mono" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

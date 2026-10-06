@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.neurio.vm'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.neurio.vm"
+        minSdk 24          // Android 7.0 — WebView suffix isolation needs 28+, guarded at runtime
+        targetSdk 35
+        versionCode 1
+        versionName "1.0.0"
+        resourceConfigurations += ["en", "fr", "ar"]
+    }
+
+    buildTypes {
+        debug {
+            // signed with the debug keystore automatically — installable as-is
+            minifyEnabled false
+        }
+        release {
+            // no signing config on purpose: CI signs it, or you run
+            //   gradle assembleRelease  and sign the unsigned APK yourself
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        buildConfig false
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+dependencies {
+    // Compile-only: the Xposed/LSPosed API declarations are provided by the
+    // framework at runtime on a hooked device, so they must never be packaged.
+    compileOnly project(':xposed-stubs')
+}

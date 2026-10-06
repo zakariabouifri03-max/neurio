@@ -1,0 +1,20 @@
+// Plain Java library — no Android SDK needed to build it.
+// Holds *stub* declarations of the Xposed / LSPosed API so that
+// com.neurio.vm.hook.NeurioHook can implement IXposedHookLoadPackage
+// without any third-party Maven dependency.
+//
+// The app declares this as `compileOnly`, therefore none of these classes
+// end up inside the APK. On a hooked device the real XposedBridge classes
+// are injected into the class loader by the framework and are used instead.
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

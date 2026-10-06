@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NeurioVM</string>
+    <string name="app_tagline">Virtual device lab</string>
+
+    <!-- ── notification ─────────────────────────────────────────────────── -->
+    <string name="channel_vm">Virtual devices</string>
+    <string name="channel_vm_desc">Shown while a virtual device is running so Android keeps it alive.</string>
+    <string name="vm_running_generic">Virtual device running</string>
+    <string name="vm_running_device">%1$s is running</string>
+    <string name="action_stop">Stop</string>
+
+    <!-- ── shared ───────────────────────────────────────────────────────── -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="error">Error</string>
+    <string name="copied">Copied to the clipboard</string>
+    <string name="state_stopped">Stopped</string>
+    <string name="state_starting">Starting</string>
+    <string name="state_running">Running</string>
+    <string name="state_degraded">Degraded</string>
+    <string name="state_failed">Failed</string>
+
+    <!-- ── device deck (MainActivity) ───────────────────────────────────── -->
+    <string name="main_title">Device deck</string>
+    <string name="main_subtitle">Every handset below is synthetic and isolated: own storage, own browser profile, own identifiers.</string>
+    <string name="main_new">+ New device</string>
+    <string name="main_random">🎲 Random</string>
+    <string name="main_console">Console</string>
+    <string name="main_import">Import</string>
+    <string name="main_export">Export</string>
+    <string name="main_empty">No virtual devices yet.\n\nTap “+ New device” for a curated handset, or “🎲 Random” for a surprise one.</string>
+    <string name="main_vault">Vault: %1$s</string>
+    <string name="main_hook">LSPosed hook: %1$s</string>
+    <string name="main_hook_on">publishing %1$s to %2$s</string>
+    <string name="main_hook_off">off</string>
+    <string name="main_active">Active</string>
+    <string name="main_tap_hint">Tap a device to open it · long-press for actions</string>
+
+    <string name="menu_activate">Make active</string>
+    <string name="menu_open">Open</string>
+    <string name="menu_clone">Clone with new identifiers</string>
+    <string name="menu_reissue">Reissue identifiers</string>
+    <string name="menu_edit">Edit identity</string>
+    <string name="menu_export">Export</string>
+    <string name="menu_delete">Delete and wipe</string>
+
+    <!-- ── device screen ────────────────────────────────────────────────── -->
+    <string name="device_title">Device</string>
+    <string name="device_identity">Identity</string>
+    <string name="device_identifiers">Identifiers</string>
+    <string name="device_display">Display &amp; locale</string>
+    <string name="device_sandbox">Sandbox</string>
+    <string name="device_start">▶ Start</string>
+    <string name="device_stop">■ Stop</string>
+    <string name="device_browser">🌐 Browser</string>
+    <string name="device_terminal">⌨ Terminal</string>
+    <string name="device_edit">✎ Edit</string>
+    <string name="device_reissue">🎲 Reissue IDs</string>
+    <string name="device_clone">⧉ Clone</string>
+    <string name="device_delete">🗑 Delete</string>
+    <string name="device_export">⇪ Export</string>
+    <string name="device_backend">Backend: %1$s</string>
+    <string name="device_state">State: %1$s</string>
+    <string name="device_uptime">Uptime: %1$s</string>
+    <string name="device_slot">Isolated process: :vm%1$d</string>
+    <string name="device_size">Storage used: %1$s</string>
+    <string name="device_hook_title">Native app hooking (LSPosed)</string>
+    <string name="device_hook_enable">Publish this identity to hooked apps</string>
+    <string name="device_hook_apps">Choose target apps…</string>
+    <string name="device_hook_status">%1$s</string>
+    <string name="device_confirm_delete">Delete “%1$s” and wipe its sandbox? Cookies, storage and downloads for this device are erased. This cannot be undone.</string>
+    <string name="device_confirm_reissue">Give “%1$s” a brand new ANDROID_ID, IMEI, serial, MACs and advertising ID? The handset model is kept.</string>
+    <string name="device_deleted">Deleted %1$s</string>
+    <string name="device_reissued">New identifiers issued for %1$s</string>
+    <string name="device_cloned">Cloned as %1$s</string>
+    <string name="device_active">“%1$s” is now the active device</string>
+
+    <!-- ── editor ───────────────────────────────────────────────────────── -->
+    <string name="editor_title_new">New virtual device</string>
+    <string name="editor_title_edit">Edit identity</string>
+    <string name="editor_preset">Preset</string>
+    <string name="editor_carrier">Carrier / region</string>
+    <string name="editor_random_all">🎲 Randomize everything</string>
+    <string name="editor_random_ids">↻ New identifiers only</string>
+    <string name="editor_save">Save</string>
+    <string name="editor_preview">Live preview</string>
+    <string name="editor_layers">Spoofing layers</string>
+    <string name="editor_label">Label</string>
+    <string name="editor_manufacturer">Manufacturer</string>
+    <string name="editor_brand">Brand</string>
+    <string name="editor_model">Model</string>
+    <string name="editor_device">Device codename</string>
+    <string name="editor_board">Board</string>
+    <string name="editor_hardware">Hardware (ro.hardware)</string>
+    <string name="editor_release">Android release</string>
+    <string name="editor_sdk">API level</string>
+    <string name="editor_buildid">Build ID</string>
+    <string name="editor_patch">Security patch</string>
+    <string name="editor_width">Screen width (px)</string>
+    <string name="editor_height">Screen height (px)</string>
+    <string name="editor_dpi">Density (dpi)</string>
+    <string name="editor_timezone">Timezone (IANA)</string>
+    <string name="editor_language">Language</string>
+    <string name="editor_country">Country</string>
+    <string name="editor_chrome">Chrome major version</string>
+    <string name="editor_battery">Battery level</string>
+    <string name="editor_layer_build">Rewrite android.os.Build (LSPosed)</string>
+    <string name="editor_layer_settings">Rewrite ANDROID_ID / GSF id</string>
+    <string name="editor_layer_telephony">Rewrite IMEI / IMSI / operator</string>
+    <string name="editor_layer_webview">Isolated WebView profile + UA</string>
+    <string name="editor_layer_js">navigator / screen / Intl overrides</string>
+    <string name="editor_layer_webgl">WebGL vendor &amp; renderer</string>
+    <string name="editor_layer_canvas">Canvas &amp; audio fingerprint noise</string>
+    <string name="editor_layer_battery">Fake battery state</string>
+    <string name="editor_warn_mismatch">Warning: this combination does not match any known handset. Services that cross-check model against fingerprint may flag it.</string>
+
+    <!-- ── browser ──────────────────────────────────────────────────────── -->
+    <string name="browser_hint">Search or type a URL</string>
+    <string name="browser_go">Go</string>
+    <string name="browser_back">◀</string>
+    <string name="browser_forward">▶</string>
+    <string name="browser_reload">⟳</string>
+    <string name="browser_verify">Verify</string>
+    <string name="browser_home">Home</string>
+    <string name="browser_clear">Clear data</string>
+    <string name="browser_external">Open externally</string>
+    <string name="browser_layers">Layers: %1$d</string>
+    <string name="browser_iframe_warn">This page embeds iframes. Without AndroidX\'s addDocumentStartJavaScript the identity is injected into the main frame only, so a cross-origin frame still sees the real device.</string>
+    <string name="browser_clear_confirm">Delete this device\'s cookies, localStorage, IndexedDB, service workers and cache?</string>
+    <string name="browser_cleared">Browser data wiped for %1$s</string>
+    <string name="browser_no_device">No virtual device is bound to this slot yet.</string>
+    <string name="browser_isolation_off">WebView profile isolation needs Android 9 (API 28). This device runs API %1$d, so cookies are shared between virtual devices.</string>
+    <string name="browser_verify_title">What the page reports</string>
+
+    <!-- ── terminal ─────────────────────────────────────────────────────── -->
+    <string name="terminal_title">Terminal</string>
+    <string name="terminal_hint">command…</string>
+    <string name="terminal_run">Run</string>
+    <string name="terminal_root">as root (su)</string>
+    <string name="terminal_clear">Clear</string>
+    <string name="terminal_env">Environment of the virtual device is exported as NEURIO_* variables.</string>
+    <string name="terminal_shell_missing">No /system/bin/sh — nothing to run.</string>
+
+    <!-- ── console ──────────────────────────────────────────────────────── -->
+    <string name="console_title">Hypervisor console</string>
+    <string name="console_probe">Re-probe capabilities</string>
+    <string name="console_capabilities">Capabilities</string>
+    <string name="console_backends">Backends</string>
+    <string name="console_backend_settings">Backend settings</string>
+    <string name="console_qemu_binary">qemu-system binary path</string>
+    <string name="console_qemu_image">Guest image path</string>
+    <string name="console_qemu_extra">Extra qemu arguments</string>
+    <string name="console_qemu_mem">Memory (MiB)</string>
+    <string name="console_qemu_smp">vCPUs</string>
+    <string name="console_qemu_kvm">Use KVM when /dev/kvm is usable</string>
+    <string name="console_rootfs">Redroid rootfs path</string>
+    <string name="console_always_su">Always run backends through su</string>
+    <string name="console_browser_home">Browser home page</string>
+    <string name="console_auto">Auto-select backend</string>
+    <string name="console_start">▶ Start active device</string>
+    <string name="console_stop">■ Stop</string>
+    <string name="console_log">Log</string>
+    <string name="console_copy">Copy</string>
+    <string name="console_share">Share</string>
+    <string name="console_probing">Probing the device…</string>
+    <string name="console_sessions">Sessions</string>
+    <string name="console_no_sessions">Nothing has been started yet.</string>
+    <string name="console_danger">Factory reset</string>
+    <string name="console_danger_confirm">Delete every virtual device, every sandbox and the encryption key?</string>
+
+    <!-- ── hook target picker ───────────────────────────────────────────── -->
+    <string name="hook_title">Hook targets</string>
+    <string name="hook_subtitle">Apps that should see this identity. Only takes effect with a rooted device running LSPosed and NeurioVM enabled as a module.</string>
+    <string name="hook_search">Filter…</string>
+    <string name="hook_all">All apps</string>
+    <string name="hook_none">None</string>
+    <string name="hook_selected">%1$d selected</string>
+    <string name="hook_saved">Hook configuration published</string>
+    <string name="hook_not_active">LSPosed is not loading this module, so nothing below will take effect. The web-identity layers still work.</string>
+
+    <!-- ── import / export ──────────────────────────────────────────────── -->
+    <string name="export_chooser">Export device profile</string>
+    <string name="import_chooser">Import device profile</string>
+    <string name="import_ok">Imported %1$d device(s)</string>
+    <string name="import_bad">That file does not contain a NeurioVM device profile</string>
+    <string name="export_secret">This file contains synthetic identifiers. Treat it as a secret: whoever has it can impersonate the device.</string>
+</resources>

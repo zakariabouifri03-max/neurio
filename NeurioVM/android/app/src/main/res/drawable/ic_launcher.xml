@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Launcher icon: a hypervisor chip with a nested device and a play glyph.
+  Vector so it scales cleanly from 48dp to any launcher size, and so the repo
+  carries no binary art that has to be regenerated per density.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- plate -->
+    <path
+        android:fillColor="#0B0F14"
+        android:pathData="M24,0 H84 A24,24 0 0 1 108,24 V84 A24,24 0 0 1 84,108 H24 A24,24 0 0 1 0,84 V24 A24,24 0 0 1 24,0 Z" />
+
+    <!-- pins, drawn before the body so they sit under its edge -->
+    <path
+        android:fillColor="#63B3FF"
+        android:pathData="M36,19 h6 v10 h-6 z M46,19 h6 v10 h-6 z M56,19 h6 v10 h-6 z M66,19 h6 v10 h-6 z
+                          M36,79 h6 v10 h-6 z M46,79 h6 v10 h-6 z M56,79 h6 v10 h-6 z M66,79 h6 v10 h-6 z
+                          M19,36 h10 v6 h-10 z M19,46 h10 v6 h-10 z M19,56 h10 v6 h-10 z M19,66 h10 v6 h-10 z
+                          M79,36 h10 v6 h-10 z M79,46 h10 v6 h-10 z M79,56 h10 v6 h-10 z M79,66 h10 v6 h-10 z" />
+
+    <!-- chip body -->
+    <path
+        android:fillColor="#16202B"
+        android:strokeColor="#33D6A6"
+        android:strokeWidth="4"
+        android:pathData="M36,28 H72 A8,8 0 0 1 80,36 V72 A8,8 0 0 1 72,80 H36 A8,8 0 0 1 28,72 V36 A8,8 0 0 1 36,28 Z" />
+
+    <!-- the nested device -->
+    <path
+        android:fillColor="#33D6A6"
+        android:pathData="M47,42 H61 A5,5 0 0 1 66,47 V61 A5,5 0 0 1 61,66 H47 A5,5 0 0 1 42,61 V47 A5,5 0 0 1 47,42 Z" />
+
+    <!-- play glyph: this thing boots -->
+    <path
+        android:fillColor="#0B0F14"
+        android:pathData="M50,48 L50,60 L61,54 Z" />
+</vector>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
+
+    <LinearLayout style="@style/Header">
+
+        <TextView
+            style="@style/HeaderTitle"
+            android:text="@string/terminal_title"
+            android:textColor="@color/primary" />
+
+        <TextView
+            android:id="@+id/t_device"
+            style="@style/HeaderSub" />
+
+        <TextView
+            style="@style/HeaderSub"
+            android:text="@string/terminal_env"
+            android:textColor="@color/text_faint" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/t_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <TextView
+            android:id="@+id/t_out"
+            style="@style/Log" />
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/bg_elevated"
+        android:gravity="center_vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$"
+            android:fontFamily="monospace"
+            android:textColor="@color/primary"
+            android:textSize="14sp"
+            android:paddingRight="6dp" />
+
+        <EditText
+            android:id="@+id/t_in"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_input"
+            android:hint="@string/terminal_hint"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="8dp"
+            android:fontFamily="monospace"
+            android:textColor="@color/text"
+            android:textColorHint="@color/text_faint"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/t_run"
+            style="@style/Btn.Primary"
+            android:layout_marginLeft="6dp"
+            android:text="@string/terminal_run" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/bg_elevated"
+        android:gravity="center_vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="8dp">
+
+        <CheckBox
+            android:id="@+id/t_root"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/terminal_root"
+            android:textColor="@color/text_dim"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/t_clear"
+            style="@style/Btn"
+            android:text="@string/terminal_clear" />
+    </LinearLayout>
+</LinearLayout>

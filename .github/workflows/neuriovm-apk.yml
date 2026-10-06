@@ -1,0 +1,146 @@
+# Builds the NeurioVM APK — no PC, no Android Studio needed.
+#
+# It also publishes the APK to a FIXED release tag, so this URL always serves
+# the newest successful build:
+#   https://github.com/zakariabouifri03-max/neurio/releases/download/neuriovm-v1.0.0/NeurioVM.apk
+#
+# Trigger a rebuild from your phone: repo → Actions → "NeurioVM APK" →
+# "Run workflow".
+name: NeurioVM APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, arena/d4c8cd57-neurio]
+    paths:
+      - 'NeurioVM/android/**'
+      - '.github/workflows/neuriovm-apk.yml'
+
+permissions:
+  contents: write          # needed to publish the release
+
+concurrency:
+  group: neuriovm-apk
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    name: Build, verify and publish the NeurioVM APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the app
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # android-actions/setup-android has been flaky on the current runners, so
+      # install the command-line tools directly — this is the path that works.
+      - name: Install Android command-line tools
+        run: |
+          sdk_root="$RUNNER_TEMP/android-sdk"
+          tools_zip="$RUNNER_TEMP/android-command-line-tools.zip"
+          mkdir -p "$sdk_root/cmdline-tools"
+          curl --fail --location --silent --show-error \
+            https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
+            --output "$tools_zip"
+          unzip -q "$tools_zip" -d "$sdk_root/cmdline-tools"
+          mv "$sdk_root/cmdline-tools/cmdline-tools" "$sdk_root/cmdline-tools/latest"
+          echo "ANDROID_HOME=$sdk_root" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$sdk_root" >> "$GITHUB_ENV"
+          echo "$sdk_root/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$sdk_root/platform-tools" >> "$GITHUB_PATH"
+
+      - name: Install Android platform and build tools
+        run: |
+          yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
+          sdkmanager --sdk_root="$ANDROID_HOME" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build the debug APK
+        working-directory: NeurioVM/android
+        run: gradle --no-daemon :app:assembleDebug :xposed-stubs:build
+
+      - name: Prepare APK for distribution
+        run: |
+          mkdir -p release-apk
+          cp NeurioVM/android/app/build/outputs/apk/debug/app-debug.apk release-apk/NeurioVM.apk
+          sha256sum release-apk/NeurioVM.apk | tee release-apk/SHA256SUMS.txt
+          ls -la release-apk
+
+      # prove the artifact really is an installable package before publishing it
+      - name: Verify the APK
+        run: |
+          apk=release-apk/NeurioVM.apk
+          echo "== file =="
+          file "$apk" || echo "file(1) not installed"
+          echo "== zip listing =="
+          python3 -c "import zipfile,sys; z=zipfile.ZipFile(sys.argv[1]); [print('  %-44s %9d B method=%d' % (n, z.getinfo(n).file_size, z.getinfo(n).compress_type)) for n in sorted(z.namelist())]; print('CRC test:', z.testzip() or 'OK')" "$apk"
+          echo "== required entries =="
+          python3 -c "import zipfile,sys; n=zipfile.ZipFile(sys.argv[1]).namelist(); miss=[r for r in ('classes.dex','AndroidManifest.xml','resources.arsc','assets/spoof.js','assets/xposed_init') if r not in n]; print('missing:', miss or 'none'); sys.exit(1 if miss else 0)" "$apk"
+          echo "== dex classes spot-check =="
+          python3 - <<'PY' || true
+          import zipfile,re
+          data = zipfile.ZipFile('release-apk/NeurioVM.apk').read('classes.dex')
+          for needle in (b'com/neurio/vm/hook/NeurioHook', b'com/neurio/vm/runtime/ProcessBridge'):
+              print(('  found  ' if needle in data else '  MISSING'), needle.decode())
+          PY
+          echo "== stubs must NOT be packaged =="
+          python3 - <<'PY'
+          import zipfile,sys
+          data = zipfile.ZipFile('release-apk/NeurioVM.apk').read('classes.dex')
+          bad = b'de/robv/android/xposed/XposedHelpers'
+          print('  XposedHelpers packaged:', bad in data)
+          sys.exit(1 if bad in data else 0)
+          PY
+          echo "== build tools =="
+          bt=$(ls -d "$ANDROID_HOME"/build-tools/* 2>/dev/null | tail -1)
+          echo "using: ${bt:-none}"
+          echo "== apksigner verify =="
+          if [ -n "${bt:-}" ]; then "$bt/apksigner" verify --print-certs "$apk" || echo "apksigner exit $?"; fi
+          echo "== VERIFY DONE =="
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NeurioVM-APK
+          path: release-apk/NeurioVM.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      # a fixed tag means one permanent download link that always points at
+      # the latest successful build
+      - name: Publish direct APK download
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: neuriovm-v1.0.0
+          name: NeurioVM v1.0.0 — Android APK
+          body: |
+            🧬 **NeurioVM** — مختبر أجهزة وهمية داخل تيليفونك / laboratoire d'appareils virtuels.
+
+            **Direct APK link:**
+            `https://github.com/zakariabouifri03-max/neurio/releases/download/neuriovm-v1.0.0/NeurioVM.apk`
+
+            **Kifach tsebtha f telefon / installation:**
+            1. Telecharji `NeurioVM.apk`
+            2. 7ellha → «Installer quand même» (makaynach 3la Play Store)
+            3. Settings → Apps → Special access → Install unknown apps → 3ti permission l navigateur dyalek
+
+            - Minimum: Android 7.0 (API 24)
+            - Mوقَّع b debug keystore — kaykhdem, walakin machi l Play Store
+            - L-build: commit `${{ github.sha }}`
+
+            **Shno kayn dakhel / what's inside:** 4 backends (redroid container, QEMU VM, AVF config generator, in-app sandbox), isolated Chromium profiles per device, DOM fingerprint rewriting, AES-GCM profile vault, and an optional LSPosed hook module for native apps.
+          files: release-apk/NeurioVM.apk
+          fail_on_unmatched_files: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

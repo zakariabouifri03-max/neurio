@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
+
+    <LinearLayout style="@style/Header">
+
+        <TextView
+            style="@style/HeaderTitle"
+            android:text="@string/console_title"
+            android:textColor="@color/primary" />
+
+        <TextView
+            android:id="@+id/c_headline"
+            style="@style/HeaderSub"
+            android:text="@string/console_probing" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="20dp"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/console_capabilities" />
+                <TextView android:id="@+id/c_caps" style="@style/Mono" android:textColor="@color/text_dim" />
+                <LinearLayout style="@style/Row">
+                    <Button android:id="@+id/b_probe" style="@style/Btn" android:text="@string/console_probe" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/console_backends" />
+                <TextView android:id="@+id/c_backends" style="@style/Mono" android:textColor="@color/text_dim" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/console_auto" />
+                <Spinner
+                    android:id="@+id/c_backend_pick"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input"
+                    android:padding="6dp" />
+
+                <LinearLayout style="@style/Row">
+                    <Button android:id="@+id/b_start" style="@style/Btn.Primary" android:text="@string/console_start" />
+                    <Button android:id="@+id/b_stop" style="@style/Btn.Danger" android:layout_marginLeft="8dp" android:text="@string/console_stop" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/console_backend_settings" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/console_qemu_binary" />
+                <EditText android:id="@+id/f_qemu_bin" style="@style/Field" android:hint="/data/data/com.termux/files/usr/bin/qemu-system-aarch64" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/console_qemu_image" />
+                <EditText android:id="@+id/f_qemu_img" style="@style/Field" android:hint="/sdcard/android-arm64.img" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/console_qemu_extra" />
+                <EditText android:id="@+id/f_qemu_extra" style="@style/Field" android:hint="-append console=ttyAMA0" />
+
+                <LinearLayout style="@style/Row">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/console_qemu_mem" />
+                        <EditText android:id="@+id/f_qemu_mem" style="@style/Field" android:inputType="number" android:hint="2048" />
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginLeft="10dp" android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/console_qemu_smp" />
+                        <EditText android:id="@+id/f_qemu_smp" style="@style/Field" android:inputType="number" android:hint="4" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <CheckBox android:id="@+id/f_qemu_kvm" style="@style/Body" android:textColor="@color/text" android:text="@string/console_qemu_kvm" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/console_rootfs" />
+                <EditText android:id="@+id/f_rootfs" style="@style/Field" android:hint="/sdcard/redroid-arm64" />
+
+                <CheckBox android:id="@+id/f_always_su" style="@style/Body" android:textColor="@color/text" android:text="@string/console_always_su" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/console_browser_home" />
+                <EditText android:id="@+id/f_home" style="@style/Field" android:hint="https://duckduckgo.com/" />
+
+                <LinearLayout style="@style/Row">
+                    <Button android:id="@+id/b_save_settings" style="@style/Btn.Primary" android:text="@string/editor_save" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/console_sessions" />
+                <TextView android:id="@+id/c_sessions" style="@style/Mono" android:textColor="@color/text_dim" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+
+                <TextView style="@style/CardTitle" android:text="@string/console_log" />
+                <TextView android:id="@+id/c_log" style="@style/Mono" android:textColor="@color/text_dim" android:maxLines="40" />
+                <LinearLayout style="@style/Row">
+                    <Button android:id="@+id/b_copy_log" style="@style/Btn" android:text="@string/console_copy" />
+                    <Button android:id="@+id/b_share_log" style="@style/Btn" android:layout_marginLeft="8dp" android:text="@string/console_share" />
+                    <Button android:id="@+id/b_reset" style="@style/Btn.Danger" android:layout_marginLeft="8dp" android:text="@string/console_danger" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

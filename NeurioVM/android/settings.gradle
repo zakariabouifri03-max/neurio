@@ -1,0 +1,30 @@
+// ─────────────────────────────────────────────────────────────────────────────
+//  NeurioVM — settings
+//
+//  Two modules:
+//    :app           the Android application itself (pure framework, no deps)
+//    :xposed-stubs  a plain Java library holding *compile-only* declarations of
+//                   the Xposed / LSPosed API. They are NEVER packaged into the
+//                   APK — at runtime the real framework provides those classes.
+//                   Keeping them here means the build needs no third-party
+//                   Maven repository at all, so it works offline and in CI.
+// ─────────────────────────────────────────────────────────────────────────────
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "NeurioVM"
+include ':app'
+include ':xposed-stubs'

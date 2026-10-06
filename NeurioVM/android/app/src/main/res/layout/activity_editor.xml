@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
+
+    <LinearLayout style="@style/Header">
+
+        <TextView
+            android:id="@+id/h_title"
+            style="@style/HeaderTitle"
+            android:textColor="@color/primary" />
+
+        <TextView
+            style="@style/HeaderSub"
+            android:text="@string/editor_warn_mismatch"
+            android:id="@+id/p_warn"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="14dp"
+            android:paddingRight="14dp">
+
+            <LinearLayout style="@style/Card"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp">
+
+                <TextView style="@style/CardTitle" android:text="@string/editor_preset" />
+
+                <Spinner
+                    android:id="@+id/e_preset"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input"
+                    android:padding="6dp" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/editor_carrier" />
+
+                <Spinner
+                    android:id="@+id/e_carrier"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input"
+                    android:padding="6dp" />
+
+                <LinearLayout style="@style/Row">
+                    <Button android:id="@+id/b_rand_all" style="@style/Btn" android:text="@string/editor_random_all" />
+                    <Button android:id="@+id/b_rand_ids" style="@style/Btn" android:layout_marginLeft="8dp" android:text="@string/editor_random_ids" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp">
+
+                <TextView style="@style/CardTitle" android:text="@string/device_identity" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/editor_label" />
+                <EditText android:id="@+id/e_label" style="@style/Field" android:inputType="text" android:hint="@string/editor_label" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/editor_manufacturer" />
+                <EditText android:id="@+id/e_manufacturer" style="@style/Field" android:hint="@string/editor_manufacturer" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/editor_brand" />
+                <EditText android:id="@+id/e_brand" style="@style/Field" android:hint="@string/editor_brand" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/editor_model" />
+                <EditText android:id="@+id/e_model" style="@style/Field" android:hint="@string/editor_model" />
+
+                <LinearLayout style="@style/Row">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/editor_device" />
+                        <EditText android:id="@+id/e_device" style="@style/Field" android:hint="@string/editor_device" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/editor_board" />
+                        <EditText android:id="@+id/e_board" style="@style/Field" android:hint="@string/editor_board" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView style="@style/FieldLabel" android:text="@string/editor_hardware" />
+                <EditText android:id="@+id/e_hardware" style="@style/Field" android:hint="@string/editor_hardware" />
+
+                <LinearLayout style="@style/Row">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/editor_release" />
+                        <EditText android:id="@+id/e_release" style="@style/Field" android:inputType="text" android:hint="14" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/editor_sdk" />
+                        <EditText android:id="@+id/e_sdk" style="@style/Field" android:inputType="number" android:hint="34" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView style="@style/FieldLabel" android:text="@string/editor_buildid" />
+                <EditText android:id="@+id/e_buildid" style="@style/Field" android:hint="@string/editor_buildid" />
+
+                <TextView style="@style/FieldLabel" android:text="@string/editor_patch" />
+                <EditText android:id="@+id/e_patch" style="@style/Field" android:hint="2024-09-05" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp">
+
+                <TextView style="@style/CardTitle" android:text="@string/device_display" />
+
+                <LinearLayout style="@style/Row">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/editor_width" />
+                        <EditText android:id="@+id/e_width" style="@style/Field" android:inputType="number" android:hint="1080" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/editor_height" />
+                        <EditText android:id="@+id/e_height" style="@style/Field" android:inputType="number" android:hint="2400" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/editor_dpi" />
+                        <EditText android:id="@+id/e_dpi" style="@style/Field" android:inputType="number" android:hint="420" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView style="@style/FieldLabel" android:text="@string/editor_timezone" />
+                <EditText android:id="@+id/e_timezone" style="@style/Field" android:hint="Africa/Casablanca" />
+
+                <LinearLayout style="@style/Row">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/editor_language" />
+                        <EditText android:id="@+id/e_language" style="@style/Field" android:hint="fr" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/editor_country" />
+                        <EditText android:id="@+id/e_country" style="@style/Field" android:hint="MA" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="vertical">
+                        <TextView style="@style/FieldLabel" android:text="@string/editor_chrome" />
+                        <EditText android:id="@+id/e_chrome" style="@style/Field" android:inputType="number" android:hint="128" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView style="@style/FieldLabel" android:text="@string/editor_battery" />
+                <SeekBar
+                    android:id="@+id/e_battery"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="100"
+                    android:paddingTop="6dp" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp">
+
+                <TextView style="@style/CardTitle" android:text="@string/editor_layers" />
+
+                <CheckBox android:id="@+id/c_build" style="@style/Body" android:textColor="@color/text" android:text="@string/editor_layer_build" />
+                <CheckBox android:id="@+id/c_settings" style="@style/Body" android:textColor="@color/text" android:text="@string/editor_layer_settings" />
+                <CheckBox android:id="@+id/c_telephony" style="@style/Body" android:textColor="@color/text" android:text="@string/editor_layer_telephony" />
+                <CheckBox android:id="@+id/c_webview" style="@style/Body" android:textColor="@color/text" android:text="@string/editor_layer_webview" />
+                <CheckBox android:id="@+id/c_js" style="@style/Body" android:textColor="@color/text" android:text="@string/editor_layer_js" />
+                <CheckBox android:id="@+id/c_webgl" style="@style/Body" android:textColor="@color/text" android:text="@string/editor_layer_webgl" />
+                <CheckBox android:id="@+id/c_canvas" style="@style/Body" android:textColor="@color/text" android:text="@string/editor_layer_canvas" />
+                <CheckBox android:id="@+id/c_battery" style="@style/Body" android:textColor="@color/text" android:text="@string/editor_layer_battery" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp">
+
+                <TextView style="@style/CardTitle" android:text="@string/editor_preview" />
+                <TextView android:id="@+id/p_fp" style="@style/Mono" />
+                <TextView android:id="@+id/p_ua" style="@style/Mono" android:textColor="@color/accent" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/bg_elevated"
+        android:gravity="center_vertical"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/b_cancel"
+            style="@style/Btn"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/b_save"
+            style="@style/Btn.Primary"
+            android:layout_marginLeft="8dp"
+            android:text="@string/editor_save" />
+    </LinearLayout>
+</LinearLayout>

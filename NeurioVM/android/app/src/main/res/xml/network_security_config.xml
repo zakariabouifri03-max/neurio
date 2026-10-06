@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A browser has to be able to reach plain-HTTP hosts, and power users may
+  install their own CA to inspect traffic. Neither is a weakness we are
+  introducing; both are what a browser is. Everything else stays at the
+  platform defaults.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
