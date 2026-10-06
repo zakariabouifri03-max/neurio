@@ -1,0 +1,82 @@
+// AI Vision 4K demo — GPU particle simulation.
+//
+// Particles are simulated in place each frame: gravity, drag, and respawn when
+// a particle's life runs out. Keeping the simulation on the GPU means the CPU
+// frame time stays flat, which matters because the benchmark's whole point is
+// to measure the renderer, not the host.
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+struct Particle {
+    vec4 positionSize;
+    vec4 colourLife;
+    vec4 velocity;
+};
+
+layout(std430, binding = 0) buffer Particles {
+    Particle particles[];
+};
+
+layout(push_constant) uniform PushConstants {
+    float deltaTime;
+    float time;
+    uint particleCount;
+    uint emitterSeed;
+    vec3 emitterPosition;
+    float gravity;
+} pc;
+
+// Deterministic hash based pseudo random numbers: reproducible runs are a
+// requirement for a benchmark scene.
+uint hash(uint x) {
+    x ^= x >> 16;
+    x *= 0x7feb352du;
+    x ^= x >> 15;
+    x *= 0x846ca68bu;
+    x ^= x >> 16;
+    return x;
+}
+
+float randomFloat(inout uint state) {
+    state = hash(state);
+    return float(state & 0xFFFFFFu) / float(0xFFFFFFu);
+}
+
+vec3 randomUnitVector(inout uint state) {
+    const float theta = randomFloat(state) * 6.2831853;
+    const float z = randomFloat(state) * 2.0 - 1.0;
+    const float r = sqrt(max(0.0, 1.0 - z * z));
+    return vec3(r * cos(theta), z, r * sin(theta));
+}
+
+void main() {
+    const uint index = gl_GlobalInvocationID.x;
+    if (index >= pc.particleCount) {
+        return;
+    }
+
+    Particle p = particles[index];
+    uint state = hash(index * 2654435761u + pc.emitterSeed);
+
+    if (p.colourLife.a <= 0.0) {
+        // Respawn at the emitter with a small upward kick.
+        p.positionSize.xyz = pc.emitterPosition + randomUnitVector(state) * 0.35;
+        p.velocity.xyz = randomUnitVector(state) * 1.2 + vec3(0.0, 1.6, 0.0);
+        p.colourLife.a = 0.001;
+        p.positionSize.w = 0.06 + randomFloat(state) * 0.05;
+        const float warm = randomFloat(state);
+        p.colourLife.rgb = mix(vec3(1.0, 0.45, 0.12), vec3(0.35, 0.7, 1.0), warm);
+    }
+
+    p.velocity.xyz += vec3(0.0, -pc.gravity, 0.0) * pc.deltaTime;
+    p.velocity.xyz *= (1.0 - 0.6 * pc.deltaTime);   // drag
+    p.positionSize.xyz += p.velocity.xyz * pc.deltaTime;
+    p.colourLife.a += pc.deltaTime * 0.45;
+
+    if (p.colourLife.a >= 1.0) {
+        p.colourLife.a = 0.0;   // flag for respawn on the next frame
+    }
+
+    particles[index] = p;
+}

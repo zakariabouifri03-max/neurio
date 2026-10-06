@@ -1,0 +1,45 @@
+// AI Vision 4K — parametric ReLU as a stand-alone pass.
+//
+// sr_conv.comp can apply PReLU inline (activation == 2), but a graph may also
+// place PReLU on a tensor produced by PixelShuffle or Add, so the executor
+// needs the pass on its own.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(std430, binding = 0) readonly buffer Input {
+    float gInput[];  // [C][H][W]
+};
+layout(std430, binding = 1) readonly buffer Slopes {
+    float gSlopes[];  // [C], or [1] when a single slope is broadcast
+};
+layout(std430, binding = 2) writeonly buffer Output {
+    float gOutput[];  // [C][H][W]
+};
+
+layout(push_constant) uniform PushConstants {
+    uint width;
+    uint height;
+    uint channels;
+    uint slopeCount;   // 1 == broadcast slope
+    uint reserved0;
+    uint reserved1;
+    uint reserved2;
+    uint reserved3;
+} pc;
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (uint(pos.x) >= pc.width || uint(pos.y) >= pc.height) {
+        return;
+    }
+    const uint plane = pc.width * pc.height;
+    const uint spatial = uint(pos.y) * pc.width + uint(pos.x);
+
+    for (uint c = 0; c < pc.channels; ++c) {
+        const uint slopeIndex = pc.slopeCount == 1u ? 0u : c;
+        const float slope = gSlopes[slopeIndex];
+        const float v = gInput[c * plane + spatial];
+        gOutput[c * plane + spatial] = v >= 0.0 ? v : v * slope;
+    }
+}

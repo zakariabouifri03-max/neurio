@@ -1,0 +1,44 @@
+// AI Vision 4K — 2x2 box downsample of the luma plane.
+//
+// Motion estimation runs at half resolution: a 9x9 block search over a full
+// 720p luma plane costs about four times more than the rest of the frame put
+// together, and the reprojection tolerates the coarser vectors because the
+// history is clamped to the local neighbourhood anyway.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uInput;    // rgba8, r = luma
+layout(set = 0, binding = 1, rgba8) uniform image2D uOutput;
+
+layout(push_constant) uniform PushConstants {
+    uint outW;
+    uint outH;
+    uint inW;
+    uint inH;
+    uint flags;      // bit0: keep the maximum instead of the mean (edge preserve)
+    uint reserved0;
+    uint reserved1;
+    uint reserved2;
+} pc;
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (uint(pos.x) >= pc.outW || uint(pos.y) >= pc.outH) {
+        return;
+    }
+    const ivec2 src = ivec2(pos) * 2;
+    float accum = 0.0;
+    float maximum = 0.0;
+    for (int dy = 0; dy < 2; ++dy) {
+        for (int dx = 0; dx < 2; ++dx) {
+            const ivec2 clamped = clamp(src + ivec2(dx, dy), ivec2(0),
+                                        ivec2(int(pc.inW) - 1, int(pc.inH) - 1));
+            const float value = texelFetch(uInput, clamped, 0).r;
+            accum += value;
+            maximum = max(maximum, value);
+        }
+    }
+    const float result = (pc.flags & 1u) != 0u ? max(maximum, accum * 0.25) : accum * 0.25;
+    imageStore(uOutput, pos, vec4(result, 0.0, 0.0, 1.0));
+}

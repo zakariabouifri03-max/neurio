@@ -1,0 +1,99 @@
+// AI Vision 4K — motion estimation.
+//
+// Block matching on the (half resolution) luma plane. This produces the
+// "temporal information when available" the architecture asks for: when the
+// game hands us its own motion vectors we skip this pass entirely, otherwise we
+// estimate them ourselves.
+//
+// Layout: one workgroup covers a 16x16 tile of the half-res luma with a 4 pixel
+// search border, so the tile plus border is 24x24 which fits comfortably in the
+// 16 KB shared memory budget of even entry-level mobile GPUs.
+#version 450
+
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uCurrentLuma;   // half res luma (r)
+layout(set = 0, binding = 1) uniform sampler2D uPreviousLuma;  // half res luma (r)
+layout(set = 0, binding = 2, rgba16f) uniform image2D uMotionOut;  // xy = motion vector in pixels
+
+layout(push_constant) uniform PushConstants {
+    vec2 lumaSize;        // half res dimensions
+    int searchRadius;     // 4 typical
+    float maxVectorLength;  // clamp for the temporal reprojection
+    float sadThreshold;   // above this SAD the vector is marked unreliable (z)
+    uint hasPrevious;     // 0 on the first frame
+    uint pad0;
+    uint pad1;
+} pc;
+
+const int kTile = 16;
+const int kMaxSearch = 8;
+const int kBorder = kMaxSearch;
+
+shared float gCurrent[kTile + 2 * kMaxSearch][kTile + 2 * kMaxSearch];
+
+void main() {
+    const ivec2 tileOrigin = ivec2(gl_WorkGroupID.xy) * kTile;
+    const ivec2 lumaSize = ivec2(pc.lumaSize);
+
+    // Cooperative load of the tile plus search border.
+    const int localStride = kTile + 2 * kBorder;
+    for (int i = int(gl_LocalInvocationIndex); i < localStride * localStride; i += 256) {
+        const int ly = i / localStride;
+        const int lx = i % localStride;
+        const ivec2 samplePos = tileOrigin + ivec2(lx - kBorder, ly - kBorder);
+        const ivec2 clampedPos = clamp(samplePos, ivec2(0), lumaSize - ivec2(1));
+        gCurrent[ly][lx] = texelFetch(uCurrentLuma, clampedPos, 0).r;
+    }
+    barrier();
+    memoryBarrierShared();
+
+    const ivec2 local = ivec2(gl_LocalInvocationID.xy);
+    const ivec2 global = tileOrigin + local;
+    if (global.x >= lumaSize.x || global.y >= lumaSize.y) {
+        return;
+    }
+
+    if (pc.hasPrevious == 0u) {
+        // No history yet: emit a zero vector, flagged as low confidence.
+        imageStore(uMotionOut, global, vec4(0.0, 0.0, 0.0, 1.0));
+        return;
+    }
+
+    // 2x2 blocks: the cost of a full-resolution search is not worth the extra
+    // precision for a temporal reprojection that is clamped anyway.
+    const ivec2 blockOrigin = ivec2(global.x & ~1, global.y & ~1);
+    const ivec2 localBlock = blockOrigin - tileOrigin + ivec2(kBorder);
+
+    float bestSad = 1e9;
+    ivec2 bestOffset = ivec2(0);
+
+    for (int dy = -pc.searchRadius; dy <= pc.searchRadius; ++dy) {
+        for (int dx = -pc.searchRadius; dx <= pc.searchRadius; ++dx) {
+            float sad = 0.0;
+            for (int by = 0; by < 2; ++by) {
+                for (int bx = 0; bx < 2; ++bx) {
+                    const ivec2 previousPos = clamp(blockOrigin + ivec2(bx, by) + ivec2(dx, dy),
+                                                    ivec2(0), lumaSize - ivec2(1));
+                    const float reference = texelFetch(uPreviousLuma, previousPos, 0).r;
+                    const float current = gCurrent[localBlock.y + by][localBlock.x + bx];
+                    sad += abs(reference - current);
+                }
+            }
+            if (sad < bestSad) {
+                bestSad = sad;
+                bestOffset = ivec2(dx, dy);
+            }
+        }
+    }
+
+    vec2 motion = vec2(bestOffset);
+    const float length = length(motion);
+    if (length > pc.maxVectorLength && length > 0.0) {
+        motion *= pc.maxVectorLength / length;
+    }
+
+    // z = confidence (1 = trustworthy), w = 1 for a valid vector.
+    const float confidence = 1.0 - clamp(bestSad / max(1e-5, pc.sadThreshold * 4.0), 0.0, 1.0);
+    imageStore(uMotionOut, global, vec4(motion, confidence, 1.0));
+}

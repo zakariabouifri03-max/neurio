@@ -1,0 +1,82 @@
+// AI Vision 4K — pre-processing pass.
+//
+//   low-resolution colour frame
+//      -> Rec.709 luma plane (used by motion estimation and edge AA)
+//      -> optionally denoised colour plane (edge-preserving 3x3 bilateral)
+//
+// The colour plane is what the reconstruction and temporal stages consume, so
+// the denoise step happens once, here, instead of inside every later tap.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uInput;        // low-res colour or luma
+layout(set = 0, binding = 1, rgba8) uniform image2D uLumaOut; // r = luma
+layout(set = 0, binding = 2, rgba16f) uniform image2D uColorOut;
+
+layout(push_constant) uniform PushConstants {
+    vec2 inputSize;
+    vec2 invInputSize;
+    float denoiseStrength;   // 0 disables the bilateral filter
+    float lumaSharpen;       // pre-sharpening of the luma plane (0..1)
+    uint flags;              // bit0: input texture already holds luma
+    uint frameIndex;
+} pc;
+
+const vec3 kLumaWeights = vec3(0.2126, 0.7152, 0.0722);
+
+vec3 fetchColor(ivec2 p) {
+    ivec2 clamped = clamp(p, ivec2(0), ivec2(pc.inputSize) - ivec2(1));
+    vec4 texel = texelFetch(uInput, clamped, 0);
+    if ((pc.flags & 1u) != 0u) {
+        return texel.rgb;
+    }
+    return texel.rgb;
+}
+
+float lumaOf(vec3 c) { return dot(c, kLumaWeights); }
+
+void main() {
+    const ivec2 gid = ivec2(gl_GlobalInvocationID.xy);
+    if (gid.x >= int(pc.inputSize.x) || gid.y >= int(pc.inputSize.y)) {
+        return;
+    }
+
+    vec3 centre = fetchColor(gid);
+
+    // --- edge preserving denoise on the colour plane -----------------------
+    if (pc.denoiseStrength > 0.0) {
+        const float centreLuma = lumaOf(centre);
+        vec3 accum = centre;
+        float weightSum = 1.0;
+        const float sigmaInv = 1.0 / max(0.004, 0.05 * pc.denoiseStrength);
+        for (int dy = -1; dy <= 1; ++dy) {
+            for (int dx = -1; dx <= 1; ++dx) {
+                if (dx == 0 && dy == 0) continue;
+                const vec3 neighbour = fetchColor(gid + ivec2(dx, dy));
+                const float lumaDiff = lumaOf(neighbour) - centreLuma;
+                const float w = exp(-lumaDiff * lumaDiff * sigmaInv * sigmaInv);
+                accum += neighbour * w;
+                weightSum += w;
+            }
+        }
+        const vec3 filtered = accum / weightSum;
+        centre = mix(centre, filtered, clamp(pc.denoiseStrength, 0.0, 1.0));
+    }
+
+    // --- luma plane --------------------------------------------------------
+    float luma = lumaOf(centre);
+    if (pc.lumaSharpen > 0.0) {
+        // A cheap 4-neighbour unsharp on luma helps motion estimation lock on
+        // to edges; it is not the final sharpening pass.
+        const float n = lumaOf(fetchColor(gid + ivec2(0, -1)));
+        const float s = lumaOf(fetchColor(gid + ivec2(0, 1)));
+        const float w = lumaOf(fetchColor(gid + ivec2(-1, 0)));
+        const float e = lumaOf(fetchColor(gid + ivec2(1, 0)));
+        const float blurred = (n + s + w + e) * 0.25;
+        luma = clamp(luma + (luma - blurred) * pc.lumaSharpen, 0.0, 1.0);
+    }
+
+    imageStore(uLumaOut, gid, vec4(luma, 0.0, 0.0, 1.0));
+    imageStore(uColorOut, gid, vec4(centre, 1.0));
+}

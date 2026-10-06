@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Model downloads and (optional) community profile packs. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!--
+        The metrics overlay over OTHER applications requires this special
+        permission. It is requested at runtime and the app degrades gracefully
+        to an in-app overlay when it is denied. The overlay can only *display*
+        metrics: it cannot touch another application's rendering pipeline.
+    -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Foreground monitoring service (metrics + thermal safety while gaming). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!--
+        Listing the installed games. QUERY_ALL_PACKAGES is intentionally NOT
+        requested: the app only needs launcher activities, which the <queries>
+        block below grants on Android 11+ (and Play policy prefers).
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <!-- Both are optional: the app runs, reports and explains what is missing. -->
+    <uses-feature
+        android:name="android.hardware.vulkan.version"
+        android:version="0x400003"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.vulkan.level"
+        android:version="0"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <application
+        android:name=".AiVision4KApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:hardwareAccelerated="true"
+        android:theme="@style/Theme.AiVision4K"
+        tools:targetApi="34">
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|density"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.AiVision4K">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            The Vulkan demo game / benchmark harness is NOT declared yet: its
+            native host (cpp/demo) is not part of this build, and shipping an
+            activity that cannot render would be worse than shipping none. When
+            the demo host lands it is declared here as a landscape, keep-screen-on
+            activity. `IntegrationKind.SampleDemo` is the engine-side switch that
+            becomes meaningful at that point.
+        -->
+
+        <service
+            android:name=".monitor.MonitorService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Live performance/thermal monitoring for an explicitly
+                    user-started gaming session; the values are shown in the
+                    in-app overlay and used for thermal safety limiting." />
+        </service>
+    </application>
+</manifest>

@@ -1,0 +1,9 @@
+{
+  "name": "aivision4k-shader-tools",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Optional WASM GLSL->SPIR-V compiler so the shaders can be rebuilt without the Vulkan SDK.",
+  "dependencies": {
+    "@webgpu/glslang": "^0.0.15"
+  }
+}

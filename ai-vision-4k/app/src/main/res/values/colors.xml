@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="v4k_void">#FF05070E</color>
+    <color name="v4k_surface">#FF0B1020</color>
+    <color name="v4k_accent">#FF35E0FF</color>
+    <color name="ic_launcher_background">#FF05070E</color>
+</resources>

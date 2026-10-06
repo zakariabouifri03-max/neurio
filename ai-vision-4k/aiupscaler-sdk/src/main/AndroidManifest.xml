@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        The AIUpscaler SDK manifest is deliberately minimal: it must not add
+        permissions to the host game. The embedding game owns all permissions
+        (network access for model downloads is optional and only needed when the
+        game wants the model manager to fetch a model at runtime).
+    -->
+
+    <!-- Declared so the host app can check availability; both are optional. -->
+    <uses-feature
+        android:name="android.hardware.vulkan.version"
+        android:version="0x400003"
+        android:required="false" />
+</manifest>

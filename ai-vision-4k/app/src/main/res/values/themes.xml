@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Platform theme only. The Compose UI draws everything; we just need a
+        dark, chrome-less shell with no action bar and a black window so the
+        Vulkan surface never flashes white.
+    -->
+    <style name="Theme.AiVision4K" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/v4k_void</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/v4k_void</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorAccent">@color/v4k_accent</item>
+    </style>
+
+    <style name="Theme.AiVision4K.Fullscreen" parent="Theme.AiVision4K">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>

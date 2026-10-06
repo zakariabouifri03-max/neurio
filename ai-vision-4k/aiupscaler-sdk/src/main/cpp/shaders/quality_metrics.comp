@@ -1,0 +1,124 @@
+// AI Vision 4K — benchmark image quality metrics (PSNR + SSIM).
+//
+// The benchmark renders the same scene at the output resolution to get a
+// ground-truth frame, then compares it against the reconstructed frame. Both
+// metrics are computed here, on the GPU, so a 4K comparison costs a fraction of
+// a millisecond instead of a multi-hundred-millisecond CPU pass.
+//
+// Each invocation owns one 8x8 block (the same block size as the CPU reference
+// implementation in core/v4k_image.cpp, so the two agree). Per-workgroup
+// partials are written to a buffer and summed by the host, which avoids
+// floating point atomics entirely (VK_KHR_shader_atomic_float is not
+// universally available on Android).
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uReference;   // ground truth
+layout(set = 0, binding = 1) uniform sampler2D uTest;        // reconstructed
+layout(std430, binding = 2) writeonly buffer Partials {
+    float partials[];    // 4 floats per workgroup: sse, ssimNumeratorSum, ssimDenominatorSum, blockCount
+};
+
+layout(push_constant) uniform PushConstants {
+    vec2 size;
+    vec2 invSize;
+    float peak;          // 1.0 for normalised colour
+    uint includeAlpha;
+    uint reserved0;
+    uint reserved1;
+} pc;
+
+shared float gSse[64];
+shared float gSsimNum[64];
+shared float gSsimDen[64];
+shared float gBlocks[64];
+
+const float kC1 = 6.5025e-2;   // (0.01 * 255)^2 in [0,1] space
+const float kC2 = 5.8509e-1;   // (0.03 * 255)^2
+
+float lumaOf(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
+
+void main() {
+    const uint lane = gl_LocalInvocationIndex;
+    const ivec2 blockOrigin = ivec2(gl_WorkGroupID.xy * 8u);
+    const ivec2 size = ivec2(pc.size);
+
+    float sse = 0.0;
+    float ssimNumerator = 0.0;
+    float ssimDenominator = 0.0;
+    float blocks = 0.0;
+
+    if (blockOrigin.x < size.x && blockOrigin.y < size.y) {
+        // Block sums for SSIM.
+        float sumA = 0.0;
+        float sumB = 0.0;
+        float sumAA = 0.0;
+        float sumBB = 0.0;
+        float sumAB = 0.0;
+        int samples = 0;
+
+        for (int y = 0; y < 8; ++y) {
+            for (int x = 0; x < 8; ++x) {
+                const ivec2 pos = blockOrigin + ivec2(x, y);
+                if (pos.x >= size.x || pos.y >= size.y) {
+                    continue;
+                }
+                const vec3 a = texelFetch(uReference, pos, 0).rgb;
+                const vec3 b = texelFetch(uTest, pos, 0).rgb;
+                const vec3 diff = a - b;
+                sse += dot(diff, diff);
+
+                const float la = lumaOf(a);
+                const float lb = lumaOf(b);
+                sumA += la;
+                sumB += lb;
+                sumAA += la * la;
+                sumBB += lb * lb;
+                sumAB += la * lb;
+                ++samples;
+            }
+        }
+
+        if (samples > 0) {
+            const float n = float(samples);
+            const float muA = sumA / n;
+            const float muB = sumB / n;
+            const float varA = max(0.0, sumAA / n - muA * muA);
+            const float varB = max(0.0, sumBB / n - muB * muB);
+            const float covariance = sumAB / n - muA * muB;
+            const float numeratorTerm = (2.0 * muA * muB + kC1) * (2.0 * covariance + kC2);
+            const float denominatorTerm = (muA * muA + muB * muB + kC1) * (varA + varB + kC2);
+            ssimNumerator = numeratorTerm;
+            ssimDenominator = denominatorTerm;
+            blocks = 1.0;
+        }
+    }
+
+    gSse[lane] = sse;
+    gSsimNum[lane] = ssimNumerator;
+    gSsimDen[lane] = ssimDenominator;
+    gBlocks[lane] = blocks;
+    barrier();
+    memoryBarrierShared();
+
+    // Power-of-two tree reduction over the 64 lanes.
+    for (uint stride = 32u; stride > 0u; stride >>= 1u) {
+        if (lane < stride) {
+            gSse[lane] += gSse[lane + stride];
+            gSsimNum[lane] += gSsimNum[lane + stride];
+            gSsimDen[lane] += gSsimDen[lane + stride];
+            gBlocks[lane] += gBlocks[lane + stride];
+        }
+        barrier();
+        memoryBarrierShared();
+    }
+
+    if (lane == 0u) {
+        const uint base = gl_WorkGroupID.y * gl_NumWorkGroups.x * 4u + gl_WorkGroupID.x * 4u;
+        partials[base + 0u] = gSse[0];
+        partials[base + 1u] = gSsimNum[0];
+        partials[base + 2u] = gSsimDen[0];
+        partials[base + 3u] = gBlocks[0];
+    }
+}

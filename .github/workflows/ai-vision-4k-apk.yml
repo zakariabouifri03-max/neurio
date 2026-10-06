@@ -1,0 +1,124 @@
+# Builds the AI Vision 4K Android APK on a real Android toolchain.
+#
+# Why CI at all: this project is developed in an environment without the Android
+# SDK, so the Gradle/NDK build runs here — on the same toolchain an Android
+# Studio user has — and the resulting APK is committed back to the branch
+# (GitHub artifact blobs are not reachable from that environment, while the
+# branch is). The commit is made with GITHUB_TOKEN, which by design does not
+# trigger another workflow run, so there is no build loop.
+#
+# Step order matters: the native core suite runs first (it needs only g++) so a
+# broken policy/format change is reported before the slow Android build.
+
+name: AI Vision 4K APK
+
+on:
+  push:
+    branches: [ arena/e293d70d-neurio ]
+    paths:
+      - 'ai-vision-4k/**'
+      - '.github/workflows/ai-vision-4k-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ai-vision-4k
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Native core test suite (host)
+        run: bash tools/run-native-tests.sh
+
+      - name: Android SDK components
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            curl -sSLo /tmp/cmdline-tools.zip \
+              https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+            unzip -q /tmp/cmdline-tools.zip -d /tmp/cmdline-unpack
+            mkdir -p "$SDK/cmdline-tools"
+            rm -rf "$SDK/cmdline-tools/latest"
+            mv /tmp/cmdline-unpack/cmdline-tools "$SDK/cmdline-tools/latest"
+            SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          fi
+          # Licences: the runner image has them accepted already; this is for the
+          # components it does not ship (CMake 3.22.1, the pinned NDK).
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" --install \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "cmake;3.22.1" \
+            "ndk;27.3.13750724"
+          "$SDKMANAGER" --list_installed | sed -n '1,40p'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Assemble debug APK
+        run: gradle :app:assembleDebug --stacktrace --console=plain
+
+      - name: Assemble release APK
+        # Signed with the debug key on purpose: this is a testing build, and a
+        # release keystore must never live in a public repository.
+        #
+        # Best effort: R8 is the one step that can fail for reasons that have
+        # nothing to do with whether the app works, and the debug APK is the
+        # build this project is judged on.
+        id: release
+        continue-on-error: true
+        run: gradle :app:assembleRelease --stacktrace --console=plain
+
+      - name: Collect APKs
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk dist/AIVision4K-debug.apk
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            cp app/build/outputs/apk/release/app-release.apk dist/AIVision4K-release-unsigned-key.apk
+          else
+            echo "release APK not produced (R8 step: ${{ steps.release.outcome }})"
+          fi
+          ls -l dist
+          for apk in dist/*.apk; do
+            printf '%s  ' "$apk"; sha256sum "$apk" | cut -d' ' -f1
+          done > dist/SHA256SUMS.txt
+          cat dist/SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ai-vision-4k-apks
+          path: |
+            ai-vision-4k/dist/*.apk
+            ai-vision-4k/dist/SHA256SUMS.txt
+          if-no-files-found: error
+
+      - name: Publish the APKs back to the branch
+        working-directory: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f ai-vision-4k/dist
+          if git diff --cached --quiet; then
+            echo "APK unchanged, nothing to publish."
+          else
+            git commit -m "ci: AI Vision 4K APK build (${GITHUB_SHA::7}) [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

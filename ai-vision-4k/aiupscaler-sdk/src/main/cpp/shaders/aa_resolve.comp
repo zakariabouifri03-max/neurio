@@ -1,0 +1,70 @@
+// AI Vision 4K — anti-aliasing resolve.
+//
+// Luma driven edge anti-aliasing (the FXAA idea, written from scratch): detect
+// the dominant edge direction from the local luma gradient and blur along it,
+// which removes the single-pixel stair-steps that survive reconstruction while
+// leaving the rest of the image untouched.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uInput;
+layout(set = 0, binding = 1, rgba16f) uniform image2D uOutput;
+
+layout(push_constant) uniform PushConstants {
+    vec2 size;
+    vec2 invSize;
+    float edgeThreshold;    // luma difference that counts as an edge (0.08 typical)
+    float strength;         // 0..1
+    uint enable;            // 0 disables the pass
+    uint reserved;
+} pc;
+
+float luma(vec2 uv) { return dot(texture(uInput, uv).rgb, vec3(0.2126, 0.7152, 0.0722)); }
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (pos.x >= int(pc.size.x) || pos.y >= int(pc.size.y)) {
+        return;
+    }
+    const vec2 uv = (vec2(pos) + 0.5) * pc.invSize;
+    const vec3 colour = texture(uInput, uv).rgb;
+
+    if (pc.enable == 0u || pc.strength <= 0.0) {
+        imageStore(uOutput, pos, vec4(colour, 1.0));
+        return;
+    }
+
+    const float centre = dot(colour, vec3(0.2126, 0.7152, 0.0722));
+    const float north = luma(uv + vec2(0.0, -pc.invSize.y));
+    const float south = luma(uv + vec2(0.0, pc.invSize.y));
+    const float west = luma(uv + vec2(-pc.invSize.x, 0.0));
+    const float east = luma(uv + vec2(pc.invSize.x, 0.0));
+
+    const float gradientX = abs(north + south - 2.0 * centre);
+    const float gradientY = abs(west + east - 2.0 * centre);
+    const float localContrast = max(abs(north - centre), abs(south - centre));
+    const float otherContrast = max(abs(west - centre), abs(east - centre));
+    const float contrast = max(localContrast, otherContrast);
+
+    if (contrast < pc.edgeThreshold) {
+        imageStore(uOutput, pos, vec4(colour, 1.0));
+        return;
+    }
+
+    // Blur across the edge (perpendicular to the dominant gradient).
+    vec3 blurred;
+    if (gradientX >= gradientY) {
+        blurred = (texture(uInput, uv + vec2(0.0, -pc.invSize.y * 1.5)).rgb +
+                   texture(uInput, uv + vec2(0.0, pc.invSize.y * 1.5)).rgb) * 0.5;
+    } else {
+        blurred = (texture(uInput, uv + vec2(-pc.invSize.x * 1.5, 0.0)).rgb +
+                   texture(uInput, uv + vec2(pc.invSize.x * 1.5, 0.0)).rgb) * 0.5;
+    }
+
+    const float edgeWeight = clamp((contrast - pc.edgeThreshold) / max(pc.edgeThreshold, 1e-4), 0.0, 1.0);
+    const float amount = clamp(pc.strength * edgeWeight, 0.0, 0.75);
+    // Preserve the local mean so the pass cannot darken or brighten the image.
+    const vec3 result = mix(colour, blurred + (colour - (colour + blurred) * 0.5) * 0.0, amount);
+    imageStore(uOutput, pos, vec4(clamp(result, vec3(0.0), vec3(1.0)), 1.0));
+}

@@ -1,0 +1,94 @@
+// AI Vision 4K — temporal reconstruction.
+//
+// The current frame is reprojected with the motion vectors and blended with the
+// accumulated history. Three classic safeguards keep ghosting out:
+//   * neighbourhood clamping (the reprojected sample must be plausible given
+//     the current frame's 3x3 colour neighbourhood);
+//   * disocclusion detection from the vector confidence produced by
+//     motion_estimate.comp (or supplied by the game);
+//   * a hard reset when the camera moves so far that the history is worthless.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uCurrentColor;
+layout(set = 0, binding = 1) uniform sampler2D uHistoryColor;
+layout(set = 0, binding = 2) uniform sampler2D uMotionVectors;    // xy in output pixels
+layout(set = 0, binding = 3) uniform sampler2D uCurrentLuma;      // r only, for variance
+layout(set = 0, binding = 4, rgba16f) uniform image2D uOutput;
+layout(set = 0, binding = 5, rgba16f) uniform image2D uHistoryScanOut;
+
+layout(push_constant) uniform PushConstants {
+    vec2 outputSize;
+    vec2 invOutputSize;
+    vec2 motionScale;      // motion vector texel -> output pixel scale
+    float historyWeight;   // base feedback (0.9 typical)
+    float clampSigma;      // neighbourhood clamp width in standard deviations
+    uint frameIndex;
+    uint resetHistory;     // 1 == ignore the history entirely this frame
+    uint reserved;
+} pc;
+
+const vec2 kOffsets[9] = vec2[9](
+    vec2(-1, -1), vec2(0, -1), vec2(1, -1),
+    vec2(-1, 0), vec2(0, 0), vec2(1, 0),
+    vec2(-1, 1), vec2(0, 1), vec2(1, 1));
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (pos.x >= int(pc.outputSize.x) || pos.y >= int(pc.outputSize.y)) {
+        return;
+    }
+
+    const vec2 uv = (vec2(pos) + 0.5) * pc.invOutputSize;
+    const vec3 current = texture(uCurrentColor, uv).rgb;
+
+    if (pc.resetHistory == 1u || pc.frameIndex == 0u) {
+        imageStore(uOutput, pos, vec4(current, 1.0));
+        imageStore(uHistoryScanOut, pos, vec4(current, 1.0));
+        return;
+    }
+
+    // --- motion vector -----------------------------------------------------
+    const vec4 motionSample = texture(uMotionVectors, uv);
+    vec2 motion = motionSample.xy * pc.motionScale;
+    const float confidence = clamp(motionSample.z, 0.0, 1.0);
+
+    // --- neighbourhood statistics of the current frame ---------------------
+    vec3 minimum = current;
+    vec3 maximum = current;
+    vec3 mean = vec3(0.0);
+    vec3 meanSquared = vec3(0.0);
+    for (int i = 0; i < 9; ++i) {
+        const vec3 sampleValue = texture(uCurrentColor, uv + kOffsets[i] * pc.invOutputSize).rgb;
+        minimum = min(minimum, sampleValue);
+        maximum = max(maximum, sampleValue);
+        mean += sampleValue;
+        meanSquared += sampleValue * sampleValue;
+    }
+    mean /= 9.0;
+    meanSquared /= 9.0;
+    const vec3 variance = max(vec3(0.0), meanSquared - mean * mean);
+    const vec3 sigma = sqrt(variance);
+
+    // --- reproject the history --------------------------------------------
+    const vec2 historyUv = uv - motion * pc.invOutputSize;
+    vec3 history = texture(uHistoryColor, historyUv).rgb;
+
+    // Clamp the reprojected colour into the current neighbourhood's plausible
+    // range: this is what stops old frames bleeding through moving objects.
+    const vec3 lower = mean - sigma * pc.clampSigma;
+    const vec3 upper = mean + sigma * pc.clampSigma;
+    const vec3 clampedHistory = clamp(history, min(lower, minimum), max(upper, maximum));
+    const float clampDistance = length(clampedHistory - history);
+    const float clampFactor = clamp(1.0 - clampDistance * 4.0, 0.0, 1.0);
+
+    // --- blending ----------------------------------------------------------
+    const float motionPenalty = clamp(length(motion) / 32.0, 0.0, 1.0);
+    float feedback = pc.historyWeight * confidence * clampFactor * (1.0 - motionPenalty * 0.5);
+    feedback = clamp(feedback, 0.0, 0.95);
+
+    const vec3 blended = mix(current, clampedHistory, feedback);
+    imageStore(uOutput, pos, vec4(blended, 1.0));
+    imageStore(uHistoryScanOut, pos, vec4(blended, 1.0));
+}

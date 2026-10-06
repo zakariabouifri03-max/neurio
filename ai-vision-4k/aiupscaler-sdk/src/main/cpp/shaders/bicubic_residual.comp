@@ -1,0 +1,70 @@
+// AI Vision 4K — bicubic upsample of the network input, written as a planar
+// tensor.
+//
+// Networks trained with a global residual (output = bicubic(low-res) + net(...))
+// need the skip connection inside the same tensor space as the network output,
+// otherwise the two halves cannot be added by pixel_shuffle.comp.
+//
+// The kernel mirrors the CPU reference in core/v4k_image.cpp (Catmull-Rom style
+// weights) so the GPU and CPU paths produce comparable results in the tests.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uInput;
+layout(std430, binding = 1) writeonly buffer ResidualOutput {
+    float gOutput[];   // [C][H][W]
+};
+
+layout(push_constant) uniform PushConstants {
+    uint outW;
+    uint outH;
+    uint channels;      // 3 typical
+    uint flags;         // bit0: clamp to [0,1]
+    vec2 inputSize;     // source size in texels
+    vec2 reserved;
+} pc;
+
+// Catmull-Rom weights, same polynomial as core/v4k_image.cpp::resizeBicubic.
+vec4 cubicWeights(float t) {
+    const float t2 = t * t;
+    const float t3 = t2 * t;
+    return vec4(
+        -0.5 * t3 + 1.0 * t2 - 0.5 * t,
+         1.5 * t3 - 2.5 * t2 + 1.0,
+        -1.5 * t3 + 2.0 * t2 + 0.5 * t,
+         0.5 * t3 - 0.5 * t2);
+}
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (uint(pos.x) >= pc.outW || uint(pos.y) >= pc.outH) {
+        return;
+    }
+
+    // Map the destination texel centre back into source space.
+    const vec2 src = ((vec2(pos) + vec2(0.5)) / vec2(float(pc.outW), float(pc.outH))) *
+                         pc.inputSize - vec2(0.5);
+    const vec2 base = floor(src);
+    const vec4 wx = cubicWeights(src.x - base.x);
+    const vec4 wy = cubicWeights(src.y - base.y);
+
+    const vec2 invInput = vec2(1.0) / pc.inputSize;
+    const uint plane = pc.outW * pc.outH;
+    const uint spatial = uint(pos.y) * pc.outW + uint(pos.x);
+
+    for (uint c = 0; c < pc.channels; ++c) {
+        float accum = 0.0;
+        for (int j = 0; j < 4; ++j) {
+            for (int i = 0; i < 4; ++i) {
+                const vec2 texel = (base + vec2(float(i - 1), float(j - 1)) + vec2(0.5)) * invInput;
+                const float weight = wx[i] * wy[j];
+                accum += texture(uInput, clamp(texel, vec2(0.0), vec2(1.0)))[c] * weight;
+            }
+        }
+        if ((pc.flags & 1u) != 0u) {
+            accum = clamp(accum, 0.0, 1.0);
+        }
+        gOutput[c * plane + spatial] = accum;
+    }
+}

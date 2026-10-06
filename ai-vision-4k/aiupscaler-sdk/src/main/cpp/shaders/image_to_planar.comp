@@ -1,0 +1,61 @@
+// AI Vision 4K — image (RGBA/R8 texture) -> planar CHW float tensor.
+//
+// Boundary pass: the renderer and the post passes work on images, the network
+// works on float storage buffers. Doing the conversion on the GPU keeps the
+// real-time path free of readbacks; the low-res input never leaves VRAM.
+//
+// The kernel is resolution independent: it samples with normalised coordinates,
+// so the frame can come from a render target of any size (dynamic resolution
+// scaling changes that size every few frames).
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uInput;      // low-res colour or luma
+layout(std430, binding = 1) writeonly buffer PlanarOutput {
+    float gOutput[];   // [C][H][W]
+};
+
+layout(push_constant) uniform PushConstants {
+    uint width;         // tensor width
+    uint height;        // tensor height
+    uint channels;      // 1 or 3
+    uint flags;         // bit0: input already holds luma (read .r only)
+                        // bit1: linearise sRGB before feeding the network
+    vec2 inputSize;     // source image size in texels (unused when uv sampling)
+    float scale;        // reserved
+} pc;
+
+const float kLumaWeights[3] = float[3](0.2126, 0.7152, 0.0722);
+
+float linearize(float value) {
+    // sRGB -> linear for the luminance-carrying channels. The neural weights are
+    // trained on linear light, and skipping this step is the single most visible
+    // mistake in a hand rolled mobile SR pipeline.
+    return value <= 0.04045 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4);
+}
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (uint(pos.x) >= pc.width || uint(pos.y) >= pc.height) {
+        return;
+    }
+
+    const vec2 uv = (vec2(pos) + vec2(0.5)) / vec2(float(pc.width), float(pc.height));
+    vec3 color = texture(uInput, uv).rgb;
+    if ((pc.flags & 2u) != 0u) {
+        color = vec3(linearize(color.r), linearize(color.g), linearize(color.b));
+    }
+
+    const uint plane = pc.width * pc.height;
+    const uint spatial = uint(pos.y) * pc.width + uint(pos.x);
+
+    if (pc.channels == 1u) {
+        const float luma = dot(color, vec3(kLumaWeights[0], kLumaWeights[1], kLumaWeights[2]));
+        gOutput[spatial] = luma;
+        return;
+    }
+    for (uint c = 0; c < pc.channels; ++c) {
+        gOutput[c * plane + spatial] = color[c];
+    }
+}

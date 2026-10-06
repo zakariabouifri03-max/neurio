@@ -1,0 +1,103 @@
+// AI Vision 4K — generic neural network layer kernel.
+//
+// One shader executes every convolutional layer of a .v4kmodel graph. Layer
+// geometry arrives through push constants, weights through a storage buffer, so
+// the driver sees a single pipeline and only the descriptor/push-constant
+// payload changes per layer. That keeps pipeline state changes (the main CPU
+// cost of a hand written mobile inference loop) to a minimum.
+//
+// Feature maps are planar (CHW) float storage buffers rather than textures:
+// a 64 channel feature map would otherwise need 16 RGBA textures and the
+// sampling hardware is not the bottleneck for 3x3 neighbourhoods anyway.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(std430, binding = 0) readonly buffer Weights {
+    float weights[];      // [outC][inC][k][k] (or [outC][k][k] when depthwise)
+};
+layout(std430, binding = 1) readonly buffer Biases {
+    float biases[];       // [outC], followed by PReLU slopes when act == 2
+};
+layout(std430, binding = 2) readonly buffer FeatureInput {
+    float gInput[];       // [inC][inH][inW]
+};
+layout(std430, binding = 3) writeonly buffer FeatureOutput {
+    float gOutput[];      // [outC][outH][outW]
+};
+
+layout(push_constant) uniform PushConstants {
+    uint inW;
+    uint inH;
+    uint outW;
+    uint outH;
+    uint inC;
+    uint outC;
+    uint kernel;      // 1 or 3
+    uint pad;         // symmetric padding
+    uint stride;      // 1 or 2
+    uint activation;  // 0 none, 1 relu, 2 prelu, 3 leaky
+    uint depthwise;   // 1 == per-channel (inC == outC, no cross channel sum)
+    uint reserved;
+} pc;
+
+float loadInput(uint c, int x, int y) {
+    // Explicit clamp: 'same' padding for the 3x3 layers, and the temporal
+    // model's feature maps are padded once at the tensor boundary.
+    const int cx = clamp(x, 0, int(pc.inW) - 1);
+    const int cy = clamp(y, 0, int(pc.inH) - 1);
+    const uint index = c * pc.inW * pc.inH + uint(cy) * pc.inW + uint(cx);
+    return gInput[index];
+}
+
+float applyActivation(float v, uint channel, uint outputChannels) {
+    if (pc.activation == 1u) {
+        return max(v, 0.0);
+    }
+    if (pc.activation == 2u) {
+        // PReLU slopes follow the biases in the same buffer.
+        const float slope = biases[outputChannels + channel];
+        return v >= 0.0 ? v : v * slope;
+    }
+    if (pc.activation == 3u) {
+        return v >= 0.0 ? v : v * 0.1;
+    }
+    return v;
+}
+
+void main() {
+    const ivec2 outPos = ivec2(gl_GlobalInvocationID.xy);
+    if (outPos.x >= int(pc.outW) || outPos.y >= int(pc.outH)) {
+        return;
+    }
+
+    const uint k = pc.kernel;
+    const int inX0 = int(outPos.x) * int(pc.stride) - int(pc.pad);
+    const int inY0 = int(outPos.y) * int(pc.stride) - int(pc.pad);
+
+    for (uint oc = 0; oc < pc.outC; ++oc) {
+        float sum = biases[oc];
+
+        if (pc.depthwise == 1u) {
+            for (uint ky = 0; ky < k; ++ky) {
+                for (uint kx = 0; kx < k; ++kx) {
+                    const float v = loadInput(oc, inX0 + int(kx), inY0 + int(ky));
+                    sum += v * weights[(oc * k + ky) * k + kx];
+                }
+            }
+        } else {
+            const uint perOutputChannel = pc.inC * k * k;
+            for (uint ic = 0; ic < pc.inC; ++ic) {
+                for (uint ky = 0; ky < k; ++ky) {
+                    for (uint kx = 0; kx < k; ++kx) {
+                        const float v = loadInput(ic, inX0 + int(kx), inY0 + int(ky));
+                        sum += v * weights[oc * perOutputChannel + (ic * k + ky) * k + kx];
+                    }
+                }
+            }
+        }
+
+        sum = applyActivation(sum, oc, pc.outC);
+        gOutput[oc * pc.outW * pc.outH + uint(outPos.y) * pc.outW + uint(outPos.x)] = sum;
+    }
+}

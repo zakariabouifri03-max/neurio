@@ -1,0 +1,50 @@
+// AI Vision 4K — planar CHW float tensor -> rgba16f image.
+//
+// Counterpart of image_to_planar.comp: it puts the network result back into the
+// image domain so the temporal/AA/sharpen passes (which are sampler based) can
+// consume it. Single channel tensors are written as a luminance image.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(std430, binding = 0) readonly buffer PlanarInput {
+    float gInput[];    // [C][H][W]
+};
+layout(set = 0, binding = 1, rgba16f) uniform image2D uOutput;
+
+layout(push_constant) uniform PushConstants {
+    uint width;
+    uint height;
+    uint channels;     // 1 or 3
+    uint writeAlpha;   // 1 == alpha = 1.0
+    float gain;        // linear gain applied on the way out
+    uint flags;        // bit0: clamp the result to [0,1]
+    uint reserved1;
+    uint reserved2;
+} pc;
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (uint(pos.x) >= pc.width || uint(pos.y) >= pc.height) {
+        return;
+    }
+    const uint plane = pc.width * pc.height;
+    const uint spatial = uint(pos.y) * pc.width + uint(pos.x);
+
+    vec4 value;
+    if (pc.channels == 1u) {
+        const float luma = gInput[spatial] * pc.gain;
+        value = vec4(luma, luma, luma, 1.0);
+    } else {
+        value = vec4(gInput[spatial] * pc.gain,
+                     gInput[plane + spatial] * pc.gain,
+                     gInput[2u * plane + spatial] * pc.gain,
+                     pc.writeAlpha == 1u ? 1.0 : gInput[2u * plane + spatial] * pc.gain);
+    }
+    if ((pc.flags & 1u) != 0u) {
+        // A network can overshoot outside the displayable range; clamping here
+        // matches the CPU interpreter's output contract exactly.
+        value = clamp(value, vec4(0.0), vec4(1.0));
+    }
+    imageStore(uOutput, pos, value);
+}

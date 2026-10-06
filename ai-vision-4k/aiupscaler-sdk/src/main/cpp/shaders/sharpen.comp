@@ -1,0 +1,57 @@
+// AI Vision 4K — contrast adaptive sharpening.
+//
+// A plain unsharp mask amplifies noise in flat areas and rings on hard edges.
+// This pass scales the high frequency boost by the local contrast (CAS), so the
+// user's 0..100% sharpening slider behaves predictably instead of turning
+// into an artifact generator at the top of its range.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uInput;
+layout(set = 0, binding = 1, rgba16f) uniform image2D uOutput;
+
+layout(push_constant) uniform PushConstants {
+    vec2 size;
+    vec2 invSize;
+    float amount;         // 0..1
+    float noiseFloor;     // high frequency amplitude treated as noise (0..1)
+    uint enable;
+    uint reserved;
+} pc;
+
+const vec3 kLumaWeights = vec3(0.2126, 0.7152, 0.0722);
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (pos.x >= int(pc.size.x) || pos.y >= int(pc.size.y)) {
+        return;
+    }
+    const vec3 centre = texelFetch(uInput, pos, 0).rgb;
+
+    if (pc.enable == 0u || pc.amount <= 0.0) {
+        imageStore(uOutput, pos, vec4(centre, 1.0));
+        return;
+    }
+
+    const ivec2 maxPos = ivec2(pc.size) - ivec2(1);
+    const vec3 north = texelFetch(uInput, clamp(pos + ivec2(0, -1), ivec2(0), maxPos), 0).rgb;
+    const vec3 south = texelFetch(uInput, clamp(pos + ivec2(0, 1), ivec2(0), maxPos), 0).rgb;
+    const vec3 west = texelFetch(uInput, clamp(pos + ivec2(-1, 0), ivec2(0), maxPos), 0).rgb;
+    const vec3 east = texelFetch(uInput, clamp(pos + ivec2(1, 0), ivec2(0), maxPos), 0).rgb;
+
+    const vec3 neighbourhoodMin = min(centre, min(min(north, south), min(west, east)));
+    const vec3 neighbourhoodMax = max(centre, max(max(north, south), max(west, east)));
+    const vec3 blurred = (north + south + west + east) * 0.25;
+
+    // Local contrast decides how much sharpening this pixel can take.
+    const float contrast = dot(neighbourhoodMax - neighbourhoodMin, kLumaWeights);
+    const float headroom = clamp(contrast / max(pc.noiseFloor, 1e-3), 0.0, 1.0);
+    const float gain = pc.amount * (0.35 + 0.65 * headroom);
+
+    vec3 sharpened = centre + (centre - blurred) * gain;
+    // Never overshoot outside the local neighbourhood: that is what causes
+    // halos around high contrast edges.
+    sharpened = clamp(sharpened, min(neighbourhoodMin, centre), max(neighbourhoodMax, centre));
+    imageStore(uOutput, pos, vec4(clamp(sharpened, vec3(0.0), vec3(1.0)), 1.0));
+}

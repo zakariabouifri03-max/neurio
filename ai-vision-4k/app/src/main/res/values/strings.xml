@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI Vision 4K</string>
+    <string name="monitor_channel_name">Performance monitoring</string>
+    <string name="monitor_channel_description">Live FPS, frame time and thermal telemetry during an active session.</string>
+    <string name="monitor_notification_title">AI Vision 4K · monitoring active</string>
+    <string name="monitor_notification_stop">Stop</string>
+    <string name="overlay_permission_message">Grant "draw over other apps" and turn the overlay on again.</string>
+</resources>

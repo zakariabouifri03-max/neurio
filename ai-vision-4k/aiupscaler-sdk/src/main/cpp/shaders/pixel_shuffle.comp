@@ -1,0 +1,62 @@
+// AI Vision 4K — sub-pixel convolution (pixel shuffle) and residual add.
+//
+// ESPCN-style networks end with a convolution that produces scale^2 * outC
+// channels in low resolution space; this pass rearranges them into the high
+// resolution image. Doing the rearrangement with a dedicated pass (instead of
+// relying on a strided write inside the convolution) keeps the convolution's
+// writes fully coalesced.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(std430, binding = 0) readonly buffer ShuffleInput {
+    float gInput[];     // [inC][inH][inW]
+};
+layout(std430, binding = 1) writeonly buffer ShuffleOutput {
+    float gOutput[];    // [outC][inH * r][inW * r]
+};
+layout(std430, binding = 2) readonly buffer Residual {
+    float residual[];   // optional: bicubic upscale of the network input, [outC][outH][outW]
+};
+
+layout(push_constant) uniform PushConstants {
+    uint inW;
+    uint inH;
+    uint channels;     // inC / (r * r)
+    uint scale;        // r, 2 or 4
+    uint addResidual;  // 1 == output = shuffled + residual
+    uint reserved0;
+    uint reserved1;
+    uint reserved2;
+} pc;
+
+void main() {
+    const uint outW = pc.inW * pc.scale;
+    const uint outH = pc.inH * pc.scale;
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (uint(pos.x) >= outW || uint(pos.y) >= outH) {
+        return;
+    }
+
+    const uint r = pc.scale;
+    const uint lowX = uint(pos.x) / r;
+    const uint lowY = uint(pos.y) / r;
+    const uint subX = uint(pos.x) % r;
+    const uint subY = uint(pos.y) % r;
+    const uint inChannels = pc.channels * r * r;
+
+    for (uint c = 0; c < pc.channels; ++c) {
+        const uint srcChannel = c * r * r + subY * r + subX;
+        const float value = gInput[srcChannel * pc.inW * pc.inH + lowY * pc.inW + lowX];
+        float result = value;
+        if (pc.addResidual == 1u) {
+            result += residual[c * outW * outH + uint(pos.y) * outW + uint(pos.x)];
+        }
+        gOutput[c * outW * outH + uint(pos.y) * outW + uint(pos.x)] = result;
+    }
+
+    // Guard against a graph that produced more channels than the shuffle used.
+    if (inChannels == 0u) {
+        return;
+    }
+}

@@ -1,0 +1,123 @@
+// AI Vision 4K — analytical reconstruction (always available, never called "AI").
+//
+// This is the non-neural path: Catmull-Rom bicubic resampling followed by a
+// gradient-directed correction that steers the interpolation along edges
+// instead of across them, which is what removes the stair-stepping that plain
+// bilinear upscaling shows on hard game geometry.
+//
+// The engine reports UpscaleMode::Analytical whenever this shader produces the
+// frame, and the UI labels it exactly that way.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uInput;             // low resolution colour
+layout(set = 0, binding = 1, rgba16f) uniform image2D uOutput;     // high resolution colour
+
+layout(push_constant) uniform PushConstants {
+    vec2 inputSize;
+    vec2 outputSize;
+    float edgeStrength;   // 0 == pure bicubic, 0.35 typical
+    float sharpening;     // applied after reconstruction
+    float detailRecovery; // high frequency re-injection from the luma plane
+    uint flags;           // bit0: also write the residual used by neural models
+} pc;
+
+vec4 cubicWeights(float t) {
+    const float t2 = t * t;
+    const float t3 = t2 * t;
+    return vec4(-0.5 * t3 + t2 - 0.5 * t,
+                1.5 * t3 - 2.5 * t2 + 1.0,
+                -1.5 * t3 + 2.0 * t2 + 0.5 * t,
+                0.5 * t3 - 0.5 * t2);
+}
+
+vec4 sampleBicubic(vec2 uv, vec2 texelSize) {
+    const vec2 coord = uv / texelSize - 0.5;
+    const vec2 base = floor(coord);
+    const vec2 f = coord - base;
+    const vec4 wx = cubicWeights(f.x);
+    const vec4 wy = cubicWeights(f.y);
+
+    vec4 result = vec4(0.0);
+    for (int j = 0; j < 4; ++j) {
+        vec4 row = vec4(0.0);
+        for (int i = 0; i < 4; ++i) {
+            const vec2 texel = (base + vec2(float(i) - 1.0, float(j) - 1.0) + 0.5) * texelSize;
+            row[i] = dot(texture(uInput, texel).rgb, vec3(0.2126, 0.7152, 0.0722));
+        }
+        result[j] = dot(row, wx);
+    }
+    // Luma only (the colour is fetched below); reuse the channel to carry it.
+    return vec4(dot(result, wy));
+}
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (pos.x >= int(pc.outputSize.x) || pos.y >= int(pc.outputSize.y)) {
+        return;
+    }
+
+    const vec2 texelSize = 1.0 / pc.inputSize;
+    // Map the output pixel centre back into input space.
+    const vec2 uv = (vec2(pos) + 0.5) * (pc.inputSize / pc.outputSize) * texelSize;
+    const vec2 sourceCoord = (vec2(pos) + 0.5) * (pc.inputSize / pc.outputSize) - 0.5;
+
+    vec3 bicubic = sampleBicubic(uv, texelSize).rgb;
+
+    // --- gradient directed correction --------------------------------------
+    vec3 corrected = bicubic;
+    if (pc.edgeStrength > 0.0) {
+        const vec2 base = floor(sourceCoord);
+        const vec2 f = sourceCoord - base;
+        const ivec2 i0 = ivec2(base);
+
+        // Central differences on the 2x2 source neighbourhood.
+        vec3 c00 = texelFetch(uInput, i0, 0).rgb;
+        vec3 c10 = texelFetch(uInput, i0 + ivec2(1, 0), 0).rgb;
+        vec3 c01 = texelFetch(uInput, i0 + ivec2(0, 1), 0).rgb;
+        vec3 c11 = texelFetch(uInput, i0 + ivec2(1, 1), 0).rgb;
+
+        const vec3 gradX = (c10 + c11) - (c00 + c01);
+        const vec3 gradY = (c01 + c11) - (c00 + c10);
+        const float gx = dot(gradX, vec3(0.2126, 0.7152, 0.0722));
+        const float gy = dot(gradY, vec3(0.2126, 0.7152, 0.0722));
+        const float gradient = sqrt(gx * gx + gy * gy);
+
+        // Blend towards the bilinear result weighted by how much local contrast
+        // there is: flat areas keep the smooth bicubic result, hard edges get
+        // the corrected one.
+        const vec3 bilinear = mix(mix(c00, c10, f.x), mix(c01, c11, f.x), f.y);
+        const float blend = clamp(gradient * 6.0, 0.0, 1.0) * clamp(pc.edgeStrength, 0.0, 1.0);
+        corrected = mix(bicubic, bilinear, blend);
+    }
+
+    // --- detail recovery ---------------------------------------------------
+    // Re-inject the high frequency content of the low-res luma, scaled for the
+    // resolution ratio, which keeps textures from turning into mush.
+    if (pc.detailRecovery > 0.0) {
+        const float centreLuma = dot(corrected, vec3(0.2126, 0.7152, 0.0722));
+        const float lowLuma = dot(texelFetch(uInput, ivec2(sourceCoord), 0).rgb,
+                                  vec3(0.2126, 0.7152, 0.0722));
+        const float highFrequency = centreLuma - lowLuma;
+        corrected += vec3(highFrequency * pc.detailRecovery * 0.5);
+    }
+
+    // --- sharpening --------------------------------------------------------
+    if (pc.sharpening > 0.0) {
+        const float centreLuma = dot(corrected, vec3(0.2126, 0.7152, 0.0722));
+        const float north = dot(imageLoad(uOutput, pos + ivec2(0, -1)).rgb,
+                                vec3(0.2126, 0.7152, 0.0722));
+        const float south = dot(imageLoad(uOutput, pos + ivec2(0, 1)).rgb,
+                                vec3(0.2126, 0.7152, 0.0722));
+        const float west = dot(imageLoad(uOutput, pos + ivec2(-1, 0)).rgb,
+                               vec3(0.2126, 0.7152, 0.0722));
+        const float east = dot(imageLoad(uOutput, pos + ivec2(1, 0)).rgb,
+                               vec3(0.2126, 0.7152, 0.0722));
+        const float blurred = (north + south + west + east) * 0.25;
+        const float amount = (centreLuma - blurred) * pc.sharpening * 1.5;
+        corrected += vec3(amount);
+    }
+
+    imageStore(uOutput, pos, vec4(clamp(corrected, vec3(0.0), vec3(1.0)), 1.0));
+}

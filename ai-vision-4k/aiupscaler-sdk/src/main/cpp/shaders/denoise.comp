@@ -1,0 +1,61 @@
+// AI Vision 4K — standalone denoise pass.
+//
+// Used when the user raises noise reduction above what the pre-processing pass
+// already handles (compressed game streams, low quality TAA in the game itself)
+// or when the source is a captured screen frame rather than an engine frame.
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uInput;
+layout(set = 0, binding = 1, rgba16f) uniform image2D uOutput;
+
+layout(push_constant) uniform PushConstants {
+    vec2 size;
+    vec2 invSize;
+    float strength;      // 0..1
+    float lumaSigma;     // edge preserving threshold
+    uint passIndex;
+    uint reserved;
+} pc;
+
+const vec3 kLumaWeights = vec3(0.2126, 0.7152, 0.0722);
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (pos.x >= int(pc.size.x) || pos.y >= int(pc.size.y)) {
+        return;
+    }
+    const vec3 centre = texelFetch(uInput, pos, 0).rgb;
+    if (pc.strength <= 0.0) {
+        imageStore(uOutput, pos, vec4(centre, 1.0));
+        return;
+    }
+
+    const float centreLuma = dot(centre, kLumaWeights);
+    const float sigmaInv = 1.0 / max(1e-3, pc.lumaSigma);
+    vec3 accum = vec3(0.0);
+    float weightSum = 0.0;
+
+    // 5x5 bilateral with a separable spatial falloff approximation; two passes
+    // (passIndex selects which tap set) keep this cheap enough for 4K output.
+    for (int dy = -2; dy <= 2; ++dy) {
+        for (int dx = -2; dx <= 2; ++dx) {
+            // Alternate passes offset the tap grid so the effective kernel is
+            // denser than one pass would allow.
+            const int ox = (pc.passIndex == 1u && ((dx + dy) % 2 != 0)) ? 1 : 0;
+            const ivec2 tap = pos + ivec2(dx, dy) + ivec2(ox, 0);
+            const vec3 sampleValue = texelFetch(uInput, tap, 0).rgb;
+            const float lumaDiff = dot(sampleValue, kLumaWeights) - centreLuma;
+            const float spatial = exp(-float(dx * dx + dy * dy) / 8.0);
+            const float range = exp(-lumaDiff * lumaDiff * sigmaInv * sigmaInv);
+            const float w = spatial * range;
+            accum += sampleValue * w;
+            weightSum += w;
+        }
+    }
+
+    const vec3 filtered = accum / max(weightSum, 1e-5);
+    const vec3 result = mix(centre, filtered, clamp(pc.strength, 0.0, 1.0));
+    imageStore(uOutput, pos, vec4(result, 1.0));
+}
