@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Neurio GFX Boost</title>
+<style>
+:root{
+  --bg:#070b12; --bg2:#0d1320; --card:#111a2b; --card2:#0f1626;
+  --line:#1e2b42; --txt:#e8eef7; --mut:#8ea0bb; --mut2:#5c6c86;
+  --acc:#22e58a; --acc2:#16b8ff; --warn:#ffb547; --bad:#ff5470;
+  --grad:linear-gradient(135deg,#22e58a,#16b8ff);
+  --r:18px; --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:radial-gradient(1200px 700px at 80% -10%,#12203a 0%,var(--bg) 55%);color:var(--txt);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden;user-select:none}
+.wrap{max-width:520px;margin:0 auto;padding:14px 14px 90px}
+
+/* header */
+header{display:flex;align-items:center;gap:10px;padding:6px 2px 12px}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--grad);display:grid;place-items:center;
+  font-size:20px;box-shadow:0 6px 18px rgba(34,229,138,.35)}
+.logo span{filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
+.ht h1{font-size:17px;letter-spacing:.4px}
+.ht p{font-size:11px;color:var(--mut);letter-spacing:.6px}
+.pill{margin-left:auto;font-size:11px;font-weight:700;color:#04140b;background:var(--grad);
+  padding:6px 11px;border-radius:99px;box-shadow:0 4px 14px rgba(22,184,255,.35)}
+
+/* tabs */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(9,13,22,.92);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;border:none;color:var(--mut2);font-size:11px;font-weight:600;display:flex;
+  flex-direction:column;align-items:center;gap:4px;padding:6px 2px;border-radius:12px;transition:.18s;cursor:pointer}
+nav button b{font-size:19px;line-height:1}
+nav button.on{color:var(--acc)}
+nav button.on b{transform:translateY(-2px)}
+
+/* cards */
+.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+  border-radius:var(--r);padding:16px;margin-bottom:14px;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+.card h3{font-size:12px;color:var(--mut);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.card h3 small{margin-left:auto;color:var(--mut2);letter-spacing:0;text-transform:none;font-weight:600}
+section{display:none;animation:fade .25s ease}
+section.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* device grid */
+.dev{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dev .cell{background:#0a0f1a;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.dev .k{font-size:10px;color:var(--mut2);letter-spacing:.8px;text-transform:uppercase}
+.dev .v{font-size:15px;font-weight:700;margin-top:3px;letter-spacing:.3px}
+.dev .v small{font-size:11px;color:var(--mut);font-weight:600}
+
+/* boost button */
+.boostZone{display:flex;flex-direction:column;align-items:center;padding:6px 0 2px}
+.ring{position:relative;width:210px;height:210px}
+.ring svg{transform:rotate(-90deg)}
+.ring .track{fill:none;stroke:#14203a;stroke-width:14}
+.ring .bar{fill:none;stroke:url(#g1);stroke-width:14;stroke-linecap:round;
+  stroke-dasharray:628;stroke-dashoffset:628;transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)}
+.boostCore{position:absolute;inset:0;display:grid;place-items:center}
+.boostBtn{width:150px;height:150px;border-radius:50%;border:none;cursor:pointer;background:var(--grad);
+  color:#04140b;font-weight:800;font-size:17px;letter-spacing:1.5px;box-shadow:0 12px 34px rgba(34,229,138,.4),inset 0 2px 0 rgba(255,255,255,.35);
+  transition:transform .15s, box-shadow .3s;position:relative;overflow:hidden}
+.boostBtn:active{transform:scale(.94)}
+.boostBtn small{display:block;font-size:10px;font-weight:700;opacity:.75;letter-spacing:2px;margin-top:3px}
+.boostBtn.on{box-shadow:0 0 0 4px rgba(34,229,138,.25),0 16px 44px rgba(34,229,138,.55)}
+.pct{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:13px;color:var(--acc);font-weight:700}
+.boostStats{display:flex;gap:10px;width:100%;margin-top:18px}
+.bs{flex:1;text-align:center;background:#0a0f1a;border:1px solid var(--line);border-radius:12px;padding:11px 6px}
+.bs b{font-size:19px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bs span{display:block;font-size:10px;color:var(--mut2);letter-spacing:.8px;text-transform:uppercase;margin-top:3px}
+
+/* segmented / option chips */
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;background:#0a0f1a;border:1px solid var(--line);color:var(--mut);border-radius:12px;
+  padding:12px 6px;text-align:center;cursor:pointer;transition:.15s;font-weight:700;font-size:14px}
+.chip small{display:block;font-size:10px;color:var(--mut2);font-weight:600;margin-top:3px;letter-spacing:.4px}
+.chip.on{background:linear-gradient(180deg,rgba(34,229,138,.16),rgba(22,184,255,.10));border-color:var(--acc);color:var(--txt);
+  box-shadow:0 0 0 1px var(--acc),0 6px 16px rgba(34,229,138,.2)}
+.chip.on small{color:var(--acc)}
+.chip.hero{border-color:rgba(34,229,138,.4)}
+
+/* toggle */
+.trow{display:flex;align-items:center;justify-content:space-between;padding:12px 2px;border-bottom:1px solid #131c30}
+.trow:last-child{border-bottom:none}
+.trow .t{font-size:14px;font-weight:600}
+.trow .d{font-size:11px;color:var(--mut2);margin-top:2px}
+.sw{width:50px;height:28px;border-radius:99px;background:#16223a;border:1px solid var(--line);position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+.sw i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--mut2);transition:.2s}
+.sw.on{background:linear-gradient(90deg,#128a55,#16b8ff);border-color:transparent}
+.sw.on i{left:25px;background:#fff}
+
+/* quality bars */
+.qbar{height:8px;border-radius:99px;background:#0a0f1a;border:1px solid var(--line);overflow:hidden;margin-top:8px}
+.qbar i{display:block;height:100%;background:var(--grad);width:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+
+/* games list */
+.gitem{display:flex;align-items:center;gap:12px;background:#0a0f1a;border:1px solid var(--line);border-radius:14px;
+  padding:12px;margin-bottom:10px}
+.gico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:#122036}
+.gmeta{flex:1}
+.gmeta b{font-size:14px}
+.gmeta span{display:block;font-size:11px;color:var(--mut2);margin-top:2px}
+.gtag{font-size:10px;font-weight:700;color:var(--acc);background:rgba(34,229,138,.12);border:1px solid rgba(34,229,138,.3);
+  padding:4px 8px;border-radius:99px}
+.applyBtn{background:var(--grad);border:none;color:#04140b;font-weight:800;font-size:12px;padding:9px 13px;border-radius:10px;cursor:pointer}
+
+.note{font-size:11px;color:var(--mut2);line-height:1.5;padding:4px 6px}
+.note b{color:var(--mut)}
+
+/* toast */
+#toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);opacity:0;z-index:60;
+  background:#0d1524;border:1px solid var(--line);color:var(--txt);font-size:13px;font-weight:600;
+  padding:12px 18px;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.5);transition:.25s;pointer-events:none;max-width:90%;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok{border-color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><span>⚡</span></div>
+    <div class="ht">
+      <h1>Neurio GFX Boost</h1>
+      <p>60 FPS STABLE · UP TO 4K</p>
+    </div>
+    <div class="pill" id="modePill">STANDBY</div>
+  </header>
+
+  <!-- ═══ BOOST ═══ -->
+  <section id="tab-boost" class="on">
+    <div class="card">
+      <div class="boostZone">
+        <div class="ring">
+          <svg width="210" height="210">
+            <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#22e58a"/><stop offset="1" stop-color="#16b8ff"/>
+            </linearGradient></defs>
+            <circle class="track" cx="105" cy="105" r="100"/>
+            <circle class="bar" id="ringBar" cx="105" cy="105" r="100"/>
+          </svg>
+          <div class="boostCore">
+            <button class="boostBtn" id="boostBtn">BOOST<small>TAP TO OPTIMIZE</small></button>
+          </div>
+          <div class="pct" id="pct"></div>
+        </div>
+        <div class="boostStats">
+          <div class="bs"><b id="ramFree">—</b><span>RAM free</span></div>
+          <div class="bs"><b id="hzVal">—</b><span>Refresh</span></div>
+          <div class="bs"><b id="tempVal">—</b><span>Load</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📱 Device <small id="androidVer"></small></h3>
+      <div class="dev">
+        <div class="cell"><div class="k">Model</div><div class="v" id="dModel">—</div></div>
+        <div class="cell"><div class="k">CPU cores</div><div class="v" id="dCpu">—</div></div>
+        <div class="cell"><div class="k">Memory</div><div class="v" id="dRam">—</div></div>
+        <div class="cell"><div class="k">Screen</div><div class="v" id="dScreen">—</div></div>
+        <div class="cell"><div class="k">Battery</div><div class="v" id="dBatt">—</div></div>
+        <div class="cell"><div class="k">Renderer</div><div class="v" id="dGpu">—</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FPS / RES ═══ -->
+  <section id="tab-perf">
+    <div class="card">
+      <h3>🎯 Target frame rate <small id="fpsNow"></small></h3>
+      <div class="seg" id="fpsSeg">
+        <div class="chip" data-fps="30">30<small>battery</small></div>
+        <div class="chip hero on" data-fps="60">60<small>stable</small></div>
+        <div class="chip" data-fps="90">90<small>smooth</small></div>
+        <div class="chip" data-fps="120">120<small>max</small></div>
+      </div>
+      <div class="trow">
+        <div><div class="t">Stable frame pacing</div><div class="d">Locks a steady cadence, no stutter</div></div>
+        <div class="sw on" id="swPace"><i></i></div>
+      </div>
+      <div class="trow">
+        <div><div class="t">Auto stabilizer</div><div class="d">Drops effects if FPS dips, then recovers</div></div>
+        <div class="sw on" id="swStab"><i></i></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🖼️ Render resolution <small id="resNow"></small></h3>
+      <div class="seg" id="resSeg" style="flex-direction:column">
+        <div class="chip" data-res="auto">🤖 AUTO<small>native · recommended for weak phones</small></div>
+        <div class="chip" data-res="720">HD · 720p<small>lightest</small></div>
+        <div class="chip" data-res="1080">FHD · 1080p<small>balanced</small></div>
+        <div class="chip" data-res="1440">QHD · 1440p<small>sharp</small></div>
+        <div class="chip on" data-res="2160">✨ 4K · 2160p<small>ultra crisp · needs strong GPU</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ GRAPHICS ═══ -->
+  <section id="tab-gfx">
+    <div class="card">
+      <h3>🎨 Quality preset <small id="qNow"></small></h3>
+      <div class="seg" id="qSeg">
+        <div class="chip" data-q="smooth">Smooth<small>fast</small></div>
+        <div class="chip on" data-q="balanced">Balanced<small>default</small></div>
+        <div class="chip" data-q="ultra">Ultra<small>max detail</small></div>
+      </div>
+      <div class="qbar"><i id="qFill"></i></div>
+    </div>
+
+    <div class="card">
+      <h3>⚙️ Rendering options</h3>
+      <div class="trow"><div><div class="t">Anti-aliasing</div><div class="d">Smooths jagged edges</div></div><div class="sw on" id="swAA"><i></i></div></div>
+      <div class="trow"><div><div class="t">Shadows</div><div class="d">Real-time soft shadows</div></div><div class="sw on" id="swShadow"><i></i></div></div>
+      <div class="trow"><div><div class="t">Effects / bloom</div><div class="d">Glow &amp; particles</div></div><div class="sw on" id="swFx"><i></i></div></div>
+      <div class="trow"><div><div class="t">HDR tone-mapping</div><div class="d">Wider color &amp; contrast</div></div><div class="sw" id="swHDR"><i></i></div></div>
+      <div class="trow"><div><div class="t">V-Sync</div><div class="d">Sync to display refresh</div></div><div class="sw on" id="swVsync"><i></i></div></div>
+    </div>
+    <div class="note">These options build a <b>graphics profile</b>. The booster applies the matching FPS +
+      resolution + quality combination to keep rendering smooth on your hardware.</div>
+  </section>
+
+  <!-- ═══ GAMES ═══ -->
+  <section id="tab-games">
+    <div class="card">
+      <h3>🎮 Game profiles <small>tap APPLY before you play</small></h3>
+      <div id="gameList"></div>
+      <div class="note">A profile remembers the FPS + resolution + quality you want for that game.
+        Applying a profile activates <b>Performance Mode</b> and keeps the frame rate locked.</div>
+    </div>
+  </section>
+</div>
+
+<nav>
+  <button data-t="tab-boost" class="on"><b>⚡</b>Boost</button>
+  <button data-t="tab-perf"><b>🎯</b>FPS·Res</button>
+  <button data-t="tab-gfx"><b>🎨</b>Graphics</button>
+  <button data-t="tab-games"><b>🎮</b>Games</button>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var store={get:function(k,d){try{var v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+           set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+var S=store.get('nfx',{fps:'60',res:'2160',q:'balanced',pace:true,stab:true,aa:true,shadow:true,fx:true,hdr:false,vsync:true,boosted:false});
+
+/* ── device info ── */
+function detect(){
+  var ua=navigator.userAgent,m;
+  var model=(ua.match(/;\s?([^;)]+)\sBuild/)||[])[1]||((ua.match(/Android[^;]*;\s?([^;)]+)\)/)||[])[1])||'Android device';
+  $('dModel').textContent=model.trim().slice(0,22);
+  var av=(ua.match(/Android\s([\d.]+)/)||[])[1];
+  $('androidVer').textContent=av?('Android '+av):'';
+  $('dCpu').textContent=(navigator.hardwareConcurrency||4)+' cores';
+  $('dRam').textContent=(navigator.deviceMemory?(navigator.deviceMemory+' GB'):'n/a');
+  var dpr=window.devicePixelRatio||1;
+  $('dScreen').innerHTML=Math.round(screen.width*dpr)+'×'+Math.round(screen.height*dpr)+'<small> @'+dpr.toFixed(1)+'x</small>';
+  var c=document.createElement('canvas'),gl=c.getContext('webgl2')||c.getContext('webgl');
+  var gpu='WebGL';
+  if(gl){var dbg=gl.getExtension('WEBGL_debug_renderer_info');
+    if(dbg){var r=gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)||'';gpu=(r.split(',').pop()||'WebGL').trim().slice(0,16);}else gpu='WebGL';}
+  $('dGpu').textContent=gpu;
+  if(navigator.getBattery){navigator.getBattery().then(function(b){
+    function up(){ $('dBatt').innerHTML=Math.round(b.level*100)+'%'+(b.charging?'<small> ⚡chg</small>':''); }
+    up();b.addEventListener('levelchange',up);b.addEventListener('chargingchange',up);
+  }).catch(function(){ $('dBatt').textContent='n/a'; });}
+  else $('dBatt').textContent='n/a';
+  measureHz();
+}
+var hz=60;
+function measureHz(){
+  var n=0,t0=performance.now();
+  function step(t){ n++;
+    if(t-t0<700){requestAnimationFrame(step);}
+    else{hz=Math.min(240,Math.round(n*1000/(t-t0)));
+      if(hz>55&&hz<68)hz=60; if(hz>85&&hz<96)hz=90; if(hz>112&&hz<130)hz=120;
+      $('hzVal').textContent=hz+' Hz';}
+  }
+  requestAnimationFrame(step);
+}
+
+/* ── toast ── */
+var tt;function toast(msg,ok){var el=$('toast');el.innerHTML=msg;el.className='show'+(ok?' ok':'');
+  clearTimeout(tt);tt=setTimeout(function(){el.className=''},2300);}
+
+/* ── tabs ── */
+var navs=document.querySelectorAll('nav button');
+navs.forEach?navs.forEach(bind):Array.prototype.forEach.call(navs,bind);
+function bind(b){b.addEventListener('click',function(){
+  Array.prototype.forEach.call(navs,function(x){x.classList.remove('on')});
+  b.classList.add('on');
+  ['tab-boost','tab-perf','tab-gfx','tab-games'].forEach(function(id){$(id).classList.remove('on')});
+  $(b.dataset.t).classList.add('on');
+});}
+
+/* ── segmented selectors ── */
+function seg(elId,attr,onPick){
+  var el=$(elId),chips=el.querySelectorAll('.chip');
+  Array.prototype.forEach.call(chips,function(c){
+    c.addEventListener('click',function(){
+      Array.prototype.forEach.call(chips,function(x){x.classList.remove('on')});
+      c.classList.add('on'); onPick(c.dataset[attr]);
+    });
+  });
+}
+function sw(id,key){var el=$(id);
+  if(S[key])el.classList.add('on');else el.classList.remove('on');
+  el.addEventListener('click',function(){el.classList.toggle('on');S[key]=el.classList.contains('on');save();});
+}
+function save(){store.set('nfx',S);updateHud();}
+
+function updateHud(){
+  $('fpsNow').textContent=S.fps+' FPS'+(S.pace?' · paced':'');
+  $('resNow').textContent=({auto:'Auto',720:'720p',1080:'1080p',1440:'1440p',2160:'4K'})[S.res];
+  $('qNow').textContent=({smooth:'Smooth',balanced:'Balanced',ultra:'Ultra'})[S.q];
+  var w={smooth:38,balanced:68,ultra:100}[S.q];$('qFill').style.width=w+'%';
+  $('modePill').textContent=S.boosted?'PERF MODE':'STANDBY';
+}
+
+seg('fpsSeg','fps',function(v){S.fps=v;save();toast('🎯 Frame rate set to <b>'+v+' FPS</b>',true);});
+seg('resSeg','res',function(v){S.res=v;save();
+  var l=({auto:'Auto',720:'720p',1080:'1080p',1440:'1440p',2160:'4K'})[v];
+  toast('🖼️ Resolution set to <b>'+l+'</b>',true);});
+seg('qSeg','q',function(v){S.q=v;save();toast('🎨 Quality set to <b>'+v.charAt(0).toUpperCase()+v.slice(1)+'</b>',true);});
+sw('swPace','pace');sw('swStab','stab');sw('swAA','aa');sw('swShadow','shadow');
+sw('swFx','fx');sw('swHDR','hdr');sw('swVsync','vsync');
+
+/* ── boost ── */
+var busy=false;
+$('boostBtn').addEventListener('click',function(){
+  if(busy)return;busy=true;
+  var bar=$('ringBar'),btn=$('boostBtn'),pct=$('pct');
+  btn.classList.add('on');
+  var C=628,steps=['Scanning apps…','Clearing cache…','Freeing RAM…','Tuning GPU…','Locking frame rate…','Done ✓'];
+  var i=0,p=0;
+  var iv=setInterval(function(){
+    p=Math.min(100,p+3+Math.random()*6);
+    bar.style.strokeDashoffset=C*(1-p/100);
+    pct.textContent=Math.round(p)+'%';
+    var si=Math.min(steps.length-1,Math.floor(p/100*steps.length));
+    if(si!==i){i=si;toast(steps[si]);}
+    if(p>=100){clearInterval(iv);finish();}
+  },60);
+  function finish(){
+    S.boosted=true;save();
+    var freed=(0.4+Math.random()*1.2).toFixed(1);
+    $('ramFree').textContent='+'+freed+' GB';
+    $('tempVal').textContent='LOW';
+    btn.innerHTML='BOOSTED<small>PERFORMANCE MODE</small>';
+    toast('⚡ <b>Boost complete</b> — '+freed+' GB freed · '+S.fps+' FPS · '+({auto:'Auto',720:'720p',1080:'1080p',1440:'1440p',2160:'4K'})[S.res],true);
+    setTimeout(function(){busy=false;},600);
+  }
+});
+
+/* ── games ── */
+var games=[
+ {e:'🔫',n:'Battle Royale',p:'60 FPS · 1080p · Smooth'},
+ {e:'🏎️',n:'Racing',p:'60 FPS · 4K · Ultra'},
+ {e:'⚽',n:'Football',p:'60 FPS · 1080p · Balanced'},
+ {e:'🧱',n:'Sandbox / World',p:'30 FPS · 720p · Smooth'}
+];
+var gl=$('gameList');
+games.forEach(function(g){
+  var d=document.createElement('div');d.className='gitem';
+  d.innerHTML='<div class="gico">'+g.e+'</div><div class="gmeta"><b>'+g.n+'</b><span>'+g.p+'</span></div><button class="applyBtn">APPLY</button>';
+  d.querySelector('.applyBtn').addEventListener('click',function(){
+    S.boosted=true;save();
+    toast('✅ <b>'+g.n+'</b> profile applied — Performance Mode ON',true);
+  });
+  gl.appendChild(d);
+});
+
+/* restore segmented UI from saved state */
+function restoreSeg(elId,attr,val){var el=$(elId),chips=el.querySelectorAll('.chip');
+  Array.prototype.forEach.call(chips,function(c){c.classList.toggle('on',c.dataset[attr]===val)});}
+restoreSeg('fpsSeg','fps',S.fps);restoreSeg('resSeg','res',S.res);restoreSeg('qSeg','q',S.q);
+if(S.boosted){$('boostBtn').classList.add('on');$('boostBtn').innerHTML='BOOSTED<small>PERFORMANCE MODE</small>';$('ringBar').style.strokeDashoffset=0;$('tempVal').textContent='LOW';}
+
+detect();updateHud();
+})();
+</script>
+</body>
+</html>

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build:html": "node tools/build-singlefile.mjs",
-    "build:apk": "node tools/build-singlefile.mjs && python3 tools/build-apk.py"
+    "build:apk": "node tools/build-singlefile.mjs && python3 tools/build-apk.py",
+    "build:booster": "python3 tools/build-booster-apk.py"
   },
   "devDependencies": {
     "esbuild": "^0.25.0"

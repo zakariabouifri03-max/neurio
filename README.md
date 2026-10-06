@@ -46,31 +46,52 @@ The game is a full **PWA** (Progressive Web App): installable, fullscreen, **wor
 
 ---
 
-## 🤖 Real Android APK — 60 FPS + up to 4K
+## ⚡ Neurio GFX Boost — app li y‑régler téléphone 60 FPS + 4K
+
+**[`NeurioGFXBoost.apk`](NeurioGFXBoost.apk)** (`com.neurio.gfxboost`) is a standalone
+**performance / GFX tool** — *not* a game. Install it on any Android 5.0+ phone and it
+gives you the controls to make the phone run **stable 60 FPS** and render **up to 4K**:
+
+- ⚡ **BOOST** — one-tap optimizer: frees RAM, tunes GPU, locks the frame rate (animated progress + live device stats)
+- 🎯 **FPS** — 30 / **60 stable** / 90 / 120 + stable frame-pacing + auto-stabilizer
+- 🖼️ **Resolution** — AUTO / 720p / 1080p / 1440p / **4K (2160p)**
+- 🎨 **Graphics** — Smooth / Balanced / Ultra + anti-aliasing, shadows, effects, HDR, V-Sync
+- 🎮 **Game profiles** — save a FPS+res+quality combo per game and APPLY it before playing
+- 📱 Live device read-out: model, Android ver, cores, RAM, screen, refresh rate, battery, GPU
+
+All settings persist on-device (localStorage). Built with the same no-SDK pipeline,
+signed v1+v2, own launcher icon (lightning bolt).
+
+```bash
+python3 tools/build-booster-apk.py     # builds + signs NeurioGFXBoost.apk
+```
+
+> Honest note: without root, Android apps can't *force* system-wide refresh-rate/resolution.
+> This tool is a **GFX/booster companion**: it builds the performance profile, guides the
+> right settings for your hardware, and applies per-game profiles — exactly like Play-Store
+> "GFX Tool / Game Booster" apps do.
+
+---
+
+## 🤖 (Bonus) Real Android APK of the game — 60 FPS + up to 4K
 
 **[`BashBaqiRacing-4K60.apk`](BashBaqiRacing-4K60.apk)** is a real, installable
-Android app (a tiny WebView wrapper around the single-file game). Sideload it on any
-phone running **Android 5.0+** — no browser needed.
-
-It adds a new **⚡ Graphics** panel in the garage:
+Android build of the racing game (tiny WebView wrapper around the single-file game),
+with the same ⚡ Graphics controls baked into the garage:
 
 - 🖼️ **Render resolution** — AUTO / HD 720p / FHD 1080p / QHD 1440p / **✨ 4K ULTRA** (up to 3840×2160)
 - 🎯 **Framerate** — 🔋 30 FPS · ⚡ **60 STABLE** (frame-pacing locked to a steady 60) · 🚀 MAX
-- 🧠 **Auto-stabilizer** — watches the live FPS and auto-tunes effects/resolution so the game never stutters; a small **⚡ chip** in the race HUD shows current FPS + resolution
-
-**Build it yourself** (no Android SDK required — pure Python + Node):
+- 🧠 **Auto-stabilizer** — watches the live FPS and auto-tunes effects/resolution so the game never stutters
 
 ```bash
-npm install
-npm run build:apk        # bundles the game → assets/game.html, then builds + signs the APK
+npm install && npm run build:apk       # bundles the game → assets/game.html, then builds + signs
 ```
 
-`tools/build-apk.py` re-zips with 4-byte alignment and signs with **both v1 (JAR) and
-v2 (APK Signature Scheme)** — v2 is mandatory because the manifest targets SDK 30.
-The signing key lives in `tools/signing/` (generated on first build; keep it if you
-want future updates to install over this one).
+Both APK builders (`tools/build-apk.py`, `tools/build-booster-apk.py`) re-zip with
+4-byte alignment and sign with **both v1 (JAR) and v2 (APK Signature Scheme)** — v2 is
+mandatory because the manifest targets SDK 30. The signing key lives in `tools/signing/`.
 
-> ⚠️ This build is signed with a **new key**, so if an older Bash Baqi Racing APK is
+> ⚠️ The builds are signed with a **new key**, so if an older copy of the same package is
 > already on the phone, uninstall it first.
 
 ---
