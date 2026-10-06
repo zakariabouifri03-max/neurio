@@ -3,3 +3,10 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# offline-chat runtime data (messages, uploads, TLS cert)
+tools/offline-chat/.data/
+
+# offline-chat single-file build (generated) + APK signing key (private!)
+tools/offline-chat/dist/
+tools/offline-chat/apk/.keys/

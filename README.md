@@ -46,6 +46,38 @@ The game is a full **PWA** (Progressive Web App): installable, fullscreen, **wor
 
 ---
 
+---
+
+## 📡 نوريو تواصل — Neurio Offline Chat
+
+**تطبيق تواصل كامل كيخدم بلا إنترنت نهائيًا** — رسائل، غرف، خاص، صور، ملفات ورسائل
+صوتية، كلشي عبر الواي فاي ديالك ولا hotspot من هاتف. **بلا حساب، بلا سيرفر خارجي، بلا
+`npm install`** (سيرفر واحد بـ Node القياسي + PWA صغيرة).
+
+A **full LAN messenger with no internet, no accounts and zero dependencies** — text,
+rooms, private chats, photos, files and voice notes over your own Wi-Fi/hotspot.
+
+```bash
+node tools/offline-chat/server.mjs
+#   💻  this machine   http://localhost:8080
+#   📱  phones         http://192.168.1.7:8080   ← نفس الواي فاي / same Wi-Fi
+```
+
+* 💬 WebSocket مكتوب من الصفر (RFC 6455) · 🏠 غرف · ✉️ خاص · 🖼️ ملفات حتى 25 ميغا
+* 🎙️ رسائل صوتية (`--https`) · ↩️ رد واقتباس · 🔍 بحث · ✍️ "كيكتب…" · 🔔 تنبيهات
+* 💾 التاريخ محفوظ فـ `.data/` (كيسترجع من بعد restart) · 📱 installable PWA
+* 🌍 دارجة / Français / English · 🔌 الرسائل كيتسناو فالطابور ملي تقطع الشبكة
+* 🧪 `node tools/offline-chat/test.mjs` — 36 اختبار بلا أي مكتبة
+
+**▶ من GitHub مباشرة / straight from GitHub:**
+* 📲 **تطبيق أندرويد (APK)**: [`NurioTawasol.apk`](https://github.com/zakariabouifri03-max/neurio/blob/main/NurioTawasol.apk) — نزلو من GitHub ودوس عليه، كيخدم بلا إنترنت (التفاصيل فـ [`tools/offline-chat/apk/README.md`](tools/offline-chat/apk/README.md))
+* 📄 **بلا سيرفر (GitHub Pages)**: بعد ما تفعّل Pages → `https://zakariabouifri03-max.github.io/neurio/tools/offline-chat/public/`
+  *(تبويبات فنفس الجهاز، ولا P2P بين جوج أجهزة برمز)*
+* ☁️ **سيرفر حقيقي بضغطة**: [`codespaces.new/zakariabouifri03-max/neurio`](https://codespaces.new/zakariabouifri03-max/neurio) → المنفذ 8080 كيتشغّل بوحدو
+* 💻 **بلا إنترنت**: `node tools/offline-chat/server.mjs` على حاسوب فالواي فاي ديالك
+
+**→ التفاصيل كاملة فـ [`tools/offline-chat/README.md`](tools/offline-chat/README.md)**
+
 ## 🎮 The Game
 
 You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
