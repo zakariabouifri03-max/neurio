@@ -3,3 +3,6 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# CI debug logs are committed only by the workflow on failure (.github/workflows/neuriovm-apk.yml)
+.ci/
