@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  LAN Game Stream — host/client prototype for LAN game streaming.
+
+  Permission notes (see docs/LIMITATIONS.md for the full discussion):
+   * INTERNET is required for LAN sockets (UDP/TCP on the local network).
+   * NEARBY_WIFI_DEVICES is only used on API 33+ for Wi-Fi-level discovery helpers.
+   * QUERY_ALL_PACKAGES is deliberately NOT requested: the game library is built from
+     the <queries> block below, which only reveals *launcher* activities. That is
+     everything GameDetector needs and keeps the app Play-policy friendly.
+   * No MANAGE_EXTERNAL_STORAGE / no storage permissions: the client never receives
+     game files, so it never needs storage access.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission
+        android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="tiramisu" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.gamepad"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false" />
+
+    <!-- Package visibility: launcher apps only (the game library). -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.LanGame">
+
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|density|uiMode"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".host.HostActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|density|uiMode"
+            android:exported="false"
+            android:label="@string/host_mode" />
+
+        <activity
+            android:name=".client.ClientActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|density|uiMode"
+            android:exported="false"
+            android:label="@string/client_mode" />
+
+        <activity
+            android:name=".client.StreamActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|density|uiMode"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.LanGame.Stream" />
+
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|density|uiMode"
+            android:exported="false"
+            android:label="@string/settings" />
+
+        <activity
+            android:name=".ui.performance.PerformanceActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|density|uiMode"
+            android:exported="false"
+            android:label="@string/performance" />
+
+        <!-- Host engine: owns MediaProjection + MediaCodec while the game runs in front. -->
+        <service
+            android:name=".host.HostStreamService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection"
+            android:stopWithTask="false" />
+
+        <!--
+          Optional, user-enabled input adapter. Stock Android only permits input
+          injection through either (a) an AccessibilityService touching the screen
+          with gesture strokes, or (b) a rooted `su` shell. This service is opt-in and
+          is never enabled automatically. See docs/INPUT_INJECTION.md.
+        -->
+        <service
+            android:name=".host.input.NeurioAccessibilityService"
+            android:exported="true"
+            android:label="@string/accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+    </application>
+
+</manifest>

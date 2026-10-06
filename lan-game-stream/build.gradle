@@ -1,0 +1,9 @@
+// LAN Game Stream — root Gradle build.
+//
+// The project intentionally declares NO third-party dependencies: the whole
+// prototype is built on the Android framework + java.* so that it can be cloned
+// and built offline once the Android SDK + AGP are cached.
+
+plugins {
+    id 'com.android.application' version '8.7.3' apply false
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      The palette below mirrors ui/Theme.java (which does the actual drawing).
+      Keeping both in sync is intentional: XML values are used by the platform
+      (window background, notification icons) while Java values are used by the
+      custom canvas UI.
+    -->
+    <color name="bg_deep">#FF070B14</color>
+    <color name="bg_surface">#FF101828</color>
+    <color name="bg_surface_alt">#FF172038</color>
+    <color name="accent_primary">#FF28E0C8</color>
+    <color name="accent_secondary">#FF7C5CFF</color>
+    <color name="accent_danger">#FFFF4D6D</color>
+    <color name="accent_warn">#FFFFC14D</color>
+    <color name="accent_ok">#FF4DFFA1</color>
+    <color name="text_primary">#FFF2F6FF</color>
+    <color name="text_secondary">#FF9AA9C7</color>
+    <color name="text_tertiary">#FF5E6C88</color>
+    <color name="ic_launcher_background">#FF070B14</color>
+</resources>

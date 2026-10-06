@@ -1,0 +1,66 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.neurio.langame'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.neurio.langame"
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName "1.0.0-prototype"
+
+        // Everything the UI needs is drawn by the app itself; no resource qualifiers
+        // other than DPI are required.
+        resourceConfigurations += ['en']
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            debuggable true
+        }
+        release {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Prototype convenience: the release build reuses the debug key so that a
+            // `./gradlew assembleRelease` output can be installed right away.
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    packaging {
+        resources {
+            excludes += ['META-INF/*.kotlin_module', 'DebugProbesKt.bin']
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// NO third-party dependencies.
+//
+// The streaming stack (MediaProjection -> MediaCodec -> UDP -> MediaCodec ->
+// SurfaceView), LAN discovery (NSD/UDP), pairing, transport and the entire
+// on-screen controller are implemented directly on top of framework APIs and
+// java.* only.  This keeps the prototype tiny, auditable and quick to build.
+// ---------------------------------------------------------------------------
+dependencies {
+}

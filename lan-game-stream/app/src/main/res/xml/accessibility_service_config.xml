@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Configuration for NeurioAccessibilityService.
+
+  canPerformGestures="true" is what allows dispatching of synthetic strokes
+  (dispatchGesture) into whatever app is in the foreground — the only input
+  injection mechanism stock, non-rooted Android offers to third-party apps.
+  The service deliberately does NOT request the ability to read screen content:
+  it uses no retrieval events, no window queries on app content.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagDefault"
+    android:canPerformGestures="true"
+    android:canRetrieveWindowContent="false"
+    android:description="@string/accessibility_service_description"
+    android:notificationTimeout="0"
+    android:settingsActivity="com.neurio.langame.ui.settings.SettingsActivity" />

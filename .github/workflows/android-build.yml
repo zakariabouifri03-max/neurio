@@ -1,0 +1,61 @@
+name: Android build
+
+# Builds the LAN Game Stream prototype (lan-game-stream/) with the real Android
+# SDK and uploads the installable debug APK as a workflow artifact.
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'lan-game-stream/**'
+      - '.github/workflows/android-build.yml'
+  pull_request:
+    paths:
+      - 'lan-game-stream/**'
+      - '.github/workflows/android-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: assembleDebug
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK components
+        run: |
+          echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+          ls "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/platforms" 2>/dev/null || true
+          SDKMANAGER="$(command -v sdkmanager || echo "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager")"
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" --install "platforms;android-35" "build-tools;35.0.0" "platform-tools" || true
+
+      - name: Build debug APK
+        working-directory: lan-game-stream
+        run: ./gradlew --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Build release APK
+        working-directory: lan-game-stream
+        run: ./gradlew --no-daemon :app:assembleRelease
+
+      - name: Collect APKs
+        run: |
+          mkdir -p artifacts
+          find lan-game-stream/app/build/outputs/apk -name '*.apk' -exec cp -v {} artifacts/ \;
+          ls -la artifacts
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: lan-game-stream-apks
+          path: artifacts/*.apk
+          if-no-files-found: error
