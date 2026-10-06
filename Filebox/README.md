@@ -14,6 +14,25 @@ y9der ythell f lakhor:
 
 ---
 
+## ⬇️ Telecharji l-APK
+
+**Lien direct (daymen kaychir l newest build):**
+
+```
+https://github.com/zakariabouifri03-max/neurio/releases/download/filebox-v1.0.0/Filebox.apk
+```
+
+Wla 7ell [saf7at l-release](https://github.com/zakariabouifri03-max/neurio/releases/tag/filebox-v1.0.0).
+
+F telefon: 7ell l-lien f Chrome → telecharji → 7ell l-fichier → «Installer quand même».
+Ila 3tak "unknown sources": Settings → Apps → Special access → Install unknown apps → Chrome.
+
+- ~39 KB · Android 7.0+ (API 24) · signé b debug keystore
+- L-APK kaybniha GitHub Actions kol merra tpushi (`Filebox/android/**`)
+  wla mn Actions → **Filebox APK** → **Run workflow**
+
+---
+
 ## ⚠️ Qbel matbda — l-7a9i9a 3la "space"
 
 L-milafat li kaydkholo l coffre **kayb9aw f telefon**. Coffre kaywaffer espace
@@ -56,16 +75,20 @@ Android, 3lach l-build khfif w l-APK sghir.
 
 ### 🔨 Kifach tbni l-APK **bla PC**
 
-1. Pushi had l-repo l GitHub dyalek
-2. 3la telefon: 7ell l-repo f `github.com` → **Actions** → **Filebox APK** →
+L-APK deja mbniya (chouf fouq). Bach t3awd tbniha:
+
+1. 3la telefon: 7ell l-repo f `github.com` → **Actions** → **Filebox APK** →
    **Run workflow**
-3. Steena 3-4 d9aye9 → dkhel l-run → **Artifacts** → `filebox-apk`
-4. Telecharji `filebox-debug.apk` → 7ellha f telefon → «Installer quand même»
+2. Steena ~1 d9i9a → l-release `filebox-v1.0.0` kayt-update bo7do
+3. L-lien l-direct kayb9a nfso — ghir l-fichier kaytbeddel
 
 L-workflow kayban f [`.github/workflows/filebox-apk.yml`](../.github/workflows/filebox-apk.yml).
+Kaynseb Android command-line tools + SDK 35 + Gradle 8.9 f runner, kaybni
+`assembleDebug`, kayverifi l-package (classes.dex / AndroidManifest.xml /
+resources.arsc), w kaypublishih.
 
-> 3lach machi mبنية hna? Had l-environnement makaych fih Java wla Android SDK,
-> w `dl.google.com` mabloki — 3lach l-build kayt3mel f GitHub Actions.
+> 3lach machi mbniya f sandbox? Makaych fih Java wla Android SDK, w
+> `dl.google.com` mabloki — 3lach l-build kayt3mel f GitHub Actions.
 
 ### 🔨 Wla b Android Studio / Gradle
 
@@ -112,7 +135,7 @@ python3 tools/make-icons.py  # icons (PNG writer bla libraries)
 python3 tools/make-interop-fixture.py   # kaytleb pyzipper
 ```
 
-`test-zip.mjs` kayverifi l-bytes dyal l-extra fields, w kayقra coffre mktوب b
+`test-zip.mjs` kayverifi l-bytes dyal l-extra fields, w kayqra coffre mktoub b
 **pyzipper** (implementation مستقلة) bach y2akked l-interop.
 
 ```bash
