@@ -73,6 +73,8 @@ public class PreviewOverlay extends View {
     private final RectF zoomBar = new RectF();
     private boolean draggingZoom;
 
+    private float bottomInset;
+
     private GestureDetector gestures;
     private ScaleGestureDetector scaleDetector;
     private boolean handlingEv;
@@ -114,6 +116,14 @@ public class PreviewOverlay extends View {
 
     public void setListener(Listener l) {
         listener = l;
+    }
+
+    /** Bottom space covered by the control bar, so the zoom scale is never hidden behind it. */
+    public void setBottomInset(float px) {
+        if (Math.abs(px - bottomInset) > 1f) {
+            bottomInset = px;
+            invalidate();
+        }
     }
 
     public void setCapabilities(Capabilities c) {
@@ -323,7 +333,7 @@ public class PreviewOverlay extends View {
             text.setTextSize(d * 12.5f);
             text.setTextAlign(Paint.Align.CENTER);
             text.setShadowLayer(d * 4, 0, d, 0xCC000000);
-            c.drawText(hint, w / 2f, h * 0.66f, text);
+            c.drawText(hint, w / 2f, Math.min(h * 0.58f, h - bottomInset - d * 90f), text);
             text.clearShadowLayer();
         }
     }
@@ -448,7 +458,7 @@ public class PreviewOverlay extends View {
     }
 
     private void drawZoomBar(Canvas c, float d, int w, int h) {
-        float barY = h - d * 128;
+        float barY = h - bottomInset - d * 34;
         zoomBar.set(d * 30, barY - d * 14, w - d * 30, barY + d * 14);
         pillRects.clear();
         text.setTextSize(d * 11);

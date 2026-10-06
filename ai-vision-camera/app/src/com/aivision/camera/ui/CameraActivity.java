@@ -286,6 +286,13 @@ public class CameraActivity extends Activity implements CameraController.Listene
         root.addView(bottom, bParams);
         bottomBar = bottom;
 
+        bottomBar.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int l, int t, int r, int b, int ol, int ot, int or, int ob) {
+                overlay.setBottomInset(Math.max(0, b - t));
+            }
+        });
+
         progress = new ProgressOverlay(this);
         progress.setCancelListener(new ProgressOverlay.CancelListener() {
             @Override
@@ -1503,12 +1510,20 @@ public class CameraActivity extends Activity implements CameraController.Listene
         try {
             File dir = library.outputDir(false);
             File f = new File(dir, "AIV_share_" + MediaLibrary.stamp() + ".jpg");
-            library.saveJpeg(lastEnhanced, f, 95);
-            Uri uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            if (library.saveJpeg(lastEnhanced, f, 95) == null) {
+                toast("Could not write the file to share");
+                return;
+            }
+            Uri uri = library.uriFor(f);
+            if (uri == null) {
+                toast("The gallery has not indexed the file yet - try sharing from the gallery");
+                return;
+            }
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType("image/jpeg");
-            i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
+            i.putExtra(Intent.EXTRA_STREAM, uri);
             i.putExtra(Intent.EXTRA_TEXT, lastOutputLabel);
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(Intent.createChooser(i, "Share with"));
         } catch (Throwable t) {
             toast("Cannot share: " + t.getMessage());

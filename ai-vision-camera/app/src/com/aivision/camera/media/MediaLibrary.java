@@ -156,6 +156,45 @@ public class MediaLibrary {
         }
     }
 
+    // ------------------------------------------------------------------ content uris
+
+    /**
+     * Looks up the MediaStore content uri for a file this app just wrote. Sharing must never hand a
+     * {@code file://} uri to another app - that throws FileUriExposedException on Android 7+ - so the
+     * share path resolves the real content uri here.
+     */
+    public Uri uriFor(File file) {
+        try {
+            ContentResolver cr = ctx.getContentResolver();
+            String[] projection = new String[]{MediaStore.MediaColumns._ID};
+            String selection;
+            String[] args;
+            if (Build.VERSION.SDK_INT >= 29) {
+                selection = MediaStore.MediaColumns.DISPLAY_NAME + " = ?";
+                args = new String[]{file.getName()};
+            } else {
+                selection = MediaStore.MediaColumns.DATA + " = ?";
+                args = new String[]{file.getAbsolutePath()};
+            }
+            for (Uri collection : new Uri[]{MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI}) {
+                Cursor c = null;
+                try {
+                    c = cr.query(collection, projection, selection, args, null);
+                    if (c != null && c.moveToFirst()) {
+                        return android.content.ContentUris.withAppendedId(collection, c.getLong(0));
+                    }
+                } catch (Throwable ignored) {
+                } finally {
+                    if (c != null) c.close();
+                }
+            }
+        } catch (Throwable t) {
+            Log.w(TAG, "uriFor", t);
+        }
+        return null;
+    }
+
     // ------------------------------------------------------------------ original frames
 
     /** The unprocessed capture is kept in app-private storage so before/after stays truthful. */

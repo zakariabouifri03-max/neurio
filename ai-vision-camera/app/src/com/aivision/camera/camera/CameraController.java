@@ -174,6 +174,7 @@ public class CameraController {
     private boolean analysisEnabled = true;
     private long lastAnalysisNs;
     private boolean front;
+    private int sessionStage;      // 0 all streams, 1 no analysis, 2 preview + jpeg, 3 preview only
 
     private Manual manual = new Manual();
     private boolean aeLocked, afLocked, awbLocked;
@@ -311,6 +312,7 @@ public class CameraController {
             public void run() {
                 try {
                     closeInternal();
+                    sessionStage = 0;
                     chars = manager.getCameraCharacteristics(cameraId);
                     Integer facing = chars.get(CameraCharacteristics.LENS_FACING);
                     front = facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT;
@@ -370,21 +372,26 @@ public class CameraController {
             Size[] rawSizes = map.getOutputSizes(ImageFormat.RAW_SENSOR);
             if (rawSizes != null && rawSizes.length > 0) rawSize = rawSizes[0];
         }
-        // preview size: match the view aspect ratio, prefer 16:9 up to 1080p
+        // preview size: closest aspect to the view, capped to the largest stream the display needs.
+        // The view transform crops to fill, so any aspect works - a mismatch only changes the crop.
         if (previewSizes != null && previewSizes.length > 0) {
             float targetAspect = viewWidth / (float) Math.max(1, viewHeight);
             Size chosen = null;
-            int bestScore = Integer.MAX_VALUE;
+            float bestScore = Float.MAX_VALUE;
             for (Size s : previewSizes) {
                 float aspect = s.getWidth() / (float) s.getHeight();
-                float aspectPenalty = Math.abs(aspect - targetAspect) * 100;
-                if (aspectPenalty > 2f) continue;
-                int resPenalty = Math.abs(s.getWidth() - 1440) / 10;
-                int score = (int) (aspectPenalty * 100) + resPenalty;
-                if (s.getWidth() > 1920) score += 200;
+                float aspectPenalty = Math.abs(aspect - targetAspect) * 1000f;
+                float resPenalty = Math.abs(s.getWidth() - 1440) / 40f;
+                if (s.getWidth() > 1920) resPenalty += 40f;
+                float score = aspectPenalty + resPenalty;
                 if (score < bestScore) {
                     bestScore = score;
                     chosen = s;
+                }
+            }
+            if (chosen == null) {
+                for (Size s : previewSizes) {
+                    if (chosen == null || s.getWidth() < chosen.getWidth()) chosen = s;
                 }
             }
             previewSize = chosen != null ? chosen : previewSizes[0];
@@ -428,13 +435,15 @@ public class CameraController {
         jpegReader.setOnImageAvailableListener(onJpeg, handler);
         List<Surface> surfaces = new ArrayList<Surface>();
         surfaces.add(previewSurface);
-        surfaces.add(jpegReader.getSurface());
-        if (rawEnabled && caps.rawSupported && rawSize != null) {
+        // The degradation ladder: if a device cannot run all streams at once the session gets
+        // progressively simpler instead of failing outright - preview first, features second.
+        if (sessionStage < 3) surfaces.add(jpegReader.getSurface());
+        if (sessionStage < 2 && rawEnabled && caps.rawSupported && rawSize != null) {
             rawReader = ImageReader.newInstance(rawSize.getWidth(), rawSize.getHeight(), ImageFormat.RAW_SENSOR, 2);
             rawReader.setOnImageAvailableListener(onRaw, handler);
             surfaces.add(rawReader.getSurface());
         }
-        if (analysisEnabled) {
+        if (sessionStage < 1 && analysisEnabled) {
             Size analysisSize = pickAnalysisSize();
             analysisReader = ImageReader.newInstance(analysisSize.getWidth(), analysisSize.getHeight(),
                     ImageFormat.YUV_420_888, 3);
@@ -460,7 +469,20 @@ public class CameraController {
 
             @Override
             public void onConfigureFailed(CameraCaptureSession s) {
-                listener.onCameraError("Camera session configuration failed");
+                sessionStage++;
+                releaseReaders();
+                if (sessionStage <= 3) {
+                    Log.w(TAG, "session configuration failed - retrying at stage " + sessionStage);
+                    try {
+                        createSession();
+                        return;
+                    } catch (Throwable t) {
+                        Log.e(TAG, "retry failed", t);
+                    }
+                }
+                listener.onCameraError(caps == null
+                        ? "Camera session configuration failed"
+                        : "This camera refused the session; try restarting the app");
             }
         }, handler);
     }
