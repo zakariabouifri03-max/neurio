@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'ma.filebox'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "ma.filebox"
-        minSdk 24          // Android 7.0 — java.util.zip + AES/GCM are all present
-        targetSdk 34
+        minSdk 24          // Android 7.0 — java.util.zip and AES/GCM are both present
+        targetSdk 35
         versionCode 1
         versionName "1.0.0"
         resourceConfigurations += ["en", "fr", "ar"]
