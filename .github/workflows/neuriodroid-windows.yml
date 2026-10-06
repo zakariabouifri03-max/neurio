@@ -22,7 +22,15 @@ jobs:
         run: npm ci
       - name: Build Windows installer and portable exe
         run: npm run dist
-      - name: Upload NeurioDroid artifacts
+      - name: Publish public download release
+        working-directory: .
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="neuriodroid-${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" neuriodroid/dist/*.exe --repo "$GITHUB_REPOSITORY" --title "NeurioDroid Windows ${GITHUB_RUN_NUMBER}" --notes "NeurioDroid Windows installer and portable version."
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: NeurioDroid-Windows
