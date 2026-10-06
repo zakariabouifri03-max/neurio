@@ -17,6 +17,7 @@ type ListingMeta = ListingsResponse["listings"][number];
 export function App() {
   const [tab, setTab] = useState<Tab>("tracked");
   const [apiUrl, setApiUrl] = useState("http://localhost:8787");
+  const [mode, setMode] = useState<"local" | "backend">("local");
   const [health, setHealth] = useState<"unknown" | "ok" | "down">("unknown");
   const [listings, setListings] = useState<ListingMeta[]>([]);
   const [analyses, setAnalyses] = useState<Record<string, Analysis | null>>({});
@@ -26,7 +27,10 @@ export function App() {
   useEffect(() => {
     void (async () => {
       const cfg = await sendMessage({ type: "config:get" });
-      if (cfg.ok) setApiUrl(cfg.data.apiUrl);
+      if (cfg.ok) {
+        setApiUrl(cfg.data.apiUrl);
+        setMode(cfg.data.mode);
+      }
       await refreshListings();
       void checkHealth();
     })();
@@ -68,7 +72,15 @@ export function App() {
       <header>
         <h1>🔥 Etsy Signal</h1>
         <span className={`chip ${health === "ok" ? "good" : health === "down" ? "bad" : "na"}`}>
-          {health === "ok" ? "backend online" : health === "down" ? "backend offline" : "…"}
+          {health === "ok"
+            ? mode === "local"
+              ? "local mode ✓"
+              : "backend online"
+            : health === "down"
+              ? mode === "local"
+                ? "error"
+                : "backend offline"
+              : "…"}
         </span>
       </header>
 
@@ -95,6 +107,13 @@ export function App() {
           <SettingsView
             apiUrl={apiUrl}
             setApiUrl={setApiUrl}
+            mode={mode}
+            onModeChange={async (m) => {
+              await sendMessage({ type: "config:set", mode: m });
+              setMode(m);
+              void refreshListings();
+              void checkHealth();
+            }}
             onTest={checkHealth}
             health={health}
           />
@@ -199,9 +218,11 @@ function CompareView({ rows }: { rows: { id: string; a: Analysis | null }[] }) {
   );
 }
 
-function SettingsView({ apiUrl, setApiUrl, onTest, health }: {
+function SettingsView({ apiUrl, setApiUrl, mode, onModeChange, onTest, health }: {
   apiUrl: string;
   setApiUrl: (v: string) => void;
+  mode: "local" | "backend";
+  onModeChange: (m: "local" | "backend") => Promise<void>;
   onTest: () => Promise<void>;
   health: "unknown" | "ok" | "down";
 }) {
@@ -211,32 +232,54 @@ function SettingsView({ apiUrl, setApiUrl, onTest, health }: {
   return (
     <div>
       <div className="section">
-        <h3>Backend API</h3>
-        <input type="url" value={local} onChange={(e) => setLocal(e.target.value)} placeholder="http://localhost:8787" />
-        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-          <button
-            className="primary"
-            onClick={async () => {
-              await sendMessage({ type: "config:set", apiUrl: local });
-              setSaved(true);
-              setTimeout(() => setSaved(false), 1500);
-              void onTest();
-            }}
-          >
-            {saved ? "Saved ✓" : "Save & test"}
-          </button>
-          <button className="ghost" onClick={() => void onTest()}>Test connection</button>
-        </div>
-        <p className="muted">
-          Status: {health === "ok" ? "✅ connected" : health === "down" ? "❌ unreachable — start the backend (see README)" : "checking…"}
-        </p>
+        <h3>Data mode</h3>
+        <label className="row" style={{ cursor: "pointer" }}>
+          <input type="radio" checked={mode === "local"} onChange={() => void onModeChange("local")} />
+          <div className="title">
+            <b>🖥 Local (recommended)</b>
+            <span>The analysis engine runs inside your browser; history is stored in your browser only. Zero setup — works immediately.</span>
+          </div>
+        </label>
+        <label className="row" style={{ cursor: "pointer" }}>
+          <input type="radio" checked={mode === "backend"} onChange={() => void onModeChange("backend")} />
+          <div className="title">
+            <b>🌐 Self-hosted backend</b>
+            <span>Durable PostgreSQL history on your own server (see repo docs).</span>
+          </div>
+        </label>
       </div>
+
+      {mode === "backend" && (
+        <div className="section">
+          <h3>Backend API</h3>
+          <input type="url" value={local} onChange={(e) => setLocal(e.target.value)} placeholder="http://localhost:8787" />
+          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+            <button
+              className="primary"
+              onClick={async () => {
+                await sendMessage({ type: "config:set", apiUrl: local });
+                setSaved(true);
+                setTimeout(() => setSaved(false), 1500);
+                void onTest();
+              }}
+            >
+              {saved ? "Saved ✓" : "Save & test"}
+            </button>
+            <button className="ghost" onClick={() => void onTest()}>Test connection</button>
+          </div>
+          <p className="muted">
+            Status: {health === "ok" ? "✅ connected" : health === "down" ? "❌ unreachable — start the backend (see README)" : "checking…"}
+          </p>
+        </div>
+      )}
+
       <div className="section">
         <h3>Privacy & honesty</h3>
         <p className="muted">
-          Etsy Signal only reads public listing information rendered by your own browser, stores it in
-          your own backend, and clearly labels every estimate. It never accesses private Etsy analytics,
-          and it would rather show “Insufficient data” than invent a number.
+          Etsy Signal only reads public listing information rendered by your own browser. In local mode
+          everything stays inside your browser; in backend mode it goes only to your own server.
+          Every estimate is clearly labelled, and the extension would rather show “Insufficient data”
+          than invent a number.
         </p>
       </div>
     </div>

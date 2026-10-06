@@ -89,15 +89,25 @@ Analysis JSON → Extension dashboards
 
 ## Quick start
 
-```bash
-npm install
-npm run build                                   # builds everything + extension/dist
-STORAGE=memory npm run start -w backend         # zero-dependency backend on :8787
-# Chrome → chrome://extensions → Developer mode → Load unpacked → extension/dist
-```
+**No backend needed.** The extension ships with a built-in *local mode*: the
+same estimation engine runs inside your browser and history is kept in
+`chrome.storage.local`.
 
-Then open `https://www.etsy.com/search?q=halloween+shirt`.
-Full guide + production PostgreSQL setup: [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
+1. Build (or download `etsy-signal-extension.zip` from this repo):
+   ```bash
+   npm install && npm run build
+   ```
+2. Chrome → `chrome://extensions` → **Developer mode** → **Load unpacked** → `extension/dist/`
+3. Open `https://www.etsy.com/search?q=halloween+shirt` — panels appear
+   immediately. Revisit over days and tracking/velocity/confidence improve.
+
+Optional self-hosted backend (durable PostgreSQL history):
+```bash
+STORAGE=memory npm run start -w backend         # quick demo on :8787
+# or STORAGE=postgres + DATABASE_URL, see docs/INSTALLATION.md
+```
+Then switch the extension to it via popup → Settings → **Self-hosted backend**.
+Full guide: [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
 
 ## Testing
 

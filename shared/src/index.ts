@@ -1,4 +1,5 @@
 export * from "./types.js";
+export * from "./store.js";
 
 /** Deterministic helpers shared across engines. */
 

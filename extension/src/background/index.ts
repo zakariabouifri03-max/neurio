@@ -1,14 +1,17 @@
 /**
- * Background service worker: the single network gateway.
+ * Background service worker: the single data gateway.
  *
- * Implements the reliability requirements:
- *   - request queue (max 2 concurrent, 150ms spacing — throttling)
- *   - timeout (10s)
- *   - retries with exponential backoff + jitter (429/5xx/network)
- *   - TTL cache for GETs (session storage survives worker restarts)
- *   - config in chrome.storage.sync
+ * Two modes (popup → Settings):
+ *   - "local"   (default): the SAME estimation engine that the backend runs,
+ *     executed in-browser, with history persisted in chrome.storage.local.
+ *     Works with zero setup.
+ *   - "backend": REST calls to the self-hosted Fastify + PostgreSQL backend,
+ *     with the reliability requirements implemented here:
+ *       request queue (max 2 concurrent, 150ms spacing), timeouts,
+ *       retries with exponential backoff + jitter, TTL cache.
  */
-import type { ListingObservation } from "@etsy-signal/shared";
+import { analyze, assembleEstimationInput } from "@etsy-signal/estimation-engine";
+import { MemoryStore, type StoredObservation } from "@etsy-signal/shared";
 import { DEFAULT_CONFIG, type BackendConfig, type ContentToBackground, type BgResponse } from "../common/messages.js";
 
 const MAX_CONCURRENT = 2;
@@ -17,6 +20,87 @@ const TIMEOUT_MS = 10_000;
 const MAX_RETRIES = 3;
 const BACKOFF_BASE_MS = 600;
 const CACHE_TTL_MS = 10 * 60 * 1000;
+
+// ---------------------------------------------------------------------------
+// Config
+// ---------------------------------------------------------------------------
+
+async function getConfig(): Promise<BackendConfig> {
+  const stored = await chrome.storage.sync.get("config");
+  return { ...DEFAULT_CONFIG, ...(stored.config ?? {}) };
+}
+
+// ---------------------------------------------------------------------------
+// Local-mode store (persisted history in chrome.storage.local)
+// ---------------------------------------------------------------------------
+
+const localStore = new MemoryStore();
+let hydrated = false;
+let persistTimer: ReturnType<typeof setTimeout> | undefined;
+
+async function hydrate(): Promise<void> {
+  if (hydrated) return;
+  try {
+    const stored = await chrome.storage.local.get("es_observations");
+    localStore.load((stored.es_observations ?? []) as StoredObservation[]);
+  } catch {
+    /* fresh install */
+  }
+  hydrated = true;
+}
+
+function persist(): void {
+  if (persistTimer) clearTimeout(persistTimer);
+  persistTimer = setTimeout(() => {
+    void chrome.storage.local.set({ es_observations: localStore.dump() }).catch(() => undefined);
+  }, 500);
+}
+
+async function handleLocal(msg: ContentToBackground): Promise<BgResponse> {
+  await hydrate();
+  switch (msg.type) {
+    case "ingest": {
+      let accepted = 0;
+      for (const obs of msg.observations.slice(0, 60)) {
+        await localStore.ingest(obs as StoredObservation);
+        accepted++;
+      }
+      persist();
+      return { ok: true, data: { accepted, rejected: 0 } };
+    }
+    case "analysis": {
+      const assembled = await assembleEstimationInput(localStore, msg.listingId, new Date().toISOString());
+      if (!assembled) return { ok: false, error: "listing not tracked yet" };
+      return { ok: true, data: analyze(assembled.input) };
+    }
+    case "history": {
+      const obs = await localStore.getObservations(msg.listingId);
+      if (obs.length === 0) return { ok: false, error: "listing not tracked yet" };
+      return {
+        ok: true,
+        data: {
+          listingId: msg.listingId,
+          snapshots: obs.map((o) => ({
+            observedAt: o.observedAt,
+            reviewCount: o.reviewCount ?? null,
+            searchPosition: o.searchPosition ?? null,
+            price: o.price ?? null,
+          })),
+        },
+      };
+    }
+    case "listings":
+      return { ok: true, data: { listings: await localStore.listListings(100) } };
+    case "health":
+      return { ok: true, data: { ok: true, service: "etsy-signal-local", mode: "local" } };
+    default:
+      return { ok: false, error: "not handled in local mode" };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Backend-mode network client (queue + throttle + backoff + cache)
+// ---------------------------------------------------------------------------
 
 let running = 0;
 let lastStart = 0;
@@ -40,11 +124,6 @@ function releaseSlot(): void {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-async function getConfig(): Promise<BackendConfig> {
-  const stored = await chrome.storage.sync.get("config");
-  return { ...DEFAULT_CONFIG, ...(stored.config ?? {}) };
-}
-
 interface CacheEntry {
   at: number;
   body: unknown;
@@ -54,45 +133,28 @@ const memCache = new Map<string, CacheEntry>();
 async function cacheGet(key: string): Promise<unknown | undefined> {
   const hit = memCache.get(key);
   if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.body;
-  try {
-    const stored = await chrome.storage.session.get("netcache");
-    const entry = (stored.netcache ?? {})[key] as CacheEntry | undefined;
-    if (entry && Date.now() - entry.at < CACHE_TTL_MS) {
-      memCache.set(key, entry);
-      return entry.body;
-    }
-  } catch {
-    /* session storage unavailable (e.g. in tests) */
-  }
   return undefined;
 }
 
-async function invalidate(url: string): Promise<void> {
-  for (const method of ["GET", "POST"]) memCache.delete(`${method} ${url}`);
-  try {
-    const stored = await chrome.storage.session.get("netcache");
-    const all = { ...(stored.netcache ?? {}) };
-    for (const k of Object.keys(all)) {
-      if (k.endsWith(url)) delete (all as Record<string, unknown>)[k];
-    }
-    await chrome.storage.session.set({ netcache: all });
-  } catch {
-    /* best-effort */
+async function cacheSet(key: string, body: unknown): Promise<void> {
+  memCache.set(key, { at: Date.now(), body });
+  if (memCache.size > 300) {
+    const oldest = [...memCache.entries()].sort((a, b) => a[1].at - b[1].at).slice(0, 100);
+    for (const [k] of oldest) memCache.delete(k);
   }
 }
 
-async function cacheSet(key: string, body: unknown): Promise<void> {
-  const entry = { at: Date.now(), body };
-  memCache.set(key, entry);
-  try {
-    const stored = await chrome.storage.session.get("netcache");
-    const all = { ...(stored.netcache ?? {}), [key]: entry };
-    // Keep the cache bounded.
-    const keys = Object.keys(all);
-    if (keys.length > 200) for (const k of keys.slice(0, keys.length - 200)) delete (all as Record<string, unknown>)[k];
-    await chrome.storage.session.set({ netcache: all });
-  } catch {
-    /* ignore quota/session errors — cache is best-effort */
+function invalidate(url: string): void {
+  for (const method of ["GET", "POST"]) memCache.delete(`${method} ${url}`);
+}
+
+class HttpError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+    public retryable: boolean,
+  ) {
+    super(message);
   }
 }
 
@@ -151,15 +213,36 @@ async function fetchJson(method: "GET" | "POST", path: string, body?: unknown, c
   }
 }
 
-class HttpError extends Error {
-  constructor(
-    public status: number,
-    message: string,
-    public retryable: boolean,
-  ) {
-    super(message);
+async function handleBackend(msg: ContentToBackground): Promise<BgResponse> {
+  switch (msg.type) {
+    case "health":
+      return { ok: true, data: await fetchJson("GET", "/health", undefined, false) };
+    case "ingest": {
+      const observations = msg.observations.slice(0, 60);
+      const data = await fetchJson("POST", "/v1/observations", { observations });
+      const { apiUrl } = await getConfig();
+      const base = apiUrl.replace(/\/$/, "");
+      for (const o of observations) {
+        const id = encodeURIComponent(o.listingId);
+        invalidate(`${base}/v1/listings/${id}/analysis`);
+        invalidate(`${base}/v1/listings/${id}/history`);
+      }
+      return { ok: true, data };
+    }
+    case "analysis":
+      return { ok: true, data: await fetchJson("GET", `/v1/listings/${encodeURIComponent(msg.listingId)}/analysis`, undefined, true) };
+    case "history":
+      return { ok: true, data: await fetchJson("GET", `/v1/listings/${encodeURIComponent(msg.listingId)}/history`, undefined, true) };
+    case "listings":
+      return { ok: true, data: await fetchJson("GET", "/v1/listings?limit=100", undefined, false) };
+    default:
+      return { ok: false, error: "not handled in backend mode" };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Messaging
+// ---------------------------------------------------------------------------
 
 chrome.runtime.onMessage.addListener((msg: ContentToBackground, _sender, sendResponse) => {
   handleMessage(msg)
@@ -169,52 +252,25 @@ chrome.runtime.onMessage.addListener((msg: ContentToBackground, _sender, sendRes
 });
 
 async function handleMessage(msg: ContentToBackground): Promise<BgResponse> {
-  switch (msg.type) {
-    case "config:get":
-      return { ok: true, data: await getConfig() };
-    case "config:set": {
-      const apiUrl = String(msg.apiUrl).trim().replace(/\/$/, "");
-      if (!/^https?:\/\//.test(apiUrl)) return { ok: false, error: "API URL must start with http:// or https://" };
-      await chrome.storage.sync.set({ config: { apiUrl } });
-      return { ok: true, data: { apiUrl } };
-    }
-    case "health": {
-      const data = await fetchJson("GET", "/health", undefined, false);
-      return { ok: true, data };
-    }
-    case "ingest": {
-      const observations = msg.observations.slice(0, 60);
-      const data = await fetchJson("POST", "/v1/observations", { observations });
-      // Fresh evidence arrived -> drop stale cached analyses/history for those listings.
-      const { apiUrl } = await getConfig();
-      const base = apiUrl.replace(/\/$/, "");
-      for (const o of observations) {
-        const id = encodeURIComponent(o.listingId);
-        await invalidate(`${base}/v1/listings/${id}/analysis`);
-        await invalidate(`${base}/v1/listings/${id}/history`);
-      }
-      return { ok: true, data };
-    }
-    case "analysis": {
-      const data = await fetchJson("GET", `/v1/listings/${encodeURIComponent(msg.listingId)}/analysis`, undefined, true);
-      return { ok: true, data };
-    }
-    case "history": {
-      const data = await fetchJson("GET", `/v1/listings/${encodeURIComponent(msg.listingId)}/history`, undefined, true);
-      return { ok: true, data };
-    }
-    case "listings": {
-      const data = await fetchJson("GET", "/v1/listings?limit=100", undefined, false);
-      return { ok: true, data };
-    }
-    default:
-      return { ok: false, error: "unknown message" };
+  if (msg.type === "config:get") return { ok: true, data: await getConfig() };
+  if (msg.type === "config:set") {
+    const apiUrl = String(msg.apiUrl ?? "").trim().replace(/\/$/, "");
+    if (msg.apiUrl && !/^https?:\/\//.test(apiUrl)) return { ok: false, error: "API URL must start with http:// or https://" };
+    const current = await getConfig();
+    const next: BackendConfig = {
+      apiUrl: msg.apiUrl ? apiUrl : current.apiUrl,
+      mode: msg.mode === "backend" || msg.mode === "local" ? msg.mode : current.mode,
+    };
+    await chrome.storage.sync.set({ config: next });
+    return { ok: true, data: next };
   }
+  const config = await getConfig();
+  return config.mode === "backend" ? handleBackend(msg) : handleLocal(msg);
 }
 
-// Wake-up: periodically clear stale cache entries (memory hygiene only).
+// Wake-up: periodic hygiene for the in-memory cache.
 chrome.alarms.create("etsy-signal-cache-sweep", { periodInMinutes: 30 });
-chrome.alarms.onAlarm.addListener(async (alarm) => {
+chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name !== "etsy-signal-cache-sweep") return;
   const now = Date.now();
   for (const [k, v] of memCache) if (now - v.at > CACHE_TTL_MS) memCache.delete(k);

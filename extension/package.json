@@ -10,6 +10,7 @@
     "test": "echo 'extension runtime covered by e2e checklist in docs/INSTALLATION.md'"
   },
   "dependencies": {
+    "@etsy-signal/estimation-engine": "*",
     "@etsy-signal/shared": "*",
     "@etsy-signal/signal-engine": "*",
     "react": "^18.3.1",

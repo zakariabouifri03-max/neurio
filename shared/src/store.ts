@@ -1,15 +1,82 @@
-import type { ListingMeta, SignalStore, StoredObservation } from "./store.js";
+/**
+ * Storage abstraction shared by backend AND extension.
+ *
+ * The extension ships its own in-browser store ("local mode") so the product
+ * works out of the box with zero setup; the PostgreSQL backend remains the
+ * option for durable / shared history.
+ */
+import type { ListingObservation } from "./types.js";
+
+export interface StoredObservation extends ListingObservation {
+  fieldsFound?: string[];
+  fieldsMissing?: string[];
+  strategy?: string;
+}
+
+export interface ListingMeta {
+  listingId: string;
+  title?: string;
+  url?: string;
+  shopName?: string;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  observationCount: number;
+}
+
+export interface SignalStore {
+  ingest(obs: StoredObservation): Promise<void>;
+  getListing(listingId: string): Promise<ListingMeta | null>;
+  listListings(limit?: number): Promise<ListingMeta[]>;
+  /** Ascending by time. */
+  getObservations(listingId: string): Promise<StoredObservation[]>;
+  /**
+   * Other listings observed on the same search query as `listingId`'s latest
+   * SERP appearance, within the same snapshot window (± 1 hour).
+   */
+  getSerpPeers(listingId: string): Promise<{ position?: number; query?: string; resultCount?: number; peers: StoredObservation[] }>;
+  /** How many SERP snapshots for that query contained this listing / total snapshots. */
+  getVisibility(listingId: string): Promise<{ appearances: number; snapshots: number }>;
+  close(): Promise<void>;
+}
+
+export function latestMerge(obs: StoredObservation[]): StoredObservation {
+  const merged: Partial<StoredObservation> = { listingId: "", observedAt: "" };
+  const sorted = [...obs].sort((a, b) => Date.parse(a.observedAt) - Date.parse(b.observedAt));
+  for (const o of sorted) {
+    merged.listingId = o.listingId;
+    merged.observedAt = o.observedAt;
+    for (const key of [
+      "url", "title", "shopName", "price", "originalPrice", "currency", "rating",
+      "reviewCount", "shopReviewCount", "shopSalesCount", "favoritesCount",
+      "badges", "searchPosition", "searchQuery", "isAd", "serpResultCount", "surface",
+    ] as const) {
+      const v = o[key];
+      if (v !== undefined && v !== null) (merged as unknown as Record<string, unknown>)[key] = v;
+    }
+  }
+  return merged as StoredObservation;
+}
 
 /**
- * In-memory store: used by the test suite and by `STORAGE=memory` demo mode.
+ * In-memory store: used by the extension (persisted to chrome.storage.local),
+ * by the test suite, and by the backend's zero-dependency demo mode.
  * Behaves identically to PostgresStore (same dedupe/merge semantics).
  */
 export class MemoryStore implements SignalStore {
   private observations: StoredObservation[] = [];
 
+  /** Hydrate from a previously persisted array (extension local mode). */
+  load(initial: StoredObservation[]): void {
+    this.observations = [...initial];
+  }
+
+  dump(): StoredObservation[] {
+    return [...this.observations];
+  }
+
   async ingest(obs: StoredObservation): Promise<void> {
     // Dedupe: same listing + same minute + same surface with identical
-    // review count & price is a duplicate scroll/pagination capture.
+    // review count & price & position is a duplicate capture.
     const dup = this.observations.some(
       (o) =>
         o.listingId === obs.listingId &&

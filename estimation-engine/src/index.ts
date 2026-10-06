@@ -25,6 +25,7 @@ export * from "./demand.js";
 export * from "./competition.js";
 export * from "./opportunity.js";
 export * from "./signals.js";
+export * from "./assemble.js";
 
 export function analyze(input: EstimationInput): Analysis {
   const sales = estimateLifetimeSales(input);

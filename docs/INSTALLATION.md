@@ -22,7 +22,13 @@ The built unpacked extension lands in **`extension/dist/`**.
 3. Click **Load unpacked** and select the `extension/dist/` folder.
 4. Pin the Etsy Signal icon if you like.
 
-## 3. Start the backend
+## 3. Backend — optional
+
+By default the extension runs in **local mode**: the estimation engine executes
+inside the browser service worker and history persists in
+`chrome.storage.local`. No server, no setup, works immediately.
+
+If you want durable / server-side history instead:
 
 Zero-dependency demo (history lost on restart):
 
@@ -41,6 +47,8 @@ DATABASE_URL=postgres://localhost/etsy_signal STORAGE=postgres npm run start -w 
 ```
 
 Verify: `curl http://localhost:8787/health` → `{"ok":true,...}`.
+Then in the popup → **Settings** → select **Self-hosted backend** and save the
+API URL.
 
 ## 4. Use it
 
@@ -54,9 +62,8 @@ Verify: `curl http://localhost:8787/health` → `{"ok":true,...}`.
    limitations behind that estimate.
 4. Open a listing to get the full multi-section dashboard (Overview, Sales
    Intelligence, Demand, Competition, Opportunity, Evidence + history chart).
-5. Click the extension icon for **Tracked / Compare / Settings**. Settings is
-   where you point the extension at your backend if it isn't
-   `http://localhost:8787`.
+5. Click the extension icon for **Tracked / Compare / Settings** (mode and
+   backend URL live in Settings).
 
 > Estimates improve the longer you track: revisit searches over days/weeks and
 > the extension builds real velocity, trend and confidence from your own

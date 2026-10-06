@@ -3,7 +3,7 @@
   "name": "Etsy Signal",
   "version": "0.1.0",
   "description": "Transparent, evidence-based analytics for Etsy listings. Reads only public on-page data; every estimate is labelled, ranged and explainable. Not affiliated with Etsy.",
-  "permissions": ["storage", "alarms"],
+  "permissions": ["storage", "alarms", "unlimitedStorage"],
   "host_permissions": [
     "*://www.etsy.com/*",
     "http://localhost/*",

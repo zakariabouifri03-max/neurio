@@ -5,7 +5,7 @@
 import { buildApp } from "./app.js";
 import { loadConfig } from "./config.js";
 import { PostgresStore } from "./postgresStore.js";
-import { MemoryStore } from "./memoryStore.js";
+import { MemoryStore } from "@etsy-signal/shared";
 import { applySchema } from "./db/init.js";
 import type { SignalStore } from "./store.js";
 

@@ -39,6 +39,12 @@ obtained, the extension says so instead of faking it.
   unavailable until you see it in search.
 * In-memory storage mode (`STORAGE=memory`) loses history on restart — use
   PostgreSQL for real tracking.
+* **Local mode** (extension default) stores history in `chrome.storage.local`:
+  it is per-browser, per-device, and clears if you uninstall the extension or
+  clear extension storage. For durable cross-session history on a server, use
+  the self-hosted backend.
+* The same estimation code runs in both modes; results are identical for the
+  same stored observations.
 * Currency: prices are stored as displayed; revenue estimates use the observed
   number without FX conversion.
 

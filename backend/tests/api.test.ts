@@ -2,7 +2,7 @@ import { beforeAll, afterAll, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import type { Analysis } from "@etsy-signal/shared";
 import { buildApp } from "../src/app.js";
-import { MemoryStore } from "../src/memoryStore.js";
+import { MemoryStore } from "@etsy-signal/shared";
 
 const NOW = "2026-10-06T12:00:00.000Z";
 const day = (n: number) => new Date(Date.parse(NOW) - n * 86_400_000).toISOString();

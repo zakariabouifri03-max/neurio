@@ -11,14 +11,20 @@ export type ContentToBackground =
   | { type: "history"; listingId: string }
   | { type: "listings" }
   | { type: "config:get" }
-  | { type: "config:set"; apiUrl: string }
+  | { type: "config:set"; apiUrl?: string; mode?: "local" | "backend" }
   | { type: "health" };
 
 export interface BackendConfig {
   apiUrl: string;
+  /**
+   * "local"  = run the estimation engine inside the extension, history kept
+   *            in chrome.storage.local. Works out of the box, zero setup.
+   * "backend" = talk to the self-hosted Fastify + PostgreSQL backend.
+   */
+  mode: "local" | "backend";
 }
 
-export const DEFAULT_CONFIG: BackendConfig = { apiUrl: "http://localhost:8787" };
+export const DEFAULT_CONFIG: BackendConfig = { apiUrl: "http://localhost:8787", mode: "local" };
 
 export type BgResponse<T = unknown> =
   | { ok: true; data: T }
