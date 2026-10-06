@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ريلز أوفلاين</string>
+    <string name="add_title">حفظ ريل</string>
+    <string name="browse_title">تصفّح إنستغرام</string>
+
+    <string name="lib_title">مكتبتي أوفلاين</string>
+    <string name="lib_sub">محفوظ فالتلفون • كيتشاف بلا إنترنت</string>
+    <string name="empty">مازال ما كاين حتى شي ريل محفوظ.\n\n1. لصق رابط الريل هنا\n2. ولا تصفّح إنستغرام ودير ⬇ على اللي عجبك\n3. تبعو أوفلاين فاش تبغي</string>
+
+    <string name="btn_add">حفظ ريل</string>
+    <string name="btn_browse">تصفّح إنستغرام</string>
+    <string name="btn_import">استيراد ملف</string>
+    <string name="btn_games">ألعاب أوفلاين</string>
+    <string name="btn_storage">المساحة</string>
+
+    <string name="add_hint">لصق رابط الريل / البوست هنا…</string>
+    <string name="add_go">تحليل وتحميل</string>
+    <string name="add_paste">لصق</string>
+    <string name="add_ready">قادر: اضغط «تحليل وتحميل»</string>
+    <string name="add_analyzing">كنحلل الرابط… خلّي الإنترنت شاعل</string>
+    <string name="add_found_video">لقيت الفيديو ✅ كنحمّلو…</string>
+    <string name="add_found_photo">لقيت الصورة ✅ كنحمّلو…</string>
+    <string name="add_fail">ما لقيتش الميديا. عاود جرّب، ولا استعمل «تصفّح إنستغرام» وحمّل من تما.</string>
+    <string name="add_bad_link">الرابط ماشي صحيح. خاصو يكون رابط إنستغرام (reel / p / tv) ولا رابط مباشر mp4/jpg.</string>
+    <string name="add_saved">تسجّل! غادي يطلع فالمكتبة.</string>
+    <string name="add_offline">ما كاينش إنترنت دابا — التحميل خاصو اتصال. المنظر أوفلاين كيبقى خدام.</string>
+
+    <string name="dl_started">بدا التحميل…</string>
+    <string name="dl_done">تحمّل ✅</string>
+    <string name="dl_error">فشل التحميل</string>
+
+    <string name="play">تشغيل</string>
+    <string name="share">مشاركة</string>
+    <string name="export">تصدير للمعرض</string>
+    <string name="delete">حذف</string>
+    <string name="close">إغلاق</string>
+    <string name="open">فتح</string>
+    <string name="cancel">إلغاء</string>
+    <string name="deleted">تحيّد</string>
+    <string name="exported">تصدّر للمعرض ✅</string>
+    <string name="export_fail">ما قدرناش نصدّرو</string>
+
+    <string name="storage_title">المساحة المستعملة</string>
+    <string name="storage_body">%1$s فـ %2$d ملف</string>
+    <string name="clear_all">حمّي الكل</string>
+
+    <string name="browse_tip">تصفّح بحالك، وكل مرة كيتسجل فيديو كيطلع ليك الزر ⬇</string>
+    <string name="browse_save_n">⬇ حفظ (%1$d)</string>
+    <string name="browse_pick">شنو تحب تحمّل؟</string>
+    <string name="browse_login_tip">دخول لحسابك كيتسجل فالتطبيق، وباقي خدام أوفلاين من بعد.</string>
+
+    <string name="notif_channel">التحميلات</string>
+    <string name="notif_downloading">كنحمّل… %1$s</string>
+    <string name="notif_done_title">تحمّل ✅</string>
+    <string name="notif_done_text">%1$s • اضغط باش تشوفو</string>
+    <string name="notif_failed">ما قدرناش نحمّلو</string>
+    <string name="add_tip">كيفاش كيخدم؟\n• عطيني رابط ريل/بوست ونحلّلو ونحمّل الفيديو ولا التصاور.\n• من «تصفّح إنستغرام» تقدر تتصفّح بحالك وتحمّل بضغطة.\n• من تطبيق إنستغرام: Share → «ريلز أوفلاين».\n• التحميل خاصو إنترنت مرة وحدة، من بعد كيتشاف بلا إنترنت للأبد.</string>
+    <string name="add_down">⬇ حفظ</string>
+    <string name="games_title">ألعاب أوفلاين</string>
+    <string name="games_pick">اختار لعبة</string>
+    <string name="game_racing">🏁 سباق باغي على الشاطئ</string>
+    <string name="storage_clear">تحيّد كلشي</string>
+    <string name="menu_title">شنو تحب تدير؟</string>
+    <string name="add_link_label">🔗  رابط الريل / Post</string>
+</resources>

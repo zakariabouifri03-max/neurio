@@ -46,6 +46,25 @@ The game is a full **PWA** (Progressive Web App): installable, fullscreen, **wor
 
 ---
 
+## 📱 Reels Offline — APK ديال الريلز بلا إنترنت
+
+**[`android/ReelsOffline.apk`](android/ReelsOffline.apk)** (~408 KB, Android 5+) — تطبيق أندرويد كامل،
+ماشي غير اللعبة: كتحمّل ريلز/بوستات إنستغرام مرة وحدة ومن بعد **كتشوفهم بلا إنترنت** للأبد،
+مع متصفح إنستغرام داخلي، player بحال البريدي (تقليب + تكرار + pinch-zoom)، مشاركة/تصدير،
+و**Bash Baqi Racing داخل التطبيق** كيلعبة أوفلاين.
+
+> ⚠️ بصراحة: **إنستغرام بحد ذاتو مستحيل يتشاف بلا إنترنت** — الفيديو كيتلعب من سيرفرات إنستغرام.
+> الحل الوحيد الخدّام هو داكشي اللي كيدير هاد التطبيق: تحميل مسبق. التفاصيل كاملة فـ
+> **[`android/README.md`](android/README.md)**.
+
+```bash
+bash android/tools/fetch-toolchain.sh   # JDK + aapt2 + d8 + apksigner (بلا Android Studio / Gradle)
+bash android/build.sh                   # → android/ReelsOffline.apk
+bash android/tools/test.sh              # 24 اختبار ديال الاستخراج (JVM)
+```
+
+---
+
 ## 🎮 The Game
 
 You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
