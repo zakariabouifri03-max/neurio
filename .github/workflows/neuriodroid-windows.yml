@@ -5,6 +5,9 @@ on:
     paths:
       - 'neuriodroid/**'
       - '.github/workflows/neuriodroid-windows.yml'
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
