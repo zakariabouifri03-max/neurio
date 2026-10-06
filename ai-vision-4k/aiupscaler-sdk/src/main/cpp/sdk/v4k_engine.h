@@ -84,6 +84,15 @@ struct SessionStats {
 
 // The frame a caller submits. Handles are 64-bit so they can carry a pointer or
 // a Vulkan object through JNI without any per-frame allocation.
+//
+// Required image layouts (the engine's barriers start from these, so a caller
+// that hands over the wrong layout may find its input discarded):
+//   * `lowResImage` must be VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL -- render
+//     the scene, then transition it before calling processFrame().
+//   * `outputImage` must be VK_IMAGE_LAYOUT_GENERAL (it is written as a storage
+//     image) and comes back in VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, ready
+//     to be sampled for presentation.
+// The demo renderer (demo/v4k_demo_renderer.cpp) does exactly this.
 struct FrameHandles {
     uint64_t lowResImage = 0;      // VkImage, engine never owns it
     uint64_t lowResView = 0;       // VkImageView

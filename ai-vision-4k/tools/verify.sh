@@ -175,9 +175,19 @@ else
             embed="$(dirname "$(find "$LOG_DIR" -name v4k_shaders_embedded.h | head -1)")"
             # The JNI bridge is compiled too when a JDK/NDK header root is given:
             # it is the one file that only exists in an Android build.
+            # V4K_JNI_INCLUDE may be a single directory or several separated by
+            # colons: a JDK keeps jni.h in include/ and jni_md.h in
+            # include/linux (or include/unix...), while the NDK puts both in the
+            # same sysroot directory. Accepting a list covers both without the
+            # caller having to build a merged directory first.
             local extra=()
             if [ -n "${V4K_JNI_INCLUDE:-}" ]; then
-                extra+=("-I${V4K_JNI_INCLUDE}")
+                local jni_root
+                local -a jni_roots=()
+                IFS=':' read -r -a jni_roots <<< "$V4K_JNI_INCLUDE"
+                for jni_root in "${jni_roots[@]}"; do
+                    [ -n "$jni_root" ] && extra+=("-I${jni_root}")
+                done
             fi
             "${CXX:-g++}" -std=c++17 -fsyntax-only -Wall -Wextra -Wno-unused-parameter \
                 -DV4K_ENABLE_VULKAN=1 -DV4K_ENABLE_NNAPI=1 -DV4K_DEBUG_CHECKS=1 \
@@ -185,11 +195,16 @@ else
                 -I"$VULKAN_INCLUDE" -I"$embed" "${extra[@]}" \
                 "$CPP"/core/*.cpp "$CPP"/ai/*.cpp "$CPP"/vulkan/*.cpp "$CPP"/sdk/*.cpp
             if [ -n "${V4K_JNI_INCLUDE:-}" ]; then
+                # V4K_ENABLE_DEMO=1 exercises the demo registration call from the
+                # SDK bridge. The demo sources are compiled here too: the renderer
+                # and the bridge that drives it are one unit, and they are the
+                # newest code in the tree, so the gate must cover them.
                 "${CXX:-g++}" -std=c++17 -fsyntax-only -Wall -Wextra -Wno-unused-parameter \
                     -DV4K_ENABLE_VULKAN=1 -DV4K_ENABLE_NNAPI=1 -DV4K_DEBUG_CHECKS=1 \
-                    -I"$CPP" -I"$CPP/core" -I"$CPP/ai" -I"$CPP/vulkan" \
-                    -I"$VULKAN_INCLUDE" -I"$embed" "${extra[@]}" "$CPP"/jni/*.cpp
-                echo "every native source (including the JNI bridge) compiles with Vulkan enabled"
+                    -DV4K_ENABLE_DEMO=1 \
+                    -I"$CPP" -I"$CPP/core" -I"$CPP/ai" -I"$CPP/vulkan" -I"$CPP/graphics" \
+                    -I"$VULKAN_INCLUDE" -I"$embed" "${extra[@]}" "$CPP"/jni/*.cpp "$CPP"/demo/*.cpp
+                echo "every native source (including the JNI bridge, the demo renderer and its bridge) compiles with Vulkan enabled"
             else
                 echo "every native source compiles with the Vulkan backend enabled"
             fi

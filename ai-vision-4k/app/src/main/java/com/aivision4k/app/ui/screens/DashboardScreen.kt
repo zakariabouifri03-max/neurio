@@ -58,6 +58,7 @@ fun DashboardScreen(
     onOpenBenchmark: () -> Unit,
     onOpenProfiles: () -> Unit,
     onOpenGames: () -> Unit,
+    onOpenDemo: () -> Unit,
 ) {
     val state = vm.state
     LazyColumn(
@@ -82,11 +83,45 @@ fun DashboardScreen(
                 OutlinedButton(onClick = onOpenBenchmark) { Text("Open benchmark") }
             }
         }
+        item { DemoCard(onOpenDemo) }
         item {
             PanelCard(title = "Android limits \u00b7 read this") {
                 SandboxExplainer()
             }
         }
+    }
+}
+
+/**
+ * The way into the Vulkan demo scene.
+ *
+ * It is a separate screen rather than a tab because it takes over the display:
+ * its own device, its own swapchain, full-screen landscape. The card also says
+ * what the demo is for, so nobody expects it to upscale a game they installed.
+ */
+@Composable
+private fun DemoCard(onOpenDemo: () -> Unit) {
+    PanelCard(title = "Vulkan demo \u00b7 native vs AI", accent = AccentCyan) {
+        Text(
+            text = "A real rendered scene \u2014 terrain, buildings, moving objects, particles and " +
+                "shadows \u2014 drawn low and upscaled through the engine, with a live switch between " +
+                "native rendering and AI upscaling and an A/B measurement you can read. " +
+                "This is our renderer, not another app's: Android does not let one app take over " +
+                "another app's rendering pipeline.",
+            style = MaterialTheme.typography.bodySmall,
+            color = TextMuted,
+        )
+        Spacer(Modifier.height(10.dp))
+        Button(
+            onClick = onOpenDemo,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AccentCyan,
+                contentColor = Color(0xFF001318),
+            ),
+        ) {
+            Text("Open the demo scene", fontWeight = FontWeight.Bold)
+        }
+        Hint("Full screen and landscape. The panel starts collapsed over the scene; use Show to open it.")
     }
 }
 

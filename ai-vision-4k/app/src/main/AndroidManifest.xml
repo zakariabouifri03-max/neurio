@@ -70,13 +70,21 @@
         </activity>
 
         <!--
-            The Vulkan demo game / benchmark harness is NOT declared yet: its
-            native host (cpp/demo) is not part of this build, and shipping an
-            activity that cannot render would be worse than shipping none. When
-            the demo host lands it is declared here as a landscape, keep-screen-on
-            activity. `IntegrationKind.SampleDemo` is the engine-side switch that
-            becomes meaningful at that point.
+            The Vulkan demo scene and the native-vs-AI benchmark harness.
+
+            It is a normal activity of this app: it renders its own scene into its
+            own SurfaceView, which is the only way an Android app may use the GPU.
+            It does not, and cannot, attach to another application's rendering.
+            Landscape and experimental, hence a separate screen reachable from the
+            dashboard rather than part of the main navigation.
         -->
+        <activity
+            android:name=".demo.DemoActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|density"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.AiVision4K" />
 
         <service
             android:name=".monitor.MonitorService"

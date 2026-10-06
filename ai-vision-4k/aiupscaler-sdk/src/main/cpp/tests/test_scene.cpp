@@ -7,9 +7,11 @@
 // particle rules that the compute shader mirrors, and the configuration the
 // benchmark screen is allowed to run.
 
+#include "graphics/v4k_demo_metrics.h"
 #include "graphics/v4k_scene.h"
 
 #include <cmath>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -578,4 +580,219 @@ V4K_TEST(demo_mode_names_are_stable) {
     CHECK_STR_CONTAINS(demoModeName(DemoMode::AiUpscaled), "AI");
     CHECK_STR_CONTAINS(demoModeName(DemoMode::SplitCompare), "Split");
     CHECK_STR_CONTAINS(demoModeName(static_cast<DemoMode>(99)), "Unknown");
+}
+
+// ---------------------------------------------------------------------------
+// Configuration -> engine session
+// ---------------------------------------------------------------------------
+
+V4K_TEST(demo_session_plan_follows_the_measured_geometry) {
+    DemoConfig config;
+    config.mode = DemoMode::AiUpscaled;
+
+    // 900p -> 1080p is a 1.2x step: upscaling, so the neural stage runs, but the
+    // step is small enough that temporal reconstruction and AA do not earn their
+    // cost and are not asked for.
+    config.renderIndex = 1;
+    config.outputIndex = 2;
+    SessionPlan plan = planSession(config);
+    CHECK(plan.upscales);
+    CHECK(plan.neural);
+    CHECK(!plan.temporal);
+    CHECK(!plan.antiAliasing);
+    CHECK(!plan.denoise);
+    CHECK_EQ_INT(plan.inputWidth, 1600u);
+    CHECK_EQ_INT(plan.outputWidth, 1920u);
+    CHECK_GT(plan.sharpening, 0.0f);
+    CHECK(plan.sharpening <= 1.0f);
+
+    // 720p -> 1080p is 1.5x -- the classic case, where temporal reconstruction
+    // and AA both pay off.
+    config.renderIndex = 0;
+    plan = planSession(config);
+    CHECK(plan.upscales);
+    CHECK(plan.neural);
+    CHECK(plan.temporal);
+    CHECK(plan.antiAliasing);
+    CHECK(!plan.denoise);
+    CHECK_EQ_INT(plan.inputWidth, 1280u);
+    CHECK_EQ_INT(plan.outputWidth, 1920u);
+
+    // 720p -> 4K: a 3x step, so the full pipeline including denoise.
+    config.outputIndex = 4;
+    plan = planSession(config);
+    CHECK(plan.neural);
+    CHECK(plan.temporal);
+    CHECK(plan.antiAliasing);
+    CHECK(plan.denoise);
+
+    // Temporal reconstruction can be turned off and the plan must respect it.
+    config.allowTemporal = false;
+    plan = planSession(config);
+    CHECK(plan.neural);
+    CHECK(!plan.temporal);
+
+    // Denoise needs quality too: the cheap preset skips it even at 3x.
+    config.allowTemporal = true;
+    config.quality = DemoQuality::Low;
+    plan = planSession(config);
+    CHECK(!plan.denoise);
+    CHECK(plan.neural);
+
+    // Same input and output is not upscaling and must not start a session.
+    config.renderIndex = 2;
+    config.outputIndex = 2;
+    plan = planSession(config);
+    CHECK(!plan.upscales);
+    CHECK(!plan.neural);
+    CHECK(!plan.temporal);
+    CHECK(!plan.antiAliasing);
+    CHECK_EQ(plan.sharpening, 0.0f);
+
+    // Native mode never starts a session, whatever the two resolutions are: it
+    // renders at the output resolution instead.
+    config.mode = DemoMode::Native;
+    config.renderIndex = 0;
+    config.outputIndex = 4;
+    plan = planSession(config);
+    CHECK(!plan.neural);
+    CHECK(!plan.upscales);
+}
+
+// ---------------------------------------------------------------------------
+// Measurement
+// ---------------------------------------------------------------------------
+
+V4K_TEST(demo_frame_stats_only_average_measured_frames) {
+    FrameStats stats(8);
+    CHECK_EQ(stats.count(), 0u);
+    CHECK(stats.meanMs() == kUnavailable);
+    CHECK(stats.fps() == kUnavailable);
+    CHECK(stats.onePercentLowFrameMs() == kUnavailable);
+
+    for (int i = 0; i < 8; ++i) stats.record(10.0);
+    CHECK_EQ(stats.count(), 8u);
+    CHECK_EQ(stats.windowFrames(), 8u);
+    CHECK_NEAR(stats.meanMs(), 10.0, 1e-9);
+    CHECK_NEAR(stats.fps(), 100.0, 1e-9);
+
+    // The window slides: 8 more slow frames must displace all of the fast ones.
+    for (int i = 0; i < 8; ++i) stats.record(20.0);
+    CHECK_EQ(stats.count(), 16u);
+    CHECK_EQ(stats.windowFrames(), 8u);
+    CHECK_NEAR(stats.meanMs(), 20.0, 1e-9);
+
+    // Nonsense samples are dropped rather than poisoning the average.
+    stats.reset();
+    stats.record(5.0);
+    stats.record(0.0);
+    stats.record(-1.0);
+    stats.record(std::nan(""));
+    stats.record(std::numeric_limits<double>::infinity());
+    CHECK_EQ(stats.count(), 1u);
+    CHECK_NEAR(stats.meanMs(), 5.0, 1e-9);
+    CHECK_NEAR(stats.maximumMs(), 5.0, 1e-9);
+
+    // min/max are the extremes actually seen, and the 1 % low is the slow tail,
+    // not the average of everything.
+    stats.reset();
+    for (int i = 0; i < 99; ++i) stats.record(10.0);
+    stats.record(50.0);   // one hitch out of 100 -> it *is* the 1 % low
+    CHECK_NEAR(stats.minimumMs(), 10.0, 1e-9);
+    CHECK_NEAR(stats.maximumMs(), 50.0, 1e-9);
+    CHECK_NEAR(stats.onePercentLowFrameMs(), 50.0, 1e-9);
+}
+
+V4K_TEST(demo_comparison_refuses_to_report_a_half_finished_measurement) {
+    AbComparison comparison;
+    SessionPlan nativePlan = planSession([] {
+        DemoConfig config;
+        config.mode = DemoMode::Native;
+        config.renderIndex = 2;
+        config.outputIndex = 2;
+        return config;
+    }());
+    SessionPlan aiPlan = planSession([] {
+        DemoConfig config;
+        config.mode = DemoMode::AiUpscaled;
+        config.renderIndex = 0;
+        config.outputIndex = 2;
+        return config;
+    }());
+
+    comparison.beginMode(DemoMode::Native, nativePlan);
+    for (uint32_t i = 0; i < kBenchmarkMinFrames; ++i) comparison.recordFrame(8.0, kUnavailable);
+    comparison.endMode();
+
+    // Only one side measured: the comparison must say so.
+    std::string json = comparison.comparisonJson();
+    CHECK_STR_CONTAINS(json, "\"ready\":false");
+    CHECK_STR_CONTAINS(json, "AI upscaling");
+    CHECK(comparison.nativeReport() != nullptr);
+    CHECK(comparison.aiReport() == nullptr);
+
+    // A short run on the second side is still not enough.
+    comparison.beginMode(DemoMode::AiUpscaled, aiPlan);
+    for (uint32_t i = 0; i < kBenchmarkMinFrames / 2; ++i) comparison.recordFrame(12.0, 3.0);
+    comparison.endMode();
+    CHECK_STR_CONTAINS(comparison.comparisonJson(), "\"ready\":false");
+
+    // Finishing it makes the report available, with the numbers measured.
+    comparison.beginMode(DemoMode::AiUpscaled, aiPlan);
+    for (uint32_t i = 0; i < kBenchmarkMinFrames; ++i) comparison.recordFrame(12.0, 3.0);
+    comparison.endMode();
+
+    json = comparison.comparisonJson();
+    CHECK_STR_CONTAINS(json, "\"ready\":true");
+    CHECK_STR_CONTAINS(json, "\"nativeMeanFrameMs\":8.000");
+    CHECK_STR_CONTAINS(json, "\"aiMeanFrameMs\":12.000");
+    // The AI path is slower per frame here, so the delta must be positive: the
+    // honest framing is "the upscaler costs frame time", never a fake speedup.
+    CHECK_STR_CONTAINS(json, "\"frameTimeDeltaMs\":4.000");
+    CHECK_STR_CONTAINS(json, "\"frameTimeDeltaPercent\":50.00");
+    CHECK_STR_CONTAINS(json, "\"aiStageMs\":3.000");
+
+    const ModeReport* ai = comparison.aiReport();
+    CHECK(ai != nullptr);
+    CHECK(ai->measured());
+    CHECK(ai->neural);
+    const ModeReport* native = comparison.nativeReport();
+    CHECK(native != nullptr);
+    CHECK(!native->neural);
+
+    // Unavailable stays unavailable in the JSON rather than becoming a zero.
+    AbComparison bare;
+    bare.beginMode(DemoMode::Native, nativePlan);
+    for (uint32_t i = 0; i < kBenchmarkMinFrames; ++i) bare.recordFrame(8.0, kUnavailable);
+    bare.endMode();
+    CHECK_STR_CONTAINS(bare.nativeReport()->toJson(), "\"aiStageMs\":null");
+
+    // Re-beginning a mode discards the previous run instead of mixing them.
+    comparison.beginMode(DemoMode::Native, nativePlan);
+    for (uint32_t i = 0; i < 5; ++i) comparison.recordFrame(9.0, kUnavailable);
+    comparison.endMode();
+    CHECK_EQ_INT(comparison.nativeReport()->frames, 5u);
+    CHECK_STR_CONTAINS(comparison.comparisonJson(), "\"ready\":false");
+}
+
+V4K_TEST(demo_scene_stats_count_what_is_drawn) {
+    const SceneBuild scene = buildDemoScene(4242u, DemoQuality::Medium);
+    const SceneStats stats = sceneStats(scene);
+
+    CHECK_EQ_INT(stats.terrainTriangles, scene.terrain.triangleCount());
+    CHECK_EQ_INT(stats.buildingInstances, scene.buildingInstances.count());
+    CHECK_EQ_INT(stats.particleCount, scene.particleCount);
+    CHECK_GT(stats.totalTriangles, stats.terrainTriangles);
+    // Two triangles per particle plus the instanced meshes: the number has to
+    // account for instances, or the "how much is in the scene" panel lies.
+    const uint64_t expected = static_cast<uint64_t>(scene.terrain.triangleCount()) +
+                              static_cast<uint64_t>(scene.box.triangleCount()) * stats.buildingInstances +
+                              static_cast<uint64_t>(scene.sphere.triangleCount()) * stats.propInstances +
+                              static_cast<uint64_t>(scene.sphere.triangleCount()) * stats.movingInstances +
+                              2ull * stats.particleCount;
+    CHECK_EQ_INT(stats.totalTriangles, static_cast<uint32_t>(expected));
+
+    const std::string json = stats.toJson();
+    CHECK_STR_CONTAINS(json, "\"particleCount\"");
+    CHECK_STR_CONTAINS(json, "\"totalTriangles\"");
 }

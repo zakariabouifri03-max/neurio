@@ -61,6 +61,23 @@ jobs:
         # asset behind.
         run: bash tools/model/generate-calibration-models.sh --check
 
+      - name: Vulkan + JNI + demo syntax check
+        # Compiles every native source with the Vulkan backend enabled, which is
+        # the only configuration the demo renderer, its JNI bridge and the whole
+        # Vulkan backend exist in: the desktop smoke test above deliberately has
+        # Vulkan off, so without this step those files would never be compiled
+        # until Gradle tried to link them into the APK.
+        #
+        # The NDK's sysroot has vulkan/vulkan.h; the runner's JDK is the place a
+        # complete jni.h + jni_md.h pair exists on this image (they live in two
+        # directories, which is why V4K_JNI_INCLUDE takes a colon-separated list).
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          export V4K_VULKAN_INCLUDE="$SDK/ndk/27.3.13750724/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include"
+          export V4K_JNI_INCLUDE="${JAVA_HOME}/include:${JAVA_HOME}/include/linux"
+          bash tools/verify.sh
+
       - name: Android SDK components
         run: |
           set -euo pipefail

@@ -81,6 +81,7 @@ set(V4K_AI_SOURCES
 # into every configuration and covered by the host test suite.
 set(V4K_GRAPHICS_SOURCES
     graphics/v4k_scene.cpp
+    graphics/v4k_demo_metrics.cpp
 )
 
 set(V4K_VULKAN_SOURCES
@@ -96,6 +97,7 @@ if(V4K_ENABLE_VULKAN)
         vulkan/v4k_vk_resources.cpp
         vulkan/v4k_vk_swapchain.cpp
         vulkan/v4k_vk_pipeline.cpp
+        vulkan/v4k_vk_graphics.cpp
     )
 endif()
 
@@ -120,18 +122,29 @@ if(ANDROID OR V4K_JNI_INCLUDE_DIRS)
     endif()
 endif()
 
+# The demo renderer and its JNI bridge. They are a matched pair: the renderer is
+# Vulkan-only and the bridge is the only caller, so they enter and leave the
+# build together, and V4K_ENABLE_DEMO tells jni/v4k_jni.cpp whether there is a
+# second bridge to register on the one JNI_OnLoad this library gets.
+#
+# The device-independent half of the scene lives in V4K_GRAPHICS_SOURCES above
+# and is always compiled and tested, with or without a GPU.
+set(V4K_DEMO_SOURCES "")
+if(V4K_ENABLE_VULKAN AND (ANDROID OR V4K_JNI_INCLUDE_DIRS))
+    list(APPEND V4K_DEMO_SOURCES
+        demo/v4k_demo_renderer.cpp
+        demo/v4k_demo_jni.cpp
+    )
+endif()
+
 set(V4K_ENGINE_SOURCES
     ${V4K_CORE_SOURCES}
     ${V4K_AI_SOURCES}
     ${V4K_GRAPHICS_SOURCES}
     ${V4K_VULKAN_SOURCES}
     ${V4K_SDK_SOURCES}
+    ${V4K_DEMO_SOURCES}
 )
-
-# The demo renderer (demo/v4k_demo_renderer.cpp) and its JNI bridge are Vulkan-
-# only and are added here as they land, following the Vulkan backend in and out
-# of the build. The device-independent half of the scene lives in
-# V4K_GRAPHICS_SOURCES above and is always compiled and tested.
 
 # The lists above are explicit so that dropping a file is a visible diff; this
 # makes a *typo* fail at configure time instead of turning into a missing symbol
@@ -164,6 +177,7 @@ else()
     target_compile_definitions(aivision4k PRIVATE V4K_DEBUG_CHECKS=0)
 endif()
 
+
 # Vulkan. The NDK ships the loader stub and the headers, so find_library() is
 # enough; when it is missing (rare, non-Android host builds) the backend is
 # simply compiled out.
@@ -175,6 +189,17 @@ if(V4K_ENABLE_VULKAN)
     else()
         message(STATUS "libvulkan not found: building without the Vulkan backend")
     endif()
+endif()
+
+# Always defined as 0 or 1, so code tests it with `#if V4K_ENABLE_DEMO` instead of
+# repeating the condition. It follows the Vulkan *define* rather than the option:
+# listing the demo sources without a loader would compile files whose bodies are
+# guarded out, and jni/v4k_jni.cpp would then call a registration function that
+# does not exist.
+if(V4K_DEMO_SOURCES AND V4K_VULKAN_LIBRARY)
+    target_compile_definitions(aivision4k PRIVATE V4K_ENABLE_DEMO=1)
+else()
+    target_compile_definitions(aivision4k PRIVATE V4K_ENABLE_DEMO=0)
 endif()
 
 # NNAPI. Not every NDK ships the stub; without it the compatibility engine

@@ -33,6 +33,8 @@
 #include "../core/v4k_thermal.h"
 #include "../sdk/v4k_engine.h"
 
+#include "v4k_jni_shared.h"
+
 namespace {
 
 constexpr const char* kBridgeClass = "com/aivision4k/sdk/NativeBridge";
@@ -334,6 +336,17 @@ const JNINativeMethod kMethods[] = {
 
 }  // namespace
 
+namespace v4k {
+
+// See jni/v4k_jni_shared.h: the demo bridge hands this same engine to the demo
+// renderer, so both screens share one model store, one profile and one
+// compatibility verdict.
+Engine* sharedEngineForDemo() {
+    return &engine();
+}
+
+}  // namespace v4k
+
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
     JNIEnv* env = nullptr;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
@@ -349,6 +362,11 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
         V4K_LOGE("jni: RegisterNatives failed");
         return JNI_ERR;
     }
+#if V4K_ENABLE_DEMO
+    // The demo activity's natives live in their own translation unit; they are
+    // registered from here because a library gets one JNI_OnLoad.
+    if (!v4kRegisterDemoBridge(env)) return JNI_ERR;
+#endif
     V4K_LOGI("jni: engine bridge registered (version %d.%d.%d)", v4k::kEngineVersionMajor,
              v4k::kEngineVersionMinor, v4k::kEngineVersionPatch);
     return JNI_VERSION_1_6;

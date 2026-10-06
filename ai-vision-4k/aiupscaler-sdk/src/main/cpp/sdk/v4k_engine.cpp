@@ -845,12 +845,19 @@ FrameResult Engine::processFrame(const FrameHandles& frame) {
         return result;
     }
 
+    // The caller's images arrive in known layouts, and the pipeline's barriers
+    // must start from the truth: the low-res colour is sampled (the caller
+    // rendered it, then transitioned it to SHADER_READ_ONLY_OPTIMAL) and the
+    // output is written as a storage image, which requires GENERAL. Without this
+    // the engine's cached layouts start at UNDEFINED and its first barrier
+    // discards the contents of a freshly rendered input.
     vk_->lowRes.image = reinterpret_cast<VkImage>(frame.lowResImage);
     vk_->lowRes.view = reinterpret_cast<VkImageView>(frame.lowResView);
     vk_->lowRes.width = desc_.inputWidth;
     vk_->lowRes.height = desc_.inputHeight;
     vk_->lowRes.format = VK_FORMAT_R16G16B16A16_SFLOAT;
     vk_->lowRes.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
+    vk_->lowRes.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     vk_->output.image = reinterpret_cast<VkImage>(frame.outputImage);
     vk_->output.view = reinterpret_cast<VkImageView>(frame.outputView);
@@ -858,6 +865,10 @@ FrameResult Engine::processFrame(const FrameHandles& frame) {
     vk_->output.height = desc_.outputHeight;
     vk_->output.format = VK_FORMAT_R16G16B16A16_SFLOAT;
     vk_->output.usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    // General, because that is the layout a storage write needs, and that is
+    // what the engine's pipeline assumes when it hands the image back in
+    // SHADER_READ_ONLY_OPTIMAL for the caller to sample.
+    vk_->output.layout = VK_IMAGE_LAYOUT_GENERAL;
 
     vk::FrameInputVk input;
     input.lowResColor = &vk_->lowRes;

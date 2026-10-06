@@ -1,6 +1,7 @@
 package com.aivision4k.app
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -65,6 +66,7 @@ import com.aivision4k.app.ui.VoidBlack
 import com.aivision4k.app.ui.compatColor
 import com.aivision4k.app.ui.screens.AiEngineScreen
 import com.aivision4k.app.ui.screens.BenchmarkScreen
+import com.aivision4k.app.demo.DemoActivity
 import com.aivision4k.app.ui.screens.DashboardScreen
 import com.aivision4k.app.ui.screens.GamesScreen
 import com.aivision4k.app.ui.screens.MonitorScreen
@@ -167,6 +169,12 @@ private fun AppRoot(vm: AppViewModel = viewModel()) {
                             onOpenBenchmark = { route = Route.Benchmark },
                             onOpenProfiles = { tab = Tab.Profiles },
                             onOpenGames = { tab = Tab.Games },
+                            // Its own activity: the demo takes the whole screen,
+                            // forces landscape and owns a Vulkan device, so it must
+                            // not share a lifecycle with the dashboard.
+                            onOpenDemo = {
+                                startActivity(Intent(this@MainActivity, DemoActivity::class.java))
+                            },
                         )
                         Tab.Games -> GamesScreen(vm)
                         Tab.Profiles -> ProfilesScreen(vm)
