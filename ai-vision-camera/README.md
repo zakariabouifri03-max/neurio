@@ -99,6 +99,27 @@ Pipeline: `kotlinc` (`-jvm-target 1.8`, lambda/SAM class lowering) → `dx --min
 Current build: **229 classes, ~1.0 MB**, min SDK 26, target SDK 36, debug-signed with
 `keystore/aivision-debug.jks` (alias `androiddebugkey`, password `android`).
 
+## If the app closes by itself
+
+Version 1.0.1 added a safety net, because a camera app that dies silently cannot
+be fixed remotely:
+
+* **Every startup step is traced.** A small `boot_trace.txt` records how far the
+  launch got; it is deleted the moment the camera starts streaming. If a run dies
+  before that, the next launch says *"Last run stopped unexpectedly"* and shows the
+  last step reached, with **Copy report** / **Share** buttons.
+* **No single failure can kill the process.** Exceptions on the camera thread, the
+  GL thread, the worker pools, inside `onDraw`, or while creating the screen are
+  caught, logged and reported in the UI instead of closing the app.
+* **Crash reports are written twice:** in the app's private folder and in
+  `Android/data/com.aivision.camera/files/` — the latter can be opened with a file
+  manager even if the app refuses to start. `adb logcat -s AIVision AndroidRuntime`
+  shows the same information live.
+* **Memory is bounded before capture**, not after: the AI stream resolution and the
+  burst length are derived from the device heap and tier (a 12-frame 24 MP stack
+  would need ~1.7 GB of float planes). Single shots without AI still use the full
+  sensor stream.
+
 ## Notes
 
 * All image processing is hand-written Kotlin (planes, alignment, resampling, tone

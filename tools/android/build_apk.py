@@ -158,7 +158,7 @@ class Builder:
             "--manifest", str(self.app / "AndroidManifest.xml"),
             "--min-sdk-version", str(MIN_SDK),
             "--target-sdk-version", str(TARGET_SDK),
-            "--version-code", "1", "--version-name", "1.0.0",
+            "--version-code", "2", "--version-name", "1.0.1",
             "--auto-add-overlay",
             str(compiled),
         ]

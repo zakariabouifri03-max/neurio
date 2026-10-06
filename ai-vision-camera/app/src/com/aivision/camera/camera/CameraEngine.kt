@@ -222,6 +222,25 @@ class CameraEngine(
         return true
     }
 
+    /**
+     * Ceiling for the still/burst stream, in pixels. The AI pipeline works on
+     * 32-bit float planes (~6 bytes per pixel once chroma is counted), so a naive
+     * 24 MP burst of 12 frames would ask for ~1.7 GB and be killed by the OS.
+     * The cap is derived from the real heap in MainActivity and applied here.
+     */
+    private var processCapPixels: Long = 12_000_000L
+
+    fun setProcessCap(pixels: Long) {
+        val clamped = pixels.coerceIn(1_500_000L, 24_000_000L)
+        if (clamped == processCapPixels) return
+        processCapPixels = clamped
+        if (device != null) {
+            closeSession()
+            configureSizes(previewSize.width, previewSize.height)
+            createSession()
+        }
+    }
+
     private var highSpeedRequested = 0
     private var highSpeedSize: Size? = null
     private var highSpeedRange: Range<Int>? = null
@@ -273,7 +292,7 @@ class CameraEngine(
         val maxPixels = when (mode) {
             CaptureMode.SLOW_MOTION, CaptureMode.VIDEO -> 1920L * 1080L
             CaptureMode.TIME_LAPSE -> 3840L * 2160L
-            else -> 24_000_000L
+            else -> minOf(24_000_000L, processCapPixels)
         }
         captureSize = SizePick.largest(l.yuvSizes, maxPixels) ?: Size(1920, 1080)
 
@@ -320,13 +339,13 @@ class CameraEngine(
         val chosen = forcedLens?.takeIf { it.facing == facing }
             ?: group.lensFor(zoom.coerceAtLeast(1f))
         lens = chosen
-        configureSizes(previewSize.width, previewSize.height)
+        safe("choosing stream sizes") { configureSizes(previewSize.width, previewSize.height) }
         try {
             characteristics = cameraManager.getCameraCharacteristics(chosen.id)
             @Suppress("MissingPermission")
             cameraManager.openCamera(chosen.id, stateCallback, handler)
         } catch (t: SecurityException) {
-            callback.onError("Camera permission denied")
+            safe("reporting permission error") { callback.onError("Camera permission denied") }
         } catch (t: Throwable) {
             L.e("openCamera failed", t)
             callback.onError("Cannot open camera ${chosen.id}: ${t.message}")
@@ -339,21 +358,21 @@ class CameraEngine(
         override fun onOpened(camera: CameraDevice) {
             L.i("camera ${camera.id} opened")
             device = camera
-            createSession()
+            safe("creating the capture session") { createSession() }
         }
 
         override fun onDisconnected(camera: CameraDevice) {
             L.w("camera disconnected")
             camera.close()
             if (device === camera) device = null
-            callback.onError("Camera disconnected")
+            safe("reporting disconnect") { callback.onError("Camera disconnected") }
         }
 
         override fun onError(camera: CameraDevice, error: Int) {
             L.e("camera error $error")
             camera.close()
             if (device === camera) device = null
-            callback.onError("Camera error ${errorName(error)}")
+            safe("reporting camera error") { callback.onError("Camera error ${errorName(error)}") }
         }
     }
 
@@ -364,6 +383,20 @@ class CameraEngine(
         CameraDevice.StateCallback.ERROR_CAMERA_DEVICE -> "device failure"
         CameraDevice.StateCallback.ERROR_CAMERA_SERVICE -> "service failure"
         else -> "code $error"
+    }
+
+    /**
+     * Camera callbacks are invoked from the camera service's binder thread, from
+     * the ImageReader handlers and from the main thread. An exception escaping any
+     * of them kills the process, so every entry point is wrapped here rather than
+     * trusting each call site.
+     */
+    private inline fun safe(where: String, body: () -> Unit) {
+        try {
+            body()
+        } catch (t: Throwable) {
+            L.e("$where failed", t)
+        }
     }
 
     // ----------------------------------------------------------------- sessions
@@ -501,7 +534,9 @@ class CameraEngine(
                 }
 
                 override fun onConfigureFailed(s: CameraCaptureSession) {
-                    callback.onError("High-speed configuration failed")
+                    safe("reporting high-speed failure") {
+                        callback.onError("High-speed configuration failed")
+                    }
                 }
             }, handler)
         } catch (t: Throwable) {
@@ -513,21 +548,27 @@ class CameraEngine(
     private val sessionCallback = object : CameraCaptureSession.StateCallback() {
         override fun onConfigured(s: CameraCaptureSession) {
             session = s
-            val l = lens
-            if (l != null) callback.onCameraReady(l, previewSize, captureSize)
-            startRepeating()
-            applyAllControls()
+            safe("starting the preview") {
+                val l = lens
+                if (l != null) callback.onCameraReady(l, previewSize, captureSize)
+                startRepeating()
+                applyAllControls()
+            }
         }
 
         override fun onConfigureFailed(s: CameraCaptureSession) {
             L.e("session configure failed")
-            callback.onError("Camera configuration failed - trying a simpler setup")
+            safe("reporting configure failure") {
+                callback.onError("Camera configuration failed - trying a simpler setup")
+            }
             // one retry with the bare minimum (preview + capture)
-            val dev = device ?: return
-            val preview = previewSurface ?: return
-            val basic = mutableListOf(preview)
-            yuvReader?.surface?.let { basic += it }
-            runCatching { dev.createCaptureSession(basic, this, handler) }
+            safe("retrying a simpler session") {
+                val dev = device ?: return@safe
+                val preview = previewSurface ?: return@safe
+                val basic = mutableListOf(preview)
+                yuvReader?.surface?.let { basic += it }
+                dev.createCaptureSession(basic, this, handler)
+            }
         }
     }
 

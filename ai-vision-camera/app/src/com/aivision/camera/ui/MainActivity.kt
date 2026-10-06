@@ -14,6 +14,8 @@ import android.hardware.SensorManager
 import android.media.Image
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.app.Activity
 import android.view.Gravity
 import android.view.MotionEvent
@@ -26,6 +28,7 @@ import android.widget.ScrollView
 import android.widget.Space
 import android.widget.TextView
 import android.widget.Toast
+import com.aivision.camera.BuildConfig
 import com.aivision.camera.ai.AiResult
 import com.aivision.camera.ai.CapturePlan
 import com.aivision.camera.ai.DepthMap
@@ -53,6 +56,7 @@ import com.aivision.camera.core.DeviceProfiler
 import com.aivision.camera.core.DeviceReport
 import com.aivision.camera.core.DeviceTier
 import com.aivision.camera.core.L
+import com.aivision.camera.core.Crash
 import com.aivision.camera.core.M
 import com.aivision.camera.core.Prefs
 import com.aivision.camera.core.QualityPolicy
@@ -104,6 +108,9 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
     private lateinit var quickRow: LinearLayout
     private lateinit var bottomBar: LinearLayout
     private var startupAnimationPlayed = false
+    private var lastAnalysisAt = 0L
+    private val startupStart = android.os.SystemClock.elapsedRealtime()
+    private var modeSwitchAllowedAt = 0L
 
     private var mode = "PHOTO"
     private var zoom = 1f
@@ -129,7 +136,13 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         prefs = Prefs(this)
+        // ask about the previous run first: if this launch also dies early, the
+        // report was already in front of the user
+        if (savedInstanceState == null) maybeShowLastCrash()
+        Crash.step(this, "onCreate: settings")
+        Crash.step(this, "onCreate: reading camera capabilities")
         registry = CameraRegistry.read(this)
+        Crash.step(this, "onCreate: profiling device")
         report = DeviceProfiler.report(this, registry.score, registry.notes)
         policy = DeviceProfiler.policy(report, prefs.tierOverride)
         ai = AiEngine(policy, report)
@@ -137,14 +150,82 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
         ai.aiUltra = prefs.aiUltra
         ai.setProgressListener(this)
         video = VideoController(this, policy)
+        Crash.step(this, "onCreate: AI engine ready (${policy.tier})")
 
-        buildUi()
-        overlay.hint = "Starting camera…"
-        applyMode(prefs.lastMode, initial = true)
-        updateThumb()
-        registerSensors()
+        try {
+            Crash.step(this, "building the camera screen")
+            buildUi()
+            Crash.step(this, "screen built")
+            overlay.hint = "Starting camera…"
+            applyMode(prefs.lastMode, initial = true)
+            updateThumb()
+            registerSensors()
+            Crash.step(this, "sensors + thumbnails ready")
+        } catch (t: Throwable) {
+            // a failure while building the screen is reported instead of closing
+            L.e("startup failed", t)
+            com.aivision.camera.core.Crash.note(this, "building the camera screen", t)
+            showFatal(t)
+            return
+        }
 
+        Crash.step(this, if (hasPermission()) "permission granted" else "asking for permission")
         if (hasPermission()) startCamera() else requestPermissions()
+    }
+
+    /** The failure path: tell the user what broke and let them send it back. */
+    private fun showFatal(t: Throwable) {
+        runCatching {
+            AlertDialog.Builder(this)
+                .setTitle("AI Vision Camera could not start")
+                .setMessage(t.javaClass.simpleName + ": " + t.message +
+                    "\n\nA report was saved - you can copy it and send it back to be fixed.")
+                .setPositiveButton("Copy report") { _, _ -> copyCrashReport() }
+                .setNegativeButton("Close") { _, _ -> finish() }
+                .show()
+        }
+    }
+
+    /** Offer the previous run's crash report, once per crash. */
+    private fun maybeShowLastCrash() {
+        val report = Crash.readLast(this)
+        val bootTrace = if (report == null) Crash.incompleteBoot(this) else null
+        if (report == null && bootTrace == null) return
+        val summary = report?.lineSequence()?.firstOrNull { it.startsWith("exception") }
+            ?: "The app stopped before the camera was ready."
+        val where = bootTrace?.lineSequence()?.lastOrNull { it.contains("  ") }
+        val text = report ?: bootTrace.orEmpty()
+        AlertDialog.Builder(this)
+            .setTitle("Last run stopped unexpectedly")
+            .setMessage(summary + (if (where != null) "\n\nLast step reached:\n$where" else "") +
+                "\n\nSend this report and the cause gets fixed.")
+            .setPositiveButton("Copy report") { _, _ -> copyCrashReport(text) }
+            .setNeutralButton("Share") { _, _ -> shareCrashReport(text) }
+            .setNegativeButton("Dismiss") { _, _ ->
+                Crash.clear(this)
+                Crash.clearBoot(this)
+            }
+            .show()
+    }
+
+    private fun copyCrashReport(report: String? = null) {
+        val text = report ?: Crash.readLast(this) ?: Crash.incompleteBoot(this) ?: return
+        runCatching {
+            val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                as android.content.ClipboardManager
+            clipboard.setPrimaryClip(android.content.ClipData.newPlainText("AI Vision crash", text))
+            toast("Crash report copied")
+        }.onFailure { toast("Copy failed") }
+    }
+
+    private fun shareCrashReport(text: String) {
+        runCatching {
+            startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, "AI Vision Camera crash report")
+                putExtra(Intent.EXTRA_TEXT, text)
+            }, "Send crash report"))
+        }.onFailure { toast("Share failed") }
     }
 
     override fun onResume() {
@@ -168,13 +249,20 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
 
         preview = GlPreviewView(this)
         preview.onSurfaceReady = { texture ->
+            Crash.step(this, "GL surface ready (${preview.width}x${preview.height})")
             engine?.start(texture, preview.width, preview.height, currentCaptureMode())
         }
         preview.onSurfaceSize = { _, _ ->
             updatePreviewTransform()
             preview.requestRender()
         }
-        preview.onGlError = { msg -> toast(msg) }
+        // NOTE: the GL callbacks below arrive on the GL thread, which has no
+        // Looper - touching UI (a Toast, a dialog, even LayoutParams) there
+        // throws and kills the process. Start-up work runs inline (it is
+        // thread-safe); everything else is posted to the main thread.
+        preview.onGlError = { msg ->
+            Handler(Looper.getMainLooper()).post { toast(msg) }
+        }
         root.addView(preview, FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
 
@@ -650,22 +738,45 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
     }
 
     private fun startCamera() {
-        val existing = engine
-        if (existing == null) {
-            engine = CameraEngine(this, registry, this).also { eng ->
-                eng.setRawStream(prefs.proRaw)
-                eng.setStabilization(prefs.hybridStabilization)
-                val st = preview.surfaceTexture
-                if (st != null) {
-                    eng.start(st, preview.width, preview.height, currentCaptureMode())
+        // called from onCreate (main thread) and from the GL thread - a failure
+        // here must never escape, it just gets reported
+        try {
+            val existing = engine
+            if (existing == null) {
+                engine = CameraEngine(this, registry, this).also { eng ->
+                    eng.setRawStream(prefs.proRaw)
+                    eng.setStabilization(prefs.hybridStabilization)
+                    val st = preview.surfaceTexture
+                    if (st != null) {
+                        eng.start(st, preview.width, preview.height, currentCaptureMode())
+                    }
                 }
+            } else {
+                existing.openCamera(prefs.lastFacing == 1)
             }
-        } else {
-            existing.openCamera(prefs.lastFacing == 1)
+        } catch (t: Throwable) {
+            L.e("startCamera failed", t)
+            com.aivision.camera.core.Crash.note(this, "starting the camera", t)
+            runOnUiThread {
+                toast("Camera failed to start: ${t.message}")
+                overlay.hint = "Camera could not start - tap FLIP or reopen the app"
+                overlay.invalidate()
+            }
         }
     }
 
     private fun applyMode(newMode: String, initial: Boolean = false) {
+        if (!initial) {
+            // tapping a mode while the session is still coming up used to tear
+            // down a half-open camera; wait until it is actually streaming
+            val now = android.os.SystemClock.elapsedRealtime()
+            if (engine?.currentLens == null && now - startupStart < 10_000L) {
+                toast("Camera is still starting…")
+                return
+            }
+            if (now < modeSwitchAllowedAt) return
+            modeSwitchAllowedAt = now + 900L
+        }
         mode = newMode
         prefs.lastMode = newMode
         modeBar.selected = modeBar.modes.indexOf(newMode).coerceAtLeast(0)
@@ -682,6 +793,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
         }
         ultraButton.visibility = View.VISIBLE
         shutter.mode = if (newMode == "VIDEO") "VIDEO" else "PHOTO"
+        engine?.setProcessCap(currentProcessCap())
         engine?.switchMode(currentCaptureMode())
         // a mode switch must not leave another mode's arming behind
         if (newMode != "AI") {
@@ -724,7 +836,9 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
 
     // ------------------------------------------------------------------- callbacks
     override fun onCameraReady(lens: LensInfo, previewSize: android.util.Size, captureSize: android.util.Size) {
-        runOnUiThread {
+        Crash.step(this, "session configured: ${lens.kind.label} ${previewSize.width}x${previewSize.height}")
+        Crash.bootComplete(this)
+        uiSafe {
             val rotation = engine?.jpegOrientation() ?: 90
             val mirror = (engine?.isFrontFacing() ?: false) && prefs.mirrorFront
             preview.updateTransform(previewSize.width, previewSize.height, rotation, mirror)
@@ -743,6 +857,14 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
     }
 
     /** Recompute the preview transform (rotation can change while running). */
+    /**
+     * Multi-frame AI needs several copies of a frame at once, so it runs on a
+     * bounded resolution; a plain single shot can use the full sensor stream.
+     */
+    private fun currentProcessCap(): Long =
+        if (ai.aiEnhance || ai.aiUltra || ai.nightMode) aiProcessPixels()
+        else min(24_000_000L, heapSafePixels() * 2L)
+
     private fun updatePreviewTransform() {
         val rotation = engine?.jpegOrientation() ?: 90
         val mirror = (engine?.isFrontFacing() ?: false) && prefs.mirrorFront
@@ -776,7 +898,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
     }
 
     override fun onStatus(status: CameraStatus) {
-        runOnUiThread {
+        uiSafe {
             val exposure = if (status.exposureNs > 0) {
                 "ISO ${status.iso} • ${CapturePlan.formatExposure(status.exposureNs)}"
             } else "ISO ${status.iso}"
@@ -791,6 +913,22 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
         }
     }
 
+    /**
+     * UI updates that arrive from camera / GL / worker threads. The body runs on
+     * the main thread inside a guard: a mistake in one of these blocks used to be
+     * an uncaught main-thread exception, i.e. the app closing under the user.
+     */
+    private inline fun uiSafe(crossinline body: () -> Unit) {
+        runOnUiThread {
+            try {
+                body()
+            } catch (t: Throwable) {
+                L.e("ui update failed", t)
+                Crash.note(this, "updating the camera screen", t)
+            }
+        }
+    }
+
     private fun zoomLabelText(z: Float): String {
         val text = if (z < 1f) "%.1f×".format(z) else if (z < 10f) "%.1f×".format(z) else "${z.roundToInt()}×"
         return if (aiZeomActive) "$text AI" else text
@@ -798,9 +936,13 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
 
     override fun onAnalysisFrame(luma: ByteArray, width: Int, height: Int, stride: Int, faces: List<Rect>) {
         if (!prefs.sceneDetection && !ai.aiEnhance) return
+        // runs on the camera thread: rate-limit before doing any per-frame work
+        val elapsed = android.os.SystemClock.elapsedRealtime()
+        if (elapsed - lastAnalysisAt < 500L) return
+        lastAnalysisAt = elapsed
         val report = ai.analysePreview(luma, width, height, stride, faces, zoom,
             motionHint = if (recording) 0.4f else 0f) ?: return
-        runOnUiThread {
+        uiSafe {
             overlay.sceneLine = "AI scene: ${report.label.display} • noise ${"%.3f".format(report.noise)}"
             if (prefs.faceEnhance && faces.isNotEmpty()) {
                 val lens = engine?.currentLens
@@ -847,7 +989,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
             val chars = engine?.currentCharacteristics()
             if (chars != null) {
                 val saved = PhotoSaver.saveDng(this, image, chars, result, "AI Vision RAW")
-                runOnUiThread {
+                uiSafe {
                     if (saved != null) flashResult("RAW saved", "${saved.width}×${saved.height} DNG")
                 }
             }
@@ -885,14 +1027,14 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
         } else Shift.ZERO
         burstFrames.add(planes)
         burstShifts.add(shift)
-        runOnUiThread {
+        uiSafe {
             overlay.processingStage = "AI capture $index/$total"
             overlay.processingProgress = (index.toFloat() / total) * 0.4f
             overlay.processing = true
         }
         if (panoramaActive) {
             panoramaFrames.add(planes)
-            runOnUiThread { overlay.processingStage = "Panorama ${panoramaFrames.size} frames" }
+            uiSafe { overlay.processingStage = "Panorama ${panoramaFrames.size} frames" }
         }
         if (timeLapse.capturing) timeLapse.addFrame(planes)
     }
@@ -941,14 +1083,15 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
     }
 
     override fun onError(message: String) {
-        runOnUiThread {
+        Crash.step(this, "camera error: $message")
+        uiSafe {
             toast(message)
             finishProcessing()
         }
     }
 
     override fun onProgress(stage: String, fraction: Float) {
-        runOnUiThread {
+        uiSafe {
             overlay.processing = true
             overlay.processingStage = stage
             overlay.processingProgress = fraction
@@ -998,12 +1141,47 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
         overlay.post(tick)
     }
 
+    /** Pixels the AI pipeline may work on, from the real heap and the tier. */
+    private fun aiProcessPixels(): Long {
+        val tierCap = when (policy.tier) {
+            DeviceTier.FLAGSHIP -> 9_000_000L
+            DeviceTier.MID_RANGE -> 5_000_000L
+            else -> 2_500_000L
+        }
+        return min(tierCap, heapSafePixels())
+    }
+
+    /** Half the heap divided by ~6 bytes/pixel leaves room for the burst stack. */
+    private fun heapSafePixels(): Long {
+        val heap = Runtime.getRuntime().maxMemory()
+        val usable = heap / 3L
+        return (usable / 6L).coerceIn(1_500_000L, 24_000_000L)
+    }
+
+    /**
+     * How many frames of the plan actually fit in memory. A frame costs about
+     * 6 bytes per pixel (float luma + quarter-res chroma) and every pool copy adds
+     * more, so the burst is trimmed before a single frame is captured.
+     */
+    private fun framesThatFit(planned: Int): Int {
+        val size = engine?.captureSizeForMode()
+        val pixels = (size?.let { it.width.toLong() * it.height.toLong() } ?: 4_000_000L)
+        val perFrame = pixels * 6L
+        val budget = Runtime.getRuntime().maxMemory() / 3L
+        val fits = (budget / perFrame.coerceAtLeast(1L)).toInt()
+        return planned.coerceAtMost(fits.coerceIn(1, 24))
+    }
+
     private fun startCapture() {
         val eng = engine ?: return
         val scene = ai.lastScene
         burstScene = scene
         val action = (scene?.motion ?: 0f) > 0.45f
-        val plan = ai.planCapture(zoom, scene, action)
+        val planned = ai.planCapture(zoom, scene, action)
+        val usableFrames = framesThatFit(planned.frames)
+        val plan = if (usableFrames < planned.frames) {
+            planned.copy(frames = usableFrames, evLadder = planned.evLadder.take(usableFrames))
+        } else planned
         burstPlan = plan
         capturing = true
         burstFrames = ArrayList()
@@ -1053,7 +1231,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
     private fun saveResult(result: AiResult) {
         val planes = result.planes
         if (planes == null) {
-            runOnUiThread { toast(result.headline); finishProcessing() }
+            uiSafe { toast(result.headline); finishProcessing() }
             return
         }
         val orientation = engine?.jpegOrientation() ?: 0
@@ -1077,7 +1255,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
                 L.w("original sidecar failed: ${t.message}")
             }
         }
-        runOnUiThread {
+        uiSafe {
             flashResult(
                 "${result.headline} • ${planes.w}×${planes.h}",
                 (result.details.take(3).joinToString(" • ") + " • saved " +
@@ -1145,13 +1323,13 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
         Work.serial.execute {
             val out = tc.transcodeTo4k(file, 3840, object : VideoTranscoder.Progress {
                 override fun onProgress(fraction: Float, stage: String) {
-                    runOnUiThread {
+                    uiSafe {
                         overlay.processingProgress = fraction
                         overlay.processingStage = stage
                     }
                 }
             })
-            runOnUiThread {
+            uiSafe {
                 overlay.processing = false
                 if (out != null) {
                     PhotoSaver.registerVideo(this, out, 3840, 2160, "AI Enhanced 4K")
@@ -1293,7 +1471,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
             overlay.processingStage = "AI time-lapse encode"
             Work.serial.execute {
                 val file = timeLapse.finishAndEncode(engine?.jpegOrientation() ?: 0)
-                runOnUiThread {
+                uiSafe {
                     overlay.processing = false
                     if (file != null) {
                         flashResult("Time-lapse saved", file.name)
@@ -1437,6 +1615,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
 
     // --------------------------------------------------------------------- shell
     private fun refreshAiState() {
+        engine?.setProcessCap(currentProcessCap())
         preview.aiActive = ai.aiEnhance || ai.aiUltra
         shutter.aiActive = ai.aiEnhance || ai.aiUltra
         shutter.invalidate()
@@ -1495,6 +1674,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
 
     private fun showDeviceSheet() {
         val message = buildString {
+            append("App: ${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})\n")
             append("SoC: ${report.soc}\n")
             append("CPU: ${report.cores} cores @ ${"%.2f".format(report.maxFreqGhz)} GHz\n")
             append("RAM: ${"%.1f".format(report.ramGb)} GB\n")
@@ -1512,6 +1692,15 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
             .setTitle("Device & AI capabilities")
             .setMessage(message)
             .setPositiveButton("OK", null)
+            .setNeutralButton("Copy") { _, _ ->
+                runCatching {
+                    val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                        as android.content.ClipboardManager
+                    clipboard.setPrimaryClip(
+                        android.content.ClipData.newPlainText("AI Vision report", message))
+                    toast("Report copied")
+                }
+            }
             .show()
     }
 
@@ -1543,6 +1732,10 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
             column.addView(row)
         }
 
+        column.addView(Theme.label(this@MainActivity,
+            "AI Vision Camera ${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})",
+            Theme.textSecondary))
+        column.addView(Space(this), LinearLayout.LayoutParams(1, Ui.dp(this@MainActivity, 10f)))
         section("AI")
         toggle("AI Enhance", prefs.aiEnhance) { prefs.aiEnhance = it; ai.aiEnhance = it; enhanceButton.active = it; refreshAiState() }
         toggle("AI Ultra Resolution", prefs.aiUltra) { prefs.aiUltra = it; ai.aiUltra = it; ultraButton.active = it; refreshAiState() }

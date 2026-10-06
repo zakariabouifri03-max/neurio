@@ -15,6 +15,7 @@ import android.util.Size
 import android.util.TypedValue
 import android.view.View
 import java.io.File
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger
@@ -50,14 +51,34 @@ object Work {
         }
     }
 
+    /**
+     * Every pool is wrapped so a failure inside one task can never take the
+     * process down: on Android an uncaught exception on *any* thread kills the
+     * whole app, which for a camera is the difference between a glitch and a
+     * "the app closes by itself" bug report.
+     */
+    private class Guarded(private val delegate: ExecutorService) : ExecutorService by delegate {
+        override fun execute(command: Runnable) {
+            delegate.execute(object : Runnable {
+                override fun run() {
+                    try {
+                        command.run()
+                    } catch (t: Throwable) {
+                        L.e("background task failed", t)
+                    }
+                }
+            })
+        }
+    }
+
     /** CPU pool used for pixel processing (tiled + row-parallel). */
-    val processor = Executors.newFixedThreadPool(cores.coerceAtMost(6), factory("aiv-work"))
+    val processor: ExecutorService = Guarded(Executors.newFixedThreadPool(cores.coerceAtMost(6), factory("aiv-work")))
 
     /** Single-thread queue for serialising camera + save operations. */
-    val serial = Executors.newSingleThreadExecutor(factory("aiv-serial"))
+    val serial: ExecutorService = Guarded(Executors.newSingleThreadExecutor(factory("aiv-serial")))
 
     /** Small pool for thumbnails / MediaStore queries. */
-    val io = Executors.newFixedThreadPool(2, factory("aiv-io"))
+    val io: ExecutorService = Guarded(Executors.newFixedThreadPool(2, factory("aiv-io")))
 }
 
 object Ui {

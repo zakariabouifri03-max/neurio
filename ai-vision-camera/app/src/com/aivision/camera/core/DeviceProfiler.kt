@@ -192,7 +192,28 @@ object DeviceProfiler {
      * Spin up a 1x1 EGL pbuffer, ask the driver who it is, tear it down.
      * Everything is guarded: a device without working EGL still gets a report.
      */
+    /**
+     * GPU facts are collected on a throw-away thread with a hard timeout.
+     * Making a GL context current on the UI thread during startup can upset the
+     * hardware renderer, and on some drivers a hiccup there kills the launch -
+     * so the probe never runs on the thread that owns the window.
+     */
     private fun gpuInfo(ctx: Context): GpuInfo {
+        val requested = glesRequested(ctx)
+        val result = arrayOfNulls<GpuInfo>(1)
+        val probe = Thread({ result[0] = probeEgl() }, "aiv-gpu-probe")
+        probe.isDaemon = true
+        try {
+            probe.start()
+            probe.join(1500)
+        } catch (t: Throwable) {
+            L.w("GPU probe thread failed: ${t.message}")
+        }
+        return result[0] ?: GpuInfo("unknown", "unknown", requested, 4096)
+    }
+
+    /** @return real GL facts, or null when the driver refuses a probe context. */
+    private fun probeEgl(): GpuInfo? {
         var display: EGLDisplay? = null
         var surface: EGLSurface? = null
         var context: EGLContext? = null
@@ -222,10 +243,10 @@ object DeviceProfiler {
             val version = GLES20.glGetString(GLES20.GL_VERSION) ?: "?"
             val maxTex = IntArray(1)
             GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, maxTex, 0)
-            return GpuInfo(vendor, renderer, "${version.ifBlank { glesRequested(ctx) }}", maxTex[0])
+            return GpuInfo(vendor, renderer, version.ifBlank { "OpenGL ES" }, maxTex[0])
         } catch (t: Throwable) {
             L.w("GPU probe failed: ${t.message}")
-            return GpuInfo("unknown", "unknown", glesRequested(ctx), 4096)
+            return null
         } finally {
             try {
                 if (display != null && display != EGL14.EGL_NO_DISPLAY) {

@@ -13,6 +13,7 @@ import android.view.MotionEvent
 import android.view.View
 import com.aivision.camera.core.Draw
 import com.aivision.camera.core.M
+import com.aivision.camera.core.L
 import com.aivision.camera.core.Ui
 import kotlin.math.abs
 import kotlin.math.max
@@ -65,7 +66,17 @@ class ViewfinderOverlay(context: Context) : View(context) {
         invalidate()
     }
 
+    /** Never let a drawing mistake take the whole app down. */
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        try {
+            drawSelf(canvas)
+        } catch (t: Throwable) {
+            L.e("view draw failed", t)
+        }
+    }
+
+    private fun drawSelf(canvas: Canvas) {
         super.onDraw(canvas)
         val w = width.toFloat()
         val h = height.toFloat()
@@ -276,7 +287,17 @@ class ShutterButton(context: Context) : View(context) {
         setMeasuredDimension(size, size)
     }
 
+    /** Never let a drawing mistake take the whole app down. */
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        try {
+            drawSelf(canvas)
+        } catch (t: Throwable) {
+            L.e("view draw failed", t)
+        }
+    }
+
+    private fun drawSelf(canvas: Canvas) {
         val cx = width / 2f
         val cy = height / 2f
         val outer = min(width, height) / 2f - Ui.dp(context, 2f).toFloat()
@@ -350,7 +371,17 @@ class ModeBar(context: Context) : View(context) {
         }
     }
 
+    /** Never let a drawing mistake take the whole app down. */
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        try {
+            drawSelf(canvas)
+        } catch (t: Throwable) {
+            L.e("view draw failed", t)
+        }
+    }
+
+    private fun drawSelf(canvas: Canvas) {
         for (i in rects.indices) {
             val r = rects[i]
             val isSelected = i == selected
@@ -415,7 +446,17 @@ class AiActionButton(context: Context) : View(context) {
         setMeasuredDimension(w, Ui.dp(context, 40f))
     }
 
+    /** Never let a drawing mistake take the whole app down. */
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        try {
+            drawSelf(canvas)
+        } catch (t: Throwable) {
+            L.e("view draw failed", t)
+        }
+    }
+
+    private fun drawSelf(canvas: Canvas) {
         val r = RectF(Ui.dp(context, 1f).toFloat(), Ui.dp(context, 1f).toFloat(),
             width - Ui.dp(context, 1f).toFloat(), height - Ui.dp(context, 1f).toFloat())
         paint.reset(); paint.isAntiAlias = true
@@ -481,7 +522,17 @@ class ZoomDial(context: Context) : View(context) {
         }
     }
 
+    /** Never let a drawing mistake take the whole app down. */
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        try {
+            drawSelf(canvas)
+        } catch (t: Throwable) {
+            L.e("view draw failed", t)
+        }
+    }
+
+    private fun drawSelf(canvas: Canvas) {
         paint.reset(); paint.isAntiAlias = true
         paint.style = Paint.Style.FILL
         paint.color = Draw.withAlpha(Theme.surface, 180)
@@ -574,7 +625,17 @@ class ProSlider(context: Context) : View(context) {
             w - Ui.dp(context, 6f).toFloat(), h - Ui.dp(context, 5f).toFloat())
     }
 
+    /** Never let a drawing mistake take the whole app down. */
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        try {
+            drawSelf(canvas)
+        } catch (t: Throwable) {
+            L.e("view draw failed", t)
+        }
+    }
+
+    private fun drawSelf(canvas: Canvas) {
         textPaint.textSize = Ui.sp(context, 10.5f)
         textPaint.color = Draw.withAlpha(Color.WHITE, 190)
         textPaint.typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD)
@@ -660,7 +721,17 @@ class ChipButton(context: Context) : View(context) {
         }
     }
 
+    /** Never let a drawing mistake take the whole app down. */
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        try {
+            drawSelf(canvas)
+        } catch (t: Throwable) {
+            L.e("view draw failed", t)
+        }
+    }
+
+    private fun drawSelf(canvas: Canvas) {
         val r = RectF(Ui.dp(context, 1f).toFloat(), Ui.dp(context, 1f).toFloat(),
             width - Ui.dp(context, 1f).toFloat(), height - Ui.dp(context, 1f).toFloat())
         paint.reset(); paint.isAntiAlias = true
@@ -728,7 +799,17 @@ class CompareSlider(context: Context) : View(context) {
         return RectF(left, top, left + dw, top + dh)
     }
 
+    /** Never let a drawing mistake take the whole app down. */
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        try {
+            drawSelf(canvas)
+        } catch (t: Throwable) {
+            L.e("view draw failed", t)
+        }
+    }
+
+    private fun drawSelf(canvas: Canvas) {
         val dest = destRect(width, height)
         val left = after
         val right = before
@@ -816,7 +897,17 @@ class ThumbView(context: Context) : View(context) {
         setMeasuredDimension(size, size)
     }
 
+    /** Never let a drawing mistake take the whole app down. */
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        try {
+            drawSelf(canvas)
+        } catch (t: Throwable) {
+            L.e("view draw failed", t)
+        }
+    }
+
+    private fun drawSelf(canvas: Canvas) {
         val r = RectF(0f, 0f, width.toFloat(), height.toFloat())
         paint.reset(); paint.isAntiAlias = true
         paint.style = Paint.Style.FILL

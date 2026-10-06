@@ -38,6 +38,16 @@ class GlPreviewView @JvmOverloads constructor(
     var onSurfaceSize: ((Int, Int) -> Unit)? = null
     var onGlError: ((String) -> Unit)? = null
 
+    /** Report a GL problem without ever letting the callback kill the GL thread. */
+    private fun reportError(message: String) {
+        L.w("gl: $message")
+        try {
+            onGlError?.invoke(message)
+        } catch (t: Throwable) {
+            L.e("glError callback failed", t)
+        }
+    }
+
     // --- live settings written from the UI thread, read by the GL thread -----
     @Volatile var denoise = 0.3f
     @Volatile var sharpen = 0.35f
@@ -144,7 +154,7 @@ class GlPreviewView @JvmOverloads constructor(
                 useFallback = true
                 fallbackProgram = buildProgram(VERTEX_SHADER, PLAIN_FRAGMENT_SHADER)
                 if (fallbackProgram == 0) {
-                    onGlError?.invoke("Preview shaders unavailable on this GPU")
+                    reportError("Preview shaders unavailable on this GPU")
                     return
                 }
                 program = fallbackProgram
@@ -167,14 +177,27 @@ class GlPreviewView @JvmOverloads constructor(
 
             surfaceTexture = SurfaceTexture(textureId)
             surfaceTexture?.setOnFrameAvailableListener { requestRender() }
-            surfaceTexture?.let { onSurfaceReady?.invoke(it) }
+            val ready = surfaceTexture
+            if (ready != null) {
+                // The host gets the texture on this (GL) thread; a mistake in the
+                // callback must not take the process down with it.
+                try {
+                    onSurfaceReady?.invoke(ready)
+                } catch (t: Throwable) {
+                    L.e("surfaceReady callback failed", t)
+                }
+            }
         }
 
         override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
             viewWidth = width.coerceAtLeast(1)
             viewHeight = height.coerceAtLeast(1)
             GLES20.glViewport(0, 0, viewWidth, viewHeight)
-            onSurfaceSize?.invoke(viewWidth, viewHeight)
+            try {
+                onSurfaceSize?.invoke(viewWidth, viewHeight)
+            } catch (t: Throwable) {
+                L.e("surfaceSize callback failed", t)
+            }
         }
 
         override fun onDrawFrame(gl: GL10?) {
