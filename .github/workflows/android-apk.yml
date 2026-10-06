@@ -44,7 +44,32 @@ jobs:
 
       - name: Build installable debug APK
         working-directory: android
-        run: ./gradlew --no-daemon :app:assembleDebug
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon --console=plain --stacktrace :app:assembleDebug 2>&1 | tee "$RUNNER_TEMP/gradle-build.log"
+
+      - name: Report Gradle failure details
+        if: failure()
+        shell: bash
+        run: |
+          log="$RUNNER_TEMP/gradle-build.log"
+          if [[ -f "$log" ]]; then
+            details="$(grep -E '(^e: |error:|^FAILURE:|^\* What went wrong:|^[[:space:]]*> |Exception|Could not )' "$log" | tail -n 60 || true)"
+            if [[ -z "$details" ]]; then details="$(tail -n 100 "$log")"; fi
+            {
+              echo '## Gradle failure details'
+              echo '```text'
+              printf '%s\n' "$details"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            while IFS= read -r line; do
+              [[ -z "$line" ]] || printf '::error title=Gradle build::%s\n' "$line"
+            done <<< "$details"
+          else
+            echo 'Gradle log was not created.' >> "$GITHUB_STEP_SUMMARY"
+            echo '::error::Gradle log was not created.'
+          fi
 
       - name: Record APK checksum
         run: sha256sum android/app/build/outputs/apk/debug/app-debug.apk | tee android/app/build/outputs/apk/debug/SHA256SUMS.txt
