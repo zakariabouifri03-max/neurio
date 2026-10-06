@@ -50,7 +50,10 @@ extern "C" void ANativeWindow_release(ANativeWindow*);
 
 namespace {
 
-constexpr const char* kDemoBridgeClass = "com/aivision4k/app/DemoNativeBridge";
+// Must match the Kotlin `package` and object name exactly. A typo here is not a
+// subtle bug: FindClass fails, registration fails, and every demo method turns
+// into an UnsatisfiedLinkError at the first click.
+constexpr const char* kDemoBridgeClass = "com/aivision4k/app/demo/DemoNativeBridge";
 
 // ---------------------------------------------------------------------------
 // Renderer ownership

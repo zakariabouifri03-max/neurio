@@ -108,7 +108,19 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 4. Embedded shader header parity (CMake generator vs Python mirror)
+# 4. JNI bindings (names, signatures and the string handed to FindClass)
+# ---------------------------------------------------------------------------
+# A wrong entry in a JNINativeMethod table is invisible to both compilers and
+# fatal at load time: System.loadLibrary throws, and every screen that uses the
+# engine dies rather than just the method that changed.
+if [ -f "$ROOT/tools/checks/jni-bindings.py" ]; then
+    step "JNI bindings" python3 "$ROOT/tools/checks/jni-bindings.py"
+else
+    skip "JNI bindings" "tools/checks/jni-bindings.py is missing"
+fi
+
+# ---------------------------------------------------------------------------
+# 5. Embedded shader header parity (CMake generator vs Python mirror)
 # ---------------------------------------------------------------------------
 check_embedding() {
     if ! command -v cmake >/dev/null 2>&1; then
@@ -139,7 +151,7 @@ check_embedding() {
 step "embedded shader header parity" check_embedding
 
 # ---------------------------------------------------------------------------
-# 5. CMake configure + build (no-Vulkan configuration)
+# 6. CMake configure + build (no-Vulkan configuration)
 # ---------------------------------------------------------------------------
 if [ "$QUICK" = 1 ]; then
     skip "CMake no-Vulkan build" "--quick"
@@ -158,7 +170,7 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 6. Optional Vulkan-enabled syntax check
+# 7. Optional Vulkan-enabled syntax check
 # ---------------------------------------------------------------------------
 if [ "$QUICK" = 1 ]; then
     skip "Vulkan syntax check" "--quick"

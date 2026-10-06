@@ -365,7 +365,13 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
 #if V4K_ENABLE_DEMO
     // The demo activity's natives live in their own translation unit; they are
     // registered from here because a library gets one JNI_OnLoad.
-    if (!v4kRegisterDemoBridge(env)) return JNI_ERR;
+    //
+    // Deliberately not fatal: if the demo's Kotlin class is missing, the demo
+    // screen cannot work, but the engine the rest of the app uses still can.
+    // Refusing to load the library would turn one broken screen into a dead app.
+    if (!v4kRegisterDemoBridge(env)) {
+        V4K_LOGE("jni: the demo bridge did not register; the demo screen will not work");
+    }
 #endif
     V4K_LOGI("jni: engine bridge registered (version %d.%d.%d)", v4k::kEngineVersionMajor,
              v4k::kEngineVersionMinor, v4k::kEngineVersionPatch);

@@ -161,7 +161,7 @@ tools/run-native-tests.sh                 # 21 867 checks, 129 cases, 0 failures
 #    and jni_md.h in include/linux, while the NDK puts both in one directory.
 V4K_VULKAN_INCLUDE=/path/to/Vulkan-Headers/include \
 V4K_JNI_INCLUDE=/path/to/jdk/include:/path/to/jdk/include/linux \
-tools/verify.sh                           # 6 steps: shaders, embedding, tests, syntax
+tools/verify.sh                           # 7 steps: tests, shaders, JNI bindings, syntax
 ```
 
 The Android build itself (Gradle + NDK + R8) runs in CI

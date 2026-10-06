@@ -50,10 +50,16 @@ jobs:
             -DV4K_ENABLE_VULKAN=OFF -DV4K_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
           cmake --build /tmp/v4k-cmake-check -j"$(nproc)"
 
-      - name: Kotlin static checks
+      - name: Static checks (Kotlin imports, JNI bindings)
         # Missing imports and unbalanced delimiters: the two mistakes that have
         # actually broken the Gradle build, caught without the Android SDK.
-        run: python3 tools/checks/kotlin-imports.py
+        #
+        # And the JNI tables: a name, signature or class string that does not
+        # match the Kotlin side does not fail either compiler, it fails
+        # System.loadLibrary on the device, which takes the whole engine with it.
+        run: |
+          python3 tools/checks/kotlin-imports.py
+          python3 tools/checks/jni-bindings.py
 
       - name: Calibration models are up to date
         # Re-exports the .v4kmodel assets and fails if they differ from the
