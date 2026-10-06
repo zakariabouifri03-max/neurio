@@ -119,6 +119,10 @@ jobs:
         # Tee the output: the log is published back to the branch on failure,
         # because the artifact/log download hosts are not reachable from every
         # development environment. `pipefail` keeps Gradle's exit status.
+        #
+        # The id is what the diagnostics step keys on -- the outcome of this step,
+        # not the presence of an APK in dist/.
+        id: debug
         run: |
           set -o pipefail
           gradle :app:assembleDebug --stacktrace --console=plain 2>&1 | tee /tmp/build-debug.log
@@ -152,13 +156,31 @@ jobs:
             ( cd dist && sha256sum *.apk > SHA256SUMS.txt )
             cat dist/SHA256SUMS.txt
           fi
-          if ls dist/*.apk > /dev/null 2>&1; then
-            # A successful build needs no diagnostics: keep the tree clean.
-            rm -f dist/build-log.txt
-          elif [ -f /tmp/build-debug.log ]; then
-            tail -n 900 /tmp/build-debug.log > dist/build-log.txt
+
+          # Diagnostics are keyed on the *build outcome*, never on whether an APK
+          # is present in dist/. The APKs are committed to this branch, so a
+          # failed build still finds yesterday's files sitting there -- which is
+          # exactly how a previous version of this step concluded "success needs
+          # no diagnostics" and deleted the one log that explained the failure.
+          #
+          # A previously built APK is left in place rather than deleted: a stale
+          # artifact that still installs is better than no artifact, and the log
+          # below says plainly that this run did not produce it.
+          if [ "${{ steps.debug.outcome }}" != "success" ]; then
+            {
+              echo "The debug build did not succeed in this run (${{ steps.debug.outcome }})."
+              echo "The APKs in dist/ are from the previous successful build, if any."
+              echo
+            } > dist/build-log.txt
+            if [ -f /tmp/build-debug.log ]; then
+              tail -n 1200 /tmp/build-debug.log >> dist/build-log.txt
+            else
+              echo "the Gradle step produced no log" >> dist/build-log.txt
+            fi
+            echo "----- last 60 lines of the build log -----"
+            tail -n 60 dist/build-log.txt
           else
-            echo "the Gradle step produced no log" > dist/build-log.txt
+            rm -f dist/build-log.txt
           fi
           ls -l dist
 
@@ -180,8 +202,21 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f ai-vision-4k/dist
           if git diff --cached --quiet; then
-            echo "APK unchanged, nothing to publish."
-          else
-            git commit -m "ci: AI Vision 4K APK build (${GITHUB_SHA::7}) [skip ci]"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
+            echo "dist/ unchanged, nothing to publish."
+            exit 0
           fi
+          git commit -m "ci: AI Vision 4K APK build (${GITHUB_SHA::7}) [skip ci]"
+          # The branch moves while this job runs (the author pushes, another run
+          # publishes), and a plain push would then be rejected -- which is how a
+          # publish step ends up reporting success while publishing nothing. The
+          # commit only ever touches dist/, so a rebase is safe.
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "published on attempt ${attempt}"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "could not publish dist/ after three attempts" >&2
+          exit 1
