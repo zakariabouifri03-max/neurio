@@ -2,6 +2,19 @@
 
 **APK جاهز:** [`ReelsOffline.apk`](ReelsOffline.apk) (~408 KB) — تركّب مباشرة فالتلفون.
 
+**تحميل مباشر من GitHub** (حلّو من التلفون مباشرة):
+
+```
+https://github.com/zakariabouifri03-max/neurio/raw/arena/748c686b-neurio/android/ReelsOffline.apk
+```
+
+ولا امسح هاد الكود بالكاميرا:
+
+![QR ديال التحميل](download-qr.png)
+
+> من بعد ما يتدمج PR #13 فـ `main`، الرابط الدائم هو:
+> `https://github.com/zakariabouifri03-max/neurio/raw/main/android/ReelsOffline.apk`
+
 تطبيق أندرويد كيخلّيك **تحمّل ريلز/بوستات إنستغرام مرة وحدة (بالإنترنت)، ومن بعد تشوفهم بلا إنترنت نهائياً**.
 
 ---
@@ -51,7 +64,7 @@
 
 ## 📲 كيفاش تركّبو
 
-1. نزّل `ReelsOffline.apk` من هذا الريبو (زرّ **Download** فالملف، ولا من التلفون مباشرة).
+1. نزّل `ReelsOffline.apk` — إما من الرابط المباشر فالفوق، إما من صفحة الملف فGitHub (زرّ **Download**).
 2. حلّ الملف من **Fichiers / Files** → كيسولك أندرويد: «تثبيت هاد التطبيق؟» → **سمح للمصدر** (Settings → Allow from this source).
 3. ثبّت. الأيقونة: **ريلز أوفلاين** 🎬.
 
