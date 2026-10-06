@@ -1,0 +1,4 @@
+# regenerable by render_video.py --preview / build_audio.py
+preview_540.mp4
+audio/office_ambience.wav
+frames/diag_*.png
