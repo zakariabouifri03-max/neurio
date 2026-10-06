@@ -14,6 +14,9 @@ on:
       - 'tools/prepare-windows.ps1'
       - '.github/workflows/windows.yml'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -31,8 +34,35 @@ jobs:
         shell: pwsh
         run: ./tools/prepare-windows.ps1
       - run: npm run tauri:build
+      - name: Name the downloadable installer
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem 'src-tauri/target/release/bundle/nsis/*.exe' | Select-Object -First 1
+          if (-not $installer) { throw 'Tauri did not produce a Windows setup executable.' }
+          Copy-Item -LiteralPath $installer.FullName -Destination 'src-tauri/target/release/bundle/nsis/NexusVideoStudio-Windows-x64-setup.exe' -Force
       - uses: actions/upload-artifact@v4
         with:
           name: NexusVideoStudio-Windows-NSIS
-          path: src-tauri/target/release/bundle/nsis/*.exe
+          path: src-tauri/target/release/bundle/nsis/NexusVideoStudio-Windows-x64-setup.exe
           if-no-files-found: error
+
+  publish-prerelease:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: NexusVideoStudio-Windows-NSIS
+          path: release-assets
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nexus-video-studio-0.1.0-${{ github.run_id }}
+          target_commitish: ${{ github.sha }}
+          name: NEXUS VIDEO STUDIO 0.1.0 — Windows
+          body: |
+            Automated Windows x64 NSIS installer from commit ${{ github.sha }}.
+
+            This is a prerelease build. Local Whisper and llama.cpp runtimes/models are optional and are not bundled.
+          prerelease: true
+          make_latest: false
+          files: release-assets/NexusVideoStudio-Windows-x64-setup.exe

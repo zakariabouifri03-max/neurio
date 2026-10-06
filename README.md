@@ -63,7 +63,7 @@ Tauri produces an NSIS setup executable under:
 src-tauri/target/release/bundle/nsis/
 ```
 
-The repository includes a Windows GitHub Actions workflow that builds and uploads the installer artifact. This Linux coding environment does not contain Rust, a Windows toolchain, or FFmpeg, so it cannot emit or validate a Windows `.exe` locally.
+The repository includes a Windows GitHub Actions workflow that builds the installer, stores it as a run artifact, and publishes a GitHub prerelease asset with a direct download URL. This Linux coding environment does not contain Rust, a Windows toolchain, or FFmpeg, so it cannot emit or validate a Windows `.exe` locally.
 
 ## Local engine setup
 
