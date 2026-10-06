@@ -1,0 +1,27 @@
+{
+  "name": "@etsy-signal/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "icons": "node scripts/make-icons.mjs",
+    "build": "npm run icons && node scripts/build.mjs",
+    "watch": "npm run icons && node scripts/build.mjs --watch",
+    "test": "echo 'extension runtime covered by e2e checklist in docs/INSTALLATION.md'"
+  },
+  "dependencies": {
+    "@etsy-signal/shared": "*",
+    "@etsy-signal/signal-engine": "*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "uplot": "^1.6.31"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.287",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

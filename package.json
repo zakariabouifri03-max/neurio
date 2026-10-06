@@ -1,0 +1,22 @@
+{
+  "name": "etsy-signal",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Etsy Signal — a Chrome extension that analyzes publicly observable Etsy listing data and produces clearly-labelled, explainable sales/revenue estimates.",
+  "workspaces": [
+    "shared",
+    "signal-engine",
+    "estimation-engine",
+    "backend",
+    "extension"
+  ],
+  "scripts": {
+    "build": "npm run build -w shared && npm run build -w signal-engine && npm run build -w estimation-engine && npm run build -w backend && npm run build -w extension",
+    "test": "npm run test -w shared && npm run test -w estimation-engine && npm run test -w signal-engine && npm run test -w backend",
+    "dev:backend": "npm run dev -w backend",
+    "dev:extension": "npm run watch -w extension"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

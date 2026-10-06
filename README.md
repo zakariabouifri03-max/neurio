@@ -1,115 +1,138 @@
-# 🏁 Bash Baqi Racing
+# 🔥 Etsy Signal
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+**Transparent, evidence-based analytics for Etsy sellers — as a Chrome extension.**
 
-**▶ Play:** serve the folder with any static server and open it:
+When you search Etsy, Etsy Signal analyzes the listings on the page and adds a
+compact analytics panel to each product. When you open a listing, it opens a
+full multi-signal dashboard. Every number is one of two things:
 
-```bash
-python3 -m http.server 8000
-# → http://localhost:8000
-```
+1. **REAL** — copied directly from publicly observable data on the page you're viewing, or
+2. **ESTIMATE** — a clearly-labelled range with a confidence score and the exact evidence behind it.
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
-
----
-
-## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
-
-A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
-soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
-
-title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
-
-Everything is generated from code (no stock footage/music):
-
-```bash
-python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
-python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
-```
-
-See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
+> ⚖️ **Prime directive: ACCURACY > APPEARANCE.** Etsy Signal would rather show
+> *"Insufficient public data"* than a convincing fake number. No random values,
+> no hidden multipliers, no fabricated history — anywhere in the codebase.
 
 ---
 
-## 📱 Install on your phone — كأنها APK!
+## What you get
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
-
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
-
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
-**Offline play** is built-in: a service worker caches all game files on first visit.
-
----
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
+| Feature | Where |
 |---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
+| 🃏 Compact panel per listing: price, rating, reviews, est. sales/revenue ranges, demand/competition/opportunity, confidence + evidence bar | search results |
+| ⚡ Floating **Analyze Page** toolbar with sort modes: 🔥 Best Opportunity · 📈 Fastest Growing · 💰 Revenue Potential · 🥊 Lowest Competition · ⭐ Strongest Demand · 🆕 New Rising | search results |
+| 🔍 **Why this estimate?** — data used, model-by-model breakdown, estimation quality, confidence, limitations | everywhere |
+| 📊 Product dashboard: Overview / Sales Intelligence / Demand / Competition / Opportunity / Evidence + review-history chart | listing page |
+| 📅 **Historical tracking**: every visit stores a timestamped snapshot; review velocity, rank movement, acceleration and confidence improve with tracked time ("Tracked for 37 days") | backend |
+| 🗂 Popup: tracked listings, side-by-side comparison (up to 4), backend settings | toolbar icon |
 
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
+Example panel output (real pipeline output, not a mockup):
 
 ```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
+🔥 Etsy Signal                                   ESTIMATE      [Why?]
+Price $19.99 · ★4.8 · 451 reviews · 🏷 Bestseller
+Est. sales        4.6k–28k      Est. monthly  1.1k–4.4k
+Est. revenue/mo   $21k–$88k
+Demand 87 · Competition 51 · Opportunity 75
+Confidence 79%  ▓▓▓▓▓▓▓░░░   Tracked for 30 days
 ```
 
-Made with ❤️ and Three.js
+## How estimation works (no `reviews × 10`)
+
+Sales are estimated by an **ensemble of independent log-normal models**, pooled
+by reliability weight — disagreement *widens* the interval instead of being
+averaged away:
+
+* `review_propensity` — reviews ÷ documented propensity prior (median 3%, disclosed)
+* `shop_calibrated` — reviews ÷ the **shop's actual public review rate** (real data when Etsy shows shop sales + reviews)
+* `velocity_rate` — measured reviews/day from your own tracking history ÷ propensity
+* `avg_rate_from_age` — lifetime reviews ÷ public listing age
+* `favorites_model` — weak, wide, clearly down-weighted
+* Bestseller badges floor only P10 (conservative, documented)
+
+Revenue = monthly sales × observed price, with discounts/variation ranges
+handled; **no observed price ⇒ "Revenue estimate unavailable"**.
+Confidence comes from a separate engine (signal count, tracking duration,
+freshness, model consistency, data quality) and is capped at 97%.
+
+📖 Full math: [`docs/ESTIMATION_METHODOLOGY.md`](docs/ESTIMATION_METHODOLOGY.md)
+
+## Architecture
+
+```
+Chrome Extension (MV3, TS, React, Vite)
+   content script ── reads PUBLIC on-page data only (signal-engine)
+   background SW  ── queue + throttle + backoff + cache
+        │  REST/JSON
+        ▼
+Backend API (Node + Fastify + TypeScript)
+        │
+        ▼
+PostgreSQL  (listings · observations · serp_snapshots)
+        │
+        ▼
+Signal Engine → Estimation Engine (pure, deterministic, unit-tested)
+        │
+        ▼
+Analysis JSON → Extension dashboards
+```
+
+```
+/shared              types — hard separation of real vs estimated data
+/signal-engine       DOM extraction + parsers (multi-strategy, jsdom-tested)
+/estimation-engine   statistics: ensembles, velocities, scores, confidence
+/backend             Fastify API + stores (Postgres & in-memory)
+/database            schema.sql + notes
+/extension           Manifest V3 extension (content script, SW, popup)
+/docs                methodology, API, schema, installation, limitations
+```
+
+## Quick start
+
+```bash
+npm install
+npm run build                                   # builds everything + extension/dist
+STORAGE=memory npm run start -w backend         # zero-dependency backend on :8787
+# Chrome → chrome://extensions → Developer mode → Load unpacked → extension/dist
+```
+
+Then open `https://www.etsy.com/search?q=halloween+shirt`.
+Full guide + production PostgreSQL setup: [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
+
+## Testing
+
+```bash
+npm test    # 67 tests
+```
+
+* estimation-engine (40): distributions, history fits, sales/revenue edge cases
+  (0 reviews, 1 review, very old/new listings, missing price/rating, rapid
+  growth, conflicting signals, shop calibration, determinism), demand /
+  competition / opportunity / trend / confidence
+* signal-engine (17): money/count/rating/date parsers, SERP + listing-page
+  extraction against Etsy-style DOM fixtures (ads, badges, i18n prices)
+* backend (7): ingest validation, timeline → velocity → analysis, peers, 404s
+* shared (3): utilities
+
+## Honesty & compliance
+
+* Reads **only** what the user's browser is already rendering — no scraping,
+  no bot traffic, no bypassing auth/CAPTCHA/rate limits. Respect Etsy's ToS,
+  robots rules and API policies; if you hold official Etsy API access, prefer it.
+* Network client implements throttling (2 concurrent, 150 ms spacing),
+  timeouts, exponential backoff + jitter on 429/5xx, TTL caching, error states.
+* Every estimate ships with `evidence`, `modelBreakdown`, `limitations` and a
+  confidence score. The UI prints `ESTIMATE` badges and never presents
+  estimates as Etsy data.
+
+## Docs
+
+* [`docs/INSTALLATION.md`](docs/INSTALLATION.md) — setup, env vars, loading in Chrome
+* [`docs/ESTIMATION_METHODOLOGY.md`](docs/ESTIMATION_METHODOLOGY.md) — every formula & prior
+* [`docs/API.md`](docs/API.md) — REST endpoints
+* [`docs/DATABASE_SCHEMA.md`](docs/DATABASE_SCHEMA.md) — tables & columns
+* [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) — what we can't know, and what we do instead
 
 ---
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
-
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
-
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
-
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+*Not affiliated with or endorsed by Etsy, Inc. "Etsy" is a trademark of Etsy, Inc.*
