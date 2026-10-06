@@ -65,7 +65,7 @@ class RemoteGameAccessibilityService : AccessibilityService(), GameInputAdapter 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return false
         if (event.action !in RemoteInputType.POINTER_DOWN..RemoteInputType.POINTER_UP) return false
         val point = toDisplayPoint(event.x, event.y)
-        synchronized(active) {
+        return synchronized(active) {
             if (event.action == RemoteInputType.POINTER_DOWN) {
                 active[event.pointerId] = ActiveStroke(null, point.x, point.y)
             }
