@@ -5,6 +5,9 @@ on:
     branches: ["**"]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,10 +32,14 @@ jobs:
           fi
 
       - name: Unit tests (protocol / adaptation / stats)
-        run: ./gradlew testDebugUnitTest --no-daemon
+        run: |
+          ./gradlew testDebugUnitTest --no-daemon --console=plain > "$GITHUB_WORKSPACE/ci-gradle.log" 2>&1 \
+            || { tail -n 150 "$GITHUB_WORKSPACE/ci-gradle.log"; exit 1; }
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: |
+          ./gradlew assembleDebug --no-daemon --console=plain >> "$GITHUB_WORKSPACE/ci-gradle.log" 2>&1 \
+            || { tail -n 150 "$GITHUB_WORKSPACE/ci-gradle.log"; exit 1; }
 
       - name: Stage APK
         run: cp app/build/outputs/apk/debug/app-debug.apk neurio-debug.apk
@@ -42,3 +49,30 @@ jobs:
           name: neurio-apk
           path: android/neurio-debug.apk
           retention-days: 30
+
+      - name: Publish APK to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.0-prototype
+          name: Neurio LAN game streaming — prototype APK
+          prerelease: true
+          make_latest: true
+          generate_release_notes: false
+          body: |
+            Debug APK of the Neurio LAN game streaming prototype.
+            Install on BOTH phones (host + client) over the same Wi-Fi.
+            Signed with the standard Android debug key — you may need to
+            allow "install unknown apps" for your browser/file manager.
+          files: android/neurio-debug.apk
+
+      - name: Commit build log on failure
+        if: failure()
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          tail -c 80000 ci-gradle.log > ci-build-log.txt || true
+          echo "" >> ci-build-log.txt
+          git config user.name "neurio-ci"
+          git config user.email "ci@neurio.local"
+          git add ci-build-log.txt
+          git commit -m "CI: build log for failed run [skip ci]" || echo "nothing to commit"
+          git push origin "HEAD:$GITHUB_REF_NAME"

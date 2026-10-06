@@ -16,7 +16,8 @@ class ProtocolTest {
 
     @Test
     fun headerRoundTrip() {
-        val buf = Protocol.newBuffer(Protocol.HEADER_SIZE)
+        // A real datagram always carries the trailing auth tag; include it.
+        val buf = Protocol.newBuffer(Protocol.HEADER_SIZE + Protocol.AUTH_SIZE)
         Protocol.writeHeader(buf, Protocol.TYPE_VIDEO, Protocol.FLAG_KEYFRAME, 0, 0x11223344, 42)
         val data = buf.array()
         val header = Protocol.readHeader(data, data.size)
@@ -29,7 +30,7 @@ class ProtocolTest {
 
     @Test
     fun rejectsBadMagic() {
-        val buf = Protocol.newBuffer(Protocol.HEADER_SIZE)
+        val buf = Protocol.newBuffer(Protocol.HEADER_SIZE + Protocol.AUTH_SIZE)
         Protocol.writeHeader(buf, Protocol.TYPE_VIDEO, 0, 0, 1, 1)
         val data = buf.array()
         data[0] = 0

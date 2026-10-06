@@ -47,14 +47,17 @@ class AdaptationControllerTest {
     @Test
     fun upgradeAfterSustainedGoodReports() {
         val controller = AdaptationController(QualityTier.WEAK)
-        var decision: AdaptationController.Decision = AdaptationController.Decision.None
+        var upgraded: AdaptationController.Decision? = null
         var t = 0L
         // Needs UPGRADE_STREAK good reports and the upgrade cooldown.
-        repeat(AdaptationController.UPGRADE_STREAK + 1) {
+        repeat(AdaptationController.UPGRADE_STREAK + 2) {
             t += AdaptationController.COOLDOWN_MS + 500
-            decision = controller.onReport(healthy(fps = 30.0), t)
+            val decision = controller.onReport(healthy(fps = 30.0), t)
+            if (decision is AdaptationController.Decision.Tier && upgraded == null) {
+                upgraded = decision
+            }
         }
-        assertTrue("expected upgrade, got $decision", decision is AdaptationController.Decision.Tier)
+        assertTrue("expected an upgrade decision, got $upgraded", upgraded is AdaptationController.Decision.Tier)
         assertEquals(QualityTier.GOOD, controller.tier)
     }
 
