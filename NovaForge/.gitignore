@@ -8,6 +8,7 @@ Builds/
 *.exe
 !build.py
 *.zip
-!dist/*.zip          # download snapshots (see dist/README.md)
+# ...except the download snapshots in dist/ (see dist/README.md)
+!dist/*.zip
 Logs/*.log
 .nf_tmp/
