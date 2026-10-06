@@ -121,10 +121,9 @@ RENDER_SRC = [
     "engine/render/postfx.cpp",
     "engine/render/effects.cpp",
 ]
-RENDER_GL_SRC = [
-    "engine/render/gl_loader.cpp",
-    "engine/render/pipe_gl.cpp",
-]
+# V1 ships the CPU rasterizer on every platform (docs/RENDERING.md explains the
+# trade-off). A hardware backend plugs into the IRenderer seam; no GL/DX code is
+# compiled or claimed until it exists.
 
 PHYSICS_SRC = [
     "engine/physics/physics.cpp",
@@ -144,6 +143,8 @@ PROJECT_SRC = ["engine/project/project.cpp", "engine/project/settings.cpp"]
 
 BUILDSYS_SRC = ["engine/buildsys/build_system.cpp"]
 
+GAME_SRC = ["engine/game/gameplay.cpp"]
+
 PLATFORM_COMMON = ["engine/platform/platform_common.cpp"]
 PLATFORM_WIN = ["engine/platform/platform_win32.cpp"]
 PLATFORM_OFF = ["engine/platform/platform_offscreen.cpp"]
@@ -156,8 +157,8 @@ IMGUI_SRC = [
     "third_party/imgui/imgui_demo.cpp",
     "third_party/imgui/misc/cpp/imgui_stdlib.cpp",
 ]
-# The editor talks to the engine's own platform layer (see editor/imgui_backend.cpp),
-# so no per-OS ImGui backend is needed.
+# The editor talks to the engine's own platform layer (see editor/imgui_soft.cpp
+# for the software ImGui renderer), so no per-OS ImGui backend is needed.
 IMGUI_WIN_SRC = []
 
 LUA_SRC = sorted(
@@ -226,13 +227,12 @@ EDITOR_SRC = [
 RUNTIME_SRC = [
     "runtime/main.cpp",
     "runtime/game_runtime.cpp",
-    "runtime/player_controller.cpp",
-    "runtime/game_hud.cpp",
 ]
 
 ENGINE_COMMON = (
     CORE_SRC + SCENE_SRC + ASSETS_SRC + RENDER_SRC + PHYSICS_SRC + AI_SRC
-    + SCRIPT_SRC + AUDIO_SRC + PROJECT_SRC + BUILDSYS_SRC + ["engine/engine_api.cpp"]
+    + SCRIPT_SRC + AUDIO_SRC + PROJECT_SRC + BUILDSYS_SRC + GAME_SRC
+    + ["engine/engine_api.cpp"]
 )
 
 TESTS_SRC = sorted(
@@ -276,14 +276,15 @@ def targets(zig):
         linux_flags,
         linux_link,
     )
-    t["editor-gl"] = Target(
-        "editor-gl",
-        ENGINE_COMMON + EDITOR_SRC + IMGUI_SRC + PLATFORM_COMMON
-        + RENDER_GL_SRC + PLATFORM_OFF + BULLET_SRC + LUA_SRC + MINIZ_SRC,
-        common_linux + ["NF_ENABLE_GL=1"],
-        BUILD / "editor-gl" / "NovaForge",
+    t["sample"] = Target(
+        "sample",
+        CORE_SRC + SCENE_SRC + ASSETS_SRC + RENDER_SRC + PHYSICS_SRC + AI_SRC
+        + PROJECT_SRC + ["tools/make_sample.cpp"]
+        + PLATFORM_COMMON + PLATFORM_OFF + BULLET_SRC + MINIZ_SRC,
+        common_linux + ["NF_HEADLESS=1"],
+        BUILD / "tools" / "make_sample",
         linux_flags,
-        linux_link + ["-lGL"],
+        linux_link,
     )
     t["runtime"] = Target(
         "runtime",
@@ -298,22 +299,22 @@ def targets(zig):
     win_flags = ["-std=c++17", "-O2", "-Wall", "-Wno-unused-parameter",
                  "-fno-strict-aliasing", "-DUNICODE", "-D_UNICODE"]
     win_link = ["-lgdi32", "-luser32", "-lole32", "-loleaut32", "-luuid",
-                "-lshell32", "-lcomdlg32", "-lwinmm", "-lopengl32",
+                "-lshell32", "-lcomdlg32", "-lwinmm",
                 "-static-libstdc++", "-static-libgcc", "-Wl,--gc-sections"]
     t["windows-runtime"] = Target(
         "windows-runtime",
         ENGINE_COMMON + RUNTIME_SRC + PLATFORM_COMMON + PLATFORM_WIN
-        + RENDER_GL_SRC + BULLET_SRC + LUA_SRC,
-        win_common + ["NF_ENABLE_GL=1", "_WIN32_WINNT=0x0601"],
+        + BULLET_SRC + LUA_SRC + MINIZ_SRC,
+        win_common + ["_WIN32_WINNT=0x0601"],
         BUILD / "windows" / "NovaForgeRuntime.exe",
         win_flags,
         win_link,
     )
     t["windows-editor"] = Target(
         "windows-editor",
-        ENGINE_COMMON + EDITOR_SRC + IMGUI_SRC + IMGUI_WIN_SRC + PLATFORM_COMMON
-        + PLATFORM_WIN + RENDER_GL_SRC + BULLET_SRC + LUA_SRC + MINIZ_SRC,
-        win_common + ["NF_ENABLE_GL=1", "_WIN32_WINNT=0x0601"],
+        ENGINE_COMMON + EDITOR_SRC + IMGUI_SRC + PLATFORM_COMMON
+        + PLATFORM_WIN + BULLET_SRC + LUA_SRC + MINIZ_SRC,
+        win_common + ["_WIN32_WINNT=0x0601"],
         BUILD / "windows" / "NovaForge.exe",
         win_flags,
         win_link,

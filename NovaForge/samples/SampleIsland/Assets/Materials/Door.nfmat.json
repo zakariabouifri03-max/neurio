@@ -1,0 +1,31 @@
+{
+  "name": "Door",
+  "id": "b7d9ad6c21d4d19d850babcf55893175",
+  "baseColor": [
+    0.55,
+    0.36,
+    0.2
+  ],
+  "metallic": 0,
+  "roughness": 0.7,
+  "opacity": 1,
+  "emissive": [
+    0,
+    0,
+    0
+  ],
+  "emissiveStrength": 0,
+  "albedoTexture": "",
+  "uvTiling": [
+    1,
+    1
+  ],
+  "uvOffset": [
+    0,
+    0
+  ],
+  "doubleSided": false,
+  "unlit": false,
+  "castShadow": true,
+  "alphaCutoff": 0.5
+}

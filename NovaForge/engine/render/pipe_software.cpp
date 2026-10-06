@@ -506,34 +506,65 @@ private:
             sv[k].color = mulRGB(src.color, mat.baseColor);
             sv[k].invW = 1.0f / std::max(clip[k].w, 1e-6f);
         }
-        // Sutherland-Hodgman against w = epsilon
+        // Sutherland-Hodgman clip against the whole view frustum, not just the
+        // near plane. Without the side planes a triangle that leaves the screen
+        // produces screen coordinates in the millions, and the float edge
+        // functions below lose every bit of sub-pixel precision (visible as
+        // pinstripe gaps along large ground planes).
         const float eps = 1e-4f;
-        Vec4 polyClip[8];
-        SurfaceVertex polySv[8];
-        int n = 0;
+        Vec4 polyClip[16];
+        SurfaceVertex polySv[16];
+        int n = 3;
         for (int k = 0; k < 3; ++k) {
-            int next = (k + 1) % 3;
-            float d0 = clip[k].w - eps, d1 = clip[next].w - eps;
-            if (d0 >= 0) {
-                polyClip[n] = clip[k];
-                polySv[n] = sv[k];
-                n++;
+            polyClip[k] = clip[k];
+            polySv[k] = sv[k];
+        }
+        // Signed distance to each clip plane; a vertex is kept when d >= 0.
+        const auto planeDistance = [](int plane, const Vec4& v) -> float {
+            switch (plane) {
+                case 0: return v.w - 1e-4f;   // w > 0  (near)
+                case 1: return v.w + v.x;     // x > -w (left)
+                case 2: return v.w - v.x;     // x <  w (right)
+                case 3: return v.w + v.y;     // y > -w (bottom)
+                case 4: return v.w - v.y;     // y <  w (top)
+                case 5: return v.w + v.z;     // z > -w (near z)
+                default: return v.w - v.z;    // z <  w (far z)
             }
-            if ((d0 >= 0) != (d1 >= 0)) {
-                float t = d0 / (d0 - d1);
-                Vec4 c0 = clip[k], c1 = clip[next];
-                Vec4 cc = c0 + (c1 - c0) * t;
-                SurfaceVertex s;
-                s.world = lerp(sv[k].world, sv[next].world, t);
-                s.normal = lerp(sv[k].normal, sv[next].normal, t).normalized();
-                s.uv = lerp(sv[k].uv, sv[next].uv, t);
-                s.color = lerp(sv[k].color, sv[next].color, t);
-                s.invW = 1.0f / std::max(cc.w, 1e-6f);
-                if (n < 8) {
-                    polyClip[n] = cc;
-                    polySv[n] = s;
-                    n++;
+        };
+        for (int plane = 0; plane < 7 && n > 0; ++plane) {
+            Vec4 outClip[16];
+            SurfaceVertex outSv[16];
+            int m = 0;
+            for (int k = 0; k < n; ++k) {
+                const int next = (k + 1) % n;
+                const float d0 = planeDistance(plane, polyClip[k]);
+                const float d1 = planeDistance(plane, polyClip[next]);
+                if (d0 >= 0) {
+                    outClip[m] = polyClip[k];
+                    outSv[m] = polySv[k];
+                    ++m;
                 }
+                if ((d0 >= 0) != (d1 >= 0)) {
+                    const float t = d0 / (d0 - d1);
+                    const Vec4 c0 = polyClip[k], c1 = polyClip[next];
+                    Vec4 cc = c0 + (c1 - c0) * t;
+                    SurfaceVertex sp;
+                    sp.world = lerp(polySv[k].world, polySv[next].world, t);
+                    sp.normal = lerp(polySv[k].normal, polySv[next].normal, t).normalized();
+                    sp.uv = lerp(polySv[k].uv, polySv[next].uv, t);
+                    sp.color = lerp(polySv[k].color, polySv[next].color, t);
+                    sp.invW = 1.0f / std::max(cc.w, 1e-6f);
+                    if (m < 16) {
+                        outClip[m] = cc;
+                        outSv[m] = sp;
+                        ++m;
+                    }
+                }
+            }
+            n = m;
+            for (int k = 0; k < n; ++k) {
+                polyClip[k] = outClip[k];
+                polySv[k] = outSv[k];
             }
         }
         for (int k = 2; k < n; ++k) {
@@ -741,7 +772,10 @@ private:
                     float depth = a.p.z * l0 + b.p.z * l1 + c.p.z * l2;
                     if (depth < -1.0f || depth > 1.0f) continue;
                     size_t di = (size_t)y * target.width + x;
-                    if (!transparent && depth >= target.depth[di]) continue;
+                    // Transparent surfaces are depth *tested* (so water does not
+                    // paint over the island behind it) but never depth written,
+                    // and DrawList::sort() orders them back to front.
+                    if (depth >= target.depth[di]) continue;
                     float invW = a.s.invW * l0 + b.s.invW * l1 + c.s.invW * l2;
                     if (invW <= 1e-9f) continue;
                     float wInv = 1.0f / invW;

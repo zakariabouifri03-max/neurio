@@ -1,0 +1,69 @@
+{
+  "format": "NovaForgeScene",
+  "version": 1,
+  "name": "Main",
+  "entities": [
+    {
+      "id": 1,
+      "name": "Main Camera",
+      "parent": 0,
+      "transform": {
+        "position": [
+          0,
+          3,
+          -8
+        ],
+        "rotation": [
+          -0.104528,
+          0,
+          0,
+          0.994522
+        ]
+      },
+      "camera": {
+        "fov": 60,
+        "near": 0.1,
+        "far": 600,
+        "orthographic": false,
+        "active": true,
+        "backgroundColor": [
+          0.42,
+          0.55,
+          0.7
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "name": "Sun",
+      "parent": 0,
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          -0.252684,
+          0.209065,
+          0.0560187,
+          0.94303
+        ]
+      },
+      "light": {
+        "type": "directional",
+        "color": [
+          1,
+          0.97,
+          0.92
+        ],
+        "intensity": 1.4,
+        "range": 15,
+        "spotAngle": 40,
+        "spotSoftness": 0.25,
+        "castShadow": true,
+        "enabled": true
+      }
+    }
+  ]
+}

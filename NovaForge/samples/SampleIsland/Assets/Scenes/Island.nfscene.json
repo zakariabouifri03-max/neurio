@@ -1,0 +1,1902 @@
+{
+  "format": "NovaForgeScene",
+  "version": 1,
+  "name": "Island",
+  "entities": [
+    {
+      "id": 1,
+      "name": "Island Ground",
+      "tag": "Ground",
+      "parent": 0,
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          40,
+          1,
+          40
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Plane",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          -0.1,
+          0
+        ],
+        "size": [
+          80,
+          0.2,
+          80
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "static",
+        "mass": 1,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 2,
+      "name": "Beach",
+      "tag": "Ground",
+      "parent": 0,
+      "transform": {
+        "position": [
+          0,
+          0.02,
+          26
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          26,
+          1,
+          12
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Plane",
+        "material": "Assets/Materials/Sand.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          -0.1,
+          0
+        ],
+        "size": [
+          52,
+          0.2,
+          24
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "static",
+        "mass": 1,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 3,
+      "name": "Water",
+      "parent": 0,
+      "transform": {
+        "position": [
+          0,
+          -0.35,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          120,
+          1,
+          120
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Plane",
+        "material": "Assets/Materials/Water.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 4,
+      "name": "Palm 1",
+      "parent": 0,
+      "transform": {
+        "position": [
+          8,
+          0,
+          -6
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "name": "Palm 1 Trunk",
+      "parent": 4,
+      "transform": {
+        "position": [
+          8,
+          1.4,
+          -6
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.35,
+          2.8,
+          0.35
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cylinder",
+        "material": "Assets/Materials/Trunk.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          0.5,
+          2.8,
+          0.5
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "static",
+        "mass": 1,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 6,
+      "name": "Palm 1 Leaves 1",
+      "parent": 4,
+      "transform": {
+        "position": [
+          7.1,
+          3.4,
+          -5.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 7,
+      "name": "Palm 1 Leaves 2",
+      "parent": 4,
+      "transform": {
+        "position": [
+          8.9,
+          3.4,
+          -6.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 8,
+      "name": "Palm 2",
+      "parent": 0,
+      "transform": {
+        "position": [
+          -10,
+          0,
+          -2
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "name": "Palm 2 Trunk",
+      "parent": 8,
+      "transform": {
+        "position": [
+          -10,
+          1.4,
+          -2
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.35,
+          2.8,
+          0.35
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cylinder",
+        "material": "Assets/Materials/Trunk.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          0.5,
+          2.8,
+          0.5
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "static",
+        "mass": 1,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 10,
+      "name": "Palm 2 Leaves 1",
+      "parent": 8,
+      "transform": {
+        "position": [
+          -10.9,
+          3.4,
+          -1.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 11,
+      "name": "Palm 2 Leaves 2",
+      "parent": 8,
+      "transform": {
+        "position": [
+          -9.1,
+          3.4,
+          -2.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 12,
+      "name": "Palm 3",
+      "parent": 0,
+      "transform": {
+        "position": [
+          13,
+          0,
+          9
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "name": "Palm 3 Trunk",
+      "parent": 12,
+      "transform": {
+        "position": [
+          13,
+          1.4,
+          9
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.35,
+          2.8,
+          0.35
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cylinder",
+        "material": "Assets/Materials/Trunk.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          0.5,
+          2.8,
+          0.5
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "static",
+        "mass": 1,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 14,
+      "name": "Palm 3 Leaves 1",
+      "parent": 12,
+      "transform": {
+        "position": [
+          12.1,
+          3.4,
+          9.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 15,
+      "name": "Palm 3 Leaves 2",
+      "parent": 12,
+      "transform": {
+        "position": [
+          13.9,
+          3.4,
+          8.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 16,
+      "name": "Palm 4",
+      "parent": 0,
+      "transform": {
+        "position": [
+          -14,
+          0,
+          12
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "name": "Palm 4 Trunk",
+      "parent": 16,
+      "transform": {
+        "position": [
+          -14,
+          1.4,
+          12
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.35,
+          2.8,
+          0.35
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cylinder",
+        "material": "Assets/Materials/Trunk.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          0.5,
+          2.8,
+          0.5
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "static",
+        "mass": 1,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 18,
+      "name": "Palm 4 Leaves 1",
+      "parent": 16,
+      "transform": {
+        "position": [
+          -14.9,
+          3.4,
+          12.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 19,
+      "name": "Palm 4 Leaves 2",
+      "parent": 16,
+      "transform": {
+        "position": [
+          -13.1,
+          3.4,
+          11.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 20,
+      "name": "Palm 5",
+      "parent": 0,
+      "transform": {
+        "position": [
+          4,
+          0,
+          16
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "name": "Palm 5 Trunk",
+      "parent": 20,
+      "transform": {
+        "position": [
+          4,
+          1.4,
+          16
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.35,
+          2.8,
+          0.35
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cylinder",
+        "material": "Assets/Materials/Trunk.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          0.5,
+          2.8,
+          0.5
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "static",
+        "mass": 1,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 22,
+      "name": "Palm 5 Leaves 1",
+      "parent": 20,
+      "transform": {
+        "position": [
+          3.1,
+          3.4,
+          16.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 23,
+      "name": "Palm 5 Leaves 2",
+      "parent": 20,
+      "transform": {
+        "position": [
+          4.9,
+          3.4,
+          15.4
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 24,
+      "name": "Palm 6",
+      "parent": 0,
+      "transform": {
+        "position": [
+          -5,
+          0,
+          -14
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "id": 25,
+      "name": "Palm 6 Trunk",
+      "parent": 24,
+      "transform": {
+        "position": [
+          -5,
+          1.4,
+          -14
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.35,
+          2.8,
+          0.35
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cylinder",
+        "material": "Assets/Materials/Trunk.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          0.5,
+          2.8,
+          0.5
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "static",
+        "mass": 1,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 26,
+      "name": "Palm 6 Leaves 1",
+      "parent": 24,
+      "transform": {
+        "position": [
+          -5.9,
+          3.4,
+          -13.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 27,
+      "name": "Palm 6 Leaves 2",
+      "parent": 24,
+      "transform": {
+        "position": [
+          -4.1,
+          3.4,
+          -14.6
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.2,
+          1.2,
+          3.2
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Sphere",
+        "material": "Assets/Materials/Grass.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      }
+    },
+    {
+      "id": 28,
+      "name": "Player",
+      "tag": "Player",
+      "parent": 0,
+      "transform": {
+        "position": [
+          0,
+          1.2,
+          -14
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.7,
+          1,
+          0.7
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Capsule",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "capsule",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          1,
+          1,
+          1
+        ],
+        "radius": 0.35,
+        "height": 1.6,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "character": {
+        "isPlayer": true,
+        "viewMode": "thirdPerson",
+        "walkSpeed": 4.5,
+        "runSpeed": 8.5,
+        "jumpHeight": 1.5,
+        "mouseSensitivity": 0.12,
+        "cameraDistance": 5.5,
+        "cameraHeight": 1.5,
+        "spawnYaw": 0
+      },
+      "health": {
+        "maxHealth": 100,
+        "currentHealth": 100,
+        "destroyOnDeath": false,
+        "invulnerable": false
+      },
+      "animator": {
+        "defaultClip": "",
+        "playOnStart": true,
+        "loop": true,
+        "speed": 1,
+        "idleClip": "Idle",
+        "walkClip": "Walk",
+        "runClip": "Run",
+        "attackClip": "Attack",
+        "deathClip": "Death"
+      },
+      "script": {
+        "file": "Assets/Scripts/player.lua",
+        "enabled": true
+      }
+    },
+    {
+      "id": 29,
+      "name": "Enemy",
+      "tag": "Enemy",
+      "parent": 0,
+      "transform": {
+        "position": [
+          9,
+          1.2,
+          6
+        ],
+        "rotation": [
+          0,
+          1,
+          0,
+          -4.37114e-08
+        ],
+        "scale": [
+          0.8,
+          1,
+          0.8
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Capsule",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "capsule",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          1,
+          1,
+          1
+        ],
+        "radius": 0.4,
+        "height": 1.5,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "npc": {
+        "behavior": "patrol",
+        "targetTag": "Player",
+        "detectionRange": 16,
+        "loseTargetRange": 22,
+        "attackRange": 2,
+        "moveSpeed": 3,
+        "turnSpeed": 8,
+        "attackDamage": 10,
+        "attackCooldown": 1.4,
+        "idleTime": 1.5,
+        "faceTarget": true,
+        "loopPatrol": true,
+        "patrolPoints": [
+          [
+            6,
+            1,
+            6
+          ],
+          [
+            -6,
+            1,
+            6
+          ],
+          [
+            -6,
+            1,
+            -6
+          ]
+        ]
+      },
+      "health": {
+        "maxHealth": 60,
+        "currentHealth": 60,
+        "destroyOnDeath": true,
+        "invulnerable": false
+      },
+      "animator": {
+        "defaultClip": "",
+        "playOnStart": true,
+        "loop": true,
+        "speed": 1,
+        "idleClip": "Idle",
+        "walkClip": "Walk",
+        "runClip": "Run",
+        "attackClip": "Attack",
+        "deathClip": "Death"
+      },
+      "script": {
+        "file": "Assets/Scripts/enemy.lua",
+        "enabled": true
+      }
+    },
+    {
+      "id": 30,
+      "name": "Enemy",
+      "tag": "Enemy",
+      "parent": 0,
+      "transform": {
+        "position": [
+          -9,
+          1.2,
+          8
+        ],
+        "rotation": [
+          0,
+          1,
+          0,
+          -4.37114e-08
+        ],
+        "scale": [
+          0.8,
+          1,
+          0.8
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Capsule",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "capsule",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          1,
+          1,
+          1
+        ],
+        "radius": 0.4,
+        "height": 1.5,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "npc": {
+        "behavior": "chase",
+        "targetTag": "Player",
+        "detectionRange": 16,
+        "loseTargetRange": 22,
+        "attackRange": 2,
+        "moveSpeed": 3,
+        "turnSpeed": 8,
+        "attackDamage": 10,
+        "attackCooldown": 1.4,
+        "idleTime": 1.5,
+        "faceTarget": true,
+        "loopPatrol": true,
+        "patrolPoints": []
+      },
+      "health": {
+        "maxHealth": 60,
+        "currentHealth": 60,
+        "destroyOnDeath": true,
+        "invulnerable": false
+      },
+      "animator": {
+        "defaultClip": "",
+        "playOnStart": true,
+        "loop": true,
+        "speed": 1,
+        "idleClip": "Idle",
+        "walkClip": "Walk",
+        "runClip": "Run",
+        "attackClip": "Attack",
+        "deathClip": "Death"
+      }
+    },
+    {
+      "id": 31,
+      "name": "Gem 1",
+      "tag": "Pickup",
+      "parent": 0,
+      "transform": {
+        "position": [
+          6,
+          1,
+          -8
+        ],
+        "rotation": [
+          0.707107,
+          0,
+          0,
+          0.707107
+        ],
+        "scale": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Torus",
+        "material": "Assets/Materials/Gem.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "sphere",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          1,
+          1,
+          1
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": true,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "interactable": {
+        "action": "pickup",
+        "prompt": "[E] Collect coin",
+        "message": "Coin collected (+1)",
+        "value": 1,
+        "target": "",
+        "teleportTo": [
+          0,
+          1,
+          0
+        ],
+        "oneShot": true,
+        "interactRange": 2.5
+      },
+      "script": {
+        "file": "Assets/Scripts/gem.lua",
+        "enabled": true
+      },
+      "particles": {
+        "color": [
+          1,
+          0.85,
+          0.3
+        ],
+        "size": 0.08,
+        "lifetime": 0.7,
+        "speed": 1.2,
+        "count": 10,
+        "playOnStart": false,
+        "looping": true,
+        "emitOnInteract": true
+      }
+    },
+    {
+      "id": 32,
+      "name": "Gem 2",
+      "tag": "Pickup",
+      "parent": 0,
+      "transform": {
+        "position": [
+          -7,
+          1,
+          4
+        ],
+        "rotation": [
+          0.707107,
+          0,
+          0,
+          0.707107
+        ],
+        "scale": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Torus",
+        "material": "Assets/Materials/Gem.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "sphere",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          1,
+          1,
+          1
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": true,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "interactable": {
+        "action": "pickup",
+        "prompt": "[E] Collect coin",
+        "message": "Coin collected (+1)",
+        "value": 1,
+        "target": "",
+        "teleportTo": [
+          0,
+          1,
+          0
+        ],
+        "oneShot": true,
+        "interactRange": 2.5
+      },
+      "script": {
+        "file": "Assets/Scripts/gem.lua",
+        "enabled": true
+      },
+      "particles": {
+        "color": [
+          1,
+          0.85,
+          0.3
+        ],
+        "size": 0.08,
+        "lifetime": 0.7,
+        "speed": 1.2,
+        "count": 10,
+        "playOnStart": false,
+        "looping": true,
+        "emitOnInteract": true
+      }
+    },
+    {
+      "id": 33,
+      "name": "Gem 3",
+      "tag": "Pickup",
+      "parent": 0,
+      "transform": {
+        "position": [
+          12,
+          1,
+          -2
+        ],
+        "rotation": [
+          0.707107,
+          0,
+          0,
+          0.707107
+        ],
+        "scale": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Torus",
+        "material": "Assets/Materials/Gem.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "sphere",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          1,
+          1,
+          1
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": true,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "interactable": {
+        "action": "pickup",
+        "prompt": "[E] Collect coin",
+        "message": "Coin collected (+1)",
+        "value": 1,
+        "target": "",
+        "teleportTo": [
+          0,
+          1,
+          0
+        ],
+        "oneShot": true,
+        "interactRange": 2.5
+      },
+      "script": {
+        "file": "Assets/Scripts/gem.lua",
+        "enabled": true
+      },
+      "particles": {
+        "color": [
+          1,
+          0.85,
+          0.3
+        ],
+        "size": 0.08,
+        "lifetime": 0.7,
+        "speed": 1.2,
+        "count": 10,
+        "playOnStart": false,
+        "looping": true,
+        "emitOnInteract": true
+      }
+    },
+    {
+      "id": 34,
+      "name": "Crate 1",
+      "parent": 0,
+      "transform": {
+        "position": [
+          -4,
+          0.6,
+          -4
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cube",
+        "material": "Assets/Materials/Trunk.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          1,
+          1,
+          1
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.7,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "dynamic",
+        "mass": 5,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 35,
+      "name": "Crate 2",
+      "parent": 0,
+      "transform": {
+        "position": [
+          -3.9,
+          1.65,
+          -4
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cube",
+        "material": "Assets/Materials/Trunk.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          1,
+          1,
+          1
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.7,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "dynamic",
+        "mass": 5,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 36,
+      "name": "Crate 3",
+      "parent": 0,
+      "transform": {
+        "position": [
+          -3.8,
+          2.7,
+          -4
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cube",
+        "material": "Assets/Materials/Trunk.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          1,
+          1,
+          1
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.7,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "dynamic",
+        "mass": 5,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 37,
+      "name": "Gate Post",
+      "parent": 0,
+      "transform": {
+        "position": [
+          4,
+          1.5,
+          20
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.6,
+          3,
+          0.6
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cube",
+        "material": "Assets/Materials/Trunk.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          0.6,
+          3,
+          0.6
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "static",
+        "mass": 1,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      }
+    },
+    {
+      "id": 38,
+      "name": "Gate Door",
+      "parent": 0,
+      "transform": {
+        "position": [
+          2,
+          1.5,
+          20
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          3.4,
+          2.8,
+          0.25
+        ]
+      },
+      "meshRenderer": {
+        "model": "primitive://Cube",
+        "material": "Assets/Materials/Door.nfmat.json",
+        "visible": true,
+        "castShadow": true,
+        "receiveShadow": true
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          3.4,
+          2.8,
+          0.25
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": false,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "rigidBody": {
+        "motionType": "static",
+        "mass": 1,
+        "linearDamping": 0.05,
+        "angularDamping": 0.2,
+        "useGravity": true,
+        "freezeRotation": false
+      },
+      "interactable": {
+        "action": "toggleDoor",
+        "prompt": "open the gate",
+        "message": "Hello!",
+        "value": 20,
+        "target": "",
+        "teleportTo": [
+          0,
+          1,
+          0
+        ],
+        "oneShot": false,
+        "interactRange": 3
+      },
+      "door": {
+        "openOffset": [
+          0,
+          3.2,
+          0
+        ],
+        "speed": 1.6,
+        "startsOpen": false,
+        "locked": false
+      }
+    },
+    {
+      "id": 39,
+      "name": "Goal Zone",
+      "parent": 0,
+      "transform": {
+        "position": [
+          2,
+          1.5,
+          24
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          6,
+          4,
+          4
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": true,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "trigger": {
+        "onEnter": "winGame",
+        "onExit": "none",
+        "target": "",
+        "value": 10,
+        "message": "You explored the whole island!",
+        "oneShot": false
+      }
+    },
+    {
+      "id": 40,
+      "name": "Deep Water Hazard",
+      "parent": 0,
+      "transform": {
+        "position": [
+          22,
+          0.4,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "collider": {
+        "shape": "box",
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "size": [
+          10,
+          3,
+          30
+        ],
+        "radius": 0.5,
+        "height": 1.8,
+        "isTrigger": true,
+        "friction": 0.6,
+        "restitution": 0.1,
+        "layer": "Default"
+      },
+      "trigger": {
+        "onEnter": "damage",
+        "onExit": "none",
+        "target": "",
+        "value": 8,
+        "message": "The current is strong!",
+        "oneShot": false
+      }
+    },
+    {
+      "id": 41,
+      "name": "Gate Torch",
+      "parent": 0,
+      "transform": {
+        "position": [
+          4.2,
+          2.6,
+          20
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "light": {
+        "type": "point",
+        "color": [
+          1,
+          0.72,
+          0.35
+        ],
+        "intensity": 2.2,
+        "range": 9,
+        "spotAngle": 40,
+        "spotSoftness": 0.25,
+        "castShadow": false,
+        "enabled": true
+      },
+      "particles": {
+        "color": [
+          1,
+          0.6,
+          0.2
+        ],
+        "size": 0.1,
+        "lifetime": 0.9,
+        "speed": 1,
+        "count": 12,
+        "playOnStart": false,
+        "looping": true,
+        "emitOnInteract": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "format": "NovaForgeProject",
+  "version": 1,
+  "name": "SampleIsland",
+  "engineVersion": "0.1.0",
+  "savedUtc": "2026-10-06T22:24:18Z",
+  "startScene": "Assets/Scenes/Island.nfscene.json",
+  "render": {
+    "quality": "High",
+    "resolutionScale": 1,
+    "shadows": true,
+    "shadowMapSize": 1024,
+    "shadowDistance": 30,
+    "fog": false,
+    "fogDensity": 0.008,
+    "fogColor": [
+      0.6,
+      0.7,
+      0.8
+    ],
+    "exposure": 1,
+    "particles": true,
+    "vsync": true,
+    "postGrade": "None",
+    "debugDrawPhysics": false,
+    "showFps": true
+  },
+  "physics": {
+    "gravity": [
+      0,
+      -9.81,
+      0
+    ],
+    "fixedTimestep": 0.0166667,
+    "maxSubSteps": 4,
+    "ccd": false
+  },
+  "build": {
+    "gameName": "SampleIsland",
+    "executableName": "SampleIsland.exe",
+    "icon": "",
+    "copyAssets": true,
+    "createZip": false,
+    "windowed": true,
+    "windowWidth": 1280,
+    "windowHeight": 720,
+    "fullscreen": false
+  },
+  "ai": {
+    "provider": "templates",
+    "model": "gpt-4o-mini",
+    "endpoint": "https://api.openai.com/v1/chat/completions",
+    "apiKeyEnv": "NOVAFORGE_AI_API_KEY",
+    "allowFileWrites": true,
+    "confirmDestructive": true,
+    "maxTokens": 1200
+  },
+  "input": {
+    "MoveForward": {
+      "keys": [
+        "W"
+      ],
+      "deadzone": 0.1,
+      "axis": false
+    },
+    "MoveBack": {
+      "keys": [
+        "S"
+      ],
+      "deadzone": 0.1,
+      "axis": false
+    },
+    "MoveLeft": {
+      "keys": [
+        "A"
+      ],
+      "deadzone": 0.1,
+      "axis": false
+    },
+    "MoveRight": {
+      "keys": [
+        "D"
+      ],
+      "deadzone": 0.1,
+      "axis": false
+    },
+    "Jump": {
+      "keys": [
+        "Space"
+      ],
+      "deadzone": 0.1,
+      "axis": false
+    },
+    "Sprint": {
+      "keys": [
+        "LeftShift"
+      ],
+      "deadzone": 0.1,
+      "axis": false
+    },
+    "Interact": {
+      "keys": [
+        "E"
+      ],
+      "deadzone": 0.1,
+      "axis": false
+    },
+    "Fire": {
+      "keys": [
+        "Mouse0"
+      ],
+      "deadzone": 0.1,
+      "axis": false
+    },
+    "CameraLook": {
+      "keys": [
+        "Mouse1"
+      ],
+      "deadzone": 0.1,
+      "axis": true
+    },
+    "ToggleDebug": {
+      "keys": [
+        "F1"
+      ],
+      "deadzone": 0.1,
+      "axis": false
+    },
+    "TogglePause": {
+      "keys": [
+        "P"
+      ],
+      "deadzone": 0.1,
+      "axis": false
+    }
+  },
+  "recentScenes": [
+    "Assets/Scenes/Main.nfscene.json"
+  ]
+}

@@ -29,6 +29,21 @@ const char* keyName(Key k) {
     return names[i];
 }
 
+Key keyFromName(const std::string& name) {
+    if (name.empty()) return Key::None;
+    for (int i = 0; i < (int)Key::Count; ++i) {
+        const char* n = keyName((Key)i);
+        if (n && name == n) return (Key)i;
+    }
+    // friendly aliases used in project input bindings and scripts
+    if (name == "Shift") return Key::LeftShift;
+    if (name == "Ctrl") return Key::LeftCtrl;
+    if (name == "Alt") return Key::LeftAlt;
+    if (name == "Return") return Key::Enter;
+    if (name == "Esc") return Key::Escape;
+    return Key::None;
+}
+
 void Window::applyEvent(const PlatformEvent& e) {
     switch (e.type) {
         case PlatformEvent::KeyDown:

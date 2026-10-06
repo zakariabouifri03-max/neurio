@@ -1,12 +1,14 @@
 // NovaForge Engine - renderer interface
 //
-// Two implementations ship in V1:
-//   * SoftwareRenderer  (engine/render/pipe_software.cpp) - always available,
-//     deterministic, used by tests, captures and as a compatibility fallback.
-//   * GLRenderer        (engine/render/pipe_gl.cpp)       - OpenGL 3.3 core,
-//     the default on Windows.
-// Both consume the same DrawList, so a scene looks the same in the editor, in
-// PLAY mode and in the exported game.
+// V1 ships ONE renderer: SoftwareRenderer (engine/render/pipe_software.cpp), a
+// multithreaded CPU rasterizer with shadow maps, fog, post grading, particles
+// and a 2D overlay. It runs identically on Windows, Linux and headless CI, so
+// the editor, PLAY mode and the exported game all show the same image and the
+// renderer is covered by automated tests.
+//
+// IRenderer is the seam a GPU backend would plug into (docs/RENDERING.md
+// explains the trade-off and what a DX12/Vulkan backend would have to provide).
+// No GPU backend is compiled or advertised in V1.
 #pragma once
 #include "assets/texture.h"
 #include "platform/platform.h"
@@ -26,10 +28,7 @@ struct SoftTarget;
 // not have to link ImGui at all (the exported game ships without it).
 using SoftImGuiDrawFn = void (*)(SoftTarget& target, void* drawData, const RenderCamera& camera,
                                  float scale);
-using GLImGuiDrawFn = void (*)(void* drawData, int framebufferWidth, int framebufferHeight,
-                              float scale);
 void setSoftwareImGuiBackend(SoftImGuiDrawFn fn);
-void setGLImGuiBackend(GLImGuiDrawFn fn);
 
 class IRenderer {
 public:
@@ -80,9 +79,7 @@ protected:
     int targetHeight_ = 720;
 };
 
-// Factories. `createGLRenderer` returns nullptr when the build has no GL
-// backend or the driver does not expose the required functions.
+// Factory for the V1 renderer.
 IRenderer* createSoftwareRenderer();
-IRenderer* createGLRenderer(Window* window);
 
 }  // namespace nf

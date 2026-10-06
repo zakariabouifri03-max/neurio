@@ -42,6 +42,9 @@ enum KeyMod {
 enum class MouseButton { Left = 0, Right = 1, Middle = 2, Count = 3 };
 
 const char* keyName(Key k);
+// Parses a key name ("W", "Space", "LeftShift", "F5") back into a Key.
+// Returns Key::None when the name is unknown (input bindings fall back to that).
+Key keyFromName(const std::string& name);
 
 // ------------------------------------------------------------------ events
 struct PlatformEvent {
