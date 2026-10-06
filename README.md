@@ -14,6 +14,24 @@ No build step, no external CDN — everything is procedural and vendored (Three.
 
 ---
 
+## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
+
+A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
+soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
+
+title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
+
+Everything is generated from code (no stock footage/music):
+
+```bash
+python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
+python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
+```
+
+See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
+
+---
+
 ## 📱 Install on your phone — كأنها APK!
 
 The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
