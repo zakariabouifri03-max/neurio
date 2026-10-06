@@ -9,10 +9,10 @@ Here are the highlights of this release:
 For more details see https://docs.gradle.org/8.9/release-notes.html
 
 Starting a Gradle Daemon (subsequent builds will be faster)
-> Task :app:preBuild UP-TO-DATE
 > Task :aiupscaler-sdk:checkKotlinGradlePluginConfigurationErrors SKIPPED
-> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
 > Task :aiupscaler-sdk:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
 > Task :aiupscaler-sdk:preDebugBuild UP-TO-DATE
 > Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
 > Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
@@ -44,12 +44,15 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:javaPreCompileDebug FROM-CACHE
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
+> Task :app:processDebugManifestForPackage
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
 > Task :app:compressDebugAssets
 > Task :app:desugarDebugFileDependencies
-> Task :app:processDebugManifestForPackage
+> Task :app:processDebugResources
+> Task :app:mergeDebugJniLibFolders
 > Task :app:checkDebugDuplicateClasses
+> Task :app:validateSigningDebug
 > Task :aiupscaler-sdk:configureCMakeDebug[arm64-v8a]
 
 > Task :aiupscaler-sdk:buildCMakeDebug[arm64-v8a]
@@ -61,19 +64,18 @@ C/C++: /home/runner/work/neurio/neurio/ai-vision-4k/aiupscaler-sdk/src/main/cpp/
 C/C++:    14 | constexpr uint32_t kVkVersion12 = 0x402000;
 C/C++:       |                    ^~~~~~~~~~~~
 C/C++: 2 warnings generated.
+
+> Task :aiupscaler-sdk:compileDebugKotlin
+w: file:///home/runner/work/neurio/neurio/ai-vision-4k/aiupscaler-sdk/src/main/java/com/aivision4k/sdk/AndroidCapsCollector.kt:93:38 'val supportedHdrTypes: IntArray!' is deprecated. Deprecated in Java.
+
+> Task :aiupscaler-sdk:buildCMakeDebug[arm64-v8a]
 C/C++: /home/runner/work/neurio/neurio/ai-vision-4k/aiupscaler-sdk/src/main/cpp/vulkan/v4k_vk_pipeline.cpp:22:32: warning: unused function 'imageBindings' [-Wunused-function]
 C/C++:    22 | std::vector<DescriptorBinding> imageBindings(uint32_t count) {
 C/C++:       |                                ^~~~~~~~~~~~~
 C/C++: 1 warning generated.
 
-> Task :aiupscaler-sdk:compileDebugKotlin
-e: file:///home/runner/work/neurio/neurio/ai-vision-4k/aiupscaler-sdk/src/main/java/com/aivision4k/sdk/AndroidCapsCollector.kt:59:48 Unresolved reference 'refreshRate'.
-e: file:///home/runner/work/neurio/neurio/ai-vision-4k/aiupscaler-sdk/src/main/java/com/aivision4k/sdk/GlesProbe.kt:116:41 None of the following candidates is applicable:
-static fun glGetIntegerv(p0: Int, p1: IntArray!, p2: Int): Unit
-static fun glGetIntegerv(p0: Int, p1: IntBuffer!): Unit
-e: file:///home/runner/work/neurio/neurio/ai-vision-4k/aiupscaler-sdk/src/main/java/com/aivision4k/sdk/GlesProbe.kt:120:28 Unresolved reference 'glGetInteger'.
-
 > Task :aiupscaler-sdk:configureCMakeDebug[x86_64]
+> Task :app:mergeExtDexDebug
 
 > Task :aiupscaler-sdk:buildCMakeDebug[x86_64]
 C/C++: ninja: Entering directory `/home/runner/work/neurio/neurio/ai-vision-4k/aiupscaler-sdk/.cxx/Debug/6l4s85f1/x86_64'
@@ -84,24 +86,40 @@ C/C++: /home/runner/work/neurio/neurio/ai-vision-4k/aiupscaler-sdk/src/main/cpp/
 C/C++:    14 | constexpr uint32_t kVkVersion12 = 0x402000;
 C/C++:       |                    ^~~~~~~~~~~~
 C/C++: 2 warnings generated.
-
-> Task :app:processDebugResources
-> Task :app:mergeExtDexDebug
-
-> Task :aiupscaler-sdk:buildCMakeDebug[x86_64]
 C/C++: /home/runner/work/neurio/neurio/ai-vision-4k/aiupscaler-sdk/src/main/cpp/vulkan/v4k_vk_pipeline.cpp:22:32: warning: unused function 'imageBindings' [-Wunused-function]
 C/C++:    22 | std::vector<DescriptorBinding> imageBindings(uint32_t count) {
 C/C++:       |                                ^~~~~~~~~~~~~
 C/C++: 1 warning generated.
 
-> Task :aiupscaler-sdk:compileDebugKotlin FAILED
 > Task :aiupscaler-sdk:mergeDebugJniLibFolders
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1791269044510.json
+> Task :aiupscaler-sdk:compileDebugJavaWithJavac NO-SOURCE
+> Task :aiupscaler-sdk:bundleLibCompileToJarDebug
+> Task :aiupscaler-sdk:processDebugJavaRes
+> Task :aiupscaler-sdk:bundleLibRuntimeToJarDebug
+> Task :aiupscaler-sdk:bundleLibRuntimeToDirDebug
+> Task :aiupscaler-sdk:mergeDebugNativeLibs
+> Task :aiupscaler-sdk:copyDebugJniLibsProjectOnly
+> Task :app:mergeLibDexDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:mergeDebugNativeLibs
+
+> Task :app:stripDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libaivision4k.so, libandroidx.graphics.path.so.
+
+> Task :app:compileDebugKotlin FAILED
+e: file:///home/runner/work/neurio/neurio/ai-vision-4k/app/src/main/java/com/aivision4k/app/monitor/MetricsOverlay.kt:105:25 Argument type mismatch: actual type is 'R?', but 'K?' was expected.
+e: file:///home/runner/work/neurio/neurio/ai-vision-4k/app/src/main/java/com/aivision4k/app/monitor/MetricsOverlay.kt:105:34 Unresolved reference 'batteryTemperatureC'.
+e: file:///home/runner/work/neurio/neurio/ai-vision-4k/app/src/main/java/com/aivision4k/app/monitor/MetricsOverlay.kt:105:55 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/neurio/neurio/ai-vision-4k/app/src/main/java/com/aivision4k/app/monitor/MetricsOverlay.kt:105:59 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/neurio/neurio/ai-vision-4k/app/src/main/java/com/aivision4k/app/monitor/MetricsOverlay.kt:105:111 Argument type mismatch: actual type is 'kotlin.String', but 'K' was expected.
+e: file:///home/runner/work/neurio/neurio/ai-vision-4k/app/src/main/java/com/aivision4k/app/monitor/MonitorService.kt:69:15 Unresolved reference 'cancel'.
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1791269306574.json
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':aiupscaler-sdk:compileDebugKotlin'.
+Execution failed for task ':app:compileDebugKotlin'.
 > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
    > Compilation error. See log for more details
 
@@ -111,7 +129,7 @@ Execution failed for task ':aiupscaler-sdk:compileDebugKotlin'.
 > Get more help at https://help.gradle.org.
 
 * Exception is:
-org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':aiupscaler-sdk:compileDebugKotlin'.
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileDebugKotlin'.
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
 	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
@@ -141,35 +159,6 @@ org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':aiupsca
 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
-	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:111)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
-	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
-	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
-	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
-	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
-	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
-	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
-	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:267)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:131)
-	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
-	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
-	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
-	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
-	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
 Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
@@ -299,35 +288,6 @@ Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionExcept
 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
-	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:111)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
-	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
-	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
-	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
-	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
-	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
-	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
-	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:267)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:131)
-	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
-	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
-	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
-	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
-	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
 Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilation error. See log for more details
@@ -363,5 +323,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 2m 21s
-38 actionable tasks: 36 executed, 2 from cache
+BUILD FAILED in 2m 31s
+52 actionable tasks: 50 executed, 2 from cache
