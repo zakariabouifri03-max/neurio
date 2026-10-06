@@ -101,6 +101,14 @@ Made with ❤️ and Three.js
 
 ---
 
+## 📡 Native Android LAN game streaming prototype
+
+A separate Android Studio project now lives in **[`android/`](android/README.md)**. It implements direct Phone 2 host → Phone 1 client streaming: Phone 2 launches an installed app, captures its real display with MediaProjection, hardware-encodes H.264, and sends encrypted live media over the LAN. Phone 1 decodes it in-app and sends touch/controller events back. The game package, OBB, and app data are never transferred or installed on Phone 1.
+
+The prototype respects Android's actual limits: MediaProjection consent is required; game audio is best-effort; arbitrary third-party input requires the user-enabled Accessibility adapter and may still be blocked by games. The implementation needs two physical Android phones for validation. The authoring sandbox has no JDK/Android SDK or devices, so an APK build and two-phone run have **not** been verified here. See the Android README for setup, ports, and the complete limitation list.
+
+---
+
 ## 📦 `BashBaqiRacing.apk` — ملف جاهز!
 
 A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).

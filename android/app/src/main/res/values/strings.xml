@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Neurio LAN Stream</string>
+    <string name="accessibility_service_name">Neurio remote touch input</string>
+    <string name="accessibility_service_description">Optional host-side adapter that translates paired LAN touch and controller events into Android accessibility gestures. Android may block gestures in protected or anti-cheat games.</string>
+</resources>

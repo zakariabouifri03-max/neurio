@@ -3,3 +3,10 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# Android Studio / Gradle outputs
+android/.gradle/
+android/.idea/
+android/local.properties
+android/**/build/
+*.iml
