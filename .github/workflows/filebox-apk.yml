@@ -76,6 +76,34 @@ jobs:
           sha256sum release-apk/Filebox.apk | tee release-apk/SHA256SUMS.txt
           ls -la release-apk
 
+      # prove the artifact really is an installable package before publishing it
+      - name: Verify the APK
+        run: |
+          set -euo pipefail
+          apk=release-apk/Filebox.apk
+          echo "--- file type ---"
+          file "$apk"
+          python3 - "$apk" <<'PYEOF'
+          import sys, zipfile
+          z = zipfile.ZipFile(sys.argv[1])
+          names = z.namelist()
+          print(f"--- {len(names)} zip entries, CRC test: {z.testzip() or 'OK'} ---")
+          for n in sorted(names):
+              i = z.getinfo(n)
+              print(f"  {n:<42} {i.file_size:>9,} B  method={i.compress_type}")
+          for required in ("classes.dex", "AndroidManifest.xml", "resources.arsc"):
+              assert required in names, f"MISSING {required} - not a valid APK"
+          print("--- classes.dex, AndroidManifest.xml, resources.arsc all present ---")
+          mf = z.read("AndroidManifest.xml")
+          assert b"MainActivity" in mf, "MainActivity not in the manifest"
+          print("--- MainActivity is declared in the manifest ---")
+          PYEOF
+          echo "--- signature (debug key) ---"
+          bt=$(ls -d "$ANDROID_HOME"/build-tools/* | tail -1)
+          "$bt/apksigner" verify --print-certs "$apk" | sed 's/^/  /'
+          echo "--- unzip -l ---"
+          unzip -l "$apk" | tail -5 | sed 's/^/  /'
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
