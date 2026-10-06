@@ -103,6 +103,8 @@ jobs:
           Install on both phones, then: HOST GAME on the phone that has the game, JOIN GAME on the other one. Everything stays on your local Wi-Fi."
           gh release view apk-latest >/dev/null 2>&1 \
             || gh release create apk-latest --title "LAN Game Stream - latest APK" \
-                 --notes "$NOTES" --prerelease --target "$GITHUB_SHA"
-          gh release edit apk-latest --notes "$NOTES"
+                 --notes "$NOTES" --target "$GITHUB_SHA"
+          # --latest makes the short link https://github.com/OWNER/REPO/releases/latest
+          # point straight at the current APK.
+          gh release edit apk-latest --notes "$NOTES" --latest
           gh release upload apk-latest artifacts/*.apk --clobber

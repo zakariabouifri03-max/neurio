@@ -113,3 +113,39 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 📡 LAN Game Stream — بث الألعاب على الشبكة المحلية · Direct APK download
+
+لعبة كاملة **كتشتغل على تيليفون واحد وكتّبثّث للتيليفون الآخر** فوق الواي فاي المحلي — بلا سيرفر، بلا إنترنت، وبلا ما تنزّل أي شي من ملفات اللعبة على التيليفون الثاني.
+
+Stream a game that runs on one phone to another phone on the same Wi-Fi (video + audio
+only, input sent back). **Requires Android 8.0+ (API 26)**, hand-rolled networking, no
+third-party libraries.
+
+### ⬇️ Download the APK · حمّل الـ APK
+
+| Build | Direct link |
+| --- | --- |
+| **`neurio-lan-game-stream.apk`** (release, installs directly — 181 KB) | **[⬇️ Download](https://github.com/zakariabouifri03-max/neurio/releases/download/apk-latest/neurio-lan-game-stream.apk)** |
+| `neurio-lan-game-stream-debug.apk` (debug — 237 KB) | [⬇️ Download](https://github.com/zakariabouifri03-max/neurio/releases/download/apk-latest/neurio-lan-game-stream-debug.apk) |
+| All builds / release page | https://github.com/zakariabouifri03-max/neurio/releases/tag/apk-latest |
+
+Short link (points at the newest build): **https://github.com/zakariabouifri03-max/neurio/releases/latest**
+
+> The APKs are rebuilt automatically by GitHub Actions on every change and re-uploaded
+> to the same `apk-latest` release, so these links always serve the latest build.
+
+**Install · التثبيت**
+1. Download the APK on **both** phones (Chrome on Android: *Install unknown apps* once).
+2. On the phone **that has the game**: `HOST GAME` → pick the game → `START STREAM` → accept
+   screen-capture consent → read out the 6-digit pairing code.
+3. On the **other phone**: `JOIN GAME` → tap the host → type the code → `PLAY`.
+4. Optional, to send touches into the game: on the host, enable **Settings → LAN Game remote
+   input** (accessibility service). Without it the client still gets video + audio.
+
+Everything stays on the local network; no game files, APKs or OBBs are ever sent to the
+client phone. Sources live in **[`lan-game-stream/`](lan-game-stream/)** — see its
+[README](lan-game-stream/README.md), [protocol](lan-game-stream/docs/PROTOCOL.md) and
+[limitations](lan-game-stream/docs/LIMITATIONS.md).
