@@ -1046,11 +1046,20 @@ function wire() {
   };
   $('#inName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#btnEnter').click(); });
   $$('#langRow .lang').forEach((b) => b.onclick = () => { LANG = b.dataset.lang; applyLang(); checkServer(); });
-  $('#btnCopyInvite').onclick = async () => {
+  // in no-server mode the invite *is* the page URL (GitHub Pages / CDN / file)
+  const inviteUrl = () => {
     const list = (S.server?.addresses || []).map((ip) => `${location.protocol}//${ip}:${location.port || 80}`);
-    const url = list[0] || location.origin;
+    if (S.mode !== 'server' || !list.length) return location.href.split('#')[0];
+    return list[0] || location.origin;
+  };
+  const shareInvite = async () => {
+    const url = inviteUrl();
+    if (navigator.share && S.mode !== 'server') {          // phones: real share sheet
+      try { await navigator.share({ title: t('appName'), text: t('tagline'), url }); return; } catch { }
+    }
     toast((await copy(url)) ? t('linkCopied') : url, 3000);
   };
+  $('#btnCopyInvite').onclick = shareInvite;
 
   /* sidebar */
   $('#btnOpenSide').onclick = toggleSide;
@@ -1061,7 +1070,7 @@ function wire() {
     const name = prompt(t('newRoom'));
     if (name && name.trim()) { send({ t: 'room', name: name.trim(), emoji: '💬' }); toast(t('roomMade')); }
   };
-  $('#btnInvite').onclick = $('#btnCopyInvite').click;
+  $('#btnInvite').onclick = () => $('#btnCopyInvite').click();
   $('#btnExport').onclick = () => downloadTranscript(S.active);
   $('#inSearch').oninput = (e) => { S.search = e.target.value.trim().toLowerCase(); renderMessages(); };
 
