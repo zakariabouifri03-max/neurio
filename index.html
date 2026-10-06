@@ -1,150 +1,303 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏁 Bash Baqi Racing</title>
-<meta name="theme-color" content="#0ea5e9">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bash Baqi">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/style.css">
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
-</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d19">
+  <meta name="description" content="استوديو Neurio لتحسين وضوح الصور والفيديوهات مع معالجة محلية تحفظ الخصوصية.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Neurio Studio">
+  <title>Neurio Studio — وضوح جديد لصورك وفيديوهاتك</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/neurio.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
-<div id="app"></div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="القائمة الرئيسية">
+      <div class="sidebar-top">
+        <a class="brand" href="#top" aria-label="Neurio Studio، الرئيسية">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none">
+              <path d="M20 3.5 24.2 15l11.6 5-11.6 4.1L20 36.5l-4.2-12.4L4.2 20l11.6-5L20 3.5Z" fill="url(#brand-gradient)"/>
+              <circle cx="20" cy="20" r="3.5" fill="#fff"/>
+              <defs><linearGradient id="brand-gradient" x1="7" y1="8" x2="33" y2="34" gradientUnits="userSpaceOnUse"><stop stop-color="#8D7BFF"/><stop offset="1" stop-color="#42D6D0"/></linearGradient></defs>
+            </svg>
+          </span>
+          <span class="brand-name">neurio<span>STUDIO</span></span>
+        </a>
 
-<!-- error overlay -->
-<div id="errLog"></div>
+        <div class="nav-group">
+          <div class="nav-caption">مساحة العمل</div>
+          <button class="nav-item active" id="navEnhance" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 4.2-4.1a1.5 1.5 0 0 1 2.1 0l1.5 1.4 2.4-2.3a1.5 1.5 0 0 1 2.1 0L20.5 15"/><path d="m17.5 3 .7 2.1 2.1.7-2.1.7-.7 2.1-.7-2.1-2.1-.7 2.1-.7.7-2.1Z"/></svg>
+            <span>تحسين الوسائط</span>
+            <span class="nav-current" aria-hidden="true"></span>
+          </button>
+        </div>
 
-<!-- loading -->
-<div id="loading">
-  <div class="loadBox">
-    <div class="loadFlag">🏁</div>
-    <div class="loadTitle">BASH BAQI<br>RACING</div>
-    <div class="loadBar"><div></div></div>
-    <div class="loadTip">warming up the buggies…</div>
-  </div>
-</div>
+        <div class="nav-group second-nav-group">
+          <div class="nav-caption">اكتشف</div>
+          <a class="nav-item" href="#howItWorks" id="navGuide">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9.1a2.45 2.45 0 1 1 4.2 1.7c-1.2 1.1-1.9 1.4-1.9 2.7"/><path d="M12 16.8h.01"/></svg>
+            <span>طريقة الاستخدام</span>
+            <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+          <button class="nav-item" id="navPrivacy" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/><path d="M12 14v2"/></svg>
+            <span>الخصوصية والمعالجة</span>
+            <svg class="nav-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
 
-<!-- speed lines overlay -->
-<div id="speedLines"></div>
-<div id="coinPops"></div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-privacy">
+          <span class="privacy-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.2c0 4.4 2.9 8.4 7 9.8 4.1-1.4 7-5.4 7-9.8V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <div><strong>ملفاتك بأمان</strong><span>المعالجة كتبقى فالجهاز ديالك</span></div>
+          <span class="privacy-light" aria-hidden="true"></span>
+        </div>
+        <div class="sidebar-profile">
+          <div class="profile-avatar">ن</div>
+          <div class="profile-copy"><strong>مساحة شخصية</strong><span>Neurio Studio</span></div>
+          <span class="profile-menu" aria-hidden="true">···</span>
+        </div>
+        <div class="sidebar-version">NEURIO STUDIO <span>•</span> 1.0</div>
+      </div>
+    </aside>
 
-<!-- ══════════ RACE HUD ══════════ -->
-<div id="hud">
-  <div class="hudTL">
-    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
-    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
-    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
-    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
-  </div>
+    <button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="إغلاق القائمة"></button>
 
-  <div id="progbar">
-    <span class="flagL">🏁</span>
-    <div class="track"><div id="progMarkers"></div></div>
-    <span class="flagR">🏆</span>
-  </div>
+    <div class="main-shell" id="top">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenuButton" type="button" aria-label="فتح القائمة">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div class="breadcrumbs"><span>الرئيسية</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><strong>تحسين الوسائط</strong></div>
+        <div class="topbar-actions">
+          <div class="secure-chip"><span class="status-dot"></span><span>معالجة محلية</span></div>
+          <button class="top-help" id="topHelp" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9.1a2.45 2.45 0 1 1 4.2 1.7c-1.2 1.1-1.9 1.4-1.9 2.7"/><path d="M12 16.8h.01"/></svg><span>مساعدة</span></button>
+          <div class="top-avatar" aria-label="الحساب الشخصي">ن</div>
+        </div>
+      </header>
 
-  <button id="btnPauseTop" class="roundBtn">⏸</button>
+      <main class="content">
+        <section class="welcome-row" aria-labelledby="pageTitle">
+          <div class="welcome-copy">
+            <div class="eyebrow"><span class="eyebrow-spark">✦</span> مساحة الإبداع ديالك</div>
+            <h1 id="pageTitle">كل تفصيلة <span>تستاهل تبان.</span></h1>
+            <p>وضّح صورك وفيديوهاتك، حسّن الألوان والتفاصيل — بطريقة سهلة وخاصة.</p>
+          </div>
+          <div class="welcome-note">
+            <div class="welcome-note-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.2c0 4.4 2.9 8.4 7 9.8 4.1-1.4 7-5.4 7-9.8V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <div><strong>خصوصيتك محفوظة</strong><span>ملفاتك ما كتطلعش للسيرفر</span></div>
+            <span class="welcome-check" aria-hidden="true">✓</span>
+          </div>
+        </section>
 
-  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
+        <div class="studio-grid">
+          <section class="workspace-card surface-card" aria-labelledby="workspaceHeading">
+            <div class="workspace-header">
+              <div class="section-heading">
+                <span class="step-number">01</span>
+                <div><h2 id="workspaceHeading">مساحة التحسين</h2><p>اختار صورة أو فيديو باش تبدا</p></div>
+              </div>
+              <div class="mode-tabs" role="tablist" aria-label="نوع الملف">
+                <button class="mode-tab active" type="button" role="tab" aria-selected="true" data-mode="image">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 4.2-4.1a1.5 1.5 0 0 1 2.1 0l1.5 1.4 2.4-2.3a1.5 1.5 0 0 1 2.1 0L20.5 15"/></svg>
+                  <span>صورة</span>
+                </button>
+                <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="video">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="13" height="14" rx="3"/><path d="m16 10 5-3v10l-5-3z"/></svg>
+                  <span>فيديو</span>
+                </button>
+              </div>
+            </div>
 
-  <div id="powerSlot" class="powerSlot">
-    <span id="hudPower"></span>
-    <span class="keyHint">SPACE</span>
-  </div>
+            <div class="dropzone" id="dropzone" tabindex="0" role="region" aria-label="اسحب ملفاً أو اختاره من الجهاز">
+              <div class="drop-art" aria-hidden="true">
+                <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+                <div class="art-spark spark-one">✦</div><div class="art-spark spark-two">✧</div>
+                <div class="art-file">
+                  <div class="art-file-image"><span></span><i></i><b></b></div>
+                  <div class="art-file-spark">✦</div>
+                </div>
+                <div class="art-glow"></div>
+              </div>
+              <div class="drop-copy">
+                <span class="drop-kicker"><span class="drop-kicker-dot"></span> البداية من هنا</span>
+                <h3 id="dropHeading">جرّ صورتك لهنا</h3>
+                <p id="dropDescription">أو اختار ملف من الجهاز ديالك</p>
+                <button class="choose-file-button" id="chooseFileButton" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3"/></svg>
+                  <span id="chooseButtonLabel">اختار صورة</span>
+                </button>
+                <div class="drop-formats"><span id="formatHint">JPG · PNG · WEBP</span><i></i><span>حتى 40 MB</span></div>
+              </div>
+              <div class="drop-corner corner-top"></div><div class="drop-corner corner-bottom"></div>
+            </div>
 
-  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
+            <input id="mediaInput" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp,image/avif">
 
-  <div id="banner"></div>
+            <div class="editor-panel" id="editorPanel" hidden>
+              <div class="file-toolbar">
+                <div class="file-info">
+                  <div class="file-type-icon" id="fileTypeIcon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="3"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 4.2-4.1a1.5 1.5 0 0 1 2.1 0l1.5 1.4 2.4-2.3a1.5 1.5 0 0 1 2.1 0L20.5 15"/></svg>
+                  </div>
+                  <div class="file-copy">
+                    <div class="file-title-row"><strong id="fileName">اسم الملف</strong><span class="file-type-badge" id="fileTypeBadge">صورة</span></div>
+                    <span id="fileDetails">—</span>
+                  </div>
+                </div>
+                <div class="file-actions">
+                  <button class="subtle-button compare-button" id="compareToggle" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5H5v3M5 5l5 5m6 9h3v-3m0 3-5-5M14 5h5v5M19 5l-5 5M10 19H5v-5m0 5 5-5"/></svg><span>قارن</span></button>
+                  <button class="subtle-button" id="replaceFileButton" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3"/></svg><span>تغيير الملف</span></button>
+                  <button class="clear-button" id="clearFileButton" type="button" aria-label="إزالة الملف" title="إزالة الملف">×</button>
+                </div>
+              </div>
 
-  <!-- touch controls -->
-  <div id="touchWrap">
-    <div class="tcol left">
-      <button id="tLeft" class="tbtn">◀</button>
-      <button id="tRight" class="tbtn">▶</button>
+              <div class="preview-frame">
+                <div class="preview-topline"><span class="preview-state"><i></i><span id="previewStateText">الأصلية</span></span><span class="preview-dimensions" id="previewDimensions">—</span></div>
+                <div class="image-stage compare-stage" id="imageStage" hidden>
+                  <img id="originalPreview" alt="معاينة الصورة الأصلية">
+                  <canvas id="enhancedPreview" aria-label="معاينة الصورة المحسّنة"></canvas>
+                  <span class="image-label original-label">الأصلية</span>
+                  <span class="image-label enhanced-label">المحسّنة</span>
+                  <input class="compare-range" id="compareRange" type="range" min="0" max="100" value="50" aria-label="اسحب للمقارنة بين الأصلية والمحسّنة" dir="ltr">
+                  <div class="image-busy" id="imageBusy" hidden><span class="mini-spinner"></span><span>كنحسّنو المعاينة…</span></div>
+                </div>
+
+                <div class="video-stage" id="videoStage" hidden>
+                  <video id="videoSource" playsinline preload="metadata"></video>
+                  <canvas id="videoCanvas" aria-label="معاينة الفيديو المحسّن"></canvas>
+                  <span class="video-watermark" id="videoWatermark"><i></i> معاينة محسّنة</span>
+                  <button class="large-play-button" id="largePlayButton" type="button" aria-label="تشغيل الفيديو">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 10 6-10 6V6Z"/></svg>
+                  </button>
+                </div>
+                <div class="video-controls" id="videoControls" hidden>
+                  <button class="player-button" id="playButton" type="button" aria-label="تشغيل الفيديو"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 10 6-10 6V6Z"/></svg></button>
+                  <span class="player-time" id="currentTime">0:00</span>
+                  <input class="seek-range" id="seekRange" type="range" min="0" max="1000" value="0" aria-label="تقديم أو إرجاع الفيديو" dir="ltr">
+                  <span class="player-time duration" id="videoDuration">0:00</span>
+                  <button class="player-button volume-button" id="muteButton" type="button" aria-label="كتم الصوت"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M16 9a5 5 0 0 1 0 6m2.5-8.5a8.5 8.5 0 0 1 0 11"/></svg></button>
+                </div>
+                <div class="export-progress" id="exportProgress" hidden>
+                  <div class="export-progress-row"><span id="exportStatus">كنوجدّو التصدير…</span><strong id="exportPercent">0%</strong></div>
+                  <div class="progress-track"><span id="exportProgressBar"></span></div>
+                </div>
+              </div>
+
+              <div class="preview-footnote">
+                <span class="footnote-check"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span>
+                <span id="previewHint">حمّل الملف باش تشوف المعاينة ديالو هنا.</span>
+                <span class="preview-private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg> على جهازك</span>
+              </div>
+            </div>
+          </section>
+
+          <aside class="settings-card surface-card" aria-labelledby="settingsHeading">
+            <div class="settings-header">
+              <div class="section-heading">
+                <span class="step-number step-two">02</span>
+                <div><h2 id="settingsHeading">ضبط التحسين</h2><p>اختار اللمسة اللي كتفضّل</p></div>
+              </div>
+              <button class="reset-button" id="resetSettingsButton" type="button" title="إرجاع الإعدادات الأصلية"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11a8.5 8.5 0 1 1 2.3 5.8"/><path d="M3.5 5.5V11h5.5"/></svg></button>
+            </div>
+
+            <div class="settings-body">
+              <div class="preset-block">
+                <div class="field-heading"><span>إعدادات جاهزة</span><span class="field-caption">لمسة وحدة</span></div>
+                <div class="preset-grid" role="group" aria-label="إعدادات جاهزة">
+                  <button class="preset-button selected" type="button" data-preset="balanced"><span class="preset-icon preset-balanced">✦</span><span>متوازن</span></button>
+                  <button class="preset-button" type="button" data-preset="details"><span class="preset-icon preset-detail"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 14.1 10l6.4 2-6.4 2L12 20.5 9.9 14 3.5 12l6.4-2L12 3.5Z"/></svg></span><span>تفاصيل</span></button>
+                  <button class="preset-button" type="button" data-preset="color"><span class="preset-icon preset-color"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.1a2 2 0 0 0 1.3-3.5 1.8 1.8 0 0 1 1.2-3.1H18a3 3 0 0 0 3-3c0-4.6-4-8.4-9-8.4Z"/><path d="M7.5 12h.01M9.5 7.5h.01M14.5 7.5h.01M17 11h.01"/></svg></span><span>ألوان</span></button>
+                  <button class="preset-button" type="button" data-preset="soft"><span class="preset-icon preset-soft"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8m0-12.8L5.6 18.4"/><circle cx="12" cy="12" r="6.2"/></svg></span><span>ناعم</span></button>
+                </div>
+              </div>
+
+              <div class="slider-group">
+                <label class="slider-label" for="sharpnessRange"><span class="slider-name"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 14.1 10l6.4 2-6.4 2L12 20.5 9.9 14 3.5 12l6.4-2L12 3.5Z"/></svg>وضوح التفاصيل</span><span class="slider-value" id="sharpnessValue">58</span></label>
+                <input class="control-range" id="sharpnessRange" type="range" min="0" max="100" value="58" dir="ltr">
+                <div class="range-labels"><span>ناعم</span><span>أوضح</span></div>
+              </div>
+
+              <div class="slider-group">
+                <label class="slider-label" for="noiseRange"><span class="slider-name"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M6 9h12M8.5 13h7M10 17h4"/><circle cx="6" cy="5" r="1.5"/><circle cx="16.5" cy="9" r="1.5"/><circle cx="9" cy="13" r="1.5"/><circle cx="14" cy="17" r="1.5"/></svg>تنقية التشويش</span><span class="slider-value" id="noiseValue">24</span></label>
+                <input class="control-range" id="noiseRange" type="range" min="0" max="100" value="24" dir="ltr">
+                <div class="range-labels"><span>طبيعي</span><span>أنقى</span></div>
+              </div>
+
+              <div class="slider-group color-slider-group">
+                <label class="slider-label" for="colorRange"><span class="slider-name"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.1a2 2 0 0 0 1.3-3.5 1.8 1.8 0 0 1 1.2-3.1H18a3 3 0 0 0 3-3c0-4.6-4-8.4-9-8.4Z"/><path d="M7.5 12h.01M9.5 7.5h.01M14.5 7.5h.01M17 11h.01"/></svg>حيوية الألوان</span><span class="slider-value" id="colorValue">55</span></label>
+                <input class="control-range" id="colorRange" type="range" min="0" max="100" value="55" dir="ltr">
+                <div class="range-labels"><span>هادئة</span><span>حيوية</span></div>
+              </div>
+
+              <div class="resolution-control" id="resolutionControl">
+                <div class="resolution-copy"><strong>حجم الصورة</strong><span>تكبير محلي للاستيفاء</span></div>
+                <div class="scale-switch" role="group" aria-label="حجم الصورة النهائي">
+                  <button class="scale-button selected" type="button" data-scale="1">1×</button>
+                  <button class="scale-button" type="button" data-scale="2">2×</button>
+                </div>
+              </div>
+
+              <div class="local-note">
+                <span class="local-note-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg></span>
+                <div><strong>معالجة محلية وخاصة</strong><span>ملفاتك ما كتغادرش الجهاز ديالك.</span></div>
+              </div>
+
+              <button class="action-button" id="actionButton" type="button" disabled>
+                <span class="action-button-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 14.1 10l6.4 2-6.4 2L12 20.5 9.9 14 3.5 12l6.4-2L12 3.5Z"/></svg></span>
+                <span class="action-button-copy"><strong id="actionButtonTitle">حمّل ملفاً للبدء</strong><small id="actionButtonCaption">اختار صورة أو فيديو أولاً</small></span>
+                <svg class="action-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+              </button>
+              <p class="engine-disclaimer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.2c0 4.4 2.9 8.4 7 9.8 4.1-1.4 7-5.4 7-9.8V6l-7-3Z"/></svg> التحسين الحالي محلي؛ ربط نموذج AI خارجي يحتاج خدمة خلفية.</p>
+            </div>
+          </aside>
+        </div>
+
+        <section class="how-section" id="howItWorks" aria-labelledby="howHeading">
+          <div class="how-heading-row"><div><div class="eyebrow small-eyebrow">ساهلة وبلا تعقيد</div><h2 id="howHeading">ثلاث خطوات… والنتيجة كتفرق</h2></div><span class="how-heading-note">خدم على ملفاتك بأمان</span></div>
+          <div class="how-grid">
+            <article class="how-card"><span class="how-number">01</span><span class="how-icon upload-how"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3"/></svg></span><div><h3>حمّل الملف</h3><p>صورة أو فيديو من الجهاز ديالك.</p></div></article>
+            <article class="how-card"><span class="how-number">02</span><span class="how-icon tune-how"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="11" cy="18" r="2"/></svg></span><div><h3>ضبط التحسين</h3><p>اختار وضوح وألوان على ذوقك.</p></div></article>
+            <article class="how-card"><span class="how-number">03</span><span class="how-icon download-how"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5"/><path d="M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1"/></svg></span><div><h3>قارن وحمّل</h3><p>شوف الفرق وصدّر النسخة المحسّنة.</p></div></article>
+          </div>
+        </section>
+
+        <footer class="page-footer"><span>صُنع بعناية من Neurio</span><span><i></i> تحسين محلي · خصوصية أولاً</span></footer>
+      </main>
     </div>
-    <div class="tcol right">
-      <button id="tBrake" class="tbtn brake">▼</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ GARAGE UI ══════════ -->
-<div id="garageUI">
-  <div id="topbar">
-    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
-    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
-    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
-    <div class="spacer"></div>
-    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
-    <button id="btnMusic" class="miniBtn">🎵</button>
-    <button id="btnSfx" class="miniBtn">🔊</button>
-    <button id="btnFull" class="miniBtn">⛶</button>
   </div>
 
-  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
-  <div id="carNamePlate"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <input id="replacementInput" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp,image/avif">
 
-  <div id="menuBar">
-    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
-    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
-    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
-    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
-    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
-    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
-  </div>
-</div>
+  <dialog class="info-dialog" id="infoDialog">
+    <form method="dialog" class="dialog-card">
+      <button class="dialog-close" aria-label="إغلاق" value="close">×</button>
+      <div class="dialog-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.2c0 4.4 2.9 8.4 7 9.8 4.1-1.4 7-5.4 7-9.8V6l-7-3Z"/><path d="M12 11v5m0-8h.01"/></svg></div>
+      <span class="dialog-kicker">NEURIO STUDIO</span>
+      <h2 id="dialogTitle">معلومات المعالجة والخصوصية</h2>
+      <p>الصور والفيديوهات كيتعالجو داخل المتصفح، وما كيتصيفطوش لأي سيرفر.</p>
+      <p>حالياً التطبيق فيه تحسين محلي للحدة والألوان وتقليل التشويش. تكبير الصورة 2× كيعتمد على الاستيفاء داخل المتصفح، وماشي نموذج توليدي AI. لإضافة تحسين AI حقيقي أو رفع دقة احترافي، خاص ربط التطبيق بنموذج وخدمة خلفية آمنة.</p>
+      <button class="dialog-ok" value="close">فهمت</button>
+    </form>
+  </dialog>
 
-<!-- ══════════ Shop / panels ══════════ -->
-<div id="panel">
-  <div class="panelBox">
-    <div class="panelHead">
-      <h2 id="panelTitle">SHOP</h2>
-      <div id="panelTabs"></div>
-      <button id="panelClose" class="roundBtn">✖</button>
-    </div>
-    <div id="panelBody"></div>
-  </div>
-</div>
-
-<!-- results -->
-<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
-<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
-
-<!-- pause -->
-<div id="pauseModal">
-  <div class="modalBox">
-    <div class="rtitle">⏸ PAUSED</div>
-    <div class="rbtns">
-      <button id="btnResume" class="big race">▶ RESUME</button>
-      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
-<div id="confetti"></div>
-
-<script type="module" src="src/main.js"></script>
-<script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-</script>
+  <script type="module" src="src/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+  </script>
 </body>
 </html>
