@@ -3,6 +3,12 @@
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
 A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
 
+## 🧩 Chrome extension: YouTube Smooth 1080p
+
+A separate Manifest V3 extension is included in [`youtube-smooth-1080p/`](youtube-smooth-1080p/). It monitors YouTube's player, buffered time, and playback state, with optional best-effort pause/resume protection. It never changes resolution and cannot increase internet speed.
+
+Install it from Chrome's `chrome://extensions` → **Developer mode** → **Load unpacked**, selecting the `youtube-smooth-1080p` folder. See its [extension README](youtube-smooth-1080p/README.md) for behavior and technical limits.
+
 **▶ Play:** serve the folder with any static server and open it:
 
 ```bash

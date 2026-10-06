@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>YouTube Smooth 1080p</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="popup-shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" role="img">
+          <path class="brand-disc" d="M20 2.5a17.5 17.5 0 1 0 0 35 17.5 17.5 0 0 0 0-35Z" />
+          <path class="brand-play" d="M16 12.4c0-1.1 1.2-1.8 2.2-1.2l12 7.1a2 2 0 0 1 0 3.4l-12 7.1c-1 .6-2.2-.1-2.2-1.2V12.4Z" />
+          <path class="brand-wave" d="M8.4 15.2a12.2 12.2 0 0 0 0 9.6M11.6 17.6a6.5 6.5 0 0 0 0 4.8" />
+        </svg>
+      </div>
+      <div class="brand-copy">
+        <p class="eyebrow">BUFFER ASSIST</p>
+        <h1>YouTube Smooth <span>1080p</span></h1>
+      </div>
+      <div class="live-badge" id="live-badge" aria-live="polite">
+        <span class="live-dot" id="live-dot"></span>
+        <span id="live-label">Checking</span>
+      </div>
+    </header>
+
+    <section class="monitor-card" aria-labelledby="monitor-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">LIVE PLAYER MONITOR</p>
+          <h2 id="monitor-heading">Playback snapshot</h2>
+        </div>
+        <span class="page-chip" id="page-chip">Waiting</span>
+      </div>
+
+      <div class="metrics-grid">
+        <article class="metric">
+          <span class="metric-label">Playback quality</span>
+          <strong class="metric-value quality-value" id="quality-value">—</strong>
+          <span class="metric-foot" id="quality-foot">Read from player</span>
+        </article>
+        <article class="metric">
+          <span class="metric-label">Connection</span>
+          <strong class="metric-value" id="connection-value">—</strong>
+          <span class="metric-foot" id="connection-foot">Network estimate</span>
+        </article>
+        <article class="metric">
+          <span class="metric-label">Est. download</span>
+          <strong class="metric-value" id="speed-value">—</strong>
+          <span class="metric-foot" id="speed-foot">No speed test is run</span>
+        </article>
+        <article class="metric">
+          <span class="metric-label">Buffered ahead</span>
+          <strong class="metric-value" id="buffer-value">—</strong>
+          <span class="metric-foot">Seconds of playable video</span>
+        </article>
+      </div>
+
+      <div class="playback-strip">
+        <div class="playback-symbol" id="playback-symbol" aria-hidden="true">
+          <svg viewBox="0 0 20 20"><path d="M7 4.8v10.4M13 4.8v10.4" /></svg>
+        </div>
+        <div class="playback-copy">
+          <span class="metric-label">Playback</span>
+          <strong id="playback-value">Waiting for YouTube</strong>
+        </div>
+        <span class="playback-note" id="playback-note">Monitoring only</span>
+      </div>
+      <p class="page-message" id="page-message">Open a YouTube watch page or Short to see live playback details.</p>
+    </section>
+
+    <section class="controls-card" aria-label="Buffering controls">
+      <div class="setting-row">
+        <div class="setting-copy">
+          <div class="setting-title-line">
+            <h2>Smart Buffer Protection</h2>
+            <span class="mini-tag">RECOMMENDED</span>
+          </div>
+          <p>Pause briefly when a stall looks likely, then resume after a reserve builds.</p>
+        </div>
+        <button class="switch" id="smart-toggle" type="button" role="switch" aria-checked="true" aria-label="Smart Buffer Protection">
+          <span class="switch-thumb"></span>
+        </button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="setting-row advanced-row">
+        <div class="setting-copy">
+          <div class="setting-title-line">
+            <h2>Maximum Smoothness</h2>
+            <span class="sparkle" aria-hidden="true">✦</span>
+          </div>
+          <p>Use a larger buffer reserve. YouTube still controls stream downloads.</p>
+        </div>
+        <button class="switch switch-violet" id="maximum-toggle" type="button" role="switch" aria-checked="false" aria-label="Maximum Smoothness Mode">
+          <span class="switch-thumb"></span>
+        </button>
+      </div>
+    </section>
+
+    <aside class="reality-note">
+      <span class="note-icon" aria-hidden="true">i</span>
+      <p><strong>No quality changes. No speed claims.</strong> The extension cannot add bandwidth or take over YouTube's adaptive stream. It monitors the player and can manage playback pauses only.</p>
+    </aside>
+
+    <footer class="bottom-bar">
+      <span class="privacy-mark"><span aria-hidden="true">◆</span> Local-only · No tracking</span>
+      <button class="settings-button" id="settings-button" type="button">
+        Settings
+        <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 7 9 12l5-5" /></svg>
+      </button>
+    </footer>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

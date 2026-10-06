@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Settings — YouTube Smooth 1080p</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <main class="settings-page">
+    <header class="page-header">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><path class="brand-disc" d="M20 2.5a17.5 17.5 0 1 0 0 35 17.5 17.5 0 0 0 0-35Z"/><path class="brand-play" d="M16 12.4c0-1.1 1.2-1.8 2.2-1.2l12 7.1a2 2 0 0 1 0 3.4l-12 7.1c-1 .6-2.2-.1-2.2-1.2V12.4Z"/><path class="brand-wave" d="M8.4 15.2a12.2 12.2 0 0 0 0 9.6M11.6 17.6a6.5 6.5 0 0 0 0 4.8"/></svg>
+      </div>
+      <div>
+        <p class="eyebrow">YOUTUBE PLAYBACK ASSIST</p>
+        <h1>Settings</h1>
+        <p class="subtitle">Tune how the extension protects playback. Your quality choice always stays yours.</p>
+      </div>
+      <span class="save-state" id="save-state" aria-live="polite"><span class="save-dot"></span><span id="save-label">Saved on this device</span></span>
+    </header>
+
+    <section class="settings-card">
+      <div class="card-heading">
+        <div class="heading-icon icon-teal" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.8M4 4.5v4.4h4.4M12 7v5l3.2 2"/></svg>
+        </div>
+        <div><p class="eyebrow">PLAYBACK BEHAVIOR</p><h2>Buffer protection</h2></div>
+      </div>
+
+      <label class="option-row" for="smart-protection">
+        <span class="option-copy"><strong>Smart Buffer Protection</strong><span>When a stall looks imminent, briefly pause playback and resume once a buffer reserve is ready. You can still pause or play normally.</span></span>
+        <span class="switch-wrap"><input id="smart-protection" type="checkbox"><span class="switch-ui" aria-hidden="true"></span></span>
+      </label>
+
+      <div class="subsetting" id="reserve-setting">
+        <div class="subsetting-copy">
+          <label for="resume-target">Resume when this much video is buffered</label>
+          <p>Protection mode waits for this reserve before it tries to continue.</p>
+        </div>
+        <div class="range-control">
+          <input id="resume-target" type="range" min="6" max="18" step="2" value="8" aria-describedby="resume-value">
+          <output id="resume-value" for="resume-target">8 sec</output>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-card advanced-card">
+      <div class="card-heading">
+        <div class="heading-icon icon-violet" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="m12 3 1.7 5.1L19 10l-5.3 1.9L12 17l-1.7-5.1L5 10l5.3-1.9L12 3ZM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg>
+        </div>
+        <div><p class="eyebrow">ADVANCED</p><h2>Maximum Smoothness Mode</h2></div>
+        <span class="beta-chip">LARGER RESERVE</span>
+      </div>
+      <label class="option-row" for="maximum-smoothness">
+        <span class="option-copy"><strong>Use a more cautious buffer target</strong><span>Raises the low-buffer trigger and waits for about six extra seconds before resuming. This may create longer pauses and cannot make a slow connection faster.</span></span>
+        <span class="switch-wrap"><input id="maximum-smoothness" type="checkbox"><span class="switch-ui" aria-hidden="true"></span></span>
+      </label>
+      <div class="mode-summary">With your current target, protection resumes near <strong id="effective-target">8 seconds</strong><span id="mode-suffix"> of buffered video.</span></div>
+    </section>
+
+    <section class="limits-card">
+      <div class="limits-icon" aria-hidden="true">i</div>
+      <div>
+        <h2>What this extension can and cannot do</h2>
+        <p>YouTube controls its DASH/adaptive media requests. Chrome does not provide extensions a reliable way to prioritize individual stream segments, so this extension does not rewrite requests, force preloading, or change resolution. It monitors the media element and player APIs, estimates the network only when Chrome exposes that estimate, and can manage a brief playback pause.</p>
+        <p><strong>1080p stays 1080p.</strong> If the connection cannot deliver enough data, buffering may still happen.</p>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span><span class="privacy-dot"></span> No external server · no tracking · no browsing history</span>
+      <span>Preferences are stored locally in Chrome.</span>
+    </footer>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>
