@@ -287,3 +287,34 @@ html[dir="rtl"] .sidebar { inset: 0 0 0 auto; border-inline-end: 0; border-inlin
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-thumb { background: #2b3a5f; border-radius: 99px; }
 ::-webkit-scrollbar-track { background: transparent; }
+
+/* ───────────────────  static mode (no server) / P2P  ─────────────────── */
+.static-note {
+  display: flex; flex-direction: column; gap: 4px; margin: 14px 0 4px; padding: 11px 13px;
+  border: 1px dashed rgba(34,211,238,.5); border-radius: 14px;
+  background: rgba(34,211,238,.07); font-size: 12.5px; line-height: 1.5;
+}
+.static-note b { color: var(--accent); font-size: 13px; }
+.static-note span { color: var(--muted); }
+
+.modal { position: fixed; inset: 0; background: rgba(3,6,14,.78); display: grid; place-items: center; z-index: 80; padding: 14px; backdrop-filter: blur(3px); }
+.modal-card {
+  width: min(560px, 100%); max-height: 88dvh; overflow-y: auto;
+  background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+  border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow);
+  padding: 16px; display: flex; flex-direction: column; gap: 12px;
+}
+.modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.modal-head b { font-size: 15.5px; }
+.p2p-block { border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: rgba(7,11,22,.5); display: flex; flex-direction: column; gap: 8px; }
+.p2p-block h4 { margin: 0; font-size: 13px; color: var(--accent); }
+.p2p-block .row { display: flex; gap: 6px; flex-wrap: wrap; }
+textarea.code {
+  width: 100%; font: 11.5px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  direction: ltr; background: rgba(0,0,0,.4); color: #cfe6ff; border: 1px solid var(--line);
+  border-radius: 10px; padding: 8px; resize: vertical; word-break: break-all;
+}
+.p2p-status { font-size: 12.5px; color: var(--muted); min-height: 18px; text-align: center; }
+.p2p-status.on { color: var(--ok); }
+.p2p-status.err { color: #ffb4b4; }
+.badge-static { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(34,211,238,.45); color: var(--accent); }

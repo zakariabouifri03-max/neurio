@@ -69,6 +69,12 @@ node tools/offline-chat/server.mjs
 * 🌍 دارجة / Français / English · 🔌 الرسائل كيتسناو فالطابور ملي تقطع الشبكة
 * 🧪 `node tools/offline-chat/test.mjs` — 36 اختبار بلا أي مكتبة
 
+**▶ من GitHub مباشرة / straight from GitHub:**
+* 📄 **بلا سيرفر (GitHub Pages)**: بعد ما تفعّل Pages → `https://zakariabouifri03-max.github.io/neurio/tools/offline-chat/public/`
+  *(تبويبات فنفس الجهاز، ولا P2P بين جوج أجهزة برمز)*
+* ☁️ **سيرفر حقيقي بضغطة**: [`codespaces.new/zakariabouifri03-max/neurio`](https://codespaces.new/zakariabouifri03-max/neurio) → المنفذ 8080 كيتشغّل بوحدو
+* 💻 **بلا إنترنت**: `node tools/offline-chat/server.mjs` على حاسوب فالواي فاي ديالك
+
 **→ التفاصيل كاملة فـ [`tools/offline-chat/README.md`](tools/offline-chat/README.md)**
 
 ## 🎮 The Game

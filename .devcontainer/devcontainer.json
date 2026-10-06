@@ -1,0 +1,21 @@
+{
+  "name": "🏁 neurio + 📡 نوريو تواصل",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "📡 نوريو تواصل — Offline Chat",
+      "onAutoForward": "openPreview",
+      "visibility": "public"
+    }
+  },
+  "postStartCommand": "bash -c 'setsid nohup node tools/offline-chat/server.mjs --port 8080 > /tmp/offline-chat.log 2>&1 < /dev/null &'",
+  "postAttachCommand": "bash -c 'curl -sf http://127.0.0.1:8080/api/health > /dev/null || (setsid nohup node tools/offline-chat/server.mjs --port 8080 > /tmp/offline-chat.log 2>&1 < /dev/null &) ; sleep 1 ; node tools/offline-chat/server.mjs --help > /dev/null ; echo \"📡 نوريو تواصل ready → port 8080 is forwarded publicly (Ports ▸ 8080 ▸ Public)\"'",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

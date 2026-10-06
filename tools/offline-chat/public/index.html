@@ -45,6 +45,11 @@
       <span data-i18n="remember">حفظ سميتي على هاد الجهاز</span>
     </label>
 
+    <div id="staticNote" class="static-note hidden">
+      <b data-i18n="staticTitle">🔗 وضع «بلا سيرفر» — GitHub / ملف ثابت</b>
+      <span data-i18n="staticBody">ما لقيناش سيرفر على هاد العنوان. مازال تقدر تجرب: نفس الجهاز (تبويبين)، ولا تربط جهاز آخر مباشرة (P2P).</span>
+    </div>
+
     <button id="btnEnter" class="btn primary big" data-i18n="enter">دخول للدردشة 🚀</button>
     <p class="hint" data-i18n="multiTabHint">بغيت تجرب بوحدك؟ حل التبويب مرتين، كل تبويب كيكون مستخدم مختلف.</p>
 
@@ -94,6 +99,7 @@
     </nav>
 
     <footer class="side-foot">
+      <button class="btn ghost small" id="btnP2P" data-i18n="p2pOpen">🔗 جهاز آخر (P2P)</button>
       <button class="btn ghost small" id="btnInvite" data-i18n="invite">🔗 دعوة</button>
       <button class="btn ghost small" id="btnExport" data-i18n="export">⬇️ تصدير</button>
       <button class="btn ghost small hidden" id="btnInstall" data-i18n="install">📱 تثبيت</button>
@@ -108,6 +114,7 @@
         <b id="roomTitle">—</b>
         <span id="roomSub" class="muted"></span>
       </div>
+      <span class="badge-static hidden" id="modeBadge"></span>
       <div class="conn" id="connBadge" title="حالة الاتصال"></div>
     </header>
 
@@ -138,7 +145,38 @@
     </div>
   </main>
 
-  <input type="file" id="fileInput" multiple hidden>
+  <div id="p2pModal" class="modal hidden">
+  <div class="modal-card">
+    <header class="modal-head">
+      <b data-i18n="p2pTitle">🔗 ربط جهاز آخر مباشرة (P2P)</b>
+      <button class="icon-btn" id="p2pClose" aria-label="close">✕</button>
+    </header>
+    <p class="hint" data-i18n="p2pHint">خدمة بلا إنترنت وبلا سيرفر: الرمز كيدوز بين الجهازين بأي طريقة (واتساب، بلوتوث، نسخ يدوي…). الجوج خاصهم يكونو على نفس الشبكة المحلية.</p>
+
+    <section class="p2p-block">
+      <h4 data-i18n="p2pCreate">1) أنا نبدا الدعوة</h4>
+      <button class="btn primary small" id="p2pCreateBtn" data-i18n="p2pCreateBtn">إنشاء رمز الدعوة</button>
+      <textarea id="p2pOffer" class="code hidden" readonly rows="3"></textarea>
+      <div class="row">
+        <button class="btn ghost small hidden" id="p2pCopyOffer" data-i18n="p2pCopy">📋 نسخ الرمز</button>
+      </div>
+      <textarea id="p2pAnswerIn" class="code hidden" rows="3" data-i18n-ph="p2pPasteAnswer" placeholder="الصق رمز الجواب هنا…"></textarea>
+      <button class="btn primary small hidden" id="p2pAcceptBtn" data-i18n="p2pAccept">🔌 اتصال</button>
+    </section>
+
+    <section class="p2p-block">
+      <h4 data-i18n="p2pJoin">2) أنا عندي رمز دعوة</h4>
+      <textarea id="p2pOfferIn" class="code" rows="3" data-i18n-ph="p2pPasteOffer" placeholder="الصق رمز الدعوة هنا…"></textarea>
+      <button class="btn primary small" id="p2pJoinBtn" data-i18n="p2pJoinBtn">توليد رمز الجواب</button>
+      <textarea id="p2pReply" class="code hidden" readonly rows="3"></textarea>
+      <button class="btn ghost small hidden" id="p2pCopyReply" data-i18n="p2pCopy">📋 نسخ الرمز</button>
+    </section>
+
+    <div class="p2p-status" id="p2pStatus"></div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" multiple hidden>
   <div id="emojiPanel" class="emoji-panel hidden"></div>
   <div id="recBar" class="rec-bar hidden">
     <span class="rec-dot"></span><span id="recTime">0:00</span>

@@ -28,6 +28,22 @@ const STRINGS = {
     httpMode: 'الوضع البديل HTTP — الـ WebSocket محجوب هنا، والخدمة مستمرة 👌',
     pushDenied: 'التنبيهات مرفوضة', notify: 'صلاحيات التنبيهات؟', welcome: 'مرحبا بيك فالغرفة',
     dmEmpty: 'اضغط على شي واحد فقائمة الموجودين باش تبدا محادثة خاصة',
+    staticTitle: '🔗 وضع «بلا سيرفر» — GitHub / ملف ثابت',
+    staticBody: 'ما لقيناش سيرفر على هاد العنوان. مازال تقدر تجرب: نفس الجهاز (تبويبين)، ولا تربط جهاز آخر مباشرة (P2P).',
+    staticBadge: 'بلا سيرفر',
+    p2pOpen: '🔗 جهاز آخر (P2P)', p2pTitle: '🔗 ربط جهاز آخر مباشرة (P2P)',
+    p2pHint: 'خدمة بلا إنترنت وبلا سيرفر: الرمز كيدوز بين الجهازين بأي طريقة (واتساب، بلوتوث، نسخ يدوي…). الجوج خاصهم يكونو على نفس الشبكة المحلية.',
+    p2pCreate: '1) أنا نبدا الدعوة', p2pCreateBtn: 'إنشاء رمز الدعوة', p2pCopy: '📋 نسخ الرمز',
+    p2pPasteAnswer: 'الصق رمز الجواب هنا…', p2pAccept: '🔌 اتصال',
+    p2pJoin: '2) أنا عندي رمز دعوة', p2pPasteOffer: 'الصق رمز الدعوة هنا…',
+    p2pJoinBtn: 'توليد رمز الجواب',
+    p2pWorking: 'كنجهزو الرمز…', p2pWaiting: 'الرمز واجد — صيفطو للجهاز الآخر 📤',
+    p2pWaitingAnswer: 'تسنا الجواب…', p2pConnecting: 'كنتصلو… ⏳',
+    p2pConnected: 'متصلين مباشرة ✅', p2pFailed: 'ماقدرناش نتصلو ❌ — تأكد أن الجهازين فنفس الشبكة',
+    p2pBadCode: 'الرمز ماشي صحيح ❌', p2pLocalHint: 'ولا حِل التطبيق فتبويب آخر هو الآخر — غادي تشوفو بعضكم دغيا.',
+    p2pNeedName: 'دخل للدردشة عاد ربط جهاز آخر',
+    localMode: 'وضع بلا سيرفر: كل تبويب = مستخدم. حِل تبويب آخر باش تهدر مع راسك 😄',
+    fileWait: '⏳ كيتحمّل…', fileGone: '⚠️ الملف ما بقاش متاح فهاد الجلسة',
   },
   fr: {
     appName: 'Neurio Contact', tagline: 'Chat sans internet — réseau local uniquement (Wi-Fi / partage)',
@@ -51,6 +67,22 @@ const STRINGS = {
     httpMode: 'Mode de secours HTTP — WebSocket bloqué, le chat continue 👌',
     pushDenied: 'Notifications refusées', notify: 'Autoriser les notifications ?', welcome: 'Bienvenue',
     dmEmpty: 'Touchez quelqu’un dans « En ligne » pour démarrer un chat privé',
+    staticTitle: '🔗 Mode « sans serveur » — GitHub / fichier statique',
+    staticBody: 'Aucun serveur à cette adresse. Vous pouvez quand même tester : même appareil (deux onglets) ou lier un autre appareil en direct (P2P).',
+    staticBadge: 'sans serveur',
+    p2pOpen: '🔗 Autre appareil (P2P)', p2pTitle: '🔗 Lier un autre appareil (P2P)',
+    p2pHint: 'Sans internet ni serveur : le code passe par n’importe quel canal (WhatsApp, Bluetooth, copier-coller…). Les deux appareils doivent être sur le même réseau local.',
+    p2pCreate: '1) Je lance l’invitation', p2pCreateBtn: 'Créer le code', p2pCopy: '📋 Copier le code',
+    p2pPasteAnswer: 'Collez le code de réponse…', p2pAccept: '🔌 Connecter',
+    p2pJoin: '2) J’ai un code d’invitation', p2pPasteOffer: 'Collez le code d’invitation…',
+    p2pJoinBtn: 'Générer la réponse',
+    p2pWorking: 'Préparation du code…', p2pWaiting: 'Code prêt — envoyez-le à l’autre appareil 📤',
+    p2pWaitingAnswer: 'En attente de la réponse…', p2pConnecting: 'Connexion… ⏳',
+    p2pConnected: 'Connectés en direct ✅', p2pFailed: 'Connexion impossible ❌ — vérifiez le réseau local',
+    p2pBadCode: 'Code invalide ❌', p2pLocalHint: 'Ou ouvrez l’app dans un autre onglet — vous vous verrez aussitôt.',
+    p2pNeedName: 'Entrez d’abord dans le chat',
+    localMode: 'Mode sans serveur : chaque onglet est un utilisateur. Ouvrez un autre onglet 😄',
+    fileWait: '⏳ réception…', fileGone: '⚠️ Fichier indisponible dans cette session',
   },
   en: {
     appName: 'Neurio Contact', tagline: 'Chat with no internet — local network only (Wi-Fi / hotspot)',
@@ -74,6 +106,22 @@ const STRINGS = {
     httpMode: 'HTTP fallback mode — WebSocket blocked, chat keeps working 👌',
     pushDenied: 'Notifications blocked', notify: 'Allow notifications?', welcome: 'Welcome',
     dmEmpty: 'Tap someone under “online now” to start a private chat',
+    staticTitle: '🔗 “No server” mode — GitHub / static file',
+    staticBody: 'No server at this address. You can still try it: same device (two tabs) or link another device directly (P2P).',
+    staticBadge: 'no server',
+    p2pOpen: '🔗 Another device (P2P)', p2pTitle: '🔗 Link another device (P2P)',
+    p2pHint: 'No internet, no server: the code travels over any channel (WhatsApp, Bluetooth, copy-paste…). Both devices must be on the same local network.',
+    p2pCreate: '1) I start the invite', p2pCreateBtn: 'Create invite code', p2pCopy: '📋 Copy code',
+    p2pPasteAnswer: 'Paste the answer code…', p2pAccept: '🔌 Connect',
+    p2pJoin: '2) I have an invite code', p2pPasteOffer: 'Paste the invite code…',
+    p2pJoinBtn: 'Generate answer code',
+    p2pWorking: 'Preparing the code…', p2pWaiting: 'Code ready — send it to the other device 📤',
+    p2pWaitingAnswer: 'Waiting for the answer…', p2pConnecting: 'Connecting… ⏳',
+    p2pConnected: 'Connected directly ✅', p2pFailed: 'Could not connect ❌ — check you are on the same network',
+    p2pBadCode: 'Invalid code ❌', p2pLocalHint: 'Or open the app in another tab — you will see each other right away.',
+    p2pNeedName: 'Enter the chat first',
+    localMode: 'No-server mode: every tab is a user. Open a second tab 😄',
+    fileWait: '⏳ receiving…', fileGone: '⚠️ File no longer available in this session',
   },
 };
 const LOCALES = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-GB' };
@@ -89,7 +137,14 @@ const time = (ts) => new Date(ts).toLocaleTimeString(LOCALES[LANG], { hour: '2-d
 const bytes = (n) => (n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(1) + ' KB' : (n / 1048576).toFixed(1) + ' MB');
 const dayKey = (ts) => new Date(ts).toDateString();
 /** every attachment gets its URL from the file id — old cached messages included */
-const fileUrl = (f) => (f && (f.url || (f.id ? '/api/file/' + encodeURIComponent(f.id) : ''))) || '';
+const fileUrl = (f) => {
+  if (!f) return '';
+  if (f.blobUrl) return f.blobUrl;
+  if (f.dataUrl) return f.dataUrl;
+  if (f.url) return f.url;
+  if (f.id && S.mode === 'server') return '/api/file/' + encodeURIComponent(f.id);
+  return '';
+};
 function dayLabel(ts) {
   if (dayKey(ts) === dayKey(Date.now())) return t('today');
   if (dayKey(ts) === dayKey(Date.now() - 864e5)) return t('yesterday');
@@ -150,13 +205,19 @@ const SID = (() => {
   if (!v) { v = uid(8); sessionStorage.setItem('nurio.sid', v); }
   return v;
 })();
-const wantHttp = new URLSearchParams(location.search).get('transport') === 'poll';
+const QS = new URLSearchParams(location.search);
+const wantHttp = QS.get('transport') === 'poll';
+const wantOffline = QS.get('mode') === 'local';     // force no-server mode
 
 const S = {
   me: null,
   ws: null, conn: 'connecting', tries: 0, timer: null,
   transport: wantHttp || localStorage.getItem('nurio.transport') === 'http' ? 'http' : 'ws',
   opened: false, wsFails: 0, httpLoop: false,
+  mode: 'server',            // server | local | p2p
+  serverOK: null,            // null = still probing
+  tabId: uid(3), localBC: null, localPeers: new Map(),
+  pc: null, dc: null, peer: null, p2pRoom: null, recv: null,
   server: null, rooms: [], dms: [], peers: [],
   active: 'general', msgs: {}, unread: {}, queue: [],
   typing: {}, replyTo: null, search: '', lastSound: 0, ready: false,
@@ -217,6 +278,7 @@ async function checkServer() {
     const r = await fetch('/api/health', { cache: 'no-store' });
     const j = await r.json();
     S.server = j;
+    S.serverOK = true;
     $('#srvDot').className = 'dot on';
     $('#srvName').textContent = `${j.name} · v${j.version} · ${j.online} 👤`;
     const box = $('#srvAddrs'); box.textContent = '';
@@ -231,8 +293,10 @@ async function checkServer() {
     });
     return true;
   } catch {
+    S.serverOK = false;
     $('#srvDot').className = 'dot off';
-    $('#srvName').textContent = t('offline');
+    $('#srvName').textContent = t('staticBadge');
+    $('#staticNote').classList.remove('hidden');
     return false;
   }
 }
@@ -248,7 +312,13 @@ function startChat(profile) {
   $('#meAvatar').style.background = S.me.color + '33';
   $('#login').classList.add('hidden');
   $('#app').classList.remove('hidden');
-  connect();
+  if (S.serverOK === false || wantOffline) {
+    S.mode = 'local';                      // GitHub Pages / plain file: no backend at all
+    S.me.id = 'tab-' + S.tabId;            // in this mode every tab is its own user
+    startLocalHub();
+  } else {
+    connect();
+  }
   if ('Notification' in window && Notification.permission === 'default') {
     setTimeout(() => Notification.requestPermission?.(), 3000);
   }
@@ -349,6 +419,8 @@ function retry() {
 }
 
 function send(obj) {
+  if (S.mode === 'local') return localHubSend(obj);
+  if (S.mode === 'p2p') return p2pSend(obj);
   if (S.transport === 'http') {
     if (S.conn !== 'on') return false;
     postIn(obj).catch(() => {
@@ -496,9 +568,12 @@ function renderHeader() {
 }
 
 function updateRoomSub() {
+  updateModeBadge();
   const r = roomName(S.active);
   const parts = [];
-  parts.push(S.conn === 'on' ? t('online_') : t('offline'));
+  parts.push(S.mode === 'p2p' ? 'P2P · ' + (S.conn === 'on' ? t('p2pConnected') : t('p2pWaitingAnswer'))
+    : S.mode === 'local' ? t('staticBadge')
+    : S.conn === 'on' ? t('online_') : t('offline'));
   if (r.kind === 'dm') {
     const p = S.peers.find((x) => x.id === r.id || x.name === r.name);
     parts.push(p ? `🟢 ${t('onlineNow')}` : '⚪️ offline');
@@ -671,7 +746,7 @@ function buildMessage(m) {
     a.href = fileUrl(m.file); a.target = '_blank'; a.rel = 'noreferrer';
     const img = document.createElement('img');
     img.className = 'photo'; img.src = fileUrl(m.file); img.alt = m.file.name; img.loading = 'lazy';
-    if (m.file.missing) { img.alt = '⚠️ ' + m.file.name; img.style.opacity = '.4'; }
+    if (m.file.missing || m.file.transferring) { img.alt = t(m.file.transferring ? 'fileWait' : 'fileGone'); img.style.opacity = '.45'; img.style.minHeight = '90px'; }
     img.onclick = (e) => { e.preventDefault(); openLightbox(fileUrl(m.file)); };
     a.append(img);
     bubble.append(a);
@@ -690,8 +765,9 @@ function buildMessage(m) {
   } else if (m.file) {
     const a = document.createElement('a');
     a.className = 'file-chip'; a.href = fileUrl(m.file); a.download = m.file.name;
+    const state = m.file.transferring ? t('fileWait') : m.file.missing ? t('fileGone') : t('download');
     a.innerHTML = `<span class="ico">${fileIcon(m.file.type, m.file.name)}</span>
-      <span><b>${esc(m.file.name)}</b><small>${bytes(m.file.size)} · ${t('download')}</small></span>`;
+      <span><b>${esc(m.file.name)}</b><small>${bytes(m.file.size)} · ${state}</small></span>`;
     bubble.append(a);
     if (m.text) {
       const c = document.createElement('div'); c.className = 'body small'; c.innerHTML = format(m.text);
@@ -805,7 +881,16 @@ function sendMessage({ text = '', file = null, kind = 'text' }) {
 }
 
 /* ─────────────────────────────── uploads ─────────────────────────────── */
+function uploadLocal(file) {
+  return Promise.resolve({
+    id: uid(8), name: file.name || 'file', size: file.size,
+    type: file.type || 'application/octet-stream',
+    blob: file, local: true,
+  });
+}
+
 function upload(file, kind) {
+  if (S.mode === 'local' || S.mode === 'p2p') return uploadLocal(file);
   return new Promise((resolve, reject) => {
     if (file.size > 25 * 1024 * 1024) return reject(new Error('too-big'));
     const xhr = new XMLHttpRequest();
@@ -836,10 +921,12 @@ async function sendFiles(files) {
       const up = await upload(f);
       const isImg = /^image\//.test(up.type);
       const kind = /^audio\//.test(up.type) && f.name.startsWith('voice-') ? 'voice' : isImg ? 'image' : 'file';
-      sendMessage({
-        kind, text: '',
-        file: { id: up.id, name: up.name, size: up.size, type: up.type, url: up.url },
-      });
+      const meta = {
+        id: up.id, name: up.name, size: up.size, type: up.type,
+        url: up.local ? '' : up.url,
+      };
+      if (up.local) { meta.blobUrl = URL.createObjectURL(up.blob); meta.blob = up.blob; }
+      sendMessage({ kind, text: '', file: meta });
     } catch (err) {
       toast(err.message === 'too-big' ? t('fileTooBig') : t('uploadFail'));
     }
@@ -872,7 +959,9 @@ async function startRecording() {
     const file = new File([blob], `voice-${Date.now()}.${ext}`, { type: type.split(';')[0] });
     try {
       const up = await upload(file);
-      sendMessage({ kind: 'voice', file: { id: up.id, name: up.name, size: up.size, type: up.type, url: up.url } });
+      const meta = { id: up.id, name: up.name, size: up.size, type: up.type, url: up.url || '' };
+      if (up.local) { meta.blobUrl = URL.createObjectURL(up.blob); meta.blob = up.blob; }
+      sendMessage({ kind: 'voice', file: meta });
     } catch { toast(t('uploadFail')); }
   };
   recorder.start();
@@ -967,16 +1056,13 @@ function wire() {
   $('#btnOpenSide').onclick = toggleSide;
   $('#btnCloseSide').onclick = closeSide;
   $('#btnSwitch').onclick = logout;
+  wireP2P();
   $('#btnNewRoom').onclick = () => {
     const name = prompt(t('newRoom'));
     if (name && name.trim()) { send({ t: 'room', name: name.trim(), emoji: '💬' }); toast(t('roomMade')); }
   };
   $('#btnInvite').onclick = $('#btnCopyInvite').click;
-  $('#btnExport').onclick = () => {
-    const url = `/api/export?room=${encodeURIComponent(S.active)}`;
-    const a = document.createElement('a');
-    a.href = url; a.download = ''; document.body.append(a); a.click(); a.remove();
-  };
+  $('#btnExport').onclick = () => downloadTranscript(S.active);
   $('#inSearch').oninput = (e) => { S.search = e.target.value.trim().toLowerCase(); renderMessages(); };
 
   /* composer */
@@ -1060,22 +1146,462 @@ function wire() {
   };
 }
 
+
+/* ══════════════════════════════════════════════════════════════════════════
+   بلا سيرفر / NO SERVER — two ways to chat without any backend
+   1. local  : every tab of the same browser is a user (BroadcastChannel)
+   2. p2p    : two devices on the same network talk directly (WebRTC, no ICE
+               server → no internet needed; the handshake code is exchanged by
+               any channel: WhatsApp, Bluetooth, copy-paste, …)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const LOCAL_ROOMS_KEY = 'nurio.local.rooms.v1';
+
+/* ─────────────────── shared helpers ─────────────────── */
+function myProfile() {
+  return { id: S.me.id, name: S.me.name, color: S.me.color, emoji: S.me.emoji };
+}
+
+/** build a message exactly like the server would (so the UI can't tell) */
+function localMessage(obj) {
+  const file = obj.file && obj.file.id ? { ...obj.file } : null;
+  return {
+    id: obj.id || uid(6),
+    room: obj.room || S.active,
+    ts: Date.now(),
+    from: myProfile(),
+    kind: obj.kind || 'text',
+    text: (obj.text || '').slice(0, 4000),
+    file,
+    replyTo: obj.replyTo && obj.replyTo.text ? obj.replyTo : null,
+  };
+}
+
+/** attachments travel as blobs — each side makes its own object URL */
+function stripBlob(msg) {
+  if (!msg.file) return msg;
+  const { blob, blobUrl, ...file } = msg.file;
+  return { ...msg, file: { ...file, transferring: !!blob } };
+}
+
+function updateModeBadge() {
+  const el = $('#modeBadge');
+  if (!el) return;
+  if (S.mode === 'server') { el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  el.textContent = S.mode === 'p2p' ? 'P2P' : t('staticBadge');
+  el.title = S.mode === 'p2p' ? t('p2pConnected') : t('staticBody');
+}
+
+/* ─────────────────── 1) local hub: one browser, many tabs ─────────────────── */
+function localRooms() {
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem(LOCAL_ROOMS_KEY) || '[]'); } catch { }
+  const base = [
+    { id: 'general', name: LANG === 'ar' ? 'العامة' : 'General', kind: 'group', emoji: '💬', createdAt: 0 },
+    { id: 'help', name: LANG === 'ar' ? 'المساعدة' : 'Help', kind: 'group', emoji: '🆘', createdAt: 0 },
+  ];
+  const out = [...base];
+  for (const r of saved) if (!out.some((x) => x.id === r.id)) out.push(r);
+  const tabs = S.localPeers.size + 1;
+  for (const r of out) r.online = tabs;
+  return out;
+}
+
+function addLocalRoom(room) {
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem(LOCAL_ROOMS_KEY) || '[]'); } catch { }
+  if (!saved.some((r) => r.id === room.id)) { saved.push(room); localStorage.setItem(LOCAL_ROOMS_KEY, JSON.stringify(saved)); }
+  if (!S.rooms.some((r) => r.id === room.id)) S.rooms.push(room);
+  renderRooms();
+}
+
+function localPeers() {
+  return [myProfile(), ...[...S.localPeers.values()].map((p) => p.profile)]
+    .map((p) => ({ ...p, devices: 1, joinedAt: 0 }));
+}
+
+function pushLocalPeers() {
+  if (S.mode !== 'local') return;
+  S.peers = localPeers();
+  renderPeople();
+}
+
+let localHubTimer = null;
+
+function startLocalHub() {
+  try {
+    S.localBC = new BroadcastChannel('nurio-local-hub');
+  } catch {
+    toast(t('p2pFailed'));
+    return;
+  }
+  S.localBC.onmessage = (e) => localHubReceive(e.data);
+  const announce = () => S.localBC.postMessage({ k: 'hello', from: S.tabId, profile: myProfile() });
+  announce();
+  clearInterval(localHubTimer);
+  localHubTimer = setInterval(() => {
+    announce();
+    let changed = false;
+    for (const [id, p] of S.localPeers) if (Date.now() - p.seen > 11000) { S.localPeers.delete(id); changed = true; }
+    if (changed) pushLocalPeers();
+  }, 3500);
+
+  setConn('on');
+  S.ready = true;
+  updateModeBadge();
+  const history = { general: S.msgs.general || [] };
+  for (const r of S.rooms || []) if (S.msgs[r.id]) history[r.id] = S.msgs[r.id];
+  handle({
+    t: 'welcome', you: myProfile(),
+    server: { name: LANG === 'ar' ? 'بلا سيرفر (محلي)' : 'No server (local)', version: 'local' },
+    rooms: localRooms(), dms: S.dms, peers: localPeers(), history,
+  });
+  send({ t: 'open', room: S.active });
+  toast(t('localMode'), 5000);
+  banner(t('staticBody'));
+}
+
+function localHubReceive(d) {
+  if (!d || d.from === S.tabId) return;
+  switch (d.k) {
+    case 'hello': {
+      S.localPeers.set(d.from, { profile: d.profile, seen: Date.now() });
+      pushLocalPeers();
+      break;
+    }
+    case 'msg': {
+      const msg = d.msg;
+      if (d.blob && msg.file) msg.file.blobUrl = URL.createObjectURL(d.blob);
+      handle({ t: 'msg', msg: { ...msg, pending: false } });
+      break;
+    }
+    case 'typing': handle({ t: 'typing', room: d.room, on: d.on, from: d.who }); break;
+    case 'delete': handle({ t: 'delete', room: d.room, id: d.id }); break;
+    case 'room': addLocalRoom(d.room); break;
+    case 'dm': {
+      if (!(d.members || []).includes(S.me.id)) break;
+      if (!S.dms.some((x) => x.id === d.room)) S.dms.unshift({ id: d.room, peer: d.peer, last: null });
+      handle({ t: 'history', room: d.room, messages: S.msgs[d.room] || [] });
+      renderDms();
+      break;
+    }
+  }
+}
+
+function localHubSend(obj) {
+  const bc = S.localBC;
+  if (!bc) return false;
+  switch (obj.t) {
+    case 'hello':
+      bc.postMessage({ k: 'hello', from: S.tabId, profile: myProfile() });
+      return true;
+    case 'msg': {
+      const msg = localMessage(obj);
+      handle({ t: 'msg', msg });                                   // our own copy (confirms ✓)
+      bc.postMessage({ k: 'msg', from: S.tabId, msg: stripBlob(msg), blob: obj.file?.blob || null });
+      return true;
+    }
+    case 'typing':
+      bc.postMessage({ k: 'typing', from: S.tabId, room: obj.room, on: !!obj.on, who: { id: S.me.id, name: S.me.name } });
+      return true;
+    case 'open':
+      handle({ t: 'history', room: obj.room, messages: S.msgs[obj.room] || [] });
+      return true;
+    case 'delete':
+      S.msgs[obj.room] = (S.msgs[obj.room] || []).filter((x) => x.id !== obj.id);
+      $$(`#messages [data-id="${obj.id}"]`).forEach((el) => el.remove());
+      saveCache();
+      bc.postMessage({ k: 'delete', from: S.tabId, room: obj.room, id: obj.id });
+      return true;
+    case 'room': {
+      const room = {
+        id: 'r-' + obj.name.toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]+/g, '-').slice(0, 24) + '-' + uid(2),
+        name: obj.name, kind: 'group', emoji: obj.emoji || '💬', createdAt: Date.now(),
+      };
+      addLocalRoom(room);
+      const sys = { id: uid(6), room: room.id, kind: 'system', ts: Date.now(), text: `${t('roomMade')} «${room.name}»` };
+      handle({ t: 'msg', msg: sys });
+      bc.postMessage({ k: 'room', from: S.tabId, room });
+      bc.postMessage({ k: 'msg', from: S.tabId, msg: sys, blob: null });
+      return true;
+    }
+    case 'dm': {
+      const peer = obj.peer || {};
+      const room = { id: 'dm:' + [S.me.id, peer.id].sort().join('|'), kind: 'dm', name: peer.name, emoji: peer.emoji };
+      if (!S.dms.some((x) => x.id === room.id)) S.dms.unshift({ id: room.id, peer: { ...peer, online: true }, last: null });
+      if (!S.msgs[room.id]) S.msgs[room.id] = [];
+      renderDms();
+      openRoom(room.id);
+      bc.postMessage({ k: 'dm', from: S.tabId, room: room.id, members: [S.me.id, peer.id], peer: myProfile() });
+      return true;
+    }
+    case 'rooms':
+      handle({ t: 'rooms', rooms: localRooms() });
+      return true;
+  }
+  return true;
+}
+
+/* ─────────────────── 2) p2p: two devices, one direct link ─────────────────── */
+const RTC_CFG = { iceServers: [] };        // LAN only — nothing to reach on the internet
+
+function packCode(type, sdp) { return btoa(JSON.stringify({ v: 1, t: type, s: sdp })); }
+function unpackCode(code) {
+  const clean = String(code || '').replace(/\s+/g, '');
+  if (!clean) throw new Error('empty');
+  const obj = JSON.parse(atob(clean));
+  if (!obj || !obj.s) throw new Error('bad');
+  return obj;
+}
+
+function p2pStatus(text, cls = '') {
+  const el = $('#p2pStatus');
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'p2p-status ' + cls;
+}
+
+function iceComplete(pc, ms = 4000) {
+  return new Promise((resolve) => {
+    if (pc.iceGatheringState === 'complete') return resolve();
+    const done = () => { clearTimeout(t); pc.removeEventListener('icegatheringstatechange', onChange); resolve(); };
+    const onChange = () => { if (pc.iceGatheringState === 'complete') done(); };
+    const t = setTimeout(done, ms);
+    pc.addEventListener('icegatheringstatechange', onChange);
+  });
+}
+
+function newPeerConnection() {
+  const pc = new RTCPeerConnection(RTC_CFG);
+  pc.onconnectionstatechange = () => {
+    const st = pc.connectionState;
+    if (st === 'connected' && S.mode !== 'p2p') p2pStatus(t('p2pConnecting'));
+    if (st === 'failed') p2pStatus(t('p2pFailed'), 'err');
+  };
+  return pc;
+}
+
+async function p2pCreate() {
+  p2pStatus(t('p2pWorking'));
+  const pc = newPeerConnection();
+  S.pc = pc;
+  wireChannel(pc.createDataChannel('nurio', { ordered: true }));
+  await pc.setLocalDescription(await pc.createOffer());
+  await iceComplete(pc);
+  return packCode('offer', pc.localDescription.sdp);
+}
+
+async function p2pJoin(code) {
+  p2pStatus(t('p2pWorking'));
+  const { t: type, s: sdp } = unpackCode(code);
+  const pc = newPeerConnection();
+  S.pc = pc;
+  pc.ondatachannel = (e) => wireChannel(e.channel);
+  await pc.setRemoteDescription({ type, sdp });
+  await pc.setLocalDescription(await pc.createAnswer());
+  await iceComplete(pc);
+  return packCode('answer', pc.localDescription.sdp);
+}
+
+async function p2pAccept(code) {
+  const { s: sdp } = unpackCode(code);
+  if (!S.pc) throw new Error('no pc');
+  await S.pc.setRemoteDescription({ type: 'answer', sdp });
+  p2pStatus(t('p2pConnecting'));
+}
+
+function wireChannel(dc) {
+  S.dc = dc;
+  dc.binaryType = 'arraybuffer';
+  dc.onopen = () => {
+    p2pStatus(t('p2pConnecting'));
+    dc.send(JSON.stringify({ t: 'hello', ...myProfile() }));
+  };
+  dc.onclose = () => {
+    if (S.mode !== 'p2p') return;
+    setConn('off');
+    banner(t('offline'), true);
+    p2pStatus(t('p2pFailed'), 'err');
+  };
+  dc.onmessage = (ev) => {
+    if (typeof ev.data !== 'string') return p2pChunk(ev.data);
+    let m; try { m = JSON.parse(ev.data); } catch { return; }
+    p2pHandle(m);
+  };
+}
+
+function p2pHandle(m) {
+  switch (m.t) {
+    case 'hello': {
+      S.peer = m;
+      S.mode = 'p2p';
+      S.p2pRoom = 'dm:' + [S.me.id, m.id].sort().join('|');
+      S.peers = [
+        { ...myProfile(), devices: 1, joinedAt: 0 },
+        { ...m, devices: 1, joinedAt: 1 },
+      ];
+      S.dms = [{ id: S.p2pRoom, peer: { id: m.id, name: m.name, color: m.color, emoji: m.emoji, online: true } }];
+      S.rooms = [];
+      setConn('on');
+      updateModeBadge();
+      p2pStatus(t('p2pConnected'), 'on');
+      $('#p2pModal').classList.add('hidden');
+      banner(null);
+      renderAll();
+      openRoom(S.p2pRoom);
+      toast(t('p2pConnected'));
+      break;
+    }
+    case 'msg': {
+      const msg = m.msg;
+      if (msg?.file?.transferring) msg.file.missing = true;   // until the transfer lands
+      handle({ t: 'msg', msg: { ...msg, pending: false } });
+      if (S.active === msg.room) renderMessages();
+      break;
+    }
+    case 'history': {
+      mergeHistory(m.room, m.messages || []);
+      if (m.room === S.active) renderMessages();
+      break;
+    }
+    case 'typing': handle({ t: 'typing', room: m.room, on: m.on, from: m.from }); break;
+    case 'delete': handle({ t: 'delete', room: m.room, id: m.id }); break;
+    case 'open': p2pSend({ t: 'history', room: m.room, messages: S.msgs[m.room] || [] }); break;
+    case 'f-begin': S.recv = { id: m.id, name: m.name, type: m.type, size: m.size, chunks: [], got: 0 }; break;
+    case 'f-end': p2pFinishTransfer(m.id); break;
+  }
+}
+
+async function transferFile(msg) {
+  const dc = S.dc;
+  const blob = msg.file.blob;
+  dc.send(JSON.stringify({ t: 'f-begin', id: msg.id, name: msg.file.name, type: msg.file.type, size: msg.file.size }));
+  const buf = await blob.arrayBuffer();
+  const CH = 16 * 1024;
+  for (let off = 0; off < buf.byteLength; off += CH) {
+    while (dc.bufferedAmount > 512 * 1024) await new Promise((r) => setTimeout(r, 20));
+    if (dc.readyState !== 'open') return;
+    dc.send(buf.slice(off, off + CH));
+  }
+  dc.send(JSON.stringify({ t: 'f-end', id: msg.id }));
+}
+
+function p2pChunk(data) {
+  if (!S.recv) return;
+  S.recv.chunks.push(data);
+  S.recv.got += data.byteLength || 0;
+}
+
+function p2pFinishTransfer(id) {
+  const recv = S.recv;
+  S.recv = null;
+  if (!recv) return;
+  const blob = new Blob(recv.chunks, { type: recv.type || 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+  for (const list of Object.values(S.msgs)) {
+    const msg = list.find((x) => x.id === id);
+    if (msg && msg.file) {
+      msg.file.blobUrl = url;
+      msg.file.transferring = false;
+      msg.file.missing = false;
+      break;
+    }
+  }
+  if (S.active) renderMessages();
+}
+
+function p2pSend(obj) {
+  if (!S.dc || S.dc.readyState !== 'open') return false;
+  if (obj.t === 'msg') {
+    const msg = localMessage(obj);
+    handle({ t: 'msg', msg });                       // echo locally, exactly like the server
+    S.dc.send(JSON.stringify({ t: 'msg', msg: stripBlob(msg) }));
+    if (msg.file?.blob) transferFile(msg).catch(() => { });
+    return true;
+  }
+  S.dc.send(JSON.stringify(obj));
+  return true;
+}
+
+/* ─────────────────── transcript export without a server ─────────────────── */
+function downloadTranscript(room) {
+  const list = S.msgs[room] || [];
+  const txt = list.map((m) => {
+    const d = new Date(m.ts).toLocaleString(LOCALES[LANG]);
+    if (m.kind === 'system') return `— ${m.text} (${d})`;
+    const body = m.file ? `${m.text ? m.text + ' ' : ''}[${m.file.name} ${bytes(m.file.size)}]` : m.text;
+    return `[${d}] ${m.from?.name || '?'}: ${body}`;
+  }).join('\n');
+  const blob = new Blob(['\uFEFF' + txt], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `chat-${String(room).replace(/[^\w\u0600-\u06ff-]+/g, '_')}-${new Date().toISOString().slice(0, 10)}.txt`;
+  document.body.append(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+/* ─────────────────── modal wiring ─────────────────── */
+function wireP2P() {
+  const show = (sel, on) => $(sel).classList.toggle('hidden', !on);
+  $('#btnP2P').onclick = () => {
+    if (!S.me) { toast(t('p2pNeedName')); return; }
+    $('#p2pStatus').textContent = S.mode === 'local' ? t('p2pLocalHint') : '';
+    $('#p2pModal').classList.remove('hidden');
+    p2pStatus(S.mode === 'local' ? t('p2pLocalHint') : '');
+  };
+  $('#p2pClose').onclick = () => $('#p2pModal').classList.add('hidden');
+
+  $('#p2pCreateBtn').onclick = async () => {
+    try {
+      const code = await p2pCreate();
+      $('#p2pOffer').value = code;
+      show('#p2pOffer', true); show('#p2pCopyOffer', true);
+      show('#p2pAnswerIn', true); show('#p2pAcceptBtn', true);
+      p2pStatus(t('p2pWaiting'));
+    } catch (err) { p2pStatus(t('p2pFailed') + ' ' + err.message, 'err'); }
+  };
+  $('#p2pCopyOffer').onclick = async () => toast((await copy($('#p2pOffer').value)) ? t('copied') : t('noCopy'));
+  $('#p2pAcceptBtn').onclick = async () => {
+    p2pStatus(t('p2pConnecting'));
+    try { await p2pAccept($('#p2pAnswerIn').value); }
+    catch (err) { p2pStatus(t('p2pBadCode') + ' ' + err.message, 'err'); }
+  };
+
+  $('#p2pJoinBtn').onclick = async () => {
+    try {
+      const code = await p2pJoin($('#p2pOfferIn').value);
+      $('#p2pReply').value = code;
+      show('#p2pReply', true); show('#p2pCopyReply', true);
+      p2pStatus(t('p2pWaiting'));
+    } catch (err) { p2pStatus(t('p2pBadCode') + ' ' + err.message, 'err'); }
+  };
+  $('#p2pCopyReply').onclick = async () => toast((await copy($('#p2pReply').value)) ? t('copied') : t('noCopy'));
+}
+
 /* ─────────────────────────────── debug hook ───────────────────────────────
    Handy from the console: __neurio.S.active, __neurio.S.queue, __neurio.say(…) */
 window.__neurio = { S, send, say: (text) => sendMessage({ text }), version: 1 };
 
 /* ─────────────────────────────── boot ─────────────────────────────── */
-function boot() {
+async function boot() {
   wire();
   applyLang();
   buildPicker();
-  checkServer();
+  // decide the deployment mode before resuming a session: with no backend every
+  // tab must start as its own user (otherwise tab #2 would be a clone of tab #1)
+  const probe = await Promise.race([
+    checkServer(),
+    new Promise((r) => setTimeout(() => r(undefined), 2500)),
+  ]);
+  const hasServer = probe === true;
   setInterval(checkServer, 20000);
 
   // returning user? (session first so several tabs = several users)
   let saved = null;
   try { saved = JSON.parse(sessionStorage.getItem('nurio.me.session') || 'null'); } catch { }
-  if (!saved) { try { saved = JSON.parse(localStorage.getItem(ME_KEY) || 'null'); } catch { } }
+  if (!saved && hasServer && !wantOffline) { try { saved = JSON.parse(localStorage.getItem(ME_KEY) || 'null'); } catch { } }
+  if (!hasServer) $('#staticNote').classList.remove('hidden');
   if (saved?.name) {
     draft = { name: saved.name, emoji: saved.emoji || '🙂', color: saved.color || COLORS[3] };
     startChat(saved);
