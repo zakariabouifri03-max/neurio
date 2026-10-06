@@ -1,5 +1,5 @@
 <resources>
-    <style name="NeurioTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+    <style name="NeurioTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:colorAccent">#9B8AFF</item>
         <item name="android:statusBarColor">#0B0D19</item>
