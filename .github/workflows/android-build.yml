@@ -104,7 +104,8 @@ jobs:
           gh release view apk-latest >/dev/null 2>&1 \
             || gh release create apk-latest --title "LAN Game Stream - latest APK" \
                  --notes "$NOTES" --target "$GITHUB_SHA"
-          # --latest makes the short link https://github.com/OWNER/REPO/releases/latest
-          # point straight at the current APK.
-          gh release edit apk-latest --notes "$NOTES" --latest
+          # --prerelease=false --latest makes the short link
+          # https://github.com/OWNER/REPO/releases/latest point straight at the APK.
+          # (the API rejects make_latest=true while a release is flagged pre-release)
+          gh release edit apk-latest --notes "$NOTES" --prerelease=false --latest
           gh release upload apk-latest artifacts/*.apk --clobber
