@@ -1,0 +1,61 @@
+#!/usr/bin/env sh
+#
+# Neurio — Gradle bootstrap (POSIX).
+#
+# The real Gradle wrapper JAR is a binary and is deliberately NOT committed to
+# this repository. This script does the same job: it downloads the pinned Gradle
+# distribution once (into ~/.gradle/wrapper/dists), verifies its SHA-256 and
+# then delegates every argument to it.
+#
+#   ./gradlew :app:assembleDebug          # build the APK
+#   ./gradlew wrapper --gradle-version 8.9   # optional: materialise a real
+#                                            # gradle/wrapper/gradle-wrapper.jar
+#                                            # if Android Studio asks for one
+#
+# Requirements: JDK 17 (Android Studio ships one) and curl or wget.
+set -eu
+
+APP_HOME=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+GRADLE_VERSION=8.9
+GRADLE_SHA256=d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab
+
+GRADLE_USER_HOME=${GRADLE_USER_HOME:-"${HOME}/.gradle"}
+DIST_HOME="$GRADLE_USER_HOME/wrapper/dists/gradle-${GRADLE_VERSION}-bin/neurio"
+DIST_DIR="$DIST_HOME/gradle-${GRADLE_VERSION}"
+
+if [ ! -x "$DIST_DIR/bin/gradle" ]; then
+  mkdir -p "$DIST_HOME"
+  ZIP="$DIST_HOME/gradle-${GRADLE_VERSION}-bin.zip"
+  if [ ! -f "$ZIP" ]; then
+    URL="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
+    if command -v curl >/dev/null 2>&1; then
+      curl -fL --retry 2 "$URL" -o "$ZIP"
+    elif command -v wget >/dev/null 2>&1; then
+      wget -q "$URL" -O "$ZIP"
+    else
+      echo "Install curl or wget (or Gradle ${GRADLE_VERSION}) to bootstrap this project." >&2
+      exit 1
+    fi
+  fi
+  if command -v sha256sum >/dev/null 2>&1; then
+    ACTUAL_SHA256=$(sha256sum "$ZIP" | awk '{print $1}')
+  elif command -v shasum >/dev/null 2>&1; then
+    ACTUAL_SHA256=$(shasum -a 256 "$ZIP" | awk '{print $1}')
+  else
+    echo "sha256sum or shasum is required to verify the Gradle distribution." >&2
+    exit 1
+  fi
+  if [ "$ACTUAL_SHA256" != "$GRADLE_SHA256" ]; then
+    echo "Gradle distribution checksum mismatch; refusing to run it." >&2
+    rm -f "$ZIP"
+    exit 1
+  fi
+  if ! command -v unzip >/dev/null 2>&1; then
+    echo "unzip is required to unpack Gradle ${GRADLE_VERSION}." >&2
+    exit 1
+  fi
+  unzip -q -o "$ZIP" -d "$DIST_HOME"
+fi
+
+exec "$DIST_DIR/bin/gradle" -p "$APP_HOME" "$@"
