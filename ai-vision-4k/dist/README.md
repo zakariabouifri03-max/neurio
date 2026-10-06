@@ -28,9 +28,11 @@ it is running. Both are optional and the app degrades instead of insisting.
 
 ## What is verified, and what is not
 
-Checked in CI on every build: the native core suite (16k+ assertions), the Kotlin static checks,
-the CMake host build, the SPIR-V push-constant mirrors, the calibration models, and that both
-APKs assemble.
+Checked in CI on every build: the native core suite (21 867 assertions), the Kotlin static checks,
+the JNI binding check (every external function against the native table, name by name), the CMake
+host build, the compile of every native source with the Vulkan backend enabled — including the
+demo renderer and its JNI bridge, which no other configuration would compile — the SPIR-V
+push-constant mirrors, the calibration models, and that both APKs assemble.
 
 Checked here, on the built files themselves: zip integrity, the ELF/ABI of each `libaivision4k.so`,
 the JNI entry points and embedded shader table inside the `.so`, the merged manifest (components,
@@ -45,8 +47,12 @@ matters instead of showing a number it did not measure. Two specific consequence
 * The neural stage needs a `.v4kmodel`. What ships are two **calibration** models (linear graphs
   that must reproduce bilinear/bicubic upscaling exactly); they are a pipeline check, not a
   quality model, and the AI Engine screen labels them that way. No trained model ships.
-* The Vulkan demo scene is **not** in this build: its native host (`cpp/demo`) does not exist yet,
-  and the manifest documents that rather than declaring an activity that cannot render.
+* The Vulkan demo scene **is** in this build (dashboard → "Open the demo scene"), and this is its
+  first build: a rendered scene with terrain, buildings, moving objects, a GPU particle system and
+  shadows, a live Native ↔ AI-upscaling switch, a split view with a magnifier, and an A/B
+  benchmark. It has been built and statically verified, but no frame of it has ever been drawn on
+  a real GPU. Treat your first run as the test, and read the panel: it reports what it measured
+  and says "unavailable" for what it could not.
 
 ## Rebuilding
 
@@ -54,7 +60,14 @@ matters instead of showing a number it did not measure. Two specific consequence
 # The host checks first (seconds, no Android SDK):
 tools/run-native-tests.sh
 tools/checks/kotlin-imports.py
+tools/checks/jni-bindings.py
 tools/model/generate-calibration-models.sh --check
+
+# Everything at once, including the Vulkan/JNI/demo syntax check (needs the
+# Vulkan headers and a JDK's jni.h + jni_md.h):
+V4K_VULKAN_INCLUDE=/path/to/Vulkan-Headers/include \
+V4K_JNI_INCLUDE=/path/to/jdk/include:/path/to/jdk/include/linux \
+tools/verify.sh
 
 # Then the real build, with the Android SDK + NDK 27.3.13750724 installed:
 gradle :app:assembleDebug        #  or open the project in Android Studio
