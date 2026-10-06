@@ -34,6 +34,12 @@ In-game controls and command line switches are listed in the package `README.md`
 
 `dist/BUILD-INFO.json` records size, machine type, subsystem and SHA-256 of both binaries.
 
+**Download from GitHub** (branch `arena/ab4e89c3-neurio` of this repository):
+
+* game runtime: <https://github.com/zakariabouifri03-max/neurio/raw/arena/ab4e89c3-neurio/NovaForge/dist/NovaForge-SampleIsland-Windows-x64.zip>
+* editor: <https://github.com/zakariabouifri03-max/neurio/raw/arena/ab4e89c3-neurio/NovaForge/dist/NovaForge-Editor-Windows-x64.zip>
+* browsing the files: <https://github.com/zakariabouifri03-max/neurio/tree/arena/ab4e89c3-neurio/NovaForge/dist>
+
 ## 2. Build from source
 
 ```bash
