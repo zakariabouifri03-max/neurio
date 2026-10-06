@@ -82,6 +82,13 @@ bool GameRuntime::init(const RuntimeOptions& options, std::string* error) {
         return false;
     }
 
+    // Everything the runtime does is also written next to the game, so a
+    // problem on a player's machine is diagnosable without a debugger:
+    //   <game folder>/Logs/runtime.log
+    const std::string logDir = fs::join(startup_.projectDir, "Logs");
+    fs::createDirectories(logDir);
+    Log::get().setLogFile(fs::join(logDir, "runtime.log"));
+
     EngineConfig cfg;
     cfg.window.title = options_.title.empty() ? startup_.gameName : options_.title;
     cfg.window.width = options_.width;

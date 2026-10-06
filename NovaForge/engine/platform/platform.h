@@ -130,15 +130,8 @@ public:
     int lastFrameWidth() const { return lastW_; }
     int lastFrameHeight() const { return lastH_; }
 
-    // ---- OpenGL (NF_ENABLE_GL) --------------------------------------
-    virtual bool hasGL() const { return false; }
-    // Create the platform GL context (returns false when unavailable, in which
-    // case the engine falls back to the software rasterizer).
-    virtual bool createGLContext() { return false; }
-    virtual void* glGetProcAddress(const char* name) { (void)name; return nullptr; }
-    virtual void glMakeCurrent() {}
-    virtual void glSwapBuffers() {}
-    virtual void glDestroyContext() {}
+    // V1 has no GPU backend: the engine renders on the CPU and hands the
+    // finished RGBA8 frame to present(). See docs/RENDERING.md.
 
     // ---- cursor / clipboard -----------------------------------------
     virtual void setCursorCaptured(bool captured) { cursorCaptured_ = captured; }

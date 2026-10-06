@@ -150,7 +150,9 @@ Window* createOffscreenWindow(const WindowDesc& d) { return new OffscreenWindow(
 
 // ------------------------------------------------------------- OS services
 // In headless mode these degrade to no-ops with a log entry, so that the same
-// code paths run in tests.
+// code paths run in tests. On Windows the real Win32 dialogs live in
+// platform_win32.cpp and take over, so they are excluded here.
+#if !defined(NF_PLATFORM_WINDOWS)
 std::string openFileDialog(const std::string& title,
                            const std::vector<std::pair<std::string, std::string>>& filters,
                            const std::string& defaultDir) {
@@ -167,5 +169,6 @@ std::string saveFileDialog(const std::string& title, const std::string& defaultN
 void showMessageBox(const std::string& title, const std::string& message, bool error) {
     NF_LOG_INFO("Platform", "[message box] %s: %s", title.c_str(), message.c_str());
 }
+#endif  // !NF_PLATFORM_WINDOWS
 
 }  // namespace nf

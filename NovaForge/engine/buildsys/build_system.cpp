@@ -266,6 +266,47 @@ BuildResult BuildSystem::build(const Project& project, const BuildOptions& optio
     }
     ++step;
 
+    // 5b. README.txt - controls and how to run, shipped with the game
+    if (options.includeReadme) {
+        report(step, totalSteps, "Writing README.txt", "README.txt", 0.0f);
+        std::string readme;
+        readme += gameName + " - a NovaForge Engine game\n";
+        readme += std::string(gameName.size() + 30, '=') + "\n\n";
+        readme += "How to play\n";
+        readme += "-----------\n";
+        readme += "  Double click " + exeName + " (Windows 10 or newer, 64 bit).\n";
+        readme += "  No installer and no editor are needed: the executable loads\n";
+        readme += "  game.json and the Assets folder that sit next to it.\n\n";
+        readme += "Controls\n";
+        readme += "--------\n";
+        readme += "  W A S D ........ move        Shift ......... run\n";
+        readme += "  Space .......... jump        Mouse ......... look around\n";
+        readme += "  Left click ..... attack      E ............. interact\n";
+        readme += "  Esc or P ....... pause       F1 ............ performance stats\n";
+        readme += "  F2 ............. screenshot  R ............. respawn after dying\n\n";
+        readme += "Command line\n";
+        readme += "------------\n";
+        readme += "  " + exeName + " --help                 usage\n";
+        readme += "  " + exeName + " --width 1920 --height 1080\n";
+        readme += "  " + exeName + " --headless --seconds 5 --screenshot shot.png\n";
+        readme += "      (runs without a window - useful to check the game on a machine\n";
+        readme += "       with no display, and it writes Logs/runtime.log the same way)\n\n";
+        readme += "Files\n";
+        readme += "-----\n";
+        readme += "  " + exeName + "        the game (NovaForge runtime + this project)\n";
+        readme += "  game.json          start scene, window size, quality\n";
+        readme += "  Assets/            scenes, materials and Lua scripts\n";
+        readme += "  Project/           the editable project (open it in the editor)\n";
+        readme += "  Logs/              runtime.log, written when the game runs\n";
+        readme += "  BUILD_INFO.txt     exactly what was exported and when\n\n";
+        readme += "Rendering in this build: NovaForge CPU software rasterizer\n";
+        readme += "(no GPU required; see docs/RENDERING.md in the source tree).\n";
+        std::string target = fs::join(outDir, "README.txt");
+        if (!fs::writeText(target, readme)) return fail("cannot write README.txt");
+        result.copiedFiles.push_back("README.txt");
+        result.totalBytes += fs::fileSize(target);
+    }
+
     // 6. optional zip
     if (options.createZip) {
         report(step, totalSteps, "Creating the .zip archive", gameName + ".zip", 0.5f);

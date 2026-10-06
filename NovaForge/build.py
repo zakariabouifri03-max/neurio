@@ -276,6 +276,16 @@ def targets(zig):
         linux_flags,
         linux_link,
     )
+    t["export"] = Target(
+        "export",
+        CORE_SRC + SCENE_SRC + ASSETS_SRC + RENDER_SRC + PHYSICS_SRC + AI_SRC + SCRIPT_SRC
+        + AUDIO_SRC + PROJECT_SRC + BUILDSYS_SRC + PLATFORM_COMMON + PLATFORM_OFF
+        + BULLET_SRC + LUA_SRC + MINIZ_SRC + ["tools/export_game.cpp"],
+        common_linux,
+        BUILD / "tools" / "export_game",
+        linux_flags,
+        linux_link,
+    )
     t["sample"] = Target(
         "sample",
         CORE_SRC + SCENE_SRC + ASSETS_SRC + RENDER_SRC + PHYSICS_SRC + AI_SRC
@@ -303,7 +313,7 @@ def targets(zig):
                 "-static-libstdc++", "-static-libgcc", "-Wl,--gc-sections"]
     t["windows-runtime"] = Target(
         "windows-runtime",
-        ENGINE_COMMON + RUNTIME_SRC + PLATFORM_COMMON + PLATFORM_WIN
+        ENGINE_COMMON + RUNTIME_SRC + PLATFORM_COMMON + PLATFORM_WIN + PLATFORM_OFF
         + BULLET_SRC + LUA_SRC + MINIZ_SRC,
         win_common + ["_WIN32_WINNT=0x0601"],
         BUILD / "windows" / "NovaForgeRuntime.exe",
@@ -313,7 +323,7 @@ def targets(zig):
     t["windows-editor"] = Target(
         "windows-editor",
         ENGINE_COMMON + EDITOR_SRC + IMGUI_SRC + PLATFORM_COMMON
-        + PLATFORM_WIN + BULLET_SRC + LUA_SRC + MINIZ_SRC,
+        + PLATFORM_WIN + PLATFORM_OFF + BULLET_SRC + LUA_SRC + MINIZ_SRC,
         win_common + ["_WIN32_WINNT=0x0601"],
         BUILD / "windows" / "NovaForge.exe",
         win_flags,

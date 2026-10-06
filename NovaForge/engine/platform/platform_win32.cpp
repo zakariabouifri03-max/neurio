@@ -105,7 +105,6 @@ public:
             closed_ = true;
             return;
         }
-        stats_.cbSize = sizeof(stats_);
         QueryPerformanceFrequency(&freq_);
         QueryPerformanceCounter(&t0_);
         ShowWindow(hwnd_, SW_SHOW);
@@ -115,7 +114,6 @@ public:
     }
 
     ~Win32Window() override {
-        glDestroyContext();
         freeDib();
         if (hwnd_) DestroyWindow(hwnd_);
     }
@@ -177,75 +175,6 @@ public:
     }
 
     // ---- OpenGL ------------------------------------------------------
-    bool hasGL() const override { return glrc_ != nullptr; }
-
-    bool createGLContext() override {
-        if (glrc_ || !hwnd_) return glrc_ != nullptr;
-        hdc_ = GetDC(hwnd_);
-        PIXELFORMATDESCRIPTOR pfd = {};
-        pfd.nSize = sizeof(pfd);
-        pfd.nVersion = 1;
-        pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-        pfd.iPixelType = PFD_TYPE_RGBA;
-        pfd.cColorBits = 32;
-        pfd.cDepthBits = 24;
-        pfd.cStencilBits = 8;
-        int pf = ChoosePixelFormat(hdc_, &pfd);
-        if (!pf) {
-            NF_LOG_ERROR("Platform", "ChoosePixelFormat failed - no OpenGL support");
-            return false;
-        }
-        SetPixelFormat(hdc_, pf, &pfd);
-        HGLRC tmp = wglCreateContext(hdc_);
-        if (!tmp) {
-            NF_LOG_ERROR("Platform", "wglCreateContext failed");
-            return false;
-        }
-        wglMakeCurrent(hdc_, tmp);
-        // Ask for a 3.3 core context (falls back to the compatibility one).
-        typedef HGLRC(WINAPI * PFNWGLCREATECONTEXTATTRIBSARB)(HDC, HGLRC, const int*);
-        auto createCtx = (PFNWGLCREATECONTEXTATTRIBSARB)wglGetProcAddress(
-            "wglCreateContextAttribsARB");
-        if (createCtx) {
-            const int attribs[] = {0x2091 /*MAJOR*/, 3, 0x2092 /*MINOR*/, 3,
-                                   0x9126 /*PROFILE_MASK*/, 0x0001 /*CORE*/, 0};
-            HGLRC core = createCtx(hdc_, nullptr, attribs);
-            if (core) {
-                wglMakeCurrent(nullptr, nullptr);
-                wglDeleteContext(tmp);
-                glrc_ = core;
-                wglMakeCurrent(hdc_, glrc_);
-                NF_LOG_INFO("Platform", "OpenGL 3.3 core context created");
-            } else {
-                glrc_ = tmp;
-                NF_LOG_WARN("Platform", "OpenGL 3.3 core unavailable, using compatibility context");
-            }
-        } else {
-            glrc_ = tmp;
-            NF_LOG_WARN("Platform", "wglCreateContextAttribsARB missing, using legacy context");
-        }
-        return true;
-    }
-
-    void* glGetProcAddress(const char* name) override {
-        void* p = (void*)wglGetProcAddress(name);
-        if (!p || p == (void*)1 || p == (void*)2 || p == (void*)3 || p == (void*)-1) {
-            static HMODULE gl = LoadLibraryA("opengl32.dll");
-            if (gl) p = (void*)GetProcAddress(gl, name);
-        }
-        return p;
-    }
-    void glMakeCurrent() override { if (glrc_) wglMakeCurrent(hdc_, glrc_); }
-    void glSwapBuffers() override { if (hdc_) SwapBuffers(hdc_); }
-    void glDestroyContext() override {
-        if (glrc_) {
-            wglMakeCurrent(nullptr, nullptr);
-            wglDeleteContext(glrc_);
-            glrc_ = nullptr;
-        }
-        if (hdc_ && hwnd_) { ReleaseDC(hwnd_, hdc_); hdc_ = nullptr; }
-    }
-
     void setTitleOS(const std::string& t) override {
         if (hwnd_) SetWindowTextW(hwnd_, std::wstring(t.begin(), t.end()).c_str());
     }
@@ -472,8 +401,6 @@ private:
 
     WindowDesc desc_;
     HWND hwnd_ = nullptr;
-    HDC hdc_ = nullptr;
-    HGLRC glrc_ = nullptr;
     HBITMAP dibBmp_ = nullptr;
     uint8_t* dibBits_ = nullptr;
     BITMAPINFO dibInfo_ = {};
