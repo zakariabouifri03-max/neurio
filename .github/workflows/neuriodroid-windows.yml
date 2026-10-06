@@ -1,0 +1,30 @@
+name: Build NeurioDroid Windows
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'neuriodroid/**'
+      - '.github/workflows/neuriodroid-windows.yml'
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: neuriodroid
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: neuriodroid/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Build Windows installer and portable exe
+        run: npm run dist
+      - name: Upload NeurioDroid artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: NeurioDroid-Windows
+          path: neuriodroid/dist/*
+          if-no-files-found: error
