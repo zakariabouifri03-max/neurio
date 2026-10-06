@@ -49,7 +49,7 @@ data class ControlSpec(
  */
 data class PadLayout(val controls: Map<String, ControlSpec>) {
 
-    fun get(id: String): ControlSpec? = controls[id]?.takeIf { it.enabled }
+    operator fun get(id: String): ControlSpec? = controls[id]?.takeIf { it.enabled }
 
     fun with(id: String, spec: ControlSpec): PadLayout =
         copy(controls = controls + (id to spec))

@@ -27,7 +27,7 @@ enum class FpsMode(val label: String, val fps: Int) {
 }
 
 enum class BitratePreset(val label: String) {
-    LOW, MEDIUM, HIGH, CUSTOM;
+    LOW("Low"), MEDIUM("Medium"), HIGH("High"), CUSTOM("Custom");
 
     /** Bits per pixel per frame. Values tuned for low-latency game content. */
     val bitsPerPixel: Float
