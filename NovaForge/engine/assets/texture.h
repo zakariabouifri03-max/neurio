@@ -57,7 +57,10 @@ public:
 
     void setProjectRoot(const std::string& root);
     const std::string& projectRoot() const { return projectRoot_; }
-    size_t loadedCount() const { return cache_.size(); }
+    size_t loadedCount() const {
+        std::lock_guard<std::mutex> lk(mutex_);
+        return cache_.size();
+    }
     size_t memoryUsageBytes() const;
     void clear();
     void logStats();
@@ -66,7 +69,7 @@ private:
     TextureCache() = default;
     std::unordered_map<std::string, std::shared_ptr<Texture>> cache_;
     std::string projectRoot_;
-    std::mutex mutex_;
+    mutable std::mutex mutex_;    // guards cache_/projectRoot_ (and const queries)
 };
 
 }  // namespace nf

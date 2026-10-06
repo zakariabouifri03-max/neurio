@@ -226,10 +226,16 @@ std::vector<DirEntry> listDirectoryExt(const std::string& p,
                                        bool recursive) {
     auto all = listDirectory(p, recursive);
     std::vector<DirEntry> out;
+    // Accept both "json" and ".json" - extension() never returns the dot, and
+    // callers (scene lists, importers, the asset browser) use both spellings.
+    std::vector<std::string> wanted;
+    wanted.reserve(extensions.size());
+    for (const std::string& e : extensions)
+        wanted.push_back(!e.empty() && e[0] == '.' ? e.substr(1) : e);
     for (auto& e : all) {
         if (e.directory) continue;
         std::string ext = extension(e.name);
-        if (std::find(extensions.begin(), extensions.end(), ext) != extensions.end())
+        if (std::find(wanted.begin(), wanted.end(), ext) != wanted.end())
             out.push_back(e);
     }
     return out;

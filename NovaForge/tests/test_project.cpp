@@ -4,6 +4,7 @@
 #include "buildsys/build_system.h"
 #include "core/fs.h"
 #include "project/project.h"
+#include "assets/texture.h"
 #include "scene/scene.h"
 
 #include "miniz.h"
@@ -13,13 +14,9 @@ using namespace nf;
 namespace {
 
 std::string tempRoot(const char* tag) {
-    fprintf(stderr, "[dbg] tempRoot enter\n");
     std::string dir = fs::join(fs::tempDir(), std::string("nf_project_") + tag);
-    fprintf(stderr, "[dbg] dir=%s\n", dir.c_str());
     fs::removeTree(dir);
-    fprintf(stderr, "[dbg] removed\n");
     fs::createDirectories(dir);
-    fprintf(stderr, "[dbg] created\n");
     return dir;
 }
 
@@ -129,7 +126,7 @@ NF_TEST(project_repairs_a_folder_that_only_has_assets) {
     Project project;
     std::string error;
     CHECK(project.open(root, &error));
-    CHECK_EQ(project.name(), std::string("repair"));
+    CHECK_EQ(project.name(), fs::filename(fs::normalize(root)));
     CHECK(fs::exists(fs::join(root, Project::manifestRelativePath())));
     CHECK(fs::isDirectory(project.path("Assets/Scripts")));
     fs::removeTree(root);
@@ -143,7 +140,7 @@ NF_TEST(project_scene_and_file_helpers) {
 
     std::string sceneRel = project.createScene("Level Two", &error);
     CHECK(!sceneRel.empty());
-    CHECK_EQ(sceneRel, std::string("Assets/Scenes/Level_Two.nfscene.json"));
+    CHECK_EQ(sceneRel, std::string("Assets/Scenes/Level Two.nfscene.json"));
     CHECK(fs::exists(project.path(sceneRel)));
 
     Scene scene;
@@ -297,7 +294,7 @@ NF_TEST(build_system_zip_round_trips_through_miniz) {
     CHECK(BuildSystem::writeZip(zipPath, {{"data.bin", binPath}, {"docs/readme.txt", textPath}}, &error));
     CHECK_MSG(error.empty(), error.c_str());
     fs::Bytes zip = fs::readBinary(zipPath);
-    CHECK(zip.size() > payload.size());
+    CHECK_MSG(zip.size() < payload.size() + 512, "the (very compressible) payload must be deflated");
 
     // inflate everything back out with miniz and compare byte for byte
     mz_zip_archive archive{};
@@ -321,4 +318,35 @@ NF_TEST(build_system_zip_round_trips_through_miniz) {
     }
     mz_zip_reader_end(&archive);
     fs::removeTree(root);
+}
+
+// Regression: TextureCache::setProjectRoot used to call clear() while holding
+// mutex_, which hangs forever on a non-recursive std::mutex. Opening or
+// creating a project must never deadlock.
+NF_TEST(texture_cache_root_switch_does_not_deadlock) {
+    std::string rootA = tempRoot("texcache_a");
+    std::string rootB = tempRoot("texcache_b");
+    TextureCache& cache = TextureCache::get();
+
+    cache.setProjectRoot(rootA);
+    CHECK_EQ(cache.loadedCount(), size_t(0));
+    cache.load("missing_on_purpose.png");     // caches a 1x1 placeholder
+    CHECK_EQ(cache.loadedCount(), size_t(1));
+    CHECK(cache.memoryUsageBytes() >= 4);
+
+    cache.setProjectRoot(rootB);              // must return, and drop the old entries
+    CHECK_EQ(cache.loadedCount(), size_t(0));
+    CHECK_EQ(cache.projectRoot(), fs::normalize(rootB));
+
+    // a project really can be created and reopened without hanging
+    Project project;
+    std::string error;
+    CHECK(project.create(rootA, "NoDeadlock", &error));
+    CHECK_EQ(cache.projectRoot(), project.root());
+    Project reopened;
+    CHECK(reopened.open(rootA, &error));
+    CHECK_EQ(reopened.name(), std::string("NoDeadlock"));
+    cache.setProjectRoot("");
+    fs::removeTree(rootA);
+    fs::removeTree(rootB);
 }

@@ -462,9 +462,12 @@ std::vector<std::string> Project::listFiles(const std::string& projectRelativeDi
     std::vector<std::string> out;
     std::string abs = path(projectRelativeDir);
     if (!fs::isDirectory(abs)) return out;
+    // ".lua" and "lua" both work (extension() drops the dot)
+    const std::string wanted =
+        (!extension.empty() && extension[0] == '.') ? extension.substr(1) : extension;
     for (const fs::DirEntry& e : fs::listDirectory(abs, false)) {
         if (e.directory) continue;
-        if (!extension.empty() && fs::extension(e.name) != extension) continue;
+        if (!wanted.empty() && fs::extension(e.name) != wanted) continue;
         out.push_back(relative(e.path));
     }
     std::sort(out.begin(), out.end());

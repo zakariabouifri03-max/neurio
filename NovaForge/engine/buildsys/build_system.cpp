@@ -10,6 +10,7 @@
 #include <ctime>
 
 #include "miniz.h"
+#include "miniz_tdef.h"
 
 namespace nf {
 
@@ -337,13 +338,15 @@ bool BuildSystem::writeZip(const std::string& zipPath,
         entry.size = (uint32_t)data.size();
         entry.offset = (uint32_t)zip.size();
 
-        // deflate with miniz's tdefl; fall back to "stored" when it does not help
-        size_t bound = mz_compressBound((mz_ulong)data.size());
-        std::vector<uint8_t> compressed(bound);
-        mz_ulong compressedSize = (mz_ulong)bound;
-        int status = mz_compress2(compressed.data(), &compressedSize, data.data(),
-                                  (mz_ulong)data.size(), MZ_BEST_COMPRESSION);
-        bool useDeflate = status == MZ_OK && compressedSize < data.size();
+        // Deflate with tdefl (RAW deflate - a ZIP entry must not carry the
+        // 2-byte zlib header mz_compress2 adds). Fall back to "stored" when
+        // compressing does not actually help.
+        entry.method = 0;
+        std::vector<uint8_t> compressed(mz_compressBound((mz_ulong)data.size()) + 64);
+        size_t compressedSize = data.empty() ? 0 : tdefl_compress_mem_to_mem(
+            compressed.data(), compressed.size(), data.data(), data.size(),
+            TDEFL_DEFAULT_MAX_PROBES);
+        bool useDeflate = compressedSize > 0 && compressedSize < data.size();
         entry.method = useDeflate ? 8 : 0;
         const uint8_t* payload = useDeflate ? compressed.data() : data.data();
         uint32_t payloadSize = useDeflate ? (uint32_t)compressedSize : (uint32_t)data.size();

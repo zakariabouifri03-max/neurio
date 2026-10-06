@@ -76,9 +76,12 @@ TextureCache& TextureCache::get() {
 }
 
 void TextureCache::setProjectRoot(const std::string& root) {
+    // NOTE: clear() takes mutex_ itself, so it must NOT be called while the
+    // lock is held - that self-deadlocks on a non-recursive std::mutex and
+    // hangs the editor while opening a project.
     std::lock_guard<std::mutex> lk(mutex_);
     if (projectRoot_ != root) {
-        clear();
+        cache_.clear();
         projectRoot_ = root;
     }
 }
@@ -139,6 +142,7 @@ void TextureCache::clear() {
 }
 
 size_t TextureCache::memoryUsageBytes() const {
+    std::lock_guard<std::mutex> lk(mutex_);
     size_t total = 0;
     for (auto& kv : cache_)
         if (kv.second) total += kv.second->pixels.size();
