@@ -25,7 +25,8 @@
     <string name="waiting_for_client">Waiting for a client to pair…</string>
     <string name="connected_client">Connected client</string>
     <string name="pairing_code">Pairing code</string>
-    <string name="pairing_code_hint">The client must type this 6-digit code to join.</string>    <string name="capture_permission_needed">Screen capture permission is required to stream.</string>
+    <string name="pairing_code_hint">The client must type this 6-digit code to join.</string>
+    <string name="capture_permission_needed">Screen capture permission is required to stream.</string>
 
     <!-- Client mode -->
     <string name="available_hosts">Available hosts</string>
@@ -87,4 +88,165 @@
     <string name="warn_no_injection">No input adapter is active. Video works, but the game will only receive input if you enable the LAN Game accessibility service or run on a rooted device.</string>
     <string name="warn_no_audio">Internal audio capture was refused by this app/game. Video continues without sound.</string>
     <string name="warn_anticheat">Some online games block injected touch input (anti-cheat). Streaming may still show video, but input may be ignored.</string>
+
+    <!-- ============ Added by the full UI pass ============ -->
+
+    <!-- Generic -->
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="retry">Retry</string>
+    <string name="refresh">Refresh</string>
+    <string name="apply">Apply</string>
+    <string name="unknown">Unknown</string>
+    <string name="unknown_game">Game</string>
+    <string name="not_available">n/a</string>
+    <string name="status">Status</string>
+    <string name="device">Device</string>
+    <string name="package_name">Package</string>
+    <string name="fps">FPS</string>
+    <string name="ping">Ping</string>
+    <string name="quality">Quality</string>
+    <string name="latency">Latency</string>
+    <string name="sessions">Session</string>
+
+    <!-- Main menu extras -->
+    <string name="menu_footer">No cloud, no accounts, no game files. Wi-Fi only.</string>
+    <string name="menu_network_ok">Wi-Fi ready · %1$s</string>
+    <string name="menu_network_warn">Not on Wi-Fi — use a hotspot on the host phone.</string>
+
+    <!-- Host screen -->
+    <string name="host_section_library">Installed games</string>
+    <string name="host_section_stream">Stream</string>
+    <string name="host_section_input">Input</string>
+    <string name="host_selected_game">Selected game</string>
+    <string name="host_no_selection">Pick a game from the list below.</string>
+    <string name="host_start_stream">START STREAM</string>
+    <string name="host_stop_stream">STOP STREAM</string>
+    <string name="host_state_idle">Idle — nobody is connected.</string>
+    <string name="host_state_waiting">Waiting for a client…</string>
+    <string name="host_state_streaming">Streaming to %1$s</string>
+    <string name="host_state_error">Stream error: %1$s</string>
+    <string name="host_client_label">Client</string>
+    <string name="host_none_connected">none</string>
+    <string name="host_video_line">%1$s · %2$d×%3$d @ %4$d fps · %5$s</string>
+    <string name="host_input_ready">Input ready: %1$s</string>
+    <string name="host_input_missing">Input not available: %1$s</string>
+    <string name="host_audio_ok">Internal audio capture is available.</string>
+    <string name="host_audio_limited">This game/phone blocks internal audio capture — video only, or use the microphone fallback.</string>
+    <string name="host_regenerate_code">New code</string>
+    <string name="host_enable_accessibility">Enable remote input</string>
+    <string name="host_open_accessibility">Open accessibility settings</string>
+    <string name="host_thermal_line">Thermal: %1$s</string>
+    <string name="host_cpu_line">CPU: %1$d%%</string>
+    <string name="host_ports_line">Ports %1$s</string>
+    <string name="host_ip_line">This phone: %1$s</string>
+    <string name="host_start_instead">Start streaming anyway (input off)</string>
+    <string name="host_launch_failed">Could not launch %1$s</string>
+    <string name="host_launched">Launched %1$s — start the stream when the game is in front.</string>
+    <string name="host_search_hint">Search installed apps</string>
+    <string name="host_show_all_apps">Show all apps</string>
+    <string name="host_show_games_only">Games only</string>
+    <string name="host_warn_no_injection_short">Input adapter unavailable — see the note below.</string>
+
+    <!-- Input adapters -->
+    <string name="input_mode_disabled">Off (video only)</string>
+    <string name="input_mode_accessibility">Accessibility service (no root)</string>
+    <string name="input_mode_root">Rooted shell (su / input)</string>
+    <string name="input_mode_selftest">Self-test (this phone only)</string>
+    <string name="input_note_accessibility">Uses the system Accessibility gesture API: taps, swipes and long presses are replayed on this phone\'s screen. The service must be enabled by you, and games that reject injected touches will ignore it.</string>
+    <string name="input_note_root">Sends events through a root shell (`input tap/swipe/keyevent`). Higher latency than the accessibility path and only works on rooted devices; analogue sticks are not supported.</string>
+    <string name="input_note_disabled">Video and audio stream, but the game receives no input. Useful for spectating.</string>
+
+    <!-- Audio modes -->
+    <string name="audio_mode_playback">Internal game audio (AudioPlaybackCapture)</string>
+    <string name="audio_mode_mic">Microphone fallback</string>
+    <string name="audio_mode_none">No audio</string>
+    <string name="audio_note_playback">Captures the game\'s own audio output. Apps can set allowAudioPlaybackCapture=false, in which case the host falls back to the microphone.</string>
+
+    <!-- Client screen -->
+    <string name="client_section_hosts">Hosts on this Wi-Fi</string>
+    <string name="client_section_manual">Direct connection</string>
+    <string name="client_manual_hint">192.168.1.23</string>
+    <string name="client_pairing_hint">6-digit code</string>
+    <string name="client_connect">CONNECT</string>
+    <string name="client_connecting_to">Connecting to %1$s…</string>
+    <string name="client_scan_hint">Both phones must be on the same Wi-Fi network or hotspot.</string>
+    <string name="client_host_summary">%1$s · %2$s · %3$s</string>
+    <string name="client_never_installs">Nothing is downloaded to this phone — only video, audio and input travel.</string>
+    <string name="client_streaming">Streaming</string>
+    <string name="client_idle">Free</string>
+    <string name="client_ping_unknown">ping…</string>
+    <string name="client_connect_failed">Connection failed: %1$s</string>
+
+    <!-- Stream screen -->
+    <string name="stream_hud_stats">%1$.0f fps · %2$.1f Mbps · %3$.0f ms</string>
+    <string name="stream_hud_quality">%1$s · %2$d×%3$d</string>
+    <string name="stream_controls_shown">Controls shown</string>
+    <string name="stream_controls_hidden">Controls hidden — tap the screen to bring them back</string>
+    <string name="stream_switch_layout">Layout</string>
+    <string name="stream_layout_default">Default</string>
+    <string name="stream_layout_left">Left-handed</string>
+    <string name="stream_layout_minimal">Minimal</string>
+    <string name="stream_layout_racing">Racing</string>
+    <string name="stream_edit_hint">Drag to move controls · tap DONE when finished</string>
+    <string name="controller_edit_hint">EDIT MODE — drag the controls where the game needs them</string>
+    <string name="stream_reconnecting">Reconnecting…</string>
+    <string name="stream_ended">Stream ended</string>
+    <string name="stream_audio_muted">Audio unavailable on the host — video continues.</string>
+
+    <!-- Performance screen -->
+    <string name="perf_title">Performance</string>
+    <string name="perf_subtitle">Live numbers, straight from the encoders and the sockets.</string>
+    <string name="perf_nothing">Nothing is streaming right now — open Host or Join to see live numbers.</string>
+    <string name="perf_fps">Displayed FPS</string>
+    <string name="perf_encoder_fps">Encoder FPS</string>
+    <string name="perf_bitrate_now">Bitrate</string>
+    <string name="perf_rtt">Network RTT</string>
+    <string name="perf_jitter">Jitter</string>
+    <string name="perf_loss">Packet loss</string>
+    <string name="perf_encoder_latency">Encoder latency</string>
+    <string name="perf_decoder_latency">Decoder latency</string>
+    <string name="perf_glass">Estimated glass-to-glass</string>
+    <string name="perf_cpu">Host CPU</string>
+    <string name="perf_thermal">Thermal</string>
+    <string name="perf_dropped">Dropped frames</string>
+    <string name="perf_queue">Decoder queue</string>
+    <string name="perf_packets">Packets</string>
+    <string name="perf_retransmits">Retransmits / NACKs</string>
+    <string name="perf_session">Session</string>
+    <string name="perf_audio">Audio</string>
+    <string name="perf_input">Input</string>
+    <string name="perf_role_host">Host</string>
+    <string name="perf_role_client">Client</string>
+    <string name="perf_log_clear">Clear log</string>
+
+    <!-- Settings -->
+    <string name="settings_video">Video</string>
+    <string name="settings_audio">Audio</string>
+    <string name="settings_input">Input</string>
+    <string name="settings_about">About</string>
+    <string name="settings_codec_h264">H.264 (compatible)</string>
+    <string name="settings_codec_h265">H.265 (smaller)</string>
+    <string name="settings_adaptive_note">The host lowers resolution, then frame rate, then bitrate when the link degrades — and climbs back when it recovers.</string>
+    <string name="settings_audio_note">Audio is captured only while you stream and never leaves your Wi-Fi.</string>
+    <string name="settings_input_note">Remote input is opt-in. Without an adapter, the client still sees video and audio.</string>
+    <string name="settings_about_text">LAN Game streams a game running on one phone to another phone over local Wi-Fi. No cloud service is involved, nothing is exposed to the internet, and the client never receives game files or install packages — only video, audio and input events.</string>
+    <string name="settings_clear_layouts">Reset controller layout</string>
+    <string name="settings_saved">Saved</string>
+    <string name="settings_resolution_1080">1080p</string>
+    <string name="settings_resolution_720">720p</string>
+    <string name="settings_resolution_480">480p</string>
+
+    <!-- Permissions / prompts -->
+    <string name="perm_notifications">Allow notifications so the streaming service can keep running.</string>
+    <string name="perm_microphone">Microphone access is needed for the microphone audio fallback.</string>
+    <string name="perm_nearby_wifi">Allow nearby devices to discover and stream over Wi-Fi.</string>
+    <string name="accessibility_enable_hint">Still not working? Enable “LAN Game remote input” in Settings → Accessibility.</string>
+    <string name="host_mode_arrow">\u203A</string>
+    <string name="placeholder_code">------</string>
+    <string name="dash">\u2014</string>
+    <string name="state_error_short">ERROR</string>
+    <string name="smaller">− size</string>
+    <string name="bigger">+ size</string>
 </resources>

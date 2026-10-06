@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Deep gaming background: near-black blue with a cyan/violet glow towards the bottom. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:startColor="#FF070B14"
+        android:centerColor="#FF0B1220"
+        android:endColor="#FF131C33"
+        android:type="linear" />
+</shape>

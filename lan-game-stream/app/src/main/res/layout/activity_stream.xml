@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Fullscreen player. Layer order (bottom → top):
+    1. the decoded video surface
+    2. the virtual controller overlay
+    3. the heads-up display (top) and control bar (bottom), which fade away
+    4. modal overlays: pairing prompt, edit bar, messages
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <SurfaceView
+        android:id="@+id/stream_surface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.neurio.langame.client.VirtualController
+        android:id="@+id/stream_controller"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Top HUD -->
+    <LinearLayout
+        android:id="@+id/stream_hud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_margin="@dimen/space_s"
+        android:background="@drawable/bg_hud"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/space_s">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/stream_game"
+                style="@style/Text.Headline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/unknown_game" />
+
+            <TextView
+                android:id="@+id/stream_stats"
+                style="@style/Text.Mono"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/stream_quality"
+            style="@style/Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- Bottom control bar -->
+    <LinearLayout
+        android:id="@+id/stream_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="@dimen/space_m"
+        android:background="@drawable/bg_hud"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/space_xs">
+
+        <Button
+            android:id="@+id/stream_btn_controls"
+            style="@style/Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hide_controls" />
+
+        <Button
+            android:id="@+id/stream_btn_layout"
+            style="@style/Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:text="@string/stream_switch_layout" />
+
+        <Button
+            android:id="@+id/stream_btn_edit"
+            style="@style/Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:text="@string/edit_controls" />
+
+        <Button
+            android:id="@+id/stream_btn_perf"
+            style="@style/Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:text="@string/performance" />
+
+        <Button
+            android:id="@+id/stream_btn_disconnect"
+            style="@style/Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:text="@string/disconnect" />
+    </LinearLayout>
+
+    <!-- Edit-mode bar -->
+    <LinearLayout
+        android:id="@+id/stream_edit_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="@dimen/space_m"
+        android:background="@drawable/bg_hud"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/space_xs"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/stream_btn_smaller"
+            style="@style/Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/smaller" />
+
+        <Button
+            android:id="@+id/stream_btn_bigger"
+            style="@style/Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:text="@string/bigger" />
+
+        <Button
+            android:id="@+id/stream_btn_reset"
+            style="@style/Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:text="@string/reset_layout" />
+
+        <Button
+            android:id="@+id/stream_btn_edit_done"
+            style="@style/Chip.Selected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:text="@string/done" />
+    </LinearLayout>
+
+    <!-- Message / status overlay -->
+    <TextView
+        android:id="@+id/stream_message"
+        style="@style/Text.Headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_hud"
+        android:padding="@dimen/space_m"
+        android:text="@string/connecting"
+        android:visibility="gone" />
+
+    <!-- Audio warning (stays for a few seconds) -->
+    <TextView
+        android:id="@+id/stream_audio_note"
+        style="@style/Text.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="96dp"
+        android:background="@drawable/bg_hud"
+        android:padding="@dimen/space_s"
+        android:text="@string/stream_audio_muted"
+        android:visibility="gone" />
+
+    <!-- Tap hint when the controls are hidden -->
+    <TextView
+        android:id="@+id/stream_hint"
+        style="@style/Text.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="72dp"
+        android:background="@drawable/bg_hud"
+        android:padding="@dimen/space_s"
+        android:text="@string/stream_controls_hidden"
+        android:visibility="gone" />
+
+    <!-- Pairing prompt: shown when the host requires a code -->
+    <LinearLayout
+        android:id="@+id/stream_pairing_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/space_l"
+        android:background="@drawable/bg_card"
+        android:orientation="vertical"
+        android:padding="@dimen/card_padding"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/stream_pairing_title"
+            style="@style/Text.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/enter_pairing_code" />
+
+        <EditText
+            android:id="@+id/stream_pairing_code"
+            style="@style/Field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:hint="@string/client_pairing_hint"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="6" />
+
+        <TextView
+            android:id="@+id/stream_pairing_error"
+            style="@style/Text.Danger"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/stream_pairing_cancel"
+                style="@style/Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/disconnect" />
+
+            <Button
+                android:id="@+id/stream_pairing_connect"
+                style="@style/Button.Primary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_s"
+                android:layout_weight="1"
+                android:text="@string/connect" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
