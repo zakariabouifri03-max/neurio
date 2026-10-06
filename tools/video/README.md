@@ -59,7 +59,12 @@ ffmpeg -i video/bash-baqi-racing-60s.mp4 -vf "scale=720:1280:flags=lanczos" \
 ```
 
 `video/index.html` is a standalone player page (video + download buttons) — it works
-straight from GitHub Pages or any static server.
+straight from GitHub Pages or any static server.  To preview it locally with proper
+HTTP Range support (so the player can seek):
+
+```bash
+python3 tools/video/serve.py 8000 .      # then open http://localhost:8000/video/
+```
 
 ## Where to tweak things
 
