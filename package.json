@@ -1,0 +1,17 @@
+{
+  "name": "botola25",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Botola 25 — a full 3D football career game that runs in the browser and ships as a signed APK.",
+  "scripts": {
+    "start": "python3 -m http.server 8000 --bind 0.0.0.0",
+    "sim": "node tools/sim-test.mjs",
+    "check:ui": "node tools/check-ui.mjs",
+    "check:dom": "node tools/dom-test.mjs",
+    "check:apk": "node tools/verify-apk.mjs",
+    "test": "node tools/check.mjs",
+    "build": "node tools/build-singlefile.mjs && node tools/make-icons.mjs",
+    "apk": "node tools/build-apk.mjs && node tools/verify-apk.mjs"
+  }
+}

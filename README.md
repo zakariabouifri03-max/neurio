@@ -1,97 +1,142 @@
-# 🏁 Bash Baqi Racing
+# ⚽ Botola 25
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+**لعبة كورة كاملة من A لـ Z** — موسم كامل، انتقاللات، تدريب، و ماتشات 3D مباشرة.
+كتخدم فالمتصفح، و كتخرج كـ **APK حقيقي موقّع** كيت ركّب على التليفون.
 
-**▶ Play:** serve the folder with any static server and open it:
+A complete football career game in the browser — 3D matches, a league season,
+transfers, training — packaged as a real signed Android APK. **No engine, no
+image files, no CDN, no Android SDK, no Java, no Gradle.**
+
+---
+
+## 📱 الـ APK — كيفاش تركّبو
+
+الـ APK جاهز فالـ repo: **`Botola25.apk`** (~350 KB)
+
+1. صيفط `Botola25.apk` للتليفون (ولا حمّلو من GitHub)
+2. حلّو → غادي يطلب منك السماح بالتثبيت من مصدر غير معروف → وافق
+3. الأيقونة كتبان فالشاشة الرئيسية و اللعبة كتخدم **offline 100%**
+
+> ⚠️ **علاش هاد الـ APK موقّع غير بـ v1؟**
+> الـ APK اللي كان ف المستودع قبل (`BashBaqiRacing.apk`) كان فيه **APK Signature
+> Scheme v2 مكسور**. Android منين كيلقا v2 block وماشي صالح **كيرفض التثبيت
+> نهائياً** و ما كيرجعش لـ v1 — هادشي على الأغلب هو السبب علاش ما تركّبش.
+>
+> tools/verify-apk.mjs كيقيس هادشي بالدقة، و الحل: **v1 (JAR) فقط +
+> `targetSdkVersion=29`**، اللي كيتقبل ف كل Android من 5.0 لفوق.
+
+### تبني الـ APK من الصفر
+
+```bash
+node tools/build-apk.mjs     # يبني
+node tools/verify-apk.mjs    # يثبت بلي صالح (40 فحص)
+# ولا بجوج:
+npm run apk
+```
+
+البناء كيدير كلشي بيديه:
+- **AndroidManifest.xml** → binary AXML مكتوب من الصفر (`tools/apk/axml.mjs`)
+- **resources.arsc** → جدول الموارد، غير اسم الباكدج كيتبدّل
+- **classes.dex** → WebView shell مبني بـ D8، السمية ديال الـ class كتبدّل و
+  الـ adler32 + SHA-1 ديال الـ header كيتحسبو من جديد
+- **الأيقونات** → مرسومة بيكسل بيكسل و مكتوبة كـ PNG (`tools/make-icons.mjs`)
+- **التوقيع** → v1 JAR signing بـ openssl (مفتاح + شهادة + PKCS#7)
+
+---
+
+## 🎮 اللعبة
+
+| | |
+|---|---|
+| **الموسم** | بطولة بـ 12 نادي مغربي، double round-robin (22 جولة)، ترتيب، هدّافين، و كاس |
+| **الماتش** | 11 ضد 11، 3D، شوطين، رميات تماس / كورنر / ركلات مرمى، حارس كيغطس |
+| **التحكم** | joystick + أزرار (باس، تسديد مع شحن، سبرينت، تاكل، تبديل لاعب) |
+| **الانتقالات** | سوق فيه 8 لاعبين، شراء، بيع (المدرسة كتعويض)، تجديد السوق |
+| **التدريب** | طلع السرعة / التسديد / الباس / الدفاع بالفلوس |
+| **الحفظ** | أوتوماتيكي ف localStorage |
+| **أوفلاين** | PWA + service worker، ولا الـ APK اللي فيه كلشي مدمج |
+
+الأندية: Atlas Fès · Olive Meknès · Casa United · Rabat Olympique · Marrakech
+Stars · Tanger Port · Agadir Waves · Oujda East · Tétouan North · Safi Ocean ·
+Laâyoune Sands · Kénitra Rail — كل واحد بألوانو و مستوى ديالو.
+
+### التحكم
+
+| الفعل | الكلافيي | التليفون |
+|---|---|---|
+| التحرك | `W A S D` / الأسهم | joystick |
+| تسديد | `SPACE` (شدّو باش تشحن) | 👟 |
+| باس | `E` | ➤ |
+| سبرينت | `SHIFT` | ⚡ |
+| تاكل | `F` | 🦵 |
+| بدّل لاعب | `Q` | 🔁 |
+| وقف | `ESC` / `P` | II |
+
+---
+
+## 🖥️ خدم بيه فالمتصفح
 
 ```bash
 python3 -m http.server 8000
 # → http://localhost:8000
 ```
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+بلا build step. `index.html` كيجيب الـ modules من `src/` و Three.js من `vendor/`.
 
 ---
 
-## 📱 Install on your phone — كأنها APK!
+## 🧱 البنية
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
+```
+src/
+  engine.js    المحرّك: فيزياء الكرة، حركة اللاعبين، AI، القوانين، الحارس
+               → pure JS، بلا DOM ولا Three.js (كايتختبر headless)
+  render.js    Three.js: الملعب، اللاعبين، الكرة، كاميرا التلفزة
+  tex.js       كل النسيج مرسوم ف canvas (عشب، خطوط، جمهور، إشهار، شبكة)
+  data.js      الأندية، التشكيلة، توليد اللاعبين، البطولة
+  career.js    الموسم، الترتيب، السوق، التدريب
+  ui.js        الشاشات + HUD + الرادار
+  audio.js     WebAudio: جمهور، صافرة، ضربة،-goal-، تصدي
+  save.js      localStorage
+  main.js      الـ loop، الإدخال، التنقل بين الشاشات
+tools/
+  sim-test.mjs       ماتشات headless
+  render-test.mjs    طبقة 3D فالـ Node
+  check-ui.mjs       تناسق HTML ↔ JS
+  dom-test.mjs       طبقة DOM على stub
+  build-singlefile.mjs  كلشي ف HTML واحد (للـ APK)
+  make-icons.mjs     مولّد PNG
+  build-apk.mjs      مولّد الـ APK
+  verify-apk.mjs     الفحص المستقل ديال الـ APK
+  apk/               AXML encoder، ZIP writer، v1 signer، DEX patcher
+```
 
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
-
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
-**Offline play** is built-in: a service worker caches all game files on first visit.
+**علاش المحرّك مفصول على الرسوميات؟** حيت هكاك نقدر نشغّل ماتش كامل ف Node
+بلا متصفح — و هادشي هو اللي خلّى كل هاد الاختبارات ممكنة.
 
 ---
 
-## 🎮 The Game
+## ✅ الاختبارات
 
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
+```bash
+npm test          # كلشي
+```
 
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
+| المرحلة | شنو كتفحص |
 |---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
-
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
-```
-
-Made with ❤️ and Three.js
+| `sim-test.mjs` | ماتشات كاملة: كتوصل لـ 90'، بلا NaN، بلا dead-lock، التسديدات/الأهداف/الاستحواذ منطقية |
+| `render-test.mjs` | Three.js فالـ Node: الملعب، اللاعبين، 1800 فريم من المزامنة، الكاميرا |
+| `check-ui.mjs` | كل `$('id')` كاين فالـ HTML، كل شاشة reachable، الأصول كاينين |
+| `dom-test.mjs` | كل الشاشات + HUD + الرادار + الصوت + الحفظ على stub DOM |
+| `build-singlefile.mjs` | الـ bundle كيتفحص بـ `node --check` قبل ما يتكتب |
+| `verify-apk.mjs` | **40 فحص**: الـ ZIP، AXML، arsc، DEX checksums، كل digests، و التوقيع بـ openssl |
 
 ---
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+## 📝 ملاحظات
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
-
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
-
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+- **المفتاح ديال التوقيع** كيتولّد ف `tools/apk/keystore/` و **ماشي ف git** (مفتاح
+  خاص ما كيت commit-اش). إلا مسحيتيه، البناء الجاي غادي يكون بمفتاح جديد و
+  خاصك تحيّد التطبيق القديم قبل ما تركّب الجديد.
+- الأسماء ديال الأندية و اللاعبين خيالية (مستوحاة من المدن المغربية).
+- Three.js r170 موجود ف `vendor/` — حتى اعتماد خارجي.

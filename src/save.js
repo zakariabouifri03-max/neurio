@@ -1,47 +1,39 @@
-// ── Persistence (localStorage) ───────────────────────────────────────────────
+/* ============================================================
+   Botola 25 — save.js
+   LocalStorage persistence with a version tag, safe on private mode.
+   ============================================================ */
 
-const KEY = 'bashbaqi_save_v1';
+const KEY = 'botola25.save';
+const VERSION = 3;
 
-export function defaultSave() {
-  return {
-    v: 1,
-    coins: 500,
-    gems: 5,
-    trophies: 0,
-    ownedCars: ['c01'],
-    selectedCar: 'c01',
-    ownedDrivers: ['dr01'],
-    selectedDriver: 'dr01',
-    upgrades: {},          // carId -> {spd,acc,hnd} levels 0..5
-    paints: {},            // carId -> hex color
-    ownedPaints: [0, 1, 2, 3, 4, 5, 6, 7],
-    wheelColor: '#23262e',
-    ownedHorns: [0],
-    horn: 0,
-    standings: null,       // {player:pts, riv0..riv4:pts}
-    seasonRace: 0,
-    seasonNum: 1,
-    wins: 0,
-    races: 0,
-    music: true,
-    sfx: true,
-  };
-}
+const memory = {};
 
 export function loadSave() {
   try {
-    const s = JSON.parse(localStorage.getItem(KEY));
-    if (s && typeof s === 'object') {
-      const d = defaultSave();
-      const out = Object.assign(d, s);
-      out.v = 1;
-      return out;
-    }
-  } catch (e) { /* corrupted save → fresh start */ }
-  return defaultSave();
+    const raw = (typeof localStorage !== 'undefined' && localStorage.getItem(KEY)) || memory[KEY];
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data || data.version !== VERSION) return null;
+    return data;
+  } catch (e) {
+    return null;
+  }
 }
 
-export function persist(s) {
-  s.v = 1;
-  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { /* private mode */ }
+export function writeSave(data) {
+  const payload = JSON.stringify({ ...data, version: VERSION, savedAt: Date.now() });
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(KEY, payload);
+  } catch (e) { /* private mode / quota — fall through */ }
+  memory[KEY] = payload;
+  return true;
 }
+
+export function clearSave() {
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.removeItem(KEY);
+  } catch (e) { /* ignore */ }
+  delete memory[KEY];
+}
+
+export const hasSave = () => !!loadSave();

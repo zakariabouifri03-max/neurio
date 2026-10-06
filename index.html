@@ -1,150 +1,211 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="ltr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏁 Bash Baqi Racing</title>
-<meta name="theme-color" content="#0ea5e9">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a1024">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bash Baqi">
+<meta name="description" content="Botola 25 — a full 3D football career game that runs in the browser and installs like an app.">
+<title>Botola 25 ⚽</title>
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="src/style.css">
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
-</script>
 </head>
 <body>
-<div id="app"></div>
+<div id="app">
 
-<!-- error overlay -->
-<div id="errLog"></div>
+  <!-- ══════════════ MENU ══════════════ -->
+  <section class="screen" id="sc-menu">
+    <div class="menu-bg"></div>
+    <div class="menu-inner">
+      <div class="logo">
+        <div class="logo-ball">⚽</div>
+        <h1>BOTOLA <span>25</span></h1>
+        <p class="tagline">لعبة كورة كاملة — موسم، انتقاللات، و ماتشات 3D</p>
+      </div>
+      <nav class="menu-btns" id="menuBtns"></nav>
+      <div class="menu-foot">
+        <span id="footClub">—</span>
+        <span class="dot">•</span>
+        <span id="footCoins">0</span> 🪙
+        <span class="dot">•</span>
+        <span id="footGems">0</span> 💎
+      </div>
+    </div>
+  </section>
 
-<!-- loading -->
-<div id="loading">
-  <div class="loadBox">
-    <div class="loadFlag">🏁</div>
-    <div class="loadTitle">BASH BAQI<br>RACING</div>
-    <div class="loadBar"><div></div></div>
-    <div class="loadTip">warming up the buggies…</div>
-  </div>
+  <!-- ══════════════ CLUB PICKER ══════════════ -->
+  <section class="screen" id="sc-club">
+    <header class="bar"><button class="back" data-go="menu">←</button><h2>ختار النادي ديالك</h2></header>
+    <div class="clubs" id="clubGrid"></div>
+  </section>
+
+  <!-- ══════════════ CAREER ══════════════ -->
+  <section class="screen" id="sc-career">
+    <header class="bar"><button class="back" data-go="menu">←</button><h2>الموسم</h2><span class="pill" id="carSeason"></span></header>
+    <div class="scroll">
+      <div class="card next" id="nextMatch"></div>
+      <div class="row2">
+        <div class="card">
+          <h3>الفورم</h3>
+          <div class="form-row" id="carForm"></div>
+        </div>
+        <div class="card">
+          <h3>إحصائياتك</h3>
+          <div id="carStats" class="kv"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>الترتيب</h3>
+        <table class="tbl" id="carTable"></table>
+      </div>
+      <div class="card">
+        <h3>الهدّافين</h3>
+        <div id="carScorers" class="kv"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ SQUAD ══════════════ -->
+  <section class="screen" id="sc-squad">
+    <header class="bar"><button class="back" data-go="menu">←</button><h2>التشكيلة</h2><span class="pill" id="sqCoins"></span></header>
+    <div class="scroll"><div class="squad" id="squadList"></div></div>
+  </section>
+
+  <!-- ══════════════ MARKET ══════════════ -->
+  <section class="screen" id="sc-market">
+    <header class="bar"><button class="back" data-go="menu">←</button><h2>سوق الانتقالات</h2><span class="pill" id="mkCoins"></span></header>
+    <div class="scroll">
+      <div class="mk-top">
+        <button class="btn small" id="mkRefresh">🔄 تجديد (40 🪙)</button>
+      </div>
+      <div class="squad" id="marketList"></div>
+      <div class="card"><h3>بيع لاعب</h3>
+        <p class="hint">التشكيلة كتبقى 11 — منين تبيع، مدرسة النادي كتعطي لاعب شاب جديد ف نفس المركز.</p>
+        <div class="squad" id="sellList"></div></div>
+    </div>
+  </section>
+
+  <!-- ══════════════ TABLE ══════════════ -->
+  <section class="screen" id="sc-table">
+    <header class="bar"><button class="back" data-go="menu">←</button><h2>الترتيب العام</h2></header>
+    <div class="scroll"><div class="card"><table class="tbl full" id="fullTable"></table></div>
+      <div class="card"><h3>الهدّافين</h3><div id="tblScorers" class="kv"></div></div>
+    </div>
+  </section>
+
+  <!-- ══════════════ SETTINGS ══════════════ -->
+  <section class="screen" id="sc-settings">
+    <header class="bar"><button class="back" data-go="menu">←</button><h2>الإعدادات</h2></header>
+    <div class="scroll">
+      <div class="card">
+        <div class="set"><span>الصوت</span><button class="btn small" id="setSound">🔊</button></div>
+        <div class="set"><span>مدة الشوط</span>
+          <div class="seg" id="setHalf">
+            <button data-v="60">1 د</button><button data-v="120">2 د</button><button data-v="180">3 د</button>
+          </div>
+        </div>
+        <div class="set"><span>مستوى الخصم</span>
+          <div class="seg" id="setDiff">
+            <button data-v="0">ساهل</button><button data-v="1">عادي</button><button data-v="2">صعيب</button>
+          </div>
+        </div>
+        <div class="set"><span>الحساسية ديال الكاميرا</span>
+          <div class="seg" id="setCam"><button data-v="0">قريبة</button><button data-v="1">عادية</button><button data-v="2">واسعة</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>التطبيق</h3>
+        <button class="btn" id="btnInstall">📱 ثبّت التطبيق (APK-like)</button>
+        <p class="hint" id="installHint">زيد اللعبة للشاشة الرئيسية و تخدم بحال تطبيق، offline.</p>
+      </div>
+      <div class="card danger">
+        <h3>منطقة الخطر</h3>
+        <button class="btn warn" id="btnWipe">🗑️ مسح المسيرة</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ MATCH ══════════════ -->
+  <section class="screen" id="sc-match">
+    <canvas id="gl"></canvas>
+    <div class="vignette"></div>
+
+    <div class="hud-top">
+      <div class="scorebox">
+        <span class="crest" id="hudHomeC"></span>
+        <span class="score" id="hudScore">0 - 0</span>
+        <span class="crest" id="hudAwayC"></span>
+      </div>
+      <div class="clockbox">
+        <span id="hudClock">0'</span>
+        <span class="half" id="hudHalf">1</span>
+      </div>
+    </div>
+    <div class="poss"><div class="poss-fill" id="possFill"></div><span id="possTxt">50%</span></div>
+    <div class="ticker" id="ticker"></div>
+    <canvas id="radar" width="200" height="130"></canvas>
+
+    <div class="msg" id="bigMsg"></div>
+    <div class="power" id="power"><div class="power-fill" id="powerFill"></div></div>
+
+    <div class="touch">
+      <div class="stick" id="stick"><div class="knob" id="knob"></div></div>
+      <div class="pads">
+        <button class="pad shoot" id="pShoot">👟<span>تسديد</span></button>
+        <button class="pad pass" id="pPass">➤<span>باس</span></button>
+        <button class="pad sprint" id="pSprint">⚡<span>سبرينت</span></button>
+        <button class="pad tackle" id="pTackle">🦵<span>تاكل</span></button>
+        <button class="pad swap" id="pSwap">🔁<span>بدّل</span></button>
+      </div>
+    </div>
+
+    <button class="pause" id="btnPause">II</button>
+
+    <div class="pausemenu" id="pauseMenu">
+      <h2>موقوف</h2>
+      <div class="stat-mini" id="pauseStats"></div>
+      <button class="btn" id="pmResume">▶ كمّل</button>
+      <button class="btn ghost" id="pmQuit">🚪 خرج للمنيو</button>
+    </div>
+  </section>
+
+  <!-- ══════════════ RESULT ══════════════ -->
+  <section class="screen" id="sc-result">
+    <div class="result-wrap">
+      <div class="res-head" id="resHead"></div>
+      <div class="res-score" id="resScore"></div>
+      <div class="card"><h3>تفاصيل الماتش</h3><div class="kv" id="resStats"></div></div>
+      <div class="card"><h3>الأحداث</h3><div class="events" id="resEvents"></div></div>
+      <div class="card reward" id="resReward"></div>
+      <button class="btn big" id="resContinue">▶ كمّل</button>
+    </div>
+  </section>
+
+  <!-- ══════════════ QUICK MATCH SETUP ══════════════ -->
+  <section class="screen" id="sc-quick">
+    <header class="bar"><button class="back" data-go="menu">←</button><h2>ماتش سريع</h2></header>
+    <div class="scroll">
+      <div class="card"><h3>نتا</h3><div class="clubs small" id="qHome"></div></div>
+      <div class="card"><h3>الخصم</h3><div class="clubs small" id="qAway"></div></div>
+      <button class="btn big" id="qPlay">⚽ العب</button>
+    </div>
+  </section>
+
 </div>
 
-<!-- speed lines overlay -->
-<div id="speedLines"></div>
-<div id="coinPops"></div>
-
-<!-- ══════════ RACE HUD ══════════ -->
-<div id="hud">
-  <div class="hudTL">
-    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
-    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
-    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
-    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
-  </div>
-
-  <div id="progbar">
-    <span class="flagL">🏁</span>
-    <div class="track"><div id="progMarkers"></div></div>
-    <span class="flagR">🏆</span>
-  </div>
-
-  <button id="btnPauseTop" class="roundBtn">⏸</button>
-
-  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
-
-  <div id="powerSlot" class="powerSlot">
-    <span id="hudPower"></span>
-    <span class="keyHint">SPACE</span>
-  </div>
-
-  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
-
-  <div id="banner"></div>
-
-  <!-- touch controls -->
-  <div id="touchWrap">
-    <div class="tcol left">
-      <button id="tLeft" class="tbtn">◀</button>
-      <button id="tRight" class="tbtn">▶</button>
-    </div>
-    <div class="tcol right">
-      <button id="tBrake" class="tbtn brake">▼</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ GARAGE UI ══════════ -->
-<div id="garageUI">
-  <div id="topbar">
-    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
-    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
-    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
-    <div class="spacer"></div>
-    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
-    <button id="btnMusic" class="miniBtn">🎵</button>
-    <button id="btnSfx" class="miniBtn">🔊</button>
-    <button id="btnFull" class="miniBtn">⛶</button>
-  </div>
-
-  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
-  <div id="carNamePlate"></div>
-
-  <div id="menuBar">
-    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
-    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
-    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
-    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
-    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
-    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
-  </div>
-</div>
-
-<!-- ══════════ Shop / panels ══════════ -->
-<div id="panel">
-  <div class="panelBox">
-    <div class="panelHead">
-      <h2 id="panelTitle">SHOP</h2>
-      <div id="panelTabs"></div>
-      <button id="panelClose" class="roundBtn">✖</button>
-    </div>
-    <div id="panelBody"></div>
-  </div>
-</div>
-
-<!-- results -->
-<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
-<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
-
-<!-- pause -->
-<div id="pauseModal">
-  <div class="modalBox">
-    <div class="rtitle">⏸ PAUSED</div>
-    <div class="rbtns">
-      <button id="btnResume" class="big race">▶ RESUME</button>
-      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
-    </div>
+<div id="rotate">
+  <div>
+    <div class="big">📱</div>
+    <b>قلّب التليفون</b><br>
+    اللعبة كتلعب أفقية (landscape) — بحال ف التليفزيون.
   </div>
 </div>
 
 <div id="toast"></div>
-<div id="confetti"></div>
-
 <script type="module" src="src/main.js"></script>
-<script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-</script>
 </body>
 </html>

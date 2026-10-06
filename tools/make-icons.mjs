@@ -1,176 +1,154 @@
-// Generates icons/icon-192.png, icon-512.png, icon-maskable-512.png
-// Hand-rolled PNG encoder + procedural beach-buggy art.
-import zlib from 'node:zlib';
-import { writeFileSync, mkdirSync } from 'node:fs';
+/* ============================================================
+   tools/make-icons.mjs
+   Draws every app icon from scratch (no image files, no canvas
+   dependency) and writes real PNGs with a tiny built-in encoder.
+   ============================================================ */
 
-// ── minimal PNG encoder (RGBA, no filter) ──
-const crcTable = (() => {
-  const t = new Uint32Array(256);
+import { deflateSync } from 'node:zlib';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+/* ---------------- minimal PNG encoder ---------------- */
+const CRC_T = (() => {
+  const t = new Int32Array(256);
   for (let n = 0; n < 256; n++) {
     let c = n;
     for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    t[n] = c >>> 0;
+    t[n] = c;
   }
   return t;
 })();
 function crc32(buf) {
   let c = 0xffffffff;
-  for (let i = 0; i < buf.length; i++) c = crcTable[(c ^ buf[i]) & 255] ^ (c >>> 8);
+  for (let i = 0; i < buf.length; i++) c = CRC_T[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
   return (c ^ 0xffffffff) >>> 0;
 }
 function chunk(type, data) {
-  const out = Buffer.alloc(12 + data.length);
-  out.writeUInt32BE(data.length, 0);
-  out.write(type, 4);
-  data.copy(out, 8);
-  out.writeUInt32BE(crc32(Buffer.concat([Buffer.from(type), data])), 8 + data.length);
-  return out;
+  const len = Buffer.alloc(4); len.writeUInt32BE(data.length, 0);
+  const td = Buffer.concat([Buffer.from(type, 'ascii'), data]);
+  const crc = Buffer.alloc(4); crc.writeUInt32BE(crc32(td), 0);
+  return Buffer.concat([len, td, crc]);
 }
-function encodePNG(px, w, h) {
+export function encodePng(size, rgba) {
   const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4);
-  ihdr[8] = 8; ihdr[9] = 6; // 8-bit RGBA
-  const raw = Buffer.alloc(h * (1 + w * 4));
-  for (let y = 0; y < h; y++) {
-    raw[y * (1 + w * 4)] = 0;
-    Buffer.from(px.buffer, y * w * 4, w * 4).copy(raw, y * (1 + w * 4) + 1);
+  ihdr.writeUInt32BE(size, 0); ihdr.writeUInt32BE(size, 4);
+  ihdr[8] = 8; ihdr[9] = 6; ihdr[10] = 0; ihdr[11] = 0; ihdr[12] = 0;
+  const stride = size * 4;
+  const raw = Buffer.alloc((stride + 1) * size);
+  for (let y = 0; y < size; y++) {
+    raw[y * (stride + 1)] = 0;                       // filter: none
+    rgba.copy(raw, y * (stride + 1) + 1, y * stride, y * stride + stride);
   }
   return Buffer.concat([
-    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
-    chunk('IHDR', ihdr),
-    chunk('IDAT', zlib.deflateSync(raw, { level: 9 })),
-    chunk('IEND', Buffer.alloc(0)),
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw, { level: 9 })), chunk('IEND', Buffer.alloc(0)),
   ]);
 }
 
-// ── tiny raster canvas ──
-class C {
-  constructor(w, h) { this.w = w; this.h = h; this.px = new Uint8ClampedArray(w * h * 4); }
-  blend(x, y, r, g, b, a) {
-    if (x < 0 || y < 0 || x >= this.w || y >= this.h || a <= 0) return;
-    const i = (y * this.w + x) * 4, ia = a / 255;
-    this.px[i] = r * ia + this.px[i] * (1 - ia);
-    this.px[i + 1] = g * ia + this.px[i + 1] * (1 - ia);
-    this.px[i + 2] = b * ia + this.px[i + 2] * (1 - ia);
-    this.px[i + 3] = Math.max(this.px[i + 3], a);
-  }
-  grad(top, mid, bot) {
-    const [t, m, b] = [top, mid, bot].map((h2) => [parseInt(h2.slice(1, 3), 16), parseInt(h2.slice(3, 5), 16), parseInt(h2.slice(5, 7), 16)]);
-    for (let y = 0; y < this.h; y++) {
-      const f = y / this.h;
-      const c = f < 0.62 ? t.map((v, i) => v + (m[i] - v) * (f / 0.62)) : m.map((v, i) => v + (b[i] - v) * ((f - 0.62) / 0.38));
-      for (let x = 0; x < this.w; x++) this.blend(x, y, c[0], c[1], c[2], 255);
-    }
-  }
-  rect(x0, y0, w, h, col, aa = 255) {
-    const [r, g, b] = hex(col);
-    for (let y = Math.max(0, y0 | 0); y < Math.min(this.h, y0 + h); y++)
-      for (let x = Math.max(0, x0 | 0); x < Math.min(this.w, x0 + w); x++) this.blend(x, y, r, g, b, aa);
-  }
-  circle(cx, cy, rad, col, aa = 255) {
-    const [r, g, b] = hex(col), r2 = rad * rad;
-    for (let y = Math.max(0, (cy - rad - 1) | 0); y < Math.min(this.h, cy + rad + 1); y++)
-      for (let x = Math.max(0, (cx - rad - 1) | 0); x < Math.min(this.w, cx + rad + 1); x++) {
-        const d2 = (x - cx) ** 2 + (y - cy) ** 2;
-        if (d2 <= r2) this.blend(x, y, r, g, b, aa);
-        else if (d2 <= (rad + 1.4) ** 2) this.blend(x, y, r, g, b, aa * 0.35 * (1 - (Math.sqrt(d2) - rad) / 1.4));
+/* ---------------- the drawing ---------------- */
+const mix = (a, b, t) => a + (b - a) * t;
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+
+export function drawIcon(size, { maskable = false } = {}) {
+  const px = Buffer.alloc(size * size * 4);
+  const put = (x, y, r, g, b, a = 255) => {
+    if (x < 0 || y < 0 || x >= size || y >= size) return;
+    const i = (y * size + x) * 4;
+    px[i] = r; px[i + 1] = g; px[i + 2] = b; px[i + 3] = a;
+  };
+  const S = size;
+  const pad = maskable ? S * 0.12 : 0;         // maskable needs a safe zone
+  const rad = maskable ? 0 : S * 0.22;
+
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      // rounded-rect alpha
+      let a = 255;
+      if (!maskable && rad > 0) {
+        const cx = clamp(x, rad, S - rad), cy = clamp(y, rad, S - rad);
+        const d = Math.hypot(x - cx, y - cy);
+        if (d > rad) a = clamp((rad - d + 0.5) * 255, 0, 255) | 0;
       }
-  }
-  ellipse(cx, cy, rx, ry, col, aa) {
-    const [r, g, b] = hex(col);
-    for (let y = Math.max(0, (cy - ry - 1) | 0); y < Math.min(this.h, cy + ry + 1); y++)
-      for (let x = Math.max(0, (cx - rx - 1) | 0); x < Math.min(this.w, cx + rx + 1); x++)
-        if (((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1) this.blend(x, y, r, g, b, aa);
-  }
-  thickLine(x1, y1, x2, y2, th, col, aa = 255) {
-    const steps = Math.ceil(Math.hypot(x2 - x1, y2 - y1) * 1.5);
-    for (let i = 0; i <= steps; i++) {
-      const t = i / steps;
-      this.circle(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t, th / 2, col, aa);
+      // pitch-green gradient + a light sweep
+      const t = (x + y) / (2 * S);
+      let r = mix(0x0c, 0x1e, t), g = mix(0x8a, 0xd0, t), b = mix(0x4c, 0x7a, t);
+      const sweep = Math.max(0, 1 - Math.hypot(x - S * 0.3, y - S * 0.22) / (S * 0.9));
+      r = mix(r, 0x6f, sweep * 0.25); g = mix(g, 0xff, sweep * 0.18); b = mix(b, 0xa8, sweep * 0.12);
+      put(x, y, r | 0, g | 0, b | 0, a);
     }
   }
-  roundMask(rad) { // transparent outside rounded rect
-    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
-      const dx = Math.max(0, Math.max(rad - x, x - (this.w - 1 - rad)));
-      const dy = Math.max(0, Math.max(rad - y, y - (this.h - 1 - rad)));
-      if (dx * dx + dy * dy > rad * rad) this.px[(y * this.w + x) * 4 + 3] = 0;
+
+  // ---- the ball ----
+  const c = { x: S / 2, y: S * 0.52 };
+  const R = S * (maskable ? 0.26 : 0.31);
+
+  const pentagon = (cx, cy, rr, rot) => {
+    const pts = [];
+    for (let i = 0; i < 5; i++) {
+      const a = rot - Math.PI / 2 + (i * 2 * Math.PI) / 5;
+      pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]);
+    }
+    return pts;
+  };
+  const inPoly = (x, y, pts) => {
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const [xi, yi] = pts[i], [xj, yj] = pts[j];
+      if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  };
+  // dark patches in ball space (-1..1)
+  const patches = [pentagon(0, 0, 0.4, 0)];
+  for (let i = 0; i < 5; i++) {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
+    patches.push(pentagon(Math.cos(a) * 0.95, Math.sin(a) * 0.95, 0.32, a + Math.PI / 2));
+  }
+
+  for (let y = Math.floor(c.y - R - 2); y <= Math.ceil(c.y + R + 2); y++) {
+    for (let x = Math.floor(c.x - R - 2); x <= Math.ceil(c.x + R + 2); x++) {
+      const d = Math.hypot(x - c.x, y - c.y);
+      if (d > R + 0.5) continue;
+      const edge = clamp((R + 0.5 - d) * 255, 0, 255) | 0;
+      // shading (light from the top-left)
+      const l = clamp(1 - ((x - c.x) * 0.5 + (y - c.y) * 0.7) / (R * 2.4), 0.5, 1.2);
+      let r = 250 * l, g = 250 * l, b = 246 * l;
+      const nx = (x - c.x) / R, ny = (y - c.y) / R;
+      let dark = false;
+      for (const pts of patches) { if (inPoly(nx, ny, pts)) { dark = true; break; } }
+      if (dark) { r *= 0.13; g *= 0.13; b *= 0.16; }
+      // rim shading
+      const rim = clamp(1 - Math.pow(d / R, 6) * 0.25, 0.6, 1);
+      r *= rim; g *= rim; b *= rim;
+      put(x, y, clamp(r, 0, 255) | 0, clamp(g, 0, 255) | 0, clamp(b, 0, 255) | 0,
+        Math.min(edge, px[(y * S + x) * 4 + 3] || 255));
     }
   }
-}
-const hex = (h2) => [parseInt(h2.slice(1, 3), 16), parseInt(h2.slice(3, 5), 16), parseInt(h2.slice(5, 7), 16)];
-
-function drawIcon(S, maskable) {
-  const c = new C(S, S);
-  const u = S / 512; // design unit
-  if (maskable) c.rect(0, 0, S, S, '#2f9be8');
-  c.grad('#2f9be8', '#8fd7ff', '#ffe9a8');
-  // sun + glow
-  c.circle(S * 0.78, S * 0.2, 66 * u, '#fff2c0', 70);
-  c.circle(S * 0.78, S * 0.2, 46 * u, '#fff2c0', 130);
-  c.circle(S * 0.78, S * 0.2, 30 * u, '#fff8dd');
-  // sand
-  c.rect(0, S * 0.8, S, S * 0.2, '#ecd9a0');
-  c.ellipse(S * 0.5, S * 0.81, S * 0.42, S * 0.05, '#5c4a2a', 30);
-  // checkered strip
-  const sq = S / 16;
-  for (let i = 0; i < 16; i++) for (let j = 0; j < 2; j++)
-    c.rect(i * sq, S * 0.9 + j * sq * 0.55, sq, sq * 0.55, (i + j) % 2 ? '#111318' : '#ffffff');
-  // wheels
-  const wy = S * 0.745, rW = 52 * u, rWr = 62 * u, x1 = S * 0.33, x2 = S * 0.7;
-  c.ellipse(S * 0.51, S * 0.805, 150 * u, 15 * u, '#8a6f3f', 70);
-  for (const [cx, r] of [[x1, rW], [x2, rWr]]) {
-    c.circle(cx, wy, r, '#1b1e26');
-    c.circle(cx, wy, r * 0.55, '#8f97a6');
-    c.circle(cx, wy, r * 0.28, '#c8ccd6');
-  }
-  // body (side view buggy)
-  const bx = S * 0.2, by = S * 0.61, bw = S * 0.6, bh = S * 0.11;
-  c.ellipse(bx + bw * 0.5, by + bh * 0.5, bw * 0.55, bh * 0.9, '#e63946'); // rounded main body
-  c.rect(bx + bw * 0.06, by, bw * 0.9, bh, '#e63946');
-  c.rect(bx + bw * 0.06, by, bw * 0.9, bh * 0.3, '#f4f1de'); // stripe
-  // nose + headlight
-  c.ellipse(bx + bw * 0.97, by + bh * 0.5, 22 * u, bh * 0.42, '#e63946');
-  c.circle(bx + bw * 1.03, by + bh * 0.42, 7 * u, '#fff6c9');
-  // rear engine + stacks
-  c.rect(bx - 6 * u, by - 26 * u, 40 * u, 30 * u, '#aab0bd');
-  c.rect(bx + 2 * u, by - 44 * u, 8 * u, 20 * u, '#8f97a6');
-  c.rect(bx + 16 * u, by - 48 * u, 8 * u, 24 * u, '#8f97a6');
-  c.rect(bx + 30 * u, by - 40 * u, 8 * u, 16 * u, '#8f97a6');
-  // driver body + head
-  c.rect(bx + bw * 0.42, by - 34 * u, 40 * u, 38 * u, '#e63946');
-  c.circle(bx + bw * 0.52, by - 44 * u, 20 * u, '#f2c891');
-  c.circle(bx + bw * 0.545, by - 47 * u, 4.6 * u, '#1b1e26'); // eye
-  c.rect(bx + bw * 0.44, by - 66 * u, 36 * u, 10 * u, '#d64545'); // brow band
-  // rollcage
-  const cage = '#23262e';
-  c.thickLine(bx + bw * 0.26, by, bx + bw * 0.34, by - 78 * u, 9 * u, cage);
-  c.thickLine(bx + bw * 0.34, by - 78 * u, bx + bw * 0.62, by - 74 * u, 9 * u, cage);
-  c.thickLine(bx + bw * 0.62, by - 74 * u, bx + bw * 0.56, by - 4 * u, 9 * u, cage);
-  // windshield hint
-  c.thickLine(bx + bw * 0.68, by - 6 * u, bx + bw * 0.76, by - 40 * u, 7 * u, '#bfe8ff', 220);
-  if (!maskable) c.roundMask(S * 0.22);
-  return encodePNG(c.px, S, S);
+  void pad;
+  return px;
 }
 
-export function makeIcon(S, maskable) {
-  return drawIcon(S, maskable);
-}
+/* ---------------- write them all ---------------- */
+const TARGETS = [
+  ['res-mipmap-mdpi/ic_launcher.png', 48, {}],
+  ['res-mipmap-hdpi/ic_launcher.png', 72, {}],
+  ['res-mipmap-xhdpi/ic_launcher.png', 96, {}],
+  ['res-mipmap-xxhdpi/ic_launcher.png', 144, {}],
+  ['res-mipmap-xxxhdpi/ic_launcher.png', 192, {}],
+  ['icons/icon-192.png', 192, {}],
+  ['icons/icon-512.png', 512, {}],
+  ['icons/icon-maskable-512.png', 512, { maskable: true }],
+];
 
-// CLI: writes PWA icons, and (with --mipmap <dir>) Android launcher densities
 if (process.argv[1] && process.argv[1].endsWith('make-icons.mjs')) {
-  mkdirSync('icons', { recursive: true });
-  writeFileSync('icons/icon-192.png', drawIcon(192, false));
-  writeFileSync('icons/icon-512.png', drawIcon(512, false));
-  writeFileSync('icons/icon-maskable-512.png', drawIcon(512, true));
-  const mi = process.argv.indexOf('--mipmap');
-  if (mi >= 0 && process.argv[mi + 1]) {
-    const dir = process.argv[mi + 1];
-    const dens = { mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
-    for (const [d, s] of Object.entries(dens)) {
-      mkdirSync(`${dir}/mipmap-${d}`, { recursive: true });
-      writeFileSync(`${dir}/mipmap-${d}/ic_launcher.png`, drawIcon(s, false));
-    }
-    console.log('mipmap icons →', dir);
+  for (const [rel, size, opt] of TARGETS) {
+    const out = join(root, rel);
+    mkdirSync(dirname(out), { recursive: true });
+    writeFileSync(out, encodePng(size, drawIcon(size, opt)));
+    console.log(`  ✓ ${rel}  (${size}×${size})`);
   }
-  console.log('icons written');
+  console.log(`\n✅ ${TARGETS.length} icons written`);
 }

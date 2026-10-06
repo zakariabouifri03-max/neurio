@@ -1,3 +1,9 @@
 .DS_Store
 Thumbs.db
 *.log
+
+# generated
+build/
+res-mipmap-*/
+tools/apk/keystore/
+node_modules/

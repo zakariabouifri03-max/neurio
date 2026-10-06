@@ -1,38 +1,132 @@
-// Builds bash-baqi-racing.html — the whole game in ONE file (works from file://)
-import { readFileSync, writeFileSync } from 'node:fs';
-import { build } from '/tmp/gb/node_modules/esbuild/lib/main.js';
+/* ============================================================
+   tools/build-singlefile.mjs
+   Flattens the whole game (Three.js + src/* + css) into ONE
+   classic-script HTML file — `build/game.html`.
 
-const root = new URL('..', import.meta.url).pathname;
+   Why: an Android WebView loading `file:///android_asset/...`
+   refuses ES modules (file:// is an opaque origin), so the APK
+   needs everything inlined as one non-module script.
 
-const res = await build({
-  entryPoints: [root + 'src/main.js'],
-  bundle: true,
-  format: 'iife',
-  minify: true,
-  legalComments: 'none',
-  logLevel: 'silent',
-  alias: {
-    'three': root + 'vendor/three.module.js',
-    'three/addons/utils/BufferGeometryUtils.js': root + 'vendor/utils/BufferGeometryUtils.js',
-  },
-  write: false,
-});
-const js = res.outputFiles[0].text;
-const css = readFileSync(root + 'src/style.css', 'utf8');
-const iconB64 = readFileSync(root + 'icons/icon-192.png').toString('base64');
+   The result is syntax-checked with `node --check` before it is
+   written anywhere.
+   ============================================================ */
 
-let html = readFileSync(root + 'index.html', 'utf8');
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
 
-// inline CSS
-html = html.replace('<link rel="stylesheet" href="src/style.css">', () => `<style>\n${css}\n</style>`);
-// inline icon as data URI
-html = html.replaceAll('icons/icon-192.png', () => `data:image/png;base64,${iconB64}`);
-// drop manifest (needs http anyway) and importmap
-html = html.replace(/<link rel="manifest"[^>]*>\n?/, '');
-html = html.replace(/<script type="importmap">[\s\S]*?<\/script>/, '');
-// replace module script with the bundle
-html = html.replace('<script type="module" src="src/main.js"></script>',
-  () => `<script>\n${js}\n</script>`);
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const outDir = join(root, 'build');
+mkdirSync(outDir, { recursive: true });
 
-writeFileSync(root + 'bash-baqi-racing.html', html);
-console.log('bash-baqi-racing.html written:', (html.length / 1024 / 1024).toFixed(2), 'MB');
+const MODULES = [
+  'src/util.js',
+  'src/data.js',
+  'src/save.js',
+  'src/career.js',
+  'src/engine.js',
+  'src/tex.js',
+  'src/render.js',
+  'src/audio.js',
+  'src/ui.js',
+  'src/main.js',
+];
+
+/* ---------- strip ESM syntax, keep everything else ---------- */
+function stripModuleSyntax(src, file) {
+  let s = src;
+  // multi-line  import { a, b } from 'x';
+  s = s.replace(/^\s*import\s+[\s\S]*?from\s*['"][^'"]+['"]\s*;?\s*$/gm, '');
+  // single line   import 'x';
+  s = s.replace(/^\s*import\s*['"][^'"]+['"]\s*;?\s*$/gm, '');
+  // export { a, b };   (drop the list entirely)
+  s = s.replace(/^\s*export\s*\{[\s\S]*?\}\s*;?\s*$/gm, '');
+  // export const/let/function/class  →  const/let/function/class
+  s = s.replace(/^\s*export\s+(?=(const|let|var|function|class|async)\b)/gm, '');
+  if (/^\s*(import|export)\b/m.test(s)) {
+    const line = s.split('\n').findIndex((l) => /^\s*(import|export)\b/.test(l)) + 1;
+    throw new Error(`${file}: unhandled ESM syntax near line ${line}`);
+  }
+  return s;
+}
+
+/* ---------- Three.js: inline it and rebuild the THREE namespace ---------- */
+function bundleThree() {
+  const raw = readFileSync(join(root, 'vendor/three.module.js'), 'utf8');
+  const m = raw.match(/^export\s*\{([\s\S]*?)\};?\s*$/m);
+  if (!m) throw new Error('three.module.js: export list not found');
+  const names = m[1].split(',').map((n) => n.trim().split(/\s+as\s+/).pop()).filter(Boolean);
+  const body = raw.replace(/^export\s*\{[\s\S]*?\};?\s*$/m, '');
+  const ns = `const THREE = { ${names.join(', ')} };`;
+  console.log(`  three.js r${(body.match(/const REVISION = '(\d+)'/) || [])[1]} — ${names.length} exports re-namespace'd`);
+  return body + '\n' + ns + '\n';
+}
+
+/* ---------- pre-flight: duplicate top-level names across modules ---------- */
+function checkDuplicates() {
+  const map = new Map();
+  for (const f of MODULES) {
+    const src = readFileSync(join(root, f), 'utf8');
+    const re = /^(?:export\s+)?(?:const|let|var|function|class|async function)\s+([A-Za-z_$][\w$]*)/gm;
+    let m;
+    while ((m = re.exec(src))) {
+      if (!map.has(m[1])) map.set(m[1], []);
+      map.get(m[1]).push(f);
+    }
+  }
+  const dupes = [...map].filter(([, f]) => f.length > 1);
+  if (dupes.length) {
+    for (const [n, f] of dupes) console.error(`  ✗ '${n}' declared in ${f.join(' and ')} — they share one scope in the bundle`);
+    process.exit(1);
+  }
+  console.log(`  ✓ ${map.size} top-level names, no duplicates`);
+}
+checkDuplicates();
+
+/* ---------- assemble ----------
+   Three.js keeps the real top level (it declares helpers like `clamp`,
+   `lerp`, `sign`…), and the game is wrapped in an IIFE so the game's own
+   `clamp`/`lerp` shadow them instead of colliding with them.          */
+const parts = ['/* Botola 25 — single-file build (generated by tools/build-singlefile.mjs) */\n'];
+parts.push(bundleThree());
+parts.push('\n;(() => {\n"use strict";\n');
+for (const f of MODULES) {
+  const src = readFileSync(join(root, f), 'utf8');
+  parts.push(`\n/* ==== ${f} ==== */\n` + stripModuleSyntax(src, f));
+  console.log('  + ' + f);
+}
+parts.push('\n})();\n');
+const js = parts.join('\n');
+
+/* ---------- syntax check before it ever reaches a phone ---------- */
+const tmp = join(tmpdir(), `botola-bundle-${Date.now()}.mjs`);
+writeFileSync(tmp, js);
+try {
+  execFileSync(process.execPath, ['--check', tmp], { stdio: 'pipe' });
+  console.log(`  ✓ bundle parses cleanly (${(js.length / 1024).toFixed(0)} KB of JS)`);
+} catch (e) {
+  console.error('  ✗ BUNDLE SYNTAX ERROR:\n' + e.stderr.toString().slice(0, 1600));
+  process.exit(1);
+}
+
+/* ---------- inline into the HTML ---------- */
+const css = readFileSync(join(root, 'src/style.css'), 'utf8');
+let html = readFileSync(join(root, 'index.html'), 'utf8');
+html = html.replace(/<link rel="stylesheet" href="src\/style.css">/, () => `<style>\n${css}\n</style>`);
+html = html.replace(/<script type="module" src="src\/main.js"><\/script>/, () => `<script>\n${js}\n</script>`);
+// a single-file build cannot register a service worker or fetch a manifest
+html = html.replace(/<link rel="manifest"[^>]*>/, '');
+html = html.replace(/<link rel="icon"[^>]*>/, '');
+html = html.replace(/<link rel="apple-touch-icon"[^>]*>/, '');
+
+// (check the tags, not the substrings — the bundle's own comments mention them)
+if (html.includes('href="src/style.css"') || html.includes('src="src/main.js"')) {
+  console.error('  ✗ the HTML still references external assets — inlining failed');
+  process.exit(1);
+}
+
+const out = join(outDir, 'game.html');
+writeFileSync(out, html);
+console.log(`\n✅ wrote ${out}  (${(html.length / 1024 / 1024).toFixed(2)} MB, ${existsSync(out) ? 'ok' : 'missing'})`);
