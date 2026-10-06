@@ -97,8 +97,8 @@ cd Filebox/android
 gradle assembleDebug                 # → app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Khass JDK 17 + Android SDK 34. L-APK dyal debug mوقَّع automatiquement b
-debug keystore, y9der ytsebte direktement.
+Khass JDK 17 + Android SDK 35 (compileSdk/targetSdk 35). L-APK dyal debug
+signé automatiquement b debug keystore, y9der ytsebte direktement.
 
 ---
 
@@ -136,7 +136,7 @@ python3 tools/make-interop-fixture.py   # kaytleb pyzipper
 ```
 
 `test-zip.mjs` kayverifi l-bytes dyal l-extra fields, w kayqra coffre mktoub b
-**pyzipper** (implementation مستقلة) bach y2akked l-interop.
+**pyzipper** (implementation mostaqilla) bach y2akked l-interop.
 
 ```bash
 pip install pyzipper
