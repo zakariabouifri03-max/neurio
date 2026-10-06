@@ -55,17 +55,24 @@ jobs:
         run: |
           log="$RUNNER_TEMP/gradle-build.log"
           if [[ -f "$log" ]]; then
-            details="$(grep -E '(^e: |error:|^FAILURE:|^\* What went wrong:|^[[:space:]]*> |Exception|Could not )' "$log" | tail -n 60 || true)"
-            if [[ -z "$details" ]]; then details="$(tail -n 100 "$log")"; fi
+            diagnostics="$(grep -E '(^e: |error:|FAILURE:|What went wrong:|Caused by:|Execution failed for task|A problem occurred|Could not )' "$log" | tail -n 40 || true)"
+            failure_tail="$(awk '/^FAILURE: Build failed with an exception\./ { capture=1 } capture { print }' "$log" | tail -n 40)"
+            if [[ -z "$failure_tail" ]]; then failure_tail="$(tail -n 40 "$log")"; fi
             {
               echo '## Gradle failure details'
+              echo '### Diagnostics'
               echo '```text'
-              printf '%s\n' "$details"
+              printf '%s\n' "${diagnostics:-No matching diagnostic lines}"
+              echo '```'
+              echo '### Failure tail'
+              echo '```text'
+              printf '%s\n' "$failure_tail"
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
-            while IFS= read -r line; do
-              [[ -z "$line" ]] || printf '::error title=Gradle build::%s\n' "$line"
-            done <<< "$details"
+            {
+              printf '%s\n' "$diagnostics"
+              printf '%s\n' "$failure_tail" | grep -Ev '^> Task |^$' | tail -n 25
+            } | awk 'NF { print "::error title=Gradle build::" $0 }'
           else
             echo 'Gradle log was not created.' >> "$GITHUB_STEP_SUMMARY"
             echo '::error::Gradle log was not created.'
