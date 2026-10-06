@@ -2,6 +2,7 @@ package com.neurio.vm;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -85,6 +86,17 @@ public class BrowserActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // A slot can be reassigned while its process is still alive (the LRU
+        // eviction path). The suffix this process claimed at startup then
+        // belongs to the previous tenant, and inflating the layout would load
+        // the WebView provider on the wrong profile. The only correct recovery
+        // is a new process: relaunch via AlarmManager, then exit.
+        if (slotChangedOwner()) {
+            restartForNewDevice();
+            return;
+        }
+
         setContentView(R.layout.activity_browser);
 
         settings = new VmSettings(this);
@@ -110,6 +122,46 @@ public class BrowserActivity extends Activity {
         wire();
 
         web.loadUrl(settings.browserHome());
+    }
+
+    /**
+     * True when the slot pointer names a different device than the one this
+     * process claimed in {@code Application.onCreate}.
+     */
+    private boolean slotChangedOwner() {
+        int slot = ProcessBridge.slot();
+        if (slot < 0) return false;
+        java.io.File pointer = com.neurio.vm.runtime.SlotTable.pointer(this, slot);
+        String wanted = null;
+        try {
+            if (pointer.isFile()) wanted = Io.read(pointer).trim();
+        } catch (Exception ignored) { }
+        String claimed = ProcessBridge.deviceId();
+        if (wanted == null || wanted.isEmpty() || claimed == null) return false;
+        boolean changed = !wanted.equals(claimed);
+        if (changed) {
+            Log.w(TAG, "slot :vm" + slot + " changed owner while this process was alive ("
+                    + claimed + " → " + wanted + "); restarting the process");
+        }
+        return changed;
+    }
+
+    private void restartForNewDevice() {
+        try {
+            Intent relaunch = new Intent(this, getClass());
+            relaunch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            int flags = PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE;
+            PendingIntent pi = PendingIntent.getActivity(this, 0x7000 + ProcessBridge.slot(),
+                    relaunch, flags);
+            android.app.AlarmManager am =
+                    (android.app.AlarmManager) getSystemService(ALARM_SERVICE);
+            if (am != null) {
+                am.set(android.app.AlarmManager.RTC, System.currentTimeMillis() + 400, pi);
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "could not schedule the relaunch", t);
+        }
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     // ── WebView configuration ──────────────────────────────────────────────

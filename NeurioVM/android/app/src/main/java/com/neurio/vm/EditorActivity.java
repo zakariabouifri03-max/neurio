@@ -44,6 +44,12 @@ public final class EditorActivity extends Activity {
     private ProfileStore store;
     private DeviceIdentity.Builder builder;
     private boolean editing;
+    /**
+     * A Spinner fires onItemSelected once during its first layout, which would
+     * overwrite a device being edited with preset #0. Ignored until the initial
+     * population has settled.
+     */
+    private boolean spinnersLive;
     private String existingId;
     private long createdAt;
 
@@ -75,6 +81,9 @@ public final class EditorActivity extends Activity {
         wireLayers();
         wirePreview();
         refreshPreview();
+
+        // the spinners settle asynchronously; arm them one frame later
+        findViewById(android.R.id.content).post(() -> spinnersLive = true);
     }
 
     // ── spinners ───────────────────────────────────────────────────────────
@@ -89,6 +98,7 @@ public final class EditorActivity extends Activity {
         preset.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long i) {
+                if (!spinnersLive) return;
                 DeviceCatalog.Preset p = presets[position];
                 p.apply(builder);
                 builder.label = p.name;
@@ -108,6 +118,7 @@ public final class EditorActivity extends Activity {
         carrier.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long i) {
+                if (!spinnersLive) return;
                 IdentityFactory.Carrier c = IdentityFactory.CARRIERS[position];
                 builder.timezoneId = c.timezone;
                 builder.language = c.language;
