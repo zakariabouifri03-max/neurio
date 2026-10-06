@@ -104,9 +104,8 @@ jobs:
             echo "release APK not produced (R8 step: ${{ steps.release.outcome }})"
           fi
           if ls dist/*.apk > /dev/null 2>&1; then
-            for apk in dist/*.apk; do
-              printf '%s  ' "$apk"; sha256sum "$apk" | cut -d' ' -f1
-            done > dist/SHA256SUMS.txt
+            # Standard `sha256sum -c` format: hash, two spaces, file name.
+            ( cd dist && sha256sum *.apk > SHA256SUMS.txt )
             cat dist/SHA256SUMS.txt
           fi
           if ls dist/*.apk > /dev/null 2>&1; then
