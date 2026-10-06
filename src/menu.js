@@ -365,6 +365,44 @@ export function openSeries(game) {
   $('panelBody').innerHTML = html;
 }
 
+export function openGfx(game) {
+  audio.click();
+  openPanel('⚡ GRAPHICS');
+  const gfx = game.save.gfx;
+  const RES = [['auto', '🤖 AUTO'], ['720', 'HD 720p'], ['1080', 'FHD 1080p'], ['1440', 'QHD 1440p'], ['2160', '✨ 4K ULTRA']];
+  const FPS = [['30', '🔋 30 FPS'], ['60', '⚡ 60 STABLE'], ['max', '🚀 MAX']];
+  const chips = (list, cur) => list.map(([k, l]) => `<button class="chip ${String(cur) === k ? 'on' : ''}" data-k="${k}">${l}</button>`).join('');
+  $('panelBody').innerHTML = `
+  <div class="help gfxPanel">
+    <p class="gxTitle">🖼️ RENDER RESOLUTION</p>
+    <div class="chips" id="gxRes">${chips(RES, gfx.res)}</div>
+    <p class="gxTitle">🎯 FRAMERATE</p>
+    <div class="chips" id="gxFps">${chips(FPS, gfx.fps)}</div>
+    <p class="gxTitle">🧠 AUTO-STABILIZER</p>
+    <div class="chips" id="gxStab">${chips([['on', '✅ ON — keeps FPS steady'], ['off', '❌ OFF']], gfx.stab ? 'on' : 'off')}</div>
+    <p class="gxNote">✨ <b>4K ULTRA</b> renders up to 3840×2160 — razor sharp, needs a strong GPU.<br>
+      ⚡ <b>60 STABLE</b> + stabilizer ON = buttery 60 FPS: quality auto-tunes so the game never stutters.<br>
+      🔋 Old phone? Try <b>AUTO + 30 FPS</b> to stay light on battery &amp; heat.</p>
+    <p class="gxInfo" id="gxInfo"></p>
+  </div>`;
+  game._gfxInfo = $('gxInfo');
+  game.updateFpsBadge();
+  const bind = (id, key, emoji) => $(id).querySelectorAll('.chip').forEach((b) => {
+    b.onclick = () => {
+      audio.click();
+      gfx[key] = b.dataset.k === 'on' ? true : b.dataset.k === 'off' ? false : b.dataset.k;
+      game.persist();
+      game._gfxLvl = 0;
+      game.applyGfx();
+      game.toast(`${emoji} <b>${b.textContent.trim()}</b>`);
+      openGfx(game);
+    };
+  });
+  bind('gxRes', 'res', '🖼️ Resolution:');
+  bind('gxFps', 'fps', '🎯 Framerate:');
+  bind('gxStab', 'stab', '🧠 Stabilizer:');
+}
+
 export function openHelp(game) {
   audio.click();
   openPanel('❓ HOW TO PLAY');

@@ -399,3 +399,22 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .powerSlot { bottom: 128px; width: 66px; height: 66px; }
   #hudPower { font-size: 28px; }
 }
+
+/* ── graphics settings panel ── */
+.gfxPanel .gxTitle { margin: 12px 0 7px; font-weight: 700; color: #ffe95e; letter-spacing: .5px; font-size: 15px; }
+.gfxPanel .gxTitle:first-child { margin-top: 2px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 9px 16px; border-radius: 99px; font-weight: 700; font-size: 14px; cursor: pointer;
+  background: rgba(255,255,255,0.14); color: #cfe3ff; border: 2px solid rgba(255,255,255,0.28);
+  transition: transform 0.1s;
+}
+.chip:active { transform: scale(0.95); }
+.chip.on { background: #ffd23f; color: #4a2c00; border-color: #fff; box-shadow: 0 3px 0 rgba(0,0,0,0.25); }
+.gxNote { font-size: 13px; opacity: 0.92; line-height: 1.55; margin-top: 14px; }
+.gxInfo { font-size: 12px; opacity: 0.7; font-family: ui-monospace, monospace; margin-top: 8px; }
+
+/* FPS / resolution chip in the race HUD */
+.hudChip.fps { background: linear-gradient(180deg, #0d9488, #0f766e); }
+.hudChip.fps b.ok { color: #86ffb0; }
+.hudChip.fps b.low { color: #ffb45e; }

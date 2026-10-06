@@ -1,0 +1,13 @@
+{
+  "name": "bash-baqi-racing",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:html": "node tools/build-singlefile.mjs",
+    "build:apk": "node tools/build-singlefile.mjs && python3 tools/build-apk.py"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

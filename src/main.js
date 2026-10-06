@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { loadSave, persist } from './save.js';
 import { MAPS, RIVALS, REWARDS, UPGRADES, carById } from './data.js';
 import { Race } from './race.js';
-import { Garage, openShop, openCustomize, openUpgrades, openSeries, openHelp, showResults, showChampion, closePanel } from './menu.js';
+import { Garage, openShop, openCustomize, openUpgrades, openSeries, openHelp, openGfx, showResults, showChampion, closePanel } from './menu.js';
 import { BloomFX } from './post.js';
 import { audio } from './audio.js';
 import { clamp, fmt } from './util.js';
@@ -31,7 +31,8 @@ const game = {
   fx: null,
   _shake: 0,
   _pendingSeason: null,
-  _fpsT: 0, _fpsN: 0, _fpsLow: 0,
+  _fpsT: 0, _fpsN: 0, _fpsNow: 0,
+  _gfxLvl: 0, _okN: 0, _acc: 0,
 };
 window.GAME = game;
 
@@ -186,10 +187,63 @@ function onRaceFinish(res) {
   });
 }
 
+// ── graphics: resolution presets (up to 4K), FPS cap, 60-FPS stabilizer ────
+const RES_TARGETS = { '720': 720, '1080': 1080, '1440': 1440, '2160': 2160 };
+const RES_LABELS = { auto: 'AUTO', '720': '720p', '1080': '1080p', '1440': '1440p', '2160': '4K' };
+// stabilizer ladder: each step trades quality for framerate
+const GFX_STEPS = [
+  { scale: 1.0, fx: true },   // L0 full quality
+  { scale: 1.0, fx: false },  // L1 bloom off
+  { scale: 0.8, fx: false },  // L2 80% resolution
+  { scale: 0.62, fx: false }, // L3 62% resolution
+  { scale: 0.5, fx: false },  // L4 50% resolution
+];
+
+game.fpsCap = () => { const f = game.save.gfx.fps; return f === '30' ? 30 : f === 'max' ? 0 : 60; };
+
+game.gfxBaseRatio = () => {
+  const target = RES_TARGETS[game.save.gfx.res];
+  if (!target) return Math.min(devicePixelRatio || 1, 2);        // AUTO = native (≤2x)
+  let r = clamp(target / innerHeight, 0.5, 5.5);                 // buffer ≈ target height
+  const px = innerWidth * innerHeight * r * r;
+  if (px > 3840 * 2160) r = Math.sqrt((3840 * 2160) / (innerWidth * innerHeight)); // ≤ ~4K pixels
+  return r;
+};
+
+game.applyGfx = () => {
+  if (!game.renderer) return;
+  const step = GFX_STEPS[game._gfxLvl || 0];
+  const ratio = game.gfxBaseRatio() * step.scale;
+  game.renderer.setPixelRatio(ratio);
+  game.renderer.setSize(innerWidth, innerHeight);
+  game.fx.enabled = step.fx;
+  game.fx.setSize(innerWidth, innerHeight);
+  game.updateFpsBadge();
+};
+
+game.gfxDown = () => { if ((game._gfxLvl || 0) < GFX_STEPS.length - 1) { game._gfxLvl++; game.applyGfx(); } };
+game.gfxUp = () => { if ((game._gfxLvl || 0) > 0) { game._gfxLvl--; game.applyGfx(); } };
+
+game.updateFpsBadge = () => {
+  const b = $('hudFps');
+  if (b) {
+    const fps = Math.round(game._fpsNow || 0);
+    const label = RES_LABELS[game.save.gfx.res] || 'AUTO';
+    b.textContent = `${fps || '--'} · ${label}${game._gfxLvl > 0 ? ' ▾' + game._gfxLvl : ''}`;
+    const target = game.fpsCap() || 60;
+    b.classList.toggle('ok', fps > 0 && fps >= target - 6);
+    b.classList.toggle('low', fps > 0 && fps < target - 6);
+  }
+  if (game._gfxInfo) {
+    const c = game.renderer.domElement;
+    game._gfxInfo.textContent =
+      `Rendering ${c.width}×${c.height} @ ${game.renderer.getPixelRatio().toFixed(2)}x · Screen ${innerWidth}×${innerHeight} (DPR ${(devicePixelRatio || 1).toFixed(1)}) · ${Math.round(game._fpsNow || 0)} FPS`;
+  }
+};
+
 // ── renderer / loop ──────────────────────────────────────────────────────────
 function boot() {
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   renderer.setSize(innerWidth, innerHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -198,16 +252,34 @@ function boot() {
   $('app').appendChild(renderer.domElement);
   game.renderer = renderer;
   game.fx = new BloomFX(renderer);
+  game.applyGfx();
 
   const clock = new THREE.Clock();
   renderer.setAnimationLoop(() => {
-    const dt = Math.min(clock.getDelta(), 0.08);
-    // auto quality: drop bloom if consistently slow
+    let dt = Math.min(clock.getDelta(), 0.08);
+
+    // ── FPS cap + frame pacing (30 / 60-stable / MAX) ──
+    const cap = game.fpsCap();
+    if (cap) {
+      game._acc += dt;
+      if (game._acc < 1 / cap - 0.0004) return; // hold the frame → rock-steady cadence
+      dt = Math.min(game._acc, 0.08);
+      game._acc = 0;
+    }
+
+    // ── FPS meter + auto-stabilizer ──
     game._fpsT += dt; game._fpsN++;
-    if (game._fpsT > 3) {
+    if (game._fpsT > 1.2) {
       const fps = game._fpsN / game._fpsT;
-      if (fps < 28 && game.fx.enabled) { game.fx.enabled = false; }
+      game._fpsNow = fps;
       game._fpsT = 0; game._fpsN = 0;
+      game.updateFpsBadge();
+      if (game.save.gfx.stab) {
+        const target = cap || 60;
+        if (fps < target - 9) { game._okN = 0; game.gfxDown(); }          // struggling → drop a step
+        else if (fps >= target - 3) { if (++game._okN >= 3) { game.gfxUp(); game._okN = 0; } } // headroom → recover
+        else game._okN = 0;
+      } else if (fps < 28 && game.fx.enabled) { game.fx.enabled = false; }
     }
 
     if (game.state === 'race' && game.race) {
@@ -221,11 +293,10 @@ function boot() {
   });
 
   addEventListener('resize', () => {
-    renderer.setSize(innerWidth, innerHeight);
     const a = innerWidth / innerHeight;
     if (game.race) { game.race.camera.aspect = a; game.race.camera.updateProjectionMatrix(); }
     if (game.garage) { game.garage.camera.aspect = a; game.garage.camera.updateProjectionMatrix(); }
-    game.fx.setSize(innerWidth, innerHeight);
+    game.applyGfx(); // recomputes ratio + buffer size (needed for 720p…4K presets)
   });
 
   wireUI();
@@ -247,6 +318,7 @@ function wireUI() {
   $('btnCustom').onclick = () => openCustomize(game);
   $('btnUpg').onclick = () => openUpgrades(game);
   $('btnSeries').onclick = () => openSeries(game);
+  $('btnGfx').onclick = () => openGfx(game);
   $('btnHelp').onclick = () => openHelp(game);
   $('panelClose').onclick = () => { audio.click(); closePanel(); };
 

@@ -1,6 +1,9 @@
 // Builds bash-baqi-racing.html — the whole game in ONE file (works from file://)
+// Usage: npm install && npm run build:html
 import { readFileSync, writeFileSync } from 'node:fs';
-import { build } from '/tmp/gb/node_modules/esbuild/lib/main.js';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const { build } = require('esbuild');
 
 const root = new URL('..', import.meta.url).pathname;
 

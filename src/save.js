@@ -25,8 +25,11 @@ export function defaultSave() {
     races: 0,
     music: true,
     sfx: true,
+    gfx: { res: 'auto', fps: '60', stab: true }, // res: auto|720|1080|1440|2160(4K) · fps: 30|60|max · stab: auto-stabilizer
   };
 }
+
+export const GFX_DEFAULT = { res: 'auto', fps: '60', stab: true };
 
 export function loadSave() {
   try {
@@ -35,6 +38,7 @@ export function loadSave() {
       const d = defaultSave();
       const out = Object.assign(d, s);
       out.v = 1;
+      out.gfx = Object.assign({}, GFX_DEFAULT, s.gfx || {});
       return out;
     }
   } catch (e) { /* corrupted save → fresh start */ }

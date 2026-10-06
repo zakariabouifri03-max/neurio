@@ -46,6 +46,35 @@ The game is a full **PWA** (Progressive Web App): installable, fullscreen, **wor
 
 ---
 
+## 🤖 Real Android APK — 60 FPS + up to 4K
+
+**[`BashBaqiRacing-4K60.apk`](BashBaqiRacing-4K60.apk)** is a real, installable
+Android app (a tiny WebView wrapper around the single-file game). Sideload it on any
+phone running **Android 5.0+** — no browser needed.
+
+It adds a new **⚡ Graphics** panel in the garage:
+
+- 🖼️ **Render resolution** — AUTO / HD 720p / FHD 1080p / QHD 1440p / **✨ 4K ULTRA** (up to 3840×2160)
+- 🎯 **Framerate** — 🔋 30 FPS · ⚡ **60 STABLE** (frame-pacing locked to a steady 60) · 🚀 MAX
+- 🧠 **Auto-stabilizer** — watches the live FPS and auto-tunes effects/resolution so the game never stutters; a small **⚡ chip** in the race HUD shows current FPS + resolution
+
+**Build it yourself** (no Android SDK required — pure Python + Node):
+
+```bash
+npm install
+npm run build:apk        # bundles the game → assets/game.html, then builds + signs the APK
+```
+
+`tools/build-apk.py` re-zips with 4-byte alignment and signs with **both v1 (JAR) and
+v2 (APK Signature Scheme)** — v2 is mandatory because the manifest targets SDK 30.
+The signing key lives in `tools/signing/` (generated on first build; keep it if you
+want future updates to install over this one).
+
+> ⚠️ This build is signed with a **new key**, so if an older Bash Baqi Racing APK is
+> already on the phone, uninstall it first.
+
+---
+
 ## 🎮 The Game
 
 You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
