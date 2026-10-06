@@ -7,7 +7,7 @@ This is a separate Android Studio app alongside the repository's existing browse
 1. Install Android Studio with Android SDK Platform 35 and JDK 17.
 2. Open this `android/` directory as an existing Gradle project and allow Android Studio to sync/download the Android Gradle Plugin and Kotlin plugin. The included `gradlew`/`gradlew.bat` bootstrap the pinned Gradle 8.9 distribution.
 3. Build with `./gradlew :app:assembleDebug` (Windows: `gradlew.bat :app:assembleDebug`) and install `app/build/outputs/apk/debug/app-debug.apk` on two Android phones (Android 12+ recommended).
-4. Alternatively, the GitHub Actions workflow **Android debug APK** builds this branch and uploads `neurio-lan-stream-debug-apk` (APK plus SHA-256 file) for 90 days. Open the workflow run in the repository's Actions tab and download its artifact ZIP. This is a debug build, not a release-signed APK. The authoring sandbox has no JDK, Android SDK, emulator, or connected phones; even after CI compilation, the required two-device hardware test still needs to be performed.
+4. The GitHub Actions workflow **Android debug APK** builds this branch, uploads a 90-day artifact, and publishes a versioned GitHub prerelease with a direct `Neurio-LAN-Stream-debug.apk` asset and SHA-256 file. Use the latest **Neurio LAN Stream debug APK** entry under GitHub Releases, or download the artifact ZIP from the workflow run. This is debug-signed, not release-signed. CI compilation does not replace the required two-device hardware test.
 
 Application ID: `com.neurio.lanstream` (`.debug` suffix for Android Studio's debug variant). Minimum SDK 26. Target SDK 35.
 

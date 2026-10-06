@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-debug-apk:
@@ -78,15 +78,44 @@ jobs:
             echo '::error::Gradle log was not created.'
           fi
 
-      - name: Record APK checksum
-        run: sha256sum android/app/build/outputs/apk/debug/app-debug.apk | tee android/app/build/outputs/apk/debug/SHA256SUMS.txt
+      - name: Rename APK and record checksum
+        working-directory: android/app/build/outputs/apk/debug
+        run: |
+          cp app-debug.apk Neurio-LAN-Stream-debug.apk
+          sha256sum Neurio-LAN-Stream-debug.apk > SHA256SUMS.txt
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v6
         with:
           name: neurio-lan-stream-debug-apk
           path: |
-            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/apk/debug/Neurio-LAN-Stream-debug.apk
             android/app/build/outputs/apk/debug/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 90
+
+      - name: Publish installable APK GitHub prerelease
+        if: github.ref == 'refs/heads/arena/22c19685-neurio'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="neurio-lan-stream-debug-${GITHUB_SHA:0:12}"
+          apk="android/app/build/outputs/apk/debug/Neurio-LAN-Stream-debug.apk"
+          checksums="android/app/build/outputs/apk/debug/SHA256SUMS.txt"
+          title="Neurio LAN Stream debug APK (${GITHUB_SHA:0:7})"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$apk" "$checksums" --clobber
+          else
+            gh release create "$tag" "$apk" "$checksums" \
+              --target "$GITHUB_SHA" --prerelease --title "$title" \
+              --notes "CI-built debug APK for the Neurio LAN streaming prototype. Install the same APK on both phones. This is not a release-signed or real-device-validated build."
+          fi
+          release_url="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${tag}"
+          apk_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}/Neurio-LAN-Stream-debug.apk"
+          {
+            echo '## Direct APK download'
+            echo "- APK: [Download Neurio-LAN-Stream-debug.apk](${apk_url})"
+            echo "- Release and checksum: [${title}](${release_url})"
+          } >> "$GITHUB_STEP_SUMMARY"
