@@ -318,3 +318,10 @@ textarea.code {
 .p2p-status.on { color: var(--ok); }
 .p2p-status.err { color: #ffb4b4; }
 .badge-static { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(34,211,238,.45); color: var(--accent); }
+
+.modal-card.small { width: min(420px, 100%); }
+.connect-row { display: flex; gap: 6px; align-items: center; margin: 8px 0 2px; }
+.connect-row input { flex: 1; padding: 10px 12px; border-radius: 11px; border: 1px solid var(--line);
+  background: rgba(7,11,22,.75); color: var(--txt); font: inherit; font-size: 13px; outline: none; }
+.connect-row input:focus { border-color: var(--accent); }
+code { background: rgba(0,0,0,.35); padding: 1px 5px; border-radius: 6px; font-size: 12px; direction: ltr; display: inline-block; }

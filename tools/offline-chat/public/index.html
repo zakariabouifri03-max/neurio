@@ -63,6 +63,15 @@
       <button class="btn ghost small" id="btnCopyInvite" data-i18n="copyInvite">📋 نسخ رابط الدعوة</button>
     </div>
 
+    <div id="connectBox" class="server-card hidden">
+      <div class="server-row"><b data-i18n="connectTitle">🔌 عندك سيرفر فالحاسوب؟</b></div>
+      <div class="connect-row">
+        <input id="connectUrl" type="text" inputmode="url" dir="ltr" placeholder="http://192.168.1.5:8080" data-i18n-ph="connectPh">
+        <button class="btn primary small" id="connectBtn" data-i18n="connectGo">اتصال</button>
+      </div>
+      <p class="hint" data-i18n="connectHint">شغّل <code>node tools/offline-chat/server.mjs</code> فالحاسوب، وحط هنا العنوان لي كيعطيك.</p>
+    </div>
+
     <div class="lang-row" id="langRow">
       <button class="lang" data-lang="ar">🇲🇦 الدارجة</button>
       <button class="lang" data-lang="fr">🇫🇷 Français</button>
@@ -145,7 +154,22 @@
     </div>
   </main>
 
-  <div id="p2pModal" class="modal hidden">
+  <div id="roomModal" class="modal hidden">
+  <div class="modal-card small">
+    <header class="modal-head">
+      <b data-i18n="newRoomTitle">🏠 غرفة جديدة</b>
+      <button class="icon-btn" id="roomClose" aria-label="close">✕</button>
+    </header>
+    <label class="field">
+      <span data-i18n="newRoomName">سمية الغرفة</span>
+      <input id="roomNameIn" type="text" maxlength="24" data-i18n-ph="newRoomPh" placeholder="مثال: فريق الدار">
+    </label>
+    <div class="chip-row" id="roomEmoji"></div>
+    <button class="btn primary" id="roomCreate" data-i18n="newRoomCreate">إنشاء الغرفة</button>
+  </div>
+</div>
+
+<div id="p2pModal" class="modal hidden">
   <div class="modal-card">
     <header class="modal-head">
       <b data-i18n="p2pTitle">🔗 ربط جهاز آخر مباشرة (P2P)</b>

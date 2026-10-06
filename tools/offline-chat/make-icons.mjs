@@ -143,3 +143,18 @@ for (const [name, size, opts] of targets) {
   console.log(`   🎨 ${name.padEnd(24)} ${size}×${size}  ${(png.length / 1024).toFixed(1)} KB`);
 }
 console.log('   ✅ icons written to public/');
+
+/* ── the same artwork, in the sizes an Android APK needs ──────────────── */
+const APK_ICONS = path.join(path.dirname(fileURLToPath(import.meta.url)), 'apk', 'icons');
+const MIPMAPS = [
+  ['mipmap-mdpi', 48], ['mipmap-hdpi', 72], ['mipmap-xhdpi', 96],
+  ['mipmap-xxhdpi', 144], ['mipmap-xxxhdpi', 192],
+];
+for (const [dir, size] of MIPMAPS) {
+  const target = path.join(APK_ICONS, dir);
+  fs.mkdirSync(target, { recursive: true });
+  const png = render(size, {});              // rounded square: launcher masks handle the shape
+  fs.writeFileSync(path.join(target, 'ic_launcher.png'), png);
+  console.log(`   🤖 ${dir.padEnd(16)} ic_launcher.png  ${size}×${size}  ${(png.length / 1024).toFixed(1)} KB`);
+}
+console.log('   ✅ APK mipmaps written to apk/icons/');

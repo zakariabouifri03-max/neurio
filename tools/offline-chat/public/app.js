@@ -31,6 +31,14 @@ const STRINGS = {
     staticTitle: '🔗 وضع «بلا سيرفر» — GitHub / ملف ثابت',
     staticBody: 'ما لقيناش سيرفر على هاد العنوان. مازال تقدر تجرب: نفس الجهاز (تبويبين)، ولا تربط جهاز آخر مباشرة (P2P).',
     staticBadge: 'بلا سيرفر',
+    newRoomTitle: '🏠 غرفة جديدة', newRoomName: 'سمية الغرفة', newRoomPh: 'مثال: فريق الدار',
+    newRoomCreate: 'إنشاء الغرفة', roomEmojiLabel: 'رمز الغرفة',
+    connectTitle: '🔌 عندك سيرفر فالحاسوب؟', connectPh: 'http://192.168.1.5:8080',
+    connectGo: 'اتصال', connectHint: 'شغّل <code>node tools/offline-chat/server.mjs</code> فالحاسوب، وحط هنا العنوان لي كيعطيك.',
+    connectBad: 'العنوان ماشي صحيح — خاصو يبدا بـ http:// ولا https://',
+    apkHint: '📱 فالتطبيق (APK): الدردشة كتخدم بلا إنترنت (P2P بين الهواتف). الصور والملفات والملاحظات الصوتية ماشي فالتطبيق — دوس على 🔗 دعوة ونسخ الرابط، وحلو فـ Chrome.',
+    apkNoFiles: 'فالتطبيق ما كاينش اختيار الملفات 📎 — من 🔗 دعوة نسخ الرابط وحلو فـ Chrome باش تصيفط تصاور ولا ملفات.',
+    apkNoMic: 'التسجيل الصوتي ما كاينش فالتطبيق 🎙️ — حل الرابط فـ Chrome.',
     p2pOpen: '🔗 جهاز آخر (P2P)', p2pTitle: '🔗 ربط جهاز آخر مباشرة (P2P)',
     p2pHint: 'خدمة بلا إنترنت وبلا سيرفر: الرمز كيدوز بين الجهازين بأي طريقة (واتساب، بلوتوث، نسخ يدوي…). الجوج خاصهم يكونو على نفس الشبكة المحلية.',
     p2pCreate: '1) أنا نبدا الدعوة', p2pCreateBtn: 'إنشاء رمز الدعوة', p2pCopy: '📋 نسخ الرمز',
@@ -70,6 +78,14 @@ const STRINGS = {
     staticTitle: '🔗 Mode « sans serveur » — GitHub / fichier statique',
     staticBody: 'Aucun serveur à cette adresse. Vous pouvez quand même tester : même appareil (deux onglets) ou lier un autre appareil en direct (P2P).',
     staticBadge: 'sans serveur',
+    newRoomTitle: '🏠 Nouveau salon', newRoomName: 'Nom du salon', newRoomPh: 'ex : Équipe maison',
+    newRoomCreate: 'Créer', roomEmojiLabel: 'Icône du salon',
+    connectTitle: '🔌 Un serveur tourne sur votre PC ?', connectPh: 'http://192.168.1.5:8080',
+    connectGo: 'Connecter', connectHint: 'Lancez <code>node tools/offline-chat/server.mjs</code> sur le PC puis collez l’adresse affichée.',
+    connectBad: 'Adresse invalide — elle doit commencer par http:// ou https://',
+    apkHint: '📱 Dans l’APK : le chat marche sans internet (P2P entre téléphones). Photos, fichiers et notes vocales n’y sont pas — bouton 🔗 Inviter, copiez le lien et ouvrez-le dans Chrome.',
+    apkNoFiles: 'L’APK n’a pas de sélecteur de fichiers 📎 — ouvrez le lien dans Chrome pour envoyer photos/fichiers.',
+    apkNoMic: 'Notes vocales indisponibles dans l’APK 🎙️ — ouvrez le lien dans Chrome.',
     p2pOpen: '🔗 Autre appareil (P2P)', p2pTitle: '🔗 Lier un autre appareil (P2P)',
     p2pHint: 'Sans internet ni serveur : le code passe par n’importe quel canal (WhatsApp, Bluetooth, copier-coller…). Les deux appareils doivent être sur le même réseau local.',
     p2pCreate: '1) Je lance l’invitation', p2pCreateBtn: 'Créer le code', p2pCopy: '📋 Copier le code',
@@ -109,6 +125,14 @@ const STRINGS = {
     staticTitle: '🔗 “No server” mode — GitHub / static file',
     staticBody: 'No server at this address. You can still try it: same device (two tabs) or link another device directly (P2P).',
     staticBadge: 'no server',
+    newRoomTitle: '🏠 New room', newRoomName: 'Room name', newRoomPh: 'e.g. Home crew',
+    newRoomCreate: 'Create room', roomEmojiLabel: 'Room icon',
+    connectTitle: '🔌 Running a server on your PC?', connectPh: 'http://192.168.1.5:8080',
+    connectGo: 'Connect', connectHint: 'Run <code>node tools/offline-chat/server.mjs</code> on the PC, then paste the address it prints.',
+    connectBad: 'Invalid address — it must start with http:// or https://',
+    apkHint: '📱 In the APK: chat works with no internet (P2P between phones). Photos, files and voice notes are not there — tap 🔗 Invite, copy the link and open it in Chrome.',
+    apkNoFiles: 'The APK has no file picker 📎 — open the link in Chrome to send photos or files.',
+    apkNoMic: 'Voice notes are unavailable in the APK 🎙️ — open the link in Chrome.',
     p2pOpen: '🔗 Another device (P2P)', p2pTitle: '🔗 Link another device (P2P)',
     p2pHint: 'No internet, no server: the code travels over any channel (WhatsApp, Bluetooth, copy-paste…). Both devices must be on the same local network.',
     p2pCreate: '1) I start the invite', p2pCreateBtn: 'Create invite code', p2pCopy: '📋 Copy code',
@@ -125,7 +149,26 @@ const STRINGS = {
   },
 };
 const LOCALES = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-GB' };
-let LANG = localStorage.getItem('nurio.lang') || 'ar';
+/* storage that can never break the app: WebViews, private mode and some
+   file:// origins throw on localStorage — fall back to memory in that case */
+const LS = (() => {
+  try {
+    const real = window['localStorage'];
+    real.setItem('__nurio_probe', '1');
+    real.removeItem('__nurio_probe');
+    return real;
+  } catch {
+    const mem = new Map();
+    return {
+      getItem: (k) => (mem.has(k) ? mem.get(k) : null),
+      setItem: (k, v) => { mem.set(k, String(v)); },
+      removeItem: (k) => { mem.delete(k); },
+    };
+  }
+})();
+const IS_APK = location.protocol === 'file:';
+const HOSTED_URL = 'https://cdn.jsdelivr.net/gh/zakariabouifri03-max/neurio@main/tools/offline-chat/public/';
+let LANG = LS.getItem('nurio.lang') || 'ar';
 const t = (k) => (STRINGS[LANG] && STRINGS[LANG][k]) || STRINGS.ar[k] || k;
 
 /* ─────────────────────────────── helpers ─────────────────────────────── */
@@ -212,7 +255,7 @@ const wantOffline = QS.get('mode') === 'local';     // force no-server mode
 const S = {
   me: null,
   ws: null, conn: 'connecting', tries: 0, timer: null,
-  transport: wantHttp || localStorage.getItem('nurio.transport') === 'http' ? 'http' : 'ws',
+  transport: wantHttp || LS.getItem('nurio.transport') === 'http' ? 'http' : 'ws',
   opened: false, wsFails: 0, httpLoop: false,
   mode: 'server',            // server | local | p2p
   serverOK: null,            // null = still probing
@@ -229,14 +272,14 @@ function saveCache() {
   try {
     const out = {};
     for (const [room, list] of Object.entries(S.msgs)) out[room] = list.slice(-70);
-    localStorage.setItem(CACHE_KEY, JSON.stringify(out));
+    LS.setItem(CACHE_KEY, JSON.stringify(out));
   } catch { /* quota — ignore */ }
 }
 function loadCache() {
-  try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch { return {}; }
+  try { return JSON.parse(LS.getItem(CACHE_KEY) || '{}'); } catch { return {}; }
 }
-function saveQueue() { try { localStorage.setItem('nurio.queue.v1', JSON.stringify(S.queue)); } catch { } }
-function loadQueue() { try { return JSON.parse(localStorage.getItem('nurio.queue.v1') || '[]'); } catch { return []; } }
+function saveQueue() { try { LS.setItem('nurio.queue.v1', JSON.stringify(S.queue)); } catch { } }
+function loadQueue() { try { return JSON.parse(LS.getItem('nurio.queue.v1') || '[]'); } catch { return []; } }
 
 /* ─────────────────────────────── login ─────────────────────────────── */
 const EMOJIS = ['🙂', '😎', '🐱', '🦊', '🐼', '🦁', '🐬', '🦅', '🌟', '🎮', '🎧', '⚽', '🍕', '🚀', '👑', '🔥'];
@@ -268,7 +311,7 @@ function applyLang() {
   $$('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
   $$('[data-i18n-ph]').forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
   $$('#langRow .lang').forEach((b) => b.classList.toggle('on', b.dataset.lang === LANG));
-  localStorage.setItem('nurio.lang', LANG);
+  LS.setItem('nurio.lang', LANG);
   document.title = t('appName');
   if (S.me) renderAll();
 }
@@ -304,7 +347,7 @@ async function checkServer() {
 function startChat(profile) {
   S.me = { ...profile, id: profile.id || uid(6) };
   sessionStorage.setItem('nurio.me.session', JSON.stringify(S.me));
-  if ($('#inRemember').checked) localStorage.setItem(ME_KEY, JSON.stringify(S.me));
+  if ($('#inRemember').checked) LS.setItem(ME_KEY, JSON.stringify(S.me));
   S.msgs = loadCache();
   S.queue = loadQueue();
   $('#meName').textContent = S.me.name;
@@ -325,7 +368,7 @@ function startChat(profile) {
 }
 
 function logout() {
-  localStorage.removeItem(ME_KEY);
+  LS.removeItem(ME_KEY);
   sessionStorage.removeItem('nurio.me.session');
   location.reload();
 }
@@ -383,7 +426,7 @@ function postIn(msg) {
 
 function useHttp(quiet) {
   S.transport = 'http';
-  try { localStorage.setItem('nurio.transport', 'http'); } catch { }
+  try { LS.setItem('nurio.transport', 'http'); } catch { }
   if (!quiet) toast(t('httpMode'), 4000);
   connectHttp();
 }
@@ -944,7 +987,7 @@ async function startRecording() {
   if (!micSupported()) { toast(t('noMic'), 4000); return; }
   try {
     recStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
-  } catch { toast(t('micDenied')); return; }
+  } catch { toast(t(IS_APK ? 'apkNoMic' : 'micDenied')); return; }
   const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'].find((m) => MediaRecorder.isTypeSupported?.(m)) || '';
   recorder = new MediaRecorder(recStream, mime ? { mimeType: mime } : undefined);
   recChunks = [];
@@ -1036,7 +1079,7 @@ function banner(text, isErr) {
 /* ─────────────────────────────── wiring ─────────────────────────────── */
 function wire() {
   /* login */
-  $('#inName').value = (() => { try { return JSON.parse(localStorage.getItem(ME_KEY) || 'null')?.name || ''; } catch { return ''; } })();
+  $('#inName').value = (() => { try { return JSON.parse(LS.getItem(ME_KEY) || 'null')?.name || ''; } catch { return ''; } })();
   buildPicker();
   $('#btnEnter').onclick = () => {
     const name = $('#inName').value.trim();
@@ -1049,7 +1092,10 @@ function wire() {
   // in no-server mode the invite *is* the page URL (GitHub Pages / CDN / file)
   const inviteUrl = () => {
     const list = (S.server?.addresses || []).map((ip) => `${location.protocol}//${ip}:${location.port || 80}`);
-    if (S.mode !== 'server' || !list.length) return location.href.split('#')[0];
+    if (S.mode !== 'server' || !list.length) {
+      // share the hosted copy when running from file:// (an APK cannot be shared)
+      return IS_APK ? HOSTED_URL : location.href.split('#')[0];
+    }
     return list[0] || location.origin;
   };
   const shareInvite = async () => {
@@ -1066,9 +1112,44 @@ function wire() {
   $('#btnCloseSide').onclick = closeSide;
   $('#btnSwitch').onclick = logout;
   wireP2P();
+  const ROOM_EMOJIS = ['💬', '🏠', '🎮', '⚽', '🎧', '🍕', '📚', '💼', '🚗', '🎉', '❤️', '🔥'];
+  let roomEmoji = '💬';
+  const paintRoomEmoji = () => {
+    const box = $('#roomEmoji');
+    box.textContent = '';
+    for (const e of ROOM_EMOJIS) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = e;
+      if (e === roomEmoji) b.classList.add('on');
+      b.onclick = () => { roomEmoji = e; paintRoomEmoji(); };
+      box.append(b);
+    }
+  };
+  paintRoomEmoji();
+  const closeRoomModal = () => $('#roomModal').classList.add('hidden');
+  const createRoomNow = () => {
+    const name = $('#roomNameIn').value.trim();
+    if (!name) { $('#roomNameIn').focus(); return; }
+    send({ t: 'room', name, emoji: roomEmoji });
+    toast(t('roomMade'));
+    $('#roomNameIn').value = '';
+    closeRoomModal();
+  };
   $('#btnNewRoom').onclick = () => {
-    const name = prompt(t('newRoom'));
-    if (name && name.trim()) { send({ t: 'room', name: name.trim(), emoji: '💬' }); toast(t('roomMade')); }
+    $('#roomModal').classList.remove('hidden');
+    setTimeout(() => $('#roomNameIn').focus(), 50);
+  };
+  $('#roomClose').onclick = closeRoomModal;
+  $('#roomCreate').onclick = createRoomNow;
+  $('#roomNameIn').addEventListener('keydown', (e) => { if (e.key === 'Enter') createRoomNow(); });
+  $('#roomModal').addEventListener('click', (e) => { if (e.target.id === 'roomModal') closeRoomModal(); });
+
+  // connect to a real LAN server (handy from the APK / static hosting)
+  $('#connectBtn').onclick = () => {
+    let url = $('#connectUrl').value.trim();
+    if (!/^https?:\/\//i.test(url)) { toast(t('connectBad'), 3000); return; }
+    if (!/:\d+/.test(url)) url = url.replace(/\/$/, '') + ':8080';
+    location.href = url;
   };
   $('#btnInvite').onclick = () => $('#btnCopyInvite').click();
   $('#btnExport').onclick = () => downloadTranscript(S.active);
@@ -1109,7 +1190,10 @@ function wire() {
   });
   buildEmojiPanel();
 
-  $('#btnAttach').onclick = () => $('#fileInput').click();
+  $('#btnAttach').onclick = () => {
+    if (IS_APK) { toast(t('apkNoFiles'), 5000); return; }   // no WebChromeClient in the shell
+    $('#fileInput').click();
+  };
   $('#fileInput').onchange = (e) => { sendFiles([...e.target.files]); e.target.value = ''; };
 
   /* drag & drop + paste */
@@ -1205,7 +1289,7 @@ function updateModeBadge() {
 /* ─────────────────── 1) local hub: one browser, many tabs ─────────────────── */
 function localRooms() {
   let saved = [];
-  try { saved = JSON.parse(localStorage.getItem(LOCAL_ROOMS_KEY) || '[]'); } catch { }
+  try { saved = JSON.parse(LS.getItem(LOCAL_ROOMS_KEY) || '[]'); } catch { }
   const base = [
     { id: 'general', name: LANG === 'ar' ? 'العامة' : 'General', kind: 'group', emoji: '💬', createdAt: 0 },
     { id: 'help', name: LANG === 'ar' ? 'المساعدة' : 'Help', kind: 'group', emoji: '🆘', createdAt: 0 },
@@ -1219,8 +1303,8 @@ function localRooms() {
 
 function addLocalRoom(room) {
   let saved = [];
-  try { saved = JSON.parse(localStorage.getItem(LOCAL_ROOMS_KEY) || '[]'); } catch { }
-  if (!saved.some((r) => r.id === room.id)) { saved.push(room); localStorage.setItem(LOCAL_ROOMS_KEY, JSON.stringify(saved)); }
+  try { saved = JSON.parse(LS.getItem(LOCAL_ROOMS_KEY) || '[]'); } catch { }
+  if (!saved.some((r) => r.id === room.id)) { saved.push(room); LS.setItem(LOCAL_ROOMS_KEY, JSON.stringify(saved)); }
   if (!S.rooms.some((r) => r.id === room.id)) S.rooms.push(room);
   renderRooms();
 }
@@ -1595,6 +1679,11 @@ window.__neurio = { S, send, say: (text) => sendMessage({ text }), version: 1 };
 /* ─────────────────────────────── boot ─────────────────────────────── */
 async function boot() {
   wire();
+  // APK / WebView (file://) → explain what works offline in the app
+  if (location.protocol === 'file:') {
+    const hint = document.querySelector('.hint');
+    if (hint) hint.insertAdjacentHTML('afterend', `<p class="hint">${t('apkHint')}</p>`);
+  }
   applyLang();
   buildPicker();
   // decide the deployment mode before resuming a session: with no backend every
@@ -1609,8 +1698,11 @@ async function boot() {
   // returning user? (session first so several tabs = several users)
   let saved = null;
   try { saved = JSON.parse(sessionStorage.getItem('nurio.me.session') || 'null'); } catch { }
-  if (!saved && hasServer && !wantOffline) { try { saved = JSON.parse(localStorage.getItem(ME_KEY) || 'null'); } catch { } }
-  if (!hasServer) $('#staticNote').classList.remove('hidden');
+  if (!saved && hasServer && !wantOffline) { try { saved = JSON.parse(LS.getItem(ME_KEY) || 'null'); } catch { } }
+  if (!hasServer) {
+    $('#staticNote').classList.remove('hidden');
+    $('#connectBox').classList.remove('hidden');
+  }
   if (saved?.name) {
     draft = { name: saved.name, emoji: saved.emoji || '🙂', color: saved.color || COLORS[3] };
     startChat(saved);

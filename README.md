@@ -70,6 +70,7 @@ node tools/offline-chat/server.mjs
 * 🧪 `node tools/offline-chat/test.mjs` — 36 اختبار بلا أي مكتبة
 
 **▶ من GitHub مباشرة / straight from GitHub:**
+* 📲 **تطبيق أندرويد (APK)**: [`NurioTawasol.apk`](https://github.com/zakariabouifri03-max/neurio/blob/main/NurioTawasol.apk) — نزلو من GitHub ودوس عليه، كيخدم بلا إنترنت (التفاصيل فـ [`tools/offline-chat/apk/README.md`](tools/offline-chat/apk/README.md))
 * 📄 **بلا سيرفر (GitHub Pages)**: بعد ما تفعّل Pages → `https://zakariabouifri03-max.github.io/neurio/tools/offline-chat/public/`
   *(تبويبات فنفس الجهاز، ولا P2P بين جوج أجهزة برمز)*
 * ☁️ **سيرفر حقيقي بضغطة**: [`codespaces.new/zakariabouifri03-max/neurio`](https://codespaces.new/zakariabouifri03-max/neurio) → المنفذ 8080 كيتشغّل بوحدو

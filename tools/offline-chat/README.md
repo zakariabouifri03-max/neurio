@@ -95,6 +95,40 @@ https://codespaces.new/zakariabouifri03-max/neurio
 > ⚠️ Codespaces كيحتاج إنترنت (وهو سيرفر سحابي) — للإستعمال **بلا إنترنت** بحال ما كتبنا
 > فوق، شغّل `node tools/offline-chat/server.mjs` على حاسوب فالشبكة المحلية.
 
+### د) 📲 التطبيق (APK) — تنزلو مباشرة من GitHub وتثبتو فالتيليفون
+
+`NurioTawasol.apk` (102 KB، موقّع v1+v2، أيقونة وسمية «نوريو تواصل») فيه التطبيق كامل
+**داخل** التطبيق — كيتقرا بلا إنترنت وكيخدم حتى إلا ما كانش سيرفر.
+
+```
+https://github.com/zakariabouifri03-max/neurio/blob/main/NurioTawasol.apk            ← صفحة فيها زر Download
+https://raw.githubusercontent.com/zakariabouifri03-max/neurio/main/NurioTawasol.apk   ← تحميل مباشر
+https://cdn.jsdelivr.net/gh/zakariabouifri03-max/neurio@main/NurioTawasol.apk        ← CDN
+```
+
+> قبل ما يتدمج PR: بدّل `main` بـ `arena/fd0733d4-neurio` فالروابط فوق.
+
+**التثبيت:** حِل الرابط فالتيليفون → نزّل الملف → دوس عليه → إلا طلب منك، شعل
+«تثبيت التطبيقات من مصادر غير معروفة» للمتصفح/تطبيق الملفات → **Install**.
+(إلا خرج تحذير Play Protect — عادي: التطبيق موقّع بمفتاح ذاتي ديالنا، ماشي من Play Store.)
+
+**شنو كيخدم فيه:**
+* ✅ الدردشة، الغرف، الرسائل الخاصة، التاريخ (كلشي محلي فالتيليفون)
+* ✅ **بلا إنترنت**: على نفس الويفي/الهوتسبوت، وحتى P2P مباشر بين زوج تيليفونات
+* ⚠️ الصور/الملفات والملاحظات الصوتية ما كايناش فالتطبيق (الـ WebView ما فيهش
+  file chooser ولا صلاحية الميكرو) — التطبيق كيقول ليك هادشي فالتلميح، ودوس على
+  «🔗 دعوة» باش تنسخ الرابط وتحلو فـ **Chrome** إلا بغيتيهم.
+
+**كيفاش تصنعو بنفسك** (بلا Java، بلا Gradle — Python + openssl فقط):
+
+```bash
+node tools/offline-chat/build-singlefile.mjs      # التطبيق فملف واحد
+python3 tools/offline-chat/apk/build_apk.py       # → NurioTawasol.apk
+```
+
+التفاصيل التقنية (AXML، dex، resources.arsc، التوقيع v1/v2، التحقق) فـ
+[`apk/README.md`](apk/README.md).
+
 ---
 
 ## ✨ شنو كاين فيه / Features
