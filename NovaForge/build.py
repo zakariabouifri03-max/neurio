@@ -421,7 +421,13 @@ def main():
     ap.add_argument("--jobs", type=int, default=max(2, (os.cpu_count() or 2)))
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--clean", action="store_true")
+    ap.add_argument("--snapshot", action="store_true",
+                    help="write dist/NovaForge-<version>-snapshot.zip: a lean "
+                         "archive of the tracked sources only (no build output)")
     args = ap.parse_args()
+
+    if args.snapshot:
+        return make_snapshot()
 
     zig = find_zig()
     all_t = targets(zig)
@@ -442,6 +448,46 @@ def main():
         print(f"== target {name}")
         ok = build_target(zig, name, all_t[name], args.jobs) and ok
     return 0 if ok else 1
+
+
+ENGINE_VERSION = "0.1.0"
+
+
+def make_snapshot():
+    """Lean source archive: only files tracked by git, never build output.
+
+    Produced with `python3 build.py --snapshot` and committed to dist/ so it can
+    be downloaded straight from GitHub with a single direct link.
+    """
+    import zipfile
+    repo = ROOT.parent
+    dist = ROOT / "dist"
+    dist.mkdir(exist_ok=True)
+    name = f"NovaForge-{ENGINE_VERSION}-snapshot.zip"
+    out = dist / name
+    try:
+        files = subprocess.run(["git", "ls-files", "-z", ROOT.name], cwd=repo,
+                               capture_output=True, text=True, check=True).stdout.split("\0")
+    except Exception as exc:                       # pragma: no cover - git missing
+        print(f"snapshot needs git: {exc}")
+        return 1
+    files = [f for f in files if f and not f.startswith(f"{ROOT.name}/dist/")]
+    if not files:
+        print("nothing tracked - is NovaForge committed?")
+        return 1
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+        for f in files:
+            full = repo / f
+            arc = f[len(ROOT.name) + 1:]
+            if not (full.exists() and full.is_file()):
+                continue
+            info = zipfile.ZipInfo.from_file(full, arc)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o644 << 16
+            z.writestr(info, full.read_bytes())
+    size = out.stat().st_size
+    print(f"snapshot -> {out.relative_to(repo)}  ({size / 1e6:.2f} MB, {len(files)} files)")
+    return 0
 
 
 def zig_version(zig):

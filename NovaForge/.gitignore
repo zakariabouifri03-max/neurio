@@ -8,5 +8,6 @@ Builds/
 *.exe
 !build.py
 *.zip
+!dist/*.zip          # download snapshots (see dist/README.md)
 Logs/*.log
 .nf_tmp/
