@@ -388,6 +388,51 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   100% { transform: translateY(110vh) rotate(340deg); opacity: 0.6; }
 }
 
+/* ══════════ Affiliate panel ══════════ */
+.aff-head { text-align: center; margin-bottom: 16px; }
+.aff-badge {
+  display: inline-block; padding: 8px 24px; border-radius: 99px;
+  background: linear-gradient(180deg, #f5c542, #d97706);
+  font-size: 22px; font-weight: 700; letter-spacing: 1px;
+  box-shadow: 0 4px 0 #b97706; border: 2px solid #fff;
+}
+.aff-sub { font-size: 14px; opacity: 0.8; margin-top: 6px; font-weight: 600; }
+
+.aff-section { background: rgba(255,255,255,0.09); border-radius: 18px; padding: 14px 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.15); }
+.aff-label { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; opacity: 0.85; margin-bottom: 8px; }
+.aff-code-row, .aff-apply-row { display: flex; gap: 8px; align-items: center; }
+.aff-code-row input, .aff-apply-row input {
+  flex: 1; padding: 10px 14px; border-radius: 12px; font-size: 18px; font-weight: 700;
+  background: rgba(0,0,0,0.35); border: 2px solid rgba(255,255,255,0.4);
+  color: #fff; letter-spacing: 3px; text-align: center; font-family: inherit;
+}
+.aff-code-row input:focus, .aff-apply-row input:focus { outline: none; border-color: #ffd23f; }
+.aff-code-row .cbtn, .aff-apply-row .cbtn { width: auto; padding: 10px 18px; font-size: 14px; white-space: nowrap; }
+.aff-preview { font-size: 14px; opacity: 0.75; margin-top: 8px; text-align: center; }
+.aff-preview span { font-weight: 700; letter-spacing: 4px; color: #ffd23f; }
+
+.aff-stats { display: flex; gap: 10px; justify-content: center; margin: 12px 0; }
+.aff-stat { background: rgba(255,255,255,0.1); border-radius: 16px; padding: 14px 20px; text-align: center; flex: 1; min-width: 80px; border: 1px solid rgba(255,255,255,0.15); }
+.aff-stat-num { font-size: 28px; font-weight: 700; color: #ffd23f; }
+.aff-stat-lbl { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+
+.aff-recent { display: flex; flex-wrap: wrap; gap: 6px; }
+.aff-ref { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 6px 12px; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.aff-ref code { font-weight: 700; letter-spacing: 2px; color: #86efac; font-size: 14px; }
+.aff-ref-date { font-size: 9px; opacity: 0.6; }
+
+.aff-used { background: rgba(134, 239, 172, 0.12); border-color: rgba(134, 239, 172, 0.3); }
+.aff-used-code { font-size: 18px; font-weight: 700; letter-spacing: 3px; color: #86efac; text-align: center; padding: 6px; }
+.aff-used-none { text-align: center; font-size: 14px; opacity: 0.75; padding: 8px; }
+
+.aff-msg { font-size: 13px; min-height: 20px; margin-top: 6px; text-align: center; }
+.aff-ok { color: #86efac; font-weight: 600; }
+.aff-err { color: #fca5a5; font-weight: 600; }
+
+.aff-reward-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.aff-reward { background: rgba(255,210,63,0.15); border: 1px solid rgba(255,210,63,0.3); border-radius: 12px; padding: 8px 16px; font-size: 14px; font-weight: 600; text-align: center; }
+.aff-reward b { color: #ffd23f; }
+
 /* responsive */
 @media (max-width: 700px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 8px; }

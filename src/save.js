@@ -25,6 +25,12 @@ export function defaultSave() {
     races: 0,
     music: true,
     sfx: true,
+    // ── Affiliate / referral ────────────────────────────────────────────────
+    affiliateCode: null,       // this player's unique referral code
+    affiliateUsedCode: null,   // code they entered when they joined (if any)
+    affiliateReferrals: [],    // { code, at } — codes that credited this player
+    affiliateEarnings: 0,      // gems earned from referrals (local tracking)
+    affiliateEarnedCoins: 0,   // coins earned from referrals (local tracking)
   };
 }
 
