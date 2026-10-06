@@ -3,7 +3,7 @@
  "name": "Island Survival",
  "template": "survival",
  "createdAt": "2026-10-06T22:26:39.716Z",
- "modifiedAt": "2026-10-06T22:39:16.387Z",
+ "modifiedAt": "2026-10-06T22:54:09.302Z",
  "description": "Sample game — third-person island survival: gather, craft, fight zombies at night. PLAYABLE.",
  "settings": {
   "graphicsQuality": "high",

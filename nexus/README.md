@@ -23,6 +23,20 @@ game you can double-click and play with the editor closed.
 
 ---
 
+## ⬇ Windows downloads (EXE)
+
+Ready-made EXEs are published to **[GitHub Releases](https://github.com/zakariabouifri03-max/neurio/releases)** — built from this exact source by GitHub Actions on a real Windows runner:
+
+| Asset | What it is |
+|---|---|
+| `IslandSurvival-win32-x64.zip` | 🎮 **The game** — extract, run `IslandSurvival.exe` |
+| `NEXUS-GAME-STUDIO-win32-x64.zip` | 🛠 **The full editor** — extract, run `NEXUS GAME STUDIO.exe` |
+| `IslandSurvival.html` | Play instantly in any browser (no exe, fully offline) |
+
+SmartScreen may warn because the exe is unsigned — **More info → Run anyway**.
+
+---
+
 ## Quick start
 
 ```bash

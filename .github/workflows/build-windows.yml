@@ -1,0 +1,78 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: ['arena/**', 'main']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: nexus
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build bundles
+        run: npm run build
+
+      - name: Build server bundle
+        run: npm run build:server
+
+      - name: Build Island Survival game + package game EXE
+        run: npx tsx Electron/build-game-win.mts
+
+      - name: Package NEXUS GAME STUDIO EXE
+        run: node Electron/package-win.mjs
+
+      - name: Zip packages + collect direct-play HTML
+        shell: pwsh
+        working-directory: nexus
+        run: |
+          Compress-Archive -Path "dist/game/IslandSurvival-win32-x64/*" -DestinationPath "dist/IslandSurvival-win32-x64.zip" -Force
+          Compress-Archive -Path "dist/nexus-editor-package/NEXUS GAME STUDIO-win32-x64/*" -DestinationPath "dist/NEXUS-GAME-STUDIO-win32-x64.zip" -Force
+          Copy-Item "Projects/island-survival/Builds/IslandSurvival/IslandSurvival.html" "dist/IslandSurvival.html"
+          Get-ChildItem dist | Select-Object Name, @{N='SizeMB';E={[math]::Round($_.Length/1MB,1)}}
+
+      - name: Create GitHub Release with the EXEs
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-windows
+          name: NEXUS GAME STUDIO v1.0.0 — Windows EXE Downloads
+          body: |
+            ## Download & Play
+
+            | File | What it is |
+            |---|---|
+            | **IslandSurvival-win32-x64.zip** | 🎮 **THE GAME** — extract, then run `IslandSurvival.exe` |
+            | **NEXUS-GAME-STUDIO-win32-x64.zip** | 🛠 **THE FULL EDITOR** — extract, then run `NEXUS GAME STUDIO.exe` |
+            | **IslandSurvival.html** | Play instantly in any browser (no exe needed, fully offline) |
+
+            ⚠ **SmartScreen warning**: the exe is unsigned — click **More info → Run anyway**.
+
+            Built automatically from source by GitHub Actions on a real Windows runner:
+            typecheck ✅ · 46 tests ✅ · editor + runtime + server bundles ✅ · 8-stage build pipeline ✅
+
+            The editor exe includes the engine, AI agent, build system and the Island Survival
+            sample project — fully offline. Your games are saved in the `Projects` folder next to the app.
+          files: |
+            nexus/dist/IslandSurvival-win32-x64.zip
+            nexus/dist/NEXUS-GAME-STUDIO-win32-x64.zip
+            nexus/dist/IslandSurvival.html

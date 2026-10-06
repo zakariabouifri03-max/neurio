@@ -13,6 +13,8 @@ import { validateProject } from '../Engine/core/ops';
 import { compileScript } from '../Engine/scripting/runtime';
 import type { ProjectData } from '../Engine/core/types';
 
+const ELECTRON_VERSION = '33.4.11';
+
 export interface BuildConfig {
   mode: 'Development' | 'Release';
   name: string;        // sanitized game name (no spaces)
@@ -125,15 +127,22 @@ export function runBuild(projectsRoot: string, projectId: string, config: BuildC
     fs.writeFileSync(path.join(buildDir, `Launch-${config.name}.bat`),
       `@echo off\r\nstart "" "%~dp0${config.name}.html"\r\n`);
     fs.writeFileSync(path.join(buildDir, `Make-${config.name}-Exe.bat`),
-      `@echo off\r\necho Packaging ${config.name}.exe (requires Node.js; first run downloads Electron ~100MB)\r\ncd /d "%~dp0Runtime"\r\nif not exist node_modules (\r\n  npm install --no-audit --no-fund\r\n)\r\nnpx electron-packager . "${config.name}" --platform=win32 --arch=x64 --out=.. --overwrite --icon=none\r\necho.\r\necho Done. ${config.name}.exe is in the parent folder.\r\npause\r\n`);
-    // electron wrapper
-    fs.writeFileSync(path.join(buildDir, 'Runtime', 'package.json'), JSON.stringify({
+      `@echo off\r\n` +
+      `cd /d "%~dp0"\r\n` +
+      `echo Packaging ${config.name}.exe (requires Node.js; first run downloads Electron ~100MB)\r\n` +
+      `if not exist node_modules ( npm install --no-audit --no-fund )\r\n` +
+      `npx electron-packager . "${config.name}" --platform=win32 --arch=x64 --out=. --overwrite\r\n` +
+      `echo.\r\necho Done. Play it: ${config.name}-win32-x64\\${config.name}.exe\r\n` +
+      `pause\r\n`);
+    // electron wrapper + ROOT manifest so electron-packager packages the whole
+    // build folder (game html + Runtime + Content + Config) into the exe
+    fs.writeFileSync(path.join(buildDir, 'package.json'), JSON.stringify({
       name: config.name.toLowerCase(),
       version: '1.0.0',
-      main: 'electron-main.cjs',
+      main: 'Runtime/electron-main.cjs',
       description: `${config.name} — built with NEXUS GAME STUDIO`,
       scripts: { start: 'electron .' },
-      devDependencies: { electron: '^33.0.0', 'electron-packager': '^17.1.2' },
+      devDependencies: { electron: ELECTRON_VERSION, 'electron-packager': '^17.1.2' },
     }, null, 2));
     fs.writeFileSync(path.join(buildDir, 'Runtime', 'electron-main.cjs'), electronMain(config.name));
     // content copy (raw assets for modding)
@@ -262,8 +271,8 @@ completely offline (all engine code and content are embedded).
 Windows EXE
 -----------
 Double-click Make-${name}-Exe.bat (requires Node.js installed).
-It packages the game with Electron into a real ${name}.exe
-(first run downloads Electron, ~100 MB).
+It packages this whole folder with Electron into a real
+${name}-win32-x64/${name}.exe (first run downloads Electron, ~100 MB).
 
 Files
 -----
