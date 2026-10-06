@@ -14,11 +14,12 @@ class InputPacketizer(private val transport: UdpTransport) {
 
     fun send(event: Protocol.InputEvent) {
         val dest = destination ?: return
+        val s = seq.getAndIncrement()
         val payload = ByteArray(Protocol.INPUT_PAYLOAD_SIZE)
         val buf = java.nio.ByteBuffer.wrap(payload).order(java.nio.ByteOrder.BIG_ENDIAN)
-        event.copy(seq = seq.getAndIncrement()).encode(buf)
+        event.copy(seq = s).encode(buf)
         transport.send(
-            Protocol.TYPE_INPUT, 0, 0, event.seq,
+            Protocol.TYPE_INPUT, 0, 0, s,
             payload, 0, payload.size, dest
         )
     }

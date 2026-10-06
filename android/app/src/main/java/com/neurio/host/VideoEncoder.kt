@@ -108,10 +108,8 @@ class VideoEncoder(private val mime: String) {
         }
 
         val mc = createCodec()
-        mc.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        inputSurface = mc.createInputSurface()
-
-        mc.setCallback(object : MediaCodec.Callback() {
+        // The callback MUST be set before configure() for async mode.
+        val callback = object : MediaCodec.Callback() {
             override fun onInputBufferAvailable(codec: MediaCodec, index: Int) {
                 // Surface-input encoder: never used.
             }
@@ -178,7 +176,11 @@ class VideoEncoder(private val mime: String) {
                     AppLog.d(TAG, "output format: $format")
                 }
             }
-        })
+        }
+
+        mc.setCallback(callback)
+        mc.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+        inputSurface = mc.createInputSurface()
         mc.start()
         codec = mc
         AppLog.i(TAG, "encoder started ${mime}x${width}x${height}@$fps ${bitrateKbps}kbps")

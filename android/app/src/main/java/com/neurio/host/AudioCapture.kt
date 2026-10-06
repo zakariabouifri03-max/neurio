@@ -196,7 +196,7 @@ class AudioCapture(private val context: Context) {
                 }
             }
         }
-        codec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+        // The callback MUST be set before configure() for async mode.
         codec.setCallback(object : MediaCodec.Callback() {
             override fun onInputBufferAvailable(codec: MediaCodec, index: Int) {}
             override fun onOutputBufferAvailable(
@@ -242,6 +242,7 @@ class AudioCapture(private val context: Context) {
                 }
             }
         })
+        codec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         codec.start()
         encoder = codec
 
