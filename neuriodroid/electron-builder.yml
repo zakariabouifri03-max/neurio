@@ -1,0 +1,22 @@
+appId: com.neurio.droid
+productName: NeurioDroid
+copyright: Copyright © 2026 Neurio
+files:
+  - src/**
+  - package.json
+  - assets/**
+asar: true
+win:
+  target:
+    - nsis
+    - portable
+  icon: assets/icon.ico
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: NeurioDroid
+portable:
+  artifactName: NeurioDroid-Portable-${version}.${ext}
+artifactName: NeurioDroid-Setup-${version}.${ext}

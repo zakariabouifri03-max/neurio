@@ -1,0 +1,30 @@
+{
+  "name": "neuriodroid",
+  "productName": "NeurioDroid",
+  "version": "1.0.0",
+  "description": "NeurioDroid — Android gaming phone on your Windows PC (LDPlayer-style manager): AVD instances, Play Store images, snapshots, APK install, keymapping.",
+  "author": "Neurio",
+  "license": "MIT",
+  "main": "src/main/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "dist": "electron-builder --win --x64",
+    "dist:dir": "electron-builder --win --x64 --dir",
+    "icon": "node tools/make-icon.mjs"
+  },
+  "devDependencies": {
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3",
+    "jimp": "^1.6.0"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.5.0",
+    "node-stream-zip": "1.16.0",
+    "png-to-ico": "^2.1.8"
+  },
+  "optionalDependencies": {
+    "uiohook-napi": "1.5.5"
+  }
+}
