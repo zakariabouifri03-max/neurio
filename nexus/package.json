@@ -1,0 +1,37 @@
+{
+  "name": "nexus-game-studio",
+  "productName": "NEXUS GAME STUDIO",
+  "version": "1.0.0",
+  "description": "AI-powered 3D game development environment \u2014 editor, engine runtime, AI agent, build system.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "bootstrap": "npm install",
+    "build": "vite build && vite build --config vite.runtime.config.ts",
+    "build:server": "esbuild Server/index.ts --bundle --platform=node --format=esm --outfile=serverout/server.mjs --packages=external",
+    "start": "node serverout/server.mjs",
+    "dev": "tsx Server/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "package:win": "node Electron/package-win.mjs"
+  },
+  "dependencies": {
+    "cannon-es": "^0.20.0",
+    "codemirror": "^5.65.16",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "@types/codemirror": "^5.60.15",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.12",
+    "@types/three": "^0.170.0",
+    "esbuild": "^0.24.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8"
+  }
+}

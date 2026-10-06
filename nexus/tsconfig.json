@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": false,
+    "noImplicitAny": false,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@engine/*": ["Engine/*"],
+      "@editor/*": ["Editor/*"],
+      "@ai/*": ["AIAgent/*"],
+      "@templates/*": ["Templates/*"]
+    }
+  },
+  "include": ["Engine", "Editor", "AIAgent", "Templates", "Server", "tests"],
+  "exclude": ["node_modules", "www", "www-runtime", "serverout", "Builds"]
+}

@@ -1,0 +1,22 @@
+# Build outputs
+www/
+www-runtime/
+serverout/
+dist/
+
+# Dependencies
+node_modules/
+
+# Project build artifacts (games built from the editor)
+Projects/*/Builds/
+Projects/*/.snapshots/
+Projects/*/.backups/
+Projects/*/Content/
+
+# AI credentials (never commit)
+Server/config.json
+
+# Test/tooling scratch
+.smoke-*
+.patch*.py
+coverage/
