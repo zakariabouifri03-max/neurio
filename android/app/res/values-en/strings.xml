@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Reels Offline</string>
+    <string name="add_title">Save a reel</string>
+    <string name="browse_title">Browse Instagram</string>
+
+    <string name="lib_title">My offline library</string>
+    <string name="lib_sub">Saved on this phone • plays with no internet</string>
+    <string name="empty">Nothing saved yet.\n\n1. Paste a reel link here\n2. Or browse Instagram and hit ⬇ on what you like\n3. Watch it offline whenever you want</string>
+
+    <string name="btn_add">Save reel</string>
+    <string name="btn_browse">Browse Instagram</string>
+    <string name="btn_import">Import file</string>
+    <string name="btn_games">Offline games</string>
+    <string name="btn_storage">Storage</string>
+
+    <string name="add_hint">Paste a reel / post link here…</string>
+    <string name="add_go">Analyse &amp; download</string>
+    <string name="add_paste">Paste</string>
+    <string name="add_ready">Ready: tap “Analyse &amp; download”</string>
+    <string name="add_analyzing">Analysing the link… keep the internet on</string>
+    <string name="add_found_video">Video found ✅ downloading…</string>
+    <string name="add_found_photo">Photo found ✅ downloading…</string>
+    <string name="add_fail">No media found. Try again, or use “Browse Instagram”.</string>
+    <string name="add_bad_link">Invalid link. Use an Instagram link (reel / p / tv) or a direct mp4/jpg URL.</string>
+    <string name="add_saved">Saved! It will appear in the library.</string>
+    <string name="add_offline">No internet right now — downloading needs a connection. Offline playback still works.</string>
+
+    <string name="dl_started">Download started…</string>
+    <string name="dl_done">Downloaded ✅</string>
+    <string name="dl_error">Download failed</string>
+
+    <string name="play">Play</string>
+    <string name="share">Share</string>
+    <string name="export">Export to gallery</string>
+    <string name="delete">Delete</string>
+    <string name="close">Close</string>
+    <string name="open">Open</string>
+    <string name="cancel">Cancel</string>
+    <string name="deleted">Deleted</string>
+    <string name="exported">Exported to the gallery ✅</string>
+    <string name="export_fail">Export failed</string>
+
+    <string name="storage_title">Storage used</string>
+    <string name="storage_body">%1$s in %2$d files</string>
+    <string name="clear_all">Clear everything</string>
+
+    <string name="browse_tip">Browse normally — every time a video is detected the ⬇ button lights up</string>
+    <string name="browse_save_n">⬇ Save (%1$d)</string>
+    <string name="browse_pick">What do you want to save?</string>
+    <string name="browse_login_tip">Logging in is saved in the app, everything still works offline afterwards.</string>
+
+    <string name="notif_channel">Downloads</string>
+    <string name="notif_downloading">Downloading… %1$s</string>
+    <string name="notif_done_title">Downloaded ✅</string>
+    <string name="notif_done_text">%1$s • tap to watch</string>
+    <string name="notif_failed">Download failed</string>
+    <string name="add_tip">How it works:\n• Give me a reel/post link, I analyse it and download the video or photos.\n• In “Browse Instagram” you browse as usual and save with one tap.\n• From the Instagram app: Share → “Reels Offline”.\n• Downloading needs the internet once, after that it plays offline forever.</string>
+    <string name="add_down">⬇ Save</string>
+    <string name="games_title">Offline games</string>
+    <string name="games_pick">Pick a game</string>
+    <string name="game_racing">🏁 Bash Baqi beach racing</string>
+    <string name="storage_clear">Clear everything</string>
+    <string name="menu_title">What do you want to do?</string>
+    <string name="add_link_label">🔗  Reel / post link</string>
+</resources>

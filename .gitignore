@@ -3,3 +3,7 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# Android build output (the toolchain lives outside the repo)
+android/build/
+android/app/assets/games/
