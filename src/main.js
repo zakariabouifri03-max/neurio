@@ -96,6 +96,7 @@ const state = {
 };
 
 let imageWorker = null;
+let imageWorkerBlobUrl = null;
 let imageWorkerReady = null;
 let imageWorkerReadyResolve = null;
 let imageWorkerReadyReject = null;
@@ -141,6 +142,46 @@ function formatTime(seconds) {
 function safeBaseName(name) {
   const base = String(name || 'neurio-media').replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]/g, '-').trim();
   return base || 'neurio-media';
+}
+
+function bytesToBase64(bytes) {
+  let binary = '';
+  const sliceSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += sliceSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + sliceSize));
+  }
+  return btoa(binary);
+}
+
+async function saveBlob(blob, filename) {
+  const bridge = window.NeurioAndroid;
+  if (bridge?.beginDownload && bridge?.appendDownload && bridge?.finishDownload) {
+    const downloadId = bridge.beginDownload(filename, blob.type || 'application/octet-stream');
+    if (!downloadId) throw new Error('ما قدرناش نوجدّو ملف التحميل.');
+    try {
+      const chunkSize = 256 * 1024;
+      for (let offset = 0; offset < blob.size; offset += chunkSize) {
+        const bytes = new Uint8Array(await blob.slice(offset, offset + chunkSize).arrayBuffer());
+        if (!bridge.appendDownload(downloadId, bytesToBase64(bytes))) {
+          throw new Error('توقّف حفظ الملف قبل ما يكمل.');
+        }
+      }
+      if (!bridge.finishDownload(downloadId)) throw new Error('ما قدرناش نحفظو الملف.');
+      return;
+    } catch (error) {
+      bridge.cancelDownload?.(downloadId);
+      throw error;
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 function getSettings() {
@@ -348,7 +389,13 @@ function ensureImageWorker() {
   if (imageWorkerFailed || typeof Worker === 'undefined') return Promise.reject(new Error('Web Worker غير متوفر'));
   if (imageWorkerReady) return imageWorkerReady;
 
-  imageWorker = new Worker(new URL('./image-worker.js', import.meta.url), { type: 'module' });
+  const embeddedWorker = $('#imageWorkerSource')?.textContent?.trim();
+  let workerSource = new URL('./src/image-worker.js', document.baseURI);
+  if (embeddedWorker) {
+    imageWorkerBlobUrl = URL.createObjectURL(new Blob([embeddedWorker], { type: 'text/javascript' }));
+    workerSource = imageWorkerBlobUrl;
+  }
+  imageWorker = new Worker(workerSource);
   imageWorkerReady = new Promise((resolve, reject) => {
     imageWorkerReadyResolve = resolve;
     imageWorkerReadyReject = reject;
@@ -379,6 +426,8 @@ function ensureImageWorker() {
   };
   imageWorker.onerror = (event) => {
     imageWorkerFailed = true;
+    if (imageWorkerBlobUrl) URL.revokeObjectURL(imageWorkerBlobUrl);
+    imageWorkerBlobUrl = null;
     const error = new Error(event.message || 'تعذّر تشغيل معالج الصور.');
     imageWorkerReadyReject?.(error);
     imageWorkerReadyResolve = null;
@@ -974,20 +1023,19 @@ function setFileInputAccept() {
 
 function downloadImage() {
   if (!state.didEnhance || !state.file || !ui.enhancedPreview.width) return;
-  ui.enhancedPreview.toBlob((blob) => {
+  ui.enhancedPreview.toBlob(async (blob) => {
     if (!blob) {
       showToast('ما قدرناش نخرّجو الصورة. جرّب صيغة أو حجم آخر.', true);
       return;
     }
-    const link = document.createElement('a');
     const scale = state.imageScale > 1 ? `-${state.imageScale}x` : '';
-    link.href = URL.createObjectURL(blob);
-    link.download = `${safeBaseName(state.file.name)}-neurio${scale}.png`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(link.href), 30_000);
-    showToast('الصورة المحسّنة واجدة للتحميل.');
+    const filename = `${safeBaseName(state.file.name)}-neurio${scale}.png`;
+    try {
+      await saveBlob(blob, filename);
+      showToast('الصورة المحسّنة تحفّظات فالتنزيلات.');
+    } catch (error) {
+      showToast(error.message || 'ما قدرناش نحفظو الصورة.', true);
+    }
   }, 'image/png');
 }
 
@@ -1067,7 +1115,6 @@ async function exportEnhancedVideo() {
     video.muted = originalMuted;
     canvasStream?.getTracks().forEach((track) => track.stop());
     sourceStream?.getTracks().forEach((track) => track.stop());
-    state.exporting = false;
     state.recorder = null;
 
     if (!error) {
@@ -1076,17 +1123,16 @@ async function exportEnhancedVideo() {
       if (!blob.size) error = new Error('ملف التصدير خرج خاوي؛ جرّب مرة أخرى.');
       else {
         const extension = type.includes('mp4') ? 'mp4' : 'webm';
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `${safeBaseName(state.file?.name)}-neurio.${extension}`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        setTimeout(() => URL.revokeObjectURL(link.href), 60_000);
-        ui.exportPercent.textContent = '100%';
-        ui.exportProgressBar.style.width = '100%';
-        ui.exportStatus.textContent = 'التصدير سالا — الملف كيتحمّل.';
-        showToast('الفيديو المحسّن بدا كيتحمّل.');
+        const filename = `${safeBaseName(state.file?.name)}-neurio.${extension}`;
+        try {
+          await saveBlob(blob, filename);
+          ui.exportPercent.textContent = '100%';
+          ui.exportProgressBar.style.width = '100%';
+          ui.exportStatus.textContent = 'التصدير سالا — تلاقاه فالتنزيلات.';
+          showToast('الفيديو المحسّن تحفّظ فالتنزيلات.');
+        } catch (saveError) {
+          error = saveError;
+        }
       }
     }
 
@@ -1094,6 +1140,7 @@ async function exportEnhancedVideo() {
       ui.exportStatus.textContent = 'توقّف التصدير.';
       showToast(error.message || 'وقع مشكل فالتصدير.', true);
     }
+    state.exporting = false;
     syncActionButton();
     if (state.file && state.mode === 'video') {
       await seekVideoTo(Math.min(originalTime, Number.isFinite(video.duration) ? video.duration : originalTime));

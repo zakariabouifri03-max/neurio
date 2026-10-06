@@ -1,0 +1,54 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "com.neurio.studio"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.neurio.studio"
+        minSdk 29
+        targetSdk 35
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ""
+            versionNameSuffix ""
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+def webRoot = projectDir.parentFile.parentFile
+
+tasks.register("syncWebAssets", Sync) {
+    from(webRoot) {
+        include "index.html"
+        include "manifest.webmanifest"
+        include "src/main.js"
+        include "src/style.css"
+        include "src/image-worker.js"
+        include "icons/neurio.svg"
+        include "icons/icon-192.png"
+    }
+    into(layout.projectDirectory.dir("src/main/assets"))
+    doLast {
+        File assetsDir = layout.projectDirectory.dir("src/main/assets").asFile
+        File htmlFile = new File(assetsDir, "index.html")
+        File workerFile = new File(webRoot, "src/image-worker.js")
+        String newline = System.lineSeparator()
+        String worker = workerFile.getText("UTF-8")
+        String embeddedWorker = "<script id=\"imageWorkerSource\" type=\"text/plain\">" + newline + worker + newline + "</script>"
+        htmlFile.setText(htmlFile.getText("UTF-8").replace("</body>", embeddedWorker + newline + "</body>"), "UTF-8")
+    }
+}
+
+tasks.named("preBuild").configure {
+    dependsOn("syncWebAssets")
+}

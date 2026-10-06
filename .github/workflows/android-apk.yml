@@ -1,0 +1,73 @@
+name: Build Neurio Studio APK
+
+on:
+  push:
+    branches:
+      - arena/5305cc0b-neurio
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: neurio-studio-apk
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and publish Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the app
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform and build tools
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        working-directory: android
+        run: gradle --no-daemon :app:assembleDebug
+
+      - name: Prepare APK for distribution
+        run: |
+          mkdir -p release-apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk release-apk/NeurioStudio.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NeurioStudio-APK
+          path: release-apk/NeurioStudio.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish direct APK download
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: neurio-studio-v1.0.0
+          name: Neurio Studio v1.0.0 — Android APK
+          body: |
+            Android install package for Neurio Studio.
+
+            - Minimum Android version: Android 10 (API 29)
+            - Photo/video processing runs locally in the app.
+            - Video export is real-time; keep the app open until it finishes.
+          files: release-apk/NeurioStudio.apk
+          fail_on_unmatched_files: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

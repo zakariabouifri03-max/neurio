@@ -3,3 +3,8 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+.gradle/
+local.properties
+**/build/
+*.jks
+*.keystore

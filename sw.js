@@ -1,5 +1,5 @@
 // Neurio Studio — small offline shell for the local media editor.
-const VERSION = 'neurio-studio-v1';
+const VERSION = 'neurio-studio-v2';
 const ASSETS = [
   './',
   './index.html',
