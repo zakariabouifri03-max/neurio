@@ -54,7 +54,7 @@ public final class Hex {
         StringBuilder body = new StringBuilder(tac == null || tac.length() != 8 ? "353" + randomDigits(11) : tac);
         if (body.length() > 14) body.setLength(14);
         while (body.length() < 14) body.append(DIGITS[RNG.nextInt(10)]);
-        return body + luhn(body.toString());
+        return body.toString() + luhn(body.toString());
     }
 
     public static String randomDigits(int n) {

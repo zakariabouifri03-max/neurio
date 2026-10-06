@@ -184,7 +184,7 @@ public class BrowserActivity extends Activity {
         });
         findViewById(R.id.b_go).setOnClickListener(v -> navigate(urlBar.getText().toString()));
         findViewById(R.id.b_back).setOnClickListener(v -> { if (web.canGoBack()) web.goBack(); });
-        findViewById(R.id.b_forward).setOnClickListener(v -> { if (web.canForward()) web.goForward(); });
+        findViewById(R.id.b_forward).setOnClickListener(v -> { if (web.canGoForward()) web.goForward(); });
         findViewById(R.id.b_reload).setOnClickListener(v -> web.reload());
         findViewById(R.id.b_home).setOnClickListener(v -> web.loadUrl(settings.browserHome()));
         findViewById(R.id.b_verify).setOnClickListener(v -> verify());

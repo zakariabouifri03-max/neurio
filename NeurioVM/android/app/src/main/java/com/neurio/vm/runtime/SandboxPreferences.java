@@ -193,7 +193,7 @@ public final class SandboxPreferences implements SharedPreferences {
 
         @Override public Editor clear() { clear = true; return this; }
 
-        @Override public boolean commit() { return applyToData(); }
+        @Override public boolean commit() { return commitNow(); }
 
         @Override
         public void apply() {
@@ -202,11 +202,13 @@ public final class SandboxPreferences implements SharedPreferences {
             final boolean snapshotClear = clear;
             // the platform applies immediately in memory and defers the write;
             // we defer the whole thing, which is close enough for our use
-            IO_EXECUTOR.execute(() -> applyToData(snapshotClear, snapshotRemovals, snapshotPuts));
+            IO_EXECUTOR.execute(() ->
+                    SandboxPreferences.this.applyToData(snapshotClear, snapshotRemovals, snapshotPuts));
         }
 
-        private boolean applyToData() {
-            return applyToData(clear, removals, puts);
+        /** Named so it cannot be confused with the outer 3-arg applyToData. */
+        private boolean commitNow() {
+            return SandboxPreferences.this.applyToData(clear, removals, puts);
         }
     }
 

@@ -136,10 +136,10 @@ public final class VirtualContext extends ContextWrapper {
         return new SandboxPreferences(new File(prefsDir, sanitize(name) + ".json"));
     }
 
-    @Override
-    public SharedPreferences getSharedPreferences(File file, int mode) {
-        return new SandboxPreferences(file);
-    }
+    // Note: Context.getSharedPreferences(File, int) is deliberately NOT
+    // overridden. It is not present in every compile target this project builds
+    // against, and nothing in NeurioVM calls it — the name+mode variant above
+    // covers every preference this app creates.
 
     // ── helpers ────────────────────────────────────────────────────────────
 
