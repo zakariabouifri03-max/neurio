@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Etsy Insight Pro — Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="side">
+      <div class="side-brand"><span class="brand-dot">EI</span><span>Etsy Insight Pro</span></div>
+      <nav class="side-nav" id="sideNav">
+        <a href="#/overview" data-route="overview">Overview</a>
+        <a href="#/research" data-route="research">Research</a>
+        <a href="#/keywords" data-route="keywords">Keywords</a>
+        <a href="#/tracked-products" data-route="tracked-products">Tracked Products</a>
+        <a href="#/tracked-shops" data-route="tracked-shops">Tracked Shops</a>
+        <a href="#/settings" data-route="settings">Settings</a>
+        <a href="#/privacy" data-route="privacy">Privacy</a>
+      </nav>
+      <div class="side-foot">
+        <button id="themeToggle" class="btn btn-ghost" title="Toggle theme">Theme: auto</button>
+        <div class="ver">v1.0.0 · local-first</div>
+      </div>
+    </aside>
+    <div class="main">
+      <header class="topbar">
+        <h1 id="viewTitle">Overview</h1>
+        <div class="top-actions">
+          <span id="storageNote" class="dim"></span>
+        </div>
+      </header>
+      <main id="view" class="view"></main>
+    </div>
+  </div>
+
+  <script src="../lib/namespace.js"></script>
+  <script src="../lib/utils.js"></script>
+  <script src="../lib/settings.js"></script>
+  <script src="../lib/storage.js"></script>
+  <script src="../lib/estimation.js"></script>
+  <script src="../lib/scores.js"></script>
+  <script src="../lib/keywords.js"></script>
+  <script src="../lib/tracking.js"></script>
+  <script src="../lib/export.js"></script>
+  <script src="../lib/charts.js"></script>
+  <script src="views/overview.js"></script>
+  <script src="views/research.js"></script>
+  <script src="views/keywords.js"></script>
+  <script src="views/tracked-products.js"></script>
+  <script src="views/tracked-shops.js"></script>
+  <script src="views/settings.js"></script>
+  <script src="views/privacy.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

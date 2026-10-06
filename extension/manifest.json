@@ -1,0 +1,66 @@
+{
+  "manifest_version": 3,
+  "name": "Etsy Insight Pro",
+  "short_name": "EtsyInsight",
+  "version": "1.0.0",
+  "description": "Product & shop research assistant for Etsy sellers. Verified on-page data plus clearly-labelled sales, view and opportunity estimates. Local-first, no tracking.",
+  "minimum_chrome_version": "116",
+  "author": "Etsy Insight Pro",
+  "homepage_url": "https://example.com/etsy-insight-pro",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Etsy Insight Pro",
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "options_page": "src/dashboard/dashboard.html",
+  "permissions": ["storage", "activeTab", "scripting", "tabs", "alarms", "contextMenus"],
+  "host_permissions": ["https://*.etsy.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://*.etsy.com/*"],
+      "js": [
+        "src/lib/namespace.js",
+        "src/lib/utils.js",
+        "src/lib/settings.js",
+        "src/lib/storage.js",
+        "src/lib/estimation.js",
+        "src/lib/scores.js",
+        "src/lib/keywords.js",
+        "src/lib/tracking.js",
+        "src/lib/export.js",
+        "src/lib/charts.js",
+        "src/content/extractors/common.js",
+        "src/content/extractors/product.js",
+        "src/content/extractors/shop.js",
+        "src/content/extractors/search.js",
+        "src/content/content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/dashboard/*", "icons/*"],
+      "matches": ["https://*.etsy.com/*"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}

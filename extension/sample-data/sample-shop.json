@@ -1,0 +1,49 @@
+{
+  "_note": "Mock extractor output for development only. NOT real Etsy data.",
+  "pageType": "shop",
+  "url": "https://www.etsy.com/shop/SampleStudio",
+  "shopName": "SampleStudio",
+  "shopTitle": "SampleStudio — Handmade Ceramics",
+  "totalSales": 45210,
+  "activeListings": 86,
+  "reviewCount": 8930,
+  "rating": 4.9,
+  "sinceYear": 2016,
+  "shopAgeYears": 10,
+  "location": "Portland, Oregon",
+  "avgPrice": 28.4,
+  "currency": "USD",
+  "niche": "ceramic mug · stoneware · handmade",
+  "listings": [
+    {
+      "listingId": "1234567890",
+      "title": "Sample Handmade Ceramic Mug — Speckled Stoneware Coffee Cup",
+      "price": 24.99,
+      "currency": "USD",
+      "rating": 4.8,
+      "reviews": 1243,
+      "isBestseller": true,
+      "url": "https://www.etsy.com/listing/1234567890/sample-handmade-ceramic-mug"
+    },
+    {
+      "listingId": "1234567891",
+      "title": "Minimalist Stoneware Vase — Modern Ceramic Home Decor",
+      "price": 39.5,
+      "currency": "USD",
+      "rating": 4.9,
+      "reviews": 486,
+      "isBestseller": false,
+      "url": "https://www.etsy.com/listing/1234567891/minimalist-stoneware-vase"
+    },
+    {
+      "listingId": "1234567892",
+      "title": "Set of 2 Espresso Cups — Handmade Pottery Gift Set",
+      "price": 34.0,
+      "currency": "USD",
+      "rating": 4.7,
+      "reviews": 152,
+      "isBestseller": false,
+      "url": "https://www.etsy.com/listing/1234567892/espresso-cups-set"
+    }
+  ]
+}

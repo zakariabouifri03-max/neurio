@@ -1,0 +1,57 @@
+{
+  "_note": "Mock extractor output for development only. NOT real Etsy data.",
+  "pageType": "search",
+  "url": "https://www.etsy.com/search?q=ceramic+mug",
+  "query": "ceramic mug",
+  "totalResults": 48213,
+  "items": [
+    {
+      "rank": 1,
+      "listingId": "1234567890",
+      "title": "Sample Handmade Ceramic Mug — Speckled Stoneware Coffee Cup",
+      "price": 24.99,
+      "currency": "USD",
+      "rating": 4.8,
+      "reviews": 1243,
+      "shop": "SampleStudio",
+      "isBestseller": true,
+      "url": "https://www.etsy.com/listing/1234567890/sample-handmade-ceramic-mug"
+    },
+    {
+      "rank": 2,
+      "listingId": "2234567890",
+      "title": "Personalized Ceramic Mug with Name — Custom Coffee Mug Gift",
+      "price": 19.95,
+      "currency": "USD",
+      "rating": 4.9,
+      "reviews": 3211,
+      "shop": "MugWorks",
+      "isBestseller": true,
+      "url": "https://www.etsy.com/listing/2234567890/personalized-ceramic-mug"
+    },
+    {
+      "rank": 3,
+      "listingId": "3234567890",
+      "title": "Funny Cat Mug — Cute Ceramic Coffee Cup for Cat Lovers",
+      "price": 16.5,
+      "currency": "USD",
+      "rating": 4.6,
+      "reviews": 214,
+      "shop": "PurrPrints",
+      "isBestseller": false,
+      "url": "https://www.etsy.com/listing/3234567890/funny-cat-mug"
+    },
+    {
+      "rank": 4,
+      "listingId": "4234567890",
+      "title": "Large Stoneware Camping Mug — Rustic Handmade Pottery Cup 16oz",
+      "price": 32.0,
+      "currency": "USD",
+      "rating": 5.0,
+      "reviews": 89,
+      "shop": "TrailClay",
+      "isBestseller": false,
+      "url": "https://www.etsy.com/listing/4234567890/camping-mug"
+    }
+  ]
+}

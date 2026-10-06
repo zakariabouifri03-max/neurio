@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Etsy Insight Pro</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="pop">
+    <header class="pop-head">
+      <div class="brand"><span class="brand-dot">EI</span><span>Etsy Insight Pro</span></div>
+      <span id="pageBadge" class="badge">…</span>
+    </header>
+
+    <div id="pageLine" class="page-line">Checking current tab…</div>
+
+    <div id="actions" class="actions">
+      <button id="btnAnalyze" class="btn btn-primary">Analyze this page</button>
+      <div class="row">
+        <button id="btnTrack" class="btn">＋ Track</button>
+        <button id="btnDashboard" class="btn">Open dashboard</button>
+      </div>
+    </div>
+
+    <div id="quickStats" class="stats hidden"></div>
+
+    <div id="notEtsy" class="note hidden">
+      This doesn’t look like an Etsy product, shop, or search page.
+      Navigate to Etsy and try again — or open the dashboard to review saved research.
+    </div>
+
+    <footer class="pop-foot">
+      <button id="btnResearch" class="link">Research</button>
+      <button id="btnKeywords" class="link">Keywords</button>
+      <button id="btnTracked" class="link">Tracked</button>
+      <button id="btnSettings" class="link">Settings</button>
+    </footer>
+  </div>
+
+  <script src="../lib/namespace.js"></script>
+  <script src="../lib/utils.js"></script>
+  <script src="../lib/settings.js"></script>
+  <script src="../lib/storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
