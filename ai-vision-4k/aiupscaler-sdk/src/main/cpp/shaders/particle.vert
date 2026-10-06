@@ -12,7 +12,11 @@ struct Particle {
     vec4 velocity;       // xyz velocity, w reserved
 };
 
-layout(std430, binding = 0) readonly buffer Particles {
+// Set 1, not set 0: the SceneUniforms block below already occupies set 0,
+// binding 0, and two different descriptor types cannot share one binding. This
+// was a latent bug until the demo renderer tried to build the pipeline layout
+// for it.
+layout(std430, set = 1, binding = 0) readonly buffer Particles {
     Particle particles[];
 };
 

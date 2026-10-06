@@ -21,13 +21,14 @@ mkdir -p "$OUT"
 SOURCES=(
   "$CPP"/core/*.cpp
   "$CPP"/ai/*.cpp
+  "$CPP"/graphics/*.cpp
   "$CPP"/tests/*.cpp
 )
 
 echo "== compiling host test binary with $CXX =="
 "$CXX" -std=c++17 -O1 -g \
   -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers \
-  -I"$CPP" -I"$CPP/core" -I"$CPP/ai" -I"$CPP/tests" \
+  -I"$CPP" -I"$CPP/core" -I"$CPP/ai" -I"$CPP/graphics" -I"$CPP/tests" \
   "${SOURCES[@]}" -o "$OUT/v4k_tests"
 
 echo "== running =="

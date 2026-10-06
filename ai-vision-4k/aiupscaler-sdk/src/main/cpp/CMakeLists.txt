@@ -76,6 +76,13 @@ set(V4K_AI_SOURCES
     ai/v4k_gpu_plan.cpp
 )
 
+# The demo scene's device-independent half: meshes, instances, camera, light and
+# the CPU mirror of the particle simulation. No Vulkan types, so it is compiled
+# into every configuration and covered by the host test suite.
+set(V4K_GRAPHICS_SOURCES
+    graphics/v4k_scene.cpp
+)
+
 set(V4K_VULKAN_SOURCES
     vulkan/v4k_device_probe.cpp      # provides the "no Vulkan" stub too
     vulkan/v4k_shader_registry.cpp   # pure SPIR-V plumbing, no Vulkan types
@@ -116,9 +123,15 @@ endif()
 set(V4K_ENGINE_SOURCES
     ${V4K_CORE_SOURCES}
     ${V4K_AI_SOURCES}
+    ${V4K_GRAPHICS_SOURCES}
     ${V4K_VULKAN_SOURCES}
     ${V4K_SDK_SOURCES}
 )
+
+# The demo renderer (demo/v4k_demo_renderer.cpp) and its JNI bridge are Vulkan-
+# only and are added here as they land, following the Vulkan backend in and out
+# of the build. The device-independent half of the scene lives in
+# V4K_GRAPHICS_SOURCES above and is always compiled and tested.
 
 # The lists above are explicit so that dropping a file is a visible diff; this
 # makes a *typo* fail at configure time instead of turning into a missing symbol
@@ -139,6 +152,7 @@ target_include_directories(aivision4k
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/core
         ${CMAKE_CURRENT_SOURCE_DIR}/ai
+        ${CMAKE_CURRENT_SOURCE_DIR}/graphics
         ${CMAKE_CURRENT_SOURCE_DIR}/vulkan
         ${CMAKE_CURRENT_SOURCE_DIR}/sdk
         ${V4K_SHADER_EMBED_DIR}
@@ -216,6 +230,7 @@ endif()
 # ---------------------------------------------------------------------------
 set(V4K_TEST_SOURCES
     tests/test_main.cpp
+    tests/test_scene.cpp
     tests/test_json.cpp
     tests/test_profile.cpp
     tests/test_thermal.cpp
@@ -232,6 +247,7 @@ if(V4K_BUILD_TESTS)
         ${V4K_TEST_SOURCES}
         ${V4K_CORE_SOURCES}
         ${V4K_AI_SOURCES}
+        ${V4K_GRAPHICS_SOURCES}
     )
     # Same include roots as the library: several headers include their
     # neighbours by bare name ("v4k_common.h", "v4k_model.h") the way the host
@@ -240,6 +256,7 @@ if(V4K_BUILD_TESTS)
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/core
         ${CMAKE_CURRENT_SOURCE_DIR}/ai
+        ${CMAKE_CURRENT_SOURCE_DIR}/graphics
         ${V4K_SHADER_EMBED_DIR}
     )
     target_compile_definitions(v4k_native_tests PRIVATE V4K_BUILD_TESTS=1)
