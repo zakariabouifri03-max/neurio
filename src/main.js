@@ -3,7 +3,8 @@ import * as THREE from 'three';
 import { loadSave, persist } from './save.js';
 import { MAPS, RIVALS, REWARDS, UPGRADES, carById } from './data.js';
 import { Race } from './race.js';
-import { Garage, openShop, openCustomize, openUpgrades, openSeries, openHelp, showResults, showChampion, closePanel } from './menu.js';
+import { Garage, openShop, openCustomize, openUpgrades, openSeries, openHelp, openAffiliate, showResults, showChampion, closePanel } from './menu.js';
+import { ensureCode } from './affiliate.js';
 import { BloomFX } from './post.js';
 import { audio } from './audio.js';
 import { clamp, fmt } from './util.js';
@@ -145,6 +146,12 @@ game.maybeSeasonModal = () => {
   return true;
 };
 
+game.openAffiliate = () => {
+  // Make sure the player has a code assigned
+  ensureCode(game);
+  openAffiliate(game);
+};
+
 game.showGarage = () => {
   if (game.maybeSeasonModal()) return;
   closePanel();
@@ -248,6 +255,7 @@ function wireUI() {
   $('btnUpg').onclick = () => openUpgrades(game);
   $('btnSeries').onclick = () => openSeries(game);
   $('btnHelp').onclick = () => openHelp(game);
+  $('btnAffiliate').onclick = () => { audio.click(); game.openAffiliate(); };
   $('panelClose').onclick = () => { audio.click(); closePanel(); };
 
   $('btnResume').onclick = () => game.togglePause();

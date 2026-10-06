@@ -1,6 +1,7 @@
 // ── Garage scene + all menu screens (shop, drivers, customize, upgrades…) ───
 import * as THREE from 'three';
 import { CARS, DRIVERS, PAINTS, WHEELS, HORNS, UPGRADES, RIVALS, carById, driverById, ARCH } from './data.js';
+import { referralCount, recentReferrals, sharePreview, REFERRAL_BONUS, REFERRER_REWARD } from './affiliate.js';
 import { buildGarageWorld, buildCar, buildDriver } from './builders.js';
 import { clamp, fmt, lerp } from './util.js';
 import { audio } from './audio.js';
@@ -363,6 +364,144 @@ export function openSeries(game) {
   html += `</table><div class="hint">Points per race: 10 / 8 / 6 / 4 / 2 / 1. After 10 races the champion wins
     🪙${fmt(1500)} + 💎6 + 🏆×3!</div>`;
   $('panelBody').innerHTML = html;
+}
+
+export function openAffiliate(game) {
+  audio.click();
+  const save = game.save;
+  const code = save.affiliateCode || '(generating…)';
+  const usedCode = save.affiliateUsedCode;
+  const count = referralCount(save);
+  const earnings = save.affiliateEarnings || 0;
+  const earnedCoins = save.affiliateEarnedCoins || 0;
+  const recent = recentReferrals(save);
+
+  // Build the share string (affiliate link / copy text)
+  const shareText = `Join Bash Baqi Racing! Use my code: ${code} 🏁`;
+  const shareLink = location.href;
+
+  let html = `
+    <div class="aff-head">
+      <div class="aff-badge">🤝 AFFILIATE</div>
+      <div class="aff-sub">Earn rewards by inviting friends to race!</div>
+    </div>
+
+    <div class="aff-section">
+      <div class="aff-label">Your referral code</div>
+      <div class="aff-code-row">
+        <input id="affCodeInput" value="${code}" readonly placeholder="XXXXXX" />
+        <button id="affCopyBtn" class="cbtn coins">📋 Copy</button>
+        <button id="affShareBtn" class="cbtn coins">🔗 Share</button>
+      </div>
+      <div class="aff-preview">Share preview: <span id="affPreview">${sharePreview(code)}</span></div>
+    </div>
+
+    <div class="aff-section">
+      <div class="aff-label">Enter a friend's code</div>
+      <div class="aff-apply-row">
+        <input id="affEnterInput" placeholder="Paste a code here…" />
+        <button id="affApplyBtn" class="cbtn coins">✅ Apply</button>
+      </div>
+      <div id="affApplyMsg" class="aff-msg"></div>
+    </div>
+
+    <div class="aff-stats">
+      <div class="aff-stat"><div class="aff-stat-num">${count}</div><div class="aff-stat-lbl">referrals</div></div>
+      <div class="aff-stat"><div class="aff-stat-num">💎 ${fmt(earnings)}</div><div class="aff-stat-lbl">gems earned</div></div>
+      <div class="aff-stat"><div class="aff-stat-num">🪙 ${fmt(earnedCoins)}</div><div class="aff-stat-lbl">coins earned</div></div>
+    </div>
+
+    ${recent.length ? `
+    <div class="aff-section">
+      <div class="aff-label">Recent referrals</div>
+      <div class="aff-recent">
+        ${recent.map(r => `<div class="aff-ref"><code>${r.code}</code><span class="aff-ref-date">${new Date(r.at).toLocaleString()}</span></div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    ${usedCode ? `
+    <div class="aff-section aff-used">
+      <div class="aff-label">You joined via</div>
+      <div class="aff-used-code"><code>${usedCode}</code></div>
+      <div class="aff-msg">🎉 You got +${REFERRAL_BONUS.coins}🪙 +${REFERRAL_BONUS.gems}💎 when you joined!</div>
+    </div>` : `
+    <div class="aff-section aff-used">
+      <div class="aff-label">You joined via</div>
+      <div class="aff-used-none">No code yet — ask a friend for their code!</div>
+    </div>`}
+
+    <div class="aff-section aff-reward-row">
+      <div class="aff-reward"><span>🙋 New player</span> gets <b>+${REFERRAL_BONUS.coins}🪙 +${REFERRAL_BONUS.gems}💎</b></div>
+      <div class="aff-reward"><span>👤 Referrer</span> earns <b>+${REFERRER_REWARD.coins}🪙 +${REFERRER_REWARD.gems}💎</b></div>
+    </div>
+  `;
+
+  openPanel('🤝 AFFILIATE');
+  $('panelBody').innerHTML = html;
+
+  // ── Copy button ──────────────────────────────────────────────────────────
+  const copyBtn = $('affCopyBtn');
+  const codeInput = $('affCodeInput');
+  copyBtn.onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      copyBtn.textContent = '✅ Copied!';
+      setTimeout(() => { copyBtn.textContent = '📋 Copy'; }, 1800);
+      game.toast('📋 Code copied to clipboard!');
+    } catch {
+      // Fallback: select the text
+      codeInput.select();
+      document.execCommand('copy');
+      copyBtn.textContent = '✅ Copied!';
+      setTimeout(() => { copyBtn.textContent = '📋 Copy'; }, 1800);
+      game.toast('📋 Code copied!');
+    }
+    audio.click();
+  };
+
+  // ── Share button ──────────────────────────────────────────────────────────
+  const shareBtn = $('affShareBtn');
+  shareBtn.onclick = async () => {
+    audio.click();
+    if (navigator.share && navigator.canShare) {
+      try {
+        await navigator.share({
+          title: 'Bash Baqi Racing',
+          text: shareText,
+          url: shareLink,
+        });
+      } catch { /* user cancelled */ }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(shareText);
+        game.toast('🔗 Share text copied! Paste it anywhere.');
+      } catch {
+        game.toast('📋 Copy your code and send it to a friend.');
+      }
+    }
+  };
+
+  // ── Apply code button ─────────────────────────────────────────────────────
+  const applyBtn = $('affApplyBtn');
+  const enterInput = $('affEnterInput');
+  const msgEl = $('affApplyMsg');
+  applyBtn.onclick = () => {
+    const result = applyCode(game, enterInput.value);
+    if (result.ok) {
+      msgEl.innerHTML = `<span class="aff-ok">${result.message}</span>`;
+      game.toast(result.message);
+      audio.buy();
+      // Refresh the panel to show updated stats
+      openAffiliate(game);
+    } else {
+      msgEl.innerHTML = `<span class="aff-err">${result.message}</span>`;
+      audio.deny();
+    }
+  };
+  enterInput.onkeydown = (e) => {
+    if (e.key === 'Enter') applyBtn.click();
+  };
 }
 
 export function openHelp(game) {
