@@ -38,6 +38,10 @@ namespace {
 constexpr VkFormat kColorFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
 constexpr VkFormat kDepthFormat = VK_FORMAT_D32_SFLOAT;
 constexpr uint32_t kSceneUniformBytes = 256;      // sizeof(SceneUniforms) rounded up
+// How long to wait before trying to start the AI session again after a failed
+// attempt: long enough not to burn GPU time on a graph this device cannot run,
+// short enough that installing a model is noticed without touching anything.
+constexpr double kSessionRetryMs = 2000.0;
 constexpr uint32_t kParticleCapacity = 16384;
 
 double nowMs() {
@@ -95,6 +99,7 @@ struct DemoRenderer::Impl {
     SessionPlan plan{};
     bool initialised = false;
     bool sessionActive = false;
+    double lastSessionAttemptMs = kUnavailable;
     std::string lastError;
     uint32_t surfaceWidth = 0;
     uint32_t surfaceHeight = 0;
@@ -692,14 +697,20 @@ struct DemoRenderer::Impl {
     }
 
     /** The present pass points its samplers at whatever this frame produced. */
+    // Which image is "the enhanced one": the engine's output when a session is
+    // running, otherwise whatever the scene pass produced. Sampling enhancedImage
+    // with no session would present an image nothing wrote.
+    // Non-const on purpose: transitionImage() records the new layout back into the
+    // image it is given, and that bookkeeping is what the next frame's barriers
+    // believe.
+    vk::Image& enhancedForPresent() {
+        if (sessionActive) return enhancedImage;
+        return wantsNativeTarget() ? nativeImage : renderImage;
+    }
+
     void updatePresentDescriptors() {
         const VkDevice device = context.device();
-        // Which image is "the enhanced one": the engine's output when a session
-        // is running, otherwise whatever the scene pass produced. Sampling
-        // enhancedImage with no session would present an image nothing wrote.
-        const vk::Image& enhanced = sessionActive ? enhancedImage
-                                   : wantsNativeTarget() ? nativeImage
-                                                         : renderImage;
+        vk::Image& enhanced = enhancedForPresent();
         vk::writeCombinedSampler(device, presentSet, 0, enhanced.view, enhancedSampler);
         // The reference is the low-resolution render: in the comparison the left
         // half shows exactly what the AI stage was given.
@@ -874,19 +885,38 @@ struct DemoRenderer::Impl {
     // -----------------------------------------------------------------------
     // Engine session
     // -----------------------------------------------------------------------
+    // Brings the session in line with the current plan. Called once at the top of
+    // a frame, *before* the command buffer is recorded, because what the frame
+    // records depends on it: the low-res image is only transitioned into the
+    // engine's documented input layout on frames that will actually be upscaled.
+    //
+    // Nothing in here is fatal. A device without the engine, or without a model
+    // installed, still gets a rendered scene and a panel that says what is
+    // missing -- refusing to draw would be a worse answer than explaining.
     bool ensureSession(std::string* error) {
         if (plan.neural == false || !plan.upscales) {
             if (sessionActive && engine != nullptr) {
                 engine->stopSession();
                 sessionActive = false;
+                historyValid = false;
             }
             return true;
         }
-        if (engine == nullptr) {
-            if (error != nullptr) *error = "no engine: AI upscaling cannot be requested";
-            return false;
-        }
         if (sessionActive) return true;
+        if (engine == nullptr || !engine->initialised()) {
+            lastError =
+                "the engine is not available in this build, so the AI stage cannot run; the panel "
+                "shows the low-resolution render";
+            return true;
+        }
+        // One attempt every two seconds: enough to notice a model installed from
+        // the AI Engine screen without retrying a graph this device cannot run
+        // sixty times a second.
+        const double now = nowMs();
+        if (lastSessionAttemptMs != kUnavailable && now - lastSessionAttemptMs < kSessionRetryMs) {
+            return true;
+        }
+        lastSessionAttemptMs = now;
 
         v4k::DeviceHandles deviceHandles;
         deviceHandles.instance = reinterpret_cast<uint64_t>(context.instance());
@@ -910,11 +940,18 @@ struct DemoRenderer::Impl {
         desc.noiseReduction = plan.noiseReduction;
         desc.maxWorkingBytes = 0;   // the engine derives it from the device
 
-        if (!engine->startSessionOnDevice(deviceHandles, desc, error)) {
-            return false;
+        std::string startError;
+        if (!engine->startSessionOnDevice(deviceHandles, desc, &startError)) {
+            lastError = "the AI stage could not start: " + startError +
+                        " The scene keeps rendering without it; install a model on the AI Engine "
+                        "screen and it will be picked up within a couple of seconds.";
+            sessionActive = false;
+            return true;
         }
         sessionActive = engine->sessionActive();
         historyValid = false;
+        if (sessionActive) lastError.clear();
+        (void)error;
         return true;
     }
 
@@ -970,6 +1007,9 @@ bool DemoRenderer::initialise(Engine* engine, void* nativeWindow, uint32_t width
     impl.scene = buildDemoScene(impl.config.seed, impl.config.quality);
     impl.sceneStats = sceneStats(impl.scene);
     impl.plan = planSession(impl.config);
+    // A new configuration is a new attempt at the session: do not make the user
+    // wait out the retry window after changing the ladder or the mode.
+    impl.lastSessionAttemptMs = kUnavailable;
 
     if (!impl.createRenderPasses(error)) return false;
     if (!impl.createPipelines(error)) return false;
@@ -1107,7 +1147,6 @@ bool DemoRenderer::setConfig(const DemoConfig& config, std::string* error) {
             if (!impl.createDescriptors(error)) return false;
         }
     }
-    if (!impl.ensureSession(error)) return false;
     return true;
 }
 
@@ -1142,6 +1181,11 @@ bool DemoRenderer::renderFrame(double deltaSeconds, double timeSeconds, std::str
         return false;
     }
 
+    // Before anything is recorded: the frame's pre-transitions depend on whether
+    // this frame will be upscaled, and the engine's contract is that the low-res
+    // image arrives in SHADER_READ_ONLY and the output in GENERAL.
+    impl.ensureSession(error);
+
     impl.updateUniforms();
     impl.updateMovingInstances();
 
@@ -1161,8 +1205,11 @@ bool DemoRenderer::renderFrame(double deltaSeconds, double timeSeconds, std::str
         impl.recordScenePass(impl.cmd, impl.renderImage, impl.sceneFramebuffer);
     }
     if (impl.sessionActive) {
-        // The engine samples the low-res image and writes the output as a
-        // storage image: both transitions are its documented contract.
+        // The engine samples the low-res image and writes the output as a storage
+        // image: both transitions are its documented contract, and they are
+        // recorded only on frames that will be upscaled. Doing them on any other
+        // frame would leave the low-res image in a layout the scene pass then has
+        // to fight its way out of.
         vk::transitionImage(impl.cmd, impl.renderImage, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                             VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
                             VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
@@ -1212,6 +1259,25 @@ bool DemoRenderer::renderFrame(double deltaSeconds, double timeSeconds, std::str
     if (vkBeginCommandBuffer(impl.cmdPost, &begin) != VK_SUCCESS) {
         if (error != nullptr) *error = "vkBeginCommandBuffer failed for the present pass";
         return false;
+    }
+    // The present pass *samples* both images, so neither may still be in
+    // COLOR_ATTACHMENT_OPTIMAL -- which is exactly where the scene pass leaves the
+    // low-res image on a frame with no session running. transitionImage() reads the
+    // layout the image is actually tracked in and does nothing when it is already
+    // SHADER_READ_ONLY, so this is correct whether or not the engine ran: after an
+    // upscale the engine has already put both of its images in that layout.
+    vk::transitionImage(impl.cmdPost, impl.enhancedForPresent(),
+                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT |
+                            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
+    // The reference is only sampled by the split view, but a descriptor that
+    // points at an image in the wrong layout is a validation error either way.
+    if (&impl.enhancedForPresent() != &impl.renderImage) {
+        vk::transitionImage(impl.cmdPost, impl.renderImage, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT |
+                                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
     }
     const float clearColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     vk::beginRenderPass(impl.cmdPost, impl.swapchain.renderPass,

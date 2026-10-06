@@ -174,8 +174,9 @@ private fun integrationDescription(kind: IntegrationKind): String = when (kind) 
         "A game that links the AIUpscaler SDK. This is the only configuration in which the engine can " +
             "replace a render resolution, because the game hands over its own Vulkan device."
     IntegrationKind.SampleDemo ->
-        "The bundled Vulkan demo / comparison harness. Marked experimental until the demo host ships in " +
-            "this build."
+        "The bundled Vulkan demo / comparison harness: this app's own scene, rendered through its own " +
+            "device, with a live native-vs-AI comparison. Experimental, and it can only ever enhance its " +
+            "own renderer \u2014 no app may reach into another app's pipeline."
     IntegrationKind.ScreenEnhance ->
         "MediaProjection frame enhancement: experimental, needs an explicit consent prompt per session, " +
             "and it cannot change a game's render resolution \u2014 it can only re-scale the composited frames. " +

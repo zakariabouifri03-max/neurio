@@ -74,8 +74,8 @@ fun DashboardScreen(
             PanelCard(title = "Benchmark", accent = AccentViolet) {
                 Text(
                     text = "Measure this app's real frame cadence, the thermal response and whether the " +
-                        "device holds its refresh rate. The in-game \u201cnative vs AI upscaling\u201d comparison runs " +
-                        "in the Vulkan demo host, which hands a real renderer's device to the engine.",
+                        "device holds its refresh rate. The \u201cnative vs AI upscaling\u201d comparison runs " +
+                        "below, in the demo scene, where our own renderer hands its Vulkan device to the engine.",
                     style = MaterialTheme.typography.bodySmall,
                     color = TextMuted,
                 )

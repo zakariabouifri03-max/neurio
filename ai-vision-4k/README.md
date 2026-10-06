@@ -46,7 +46,7 @@ app's FPS) are displayed as `—`, never as a plausible-looking number.
 | Kotlin SDK (`AIUpscaler`, typed models, Android caps collector, GLES probe) | Implemented |
 | App: dashboard, supported games, profiles, live monitor, thermal safety, AI engine / model manager, benchmark, settings, honest sandbox explanation | Implemented (this APK) |
 | Per-game profiles, preset ladder, compatibility tiers, battery-saver behaviour | Implemented |
-| Vulkan demo host (`cpp/demo`) with a live Native ↔ AI comparison | **Not in this build** — planned; the app says so on the benchmark screen instead of estimating |
+| Vulkan demo scene (`cpp/demo`) with a live Native ↔ AI comparison | **Implemented (this APK), experimental** — a real rendered scene, a live mode switch and an A/B measurement that only publishes once both sides were measured on the device. See [The Vulkan demo scene](#the-vulkan-demo-scene) |
 | Bundled `.v4kmodel` files | Two **calibration models** ship in `aiupscaler-sdk/src/main/assets/models/` — linear graphs that reproduce bilinear/bicubic exactly, so the AI path can be checked on a device with no download and no trained weights. They are not quality models. No trained model ships; no download server is configured. Regenerate with `tools/model/generate-calibration-models.sh` |
 | MediaProjection `ScreenEnhance` mode | Experimental, documented, not enabled by default |
 | On-device instrumentation tests for the Vulkan path | Not written yet |
@@ -153,12 +153,14 @@ already at `CRITICAL`.
 ```bash
 # 1. The platform-independent core: profiles, thermal, compatibility, metrics,
 #    image quality, SHA-256, model container, CPU interpreter, GPU plan.
-tools/run-native-tests.sh                 # 15 931 checks, 106 cases, 0 failures
+tools/run-native-tests.sh                 # 21 867 checks, 129 cases, 0 failures
 
 # 2. The full gate (needs a C++17 compiler; optionally the Vulkan headers and a
-#    JDK's jni.h to syntax-check the Vulkan and JNI layers too).
+#    JDK's jni.h to syntax-check the Vulkan, JNI and demo layers too).
+#    V4K_JNI_INCLUDE takes a colon-separated list: a JDK keeps jni.h in include/
+#    and jni_md.h in include/linux, while the NDK puts both in one directory.
 V4K_VULKAN_INCLUDE=/path/to/Vulkan-Headers/include \
-V4K_JNI_INCLUDE=/path/to/jdk/include \
+V4K_JNI_INCLUDE=/path/to/jdk/include:/path/to/jdk/include/linux \
 tools/verify.sh                           # 6 steps: shaders, embedding, tests, syntax
 ```
 
@@ -193,6 +195,95 @@ Requirements: JDK 17, Gradle 8.9+, Android SDK 35, NDK 27.3.13750724, CMake 3.22
 
 There is no `QUERY_ALL_PACKAGES`: the `<queries>` block asks only for launcher
 activities, which is all the supported-games list needs.
+
+---
+
+## The Vulkan demo scene
+
+The dashboard's **Open the demo scene** button starts it. It is a normal activity
+of this app, and that is the whole point: it renders *our* scene into *our*
+SurfaceView through *our* device, which is the only thing an Android app is
+allowed to do with a GPU. It cannot and does not attach to another app's
+rendering — see [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
+
+What it renders: a seeded procedural terrain with buildings, moving objects, a GPU
+particle system with a compute pass, a directional light with a shadow map, and a
+sky. What it demonstrates:
+
+* **Native** — the scene is rendered at the output resolution and presented.
+* **AI Upscaled** — the scene is rendered low, handed to the engine on the *same*
+  device and upscaled, with the resulting image presented instead. This is the
+  real `startSessionOnDevice()` / `processFrame()` path, not a special case for
+  the demo.
+* **Split compare** — both at once, split at a movable line, with an optional
+  magnifier that zooms the same screen region on both sides. That is where the
+  difference is actually visible; a full-screen screenshot of 4K upscaled from
+  720p mostly shows that both are 4K.
+
+The render and output resolutions come off the same ladder the profiles screen
+uses (720p / 900p / 1080p / 1440p / 4K), so 720p→1080p and 1080p→4K are one tap
+apart. AI quality (Low/Medium/High) changes what the engine is asked for: the
+session plan turns temporal reconstruction and anti-aliasing on when the scale
+factor is at least 1.4×, noise reduction at 2.5× and above, and always leaves a
+native render asking for none of it.
+
+### The comparison is a measurement, not a chart
+
+Pressing **Measure native** or **Measure AI** runs that mode for six seconds at
+the current settings and records the frame times. The report appears only when
+*both* sides have at least 60 measured frames; until then it says what is still
+missing. It publishes real frame times, the per-frame GPU cost of the AI stage
+from the engine's timestamp queries, and the render width each side used.
+
+Two rules are enforced in code, not in prose:
+
+* the **AI pass will not start while the AI stage is stopped** — without a
+  running session the "AI" side would be a low-resolution render presented at the
+  output size, and publishing that as upscaling would be a lie dressed up as a
+  benchmark;
+* a value the device did not report is `null` in the JSON and `unavailable` on the
+  panel. Never `0`, never an estimate.
+
+Expect the AI column to be *slower* per frame at a fixed render resolution: it
+renders the same scene low and then spends GPU time reconstructing it. That is the
+trade the whole feature is about, and the panel says so in the report itself.
+
+### The panel
+
+Collapsible, floating over the scene: live FPS / frame time / 1% low, the
+render→output pair, the AI stage's GPU time, frames drawn, thermal status and
+battery temperature, the mode switch, both resolution ladders, AI quality, split
+position and magnifier, the benchmark, and a frame-rate cap (30 / 60 / 120 /
+uncapped) for the render loop itself.
+
+### Safety
+
+At thermal status `SEVERE` the render loop stops by itself, explains why, and
+waits to be resumed deliberately. The demo is not allowed to cook a phone to make
+a number look good.
+
+### What it needs
+
+Vulkan 1.0+ and a model. The two **calibration models** that ship in the APK make
+the AI path runnable on any supported device with no download; they reproduce
+bilinear/bicubic resampling exactly, so they are for correctness, not for quality.
+Install one from the AI Engine screen, then open the demo. With no model
+installed the demo still renders and says, on the panel, that the AI stage is not
+running.
+
+### Limitations, stated plainly
+
+* Experimental. It has been built and statically verified, but nothing in this
+  repository has run it on a physical device or an emulator — there is no GPU in
+  the build environment. Treat the first run on your hardware as the real test.
+* Single-frame-in-flight rendering: the loop is a demonstration of the upscaling
+  path, not a shipping game engine. A game integrating the SDK pipelines two or
+  three frames ahead.
+* No trained model ships, so "AI quality" today means the reconstruction stages
+  the engine can run (analytical upscale, optional temporal reconstruction,
+  anti-aliasing, sharpening, denoise) with a calibration graph. The model manager,
+  the container and the download-on-demand path are the parts that change when a
+  trained model is added.
 
 ---
 

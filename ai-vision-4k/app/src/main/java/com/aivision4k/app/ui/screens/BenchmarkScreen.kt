@@ -82,9 +82,9 @@ fun BenchmarkScreen(vm: AppViewModel, onBack: () -> Unit) {
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = "It is not a game benchmark and it does not measure the AI pipeline: an app cannot " +
-                        "read another app's frame rate, and the \u201cnative vs AI upscaling\u201d comparison needs a " +
-                        "renderer that hands its Vulkan device to the engine (the demo host). Nothing here is " +
-                        "extrapolated into a number for a game you did not measure.",
+                        "read another app's frame rate, and the \u201cnative vs AI upscaling\u201d comparison lives " +
+                        "in the demo scene, where our own renderer hands its Vulkan device to the engine. " +
+                        "Nothing here is extrapolated into a number for a game you did not measure.",
                     style = MaterialTheme.typography.bodySmall,
                     color = WarnAmber,
                 )
@@ -133,15 +133,22 @@ fun BenchmarkScreen(vm: AppViewModel, onBack: () -> Unit) {
         item { ResultPanel(state) }
         item { EngineViewPanel(state) }
         item {
+            // This screen measures this app's own frame cadence. The native vs AI
+            // comparison is a different measurement and lives in the demo scene,
+            // where a renderer actually hands its device to the engine -- so this
+            // card points there instead of publishing a number measured elsewhere
+            // and labelled for a game.
             PanelCard(title = "Native vs AI upscaling") {
                 Text(
-                    text = "Not available in this build. That comparison needs the Vulkan demo host: a real " +
-                        "renderer that draws a scene at a low resolution, hands its device to the engine, and " +
-                        "measures presentation with and without the AI passes. Until that component is in the " +
-                        "APK, this screen shows no number for it \u2014 an estimate would be a fabrication.",
+                    text = "That comparison runs in the Vulkan demo scene, not here: it needs a renderer that " +
+                        "draws a scene at a low resolution, hands its device to the engine and measures " +
+                        "presentation with and without the AI passes. Open the scene from the dashboard, run " +
+                        "each side, and the report appears above the panel once both have been measured. " +
+                        "Nothing on this screen is extrapolated into a number for it.",
                     style = MaterialTheme.typography.bodySmall,
                     color = TextMuted,
                 )
+                Hint("Dashboard \u2192 Open the demo scene", accent = AccentCyan)
             }
         }
         item { OutlinedButton(onClick = onBack) { Text("Back to the dashboard") } }
