@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Accessibility service used ONLY to dispatch the player's own gestures
+  (GestureDescription / dispatchGesture) into the game that the host phone is
+  running. It does not read, record or upload anything from the screen.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/accessibility_service_description"
+    android:accessibilityEventTypes="typeAllMask"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:canRetrieveWindowContent="false"
+    android:canPerformGestures="true"
+    android:canRequestTouchExplorationMode="false"
+    android:canRequestFilterKeyEvents="true"
+    android:notificationTimeout="0"
+    android:summary="@string/accessibility_service_label" />

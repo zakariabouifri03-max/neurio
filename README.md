@@ -113,3 +113,20 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 📡 `android/` — Neurio: LAN game-streaming prototype (Android, Kotlin)
+
+A **real** peer-to-peer game-streaming prototype lives in [`android/`](android/README.md):
+
+* **Phone 2 (host)** runs an installed game, captures its screen with `MediaProjection`,
+  hardware-encodes H.264/H.265 with `MediaCodec` and streams it over the LAN.
+* **Phone 1 (client)** — **with the game NOT installed and never downloaded** —
+  hardware-decodes the live stream, renders it full screen and sends touch/gamepad input back.
+* Same APK, two modes (HOST GAME / JOIN GAME) + Settings, Diagnostics and About.
+
+Open the `android/` folder in Android Studio to build it. Start with
+[`android/README.md`](android/README.md), then [`android/docs/LIMITATIONS.md`](android/docs/LIMITATIONS.md)
+for an honest account of the Android restrictions (input injection, internal audio,
+secure surfaces) and how the app works within them.

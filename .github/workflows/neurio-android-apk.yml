@@ -1,0 +1,145 @@
+name: Neurio LAN Stream debug APK
+
+on:
+  push:
+    branches:
+      - arena/176424e0-neurio
+    paths:
+      - "android/**"
+      - ".github/workflows/neurio-android-apk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Configure preinstalled Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          if [[ -z "$SDKMANAGER" ]]; then
+            echo "Android SDK command-line tools were not found under $SDK_ROOT" >&2
+            exit 1
+          fi
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "$(dirname "$SDKMANAGER")" >> "$GITHUB_PATH"
+          echo "$SDK_ROOT/platform-tools" >> "$GITHUB_PATH"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Build installable debug APK
+        working-directory: android
+        shell: bash
+        run: |
+          set -o pipefail
+          chmod +x ./gradlew
+          ./gradlew --no-daemon --console=plain --stacktrace :app:assembleDebug 2>&1 | tee "$RUNNER_TEMP/gradle-build.log"
+
+      - name: Report Gradle failure details
+        if: failure()
+        shell: bash
+        run: |
+          log="$RUNNER_TEMP/gradle-build.log"
+          if [[ -f "$log" ]]; then
+            diagnostics="$(grep -E '(^e: |error:|FAILURE:|What went wrong:|Caused by:|Execution failed for task|A problem occurred|Could not )' "$log" | tail -n 60 || true)"
+            failure_tail="$(awk '/^FAILURE: Build failed with an exception\./ { capture=1 } capture { print }' "$log" | tail -n 60)"
+            if [[ -z "$failure_tail" ]]; then failure_tail="$(tail -n 60 "$log")"; fi
+            {
+              echo '## Gradle failure details'
+              echo '### Diagnostics'
+              echo '```text'
+              printf '%s\n' "${diagnostics:-No matching diagnostic lines}"
+              echo '```'
+              echo '### Failure tail'
+              echo '```text'
+              printf '%s\n' "$failure_tail"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            {
+              printf '%s\n' "$diagnostics"
+              printf '%s\n' "$failure_tail" | grep -Ev '^> Task |^$' | tail -n 25
+            } | awk 'NF { print "::error title=Gradle build::" $0 }'
+          else
+            echo 'Gradle log was not created.' >> "$GITHUB_STEP_SUMMARY"
+            echo '::error::Gradle log was not created.'
+          fi
+
+      - name: Rename APK and record checksum
+        working-directory: android/app/build/outputs/apk/debug
+        run: |
+          cp app-debug.apk Neurio-LAN-Stream-debug.apk
+          sha256sum Neurio-LAN-Stream-debug.apk > SHA256SUMS.txt
+
+      - name: Upload Gradle build log (debugging aid)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-log
+          path: ${{ runner.temp }}/gradle-build.log
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: neurio-lan-stream-debug-apk
+          path: |
+            android/app/build/outputs/apk/debug/Neurio-LAN-Stream-debug.apk
+            android/app/build/outputs/apk/debug/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Publish installable APK GitHub prerelease
+        if: github.ref == 'refs/heads/arena/176424e0-neurio'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="neurio-lanstream-debug-${GITHUB_SHA:0:12}"
+          apk="android/app/build/outputs/apk/debug/Neurio-LAN-Stream-debug.apk"
+          checksums="android/app/build/outputs/apk/debug/SHA256SUMS.txt"
+          title="Neurio LAN Stream debug APK (${GITHUB_SHA:0:7})"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$apk" "$checksums" --clobber
+          else
+            gh release create "$tag" "$apk" "$checksums" \
+              --target "$GITHUB_SHA" --prerelease --title "$title" \
+              --notes "CI-built debug APK of the Neurio LAN game-streaming prototype in \`android/\`. Install the SAME APK on both phones (one hosts, one joins). Not release-signed and not validated on real devices yet."
+          fi
+          release_url="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${tag}"
+          apk_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}/Neurio-LAN-Stream-debug.apk"
+
+          # Also refresh a fixed "latest" tag so the download URL never changes.
+          latest_tag="neurio-lanstream-latest"
+          latest_title="Neurio LAN Stream - latest debug APK"
+          if gh release view "$latest_tag" >/dev/null 2>&1; then
+            gh release upload "$latest_tag" "$apk" "$checksums" --clobber
+          else
+            gh release create "$latest_tag" "$apk" "$checksums" \
+              --target "$GITHUB_SHA" --prerelease --title "$latest_title" \
+              --notes "Always-fresh CI build of \`android/\` (commit ${GITHUB_SHA:0:7}). The download URL does not change: install this APK on BOTH phones, one hosts, one joins. Debug build, unsigned for release, not yet validated on real devices."
+          fi
+          latest_apk_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${latest_tag}/Neurio-LAN-Stream-debug.apk"
+
+          {
+            echo '## Direct APK download'
+            echo "- Latest (fixed URL): [Download Neurio-LAN-Stream-debug.apk](${latest_apk_url})"
+            echo "- This commit: [${tag}](${apk_url})"
+            echo "- Release and checksum: [${title}](${release_url})"
+          } >> "$GITHUB_STEP_SUMMARY"
