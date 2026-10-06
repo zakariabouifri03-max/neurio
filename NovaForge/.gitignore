@@ -1,0 +1,12 @@
+# NovaForge engine - build outputs and machine-local files
+build/
+Builds/
+*.o
+*.obj
+*.pdb
+*.ilk
+*.exe
+!build.py
+*.zip
+Logs/*.log
+.nf_tmp/
