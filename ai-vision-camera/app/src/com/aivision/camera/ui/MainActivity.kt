@@ -109,6 +109,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
     private lateinit var bottomBar: LinearLayout
     private var startupAnimationPlayed = false
     private var lastAnalysisAt = 0L
+    private var analysisSeen = false
     private val startupStart = android.os.SystemClock.elapsedRealtime()
     private var modeSwitchAllowedAt = 0L
 
@@ -837,7 +838,10 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
     // ------------------------------------------------------------------- callbacks
     override fun onCameraReady(lens: LensInfo, previewSize: android.util.Size, captureSize: android.util.Size) {
         Crash.step(this, "session configured: ${lens.kind.label} ${previewSize.width}x${previewSize.height}")
-        Crash.bootComplete(this)
+        // the trace only counts the launch as good once the camera has actually
+        // been streaming for a while - a death right after the first frame is
+        // exactly the kind of failure this file has to survive for
+        overlay.postDelayed({ Crash.bootComplete(this) }, 12_000L)
         uiSafe {
             val rotation = engine?.jpegOrientation() ?: 90
             val mirror = (engine?.isFrontFacing() ?: false) && prefs.mirrorFront
@@ -897,7 +901,12 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
         preview.requestRender()
     }
 
+    private var streams = 0
+
     override fun onStatus(status: CameraStatus) {
+        streams++
+        if (streams == 1) Crash.step(this, "first camera frame (${status.previewSize.width}x${status.previewSize.height})")
+        if (streams == 60) Crash.step(this, "camera streaming steadily")
         uiSafe {
             val exposure = if (status.exposureNs > 0) {
                 "ISO ${status.iso} • ${CapturePlan.formatExposure(status.exposureNs)}"
@@ -935,6 +944,10 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
     }
 
     override fun onAnalysisFrame(luma: ByteArray, width: Int, height: Int, stride: Int, faces: List<Rect>) {
+        if (streams > 0 && !analysisSeen) {
+            analysisSeen = true
+            Crash.step(this, "first analysis frame ${width}x$height")
+        }
         if (!prefs.sceneDetection && !ai.aiEnhance) return
         // runs on the camera thread: rate-limit before doing any per-frame work
         val elapsed = android.os.SystemClock.elapsedRealtime()
@@ -1040,6 +1053,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
     }
 
     override fun onBurstDone(count: Int, lens: LensInfo) {
+        Crash.step(this, "burst done ($count frames)")
         val frames = ArrayList(burstFrames)
         val shifts = ArrayList(burstShifts)
         burstFrames = ArrayList()
@@ -1183,6 +1197,7 @@ class MainActivity : Activity(), CameraEngine.Callback, AiEngine.Progress {
             planned.copy(frames = usableFrames, evLadder = planned.evLadder.take(usableFrames))
         } else planned
         burstPlan = plan
+        Crash.step(this, "capture requested (${plan.frames} frames, iso ${plan.manualIso})")
         capturing = true
         burstFrames = ArrayList()
         burstShifts = ArrayList()

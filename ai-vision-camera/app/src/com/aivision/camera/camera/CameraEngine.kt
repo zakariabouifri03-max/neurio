@@ -241,6 +241,9 @@ class CameraEngine(
         }
     }
 
+    /** True between "shoot a still" and the frame that satisfies it. */
+    private val awaitingStill = java.util.concurrent.atomic.AtomicBoolean(false)
+
     private var highSpeedRequested = 0
     private var highSpeedSize: Size? = null
     private var highSpeedRange: Range<Int>? = null
@@ -251,6 +254,7 @@ class CameraEngine(
         burstTotal = 1
         burstIndex = 0
         bursting.set(true)
+        awaitingStill.set(true)
         issueBurstFrame()
     }
 
@@ -414,11 +418,15 @@ class CameraEngine(
                     callback.onBurstFrame(image, idx, burstTotal, l)
                     if (burstIndex >= burstTotal) {
                         bursting.set(false)
+                        awaitingStill.set(false)
                         callback.onBurstDone(burstTotal, l)
                     } else {
                         issueBurstFrame()
                     }
-                } else {
+                } else if (awaitingStill.get()) {
+                    // a single still was asked for; the flag is cleared as soon as
+                    // it has been handed over so no stray frame becomes a "photo"
+                    awaitingStill.set(false)
                     callback.onFrameForProcessing(image, l, lastResult)
                 }
             } catch (t: Throwable) {
@@ -435,8 +443,12 @@ class CameraEngine(
                 rawReader?.setOnImageAvailableListener({ reader ->
                     val image = try { reader.acquireLatestImage() } catch (t: Throwable) { null }
                     if (image != null) {
-                        try { callback.onFrameForProcessing(image, l, lastResult) }
-                        finally { runCatching { image.close() } }
+                        try {
+                            wantRawForNext = false
+                            callback.onFrameForProcessing(image, l, lastResult)
+                        } finally {
+                            runCatching { image.close() }
+                        }
                     }
                 }, handler)
             }
@@ -502,7 +514,11 @@ class CameraEngine(
 
         val hs = highSpeedRange
         if (highSpeedActive && hs != null && recorderSurface != null) {
-            createHighSpeedSession(dev, surfaces, hs)
+            // A constrained high-speed session only accepts the preview and the
+            // recorder surface; extra readers make the configuration fail.
+            val fast = mutableListOf<Surface>(preview)
+            recorderSurface?.let { fast += it }
+            createHighSpeedSession(dev, fast, hs)
             return
         }
 
@@ -522,7 +538,9 @@ class CameraEngine(
                     (s as? CameraConstrainedHighSpeedCaptureSession)?.let { hs ->
                         highSpeedSession = hs
                         try {
-                            val req = buildRequest(CameraDevice.TEMPLATE_RECORD)
+                            val req = dev.createCaptureRequest(CameraDevice.TEMPLATE_RECORD)
+                            previewSurface?.let { req.addTarget(it) }
+                            recorderSurface?.let { req.addTarget(it) }
                             req.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, range)
                             val list = hs.createHighSpeedRequestList(req.build())
                             hs.setRepeatingBurst(list, captureCallback, handler)
@@ -579,6 +597,7 @@ class CameraEngine(
     }
 
     fun closeCamera() {
+        awaitingStill.set(false)
         closeSession()
         runCatching { device?.close() }
         device = null
@@ -595,15 +614,31 @@ class CameraEngine(
     // ----------------------------------------------------------------- requests
     private var lastResult: CaptureResult? = null
 
-    private fun buildRequest(template: Int): CaptureRequest.Builder {
+    /**
+     * Build a request.
+     *
+     * `still` must be true only for the requests that are actually meant to
+     * produce a still (or a RAW/DEPTH frame). The repeating preview request must
+     * NEVER include the still readers: doing so makes the camera stream
+     * full-resolution YUV (and RAW, and DEPTH) at 30 fps into readers that only
+     * pick up the latest image - a data rate of hundreds of MB per second that
+     * gets the process killed within a second or two, and turns every preview
+     * frame into a bogus "photo". The small 640x480 analysis reader is the only
+     * extra target the repeat request is allowed to have.
+     */
+    private fun buildRequest(template: Int, still: Boolean = false): CaptureRequest.Builder {
         val dev = device ?: throw IllegalStateException("camera closed")
         val builder = dev.createCaptureRequest(template)
         previewSurface?.let { builder.addTarget(it) }
-        yuvReader?.surface?.let { builder.addTarget(it) }
-        rawReader?.surface?.let { builder.addTarget(it) }
-        depthReader?.surface?.let { builder.addTarget(it) }
-        analysisReader?.surface?.let { builder.addTarget(it) }
         recorderSurface?.let { builder.addTarget(it) }
+        analysisReader?.surface?.let { builder.addTarget(it) }
+        if (still) {
+            yuvReader?.surface?.let { builder.addTarget(it) }
+            if (rawStreamEnabled || wantRawForNext) rawReader?.surface?.let { builder.addTarget(it) }
+            if (mode == CaptureMode.PORTRAIT || mode == CaptureMode.AI) {
+                depthReader?.surface?.let { builder.addTarget(it) }
+            }
+        }
         return builder
     }
 
@@ -801,6 +836,7 @@ class CameraEngine(
 
         override fun onCaptureFailed(s: CameraCaptureSession, request: CaptureRequest, failure: CaptureFailure) {
             L.w("capture failed reason=${failure.reason}")
+            awaitingStill.set(false)
             if (bursting.get()) {
                 bursting.set(false)
                 callback.onError("Capture interrupted")
@@ -835,9 +871,11 @@ class CameraEngine(
         val s = session ?: return
         val dev = device ?: return
         try {
+            awaitingStill.set(true)
             val req = buildRequest(
                 if (mode == CaptureMode.VIDEO || mode == CaptureMode.SLOW_MOTION) CameraDevice.TEMPLATE_RECORD
-                else CameraDevice.TEMPLATE_STILL_CAPTURE
+                else CameraDevice.TEMPLATE_STILL_CAPTURE,
+                still = true,
             )
             applyControls(req)
             req.set(CaptureRequest.JPEG_ORIENTATION, jpegOrientation())
@@ -858,6 +896,7 @@ class CameraEngine(
         } catch (t: Throwable) {
             L.e("capture failed", t)
             bursting.set(false)
+            awaitingStill.set(false)
             callback.onError("Capture failed: ${t.message}")
         }
     }

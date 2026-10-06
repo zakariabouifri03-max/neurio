@@ -116,6 +116,13 @@ class GlPreviewView @JvmOverloads constructor(
         private var useFallback = false
         private var quad: FloatBuffer? = null
         private var texCoords: FloatBuffer? = null
+        // cached once after linking: glGet* runs a driver round trip and is far
+        // too expensive to repeat 30-60 times per second in the GL thread
+        private var aPosLoc = -1
+        private var aTexLoc = -1
+        private var sTexLoc = -1
+        private val texMatrix = FloatArray(16)
+        private val rotMatrix = FloatArray(4)
         private var uTexMatrixLoc = 0
         private var uCropLoc = 0
         private var uRotLoc = 0
@@ -174,6 +181,9 @@ class GlPreviewView @JvmOverloads constructor(
             uVibranceLoc = GLES20.glGetUniformLocation(program, "uVibrance")
             uSaturationLoc = GLES20.glGetUniformLocation(program, "uSaturation")
             uZoomLoc = GLES20.glGetUniformLocation(program, "uZoom")
+            aPosLoc = GLES20.glGetAttribLocation(program, "aPos")
+            aTexLoc = GLES20.glGetAttribLocation(program, "aTex")
+            sTexLoc = GLES20.glGetUniformLocation(program, "sTex")
 
             surfaceTexture = SurfaceTexture(textureId)
             surfaceTexture?.setOnFrameAvailableListener { requestRender() }
@@ -208,26 +218,23 @@ class GlPreviewView @JvmOverloads constructor(
                 L.d("updateTexImage: ${t.message}")
                 return
             }
-            val matrix = FloatArray(16)
-            st.getTransformMatrix(matrix)
+            st.getTransformMatrix(texMatrix)
 
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
             if (program == 0) return
             GLES20.glUseProgram(program)
 
-            val aPos = GLES20.glGetAttribLocation(program, "aPos")
-            val aTex = GLES20.glGetAttribLocation(program, "aTex")
             quad?.position(0)
-            GLES20.glEnableVertexAttribArray(aPos)
-            GLES20.glVertexAttribPointer(aPos, 2, GLES20.GL_FLOAT, false, 0, quad)
+            GLES20.glEnableVertexAttribArray(aPosLoc)
+            GLES20.glVertexAttribPointer(aPosLoc, 2, GLES20.GL_FLOAT, false, 0, quad)
             texCoords?.position(0)
-            GLES20.glEnableVertexAttribArray(aTex)
-            GLES20.glVertexAttribPointer(aTex, 2, GLES20.GL_FLOAT, false, 0, texCoords)
+            GLES20.glEnableVertexAttribArray(aTexLoc)
+            GLES20.glVertexAttribPointer(aTexLoc, 2, GLES20.GL_FLOAT, false, 0, texCoords)
 
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
             GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId)
-            GLES20.glUniform1i(GLES20.glGetUniformLocation(program, "sTex"), 0)
-            GLES20.glUniformMatrix4fv(uTexMatrixLoc, 1, false, matrix, 0)
+            GLES20.glUniform1i(sTexLoc, 0)
+            GLES20.glUniformMatrix4fv(uTexMatrixLoc, 1, false, texMatrix, 0)
 
             // ---- geometry: display-space crop -> sensor-space rotation --------
             val rotated = rotationDegrees % 360 == 90 || rotationDegrees % 360 == 270
@@ -245,7 +252,8 @@ class GlPreviewView @JvmOverloads constructor(
             val rad = Math.toRadians(rotationDegrees.toDouble())
             val cos = kotlin.math.cos(rad).toFloat()
             val sin = kotlin.math.sin(rad).toFloat()
-            GLES20.glUniformMatrix2fv(uRotLoc, 1, false, floatArrayOf(cos, -sin, sin, cos), 0)
+            rotMatrix[0] = cos; rotMatrix[1] = -sin; rotMatrix[2] = sin; rotMatrix[3] = cos
+            GLES20.glUniformMatrix2fv(uRotLoc, 1, false, rotMatrix, 0)
             GLES20.glUniform1f(uMirrorLoc, if (mirror) 1f else 0f)
             GLES20.glUniform2f(uTexelLoc, 1f / sensorWidth, 1f / sensorHeight)
 
@@ -265,8 +273,8 @@ class GlPreviewView @JvmOverloads constructor(
             }
 
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
-            GLES20.glDisableVertexAttribArray(aPos)
-            GLES20.glDisableVertexAttribArray(aTex)
+            GLES20.glDisableVertexAttribArray(aPosLoc)
+            GLES20.glDisableVertexAttribArray(aTexLoc)
         }
 
         private fun buildQuad(): FloatBuffer {
