@@ -117,4 +117,19 @@ std::string describeDevice(const DeviceCapabilities& caps) {
     return out;
 }
 
+uint64_t defaultWorkingSetBudget(uint64_t deviceLocalMemoryBytes, uint64_t deviceMemoryBudgetBytes) {
+    constexpr uint64_t kMiB = 1024ull * 1024ull;
+    constexpr uint64_t kFloor = 64ull * kMiB;
+    constexpr uint64_t kCeiling = 384ull * kMiB;
+    constexpr uint64_t kUnknown = 128ull * kMiB;
+
+    const uint64_t reference = deviceMemoryBudgetBytes > 0 ? deviceMemoryBudgetBytes : deviceLocalMemoryBytes;
+    if (reference == 0) return kUnknown;
+
+    uint64_t budget = reference / 4;
+    if (budget < kFloor) budget = kFloor;
+    if (budget > kCeiling) budget = kCeiling;
+    return budget;
+}
+
 }  // namespace v4k

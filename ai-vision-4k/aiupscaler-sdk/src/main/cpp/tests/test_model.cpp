@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "ai/v4k_cpu_infer.h"
+#include "core/v4k_image.h"
 #include "core/v4k_sha256.h"
 #include "ai/v4k_model.h"
 #include "ai/v4k_model_catalog.h"
@@ -262,6 +263,72 @@ V4K_TEST(cpu_inference_rejects_broken_graphs) {
 
     Model empty;
     CHECK(!infer.prepare(empty, &error));
+}
+
+V4K_TEST(cpu_inference_global_residual_keeps_the_bicubic_base) {
+    // A residual graph whose network is identically zero must return the bicubic
+    // base image untouched. Nothing else in the suite covers upsampleInput(),
+    // which quietly treated a planar tensor as interleaved until the model
+    // exporter's calibration check caught the resulting 0.65 maximum error.
+    Model model;
+    model.inputChannels = 3;
+    model.scaleFactor = 2;
+    model.flags = kModelFlagGlobalResidual;
+    model.weightFormat = ModelWeightFormat::Fp32;
+
+    ModelOp head;
+    head.type = ModelOpType::Conv2d;
+    head.inputIndex = -1;
+    head.inputChannels = 3;
+    head.outputChannels = 12;      // 3 channels * r^2 for the shuffle below
+    head.kernelSize = 3;
+    head.stride = 1;
+    head.padding = 1;
+    head.weights.assign(static_cast<size_t>(12) * 3 * 9, 0.0f);
+    head.bias.assign(12, 0.0f);
+
+    ModelOp shuffle;
+    shuffle.type = ModelOpType::PixelShuffle;
+    shuffle.inputIndex = 0;
+    shuffle.inputChannels = 12;
+    shuffle.outputChannels = 3;
+    shuffle.kernelSize = 1;
+
+    model.ops.push_back(head);
+    model.ops.push_back(shuffle);
+    model.opCount = static_cast<uint32_t>(model.ops.size());
+
+    CpuInference infer;
+    std::string error;
+    CHECK(infer.prepare(model, &error));
+    if (!infer.ready()) {
+        V4K_FAIL("prepare failed: " + error);
+        return;
+    }
+    infer.setThreadCount(1);
+
+    const int w = 6;
+    const int h = 5;
+    Image input(w, h, 3);
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            for (int c = 0; c < 3; ++c) {
+                input.pixel(x, y)[c] = 0.1f + 0.05f * static_cast<float>(x + y) + 0.02f * static_cast<float>(c);
+            }
+        }
+    }
+
+    const std::vector<float> planar = imageToPlanar(input);
+    std::vector<float> output(static_cast<size_t>(w * 2) * (h * 2) * 3, 0.0f);
+    CHECK(infer.run(planar.data(), w, h, output.data()));
+
+    const Image produced = imageFromPlanar(output.data(), w * 2, h * 2, 3);
+    const Image reference = resizeBicubic(input, w * 2, h * 2);
+    CHECK_EQ_INT(produced.width, w * 2);
+    CHECK_EQ_INT(produced.channels, 3);
+    for (size_t i = 0; i < reference.data.size(); ++i) {
+        CHECK_NEAR(produced.data[i], reference.data[i], 1e-5);
+    }
 }
 
 V4K_TEST(catalog_parsing_and_selection) {

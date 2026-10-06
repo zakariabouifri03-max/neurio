@@ -44,6 +44,9 @@ sdk.dir=/path/to/Android/Sdk
 tools/run-native-tests.sh          # host build + run of the core test suite
 tools/run-native-tests.sh -v       # verbose per-case output
 tools/verify.sh                    # the gate CI runs, in six steps
+tools/checks/kotlin-imports.py     # unresolved imports / unbalanced delimiters in the Kotlin sources
+tools/model/generate-calibration-models.sh           # rebuild the .v4kmodel assets
+tools/model/generate-calibration-models.sh --check   # fail if those assets are stale
 
 # Syntax-check the layers that need extra headers:
 V4K_VULKAN_INCLUDE=$HOME/Vulkan-Headers/include \

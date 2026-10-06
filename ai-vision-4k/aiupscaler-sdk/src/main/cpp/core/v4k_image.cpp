@@ -25,6 +25,35 @@ inline void cubicWeights(float t, float w[4]) {
 
 }  // namespace
 
+std::vector<float> imageToPlanar(const Image& image) {
+    std::vector<float> out(static_cast<size_t>(image.width) * image.height * image.channels, 0.0f);
+    if (image.width <= 0 || image.height <= 0 || image.channels <= 0) return out;
+    if (image.data.size() != out.size()) return out;   // refuses to guess at a mismatched buffer
+    const size_t plane = static_cast<size_t>(image.width) * image.height;
+    for (int c = 0; c < image.channels; ++c) {
+        for (int y = 0; y < image.height; ++y) {
+            for (int x = 0; x < image.width; ++x) {
+                out[c * plane + static_cast<size_t>(y) * image.width + x] = image.pixel(x, y)[c];
+            }
+        }
+    }
+    return out;
+}
+
+Image imageFromPlanar(const float* planar, int width, int height, int channels) {
+    Image image(width, height, channels);
+    if (planar == nullptr || width <= 0 || height <= 0 || channels <= 0) return image;
+    const size_t plane = static_cast<size_t>(width) * height;
+    for (int c = 0; c < channels; ++c) {
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                image.pixel(x, y)[c] = planar[c * plane + static_cast<size_t>(y) * width + x];
+            }
+        }
+    }
+    return image;
+}
+
 Image rgba8ToImage(const uint8_t* rgba, int width, int height) {
     Image img(width, height, 4);
     const size_t n = static_cast<size_t>(width) * height * 4;

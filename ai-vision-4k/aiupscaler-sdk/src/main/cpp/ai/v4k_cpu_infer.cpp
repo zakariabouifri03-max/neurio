@@ -237,12 +237,17 @@ bool CpuInference::applyActivation(ModelActivation activation, const ModelOp& op
 }
 
 bool CpuInference::upsampleInput(const Tensor& input, Tensor& out) {
-    Image rgba(input.width, input.height, static_cast<int>(input.channels));
-    rgba.data = input.data;
+    // `input` is planar CHW and Image is interleaved HWC: convert rather than
+    // reinterpreting the buffer. Assigning a planar tensor to Image::data does
+    // not fail, it scrambles the channels -- which is exactly what happened here
+    // until the model exporter's global-residual calibration check caught the
+    // resulting 0.65 maximum error.
+    const Image planar = imageFromPlanar(input.data.data(), static_cast<int>(input.width),
+                                        static_cast<int>(input.height), static_cast<int>(input.channels));
     // Only colour inputs (1 or 3 channels) are supported by the reference path.
-    Image up = resizeBicubic(rgba, input.width * scaleFactor_, input.height * scaleFactor_);
+    const Image up = resizeBicubic(planar, input.width * scaleFactor_, input.height * scaleFactor_);
     out.allocate(up.channels, up.width, up.height);
-    out.data = up.data;
+    out.data = imageToPlanar(up);
     return true;
 }
 

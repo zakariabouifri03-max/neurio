@@ -40,6 +40,27 @@ jobs:
       - name: Native core test suite (host)
         run: bash tools/run-native-tests.sh
 
+      - name: CMake configure + host build (no Vulkan)
+        # The fast smoke test for the build files themselves: it catches a
+        # CMake or include-path mistake in ~15s instead of three minutes into
+        # Gradle, and it is the configuration a developer desktop uses.
+        run: |
+          set -euo pipefail
+          cmake -S aiupscaler-sdk/src/main/cpp -B /tmp/v4k-cmake-check \
+            -DV4K_ENABLE_VULKAN=OFF -DV4K_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake --build /tmp/v4k-cmake-check -j"$(nproc)"
+
+      - name: Kotlin static checks
+        # Missing imports and unbalanced delimiters: the two mistakes that have
+        # actually broken the Gradle build, caught without the Android SDK.
+        run: python3 tools/checks/kotlin-imports.py
+
+      - name: Calibration models are up to date
+        # Re-exports the .v4kmodel assets and fails if they differ from the
+        # committed ones, so a changed container/op-table cannot leave a stale
+        # asset behind.
+        run: bash tools/model/generate-calibration-models.sh --check
+
       - name: Android SDK components
         run: |
           set -euo pipefail

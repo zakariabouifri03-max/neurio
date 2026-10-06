@@ -98,11 +98,19 @@ set(V4K_SDK_SOURCES
     sdk/v4k_engine.cpp
 )
 
-if(ANDROID)
-    # The JNI bridge needs <jni.h>, which only the Android toolchain provides.
+# The JNI bridge needs <jni.h>. The NDK provides it for Android builds; a host
+# build compiles it too when V4K_JNI_INCLUDE_DIRS points at a JDK's
+# share/native/include and unix/native/include directories (this is what makes a
+# full compile of jni/v4k_jni.cpp possible without a device or the NDK).
+set(V4K_JNI_INCLUDE_DIRS "" CACHE STRING
+    "JDK include directories holding jni.h and jni_md.h (host builds of the JNI bridge)")
+if(ANDROID OR V4K_JNI_INCLUDE_DIRS)
     list(APPEND V4K_SDK_SOURCES
         jni/v4k_jni.cpp
     )
+    if(NOT ANDROID)
+        include_directories(${V4K_JNI_INCLUDE_DIRS})
+    endif()
 endif()
 
 set(V4K_ENGINE_SOURCES
@@ -111,6 +119,17 @@ set(V4K_ENGINE_SOURCES
     ${V4K_VULKAN_SOURCES}
     ${V4K_SDK_SOURCES}
 )
+
+# The lists above are explicit so that dropping a file is a visible diff; this
+# makes a *typo* fail at configure time instead of turning into a missing symbol
+# three minutes into a Gradle build.
+foreach(source ${V4K_ENGINE_SOURCES} ${V4K_TEST_SOURCES})
+    if(source MATCHES "\\.(cpp|c)$")
+        if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${source}")
+            message(FATAL_ERROR "V4K source list refers to a missing file: ${source}")
+        endif()
+    endif()
+endforeach()
 
 add_library(aivision4k SHARED ${V4K_ENGINE_SOURCES})
 
@@ -167,6 +186,10 @@ if(ANDROID)
     # liblog for the logging shim, libandroid for ANativeWindow (the renderer
     # draws into the game's SurfaceView, so it never touches the activity).
     target_link_libraries(aivision4k PRIVATE log android)
+else()
+    # std::thread in the CPU reference interpreter; part of libc on Android.
+    find_package(Threads REQUIRED)
+    target_link_libraries(aivision4k PRIVATE Threads::Threads)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")

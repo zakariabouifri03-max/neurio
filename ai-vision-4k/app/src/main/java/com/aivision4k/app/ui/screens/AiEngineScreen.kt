@@ -85,6 +85,12 @@ fun AiEngineScreen(vm: AppViewModel) {
                     }
                     OutlinedButton(onClick = { vm.removeModel() }) { Text("Remove") }
                 }
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedButton(onClick = { vm.installBundledCalibrationModel() }) {
+                        Text("Install calibration model")
+                    }
+                }
                 Hint(
                     "The engine verifies the file (magic, header, operator table, weights and the body " +
                         "SHA-256) before installing it. Without a model the neural stage is unavailable and " +
@@ -99,10 +105,14 @@ fun AiEngineScreen(vm: AppViewModel) {
                 MetricRow("Mobile SR Quality", "largest working set, flagship tier")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    text = "This build ships no model and configures no download server, so the tiers are listed " +
-                        "as targets rather than as buttons that would fail: generating one is a single command " +
-                        "(tools/model/export_v4kmodel.py) and importing it is the button above. A real download " +
-                        "endpoint can be dropped in without changing the engine.",
+                    text = "No trained model ships and no download server is configured, so the three tiers are " +
+                        "listed as targets rather than as buttons that would fail. What does ship are two " +
+                        "calibration models (button above): linear graphs whose output must equal bilinear or " +
+                        "bicubic upscaling, which is how the container, the planner and the kernels are checked " +
+                        "on a real device. They are a pipeline check, not an image-quality model - bilinear " +
+                        "quality is exactly what they produce. A trained model is written into the same " +
+                        "container with tools/model/generate-calibration-models.sh's writer, and the engine " +
+                        "reports the model it actually loaded.",
                     style = MaterialTheme.typography.labelSmall,
                     color = TextMuted,
                 )

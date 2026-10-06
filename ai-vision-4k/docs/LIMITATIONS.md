@@ -71,7 +71,16 @@ when the device is already hot.
 
 ## 8. A model is a file, not magic
 
-The neural stage needs a `.v4kmodel` container. This build ships none and configures
-no download server, so the model manager's honest state is "import a file". Quality
+The neural stage needs a `.v4kmodel` container. This build ships two *calibration*
+models (`aiupscaler-sdk/src/main/assets/models/`): linear graphs whose output must
+equal bilinear (sub-pixel architecture) or bicubic (global-residual architecture)
+upscaling of the input. They exist so the container, the planner, the kernels and the
+interpreter can be checked numerically on a real device — not because they look good.
+Their image quality *is* bilinear/bicubic quality, and no screen in the app presents
+them as an AI improvement.
+
+No trained model ships, and no download server is configured. A trained model has to
+be written into the same container with `v4k::writeModel()` and placed in the assets
+or imported at runtime; `tools/model/README.md` describes that path. Quality then
 depends on the model that was actually loaded — the compatibility engine degrades to
 analytical upscaling rather than pretending.

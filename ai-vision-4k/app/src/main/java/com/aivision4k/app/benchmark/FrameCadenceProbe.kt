@@ -3,6 +3,7 @@ package com.aivision4k.app.benchmark
 import android.os.Handler
 import android.os.Looper
 import android.view.Choreographer
+import java.util.ArrayList
 
 /**
  * Measures the frame cadence this process can actually sustain.

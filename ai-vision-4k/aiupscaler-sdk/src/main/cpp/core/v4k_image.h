@@ -44,8 +44,22 @@ struct Image {
     }
 };
 
-// RGBA8 <-> planar float helpers (used by the JNI boundaries and tests).
+// RGBA8 <-> interleaved float helpers (used by the JNI boundaries and tests).
+//
+// NB: `Image` is *interleaved* (HWC): pixel(x, y)[c]. The inference interpreter
+// (ai/v4k_cpu_infer.h) and the GPU dispatch buffers are *planar* (CHW). Feeding
+// an Image's buffer straight into `CpuInference::run()` therefore does not fail,
+// it silently scrambles the channels -- it produced a plausible-looking but
+// wrong image when the model exporter was first written. Use the conversions
+// below at every boundary; assigning planar data to Image::data is a bug.
 Image rgba8ToImage(const uint8_t* rgba, int width, int height);
+
+// Interleaved (HWC) -> planar (CHW).
+std::vector<float> imageToPlanar(const Image& image);
+
+// Planar (CHW) -> interleaved (HWC). `planar` must hold
+// width * height * channels floats in channel-plane order.
+Image imageFromPlanar(const float* planar, int width, int height, int channels);
 void imageToRgba8(const Image& img, uint8_t* out);   // expects channels == 4
 
 // Grayscale conversion using Rec.709 luma.

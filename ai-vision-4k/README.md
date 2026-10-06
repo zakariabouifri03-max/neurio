@@ -47,7 +47,7 @@ app's FPS) are displayed as `—`, never as a plausible-looking number.
 | App: dashboard, supported games, profiles, live monitor, thermal safety, AI engine / model manager, benchmark, settings, honest sandbox explanation | Implemented (this APK) |
 | Per-game profiles, preset ladder, compatibility tiers, battery-saver behaviour | Implemented |
 | Vulkan demo host (`cpp/demo`) with a live Native ↔ AI comparison | **Not in this build** — planned; the app says so on the benchmark screen instead of estimating |
-| Bundled/downloadable `.v4kmodel` files | **Not in this build** — the model manager imports a file you generate with `tools/model/export_v4kmodel.py` |
+| Bundled `.v4kmodel` files | Two **calibration models** ship in `aiupscaler-sdk/src/main/assets/models/` — linear graphs that reproduce bilinear/bicubic exactly, so the AI path can be checked on a device with no download and no trained weights. They are not quality models. No trained model ships; no download server is configured. Regenerate with `tools/model/generate-calibration-models.sh` |
 | MediaProjection `ScreenEnhance` mode | Experimental, documented, not enabled by default |
 | On-device instrumentation tests for the Vulkan path | Not written yet |
 

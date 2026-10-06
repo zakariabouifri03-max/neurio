@@ -27,6 +27,7 @@ import com.aivision4k.sdk.PerformanceSnapshot
 import com.aivision4k.sdk.ProfilePresetOption
 import com.aivision4k.sdk.UpscalerMetrics
 import com.aivision4k.sdk.UpscalingQuality
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -428,6 +429,46 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         message("Model removed. The engine falls back to analytical upscaling.")
     }
 
+    /**
+     * Installs one of the calibration models that ship inside the APK.
+     *
+     * They are linear graphs on purpose: the sub-pixel one must reproduce bilinear
+     * upscaling of the input and the residual one must reproduce bicubic. That is what
+     * makes them useful - they exercise the container, the GPU planner and the compute
+     * kernels on a real device and have a right answer to check against. They are *not*
+     * quality models, and every label around this button says so.
+     */
+    fun installBundledCalibrationModel(assetPath: String = CALIBRATION_SUBPIXEL) {
+        val context = getApplication<Application>()
+        viewModelScope.launch {
+            val file = withContext(Dispatchers.IO) {
+                runCatching {
+                    val directory = File(context.filesDir, "models").apply { mkdirs() }
+                    val target = File(directory, assetPath.substringAfterLast('/'))
+                    context.assets.open(assetPath).use { input ->
+                        target.outputStream().use { output -> input.copyTo(output) }
+                    }
+                    target
+                }.getOrNull()
+            }
+            if (file == null || !file.exists()) {
+                message("The bundled calibration model is not in this build's assets.")
+                return@launch
+            }
+            val error = AIUpscaler.installModelFile(file.absolutePath)
+            if (error != null) {
+                message(error)
+                return@launch
+            }
+            state = state.copy(model = AIUpscaler.model())
+            message(
+                "Calibration model installed (${file.length()} bytes). It reproduces " +
+                    (if (assetPath == CALIBRATION_RESIDUAL) "bicubic" else "bilinear") +
+                    " upscaling exactly - a pipeline check, not an image-quality model.",
+            )
+        }
+    }
+
     // -----------------------------------------------------------------------
     // Benchmark
     // -----------------------------------------------------------------------
@@ -461,5 +502,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     override fun onCleared() {
         cadenceProbe.cancel()
         super.onCleared()
+    }
+
+    companion object {
+        /** Asset paths of the calibration models, see tools/model/README.md. */
+        const val CALIBRATION_SUBPIXEL = "models/reference_sr_x2_subpixel.v4kmodel"
+        const val CALIBRATION_RESIDUAL = "models/reference_sr_x2_residual.v4kmodel"
     }
 }

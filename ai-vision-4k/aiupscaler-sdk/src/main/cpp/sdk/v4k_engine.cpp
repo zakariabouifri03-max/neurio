@@ -756,7 +756,12 @@ bool Engine::startSessionOnDevice(const DeviceHandles& handles, const SessionDes
     pipelineDesc.antiAliasing = desc.antiAliasing;
     pipelineDesc.sharpening = clamp01(desc.sharpening);
     pipelineDesc.denoiseStrength = clamp01(desc.noiseReduction);
-    pipelineDesc.maxWorkingBytes = desc.maxWorkingBytes;
+    // An unstated budget is derived from the device's reported memory rather
+    // than left unlimited: see defaultWorkingSetBudget() for the policy.
+    pipelineDesc.maxWorkingBytes =
+        desc.maxWorkingBytes != 0
+            ? desc.maxWorkingBytes
+            : defaultWorkingSetBudget(caps_.vulkan.deviceLocalMemoryBytes, caps_.vulkan.memoryBudgetBytes);
 
     std::string pipelineError;
     if (!vk_->pipeline.init(vk_->context, pipelineDesc, &pipelineError)) {
@@ -1023,6 +1028,10 @@ std::string Engine::statusJson() {
     JsonWriter w(2);
     w.beginObject();
     w.field("engineVersion", "1.0.0");
+    // Which kind of native build this is, so a bug report or a screenshot can
+    // say it without guessing. Both are compile-time facts, not measurements.
+    w.field("debugChecks", kDebugChecks);
+    w.field("vulkanBackend", vk::kAvailable);
     w.field("initialised", initialised_);
     w.field("integration", toString(integration_));
     w.field("tier", toString(tier_));

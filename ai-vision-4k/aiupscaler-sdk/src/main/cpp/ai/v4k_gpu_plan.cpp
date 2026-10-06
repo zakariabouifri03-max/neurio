@@ -1,5 +1,7 @@
 #include "v4k_gpu_plan.h"
 
+#include "v4k_log.h"
+
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -394,6 +396,14 @@ bool buildGpuPlan(const Model& model, uint32_t inputWidth, uint32_t inputHeight,
 
     out.feasible = true;
     if (error != nullptr) error->clear();
+
+    V4K_LOGV("gpu plan: %u layers, %u slots, %s activations + %s weights, %ux%u -> %ux%u", out.stats.layerCount,
+             out.stats.slotCount, formatBytes(out.stats.activationBytes).c_str(),
+             formatBytes(out.stats.weightBytes).c_str(), inputWidth, inputHeight, out.output.width,
+             out.output.height);
+    for (const std::string& warning : out.warnings) {
+        V4K_LOGV("gpu plan warning: %s", warning.c_str());
+    }
     return true;
 }
 

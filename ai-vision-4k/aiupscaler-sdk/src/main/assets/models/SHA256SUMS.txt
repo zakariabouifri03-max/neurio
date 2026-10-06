@@ -1,0 +1,2 @@
+c44b4c63682e2d8eea733a5c638f9f170fc5db4ad0037b2baa9acdd04981d41a  ./reference_sr_x2_residual.v4kmodel
+0f85fbdf9402ebe684a6a48e527d36c467df7fb1985dff3f37310f7bb83b7b38  ./reference_sr_x2_subpixel.v4kmodel

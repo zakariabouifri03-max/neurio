@@ -154,6 +154,35 @@ V4K_TEST(image_edge_directed_upscale_produces_the_requested_size) {
     }
 }
 
+V4K_TEST(image_planar_conversion_round_trips) {
+    // Distinct value per (x, y, c) so a swapped axis or channel cannot pass.
+    Image image(7, 5, 3);
+    for (int y = 0; y < 5; ++y) {
+        for (int x = 0; x < 7; ++x) {
+            for (int c = 0; c < 3; ++c) {
+                image.pixel(x, y)[c] = static_cast<float>(x * 100 + y * 10 + c) / 1000.0f;
+            }
+        }
+    }
+
+    const std::vector<float> planar = imageToPlanar(image);
+    CHECK_EQ_INT(planar.size(), 7u * 5u * 3u);
+    // Planar layout is [channel][row][column].
+    CHECK_NEAR(planar[0 * 35 + 2 * 7 + 4], image.pixel(4, 2)[0], 1e-6);
+    CHECK_NEAR(planar[1 * 35 + 2 * 7 + 4], image.pixel(4, 2)[1], 1e-6);
+    CHECK_NEAR(planar[2 * 35 + 2 * 7 + 4], image.pixel(4, 2)[2], 1e-6);
+
+    const Image restored = imageFromPlanar(planar.data(), 7, 5, 3);
+    CHECK_EQ_INT(restored.channels, 3);
+    CHECK_NEAR(worstDifference(image, restored), 0.0, 1e-6);
+
+    // A single-channel image must not be reinterpreted as interleaved.
+    const Image luma(4, 4, 1, 0.25f);
+    const std::vector<float> lumaPlanar = imageToPlanar(luma);
+    CHECK_EQ_INT(lumaPlanar.size(), 16u);
+    CHECK_NEAR(lumaPlanar[5], 0.25f, 1e-6);
+}
+
 V4K_TEST(image_compare_agrees_with_psnr) {
     const Image reference = makeRamp(32, 32, 3);
     Image close = reference;

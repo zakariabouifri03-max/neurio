@@ -643,6 +643,33 @@ V4K_TEST(gpu_plan_rejects_prelu_with_a_short_slope_table) {
     CHECK_STR_CONTAINS(plan.reason, "PReLU has 2 slopes for 4 channels");
 }
 
+V4K_TEST(gpu_plan_default_budget_follows_device_memory) {
+    constexpr uint64_t MiB = 1024ull * 1024ull;
+
+    // Nothing known: a conservative cap, never "unlimited".
+    CHECK_EQ_INT(defaultWorkingSetBudget(0, 0), 128ull * MiB);
+    // A quarter of the VK_EXT_memory_budget figure, which wins over the heap.
+    CHECK_EQ_INT(defaultWorkingSetBudget(8ull * 1024 * MiB, 2ull * 1024 * MiB), 384ull * MiB);  // ceiling
+    CHECK_EQ_INT(defaultWorkingSetBudget(0, 1024ull * MiB), 256ull * MiB);
+    // Small devices are floored, not scaled to nothing.
+    CHECK_EQ_INT(defaultWorkingSetBudget(0, 128ull * MiB), 64ull * MiB);
+    CHECK_EQ_INT(defaultWorkingSetBudget(0, 1ull * MiB), 64ull * MiB);
+    // The heap is the fallback when there is no budget extension.
+    CHECK_EQ_INT(defaultWorkingSetBudget(900ull * MiB, 0), 225ull * MiB);
+
+    // And the derived number is what actually gates the planner: a model that
+    // needs more than the cap must be rejected rather than attempted.
+    const Model model = nearestNeighbourModel(3);
+    GpuPlan plan;
+    const uint64_t derived = defaultWorkingSetBudget(0, 128ull * MiB);
+    CHECK_EQ_INT(derived, 64ull * MiB);
+    CHECK(build(model, 64, 64, derived, plan));
+    CHECK(build(model, 256, 256, derived, plan));            // ~7 MiB, fits
+    CHECK(!build(model, 4096, 4096, derived, plan));         // ~1.8 GiB, rejected by the cap
+    CHECK(!build(model, 256, 256, 1ull * MiB, plan));        // tiny budget, rejected
+    CHECK_STR_CONTAINS(plan.reason, "budget");
+}
+
 V4K_TEST(gpu_plan_enforces_the_activation_memory_budget) {
     const Model model = nearestNeighbourModel();
     GpuPlan probe;

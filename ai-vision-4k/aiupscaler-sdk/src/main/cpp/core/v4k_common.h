@@ -212,6 +212,28 @@ inline bool clampTo(T& value, T lo, T hi) {
 
 inline float lerp(float a, float b, float t) { return a + (b - a) * t; }
 
+/**
+ * Activation budget for a session that did not state one.
+ *
+ * `v4k::SessionDesc::maxWorkingBytes == 0` used to mean "unlimited", which is
+ * the wrong default for a phone: a graph that needs a few hundred MiB of
+ * intermediate tensors is then attempted instead of rejected, and the failure
+ * surfaces as an allocation error deep inside the driver, or as the system
+ * killing the app. The engine now asks for a number derived from what the device
+ * reported:
+ *
+ *   * prefer the VK_EXT_memory_budget figure, else the largest DEVICE_LOCAL heap;
+ *   * spend a quarter of it on activations;
+ *   * clamp to [64 MiB, 384 MiB];
+ *   * when nothing is known, cap at 128 MiB.
+ *
+ * This is a policy, not a measurement -- a quarter of the heap is a defensible
+ * starting point for transient buffers, and the ceiling stops a large phone from
+ * being handed a budget nobody has profiled. Both figures can be overridden by
+ * passing an explicit budget to a session.
+ */
+uint64_t defaultWorkingSetBudget(uint64_t deviceLocalMemoryBytes, uint64_t deviceMemoryBudgetBytes);
+
 // Round up to a multiple (used for workgroup/tile alignment).
 inline uint32_t alignUp(uint32_t v, uint32_t a) {
     if (a == 0) return v;
