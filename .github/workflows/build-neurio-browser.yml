@@ -41,7 +41,7 @@ jobs:
         run: gradle --no-daemon :app:assembleDebug
         working-directory: android
       - name: Publish direct APK release
-        if: github.event_name == 'workflow_dispatch' && inputs.publish_release
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish_release) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-apk]')) }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
