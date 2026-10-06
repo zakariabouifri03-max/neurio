@@ -2,7 +2,7 @@
 
 **NEXUS Game Studio** is a focused, browser-based 3D game editor built around the repository's vendored Three.js runtime. It is a working scene editor and playable prototype—not a native Unreal/Unity replacement. The editor ships with a playable **Island Survival** sample, local project storage, GLB/glTF/OBJ geometry import, an executable gameplay-event graph, and a one-file browser-game exporter.
 
-> **Platform note:** this checkout implements a desktop-oriented web application. It does **not** compile or package a Windows `.exe`. The Build panel produces a self-contained `.html` game which can be opened independently in a current browser. Native Electron/Tauri packaging, a Windows toolchain, a full scripting runtime, and a production physics backend are not present; the UI and build results identify those limits rather than claiming otherwise.
+> **Platform note:** the editor runs in a secure Electron desktop shell, and GitHub Actions packages an **unsigned Windows x64 portable `.exe`**. It is a desktop wrapper around the browser-based Three.js editor, not a native C++ game engine; Windows SmartScreen may show an unsigned-app warning. The in-editor Build panel separately produces a self-contained `.html` game.
 
 ## Run the editor
 
@@ -19,7 +19,7 @@ Or, without npm:
 python3 -m http.server 8000 --bind 0.0.0.0
 ```
 
-The app uses IndexedDB for its browser workspace and registers a service worker for offline use after the first successful load. Use **File → Export Project File** to move a project; browser storage is not an arbitrary folder on disk. `racing.html` still opens the original Bash Baqi Racing game from this repository.
+For the desktop shell, install dependencies and run `npm run desktop`. Build a Windows x64 portable `.exe` on Windows with `npm run build:win`; pushes to the session branch also run the Windows packaging workflow and publish a GitHub prerelease containing only the `.exe` asset. The Electron wrapper serves the bundled editor on a persistent loopback origin so IndexedDB projects survive app restarts. Use **File → Export Project File** to move a project; browser storage is not an arbitrary folder on disk. `racing.html` still opens the original Bash Baqi Racing game from this repository.
 
 ## What works in this build
 
@@ -57,12 +57,13 @@ The sample scene includes a low-poly island, shore, cabin, trees, rocks, a playe
 3. The builder validates the scene, checks the local Three.js runtime, serializes the scene, bundles the single-file runtime, parses the embedded payload, and downloads `<ProjectName>.html`.
 4. Open that file in a modern browser. It runs without the editor and without a server or external module import.
 
-This is a portable browser game, **not** a Windows application or `.exe`. The Build modal calls this out before export. A native wrapper must be added and built separately to produce an executable.
+This in-editor export is a portable browser game, **not** the desktop `.exe`. The desktop wrapper is built separately with `npm run build:win` or by the Windows GitHub Actions workflow.
 
 ## Project and architecture
 
 ```text
 index.html                 NEXUS editor shell
+electron/main.cjs          Secure Electron window and persistent-origin local file server
 src/studio.js              Editor UI, project workflow, panels, commands and build orchestration
 src/engine.js              Three.js renderer, scene graph, editor controls and play simulation
 src/asset-import.js        OBJ + GLB/glTF 2.0 geometry/material import
@@ -76,7 +77,7 @@ racing.html                Original repository game, kept available separately
 tests/core.test.js         Node tests for import, planning, project and graph utilities
 ```
 
-The code deliberately favors a small JavaScript/Three.js path because this repository already contains a vendored real-time renderer and a working browser game. A native C++/Vulkan/DirectX engine and the requested production subsystems cannot be honestly delivered as a quick layer on top of this web checkout. The current physics is a light prototype (character ground/gravity, obstacle checks, and vertical rigid-body gravity); it is **not** a full rigid-body solver. Animation import/retargeting, audio authoring, terrain sculpting, visual shader graphs, arbitrary script execution, and native packaging remain future work.
+The code deliberately favors a small JavaScript/Three.js path because this repository already contains a vendored real-time renderer and a working browser game. A native C++/Vulkan/DirectX engine and the requested production subsystems cannot be honestly delivered as a quick layer on top of this web checkout. The current physics is a light prototype (character ground/gravity, obstacle checks, and vertical rigid-body gravity); it is **not** a full rigid-body solver. Animation import/retargeting, audio authoring, terrain sculpting, visual shader graphs, arbitrary script execution, code signing, and a native C++ game engine remain future work.
 
 ## Tests and checks
 

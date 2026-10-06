@@ -1,0 +1,53 @@
+name: Windows portable EXE
+
+on:
+  push:
+    branches:
+      - arena/cb1c7aae-neurio
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Verify source and tests
+        run: |
+          npm run check
+          npm test
+      - name: Package portable Windows x64 executable
+        run: npm run build:win
+      - name: Attach EXE to a GitHub prerelease
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nexus-exe-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: NEXUS Game Studio · Windows x64 · build ${{ github.run_number }}
+          body: |
+            Portable Windows x64 desktop build of NEXUS Game Studio.
+
+            This is an unsigned Electron desktop wrapper. Windows SmartScreen may display an unknown-publisher warning. The release contains the standalone `.exe` only.
+          files: release/*.exe
+          prerelease: true
+          make_latest: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Keep the executable as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEXUS-Game-Studio-Windows-x64
+          path: release/*.exe
+          if-no-files-found: error
+          retention-days: 30

@@ -3,11 +3,49 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Focused browser-based 3D game editor with an offline standalone game exporter.",
+  "main": "electron/main.cjs",
+  "description": "Focused browser-based 3D game editor with a portable Windows desktop build.",
   "scripts": {
     "start": "python3 -m http.server 8000 --bind 0.0.0.0",
+    "desktop": "electron .",
+    "build:win": "electron-builder --win portable --x64",
     "test": "node --test tests/*.test.js",
-    "check": "node --check src/studio.js && node --check src/engine.js && node --check src/agent.js && node --check src/asset-import.js && node --check src/project.js && node --check src/exporter.js && node --check src/graph.js"
+    "check": "node --check src/studio.js && node --check src/engine.js && node --check src/agent.js && node --check src/asset-import.js && node --check src/project.js && node --check src/exporter.js && node --check src/graph.js && node --check electron/main.cjs"
+  },
+  "build": {
+    "appId": "com.nexus.gamestudio",
+    "productName": "NEXUS Game Studio",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/main.cjs",
+      "index.html",
+      "racing.html",
+      "manifest.webmanifest",
+      "sw.js",
+      "icons/**/*",
+      "src/**/*",
+      "vendor/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "icons/nexus.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "NEXUS-Game-Studio-${version}-Windows-x64.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "26.15.3"
   },
   "license": "MIT"
 }
