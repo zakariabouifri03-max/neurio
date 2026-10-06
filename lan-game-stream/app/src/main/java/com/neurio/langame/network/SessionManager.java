@@ -148,7 +148,20 @@ public final class SessionManager {
             this.session = result;
             clientConnected.set(true);
             lastReportMs = System.currentTimeMillis();
-            newChannel.start(this::onControlFrame);
+            newChannel.start(new ControlChannel.Listener() {
+                @Override
+                public void onFrame(ControlFrame frame) {
+                    onControlFrame(frame);
+                }
+
+                @Override
+                public void onClosed(String reason) {
+                    Logger.i(TAG, "Control channel closed: " + reason);
+                    if (clientConnected.get()) {
+                        closeSession("connection lost: " + reason);
+                    }
+                }
+            });
             if (listener != null) {
                 listener.onClientConnected(result);
             }

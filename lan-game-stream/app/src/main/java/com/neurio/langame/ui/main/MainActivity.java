@@ -15,7 +15,6 @@ import com.neurio.langame.R;
 import com.neurio.langame.client.ClientActivity;
 import com.neurio.langame.host.HostActivity;
 import com.neurio.langame.host.HostStreamService;
-import com.neurio.langame.network.DiscoveryService;
 import com.neurio.langame.ui.performance.PerformanceActivity;
 import com.neurio.langame.ui.settings.SettingsActivity;
 
@@ -71,7 +70,7 @@ public class MainActivity extends Activity {
     private void updateNetworkLine() {
         StringBuilder sb = new StringBuilder();
         sb.append(isOnWifi() ? "Wi-Fi" : "No Wi-Fi");
-        String link = DiscoveryService.describeLocalLink(this);
+        String link = com.neurio.langame.network.NetworkUtils.activeLinkDescription(this);
         if (link != null && !link.isEmpty()) {
             sb.append(" · ").append(link);
         }

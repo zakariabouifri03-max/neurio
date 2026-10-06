@@ -90,7 +90,7 @@ public final class ScreenCapture {
     }
 
     /** Creates (or recreates) the virtual display feeding {@code surface}. */
-    public void start(Surface surface, int requestedWidth, int requestedHeight) {
+    public void startAdaptive(Surface surface, int requestedWidth, int requestedHeight) {
         int[] size = computeCaptureSize(context, requestedWidth, requestedHeight);
         start(surface, size[0], size[1]);
     }

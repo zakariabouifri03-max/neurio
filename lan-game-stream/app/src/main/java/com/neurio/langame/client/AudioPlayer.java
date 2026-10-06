@@ -84,7 +84,7 @@ public final class AudioPlayer {
         track = new AudioTrack.Builder()
                 .setAudioAttributes(new AudioAttributes.Builder()
                         .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_GAME)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                         .build())
                 .setAudioFormat(new AudioFormat.Builder()
                         .setEncoding(AudioFormat.ENCODING_PCM_16BIT)

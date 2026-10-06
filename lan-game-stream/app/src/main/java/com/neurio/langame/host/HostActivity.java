@@ -387,9 +387,10 @@ public class HostActivity extends Activity implements HostStreamService.Listener
             inputStatus.setTextColor(UiKit.WARN);
         }
         inputStatus.setText(text);
-        ((Button) findViewById(R.id.btn_input)).setText(accessibilityOn
-                ? R.string.accessibility_service_label + " ✓"
-                : R.string.host_enable_accessibility);
+        Button inputButton = findViewById(R.id.btn_input);
+        inputButton.setText(accessibilityOn
+                ? getString(R.string.accessibility_service_label) + " ✓"
+                : getString(R.string.host_enable_accessibility));
     }
 
     private void refreshAudioStatus() {

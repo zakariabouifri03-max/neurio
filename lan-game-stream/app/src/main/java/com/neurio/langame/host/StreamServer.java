@@ -120,6 +120,8 @@ public final class StreamServer {
     private InputReceiver inputReceiver;
     private AdaptiveController adaptive;
     private PairingService.HandshakeResult session;
+    /** The profile currently being encoded (adapts during the session). */
+    private volatile StreamProfile currentProfile;
     private GameInputAdapter inputAdapter;
 
     private String pairingCode = Security.newPairingCode();
@@ -227,12 +229,15 @@ public final class StreamServer {
         @Override
         public void onClientConnected(PairingService.HandshakeResult handshake) {
             session = handshake;
+            currentProfile = handshake.profile;
+            stats.profile = currentProfile;
             startClientPipeline(handshake);
         }
 
         @Override
         public void onClientDisconnected(String reason) {
             session = null;
+            currentProfile = null;
             teardownClientPipeline(reason);
         }
 
@@ -462,7 +467,7 @@ public final class StreamServer {
             // One automatic rebuild, then give up and tell the truth to the user.
             if (encoderRestarts < 1 && session != null) {
                 encoderRestarts++;
-                mainHandler.post(() -> rebuildPipeline(session.profile, "encoder recovery"));
+                mainHandler.post(() -> rebuildPipeline(currentProfile, "encoder recovery"));
             } else {
                 leave("encoder error: " + message);
                 setState(State.ERROR, "Encoder failed: " + message);
@@ -559,9 +564,11 @@ public final class StreamServer {
             if (encoder != null) {
                 encoder.setBitrate(bitrateBps);
                 stats.bitrateBps = bitrateBps;
-                if (session != null) {
-                    session = new StreamProfile(session.profile.codec, session.profile.width,
-                            session.profile.height, session.profile.fps, bitrateBps);
+                StreamProfile active = currentProfile;
+                if (active != null) {
+                    currentProfile = new StreamProfile(active.codec, active.width, active.height,
+                            active.fps, bitrateBps);
+                    stats.profile = currentProfile;
                 }
             }
         }
@@ -591,9 +598,8 @@ public final class StreamServer {
                 sessionManager.sendProfileUpdate(profile, stats.audioActive);
             }
             startEncoder(profile);
-            session = new StreamProfile(profile.codec, profile.width, profile.height, profile.fps,
-                    profile.bitrateBps);
-            stats.profile = session;
+            currentProfile = profile;
+            stats.profile = currentProfile;
             if (adaptive != null) {
                 adaptive.onProfileReplaced(profile);
             }

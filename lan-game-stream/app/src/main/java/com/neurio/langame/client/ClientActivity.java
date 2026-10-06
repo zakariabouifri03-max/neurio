@@ -56,7 +56,7 @@ public class ClientActivity extends Activity implements HostDiscovery.Listener {
 
         findViewById(R.id.btn_back).setOnClickListener(v -> finish());
         findViewById(R.id.btn_rescan).setOnClickListener(v -> {
-            UiKit.toast(this, R.string.scanning);
+            UiKit.toast(this, getString(R.string.scanning));
             status.setText(R.string.scanning);
         });
         findViewById(R.id.btn_connect).setOnClickListener(v -> connectManual());
