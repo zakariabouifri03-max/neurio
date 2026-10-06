@@ -137,8 +137,8 @@ class HostControlServer(
                 LanProtocol.writeString(this, gameName, 160)
                 writeInt(LanProtocol.TCP_PORT)
                 writeInt(LanProtocol.VIDEO_PORT)
-                this.writeSizedBytes(serverNonce, 32)
-                this.writeSizedBytes(serverPublic, 512)
+                LanProtocol.writeSizedBytes(this, serverNonce, 32)
+                LanProtocol.writeSizedBytes(this, serverPublic, 512)
             }
 
             val auth = LanProtocol.readClearFrame(input)
@@ -175,8 +175,8 @@ class HostControlServer(
             val serverProof = PairingCrypto.codeProof(pairingCode, transcript, 'S'.code.toByte())
             val authOkPlain = java.io.ByteArrayOutputStream().use { bytes ->
                 DataOutputStream(bytes).use { authOut ->
-                    authOut.writeSizedBytes(token, 64)
-                    authOut.writeSizedBytes(serverProof, 64)
+                    LanProtocol.writeSizedBytes(authOut, token, 64)
+                    LanProtocol.writeSizedBytes(authOut, serverProof, 64)
                     authOut.writeInt(LanProtocol.VIDEO_PORT)
                     LanProtocol.writeString(authOut, clientName, 80)
                 }
@@ -188,7 +188,7 @@ class HostControlServer(
                 PairingCrypto.authOkAad(sessionId),
                 authOkPlain,
             )
-            LanProtocol.writeClearFrame(output, LanProtocol.AUTH_OK) { this.writeSizedBytes(encryptedAuthOk, 2048) }
+            LanProtocol.writeClearFrame(output, LanProtocol.AUTH_OK) { LanProtocol.writeSizedBytes(this, encryptedAuthOk, 2048) }
             socket.soTimeout = 0
 
             val channel = SecureControlChannel(

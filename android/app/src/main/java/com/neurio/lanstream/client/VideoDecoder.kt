@@ -42,7 +42,7 @@ class VideoDecoder(
         synchronized(stateLock) { stateLock.notifyAll() }
     }
 
-    fun enqueue(sample: EncodedAccessUnit) {
+    internal fun enqueue(sample: EncodedAccessUnit) {
         if (!running.get() || sample.mediaType != com.neurio.lanstream.protocol.LanProtocol.MEDIA_VIDEO) return
         if (!queue.offer(sample)) {
             queue.poll()

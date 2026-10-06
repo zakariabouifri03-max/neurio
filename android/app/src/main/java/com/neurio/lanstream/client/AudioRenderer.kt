@@ -30,7 +30,7 @@ class AudioRenderer(private val onError: (String) -> Unit) : AutoCloseable {
         synchronized(stateLock) { stateLock.notifyAll() }
     }
 
-    fun enqueue(sample: EncodedAccessUnit) {
+    internal fun enqueue(sample: EncodedAccessUnit) {
         if (!running.get() || sample.mediaType != com.neurio.lanstream.protocol.LanProtocol.MEDIA_AUDIO) return
         if (!queue.offer(sample)) {
             queue.poll()

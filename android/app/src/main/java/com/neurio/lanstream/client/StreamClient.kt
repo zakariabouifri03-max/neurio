@@ -162,8 +162,8 @@ class StreamClient(
                 write(clientNonce)
                 writeInt(udpLocal.localPort)
                 LanProtocol.writeString(this, clientDeviceName, 80)
-                this.writeSizedBytes(clientPublic, 512)
-                this.writeSizedBytes(proof, 64)
+                LanProtocol.writeSizedBytes(this, clientPublic, 512)
+                LanProtocol.writeSizedBytes(this, proof, 64)
             }
             listener.onState("Authenticating locally; no cloud account is used…")
             val response = LanProtocol.readClearFrame(input)
