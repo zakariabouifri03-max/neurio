@@ -65,6 +65,35 @@ def patch_strings(man, replacements):
     return bytes(man)
 
 
+# ── dex patching (rename the Activity class to the new package) ──────────────
+# The wrapper's MainActivity lives in the dex as Lcom/bashbaqi/racing/MainActivity;.
+# Since we changed the manifest package to com.neurio.gfxboost, the launcher
+# resolves .MainActivity → com.neurio.gfxboost.MainActivity, which must exist in
+# the dex or the app crashes on launch. Both descriptors are EXACTLY 34 bytes,
+# so we can patch the dex string in place and then refresh the dex header
+# signature (SHA-1 of [32:]) + checksum (Adler-32 of [12:]).
+OLD_DESC = b"Lcom/bashbaqi/racing/MainActivity;"
+NEW_DESC = b"Lcom/neurio/gfxboost/MainActivity;"
+assert len(OLD_DESC) == len(NEW_DESC) == 34
+
+
+def patch_dex(dex):
+    import hashlib
+    import zlib
+    dex = bytearray(dex)
+    i = dex.find(OLD_DESC)
+    if i < 0:
+        raise ValueError("MainActivity descriptor not found in dex")
+    dex[i:i + len(NEW_DESC)] = NEW_DESC
+    # SHA-1 signature over bytes[32:]
+    sha = hashlib.sha1(bytes(dex[32:])).digest()
+    dex[12:32] = sha
+    # Adler-32 checksum over bytes[12:]
+    adl = zlib.adler32(bytes(dex[12:])) & 0xFFFFFFFF
+    struct.pack_into("<I", dex, 8, adl)
+    return bytes(dex)
+
+
 # ── icon generation ───────────────────────────────────────────────────────────
 def make_icon(size):
     from PIL import Image, ImageDraw
@@ -128,6 +157,9 @@ def main():
             print(f"[manifest] package → {NEW_PKG} · label → {NEW_LBL}")
         elif info.filename == "assets/game.html":
             data = html
+        elif info.filename == "classes.dex":
+            data = patch_dex(data)
+            print("[dex] MainActivity → com.neurio.gfxboost.MainActivity (checksums refreshed)")
         elif info.filename.startswith("res/") and info.filename.endswith(".png"):
             # launcher icon — regenerate at the right density
             dpi = {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
