@@ -1,52 +1,22 @@
-// Bash Baqi Racing — service worker: full offline support
-const VERSION = 'bbr-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './src/main.js',
-  './src/race.js',
-  './src/menu.js',
-  './src/builders.js',
-  './src/data.js',
-  './src/tex.js',
-  './src/audio.js',
-  './src/util.js',
-  './src/save.js',
-  './src/post.js',
-  './src/style.css',
-  './vendor/three.module.js',
-  './vendor/utils/BufferGeometryUtils.js',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-];
+const CACHE_NAME = 'nexus-video-studio-shell-v1';
+const SHELL = ['/'];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())
-  );
+self.addEventListener('install', (event) => {
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()));
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
+self.addEventListener('activate', (event) => {
+  event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key.startsWith('nexus-video-studio-') && key !== CACHE_NAME).map((key) => caches.delete(key)))).then(() => self.clients.claim()));
 });
 
-self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then((hit) => {
-      if (hit) return hit;
-      return fetch(e.request).then((res) => {
-        if (res.ok && new URL(e.request.url).origin === location.origin) {
-          const copy = res.clone();
-          caches.open(VERSION).then((c) => c.put(e.request, copy));
-        }
-        return res;
-      }).catch(() => caches.match('./index.html'));
-    })
-  );
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
+    if (response.ok && response.type === 'basic') {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+    }
+    return response;
+  }).catch(() => caches.match('/index.html'))));
 });
