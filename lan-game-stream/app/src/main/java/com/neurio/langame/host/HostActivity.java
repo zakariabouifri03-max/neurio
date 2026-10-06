@@ -25,6 +25,7 @@ import com.neurio.langame.common.DeviceInfo;
 import com.neurio.langame.common.Logger;
 import com.neurio.langame.common.Utils;
 import com.neurio.langame.host.input.InputAdapterFactory;
+import com.neurio.langame.host.input.LocalSelfTestAdapter;
 import com.neurio.langame.host.input.NeurioAccessibilityService;
 import com.neurio.langame.network.NetworkUtils;
 import com.neurio.langame.ui.views.UiKit;
@@ -375,6 +376,10 @@ public class HostActivity extends Activity implements HostStreamService.Listener
         if (mode == Configuration.InputMode.DISABLED) {
             text = getString(R.string.input_note_disabled);
             inputStatus.setTextColor(UiKit.TEXT_SECONDARY);
+        } else if (mode == Configuration.InputMode.LOCAL_SELFTEST) {
+            text = "Self-test mode: " + LocalSelfTestAdapter.recordedEvents()
+                    + " events verified in this app — nothing is injected into the game.";
+            inputStatus.setTextColor(UiKit.WARN);
         } else if (mode == Configuration.InputMode.ACCESSIBILITY && accessibilityOn) {
             text = getString(R.string.host_input_ready, mode.label)
                     + " · " + getString(R.string.accessibility_service_label) + " is on";

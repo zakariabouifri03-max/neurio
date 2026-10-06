@@ -165,7 +165,7 @@ public final class StreamServer {
         }
 
         discovery = new DiscoveryService(context, new DiscoveryListener());
-        discovery.setAdvertisedState(gameName, 1);
+        discovery.setAdvertisedState(gameName, 1, profileSummary());
         discovery.startAdvertising(hostName, Configuration.PORT_CONTROL);
 
         statsThread = Utils.startThread("lgs-host-stats-tick", Thread.NORM_PRIORITY, this::statsLoop);
@@ -203,7 +203,8 @@ public final class StreamServer {
         pairingCode = Security.newPairingCode();
         Logger.i(TAG, "New pairing code generated");
         if (discovery != null) {
-            discovery.setAdvertisedState(gameName, state == State.STREAMING ? 2 : 1);
+            discovery.setAdvertisedState(gameName, state == State.STREAMING ? 2 : 1,
+                    profileSummary());
         }
         setState(state, "New pairing code " + pairingCode);
     }
@@ -211,7 +212,8 @@ public final class StreamServer {
     public void setGameName(String name) {
         this.gameName = name == null ? "" : name;
         if (discovery != null) {
-            discovery.setAdvertisedState(gameName, state == State.STREAMING ? 2 : 1);
+            discovery.setAdvertisedState(gameName, state == State.STREAMING ? 2 : 1,
+                    profileSummary());
         }
     }
 
@@ -575,6 +577,13 @@ public final class StreamServer {
         }
     }
 
+    /** One-line shape shown to clients in their host list ("1280x720 @ 60 fps"). */
+    private String profileSummary() {
+        StreamProfile profile = currentProfile;
+        return profile == null ? ""
+                : profile.width + "x" + profile.height + " @" + profile.fps + " fps";
+    }
+
     /** Rebuilds capture + encoder at a new shape, keeping the session intact. */
     private void rebuildPipeline(StreamProfile profile, String cause) {
         if (session == null || !running) {
@@ -710,7 +719,8 @@ public final class StreamServer {
         state = newState;
         stats.state = newState;
         if (discovery != null) {
-            discovery.setAdvertisedState(gameName, newState == State.STREAMING ? 2 : 1);
+            discovery.setAdvertisedState(gameName, newState == State.STREAMING ? 2 : 1,
+                    profileSummary());
         }
         Logger.i(TAG, "State → " + newState + " (" + message + ")");
         if (listener != null) {

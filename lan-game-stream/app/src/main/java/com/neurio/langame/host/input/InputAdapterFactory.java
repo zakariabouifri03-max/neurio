@@ -35,6 +35,10 @@ public final class InputAdapterFactory {
             }
             case DISABLED:
                 return null;
+            case LOCAL_SELFTEST: {
+                LocalSelfTestAdapter adapter = new LocalSelfTestAdapter();
+                return adapter.prepare(context) ? adapter : null;
+            }
             case ACCESSIBILITY:
             default: {
                 AccessibilityInputAdapter adapter = new AccessibilityInputAdapter();
@@ -55,13 +59,24 @@ public final class InputAdapterFactory {
 
     /** Human readable explanation for the host UI when no adapter is active. */
     public static String explainFailure(Context context, Configuration.InputMode mode) {
-        if (mode == Configuration.InputMode.DISABLED) {
-            return "Input injection is disabled in Settings";
+        switch (mode) {
+            case DISABLED:
+                return "Input injection is disabled in Settings";
+            case LOCAL_SELFTEST:
+                // Not a failure: it is a deliberate mode that injects nothing.
+                return "";
+            case ROOT_SHELL:
+                return new RootShellInputAdapter().isAvailable(context)
+                        ? ""
+                        : "Root access is not available on this phone — enable the accessibility "
+                        + "service instead, or choose Off (video only)";
+            case ACCESSIBILITY:
+            default:
+                if (!NeurioAccessibilityService.isConnected()) {
+                    return "Enable the “LAN Game remote input” accessibility service to send "
+                            + "controls into the game";
+                }
+                return "";
         }
-        if (!NeurioAccessibilityService.isConnected()) {
-            return "Enable the “LAN Game remote input” accessibility service to send "
-                    + "controls into the game";
-        }
-        return "No usable input adapter";
     }
 }

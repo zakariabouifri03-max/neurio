@@ -116,6 +116,9 @@ public class ClientActivity extends Activity implements HostDiscovery.Listener {
             if (!host.gameName.isEmpty()) {
                 subtitle = subtitle + " · " + host.gameName;
             }
+            if (!host.streamDescription.isEmpty()) {
+                subtitle = subtitle + " · " + host.streamDescription;
+            }
             String trailing = host.isStreaming() ? getString(R.string.client_streaming)
                     : (host.status == 1 ? getString(R.string.waiting_for_client)
                     : getString(R.string.client_idle));

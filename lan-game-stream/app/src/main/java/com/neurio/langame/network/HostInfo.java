@@ -14,6 +14,8 @@ public final class HostInfo {
     public int controlPort = Configuration.PORT_CONTROL;
     public String gameName = "";
     public String deviceModel = "";
+    /** e.g. "1280x720 @ 60 fps" while the host is streaming (empty when idle). */
+    public String streamDescription = "";
     /** 0 = idle, 1 = waiting for a client, 2 = streaming. */
     public int status;
     public long lastSeenMs = System.currentTimeMillis();

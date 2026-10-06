@@ -70,6 +70,7 @@ public final class DiscoveryService implements Closeable {
     private String advertisedName;
     private int advertisedPort;
     private String advertisedGame = "";
+    private volatile String advertisedProfile = "";
     private volatile int advertisedStatus;
     private NsdManager.RegistrationListener registrationListener;
     private DatagramSocket beaconSocket;
@@ -92,8 +93,27 @@ public final class DiscoveryService implements Closeable {
     }
 
     public void setAdvertisedState(String gameName, int status) {
+        setAdvertisedState(gameName, status, null);
+    }
+
+    /**
+     * @param streamDescription shape currently being encoded ("1280x720 @ 60 fps"),
+     *                          or null to keep the previous value. Advertised in the
+     *                          mDNS TXT record and the UDP beacon so the client's host
+     *                          list can show resolution and frame rate before it
+     *                          even connects.
+     */
+    public void setAdvertisedState(String gameName, int status, String streamDescription) {
         this.advertisedGame = gameName == null ? "" : gameName;
         this.advertisedStatus = status;
+        boolean profileChanged = streamDescription != null
+                && !streamDescription.equals(advertisedProfile);
+        if (streamDescription != null) {
+            this.advertisedProfile = streamDescription;
+        }
+        if (profileChanged && advertisedName != null && nsdManager != null) {
+            registerNsdService();   // refresh the TXT record
+        }
     }
 
     /* ------------------------------------------------------------------ *
@@ -117,6 +137,13 @@ public final class DiscoveryService implements Closeable {
             state("NSD unavailable — UDP beacons only");
             return;
         }
+        if (registrationListener != null) {
+            try {
+                nsdManager.unregisterService(registrationListener);
+            } catch (Exception ignored) {
+            }
+            registrationListener = null;
+        }
         NsdServiceInfo info = new NsdServiceInfo();
         info.setServiceName(advertisedName);
         info.setServiceType(Configuration.NSD_SERVICE_TYPE);
@@ -125,6 +152,7 @@ public final class DiscoveryService implements Closeable {
         info.setAttribute("game", advertisedGame);
         info.setAttribute("status", String.valueOf(advertisedStatus));
         info.setAttribute("ver", String.valueOf(Configuration.PROTOCOL_VERSION));
+        info.setAttribute("profile", advertisedProfile);
 
         registrationListener = new NsdManager.RegistrationListener() {
             @Override
@@ -233,6 +261,8 @@ public final class DiscoveryService implements Closeable {
         Protocol.putString(buf, advertisedName);
         Protocol.putString(buf, advertisedGame);
         Protocol.putString(buf, com.neurio.langame.common.DeviceInfo.deviceName());
+        // Appended last so older builds simply ignore it (they stop reading here).
+        Protocol.putString(buf, advertisedProfile);
         return Protocol.toBytes(buf);
     }
 
@@ -360,6 +390,7 @@ public final class DiscoveryService implements Closeable {
                             host.deviceModel = attribute(attributes, "device");
                             String status = attribute(attributes, "status");
                             host.status = status.isEmpty() ? 0 : Integer.parseInt(status);
+                            host.streamDescription = attribute(attributes, "profile");
                         }
                         host.lastSeenMs = System.currentTimeMillis();
                         if (listener != null) {
@@ -459,12 +490,14 @@ public final class DiscoveryService implements Closeable {
             String name = Protocol.getString(in);
             String game = Protocol.getString(in);
             String device = Protocol.getString(in);
+            String profile = in.hasRemaining() ? Protocol.getString(in) : "";
 
             HostInfo host = new HostInfo(packet.getAddress().getHostAddress(), controlPort);
             host.source = HostInfo.Source.UDP_BEACON;
-            host.name = advertisedAddress.isEmpty() ? name : advertisedAddress;
+            host.name = name.isEmpty() ? advertisedAddress : name;
             host.deviceModel = device;
             host.gameName = game;
+            host.streamDescription = profile;
             host.status = status;
             host.pingMs = 6f;   // conservative default; refined by connect-time PING/PONG
             host.lastSeenMs = System.currentTimeMillis();

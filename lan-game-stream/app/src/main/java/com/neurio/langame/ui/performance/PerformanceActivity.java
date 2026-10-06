@@ -154,6 +154,9 @@ public class PerformanceActivity extends Activity
                 stats.encodeLatencyMs + stats.networkRttMs / 2f + stats.inputLatencyMs / 2f));
         setText(R.id.perf_cpu_value, String.format(Locale.US, "%.0f %%", stats.cpuPercent));
         setText(R.id.perf_thermal_value, stats.thermalText);
+        setText(R.id.perf_resolution_value, stats.profile == null ? getString(R.string.dash)
+                : String.format(Locale.US, "%d×%d @ %d fps", stats.profile.width,
+                stats.profile.height, stats.profile.fps));
         setText(R.id.perf_dropped_value, String.format(Locale.US, "encoder %d",
                 stats.droppedFrames));
         setText(R.id.perf_queue_value, String.format(Locale.US, "%d frames", stats.clientDecoderQueue));
@@ -192,6 +195,9 @@ public class PerformanceActivity extends Activity
                 : String.format(Locale.US, "%s · headroom %.0f %%",
                 DeviceInfo.thermalLabel(stats.hostThermalStatus),
                 stats.hostThermalHeadroom * 100f));
+        setText(R.id.perf_resolution_value, stats.profile == null ? getString(R.string.dash)
+                : String.format(Locale.US, "%d×%d @ %d fps", stats.profile.width,
+                stats.profile.height, stats.profile.fps));
         setText(R.id.perf_dropped_value, String.format(Locale.US, "decoder %d · host %d",
                 stats.framesDropped, stats.hostDroppedFrames));
         setText(R.id.perf_queue_value, String.format(Locale.US, "%d frames", stats.decoderQueue));
@@ -211,7 +217,8 @@ public class PerformanceActivity extends Activity
         int[] ids = {R.id.perf_fps_value, R.id.perf_encoder_fps_value, R.id.perf_bitrate_value,
                 R.id.perf_rtt_value, R.id.perf_jitter_value, R.id.perf_loss_value,
                 R.id.perf_enc_latency_value, R.id.perf_dec_latency_value, R.id.perf_glass_value,
-                R.id.perf_cpu_value, R.id.perf_thermal_value, R.id.perf_dropped_value,
+                R.id.perf_cpu_value, R.id.perf_thermal_value, R.id.perf_resolution_value,
+                R.id.perf_dropped_value,
                 R.id.perf_queue_value, R.id.perf_packets_value, R.id.perf_retransmit_value,
                 R.id.perf_session_value, R.id.perf_audio_value, R.id.perf_input_value};
         for (int id : ids) {

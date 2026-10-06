@@ -145,6 +145,7 @@ public final class HostDiscovery implements Closeable, DiscoveryService.Listener
                 if (!incoming.deviceModel.isEmpty()) {
                     existing.deviceModel = incoming.deviceModel;
                 }
+                existing.streamDescription = incoming.streamDescription;
                 existing.status = incoming.status;
                 if (existing.pingMs < 0 && incoming.pingMs >= 0) {
                     existing.pingMs = incoming.pingMs;
