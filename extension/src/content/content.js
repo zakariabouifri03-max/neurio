@@ -221,20 +221,27 @@
     const settings = state.settings;
     const history = await getProductHistory(extracted.listingId);
     const historyPoints = history ? history.length : 0;
-    const trackedVel = historyPoints >= 2 ? EIP.tracking.recentVelocity(history, 30) : null;
+    // Tracked snapshots (real deltas) beat on-page review samples.
+    const vel = EIP.tracking.bestVelocity(history, extracted.recentReviews30d);
 
     const signals = {
       listingReviews: extracted.reviews,
-      recentReviews30d: extracted.recentReviews30d !== null ? extracted.recentReviews30d : trackedVel,
-      hasRecentActivity: extracted.recentReviews30d !== null || trackedVel !== null,
+      recentReviews30d: vel.value,
+      recentSource: vel.source,
+      hasRecentActivity: vel.value !== null,
       listingAgeDays: extracted.listingAgeDays,
       favorites: extracted.favorites !== null ? extracted.favorites : extracted.inCarts,
       shopSales: extracted.shopTotalSales,
-      shopReviews: null,
+      shopReviews: extracted.shopReviewCount,
+      shopAgeMonths: extracted.shopAgeYears !== null ? extracted.shopAgeYears * 12 : null,
+      shopListings: null, // unknown from a product page; cap stays conservative
       historyPoints
     };
     const sales = EIP.estimation.estimateMonthlySales(signals, settings);
-    const revenue = EIP.estimation.estimateRevenue(sales, extracted.price, extracted.currency || settings.currency);
+    const priceInput = extracted.priceHigh !== null && extracted.price !== null
+      ? { low: extracted.price, high: extracted.priceHigh }
+      : extracted.price;
+    const revenue = EIP.estimation.estimateRevenue(sales, priceInput, extracted.currency || settings.currency);
     const views = EIP.estimation.estimateViews({
       monthlyOrdersMid: sales.mid, monthlyOrdersLo: sales.low, monthlyOrdersHi: sales.high,
       favorites: signals.favorites, isBestseller: extracted.isBestseller, isPopular: extracted.isPopular,
@@ -257,10 +264,12 @@
   async function analyzeShop() {
     const extracted = EIP.extract.shop.extractShop(document);
     const settings = state.settings;
+    const shopAgeMonths = extracted.shopAgeYears !== null ? extracted.shopAgeYears * 12 : null;
     const enriched = extracted.listings.map(l => {
       const sales = EIP.estimation.estimateMonthlySales({
         listingReviews: l.reviews, listingAgeDays: null, favorites: null,
-        shopSales: extracted.totalSales, shopReviews: extracted.reviewCount, historyPoints: 0
+        shopSales: extracted.totalSales, shopReviews: extracted.reviewCount,
+        shopAgeMonths, shopListings: extracted.activeListings, historyPoints: 0
       }, settings);
       const revenue = EIP.estimation.estimateRevenue(sales, l.price, l.currency || extracted.currency || settings.currency);
       const scores = EIP.scores.allScores({
@@ -540,15 +549,52 @@
       `<span class="eip-foot-note">Local-first · Estimates are labelled</span>`;
   }
 
+  // ----- data-quality coverage: which verified fields were actually found? -----
+  const COVERAGE_FIELDS = {
+    product: [['title', 'Title'], ['price', 'Price'], ['currency', 'Currency'], ['reviews', 'Reviews'], ['rating', 'Rating'], ['shopName', 'Shop'], ['shopTotalSales', 'Shop sales'], ['category', 'Category']],
+    shop: [['shopName', 'Shop'], ['totalSales', 'Total sales'], ['reviewCount', 'Reviews'], ['rating', 'Rating'], ['avgPrice', 'Avg price']],
+    search: [['query', 'Query'], ['totalResults', 'Total results']]
+  };
+
+  function computeCoverage(a) {
+    const x = (a && a.extracted) || {};
+    const fields = COVERAGE_FIELDS[a.type] || [];
+    const missing = fields
+      .filter(([k]) => x[k] === null || x[k] === undefined || x[k] === '')
+      .map(([, label]) => label);
+    let extra = 0, extraTotal = 0;
+    if (a.type === 'shop' || a.type === 'search') {
+      extraTotal = 1;
+      const n = (a.type === 'shop' ? x.listings : x.items) || [];
+      if (n.length) extra = 1; else missing.push('Listing cards');
+    }
+    return { found: fields.length - missing.length + extra, total: fields.length + extraTotal, missing };
+  }
+
+  function coverageBannerHTML(a) {
+    const u = U();
+    const c = computeCoverage(a);
+    if (!c.missing.length) {
+      return `<div class="eip-note eip-note-good">✓ Verified data complete — ${c.found}/${c.total} fields read from this page.</div>`;
+    }
+    const pct = c.total ? Math.round((c.found / c.total) * 100) : 0;
+    return `<div class="eip-note eip-note-warn">⚠ Data quality ${pct}% — found ${c.found}/${c.total} verified fields. ` +
+      `Missing: ${u.escapeHtml(c.missing.join(', '))}. Estimates use only verified inputs; scroll down &amp; press ↻ to retry.</div>`;
+  }
+
   // ----- product panel -----
 
   function productHTML(a) {
     const u = U();
     const x = a.extracted;
     const cur = x.currency || state.settings.currency;
+    const priceRow = x.price === null ? '—'
+      : x.priceHigh !== null
+        ? `${u.formatMoney(x.price, cur)} – ${u.formatMoney(x.priceHigh, cur)} (variants)`
+        : u.formatMoney(x.price, cur);
     const verifiedRows = [
       ['Title', x.title || '—', true],
-      ['Price', x.price !== null ? u.formatMoney(x.price, cur) : '—'],
+      ['Price', priceRow],
       ['Currency', cur],
       ['Reviews', x.reviews !== null ? u.formatInt(x.reviews) : '—'],
       ['Rating', x.rating !== null ? `${x.rating} ★` : '—'],
@@ -562,6 +608,7 @@
     const s = a.sales, r = a.revenue, v = a.views;
     const pills = (est) => `<span class="eip-pill eip-est">Estimated</span> ${confPill(est.confidence)}`;
     return `
+      ${coverageBannerHTML(a)}
       <div class="eip-title-block"><div class="eip-listing-title">${u.escapeHtml(x.title || 'Untitled listing')}</div>
       <div class="eip-track-row">${state.tracked
         ? `<button class="eip-btn eip-btn-ghost" data-action="untrack">✓ Tracking — stop</button>`
@@ -602,6 +649,7 @@
       ? `<button class="eip-btn eip-btn-ghost" data-action="untrack">✓ Tracking — stop</button>`
       : `<button class="eip-btn eip-btn-primary" data-action="track">＋ Track this shop</button>`;
     return `
+      ${coverageBannerHTML(a)}
       <div class="eip-title-block"><div class="eip-listing-title">${u.escapeHtml(x.shopTitle || x.shopName || 'Shop')}</div>
       <div class="eip-track-row">${trackBtn}<button class="eip-btn" data-action="export-csv">CSV</button><button class="eip-btn" data-action="export-json">JSON</button></div></div>
       <div class="eip-card"><div class="eip-card-head"><h3>Verified Etsy data</h3><span class="eip-pill eip-verified">On-page</span></div>
@@ -636,6 +684,7 @@
     const u = U();
     const x = a.extracted;
     return `
+      ${coverageBannerHTML(a)}
       <div class="eip-title-block"><div class="eip-listing-title">“${u.escapeHtml(x.query || 'Search results')}”</div>
       <div class="eip-sub">${x.totalResults !== null ? u.formatInt(x.totalResults) + ' total results · ' : ''}${x.items.length} visible listings analysed</div>
       <div class="eip-track-row"><button class="eip-btn" data-action="export-csv">Export CSV</button><button class="eip-btn" data-action="export-json">Export JSON</button></div></div>
@@ -876,7 +925,11 @@
     .eip-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .eip-chip { background: var(--eip-bg, #fff); border: 1px solid var(--eip-line); border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 600; }
     .eip-note { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; border-radius: 10px; padding: 8px 10px; font-size: 12px; }
+    .eip-note-good { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+    .eip-note-warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
     :host([data-theme="dark"]) .eip-note { background: #1e3a8a33; border-color: #1e40af; color: #bfdbfe; }
+    :host([data-theme="dark"]) .eip-note-good { background: #14532d55; border-color: #166534; color: #bbf7d0; }
+    :host([data-theme="dark"]) .eip-note-warn { background: #42200655; border-color: #854d0e; color: #fde68a; }
     :host([data-theme="dark"]) .eip-verified, :host([data-theme="dark"]) .eip-conf-high { background: #14532d; color: #bbf7d0; }
     :host([data-theme="dark"]) .eip-est { background: #431407; color: #fdba74; }
     :host([data-theme="dark"]) .eip-conf-medium { background: #422006; color: #fde68a; }

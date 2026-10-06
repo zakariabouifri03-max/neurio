@@ -28,11 +28,30 @@
     return Number.isFinite(n) ? n : null;
   }
 
-  /** Parse a price string ("$12.99", "€12,99", "£1,234.56") → { value, currencyGuess }. */
+  /** Parse a price string ("$12.99", "€12,99", "£1,234.56", "$10 - $20") →
+   *  { value, high, currencyGuess }. Variant ranges return low in `value`
+   *  and the top in `high` so revenue math can use the midpoint. */
   function parsePrice(raw) {
-    if (raw === null || raw === undefined) return { value: null, currencyGuess: null };
-    if (typeof raw === 'number') return { value: Number.isFinite(raw) ? raw : null, currencyGuess: null };
+    if (raw === null || raw === undefined) return { value: null, high: null, currencyGuess: null };
+    if (typeof raw === 'number') return { value: Number.isFinite(raw) ? raw : null, high: null, currencyGuess: null };
     const s = String(raw).trim();
+    if (!s) return { value: null, high: null, currencyGuess: null };
+    // Variant range? "19.95 - 34.95", "$10–$20", "from $5 to $9".
+    const rangeParts = s.split(/\s*(?:–|—|\bto\b|\.\.\.)\s*|\s+-\s+/i).map(p => p.trim()).filter(Boolean);
+    if (rangeParts.length === 2) {
+      const a = parseSinglePrice(rangeParts[0]);
+      const b = parseSinglePrice(rangeParts[1]);
+      if (a.value !== null && b.value !== null) {
+        const lo = Math.min(a.value, b.value), hi = Math.max(a.value, b.value);
+        return { value: lo, high: hi === lo ? null : hi, currencyGuess: a.currencyGuess || b.currencyGuess || null };
+      }
+    }
+    const single = parseSinglePrice(s);
+    return { value: single.value, high: null, currencyGuess: single.currencyGuess };
+  }
+
+  function parseSinglePrice(raw) {
+    const s = String(raw === null || raw === undefined ? '' : raw).trim();
     if (!s) return { value: null, currencyGuess: null };
     const symbolMap = { '$': 'USD', '€': 'EUR', '£': 'GBP', '¥': 'JPY', '₹': 'INR', 'A$': 'AUD', 'C$': 'CAD' };
     let currencyGuess = null;

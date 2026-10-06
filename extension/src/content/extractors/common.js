@@ -80,8 +80,9 @@
 
   function bodyText(maxLen) {
     try {
-      const t = (document.body && document.body.innerText) || '';
-      return t.slice(0, maxLen || 120000);
+      const body = document.body;
+      const t = (body && (body.innerText || body.textContent)) || '';
+      return t.replace(/\s+/g, ' ').trim().slice(0, maxLen || 120000);
     } catch (e) { return ''; }
   }
 
@@ -146,6 +147,96 @@
     });
   }
 
+  /* ---------- accuracy: validators + consensus ---------- */
+
+  function validPrice(v) {
+    return Number.isFinite(v) && v > 0 && v < 10000000 ? Math.round(v * 100) / 100 : null;
+  }
+
+  function validRating(v) {
+    return Number.isFinite(v) && v >= 0 && v <= 5 ? Math.round(v * 100) / 100 : null;
+  }
+
+  function validCount(v, max) {
+    const m = max || 100000000;
+    return Number.isFinite(v) && v >= 0 && v < m ? Math.round(v) : null;
+  }
+
+  /**
+   * Consensus picker: candidates = [{ value, source, trust }].
+   * Returns { value, source } — prefers values confirmed by 2+ independent
+   * sources (within tolerance), else the highest-trust candidate.
+   * This is what keeps one stale/mis-parsed element from corrupting results.
+   */
+  function consensus(candidates, tolerance) {
+    const tol = tolerance === undefined ? 0.011 : tolerance;
+    const list = (candidates || []).filter(c => c && c.value !== null && c.value !== undefined);
+    if (!list.length) return { value: null, source: null };
+    // Group numeric candidates by proximity; exact match for strings.
+    const groups = [];
+    for (const c of list) {
+      let placed = false;
+      for (const g of groups) {
+        const same = (typeof c.value === 'number' && typeof g.value === 'number')
+          ? Math.abs(c.value - g.value) <= Math.max(tol, Math.abs(g.value) * tol)
+          : c.value === g.value;
+        if (same) {
+          g.members.push(c);
+          g.trust += (c.trust || 1);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) groups.push({ value: c.value, trust: (c.trust || 1), members: [c] });
+    }
+    groups.sort((a, b) => {
+      // Confirmed-by-multiple first, then trust.
+      const ac = a.members.length > 1 ? 1 : 0, bc = b.members.length > 1 ? 1 : 0;
+      if (ac !== bc) return bc - ac;
+      return b.trust - a.trust;
+    });
+    const win = groups[0];
+    const src = win.members.map(m => m.source).filter(Boolean).join(' + ');
+    return { value: win.value, source: `consensus(${src || 'single'})` };
+  }
+
+  function scopedText(container, maxLen) {
+    try {
+      const t = (container && (container.innerText || container.textContent)) || '';
+      return t.replace(/\s+/g, ' ').trim().slice(0, maxLen || 20000);
+    } catch (e) { return ''; }
+  }
+
+  /** "(1,234)" style count near a given element (walks up 3 levels). */
+  function countNearElement(el, parseCount) {
+    let node = el;
+    for (let i = 0; i < 4 && node; i++) {
+      const t = scopedText(node, 2000);
+      const m = t.match(/\(([0-9][0-9,.\s\u00a0\u202fKkMm]*)\)/);
+      if (m) {
+        const n = parseCount(m[1]);
+        if (n !== null && n < 10000000) return n;
+      }
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  function findBreadcrumbLd(blocks) {
+    for (const b of blocks || []) {
+      const type = b && b['@type'];
+      if (type === 'BreadcrumbList' || (Array.isArray(type) && type.includes('BreadcrumbList'))) return b;
+    }
+    return null;
+  }
+
+  function breadcrumbNames(bc) {
+    try {
+      const items = (bc && bc.itemListElement) || [];
+      return items.map(it => (it && it.name ? String(it.name).trim() : '')).filter(Boolean);
+    } catch (e) { return []; }
+  }
+
   /** Extract a number near a label, e.g. "(1,234)" after stars. */
   function numberNearStars(scope) {
     const candidates = $all('a[href*="#reviews"], [data-review-count], .wt-display-inline-flex, span', scope).slice(0, 400);
@@ -164,8 +255,10 @@
   EIP.extract = EIP.extract || {};
   EIP.extract.common = {
     $, $all, textOf, firstText, firstAttr, metaContent,
-    parseJsonLd, findProductJsonLd, bodyText, findInPageText,
+    parseJsonLd, findProductJsonLd, findBreadcrumbLd, breadcrumbNames,
+    bodyText, findInPageText,
     detectPageType, listingIdFromUrl, shopNameFromUrl,
-    waitForAny, numberNearStars
+    waitForAny, numberNearStars,
+    validPrice, validRating, validCount, consensus, scopedText, countNearElement
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

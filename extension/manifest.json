@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Etsy Insight Pro",
   "short_name": "EtsyInsight",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Product & shop research assistant for Etsy sellers. Verified on-page data plus clearly-labelled sales, view and opportunity estimates. Local-first, no tracking.",
   "minimum_chrome_version": "116",
   "author": "Etsy Insight Pro",

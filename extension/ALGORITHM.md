@@ -7,6 +7,15 @@ must be computable from the formulas below, and the UI must link the reasoning
 Notation: `V(x)` = verified on-page value, `A` = user assumption from Settings,
 `E(x)` = estimate. Ranges are `[low, high]` around a `mid` midpoint.
 
+> **v1.1 accuracy update:** verified fields are now resolved by multi-source
+> consensus (JSON-LD → scoped buy-box DOM → meta → global DOM); a value
+> confirmed by 2+ independent sources wins and lone outliers are discarded.
+> Listing-level numbers are read from the buy-box/review module first, so
+> shop-level distractors (e.g. “8,930 Shop Reviews”) can never leak into
+> listing-level fields. Every panel shows a **data-quality banner**
+> (verified fields found / expected) — anything missing is shown as missing,
+> never guessed.
+
 ---
 
 ## 1. Monthly sales `E(sales/mo)`
@@ -16,8 +25,11 @@ Notation: `V(x)` = verified on-page value, `A` = user assumption from Settings,
 `V(listingAgeDays)`, `V(favorites)`, `V(shopSales)`, `V(shopReviews)`,
 `A(reviewRate)` default **15%**, `A(sensitivity)` default **Balanced**.
 
-**Step 1 — monthly review velocity:**
-- If recent 30-day activity observed: `monthlyReviews = recentReviews30d`
+**Step 1 — monthly review velocity (best source wins):**
+- Tracked snapshots spanning ≥7 days (real observed deltas) beat everything.
+- Else on-page recent-30-day sample, if ≥3 dated reviews visible. If the sample
+  shows 0 but lifetime history exists, blend with 25% of lifetime velocity
+  (a dead-looking sample rarely means literally zero sales) — disclosed in trace.
 - Else if reviews + age known: `monthlyReviews = listingReviews / max(ageMonths, 0.25)`
 - Else if only reviews known: amortise over assumed 12 months (flagged in the trace)
 - Else: no review signal → favorites-only fallback (`favorites / 60`, labelled “very rough”) or null
@@ -33,6 +45,13 @@ Notation: `V(x)` = verified on-page value, `A` = user assumption from Settings,
 - Sensitivity multipliers: Conservative ×0.55–×1.25 · Balanced ×0.75–×1.6 · Optimistic ×0.9–×2.0
 - `low = mid × lowFactor`, `high = mid × highFactor`
 - Daily = monthly ÷ 30.44, weekly = monthly ÷ 4.345
+- **Shop-throughput cap (v1.1):** when shop lifetime sales + shop age (≥12 months)
+  are known, a single listing's midpoint is capped at
+  `shopMonthlyAvg × min(2, max(0.5, 6/√shopListings))` — diversified old shops
+  can't plausibly have one listing outselling their whole history. Always
+  disclosed (“Capped by shop throughput”) and lowers confidence one notch.
+- **Unreviewed listings (v1.1):** 0 reviews → `0` midpoint with an honest small
+  upper bound (shop per-listing context, else 2) instead of a fake “0–0”.
 
 **Confidence score (points):** recent velocity +2 (else lifetime +1) · age known +1 ·
 shop calibration +1 · ≥3 tracked observations +1 (1–2 → +0.5) · favorites visible +0.5.
@@ -41,8 +60,11 @@ shop calibration +1 · ≥3 tracked observations +1 (1–2 → +0.5) · favorite
 ## 2. Revenue `E(revenue)`
 
 - `monthlyRevenue = E(sales range) × V(price)` (low/mid/high each multiplied).
+- Variant listings (`$19.95–$34.95`): the range midpoint is used and disclosed.
 - `yearlyRevenue = monthly × 12` (trace notes the stable-demand assumption).
 - Confidence inherits the sales confidence. Currency: the listing’s own when known.
+- Confidence penalties (v1.1): −1 when the shop-throughput cap fired (conflicting
+  signals), −1 for listings under 30 days old, +0.5 for tracked-velocity input.
 
 ## 3. Views `E(views)`
 

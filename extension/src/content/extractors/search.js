@@ -76,20 +76,20 @@
         seen.add(id);
         rank++;
         const root = (card.closest && (card.closest('[data-listing-id], .v2-listing-card, li') || card)) || card;
-        const img = root.querySelector ? root.querySelector('img[alt]') : null;
+        const q = (sel) => { try { return root.querySelector ? root.querySelector(sel) : null; } catch (e) { return null; } };
+        const img = q('img[alt]');
         const title = ((img && img.getAttribute('alt')) || '').trim() ||
-          C.textOf(root.querySelector ? root.querySelector('.v2-listing-card__title, h3, h2') : null) ||
+          C.textOf(q('.v2-listing-card__title, [data-title], h3, h2')) ||
           `Listing ${id}`;
-        const priceText = C.textOf(root.querySelector ? root.querySelector('.currency-value, .n-listing-card__price, .v2-listing-card__price, [data-price]') : null) ||
-          C.textOf(card);
-        const parsed = U.parsePrice(priceText || '');
+        const parsed = U.parsePrice(C.textOf(q('.currency-value')) || C.textOf(q('[data-price], .n-listing-card__price, .v2-listing-card__price, [class*="price" i]')) || '');
+        const price = C.validPrice(parsed.value);
         let rating = null;
         try {
-          const star = root.querySelector ? root.querySelector('[aria-label*="stars"], [aria-label*="out of 5"]') : null;
-          if (star) rating = U.parseRating(star.getAttribute('aria-label'));
+          const star = q('[aria-label*="out of 5"], [aria-label*="stars"]');
+          if (star) rating = C.validRating(U.parseRating(star.getAttribute('aria-label')));
         } catch (e) { /* ignore */ }
-        const revM = (C.textOf(root) || '').match(/\(([0-9][0-9,.\sKkMm]*)\)/);
-        const reviews = revM ? U.parseCount(revM[1]) : null;
+        const revM = (C.scopedText(root, 3000) || '').match(/\(([0-9][0-9,.\s\u00a0\u202fKkMm]*)\)/);
+        const reviews = revM ? C.validCount(U.parseCount(revM[1]), 10000000) : null;
         const badgeText = C.textOf(root) || '';
         // Shop is rarely on the card; try data attrs.
         let shop = null;
@@ -102,9 +102,9 @@
           }
         } catch (e) { /* ignore */ }
         out.push({
-          rank, position: rank, listingId: id, title,
-          price: parsed.value, currency: parsed.currencyGuess,
-          rating, reviews: reviews !== null ? Math.round(reviews) : null,
+          rank, position: rank, listingId: id, title: String(title).slice(0, 200),
+          price, currency: parsed.currencyGuess,
+          rating, reviews,
           shop: shop || null,
           isBestseller: /\bBestseller\b/.test(badgeText),
           isAd: /\bAd\b/.test(badgeText.slice(0, 60)),

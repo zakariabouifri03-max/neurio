@@ -3,11 +3,12 @@
 ## A. Automated tests (no browser needed)
 
 ```bash
-cd extension
-node test/run-tests.mjs
+cd extension/test
+npm install   # once
+npm test
 ```
 
-This runs three suites and exits non-zero on any failure:
+This runs four suites and exits non-zero on any failure:
 
 1. **Manifest validation** — JSON parses, `manifest_version: 3`, required keys
    present, every referenced file (worker, popup, content scripts, icons) exists,
@@ -25,6 +26,11 @@ This runs three suites and exits non-zero on any failure:
    - `exporter`: CSV quoting/headers, JSON shape
    - `tracking`: deltas, trends, 30-day velocity
    - `storage`: settings round-trip, observation record, backup shape (memory fallback)
+4. **DOM tests** (`node dom-tests.mjs`, needs `npm install`) — extractors run in
+   jsdom against `test/fixtures/*.html` (realistic Etsy markup with deliberate
+   distractors: shop-review counts on product pages, variant price ranges,
+   digital items, market URLs), plus estimation edge cases. Skips cleanly when
+   jsdom is absent.
 
 ## B. Manual checks on live Etsy pages
 

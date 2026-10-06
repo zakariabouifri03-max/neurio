@@ -3,3 +3,6 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# test deps (reproducible via npm install)
+extension/test/node_modules/

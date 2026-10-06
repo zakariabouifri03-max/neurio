@@ -165,8 +165,33 @@
     return Number.isFinite(v) ? v : null;
   }
 
+  /**
+   * Best 30-day review velocity: tracked snapshots (real observed deltas over
+   * ≥7 days) beat on-page samples, which only show a handful of reviews.
+   * @returns { value|null, source: 'tracked'|'page'|'none', spanDays }
+   */
+  function bestVelocity(history, pageRecent) {
+    const obs = (history || [])
+      .filter(o => o && Number.isFinite(o.t) && Number.isFinite(o.reviews))
+      .sort((a, b) => a.t - b.t);
+    let tracked = null;
+    if (obs.length >= 2) {
+      const spanDays = (obs[obs.length - 1].t - obs[0].t) / 86400000;
+      const v = recentVelocity(history, 30);
+      if (v !== null) tracked = { value: v, spanDays };
+    }
+    if (tracked && tracked.spanDays >= 7) {
+      return { value: tracked.value, source: 'tracked', spanDays: Math.round(tracked.spanDays * 10) / 10 };
+    }
+    if (pageRecent !== null && pageRecent !== undefined && Number.isFinite(pageRecent)) {
+      return { value: pageRecent, source: 'page', spanDays: 30 };
+    }
+    if (tracked) return { value: tracked.value, source: 'tracked', spanDays: Math.round(tracked.spanDays * 10) / 10 };
+    return { value: null, source: 'none', spanDays: null };
+  }
+
   EIP.tracking = {
-    pruneObservations, summarizeHistory, trendOf, trendLabel, recentVelocity,
+    pruneObservations, summarizeHistory, trendOf, trendLabel, recentVelocity, bestVelocity,
     recordProductObservation, recordShopObservation, removeProduct, removeShop,
     buildProductObservation, buildShopObservation
   };

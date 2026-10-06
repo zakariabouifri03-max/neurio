@@ -84,9 +84,15 @@ Nothing is sent anywhere; exports/backups are files you create explicitly.
 ## Testing
 
 ```bash
-cd extension
-node test/run-tests.mjs   # manifest + node --check + unit tests
+cd extension/test
+npm install   # once: jsdom for DOM tests (test-only dependency)
+npm test      # unit suite (88) + real-DOM extractor suite (48) = 136 checks
 ```
+
+- `node run-tests.mjs` — manifest validation + `node --check` + unit tests (no deps).
+- `node dom-tests.mjs` — extractors run against realistic Etsy-style HTML
+  fixtures (product incl. variant pricing + distractors, shop, search),
+  plus estimation edge cases (shop cap, unreviewed bound, tracked velocity).
 
 Plus manual checks on live Etsy pages — see [`TESTING.md`](TESTING.md).
 

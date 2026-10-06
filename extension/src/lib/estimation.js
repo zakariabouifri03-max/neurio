@@ -18,6 +18,8 @@
  * both known, the implied shop review rate (shopReviews / shopSales)
  * nudges the assumed reviewRate toward the observed value (50/50 blend,
  * clamped to 5%–50%). This grounds the estimate in verified shop data.
+ * v1.1 adds: multi-source consensus extraction, tracked-velocity priority,
+ * shop-throughput caps, unreviewed bounds, and variant-price midpoints.
  *
  * Views: monthlyViews = monthlyOrders / conversionRate, optionally
  * cross-checked against favorites × viewsPerFavorite. Trend comes from
@@ -58,6 +60,8 @@
     const recent30 = num(sig.recentReviews30d);
     const ageDays = num(sig.listingAgeDays);
     const ageMonths = ageDays !== null ? Math.max(ageDays / 30.44, 0.25) : null;
+    const lifetimeMonthly = (listingReviews !== null && ageMonths !== null && ageMonths > 0)
+      ? listingReviews / ageMonths : null;
 
     // 1. Monthly review velocity.
     let monthlyReviews = null;
@@ -65,7 +69,17 @@
     if (recent30 !== null && sig.hasRecentActivity !== false) {
       monthlyReviews = recent30;
       velocitySource = 'recent';
-      steps.push(`Recent review velocity: ~${fmt(recent30)} reviews in the last 30 days (observed on-page).`);
+      const srcNote = sig.recentSource === 'tracked'
+        ? 'measured from your tracked snapshots (most reliable)'
+        : 'observed on-page';
+      if (recent30 === 0 && lifetimeMonthly !== null && lifetimeMonthly > 0) {
+        // No recent reviews visible but the listing has history: don't claim
+        // absolute zero — blend with a fraction of lifetime velocity.
+        monthlyReviews = Math.round(lifetimeMonthly * 0.25 * 10) / 10;
+        steps.push(`No reviews observed in the last 30 days (${srcNote}), but the listing has lifetime history — blended with 25% of lifetime velocity ≈ ${fmt(monthlyReviews, 1)} reviews/month.`);
+      } else {
+        steps.push(`Recent review velocity: ~${fmt(recent30)} reviews in the last 30 days (${srcNote}).`);
+      }
     } else if (listingReviews !== null && ageMonths !== null) {
       monthlyReviews = listingReviews / ageMonths;
       velocitySource = 'lifetime';
@@ -97,16 +111,45 @@
 
     // 3. Monthly orders → range.
     let monthly = null;
+    let cappedByShop = false;
+    let lo = null, hi = null, mid = null;
+    let zeroBoundHi = null;
     if (monthlyReviews !== null && monthlyReviews > 0 && reviewRate > 0) {
       monthly = monthlyReviews / reviewRate;
       steps.push(`Estimated orders: ${fmt(monthlyReviews, 1)} reviews/month ÷ ${(reviewRate * 100).toFixed(1)}% ≈ ${fmt(monthly, 1)} orders/month (midpoint).`);
+      // Shop-throughput sanity cap: one listing in a big, established, diversified
+      // shop cannot plausibly outsell the whole shop's historical average by far.
+      // This kills the most common absurd over-estimates (e.g. young viral age math).
+      const shopAgeMonths = num(sig.shopAgeMonths);
+      const shopListings = num(sig.shopListings);
+      if (shopSales !== null && shopSales > 0 && shopAgeMonths !== null && shopAgeMonths >= 12) {
+        const shopMonthlyAvg = shopSales / shopAgeMonths;
+        const shareFactor = shopListings !== null && shopListings > 0
+          ? Math.min(2, Math.max(0.5, 6 / Math.sqrt(shopListings)))
+          : 1.5;
+        const cap = Math.max(shopMonthlyAvg * shareFactor, 5);
+        if (monthly > cap) {
+          steps.push(`Capped by shop throughput: this shop averages ≈${fmt(shopMonthlyAvg, 0)} sales/month over ${fmt(shopAgeMonths, 0)} months, so a single listing above ≈${fmt(cap, 0)}/month is implausible — midpoint reduced from ${fmt(monthly, 0)} to ${fmt(cap, 0)}.`);
+          monthly = cap;
+          cappedByShop = true;
+        }
+      }
     } else if (monthlyReviews === 0 || listingReviews === 0) {
       monthly = 0;
-      steps.push('No reviews observed — estimated sales are at or near zero. Any real sales would raise this over time.');
+      // Honest small upper bound for unreviewed listings instead of "0–0":
+      // use the shop's per-listing average when known, else a small constant.
+      let boundHi = 2;
+      const shopListings = num(sig.shopListings);
+      if (shopSales !== null && shopSales > 0 && shopListings !== null && shopListings > 0) {
+        boundHi = Math.min(10, Math.max(1, Math.round((shopSales / Math.max(num(sig.shopAgeMonths) || 12, 1) / shopListings) * 2)));
+      }
+      zeroBoundHi = boundHi;
+      steps.push(`No reviews observed — estimated sales are at or near zero (bounded 0–${boundHi}/month from shop context; any real sales will raise this over time).`);
     }
 
-    let lo = null, hi = null, mid = null;
-    if (monthly !== null) {
+    if (zeroBoundHi !== null) {
+      mid = 0; lo = 0; hi = zeroBoundHi;
+    } else if (monthly !== null) {
       mid = monthly;
       lo = Math.max(0, monthly * factors.low);
       hi = Math.max(lo, monthly * factors.high);
@@ -135,6 +178,8 @@
     if (favorites !== null) evidence.push('favorites visible');
     if ((sig.historyPoints || 0) >= 3) evidence.push(`${sig.historyPoints} tracked observations`);
     if ((sig.historyPoints || 0) >= 1 && (sig.historyPoints || 0) < 3) evidence.push('limited history');
+    if (cappedByShop) evidence.push('capped by shop throughput (signals conflicted)');
+    if (ageDays !== null && ageDays < 30) evidence.push('very new listing (<30 days)');
     let confidence = 'Low';
     let confidenceScore = 0;
     if (velocitySource === 'recent') confidenceScore += 2;
@@ -144,7 +189,11 @@
     if ((sig.historyPoints || 0) >= 3) confidenceScore += 1;
     else if ((sig.historyPoints || 0) >= 1) confidenceScore += 0.5;
     if (favorites !== null) confidenceScore += 0.5;
+    if (sig.recentSource === 'tracked') confidenceScore += 0.5;
+    if (cappedByShop) confidenceScore -= 1;
+    if (ageDays !== null && ageDays < 30) confidenceScore -= 1;
     if (mid === null) confidenceScore = 0;
+    confidenceScore = Math.max(0, confidenceScore);
     if (confidenceScore >= 4) confidence = 'High';
     else if (confidenceScore >= 2) confidence = 'Medium';
 
@@ -156,7 +205,8 @@
       inputs: {
         listingReviews, recentReviews30d: recent30, listingAgeDays: ageDays,
         reviewRate: round4(reviewRate), calibrated, favorites,
-        shopSales, shopReviews, sensitivity: s.sensitivity, velocitySource
+        shopSales, shopReviews, sensitivity: s.sensitivity, velocitySource,
+        recentSource: sig.recentSource || null, cappedByShop
       },
       confidence,
       confidenceScore,
@@ -166,9 +216,20 @@
     };
   }
 
-  /** Revenue = sales range × price. Price should be the verified listing price. */
+  /** Revenue = sales range × price. Price may be a number or { low, high }
+   *  for variant listings — the midpoint is used and disclosed. */
   function estimateRevenue(salesEstimate, price, currency) {
-    const p = num(price);
+    let p = num(price);
+    let priceNote = null;
+    if (p === null && price && typeof price === 'object') {
+      const lo = num(price.low), hi = num(price.high);
+      if (lo !== null && hi !== null && hi > lo) {
+        p = Math.round(((lo + hi) / 2) * 100) / 100;
+        priceNote = `Variant pricing (${fmt(lo, 2)}–${fmt(hi, 2)}) — midpoint ${fmt(p, 2)} used.`;
+      } else {
+        p = lo !== null ? lo : hi;
+      }
+    }
     if (!salesEstimate || salesEstimate.mid === null || p === null) {
       return {
         kind: 'revenue', monthly: null, yearly: null, price: p, currency: currency || null,
@@ -186,6 +247,7 @@
       price: p, currency: currency || null,
       confidence: salesEstimate.confidence,
       steps: [
+        ...(priceNote ? [priceNote] : []),
         `Monthly revenue ≈ estimated sales (${fmt(salesEstimate.low, 0)}–${fmt(salesEstimate.high, 0)}) × visible price.`,
         `Yearly revenue ≈ monthly × 12 (assumes stable demand — seasonal listings will vary).`
       ],

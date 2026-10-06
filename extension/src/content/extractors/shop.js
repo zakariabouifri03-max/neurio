@@ -26,51 +26,78 @@
     if (out.shopName) hints.shopName = 'url:/shop/';
 
     // Title.
-    const title = C.firstText(['h1', '[data-shop-name]', '.shop-title'], scope);
-    if (title.value) set(out, 'shopTitle', title.value, title.source);
+    const title = C.firstText(['h1.shop-title', '[data-shop-name]', '.shop-title', 'h1'], scope);
+    if (title.value) set(out, 'shopTitle', cleanShopTitle(title.value), title.source);
 
     const pageText = C.bodyText(150000);
+    // Shop header region (first 25k chars ≈ header) — keeps listing-grid
+    // numbers ("(1,243)" under cards) out of shop-level fields.
+    const headerText = pageText.slice(0, 25000);
 
-    // "12,345 Sales".
+    // "12,345 Sales" — consensus of header + global occurrences.
     {
-      const m = pageText.match(/([0-9][0-9,.\s\u00a0\u202f]*)\s+Sales\b/);
-      if (m) {
-        const n = U.parseCount(m[1]);
-        if (n !== null && n < 100000000) set(out, 'totalSales', Math.round(n), 'dom:text-sales');
+      const cands = [];
+      const hm = headerText.match(/([0-9][0-9,.\s\u00a0\u202fKkMm]*)\s+sales\b/i);
+      if (hm) {
+        const n = C.validCount(U.parseCount(hm[1]));
+        if (n !== null) cands.push({ value: n, source: 'dom:header-sales', trust: 3 });
       }
+      const gm = pageText.match(/([0-9][0-9,.\s\u00a0\u202fKkMm]*)\s+sales\b/i);
+      if (gm) {
+        const n = C.validCount(U.parseCount(gm[1]));
+        if (n !== null) cands.push({ value: n, source: 'dom:text-sales', trust: 1 });
+      }
+      const win = C.consensus(cands);
+      if (win.value !== null) set(out, 'totalSales', Math.round(win.value), win.source);
     }
-    // Review count + rating: "4.9 (2,341)" near shop header.
+    // Review count + rating: prefer "N Shop Reviews" + header stars.
     {
-      const star = $('[aria-label*="out of 5"], [aria-label*="stars"]');
+      const revCands = [], rateCands = [];
+      const sm = headerText.match(/([0-9][0-9,.\s\u00a0\u202fKkMm]*)\s+shop\s+reviews?\b/i)
+        || pageText.match(/([0-9][0-9,.\s\u00a0\u202fKkMm]*)\s+shop\s+reviews?\b/i);
+      if (sm) {
+        const n = C.validCount(U.parseCount(sm[1]));
+        if (n !== null) revCands.push({ value: n, source: 'dom:text-shop-reviews', trust: 3 });
+      }
+      const headerEl = $('header, [data-shop-header], main');
+      const star = (headerEl && C.$('[aria-label*="out of 5"], [aria-label*="stars"]', headerEl)) || $('[aria-label*="out of 5"]');
       if (star) {
-        const r = U.parseRating(star.getAttribute('aria-label'));
-        if (r !== null) set(out, 'rating', r, 'dom:aria-stars');
+        const r = C.validRating(U.parseRating(star.getAttribute('aria-label')));
+        if (r !== null) rateCands.push({ value: r, source: 'dom:header-stars', trust: 3 });
+        const near = C.countNearElement(star, U.parseCount);
+        if (near !== null) revCands.push({ value: near, source: 'dom:stars-parens', trust: 1 });
       }
-      const m = pageText.match(/([0-9][0-9,.\s\u00a0]*)\s+(?:Shop Reviews|reviews)\b/i);
-      if (m) {
-        const n = U.parseCount(m[1]);
-        if (n !== null) set(out, 'reviewCount', Math.round(n), 'dom:text-shop-reviews');
-      }
-      if (out.reviewCount === null) {
-        const near = C.numberNearStars(scope);
-        if (near.value !== null) set(out, 'reviewCount', Math.round(near.value), near.source);
-      }
-      if (out.rating === null) {
-        const rm = pageText.match(/(\d\.\d)\s*(?:out of 5|stars?)/i);
+      if (!rateCands.length) {
+        const rm = headerText.match(/(\d[.,]\d)\s*(?:out of 5|stars?)/i);
         if (rm) {
-          const r = U.parseRating(rm[0]);
-          if (r !== null) set(out, 'rating', r, 'dom:text-rating');
+          const r = C.validRating(U.parseRating(rm[0]));
+          if (r !== null) rateCands.push({ value: r, source: 'dom:text-rating', trust: 1 });
         }
       }
+      const revWin = C.consensus(revCands);
+      if (revWin.value !== null) set(out, 'reviewCount', Math.round(revWin.value), revWin.source);
+      const rateWin = C.consensus(rateCands);
+      if (rateWin.value !== null) set(out, 'rating', rateWin.value, rateWin.source);
     }
-    // Active listings: "128 Items" / "All Items (128)".
+    // Active listings: "All Items (128)" / "128 Items" / tab buttons.
     {
-      const m = pageText.match(/(?:All Items|Items)\s*\(?\s*([0-9][0-9,.\s]*)\s*\)?/i)
-        || pageText.match(/([0-9][0-9,.\s]*)\s+Items\b/);
-      if (m) {
-        const n = U.parseCount(m[1]);
-        if (n !== null && n < 1000000) set(out, 'activeListings', Math.round(n), 'dom:text-items');
+      const cands = [];
+      const tabBtn = $all('button, a[role="tab"], [role="tab"]').map(b => C.textOf(b)).find(t => t && /items?/i.test(t));
+      if (tabBtn) {
+        const m = tabBtn.match(/([0-9][0-9,.\s]*)/);
+        if (m) {
+          const n = C.validCount(U.parseCount(m[1]), 1000000);
+          if (n !== null) cands.push({ value: n, source: 'dom:items-tab', trust: 3 });
+        }
       }
+      const m = pageText.match(/(?:all\s+items|items)\s*\(?\s*([0-9][0-9,.\s]*)\s*\)?/i)
+        || pageText.match(/([0-9][0-9,.\s]*)\s+items\b/i);
+      if (m) {
+        const n = C.validCount(U.parseCount(m[1]), 1000000);
+        if (n !== null) cands.push({ value: n, source: 'dom:text-items', trust: 2 });
+      }
+      const win = C.consensus(cands);
+      if (win.value !== null) set(out, 'activeListings', Math.round(win.value), win.source);
     }
     // "On Etsy since 2014".
     {
@@ -123,7 +150,8 @@
     const U = EIP.utils;
     const cards = C.$all(
       '[data-listing-id], a[href*="/listing/"].listing-link, .v2-listing-card a[href*="/listing/"], ' +
-      '[data-testid="listing-card"], .shop-home-listing-grid a[href*="/listing/"]',
+      '[data-testid="listing-card"], .shop-home-listing-grid a[href*="/listing/"], ' +
+      'li a[href*="/listing/"], .listing-card a[href*="/listing/"]',
       scope
     );
     const seen = new Set();
@@ -136,27 +164,31 @@
         const id = C.listingIdFromUrl(absUrl || '') || (card.getAttribute && card.getAttribute('data-listing-id'));
         if (!id || seen.has(id)) continue;
         seen.add(id);
-        const root = card.closest ? (card.closest('[data-listing-id], .v2-listing-card, li, div') || card) : card;
-        const title =
-          C.textOf(root.querySelector && root.querySelector('img[alt]') && altAsEl(root)) ||
-          C.textOf((root.querySelector && (root.querySelector('.v2-listing-card__title, [data-title], h3, h2, p'))) || null) ||
-          imgAlt(root, C);
-        const priceText = C.textOf(root.querySelector && root.querySelector('.currency-value, [data-price], .n-listing-card__price, .v2-listing-card__price')) || C.textOf(card);
-        const parsed = U.parsePrice(priceText || '');
-        const starsText = C.textOf(root.querySelector && root.querySelector('[aria-label*="stars"], [aria-label*="out of 5"]')) || '';
-        const rating = U.parseRating((root.querySelector && root.querySelector('[aria-label*="stars"], [aria-label*="out of 5"]') || {}).getAttribute
-          ? (root.querySelector('[aria-label*="stars"], [aria-label*="out of 5"]')).getAttribute('aria-label') : starsText);
-        const revM = (C.textOf(root) || '').match(/\(([0-9][0-9,.\sKkMm]*)\)/);
-        const reviews = revM ? U.parseCount(revM[1]) : null;
-        const badgeText = (C.textOf(root) || '');
+        const root = card.closest ? (card.closest('[data-listing-id], .v2-listing-card, li') || card.closest('div') || card) : card;
+        const q = (sel) => { try { return root.querySelector ? root.querySelector(sel) : null; } catch (e) { return null; } };
+        // Title: image alt is the most stable card title on Etsy.
+        const title = imgAlt(root) ||
+          C.textOf(q('.v2-listing-card__title, [data-title], h3, h2')) ||
+          C.textOf(q('p[class*="title" i]')) ||
+          `Listing ${id}`;
+        // Price: currency-value spans first (avoids rating/review numbers).
+        const priceEl = q('.currency-value') || q('[data-price], .n-listing-card__price, .v2-listing-card__price, [class*="price" i]');
+        const parsed = U.parsePrice(C.textOf(priceEl) || '');
+        const price = C.validPrice(parsed.value);
+        // Rating + reviews.
+        const starEl = q('[aria-label*="out of 5"], [aria-label*="stars"]');
+        const rating = starEl ? C.validRating(U.parseRating(starEl.getAttribute('aria-label'))) : null;
+        const revM = (C.scopedText(root, 3000) || '').match(/\(([0-9][0-9,.\s\u00a0\u202fKkMm]*)\)/);
+        const reviews = revM ? C.validCount(U.parseCount(revM[1]), 10000000) : null;
+        const badgeText = C.scopedText(root, 3000) || '';
         out.push({
           listingId: id,
-          title: title || `Listing ${id}`,
-          price: parsed.value,
+          title: String(title).slice(0, 200),
+          price,
           currency: parsed.currencyGuess,
           rating, reviews,
-          isBestseller: /\bBestseller\b/.test(badgeText),
-          isStarred: /Star Seller/.test(badgeText),
+          isBestseller: /\bBestseller\b/i.test(badgeText),
+          isStarred: /Star Seller/i.test(badgeText),
           url: absUrl,
           image: imgSrc(root)
         });
@@ -166,7 +198,10 @@
     return out;
   }
 
-  function altAsEl() { return null; }
+  function cleanShopTitle(t) {
+    if (!t) return t;
+    return String(t).replace(/\s*[|\-–]\s*Etsy\s*$/i, '').trim();
+  }
   function imgAlt(root, C) {
     try {
       const img = root.querySelector && root.querySelector('img[alt]');
