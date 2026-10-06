@@ -2,11 +2,12 @@
 
 A lightweight Arabic/Darija browser app source project is available in [`android/`](android/), with a mobile-first interface preview in [`browser/`](browser/). It uses Android System WebView for real websites and includes tabs, bookmarks, browsing history, system downloads, fullscreen video, desktop mode, and an optional image-saving mode.
 
+- **Direct APK download:** [NeurioBrowser-debug.apk](https://github.com/zakariabouifri03-max/neurio/releases/download/neurio-browser-v1.0.0-debug/NeurioBrowser-debug.apk) · [GitHub release page](https://github.com/zakariabouifri03-max/neurio/releases/tag/neurio-browser-v1.0.0-debug)
 - **Build instructions and important limitations:** [`browser/README.md`](browser/README.md)
 - **Web preview:** run `python3 -m http.server 8000 --directory browser` and open `http://localhost:8000`.
-- **APK build:** open `android/` in Android Studio (JDK 17 + Android SDK 35), or run `gradle :app:assembleDebug` from that folder. A GitHub Actions workflow can also publish a debug APK artifact after the Android source is pushed.
+- **APK source/build:** Android Studio project in `android/`; the GitHub Actions workflow builds the APK.
 
-> The browser cannot increase the speed of a slow Wi-Fi link or force YouTube to stream high quality without enough bandwidth. The existing `BashBaqiRacing.apk` in this repository is still the racing game, not this browser. This sandbox has no Android SDK/JDK, so a new APK has not been compiled here.
+> This is an installable **debug-signed test APK** (Android 6+), not a Play Store release. Android may ask you to allow installation from this source. The browser cannot increase slow Wi-Fi speed or force YouTube to stream high quality without enough bandwidth. The existing `BashBaqiRacing.apk` in this repository is still the racing game, not this browser.
 
 ---
 

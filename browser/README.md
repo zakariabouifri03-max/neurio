@@ -45,4 +45,4 @@ The debug APK is created at:
 android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-The release variant requires your own signing configuration before distribution. A distributable, signed release APK has **not** been generated in this workspace: this environment has no JDK or Android SDK/build tools. The existing `BashBaqiRacing.apk` at the repository root is the older racing game, **not** Neurio Browser.
+A debug-signed installable APK is published here: [Download NeurioBrowser-debug.apk](https://github.com/zakariabouifri03-max/neurio/releases/download/neurio-browser-v1.0.0-debug/NeurioBrowser-debug.apk). It is for testing, not a Play Store release; a production release needs your own stable signing key. The build was run in GitHub Actions because this local sandbox has no JDK or Android SDK. The existing `BashBaqiRacing.apk` at the repository root is the older racing game, **not** Neurio Browser.
