@@ -44,6 +44,9 @@ android {
 
     buildFeatures {
         compose = true
+        // The About screen shows BuildConfig.VERSION_NAME. AGP 8 disables the
+        // generated BuildConfig class by default, so switch it back on.
+        buildConfig = true
     }
 
     packaging {

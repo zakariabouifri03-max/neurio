@@ -189,7 +189,13 @@ fun AppIcon(packageName: String, modifier: Modifier = Modifier) {
         val drawable = com.neurio.lanstream.games.GameLibrary.icon(context, packageName)
         drawable?.let {
             runCatching {
-                androidx.core.graphics.drawable.toBitmap(it, 96, 96).asImageBitmap()
+                val bitmap = android.graphics.Bitmap.createBitmap(
+                    96, 96, android.graphics.Bitmap.Config.ARGB_8888
+                )
+                val canvas = android.graphics.Canvas(bitmap)
+                it.setBounds(0, 0, 96, 96)
+                it.draw(canvas)
+                bitmap.asImageBitmap()
             }.getOrNull()
         }
     }

@@ -10,7 +10,7 @@ import android.os.Build
 import com.neurio.lanstream.core.Log
 
 /** Low-latency PCM sink for the streamed game audio. */
-class AudioPlayer(sampleRate: Int, channelCount: Int) {
+class AudioPlayer(private val sampleRate: Int, private val channelCount: Int) {
 
     private val channelMask =
         if (channelCount >= 2) AudioFormat.CHANNEL_OUT_STEREO else AudioFormat.CHANNEL_OUT_MONO

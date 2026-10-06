@@ -29,16 +29,16 @@ enum class Screen { MAIN, HOST, CLIENT, STREAM, SETTINGS, CONTROLS, ABOUT, DIAGN
  * Android framework details (except where a preview genuinely needs them).
  */
 data class UiActions(
-    val onStartHost: (GameApp?) -> Unit = {},
+    val onStartHost: (GameApp?) -> Unit = { _ -> },
     val onStopHost: () -> Unit = {},
-    val onLaunchGame: (GameApp) -> Unit = {},
+    val onLaunchGame: (GameApp) -> Unit = { _ -> },
     val onRotateCode: () -> Unit = {},
-    val onConnect: (HostEndpoint, String) -> Unit = {},
+    val onConnect: (HostEndpoint, String) -> Unit = { _, _ -> },
     val onDisconnect: () -> Unit = {},
     val onOpenAccessibilitySettings: () -> Unit = {},
     val onOpenOverlaySettings: () -> Unit = {},
     val onOpenNotificationSettings: () -> Unit = {},
-    val onCopy: (String) -> Unit = {}
+    val onCopy: (String) -> Unit = { _ -> }
 )
 
 @Composable

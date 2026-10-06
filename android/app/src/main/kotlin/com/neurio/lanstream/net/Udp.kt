@@ -63,7 +63,7 @@ object Udp {
  * One-way UDP sender with a reused DatagramPacket (no per-frame allocation on
  * the hot path).
  */
-class UdpSender(socket: DatagramSocket, destination: InetSocketAddress) {
+class UdpSender(private val socket: DatagramSocket, destination: InetSocketAddress) {
 
     private val buffer = ByteArray(Protocol.MAX_DATAGRAM)
     private val packet = DatagramPacket(buffer, buffer.size, destination)

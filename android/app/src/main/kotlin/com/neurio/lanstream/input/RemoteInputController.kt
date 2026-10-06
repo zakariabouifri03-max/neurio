@@ -76,7 +76,9 @@ class RemoteInputController(
             is InputEvent.Touch -> apply(event)
             is InputEvent.Gamepad -> {
                 val mapped = synchronized(lock) { adapter.map(event) }
-                mapped.forEach { apply(it) }
+                mapped.forEach { mappedEvent ->
+                    if (mappedEvent is InputEvent.Touch) apply(mappedEvent)
+                }
             }
         }
     }
