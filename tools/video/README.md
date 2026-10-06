@@ -4,6 +4,8 @@ A one-minute vertical (1080×1920, 24 fps) cartoon trailer with a full synthesis
 soundtrack — **generated entirely from code**, no external assets, no stock audio.
 
 **▶ Output:** [`../../video/bash-baqi-racing-60s.mp4`](../../video/bash-baqi-racing-60s.mp4)
+(27 MB, 1080×1920) · mobile copy [`bash-baqi-racing-60s-720p.mp4`](../../video/bash-baqi-racing-60s-720p.mp4) (10 MB)
+· watch page [`video/index.html`](../../video/index.html)
 
 ---
 
@@ -47,6 +49,17 @@ python3 tools/video/cartoon.py --start 0 --end 240 --outdir /tmp/frames
 ```
 
 A full pass is ~1440 frames; on 2 vCPU it takes roughly 10 minutes.
+
+A lighter 720×1280 copy for phones / WhatsApp:
+
+```bash
+ffmpeg -i video/bash-baqi-racing-60s.mp4 -vf "scale=720:1280:flags=lanczos" \
+  -c:v libx264 -preset medium -crf 24 -pix_fmt yuv420p -movflags +faststart \
+  -c:a aac -b:a 128k video/bash-baqi-racing-60s-720p.mp4
+```
+
+`video/index.html` is a standalone player page (video + download buttons) — it works
+straight from GitHub Pages or any static server.
 
 ## Where to tweak things
 
