@@ -32,10 +32,13 @@
             android:textColor="@color/text_dim"
             android:paddingTop="2dp" />
 
+        <!-- textIsSelectable off: a selectable TextView inside a ListView row
+             swallows the tap and the long-press that open the device. -->
         <TextView
             android:id="@+id/d_fp"
             style="@style/Mono"
             android:textColor="@color/text_faint"
+            android:textIsSelectable="false"
             android:maxLines="2"
             android:ellipsize="end" />
 
@@ -43,6 +46,7 @@
             android:id="@+id/d_android"
             style="@style/Mono"
             android:textColor="@color/mono"
+            android:textIsSelectable="false"
             android:maxLines="1" />
 
         <LinearLayout

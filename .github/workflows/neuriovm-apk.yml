@@ -65,9 +65,27 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      # The log is teed to a file because the sandbox that develops this repo
+      # cannot reach Actions' log storage; on failure the log is committed back
+      # to the branch (paths filter keeps that from retriggering the workflow).
       - name: Build the debug APK
         working-directory: NeurioVM/android
-        run: gradle --no-daemon :app:assembleDebug :xposed-stubs:build
+        run: gradle --no-daemon --console=plain :app:assembleDebug :xposed-stubs:build 2>&1 | tee "$RUNNER_TEMP/neuriovm-gradle.log"
+
+      - name: Publish build log on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .ci
+          cp "$RUNNER_TEMP/neuriovm-gradle.log" .ci/neuriovm-gradle.log 2>/dev/null || true
+          gh run view "$GITHUB_RUN_ID" --log > .ci/neuriovm-run.log 2>/dev/null || true
+          ls -la .ci || true
+          git config user.name "neurio-ci"
+          git config user.email "ci@users.noreply.github.com"
+          git add -f .ci
+          git commit -q -m "ci: NeurioVM build log for run $GITHUB_RUN_ID [skip ci]" || echo "nothing to commit"
+          git push origin "HEAD:$GITHUB_REF_NAME" || true
 
       - name: Prepare APK for distribution
         run: |

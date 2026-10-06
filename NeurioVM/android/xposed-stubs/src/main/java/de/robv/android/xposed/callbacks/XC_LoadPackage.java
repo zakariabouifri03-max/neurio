@@ -1,7 +1,5 @@
 package de.robv.android.xposed.callbacks;
 
-import android.content.pm.ApplicationInfo;
-
 /**
  * Stub declaration of the real Xposed callback type.
  *
@@ -12,18 +10,22 @@ import android.content.pm.ApplicationInfo;
  * into the APK. On a device running LSPosed the real implementation is injected
  * into the class loader before application code runs.
  *
- * <p>Only the public fields actually read by {@code NeurioHook} are declared,
- * and they carry exactly the same names and types as in the real API, so the
- * generated field-access bytecode links against the runtime implementation.
+ * <p><b>This module must stay free of {@code android.*} references:</b> it is a
+ * plain Java library with no android.jar on its compile classpath. Only the
+ * fields {@code NeurioHook} actually reads are declared, with the same names and
+ * types as the real API, so the generated field-access bytecode links against
+ * the runtime implementation.
  */
 public abstract class XC_LoadPackage {
 
-    /** Parameters handed to {@code IXposedHookLoadPackage.handleLoadPackage}. */
+    /**
+     * Parameters handed to {@code IXposedHookLoadPackage.handleLoadPackage}.
+     * The real class carries more fields ({@code appInfo}, {@code isFirstApp},
+     * {@code processName}); only the two this module uses are declared.
+     */
     public static final class LoadPackageParam {
         public String packageName;
         public String processName;
-        public ApplicationInfo appInfo;
-        public boolean firstApplication;
         public ClassLoader classLoader;
     }
 

@@ -108,6 +108,7 @@ public final class VmService extends Service {
         }
 
         String deviceId = intent == null ? null : intent.getStringExtra(EXTRA_DEVICE);
+        final String backendId = intent == null ? null : intent.getStringExtra(EXTRA_BACKEND);
         final DeviceIdentity device = ProfileStore.get(this).get(deviceId);
         if (device == null) {
             Log.w(TAG, "start requested for unknown device " + deviceId);
@@ -118,7 +119,7 @@ public final class VmService extends Service {
         // The notification has to appear quickly; the backend starts on the
         // manager's worker thread and updates it when the state settles.
         startForegroundCompat(build(device, null, VmSession.State.STARTING));
-        manager.start(device, intent.getStringExtra(EXTRA_BACKEND), (session, error) -> {
+        manager.start(device, backendId, (session, error) -> {
             session.addListener(listener);
             refresh(session);
             if (!manager.anyRunning()) stopSelf();
