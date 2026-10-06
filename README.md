@@ -46,6 +46,31 @@ The game is a full **PWA** (Progressive Web App): installable, fullscreen, **wor
 
 ---
 
+---
+
+## 📡 نوريو تواصل — Neurio Offline Chat
+
+**تطبيق تواصل كامل كيخدم بلا إنترنت نهائيًا** — رسائل، غرف، خاص، صور، ملفات ورسائل
+صوتية، كلشي عبر الواي فاي ديالك ولا hotspot من هاتف. **بلا حساب، بلا سيرفر خارجي، بلا
+`npm install`** (سيرفر واحد بـ Node القياسي + PWA صغيرة).
+
+A **full LAN messenger with no internet, no accounts and zero dependencies** — text,
+rooms, private chats, photos, files and voice notes over your own Wi-Fi/hotspot.
+
+```bash
+node tools/offline-chat/server.mjs
+#   💻  this machine   http://localhost:8080
+#   📱  phones         http://192.168.1.7:8080   ← نفس الواي فاي / same Wi-Fi
+```
+
+* 💬 WebSocket مكتوب من الصفر (RFC 6455) · 🏠 غرف · ✉️ خاص · 🖼️ ملفات حتى 25 ميغا
+* 🎙️ رسائل صوتية (`--https`) · ↩️ رد واقتباس · 🔍 بحث · ✍️ "كيكتب…" · 🔔 تنبيهات
+* 💾 التاريخ محفوظ فـ `.data/` (كيسترجع من بعد restart) · 📱 installable PWA
+* 🌍 دارجة / Français / English · 🔌 الرسائل كيتسناو فالطابور ملي تقطع الشبكة
+* 🧪 `node tools/offline-chat/test.mjs` — 36 اختبار بلا أي مكتبة
+
+**→ التفاصيل كاملة فـ [`tools/offline-chat/README.md`](tools/offline-chat/README.md)**
+
 ## 🎮 The Game
 
 You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!

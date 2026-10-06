@@ -3,3 +3,6 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# offline-chat runtime data (messages, uploads, TLS cert)
+tools/offline-chat/.data/

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>نوريو تواصل — دردشة بلا إنترنت</title>
+<meta name="description" content="تطبيق تواصل يخدم بلا إنترنت: رسائل، مجموعات، صور وملفات ورسائل صوتية عبر الشبكة المحلية فقط.">
+<meta name="theme-color" content="#0b1020">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="نوريو تواصل">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════ شاشة الدخول ═══════════ -->
+<section id="login" class="screen login">
+  <div class="login-card">
+    <div class="brand-big">
+      <span class="brand-logo">📡</span>
+      <h1 data-i18n="appName">نوريو تواصل</h1>
+      <p class="tagline" data-i18n="tagline">دردشة بلا إنترنت — غير الشبكة المحلية (واي فاي / hotspot)</p>
+    </div>
+
+    <label class="field">
+      <span data-i18n="yourName">سميتك</span>
+      <input id="inName" type="text" maxlength="24" autocomplete="nickname" placeholder="مثال: يوسف" data-i18n-ph="namePlaceholder">
+    </label>
+
+    <div class="field">
+      <span data-i18n="yourEmoji">الرمز ديالك</span>
+      <div id="emojiPick" class="chip-row"></div>
+    </div>
+
+    <div class="field">
+      <span data-i18n="yourColor">اللون</span>
+      <div id="colorPick" class="chip-row"></div>
+    </div>
+
+    <label class="check">
+      <input id="inRemember" type="checkbox" checked>
+      <span data-i18n="remember">حفظ سميتي على هاد الجهاز</span>
+    </label>
+
+    <button id="btnEnter" class="btn primary big" data-i18n="enter">دخول للدردشة 🚀</button>
+    <p class="hint" data-i18n="multiTabHint">بغيت تجرب بوحدك؟ حل التبويب مرتين، كل تبويب كيكون مستخدم مختلف.</p>
+
+    <div class="server-card">
+      <div class="server-row">
+        <span class="dot" id="srvDot"></span>
+        <b data-i18n="server">السيرفر</b>
+        <span id="srvName" class="muted">…</span>
+      </div>
+      <div id="srvAddrs" class="addr-list"></div>
+      <button class="btn ghost small" id="btnCopyInvite" data-i18n="copyInvite">📋 نسخ رابط الدعوة</button>
+    </div>
+
+    <div class="lang-row" id="langRow">
+      <button class="lang" data-lang="ar">🇲🇦 الدارجة</button>
+      <button class="lang" data-lang="fr">🇫🇷 Français</button>
+      <button class="lang" data-lang="en">🇬🇧 English</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ التطبيق ═══════════ -->
+<section id="app" class="screen app hidden">
+  <aside id="sidebar" class="sidebar">
+    <header class="side-head">
+      <div class="me" id="meBox">
+        <span class="avatar" id="meAvatar">🙂</span>
+        <div>
+          <b id="meName">—</b>
+          <button class="link" id="btnSwitch" data-i18n="changeMe">تبديل المستخدم</button>
+        </div>
+      </div>
+      <button class="icon-btn only-mobile" id="btnCloseSide" aria-label="close">✕</button>
+    </header>
+
+    <div class="search-wrap">
+      <input id="inSearch" type="search" data-i18n-ph="searchPh" placeholder="🔍 بحث في الرسائل…">
+    </div>
+
+    <nav class="lists" id="lists">
+      <div class="list-title"><span data-i18n="rooms">الغرف</span><button class="icon-btn" id="btnNewRoom" title="غرفة جديدة">＋</button></div>
+      <div id="roomList" class="list"></div>
+      <div class="list-title"><span data-i18n="dms">الخاص</span></div>
+      <div id="dmList" class="list"></div>
+      <div class="list-title"><span data-i18n="online">الموجودين دابا</span><span class="badge" id="onlineCount">0</span></div>
+      <div id="peerList" class="list peers"></div>
+    </nav>
+
+    <footer class="side-foot">
+      <button class="btn ghost small" id="btnInvite" data-i18n="invite">🔗 دعوة</button>
+      <button class="btn ghost small" id="btnExport" data-i18n="export">⬇️ تصدير</button>
+      <button class="btn ghost small hidden" id="btnInstall" data-i18n="install">📱 تثبيت</button>
+    </footer>
+  </aside>
+
+  <main class="chat">
+    <header class="chat-head">
+      <button class="icon-btn only-mobile" id="btnOpenSide" aria-label="menu">☰</button>
+      <span class="avatar small" id="roomAvatar">💬</span>
+      <div class="room-meta">
+        <b id="roomTitle">—</b>
+        <span id="roomSub" class="muted"></span>
+      </div>
+      <div class="conn" id="connBadge" title="حالة الاتصال"></div>
+    </header>
+
+    <div id="banner" class="banner hidden"></div>
+
+    <div id="messages" class="messages" tabindex="0"></div>
+
+    <button id="btnJump" class="jump hidden">↓ رسائل جديدة</button>
+
+    <div id="typing" class="typing"></div>
+
+    <form id="composer" class="composer" autocomplete="off">
+      <button type="button" class="icon-btn" id="btnAttach" title="ملف/صورة">📎</button>
+      <button type="button" class="icon-btn" id="btnEmoji" title="إيموجي">😊</button>
+      <textarea id="inMsg" rows="1" maxlength="4000" data-i18n-ph="messagePh" placeholder="كتب رسالة… (Enter للإرسال)"></textarea>
+      <button type="button" class="icon-btn mic" id="btnMic" title="رسالة صوتية">🎙️</button>
+      <button type="submit" class="send-btn" id="btnSend" title="إرسال">➤</button>
+    </form>
+
+    <div id="replyBar" class="reply-bar hidden">
+      <div class="reply-text"><b id="replyName"></b><span id="replyText"></span></div>
+      <button class="icon-btn" id="btnCancelReply">✕</button>
+    </div>
+
+    <div id="uploadBar" class="upload-bar hidden">
+      <div class="bar"><div class="bar-fill" id="upFill"></div></div>
+      <span id="upLabel">…</span>
+    </div>
+  </main>
+
+  <input type="file" id="fileInput" multiple hidden>
+  <div id="emojiPanel" class="emoji-panel hidden"></div>
+  <div id="recBar" class="rec-bar hidden">
+    <span class="rec-dot"></span><span id="recTime">0:00</span>
+    <button class="btn ghost small" id="btnRecCancel" data-i18n="cancel">إلغاء</button>
+    <button class="btn primary small" id="btnRecSend" data-i18n="sendVoice">إرسال 🎙️</button>
+  </div>
+</section>
+
+<div id="toast" class="toast hidden"></div>
+<div id="lightbox" class="lightbox hidden"><img id="lightImg" alt=""></div>
+
+<script src="app.js" type="module"></script>
+</body>
+</html>
