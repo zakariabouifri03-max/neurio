@@ -1,0 +1,45 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ma.filebox'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "ma.filebox"
+        minSdk 24          // Android 7.0 — java.util.zip + AES/GCM are all present
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+        resourceConfigurations += ["en", "fr", "ar"]
+    }
+
+    buildTypes {
+        debug {
+            // signed with the debug keystore automatically — installable as-is
+            minifyEnabled false
+        }
+        release {
+            // no signing config on purpose: CI signs it, or you run
+            //   ./gradlew assembleRelease   and sign the unsigned APK yourself
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // keeps the build hermetic: no generated BuildConfig fields we don't use
+    buildFeatures {
+        buildConfig false
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+// deliberately no dependencies block — the app is pure framework Android

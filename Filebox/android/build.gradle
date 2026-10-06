@@ -1,0 +1,10 @@
+// Filebox — top-level build file.
+// No third-party libraries anywhere in the project, so the only thing Gradle
+// has to fetch is the Android Gradle Plugin itself.
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+}
+
+tasks.register('clean', Delete) {
+    delete rootProject.buildDir
+}
