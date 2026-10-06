@@ -220,3 +220,69 @@ jobs:
           done
           echo "could not publish dist/ after three attempts" >&2
           exit 1
+
+      - name: Publish the APKs as a GitHub release
+        # A permanent download link that does not depend on a sandbox session or
+        # on being logged in to fetch a CI artifact:
+        #
+        #   https://github.com/zakariabouifri03-max/neurio/releases/download/\
+        #     ai-vision-4k-latest/AIVision4K-debug.apk
+        #
+        # One moving tag, its assets replaced on every successful build, so the
+        # link never changes and always serves the newest APK. The asset upload
+        # has to happen here: uploads.github.com is not reachable from every
+        # environment that can otherwise use the API.
+        #
+        # Best effort: a release is a convenience, the APKs in dist/ are the
+        # deliverable, and a hiccup here must not mark a good build as failed.
+        if: success()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd "${{ github.workspace }}/ai-vision-4k"
+          if [ ! -f dist/AIVision4K-debug.apk ]; then
+            echo "no debug APK was produced, nothing to release"
+            exit 0
+          fi
+          TAG="ai-vision-4k-latest"
+          NOTES="$(mktemp)"
+          {
+            echo "Automatic build of **AI Vision 4K** from commit \`${GITHUB_SHA:0:7}\`"
+            echo "(workflow run ${GITHUB_RUN_ID}, ${GITHUB_REPOSITORY})."
+            echo
+            echo "## Download"
+            echo
+            echo "| file | bytes | sha256 |"
+            echo "| --- | --- | --- |"
+            while read -r hash name; do
+              printf '| \`%s\` | %s | \`%s\` |\n' "$name" "$(stat -c %s "dist/$name")" "$hash"
+            done < dist/SHA256SUMS.txt
+            echo
+            echo "Install \`AIVision4K-debug.apk\` (debug-signed, package \`com.aivision4k.debug\`,"
+            echo "Android 8.0+/64-bit): \`adb install -r AIVision4K-debug.apk\`. The release APK is"
+            echo "R8-minified and signed with the debug key - testing only."
+            echo
+            echo "The complete notes for this project live in the repository:"
+            echo "\`ai-vision-4k/README.md\` and \`ai-vision-4k/dist/README.md\`, including what has"
+            echo "and has not been verified (nothing here has run on real hardware yet)."
+          } > "$NOTES"
+
+          if ! gh release view "$TAG" > /dev/null 2>&1; then
+            gh release create "$TAG" \
+              --title "AI Vision 4K - latest debug build" \
+              --notes-file "$NOTES" \
+              --target "$GITHUB_SHA" \
+              || gh release create "$TAG" --title "AI Vision 4K - latest debug build" --notes-file "$NOTES"
+          else
+            gh release edit "$TAG" --notes-file "$NOTES"
+          fi
+
+          gh release upload "$TAG" \
+            dist/AIVision4K-debug.apk \
+            dist/AIVision4K-release-unsigned-key.apk \
+            dist/SHA256SUMS.txt \
+            --clobber
+          echo "release ${TAG} updated:"
+          gh release view "$TAG" --json assets --jq '.assets[] | "  \(.name)  \(.size) bytes"'
