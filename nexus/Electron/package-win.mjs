@@ -11,12 +11,20 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const staging = path.join(root, 'dist', 'nexus-editor');
 const outDir = path.join(root, 'dist', 'nexus-editor-package');
-const APP_NAME = 'NEXUS GAME STUDIO';
+const APP_NAME = 'NEXUS-GAME-STUDIO';       // exe name — no spaces (cmd/quoting-safe)
+const PRODUCT_NAME = 'NEXUS GAME STUDIO';    // window title / productName
 const ELECTRON_VERSION = '33.4.11';
 
 function run(cmd, opts = {}) {
   console.log('>', cmd);
-  execSync(cmd, { stdio: 'inherit', cwd: root, ...opts });
+  try {
+    execSync(cmd, { stdio: 'inherit', cwd: root, ...opts });
+  } catch (e) {
+    // surface the child's stderr/stdout in the error itself (CI-friendly)
+    const out = [...(e.output ?? [])].filter(Boolean).join('\n');
+    console.error(`\n[FAILED] ${cmd}\n${out}\n${e.message}`);
+    throw new Error(`Command failed: ${cmd}\n${out}`);
+  }
 }
 const copy = (src, dest) => fs.cpSync(src, dest, { recursive: true });
 
@@ -51,7 +59,7 @@ fs.mkdirSync(path.join(staging, 'Server'), { recursive: true });
 // app manifest — deps are installed into the staging so the packaged app is self-contained
 fs.writeFileSync(path.join(staging, 'package.json'), JSON.stringify({
   name: 'nexus-game-studio',
-  productName: APP_NAME,
+  productName: PRODUCT_NAME,
   version: '1.0.0',
   description: 'AI-powered 3D game development environment',
   main: 'electron/main.cjs',

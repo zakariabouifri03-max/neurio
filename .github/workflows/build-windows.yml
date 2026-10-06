@@ -37,17 +37,29 @@ jobs:
         run: npm run build:server
 
       - name: Build Island Survival game + package game EXE
-        run: npx tsx Electron/build-game-win.mts
+        shell: bash
+        run: |
+          set -o pipefail
+          if ! npx tsx Electron/build-game-win.mts 2>&1 | tee /tmp/game-pkg.log; then
+            tail -c 900 /tmp/game-pkg.log | tr '\n' '·' | sed 's/"/\"/g' | xargs -I{} echo "::error title=Game packaging failed::{}"
+            exit 1
+          fi
 
       - name: Package NEXUS GAME STUDIO EXE
-        run: node Electron/package-win.mjs
+        shell: bash
+        run: |
+          set -o pipefail
+          if ! node Electron/package-win.mjs 2>&1 | tee /tmp/editor-pkg.log; then
+            tail -c 900 /tmp/editor-pkg.log | tr '\n' '·' | sed 's/"/\"/g' | xargs -I{} echo "::error title=Editor packaging failed::{}"
+            exit 1
+          fi
 
       - name: Zip packages + collect direct-play HTML
         shell: pwsh
         working-directory: nexus
         run: |
           Compress-Archive -Path "dist/game/IslandSurvival-win32-x64/*" -DestinationPath "dist/IslandSurvival-win32-x64.zip" -Force
-          Compress-Archive -Path "dist/nexus-editor-package/NEXUS GAME STUDIO-win32-x64/*" -DestinationPath "dist/NEXUS-GAME-STUDIO-win32-x64.zip" -Force
+          Compress-Archive -Path "dist/nexus-editor-package/NEXUS-GAME-STUDIO-win32-x64/*" -DestinationPath "dist/NEXUS-GAME-STUDIO-win32-x64.zip" -Force
           Copy-Item "Projects/island-survival/Builds/IslandSurvival/IslandSurvival.html" "dist/IslandSurvival.html"
           Get-ChildItem dist | Select-Object Name, @{N='SizeMB';E={[math]::Round($_.Length/1MB,1)}}
 
@@ -62,7 +74,7 @@ jobs:
             | File | What it is |
             |---|---|
             | **IslandSurvival-win32-x64.zip** | 🎮 **THE GAME** — extract, then run `IslandSurvival.exe` |
-            | **NEXUS-GAME-STUDIO-win32-x64.zip** | 🛠 **THE FULL EDITOR** — extract, then run `NEXUS GAME STUDIO.exe` |
+            | **NEXUS-GAME-STUDIO-win32-x64.zip** | 🛠 **THE FULL EDITOR** — extract, then run `NEXUS-GAME-STUDIO.exe` |
             | **IslandSurvival.html** | Play instantly in any browser (no exe needed, fully offline) |
 
             ⚠ **SmartScreen warning**: the exe is unsigned — click **More info → Run anyway**.
