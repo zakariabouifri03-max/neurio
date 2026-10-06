@@ -98,7 +98,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private fun bootstrap() {
         val context = getApplication<Application>()
         val integration = settings.integration
-        val error = AIUpscaler.initialize(context, integration)
+        // A probe can throw on a hostile driver. The app must still start and
+        // say why, so the failure is turned into a message instead of a crash.
+        val error = runCatching { AIUpscaler.initialize(context, integration) }
+            .getOrElse { failure ->
+                "Engine initialisation failed: ${'$'}{failure.message ?: failure.javaClass.simpleName}"
+            }
         state = state.copy(
             engineReady = AIUpscaler.isInitialised,
             engineError = error,
@@ -155,15 +160,19 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private fun backgroundTick(deep: Boolean) {
         if (!AIUpscaler.isInitialised) return
         val context = getApplication<Application>()
-        AIUpscaler.updateThermal(context)
-        val snapshot = AIUpscaler.status()
-        val metrics = if (deep) AIUpscaler.metrics() else null
-        state = state.copy(
-            snapshot = snapshot ?: state.snapshot,
-            metrics = metrics ?: state.metrics,
-            model = if (deep) (AIUpscaler.model() ?: state.model) else state.model,
-            overlayVisible = MetricsOverlay.isVisible,
-        )
+        // A tick that throws must not kill the monitoring loop: the previous
+        // snapshot simply stays on screen, which is visible to the user.
+        runCatching {
+            AIUpscaler.updateThermal(context)
+            val snapshot = AIUpscaler.status()
+            val metrics = if (deep) AIUpscaler.metrics() else null
+            state = state.copy(
+                snapshot = snapshot ?: state.snapshot,
+                metrics = metrics ?: state.metrics,
+                model = if (deep) (AIUpscaler.model() ?: state.model) else state.model,
+                overlayVisible = MetricsOverlay.isVisible,
+            )
+        }
     }
 
     // -----------------------------------------------------------------------

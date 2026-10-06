@@ -109,7 +109,10 @@ jobs:
             done > dist/SHA256SUMS.txt
             cat dist/SHA256SUMS.txt
           fi
-          if [ -f /tmp/build-debug.log ]; then
+          if ls dist/*.apk > /dev/null 2>&1; then
+            # A successful build needs no diagnostics: keep the tree clean.
+            rm -f dist/build-log.txt
+          elif [ -f /tmp/build-debug.log ]; then
             tail -n 900 /tmp/build-debug.log > dist/build-log.txt
           else
             echo "the Gradle step produced no log" > dist/build-log.txt

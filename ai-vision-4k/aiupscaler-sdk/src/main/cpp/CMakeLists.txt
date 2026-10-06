@@ -147,6 +147,12 @@ endif()
 # NNAPI. Not every NDK ships the stub; without it the compatibility engine
 # reports NNAPI as unavailable, which is exactly what it would do on a device
 # without the service.
+#
+# Note for readers of this file: no translation unit in this tree currently calls
+# the NNAPI API, so enabling the option only makes the symbol available — the
+# inference paths that exist today are Vulkan compute and the CPU reference
+# interpreter. The engine reports that state as-is rather than claiming an NPU
+# path it does not run.
 if(V4K_ENABLE_NNAPI)
     find_library(V4K_NNAPI_LIBRARY neuralnetworks)
     if(V4K_NNAPI_LIBRARY)
