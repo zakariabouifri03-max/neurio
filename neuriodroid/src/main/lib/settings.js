@@ -11,18 +11,19 @@ const DEFAULTS = {
   language: 'ar',            // 'ar' | 'en'
   theme: 'neon',
   root: null,                // null = auto (%LOCALAPPDATA%\NeurioDroid)
-  gpu: 'host',               // host | auto | angle_indirect | swiftshader_indirect | off
+  profile: 'potato',         // potato | balanced | gaming
+  gpu: 'auto',               // host | auto | angle_indirect | swiftshader_indirect | off
   accel: 'auto',             // on | off | auto
-  cores: 4,
-  ramMB: 4096,
-  dataPartitionGB: 12,
+  cores: 2,
+  ramMB: 2048,
+  dataPartitionGB: 8,
   dns: '1.1.1.1,8.8.8.8',
   noBootAnim: true,
   metrics: false,
-  previewFps: 3,             // 0 = disabled (in-app live preview via screencap)
-  audio: true,
+  previewFps: 0,             // disabled in Potato mode; screenshots remain available
+  audio: false,
   basePort: 5554,
-  maxInstances: 4,
+  maxInstances: 1,
   closeAction: 'ask',        // ask | minimize | quit
   snapshotsOnExit: true,
   keymap: { enabled: true, engine: 'uiohook', holdMs: 60, repeatMs: 90 },

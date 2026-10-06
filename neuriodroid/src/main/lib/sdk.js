@@ -296,7 +296,13 @@ async function provision(paths, settings, { onProgress = () => {}, signal, image
   acceptLicenses(paths);
 
   // 3. choose image
-  const chosen = image || remote.recommendImage(meta.images, { abi, maxApi: settings.maxApi || 35 });
+  const isPotato = settings.profile === 'potato';
+  const chosen = image || remote.recommendImage(meta.images, {
+    abi,
+    // Older Play images are smaller and boot faster on weak machines.
+    maxApi: settings.maxApi || (isPotato ? 30 : 35),
+    minApi: isPotato ? 28 : 28,
+  });
   const imagePkg = chosen ? chosen.package : `system-images;android-34;google_apis_playstore;${abi}`;
   const plat = platformPkgForImage(imagePkg) || 'platforms;android-34';
 
