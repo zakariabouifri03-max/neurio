@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">نيوريو — بث محلي</string>
+
+    <string name="main_title">بث الألعاب عبر الشبكة</string>
+    <string name="main_subtitle">الجوال الثاني يشغّل اللعبة · الجوال الأول يلعب بدون تحميل</string>
+    <string name="main_host">استضافة لعبة</string>
+    <string name="main_host_desc">هذا الجوال يملك اللعبة ويبثّها</string>
+    <string name="main_join">الانضمام للعبة</string>
+    <string name="main_join_desc">هذا الجوال يلعب بدون تثبيت اللعبة</string>
+    <string name="main_settings">الإعدادات</string>
+    <string name="main_settings_desc">الدقة، معدل البت، الصوت، الإدخال</string>
+    <string name="main_about">حول التطبيق</string>
+    <string name="main_about_desc">طريقة العمل وقيود النظام</string>
+    <string name="main_diagnostics">التشخيص</string>
+    <string name="main_role_hint">ثبّت التطبيق على الجوالين: واحد يستضيف والآخر يلعب.</string>
+
+    <string name="common_back">رجوع</string>
+    <string name="common_cancel">إلغاء</string>
+    <string name="common_ok">حسناً</string>
+    <string name="common_close">إغلاق</string>
+    <string name="common_stop">إيقاف</string>
+    <string name="common_start">ابدأ</string>
+    <string name="common_refresh">تحديث</string>
+    <string name="common_copy">نسخ</string>
+    <string name="common_unknown">—</string>
+    <string name="common_open_settings">فتح الإعدادات</string>
+
+    <string name="host_title">استضافة لعبة</string>
+    <string name="host_device">الجهاز</string>
+    <string name="host_ip">عنوان IP المحلي</string>
+    <string name="host_network">الشبكة</string>
+    <string name="host_code">رمز الاتصال</string>
+    <string name="host_code_hint">اكتب هذا الرمز في جوال اللاعب</string>
+    <string name="host_status">الاتصال</string>
+    <string name="host_waiting">في انتظار اللاعب…</string>
+    <string name="host_connected_player">متصل: %1$s</string>
+    <string name="host_select_game">اختر لعبة للبث</string>
+    <string name="host_games">الألعاب المتاحة</string>
+    <string name="host_searching_games">جارٍ فحص التطبيقات…</string>
+    <string name="host_no_games">لم يتم العثور على تطبيقات.</string>
+    <string name="host_start_stream">ابدأ البث</string>
+    <string name="host_stop_stream">إيقاف البث</string>
+    <string name="host_rotate_code">رمز جديد</string>
+    <string name="host_stats">البث</string>
+    <string name="host_fps">إطار/ث</string>
+    <string name="host_latency">زمن الاستجابة</string>
+    <string name="host_bitrate">معدل البت</string>
+    <string name="host_resolution">الدقة</string>
+    <string name="host_dropped">مفقود</string>
+    <string name="host_encoder">المشفّر</string>
+    <string name="host_packets_lost">فقد حزم</string>
+    <string name="host_audio">الصوت</string>
+    <string name="host_input">الإدخال</string>
+    <string name="host_capture_needed">يلزم إذن تصوير الشاشة للبث.</string>
+    <string name="host_capture_denied">تم رفض تصوير الشاشة.</string>
+    <string name="host_capture_hint">سيظهر سؤال النظام: ابدأ الآن.</string>
+    <string name="host_preparing">جارٍ التحضير…</string>
+    <string name="host_streaming_live">مباشر — البث إلى %1$s</string>
+    <string name="host_game_running">اللعبة تعمل على هذا الجوال</string>
+    <string name="host_notif_title">نيوريو يبثّ الآن</string>
+    <string name="host_notif_text">الجلسة %1$s · %2$s</string>
+    <string name="host_notif_action_open">فتح لوحة الاستضافة</string>
+    <string name="host_notif_action_stop">إيقاف</string>
+
+    <string name="client_title">الانضمام للعبة</string>
+    <string name="client_scanning">البحث عن أجهزة…</string>
+    <string name="client_no_hosts">لم يُعثر على مضيف. تأكد من نفس شبكة Wi-Fi.</string>
+    <string name="client_found">الأجهزة على الشبكة</string>
+    <string name="client_ping">الاستجابة</string>
+    <string name="client_status">الحالة</string>
+    <string name="client_status_available">متاح</string>
+    <string name="client_status_streaming">في جلسة</string>
+    <string name="client_connect">اتصال</string>
+    <string name="client_enter_code">أدخل الرمز المكوّن من 6 أرقام</string>
+    <string name="client_code_label">رمز الاقتران</string>
+    <string name="client_connecting">جارٍ الاتصال…</string>
+    <string name="client_authenticating">جارٍ التحقق…</string>
+    <string name="client_connected">متصل. بدء البث…</string>
+    <string name="client_disconnect">قطع الاتصال</string>
+    <string name="client_manual">إضافة مضيف عبر IP</string>
+    <string name="client_manual_hint">مثال: 192.168.1.24</string>
+    <string name="client_add">إضافة</string>
+    <string name="client_game_label">اللعبة</string>
+    <string name="client_waiting_video">في انتظار الفيديو…</string>
+    <string name="client_notif_title">بث نيوريو يعمل</string>
+    <string name="client_notif_text">اللعب من %1$s</string>
+
+    <string name="stream_title">بث اللعبة</string>
+    <string name="stream_tap_hint">المس الشاشة لإظهار الأزرار</string>
+    <string name="stream_show_controls">إظهار الأزرار</string>
+    <string name="stream_hide_controls">إخفاء الأزرار</string>
+    <string name="stream_disconnect">خروج</string>
+    <string name="stream_waiting">في انتظار فيديو المضيف…</string>
+    <string name="stream_no_video">لا يوجد فيديو بعد.</string>
+
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_section_stream">جودة البث</string>
+    <string name="settings_resolution">الدقة</string>
+    <string name="settings_fps">إطار/ثانية</string>
+    <string name="settings_bitrate">معدل البت</string>
+    <string name="settings_adaptive">معدل بت تلقائي</string>
+    <string name="settings_adaptive_desc">تقليل الجودة تلقائياً عند ضعف Wi-Fi</string>
+    <string name="settings_low_latency">وضع زمن منخفض</string>
+    <string name="settings_low_latency_desc">تقليل التخزين المؤقت وإسقاط الإطارات المتأخرة</string>
+    <string name="settings_audio">بث صوت اللعبة</string>
+    <string name="settings_audio_desc">أندرويد 10+ فقط، وبشرط سماح اللعبة بالتقاط الصوت</string>
+    <string name="settings_section_device">الجهاز</string>
+    <string name="settings_device_name">اسم الجهاز</string>
+    <string name="settings_show_stats">إظهار الإحصائيات</string>
+    <string name="settings_section_input">الإدخال</string>
+    <string name="settings_input_mode">طريقة إدخال اللمس</string>
+    <string name="settings_controls">تخطيط الأزرار</string>
+    <string name="settings_controls_desc">تحريك وتحجيم وإظهار الأزرار</string>
+    <string name="settings_reset">استعادة الافتراضي</string>
+
+    <string name="preset_low">منخفض</string>
+    <string name="preset_medium">متوسط</string>
+    <string name="preset_high">عالي</string>
+    <string name="preset_custom">مخصص</string>
+
+    <string name="input_mode_auto">تلقائي</string>
+    <string name="input_mode_accessibility">خدمة الوصول</string>
+    <string name="input_mode_root">صلاحيات الروت</string>
+    <string name="input_mode_overlay">عرض فقط</string>
+    <string name="input_mode_disabled">معطّل</string>
+
+    <string name="about_title">حول التطبيق</string>
+    <string name="about_limitations_title">قيود النظام بصراحة</string>
+    <string name="about_version">الإصدار</string>
+
+    <string name="diag_title">التشخيص</string>
+    <string name="diag_device">الجهاز</string>
+    <string name="diag_network">الشبكة</string>
+    <string name="diag_codecs">المشفّرات</string>
+    <string name="diag_permissions">القدرات</string>
+    <string name="diag_copy">نسخ التقرير</string>
+    <string name="diag_screen_capture">تصوير الشاشة</string>
+    <string name="diag_audio_capture">التقاط صوت اللعبة</string>
+    <string name="diag_accessibility">إدخال عبر الوصول</string>
+    <string name="diag_notifications">الإشعارات</string>
+
+    <string name="status_unknown">غير معروف</string>
+    <string name="status_supported">مدعوم</string>
+    <string name="status_unsupported">غير مدعوم</string>
+    <string name="status_disabled">معطّل</string>
+    <string name="status_granted">ممنوح</string>
+    <string name="status_missing">غير ممنوح</string>
+    <string name="status_active">نشط</string>
+    <string name="status_idle">خامل</string>
+    <string name="status_waiting">انتظار</string>
+    <string name="status_streaming">يبثّ</string>
+    <string name="status_error">خطأ</string>
+    <string name="status_blocked">محجوب من اللعبة</string>
+    <string name="status_android_10_required">يلزم أندرويد 10+</string>
+
+    <string name="accessibility_service_label">إدخال نيوريو عن بُعد</string>
+    <string name="accessibility_service_description">يسمح لنيوريو بتنفيذ اللمسات القادمة من جوال اللاعب
+        داخل اللعبة التي تعمل على هذا الجوال (وضع الاستضافة فقط).</string>
+
+    <!-- أضيفت لاستكمال مطابقة ملف strings.xml الإنجليزي -->
+    <string name="common_yes">نعم</string>
+    <string name="common_no">لا</string>
+    <string name="host_relaunch">إعادة التشغيل</string>
+    <string name="stream_back">رجوع</string>
+    <string name="stream_keyframe">طلب إطار مفتاحي</string>
+    <string name="settings_custom_bitrate">معدل البث المخصص: %1$d ميجابت/ثانية</string>
+    <string name="settings_input_hint">لا يسمح أندرويد بإدخال اللمسات داخل تطبيقات أخرى بدون
+        خدمة إمكانية الوصول (أو صلاحيات الروت). اختر المدى المسموح به على هذا الجهاز.</string>
+
+    <string name="controls_title">تخطيط أزرار التحكم</string>
+    <string name="controls_desc">حرّك أشرطة التمرير لتحديد موضع كل زر. المواضع نسب مئوية من
+        مساحة البث وتُرسل إلى الجوال المضيف كإحداثيات لمس.</string>
+    <string name="controls_enable">مُفعّل</string>
+    <string name="controls_x">س</string>
+    <string name="controls_y">ص</string>
+    <string name="controls_size">الحجم</string>
+    <string name="controls_reset">إعادة الضبط</string>
+    <string name="controls_preview">معاينة</string>
+
+    <string name="about_body">نيوريو نموذج أولي لبث الألعاب عبر الشبكة المحلية.\n\n
+        يشغّل الجوال المضيف اللعبة الحقيقية محليًا، ويلتقط شاشته عبر MediaProjection،
+        ويشفّرها بمشفّر H.264 العتادي، ثم يرسلها مباشرة عبر Wi‑Fi إلى الجوال الثاني
+        الذي يفكّ التشفير عتاديًا ويعرض البث ملء الشاشة ويرسل لمساته عودةً إلى المضيف.\n\n
+        لا يتم نقل اللعبة إطلاقًا: لا APK ولا OBB ولا نسخ بيانات ولا خادم سحابي.</string>
+    <string name="about_limitations">• الإدخال: لا يمكن لأندرويد إدخال اللمسات داخل تطبيق آخر
+        بدون خدمة إمكانية الوصول (أو صلاحيات الروت/النظام). يحتوي التطبيق على مُدخل عبر
+        خدمة إمكانية الوصول ينفّذ لمسات حقيقية عند تفعيلها يدويًا من الإعدادات، وإلا فلن
+        يتم إدخال أي لمسة.\n
+        • الصوت: التقاط الصوت الداخلي ليس مضمونًا، فبعض الألعاب تمنع تسجيل تشغيل الصوت؛
+        وعند التعذر يبقى البث المرئي يعمل وتظهر حالة الصوت بوضوح.\n
+        • الالتقاط: يعرض MediaProjection مربع موافقة للمستخدم في كل جلسة، وبعض
+        الأسطح الآمنة تمنع الالتقاط تمامًا.\n
+        • كل شيء محلي: لا يوجد أي خادم خارجي في الحلقة.</string>
+
+    <string name="diag_hardware">عتادي</string>
+    <string name="diag_software">برمجي</string>
+    <string name="diag_copied">تم نسخ التقرير</string>
+    <string name="diag_overlay">إذن العرض فوق التطبيقات</string>
+    <string name="unit_ms">%1$d مللي ثانية</string>
+    <string name="unit_mbps">%1$s ميجابت/ثانية</string>
+    <string name="unit_fps">%1$d إطار/ثانية</string>
+</resources>

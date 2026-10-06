@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+        NETWORKING
+        Raw TCP/UDP sockets on the LAN. Nothing leaves the local network:
+        there is no server, no cloud relay and no analytics in this project.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
+    <!-- FOREGROUND SERVICES (host capture / client session) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- AUDIO (host: playback capture via MediaProjection, Android 10+) -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- INPUT VISUALISER overlay (optional, only used by the overlay injector) -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!--
+        NOTE (deliberately NOT requested):
+          * android.permission.INJECT_EVENTS is signature-level; a normal app can
+            never hold it, so we do not even declare it. See docs/LIMITATIONS.md.
+          * android.permission.CAPTURE_AUDIO_OUTPUT is privileged; MediaProjection
+            based playback capture does not need it, so it is not declared.
+          * QUERY_ALL_PACKAGES is not needed: the <queries> block below only asks
+            to see launcher apps, which is the documented way to build a launcher.
+    -->
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+
+    <application
+        android:name=".platform.NeurioApp"
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="false"
+        android:theme="@style/Theme.Neurio"
+        tools:targetApi="34">
+
+        <activity
+            android:name=".platform.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Neurio"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            HOST: owns the MediaProjection session. On Android 10+ a projection
+            may only be used from a foreground service of type mediaProjection.
+        -->
+        <service
+            android:name=".platform.HostStreamService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection"
+            tools:ignore="ForegroundServicePermission" />
+
+        <!-- CLIENT: keeps the decoder + input link alive while the user plays. -->
+        <service
+            android:name=".platform.ClientSessionService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice"
+            tools:ignore="ForegroundServicePermission" />
+
+        <!--
+            INPUT: the only legitimate way for a normal app to deliver touches
+            into another app. Opt-in in Android Settings -> Accessibility.
+        -->
+        <service
+            android:name=".platform.NeurioAccessibilityService"
+            android:exported="true"
+            android:label="@string/accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+    </application>
+
+</manifest>

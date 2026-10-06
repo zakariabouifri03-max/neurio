@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Stream "play" wedge -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M40,30 L82,54 L40,78 Z" />
+    <!-- Signal bars -->
+    <path
+        android:fillColor="#8B5CF6"
+        android:pathData="M22,46 L28,46 L28,74 L22,74 Z" />
+    <path
+        android:fillColor="#22D3EE"
+        android:pathData="M14,54 L19,54 L19,74 L14,74 Z" />
+</vector>
