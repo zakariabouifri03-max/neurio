@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- premium dark palette -->
+    <color name="bg">#FF07080A</color>
+    <color name="bg_panel">#F2131519</color>
+    <color name="bg_panel_soft">#B31A1D22</color>
+    <color name="stroke">#26FFFFFF</color>
+    <color name="stroke_strong">#4DFFFFFF</color>
+    <color name="text">#F2FFFFFF</color>
+    <color name="text_dim">#99FFFFFF</color>
+    <color name="text_faint">#66FFFFFF</color>
+    <color name="accent">#FFFFC24B</color>
+    <color name="accent_soft">#40FFC24B</color>
+    <color name="accent2">#FF4CE0D2</color>
+    <color name="accent2_soft">#334CE0D2</color>
+    <color name="danger">#FFFF5A5F</color>
+    <color name="shutter">#FFFFFFFF</color>
+    <color name="shutter_ring">#59FFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="ic_launcher_background">#FF07080A</color>
+</resources>

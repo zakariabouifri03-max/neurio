@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI Vision Camera</string>
+    <string name="app_name_ar">كاميرا الرؤية الذكية</string>
+    <string name="mode_photo">PHOTO</string>
+    <string name="mode_video">VIDEO</string>
+    <string name="mode_pro">PRO</string>
+    <string name="mode_night">NIGHT</string>
+    <string name="mode_ai">AI</string>
+    <string name="ai_enhance">AI ENHANCE</string>
+    <string name="ai_ultra">AI ULTRA</string>
+    <string name="ai_off">AI OFF</string>
+    <string name="processing">AI processing</string>
+    <string name="cancel">Cancel</string>
+    <string name="gallery">Gallery</string>
+    <string name="settings">Settings</string>
+    <string name="permission_needed">Camera permission is required to take photos and record video.</string>
+    <string name="grant">Grant permission</string>
+    <string name="saved">Saved</string>
+    <string name="raw_saved">RAW + JPEG saved</string>
+    <string name="ultra_note">AI Ultra uses a multi frame capture to recover real resolution beyond a single shot.</string>
+    <string name="not_native_4k">AI Enhanced 4K - upscaled from %1$s (native sensor resolution)</string>
+    <string name="native_4k">Native 4K</string>
+    <string name="before">Before</string>
+    <string name="after">After</string>
+    <string name="ai_report">AI report</string>
+    <string name="no_items">No photos or videos yet</string>
+</resources>
