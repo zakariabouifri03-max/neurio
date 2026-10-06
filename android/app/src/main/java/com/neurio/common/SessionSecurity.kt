@@ -71,6 +71,9 @@ object SessionSecurity {
 
     fun fromHex(hex: String): ByteArray? {
         if (hex.length % 2 != 0) return null
+        for (c in hex) {
+            if (Character.digit(c, 16) < 0) return null
+        }
         return try {
             ByteArray(hex.length / 2) { i ->
                 ((Character.digit(hex[i * 2], 16) shl 4) + Character.digit(hex[i * 2 + 1], 16)).toByte()

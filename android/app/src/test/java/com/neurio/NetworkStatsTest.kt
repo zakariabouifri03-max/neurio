@@ -47,8 +47,9 @@ class NetworkStatsTest {
     fun bitrateWindowProducesNonZeroRate() {
         val stats = NetworkStats()
         var nano = 0L
-        for (seq in 0 until 2000) {
-            nano += 500_000 // 0.5ms -> 1 second total
+        // 2200 packets x 0.5ms > 1s so the 1-second bitrate window rolls.
+        for (seq in 0 until 2200) {
+            nano += 500_000 // 0.5ms
             stats.recordVideoPacket(seq, 1200, nano)
         }
         assertTrue(stats.snapshotBitrateMbps() > 5.0)
