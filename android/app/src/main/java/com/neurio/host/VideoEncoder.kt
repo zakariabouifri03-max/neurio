@@ -199,7 +199,7 @@ class VideoEncoder(private val mime: String) {
     fun setBitrate(kbps: Int) {
         try {
             val params = Bundle()
-            params.putInt(MediaCodec.PARAMETER_KEY_BIT_RATE, kbps * 1000)
+            params.putInt(MediaCodec.PARAMETER_KEY_VIDEO_BITRATE, kbps * 1000)
             codec?.setParameters(params)
             AppLog.i(TAG, "bitrate set to ${kbps}kbps")
         } catch (e: Exception) {
@@ -210,7 +210,8 @@ class VideoEncoder(private val mime: String) {
     fun setFps(fps: Int) {
         try {
             val params = Bundle()
-            params.putInt(MediaCodec.PARAMETER_KEY_FRAME_RATE, fps)
+            // "frame-rate" is the documented runtime frame-rate parameter key.
+            params.putInt("frame-rate", fps)
             codec?.setParameters(params)
         } catch (e: Exception) {
             AppLog.w(TAG, "setFps: ${e.message}")

@@ -51,7 +51,7 @@ class JoystickView @JvmOverloads constructor(
         super.onDraw(canvas)
         val cx = width / 2f
         val cy = height / 2f
-        val radius = minOf(width, height) / 2f - dp(2)
+        val radius = minOf(width, height) / 2f - dp(2f)
         canvas.drawCircle(cx, cy, radius, baseFill)
         canvas.drawCircle(cx, cy, radius, basePaint)
         val kx = cx + knobX * radius

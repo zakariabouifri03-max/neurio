@@ -165,7 +165,7 @@ class TouchInjectionAdapter(private val context: Context) : GameInputAdapter {
 
     private fun handleButton(d: GestureDispatcher, event: Protocol.InputEvent) {
         if (event.value < 0.5f) return // release: taps are instantaneous
-        val pos: Pair<Float, Float>? = when (event.code) {
+        val pos = when (event.code) {
             Protocol.BTN_A -> Pair(BTN_CLUSTER_X, BTN_CLUSTER_Y + 0.06f)
             Protocol.BTN_B -> Pair(BTN_CLUSTER_X + 0.06f, BTN_CLUSTER_Y)
             Protocol.BTN_X -> Pair(BTN_CLUSTER_X - 0.06f, BTN_CLUSTER_Y)

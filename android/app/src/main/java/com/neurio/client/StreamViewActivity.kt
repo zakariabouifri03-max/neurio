@@ -130,7 +130,7 @@ class StreamViewActivity : AppCompatActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enterImmersive()
-        window.setKeepScreenOn(true)
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         handler.post(hudTicker)
     }
 

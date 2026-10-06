@@ -115,7 +115,7 @@ class ControlChannel(val socket: Socket) {
         val t = Thread {
             try {
                 while (isOpen) {
-                    val msg = read(input) ?: break
+                    val msg = ControlMessage.read(input) ?: break
                     try {
                         onMessage(msg)
                     } catch (e: Exception) {

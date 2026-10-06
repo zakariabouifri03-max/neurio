@@ -163,7 +163,7 @@ class StreamServer(private val context: Context) : PairingService.Callbacks {
         post { listener?.onPairingCode(pairingCode) }
     }
 
-    fun hostDisplayName(): String =
+    override fun hostDisplayName(): String =
         (Build.MODEL ?: "Android").ifBlank { "Android host" }
 
     private fun log(msg: String) {
