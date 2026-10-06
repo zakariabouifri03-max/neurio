@@ -1,2 +1,2 @@
-8d7ad6400215de001c994bc715334b933b56590b05f7747a1407694b9ebade7d  AIVision4K-debug.apk
-60031c6e9307f00d210b201b2603245663f1e38f0b9ffd94b2d66d1505aa5ab0  AIVision4K-release-unsigned-key.apk
+90bbd2e0a284c541cfd01c8dce3867a9bd55b3dff541f912672444da5332b2f2  AIVision4K-debug.apk
+5c1ae310af3fc56a5b75a1830053eec3cf4f5fdbdf8d90489c4e613ebbc2de22  AIVision4K-release-unsigned-key.apk
