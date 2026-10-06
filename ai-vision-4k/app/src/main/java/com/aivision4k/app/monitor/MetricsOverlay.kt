@@ -102,7 +102,7 @@ object MetricsOverlay {
                         snapshot.frameTimeMs?.let { String.format(Locale.US, "%.1f ms", it) } ?: "\u2014",
                         snapshot.cpuLoadFraction?.let { String.format(Locale.US, "%.0f%%", it * 100) } ?: "\u2014",
                         snapshot.ramUsedFraction?.let { String.format(Locale.US, "%.0f%%", it * 100) } ?: "\u2014",
-                        snapshot.batteryTemperatureC?.let { String.format(Locale.US, "%.1f \u00b0C", it) } ?: "n/a",
+                        snapshot.batteryTempC?.let { String.format(Locale.US, "%.1f \u00b0C", it) } ?: "n/a",
                         snapshot.note,
                     )
                 }
