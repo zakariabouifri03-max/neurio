@@ -1,0 +1,41 @@
+{
+  "bindings": [
+    {
+      "action": "MoveForward",
+      "keys": ["W", "Up"]
+    },
+    {
+      "action": "MoveBackward",
+      "keys": ["S", "Down"]
+    },
+    {
+      "action": "MoveLeft",
+      "keys": ["A", "Left"]
+    },
+    {
+      "action": "MoveRight",
+      "keys": ["D", "Right"]
+    },
+    {
+      "action": "Jump",
+      "keys": ["Space"]
+    },
+    {
+      "action": "Sprint",
+      "keys": ["LeftShift"]
+    },
+    {
+      "action": "Interact",
+      "keys": ["E"]
+    },
+    {
+      "action": "Pause",
+      "keys": ["Escape"]
+    },
+    {
+      "action": "Fire",
+      "keys": [],
+      "mouseButton": "Left"
+    }
+  ]
+}

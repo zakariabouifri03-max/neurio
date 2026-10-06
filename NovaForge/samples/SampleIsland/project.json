@@ -1,0 +1,70 @@
+{
+  "name": "SampleIsland",
+  "version": "1.0.0",
+  "description": "NovaForge Engine sample project - walk, jump, fight, explore.",
+  "company": "Independent",
+  "window": {
+    "width": 1280,
+    "height": 720,
+    "fullscreen": false,
+    "vsync": true,
+    "targetFps": 0,
+    "showConsoleWindow": false,
+    "icon": ""
+  },
+  "graphics": {
+    "quality": 2,
+    "fieldOfView": 60,
+    "showFpsInGame": true,
+    "allowWindowedToggle": true
+  },
+  "gameplay": {
+    "gravity": -20,
+    "masterVolume": 0.800000012,
+    "startScene": "Assets/Scenes/SampleIsland.nfscene"
+  },
+  "input": [
+    {
+      "action": "MoveForward",
+      "keys": ["W", "Up"]
+    },
+    {
+      "action": "MoveBackward",
+      "keys": ["S", "Down"]
+    },
+    {
+      "action": "MoveLeft",
+      "keys": ["A", "Left"]
+    },
+    {
+      "action": "MoveRight",
+      "keys": ["D", "Right"]
+    },
+    {
+      "action": "Jump",
+      "keys": ["Space"]
+    },
+    {
+      "action": "Sprint",
+      "keys": ["LeftShift"]
+    },
+    {
+      "action": "Interact",
+      "keys": ["E"]
+    },
+    {
+      "action": "Pause",
+      "keys": ["Escape"]
+    },
+    {
+      "action": "Fire",
+      "keys": [],
+      "mouseButton": "Left"
+    }
+  ],
+  "tags": ["Untagged", "Player", "Enemy", "Ground", "Pickup", "Door", "Trigger"],
+  "format": {
+    "generator": "NovaForge Engine",
+    "formatVersion": 1
+  }
+}

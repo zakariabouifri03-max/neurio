@@ -1,0 +1,1551 @@
+{
+  "format": "NovaForge Scene",
+  "version": 1,
+  "name": "SampleIsland",
+  "environment": {
+    "ambientColor": [0.319999993, 0.349999994, 0.419999987],
+    "ambientIntensity": 1,
+    "skyTop": [0.349999994, 0.550000012, 0.899999976],
+    "skyBottom": [0.800000012, 0.850000024, 0.949999988],
+    "fogColor": [0.620000005, 0.699999988, 0.819999993],
+    "fogEnabled": false,
+    "fogStart": 30,
+    "fogEnd": 180,
+    "gravity": [0, -20, 0],
+    "showSkybox": true,
+    "showGrid": true,
+    "gridSpacing": 1
+  },
+  "objects": [
+    {
+      "id": 1,
+      "name": "Ground_1",
+      "tag": "Ground",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [0, 0, 0],
+            "rotationEuler": [0, 0, 0],
+            "scale": [6, 1, 6]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 2,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.360000014, 0.449999988, 0.319999993, 1],
+            "metallic": 0,
+            "roughness": 0.920000017,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 15
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 0,
+            "isTrigger": false,
+            "center": [0, -0.100000001, 0],
+            "size": [10, 0.200000003, 10],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "enabled": true,
+          "properties": {
+            "mass": 1,
+            "useGravity": false,
+            "isKinematic": true,
+            "drag": 0.0199999996,
+            "angularDrag": 0.0500000007,
+            "freezeRotation": true,
+            "freezeX": false,
+            "freezeY": false,
+            "freezeZ": false
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "RaisedPlatform_1",
+      "tag": "Ground",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [9, 1.60000002, -4],
+            "rotationEuler": [0, 0, 0],
+            "scale": [10, 0.600000024, 10]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 0,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.419999987, 0.439999998, 0.479999989, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 0,
+            "isTrigger": false,
+            "center": [0, 0.5, 0],
+            "size": [1, 1, 1],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Sun_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [12, 18, 8],
+            "rotationEuler": [50, -35, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "Light",
+          "enabled": true,
+          "properties": {
+            "lightType": 0,
+            "color": [1, 0.959999979, 0.860000014],
+            "intensity": 1.14999998,
+            "range": 12,
+            "innerAngle": 25,
+            "outerAngle": 35,
+            "castShadows": true,
+            "shadowStrength": 0.850000024,
+            "shadowBias": 0.00150000001
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "DoorLamp_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [-6, 3.4000001, 2],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "Light",
+          "enabled": true,
+          "properties": {
+            "lightType": 1,
+            "color": [1, 0.779999971, 0.449999988],
+            "intensity": 2.4000001,
+            "range": 14,
+            "innerAngle": 25,
+            "outerAngle": 35,
+            "castShadows": true,
+            "shadowStrength": 0.850000024,
+            "shadowBias": 0.00150000001
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Player_1",
+      "tag": "Player",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [0, 1.20000005, -8],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 4,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.25, 0.550000012, 0.949999988, 1],
+            "metallic": 0,
+            "roughness": 0.5,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "CharacterController",
+          "enabled": true,
+          "properties": {
+            "viewMode": 0,
+            "moveSpeed": 5.5,
+            "sprintMultiplier": 1.79999995,
+            "enableSprint": true,
+            "jumpHeight": 1.35000002,
+            "gravity": -20,
+            "airControl": 0.349999994,
+            "rotateTowardsMovement": true,
+            "turnSpeed": 12,
+            "mouseSensitivity": 0.129999995,
+            "invertY": false,
+            "cameraDistance": 4.5,
+            "cameraHeight": 1.60000002,
+            "cameraPitchOffset": 10,
+            "pitchMin": -75,
+            "pitchMax": 75,
+            "capsuleRadius": 0.400000006,
+            "capsuleHeight": 1.79999995,
+            "autoCreateCamera": true,
+            "useControllerAnimation": true
+          }
+        },
+        {
+          "type": "Health",
+          "enabled": true,
+          "properties": {
+            "maxHealth": 120,
+            "currentHealth": 120,
+            "regenerationPerSecond": 2,
+            "invulnerableTime": 0,
+            "isPlayer": true,
+            "destroyOnDeath": false,
+            "deathEvent": "PlayerDied"
+          }
+        },
+        {
+          "type": "Animator",
+          "enabled": true,
+          "properties": {
+            "animationAsset": "",
+            "defaultClip": "Idle",
+            "walkClip": "Walk",
+            "runClip": "Run",
+            "attackClip": "Attack",
+            "deathClip": "Death",
+            "playOnStart": true,
+            "loop": true,
+            "speed": 1,
+            "rootMotion": false
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 2,
+            "isTrigger": false,
+            "center": [0, 0.899999976, 0],
+            "size": [1, 1, 1],
+            "radius": 0.400000006,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "enabled": true,
+          "properties": {
+            "mass": 70,
+            "useGravity": false,
+            "isKinematic": true,
+            "drag": 0.0199999996,
+            "angularDrag": 0.0500000007,
+            "freezeRotation": true,
+            "freezeX": false,
+            "freezeY": false,
+            "freezeZ": false
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Guard_1",
+      "tag": "Enemy",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [-9, 0.899999976, 7],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 4,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.850000024, 0.300000012, 0.25, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "AI",
+          "enabled": true,
+          "properties": {
+            "behavior": 1,
+            "detectionRadius": 16,
+            "loseTargetRadius": 22,
+            "targetTag": "Player",
+            "explicitTarget": 0,
+            "requireLineOfSight": false,
+            "moveSpeed": 2.5999999,
+            "chaseSpeed": 3.79999995,
+            "turnSpeed": 6,
+            "gravity": -20,
+            "patrolPoints": [
+              [-12, 0.899999976, 4],
+              [-12, 0.899999976, 12],
+              [-4, 0.899999976, 12]
+            ],
+            "patrolWaitTime": 1.5,
+            "wanderRadius": 8,
+            "canAttack": true,
+            "attackRange": 2.20000005,
+            "attackDamage": 8,
+            "attackCooldown": 1.39999998,
+            "attackWindup": 0.349999994,
+            "animateMovement": true
+          }
+        },
+        {
+          "type": "Health",
+          "enabled": true,
+          "properties": {
+            "maxHealth": 60,
+            "currentHealth": 60,
+            "regenerationPerSecond": 0,
+            "invulnerableTime": 0,
+            "isPlayer": false,
+            "destroyOnDeath": true,
+            "deathEvent": "EnemyDefeated"
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 2,
+            "isTrigger": false,
+            "center": [0, 0.850000024, 0],
+            "size": [1, 1, 1],
+            "radius": 0.449999988,
+            "height": 1.70000005,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "enabled": true,
+          "properties": {
+            "mass": 60,
+            "useGravity": true,
+            "isKinematic": false,
+            "drag": 0.0199999996,
+            "angularDrag": 0.0500000007,
+            "freezeRotation": true,
+            "freezeX": false,
+            "freezeY": false,
+            "freezeZ": false
+          }
+        },
+        {
+          "type": "Animator",
+          "enabled": true,
+          "properties": {
+            "animationAsset": "",
+            "defaultClip": "Idle",
+            "walkClip": "Walk",
+            "runClip": "Run",
+            "attackClip": "Attack",
+            "deathClip": "Death",
+            "playOnStart": true,
+            "loop": true,
+            "speed": 1,
+            "rootMotion": false
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Brute_1",
+      "tag": "Enemy",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [11, 2.5, -6],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 4,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.850000024, 0.300000012, 0.25, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "AI",
+          "enabled": true,
+          "properties": {
+            "behavior": 3,
+            "detectionRadius": 16,
+            "loseTargetRadius": 22,
+            "targetTag": "Player",
+            "explicitTarget": 0,
+            "requireLineOfSight": false,
+            "moveSpeed": 3.4000001,
+            "chaseSpeed": 4.60000038,
+            "turnSpeed": 6,
+            "gravity": -20,
+            "patrolPoints": [
+              [-12, 0.899999976, 4],
+              [-12, 0.899999976, 12],
+              [-4, 0.899999976, 12]
+            ],
+            "patrolWaitTime": 1.5,
+            "wanderRadius": 8,
+            "canAttack": true,
+            "attackRange": 2.20000005,
+            "attackDamage": 14,
+            "attackCooldown": 1.39999998,
+            "attackWindup": 0.349999994,
+            "animateMovement": true
+          }
+        },
+        {
+          "type": "Health",
+          "enabled": true,
+          "properties": {
+            "maxHealth": 60,
+            "currentHealth": 60,
+            "regenerationPerSecond": 0,
+            "invulnerableTime": 0,
+            "isPlayer": false,
+            "destroyOnDeath": true,
+            "deathEvent": "EnemyDefeated"
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 2,
+            "isTrigger": false,
+            "center": [0, 0.850000024, 0],
+            "size": [1, 1, 1],
+            "radius": 0.449999988,
+            "height": 1.70000005,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "enabled": true,
+          "properties": {
+            "mass": 60,
+            "useGravity": true,
+            "isKinematic": false,
+            "drag": 0.0199999996,
+            "angularDrag": 0.0500000007,
+            "freezeRotation": true,
+            "freezeX": false,
+            "freezeY": false,
+            "freezeZ": false
+          }
+        },
+        {
+          "type": "Animator",
+          "enabled": true,
+          "properties": {
+            "animationAsset": "",
+            "defaultClip": "Idle",
+            "walkClip": "Walk",
+            "runClip": "Run",
+            "attackClip": "Attack",
+            "deathClip": "Death",
+            "playOnStart": true,
+            "loop": true,
+            "speed": 1,
+            "rootMotion": false
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Scout_1",
+      "tag": "Enemy",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [6, 0.899999976, 9],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 4,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.850000024, 0.300000012, 0.25, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "AI",
+          "enabled": true,
+          "properties": {
+            "behavior": 3,
+            "detectionRadius": 16,
+            "loseTargetRadius": 22,
+            "targetTag": "Player",
+            "explicitTarget": 0,
+            "requireLineOfSight": false,
+            "moveSpeed": 4,
+            "chaseSpeed": 5.19999981,
+            "turnSpeed": 6,
+            "gravity": -20,
+            "patrolPoints": [
+              [-12, 0.899999976, 4],
+              [-12, 0.899999976, 12],
+              [-4, 0.899999976, 12]
+            ],
+            "patrolWaitTime": 1.5,
+            "wanderRadius": 8,
+            "canAttack": true,
+            "attackRange": 2.20000005,
+            "attackDamage": 6,
+            "attackCooldown": 1.39999998,
+            "attackWindup": 0.349999994,
+            "animateMovement": true
+          }
+        },
+        {
+          "type": "Health",
+          "enabled": true,
+          "properties": {
+            "maxHealth": 60,
+            "currentHealth": 60,
+            "regenerationPerSecond": 0,
+            "invulnerableTime": 0,
+            "isPlayer": false,
+            "destroyOnDeath": true,
+            "deathEvent": "EnemyDefeated"
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 2,
+            "isTrigger": false,
+            "center": [0, 0.850000024, 0],
+            "size": [1, 1, 1],
+            "radius": 0.449999988,
+            "height": 1.70000005,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "enabled": true,
+          "properties": {
+            "mass": 60,
+            "useGravity": true,
+            "isKinematic": false,
+            "drag": 0.0199999996,
+            "angularDrag": 0.0500000007,
+            "freezeRotation": true,
+            "freezeX": false,
+            "freezeY": false,
+            "freezeZ": false
+          }
+        },
+        {
+          "type": "Animator",
+          "enabled": true,
+          "properties": {
+            "animationAsset": "",
+            "defaultClip": "Idle",
+            "walkClip": "Walk",
+            "runClip": "Run",
+            "attackClip": "Attack",
+            "deathClip": "Death",
+            "playOnStart": true,
+            "loop": true,
+            "speed": 1,
+            "rootMotion": false
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Gate_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [-4.5999999, 0, 4.5],
+            "rotationEuler": [0, 90, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 0,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.550000012, 0.379999995, 0.219999999, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 0,
+            "isTrigger": false,
+            "center": [0, 0.5, 0],
+            "size": [1, 1, 1],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "Door",
+          "enabled": true,
+          "properties": {
+            "openAngle": 95,
+            "openSpeed": 120,
+            "autoClose": true,
+            "autoCloseDelay": 4,
+            "locked": false,
+            "requiredKeyTag": "Key",
+            "hingeAxis": [0, 1, 0],
+            "startOpen": false,
+            "openSound": ""
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Gate_Trigger",
+      "tag": "Untagged",
+      "active": true,
+      "parent": 9,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [0, 0, 1.79999995],
+            "rotationEuler": [0, 0, 0],
+            "scale": [0.833333313, 0.454545438, 6.66666651]
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 0,
+            "isTrigger": true,
+            "center": [0, 1.20000005, 0],
+            "size": [3, 2.4000001, 3],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "HealthPack_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [3.5, 0.899999976, -2.5],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 1,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.899999976, 0.200000003, 0.25, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0.314999998, 0.0700000003, 0.0874999985],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "Pickup",
+          "enabled": true,
+          "properties": {
+            "kind": 0,
+            "amount": 30,
+            "pickupRadius": 1.60000002,
+            "spinSpeed": 90,
+            "bobHeight": 0.25,
+            "destroyOnPickup": true,
+            "respawnSeconds": 0,
+            "pickupEvent": "ItemPickedUp",
+            "requiredTag": "Player"
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 1,
+            "isTrigger": true,
+            "center": [0, 0, 0],
+            "size": [1, 1, 1],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "AmmoBox_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [-2, 0.899999976, -6.5],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 0,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.899999976, 0.75, 0.200000003, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0.314999998, 0.262499988, 0.0700000003],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "Pickup",
+          "enabled": true,
+          "properties": {
+            "kind": 1,
+            "amount": 1,
+            "pickupRadius": 1.60000002,
+            "spinSpeed": 90,
+            "bobHeight": 0.25,
+            "destroyOnPickup": true,
+            "respawnSeconds": 0,
+            "pickupEvent": "ItemPickedUp",
+            "requiredTag": "Player"
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 1,
+            "isTrigger": true,
+            "center": [0, 0, 0],
+            "size": [1, 1, 1],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "WelcomeTrigger_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [0, 1.5, 2],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 0,
+            "isTrigger": true,
+            "center": [0, 1.5, 0],
+            "size": [6, 3, 6],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "TriggerVolume",
+          "enabled": true,
+          "properties": {
+            "requiredTag": "Player",
+            "oneShot": true,
+            "action": 1,
+            "message": "Message:Welcome to NovaForge! Find the gate and fight the guards.",
+            "targetEntity": 0,
+            "spawnObjectName": "",
+            "questEntity": 0,
+            "healAmount": 25
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "SpinningCrate_1",
+      "tag": "Pickup",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [-1.5, 0.400000006, -3],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 0,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.850000024, 0.620000005, 0.25, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 0,
+            "isTrigger": false,
+            "center": [0, 0.5, 0],
+            "size": [1, 1, 1],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "enabled": true,
+          "properties": {
+            "mass": 2,
+            "useGravity": true,
+            "isKinematic": false,
+            "drag": 0.0199999996,
+            "angularDrag": 0.0500000007,
+            "freezeRotation": true,
+            "freezeX": false,
+            "freezeY": false,
+            "freezeZ": false
+          }
+        },
+        {
+          "type": "Script",
+          "enabled": true,
+          "properties": {
+            "className": "Rotator",
+            "sourcePath": "Assets/Scripts/Spinner.nfscript",
+            "modulePath": "",
+            "logStart": false
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Crate1_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [5.5, 0.400000006, -1],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 0,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.550000012, 0.419999987, 0.300000012, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 0,
+            "isTrigger": false,
+            "center": [0, 0.5, 0],
+            "size": [1, 1, 1],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "enabled": true,
+          "properties": {
+            "mass": 2,
+            "useGravity": true,
+            "isKinematic": false,
+            "drag": 0.0199999996,
+            "angularDrag": 0.0500000007,
+            "freezeRotation": true,
+            "freezeX": false,
+            "freezeY": false,
+            "freezeZ": false
+          }
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Crate2_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [6.4000001, 0.400000006, -1.89999998],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 0,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.550000012, 0.419999987, 0.300000012, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 0,
+            "isTrigger": false,
+            "center": [0, 0.5, 0],
+            "size": [1, 1, 1],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "enabled": true,
+          "properties": {
+            "mass": 2,
+            "useGravity": true,
+            "isKinematic": false,
+            "drag": 0.0199999996,
+            "angularDrag": 0.0500000007,
+            "freezeRotation": true,
+            "freezeX": false,
+            "freezeY": false,
+            "freezeZ": false
+          }
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "RedCrate_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [-8.5, 0.400000006, -3],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1.20000005, 1.20000005, 1.20000005]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 0,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.620000005, 0.300000012, 0.300000012, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        },
+        {
+          "type": "Collider",
+          "enabled": true,
+          "properties": {
+            "shape": 0,
+            "isTrigger": false,
+            "center": [0, 0.5, 0],
+            "size": [1, 1, 1],
+            "radius": 0.5,
+            "height": 1.79999995,
+            "friction": 0.600000024,
+            "restitution": 0,
+            "layer": 0,
+            "visibleInEditor": true
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "enabled": true,
+          "properties": {
+            "mass": 2,
+            "useGravity": true,
+            "isKinematic": false,
+            "drag": 0.0199999996,
+            "angularDrag": 0.0500000007,
+            "freezeRotation": true,
+            "freezeX": false,
+            "freezeY": false,
+            "freezeZ": false
+          }
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "name": "Pillar1_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [-14, 2, 14],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1.20000005, 4, 1.20000005]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 3,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.680000007, 0.660000026, 0.600000024, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "name": "Pillar2_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [-8, 2, 14],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1.20000005, 4, 1.20000005]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 3,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.680000007, 0.660000026, 0.600000024, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Pillar3_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [-2, 2, 14],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1.20000005, 4, 1.20000005]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 3,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.680000007, 0.660000026, 0.600000024, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "name": "Pillar4_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [4, 2, 14],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1.20000005, 4, 1.20000005]
+          }
+        },
+        {
+          "type": "MeshRenderer",
+          "enabled": true,
+          "properties": {
+            "meshSource": 0,
+            "primitive": 3,
+            "meshAsset": "",
+            "visible": true,
+            "castShadows": true,
+            "receiveShadows": true,
+            "useMaterialFile": false,
+            "materialAsset": "",
+            "baseColor": [0.680000007, 0.660000026, 0.600000024, 1],
+            "metallic": 0,
+            "roughness": 0.600000024,
+            "opacity": 1,
+            "emissiveColor": [0, 0, 0],
+            "unlit": false,
+            "doubleSided": false,
+            "baseColorTexture": "",
+            "normalTexture": "",
+            "uvTiling": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "name": "Objectives_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [0, 0, 0],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "Quest",
+          "enabled": true,
+          "properties": {
+            "questName": "Survive the island",
+            "description": "Talk to the villager.",
+            "objectives": [],
+            "complete": false,
+            "completedEvent": "QuestCompleted"
+          }
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "name": "Ambience_1",
+      "tag": "Untagged",
+      "active": true,
+      "components": [
+        {
+          "type": "Transform",
+          "enabled": true,
+          "properties": {
+            "position": [0, 1, 0],
+            "rotationEuler": [0, 0, 0],
+            "scale": [1, 1, 1]
+          }
+        },
+        {
+          "type": "AudioSource",
+          "enabled": true,
+          "properties": {
+            "clipPath": "Assets/Audio/ambience.wav",
+            "volume": 1,
+            "pitch": 1,
+            "loop": false,
+            "playOnAwake": true,
+            "spatial": true,
+            "minDistance": 1,
+            "maxDistance": 25,
+            "playEvent": ""
+          }
+        }
+      ]
+    }
+  ],
+  "playerObject": "Player_1"
+}

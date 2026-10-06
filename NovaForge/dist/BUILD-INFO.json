@@ -1,0 +1,23 @@
+{
+  "editor": {
+    "file": "NovaForge.exe",
+    "bytes": 4144640,
+    "machine": "0x8664",
+    "bits": 64,
+    "subsystem": "windows-gui",
+    "sha256": "f1fc9447d2caa5b8bb03cc6f00bc656a56bf2dd23ce981c4e81503372155db50"
+  },
+  "game": {
+    "file": "NovaForgeGame.exe",
+    "bytes": 4008960,
+    "machine": "0x8664",
+    "bits": 64,
+    "subsystem": "console",
+    "sha256": "e1410be95a55f3a9809e237529927e45f0d0ca814852bed688a8ba4207dab5d0"
+  },
+  "project": "samples/SampleIsland",
+  "packages": {
+    "NovaForge-SampleIsland-Windows-x64.zip": 1938649,
+    "NovaForge-Editor-Windows-x64.zip": 2004121
+  }
+}

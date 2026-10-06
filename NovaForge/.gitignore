@@ -1,0 +1,15 @@
+# NovaForge build artifacts (never commit generated output)
+build/
+dist/
+*.o
+*.obj
+*.a
+*.exe
+*.dll
+*.pdb
+*.ilk
+obj/
+unity/
+.cache/
+Logs/
+Builds/

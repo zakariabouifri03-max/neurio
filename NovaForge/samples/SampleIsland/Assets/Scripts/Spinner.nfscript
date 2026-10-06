@@ -1,0 +1,35 @@
+{
+  "format": "NovaForge Script",
+  "version": 1,
+  "name": "Spinner",
+  "variables": {
+    "count": 0
+  },
+  "on_start": [
+    {
+      "action": "log",
+      "message": "Spinner started"
+    }
+  ],
+  "on_update": [
+    {
+      "action": "rotate",
+      "axis": [0, 1, 0],
+      "speed": 90
+    }
+  ],
+  "on_trigger": [
+    {
+      "action": "if",
+      "condition": {
+        "type": "triggered"
+      },
+      "then": [
+        {
+          "action": "message",
+          "message": "Spinner: trigger entered"
+        }
+      ]
+    }
+  ]
+}

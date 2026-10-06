@@ -1,0 +1,35 @@
+{
+  "format": "NovaForge Script",
+  "version": 1,
+  "name": "BobbingCrate",
+  "variables": {
+    "count": 0
+  },
+  "on_start": [
+    {
+      "action": "log",
+      "message": "BobbingCrate started"
+    }
+  ],
+  "on_update": [
+    {
+      "action": "bob",
+      "amplitude": 0.4,
+      "speed": 1.5
+    }
+  ],
+  "on_trigger": [
+    {
+      "action": "if",
+      "condition": {
+        "type": "triggered"
+      },
+      "then": [
+        {
+          "action": "message",
+          "message": "BobbingCrate: trigger entered"
+        }
+      ]
+    }
+  ]
+}
