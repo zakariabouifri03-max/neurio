@@ -249,4 +249,5 @@
     <string name="state_error_short">ERROR</string>
     <string name="smaller">− size</string>
     <string name="bigger">+ size</string>
+    <string name="warn_audio_mic_fallback">This game refused internal audio capture — streaming the microphone instead.</string>
 </resources>

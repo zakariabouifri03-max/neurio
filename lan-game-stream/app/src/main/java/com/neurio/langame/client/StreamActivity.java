@@ -78,6 +78,8 @@ public class StreamActivity extends Activity
     private boolean editMode;
     private int presetIndex = LAYOUT_PRESET_INDEX;
     private boolean keyMode;
+    /** True while we deliberately keep the session alive across an onStop. */
+    private boolean keepAlive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,8 +143,10 @@ public class StreamActivity extends Activity
         findViewById(R.id.stream_btn_controls).setOnClickListener(v -> toggleControls());
         findViewById(R.id.stream_btn_layout).setOnClickListener(v -> showLayoutDialog());
         findViewById(R.id.stream_btn_edit).setOnClickListener(v -> setEditMode(!editMode));
-        findViewById(R.id.stream_btn_perf).setOnClickListener(v ->
-                startActivity(new Intent(this, PerformanceActivity.class)));
+        findViewById(R.id.stream_btn_perf).setOnClickListener(v -> {
+            keepAlive = true;   // the stream keeps running while the numbers are read
+            startActivity(new Intent(this, PerformanceActivity.class));
+        });
         findViewById(R.id.stream_btn_disconnect).setOnClickListener(v -> disconnect());
         findViewById(R.id.stream_btn_smaller).setOnClickListener(v -> {
             layout.resize(0.9f);
@@ -184,18 +188,30 @@ public class StreamActivity extends Activity
     @Override
     protected void onStart() {
         super.onStart();
-        connect();
+        if (client == null) {
+            connect();
+        }
     }
 
     @Override
     protected void onStop() {
-        if (client != null) {
-            client.disconnect();
-            client.close();
-            client = null;
+        // Opening the performance screen must not kill the session: only a real exit
+        // (back/home) disconnects. keepAlive is set right before that navigation.
+        if (!keepAlive && !isChangingConfigurations()) {
+            if (client != null) {
+                client.disconnect();
+                client.close();
+                client = null;
+            }
+            ClientStatsHolder.clear();
         }
-        ClientStatsHolder.clear();
         super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        keepAlive = false;
     }
 
     private void connect() {

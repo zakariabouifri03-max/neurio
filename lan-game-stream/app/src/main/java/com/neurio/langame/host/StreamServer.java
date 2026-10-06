@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.neurio.langame.common.AppSettings;
+import com.neurio.langame.R;
 import com.neurio.langame.common.Configuration;
 import com.neurio.langame.common.DeviceInfo;
 import com.neurio.langame.common.Logger;
@@ -363,19 +364,50 @@ public final class StreamServer {
                     handshake.clientAudioPort, handshake.sessionTag);
             audioEncoder = new AudioEncoder(new AudioEncoderListener());
             audioEncoder.start();
-            audioCapture = new AudioCapture(context, AudioCapture.Source.PLAYBACK_CAPTURE,
-                    new AudioCaptureListener());
-            if (audioCapture.start(projection)) {
+
+            AudioCaptureSource preferred = AudioCapture.supportsPlaybackCapture()
+                    ? AudioCapture.Source.PLAYBACK_CAPTURE : AudioCapture.Source.MICROPHONE;
+            audioCapture = new AudioCapture(context, preferred, new AudioCaptureListener());
+            if (audioCapture.start(preferred == AudioCapture.Source.PLAYBACK_CAPTURE
+                    ? projection : null)) {
                 stats.audioActive = true;
-                stats.audioNote = "internal audio capture (API 29+ playback capture)";
-            } else {
-                stats.audioActive = false;
+                stats.audioNote = preferred == AudioCapture.Source.PLAYBACK_CAPTURE
+                        ? "internal audio capture (AudioPlaybackCapture)"
+                        : "microphone fallback (this Android version has no playback capture)";
+                return;
             }
+
+            // Playback capture is frequently refused: the game may have opted out, or
+            // the usage is not MEDIA/GAME/UNKNOWN. Fall back to the microphone and say
+            // so honestly on both screens instead of silently going quiet.
+            if (preferred == AudioCapture.Source.PLAYBACK_CAPTURE) {
+                stopAudioCaptureOnly();
+                audioCapture = new AudioCapture(context, AudioCapture.Source.MICROPHONE,
+                        new AudioCaptureListener());
+                if (audioCapture.start(null)) {
+                    stats.audioActive = true;
+                    stats.audioNote = "microphone fallback (the game refused internal capture)";
+                    warn(context.getString(R.string.warn_audio_mic_fallback));
+                    return;
+                }
+            }
+            stats.audioActive = false;
+            stats.audioNote = "audio unavailable on this device";
+            warn(context.getString(R.string.warn_no_audio));
+            stopAudio();
         } catch (Throwable t) {
             stats.audioActive = false;
             stats.audioNote = "audio unavailable: " + t.getMessage();
             Logger.w(TAG, "Audio pipeline not started: " + t.getMessage());
             stopAudio();
+        }
+    }
+
+    /** Releases only the capture side, keeping the encoder/sender for a retry. */
+    private void stopAudioCaptureOnly() {
+        if (audioCapture != null) {
+            audioCapture.stop();
+            audioCapture = null;
         }
     }
 
