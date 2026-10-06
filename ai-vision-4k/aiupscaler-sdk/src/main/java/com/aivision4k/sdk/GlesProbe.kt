@@ -113,11 +113,17 @@ object GlesProbe {
             val glVersion = GLES20.glGetString(GLES20.GL_VERSION) ?: ""
             val (major, minor) = parseVersion(glVersion)
             val compute = major > 3 || (major == 3 && minor >= 1)
-            val maxTextureSize = GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE).coerceAtLeast(0)
+            // glGetIntegerv has no scalar overload in GLES20/GLES31: the value is
+            // written into a one-element array.
+            val textureSizeQuery = IntArray(1)
+            GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, textureSizeQuery, 0)
+            val maxTextureSize = textureSizeQuery[0].coerceAtLeast(0)
             var maxInvocations = 0
             if (compute) {
                 maxInvocations = try {
-                    GLES31.glGetInteger(GLES31.GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS)
+                    val query = IntArray(1)
+                    GLES31.glGetIntegerv(GLES31.GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, query, 0)
+                    query[0]
                 } catch (error: Throwable) {
                     0
                 }

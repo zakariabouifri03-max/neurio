@@ -56,7 +56,7 @@ object AndroidCapsCollector {
             put("supportsArm64", Build.SUPPORTED_ABIS.any { it == "arm64-v8a" })
             put("isEmulator", isEmulator())
             put("hdrDisplay", hdrDisplay(context))
-            put("displayRefreshRate", metrics?.refreshRate ?: 60.0f)
+            put("displayRefreshRate", refreshRate(context))
             put("displayWidth", metrics?.widthPixels ?: 0)
             put("displayHeight", metrics?.heightPixels ?: 0)
             put("displayDensityDpi", metrics?.densityDpi ?: 0)
@@ -102,6 +102,22 @@ object AndroidCapsCollector {
         manager?.defaultDisplay
     } catch (error: Throwable) {
         null
+    }
+
+    /**
+     * Current refresh rate in Hz.
+     *
+     * `DisplayMetrics.refreshRate` is not part of the public platform jar on
+     * every SDK level, so the rate is read from the `Display` itself, which has
+     * exposed it since API 1. Falling back to 60 Hz is a deliberate, visible
+     * default: the engine treats the rate as a hint, never as a measurement.
+     */
+    @Suppress("DEPRECATION")
+    private fun refreshRate(context: Context): Float = try {
+        val manager = context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+        manager?.defaultDisplay?.refreshRate?.takeIf { it > 0f } ?: 60.0f
+    } catch (error: Throwable) {
+        60.0f
     }
 
     @Suppress("DEPRECATION")
