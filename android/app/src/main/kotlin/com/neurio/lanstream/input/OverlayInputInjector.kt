@@ -78,7 +78,7 @@ class OverlayInputInjector(private val context: Context) : InputInjector {
             } else {
                 windowManager.updateViewLayout(view, params)
             }
-            view.pressed = pressed
+            view.touching = pressed
         } catch (t: Throwable) {
             Log.w("Overlay show failed: ${t.message}")
             attached = false
@@ -119,7 +119,10 @@ class OverlayInputInjector(private val context: Context) : InputInjector {
 
     private class MarkerView(context: Context) : View(context) {
 
-        var pressed: Boolean = false
+        // NOTE: not called "pressed" - View already has setPressed(boolean),
+        // and a Kotlin property with that name would generate the same JVM
+        // signature (accidental override).
+        var touching: Boolean = false
             set(value) {
                 field = value
                 invalidate()
@@ -141,7 +144,7 @@ class OverlayInputInjector(private val context: Context) : InputInjector {
             val centre = MARKER_SIZE / 2f
             val radius = centre - 6f
             canvas.drawCircle(centre, centre, radius, ringPaint)
-            if (pressed) {
+            if (touching) {
                 canvas.drawCircle(centre, centre, radius * 0.55f, fillPaint)
             }
         }
