@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>YouTube Smooth 1080p — Settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>YouTube Smooth 1080p</h1>
+        <p class="tag">Settings, privacy and an honest explanation of what this can and cannot do.</p>
+      </div>
+      <span class="ver" id="ver">v1.0.0</span>
+    </header>
+
+    <div class="grid">
+      <!-- ── Core ───────────────────────────────────────────────────────── -->
+      <section class="card">
+        <h2>Core</h2>
+
+        <label class="row toggle">
+          <span class="row-txt">
+            <b>Smart Buffer Protection</b>
+            <small>When the playable runway gets short, pause for a moment to download more video, then resume automatically.</small>
+          </span>
+          <input type="checkbox" data-key="smartBuffer" />
+          <span class="track"><i></i></span>
+        </label>
+
+        <label class="row toggle">
+          <span class="row-txt">
+            <b>Maximum Smoothness Mode</b>
+            <small>Intervenes earlier, aims for a bigger buffer (~20&nbsp;s), monitors bandwidth more often and lets the optional levers below work harder. Never changes resolution.</small>
+          </span>
+          <input type="checkbox" data-key="maxSmoothness" />
+          <span class="track"><i></i></span>
+        </label>
+
+        <label class="row toggle">
+          <span class="row-txt">
+            <b>In-page dashboard</b>
+            <small>Small draggable overlay on YouTube showing connection, speed, quality, buffer and playback state. Shortcut: <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd>.</small>
+          </span>
+          <input type="checkbox" data-key="hudEnabled" />
+          <span class="track"><i></i></span>
+        </label>
+      </section>
+
+      <!-- ── Tuning ─────────────────────────────────────────────────────── -->
+      <section class="card">
+        <h2>Buffer protection tuning</h2>
+
+        <label class="row field">
+          <span class="row-txt"><b>Low-water mark</b><small>Pause when the playable runway drops below this.</small></span>
+          <span class="input"><input type="number" min="1" max="30" step="1" data-key="lowWaterSec" /> s</span>
+        </label>
+
+        <label class="row field">
+          <span class="row-txt"><b>Resume target</b><small>Resume once this much video is buffered.</small></span>
+          <span class="input"><input type="number" min="3" max="120" step="1" data-key="resumeSec" /> s</span>
+        </label>
+
+        <label class="row field">
+          <span class="row-txt"><b>Maximum pause</b><small>Never hold a protective pause longer than this, even if the buffer is still filling.</small></span>
+          <span class="input"><input type="number" min="1500" max="60000" step="500" data-key="maxPauseMs" /> ms</span>
+        </label>
+
+        <label class="row field">
+          <span class="row-txt"><b>Cooldown</b><small>Minimum time between two interventions.</small></span>
+          <span class="input"><input type="number" min="5" max="300" step="5" data-key="cooldownSec" /> s</span>
+        </label>
+
+        <label class="row field">
+          <span class="row-txt"><b>Intervention cap</b><small>Maximum protective pauses per minute. Above this the extension leaves the video alone.</small></span>
+          <span class="input"><input type="number" min="1" max="20" step="1" data-key="maxInterventionsPerMin" /> /min</span>
+        </label>
+
+        <label class="row field">
+          <span class="row-txt"><b>Grace period</b><small>Hands-off window after you press play or seek, so scrubbing is never punished with a pause.</small></span>
+          <span class="input"><input type="number" min="0" max="30" step="1" data-key="graceSec" /> s</span>
+        </label>
+
+        <label class="row toggle">
+          <span class="row-txt"><b>Protect in background tabs</b><small>Off by default: a hidden tab that pauses may look like the video froze.</small></span>
+          <input type="checkbox" data-key="protectHiddenTab" />
+          <span class="track"><i></i></span>
+        </label>
+      </section>
+
+      <!-- ── Advanced levers ────────────────────────────────────────────── -->
+      <section class="card">
+        <h2>Advanced levers <span class="tag-inline">optional, off by default</span></h2>
+
+        <label class="row toggle">
+          <span class="row-txt">
+            <b>Playback pacing</b>
+            <small>
+              If the link delivers less than realtime, play a few percent slower so the buffer grows instead of draining.
+              <b>Resolution is untouched</b> — 1080p stays 1080p — but the playback speed changes slightly and is restored
+              as soon as the buffer is healthy. Your own speed choice is always the ceiling.
+            </small>
+          </span>
+          <input type="checkbox" data-key="rateAdapt" />
+          <span class="track"><i></i></span>
+        </label>
+
+        <label class="row field">
+          <span class="row-txt"><b>Maximum slowdown</b><small>Cap on how far pacing may go below your chosen speed.</small></span>
+          <span class="input"><input type="number" min="0" max="25" step="1" data-key="rateMaxDeviationPct" /> %</span>
+        </label>
+
+        <label class="row field">
+          <span class="row-txt"><b>Absolute speed floor</b><small>Pacing never goes below this rate.</small></span>
+          <span class="input"><input type="number" min="0.25" max="1" step="0.05" data-key="rateMinRate" />×</span>
+        </label>
+
+        <label class="row toggle">
+          <span class="row-txt">
+            <b>Pin the selected quality</b>
+            <small>
+              If YouTube's own ABR quietly drops below the quality you picked, ask the player to put it back.
+              Best effort: YouTube may ignore the request, and each restore can cause one rebuffer.
+              It can only ever move <em>up</em> to your choice — never down.
+            </small>
+          </span>
+          <input type="checkbox" data-key="pinQuality" />
+          <span class="track"><i></i></span>
+        </label>
+
+        <label class="row toggle">
+          <span class="row-txt">
+            <b>Reduce background requests</b>
+            <small>
+              Blocks YouTube's telemetry endpoints (<code>api/stats</code>, <code>ptracking</code>,
+              <code>activeview</code>, <code>log_event</code>) so they stop competing with video bytes.
+              Media (<code>googlevideo.com</code>), ads, recommendations, login and the player itself are never touched.
+              Needs an extra permission — granted only when you press the button.
+            </small>
+          </span>
+          <input type="checkbox" data-key="reduceRequests" id="reduceRequests" />
+          <span class="track"><i></i></span>
+        </label>
+
+        <div class="perm" id="permBox" hidden>
+          <p id="permText">This feature needs the optional <code>declarativeNetRequest</code> permission.</p>
+          <button type="button" class="btn" id="btnGrant">Grant permission</button>
+        </div>
+
+        <label class="row toggle">
+          <span class="row-txt"><b>Debug logging</b><small>Print the extension's decisions to the page console.</small></span>
+          <input type="checkbox" data-key="debugLog" />
+          <span class="track"><i></i></span>
+        </label>
+      </section>
+
+      <!-- ── Honesty ────────────────────────────────────────────────────── -->
+      <section class="card">
+        <h2>What this extension can and cannot do</h2>
+        <div class="two">
+          <div class="col can">
+            <h3>It can</h3>
+            <ul>
+              <li>Read exactly how many seconds of video are buffered ahead of the playhead.</li>
+              <li>Measure real download throughput from the player's own media requests.</li>
+              <li>Predict when the buffer will run out, seconds in advance.</li>
+              <li>Pause briefly so the player fills further ahead, then resume.</li>
+              <li>Stop its own telemetry-blocking rules from competing with video bytes.</li>
+              <li>Optionally pace playback a few percent slower to convert throughput into buffer.</li>
+            </ul>
+          </div>
+          <div class="col cant">
+            <h3>It cannot</h3>
+            <ul>
+              <li><b>Increase your bandwidth.</b> A 2&nbsp;Mbps connection stays 2&nbsp;Mbps.</li>
+              <li>Make 1080p stream on a link that is permanently slower than 1080p's bitrate — nothing can.</li>
+              <li>Choose which byte ranges YouTube's player fetches; that is decided by YouTube's DASH client.</li>
+              <li>Rewrite or proxy media segments — Chrome's security model does not allow it here.</li>
+              <li>Change your resolution, and it never will: there is no code path that selects a lower quality.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="note">
+          <b>Example.</b> On a 2&nbsp;Mbps line a 1080p stream may need ~3.5&nbsp;Mbps. The extension cannot close that gap.
+          What it can do is make sure the little headroom you have is spent downloading video ahead of you, and pause for
+          two seconds now instead of letting the player stall for ten seconds later. If the shortfall is permanent, the
+          honest fix is a lower resolution — which is your call, not the extension's.
+        </p>
+      </section>
+
+      <!-- ── Privacy ────────────────────────────────────────────────────── -->
+      <section class="card">
+        <h2>Privacy</h2>
+        <ul class="checks">
+          <li>Manifest V3, no background pages, no remote code.</li>
+          <li>No external servers. Every byte stays inside your browser.</li>
+          <li>No tracking, no analytics, no ads, no affiliate links.</li>
+          <li>No browsing history is read or stored. The only persisted data is this settings object.</li>
+          <li>Runs on <code>youtube.com</code>, <code>www.youtube.com</code> and <code>m.youtube.com</code> only.</li>
+          <li>Permissions requested: <code>storage</code> (your settings) and <code>scripting</code> (to read the player's
+              quality on YouTube pages). <code>declarativeNetRequest</code> is optional and only asked for if you enable
+              request reduction.</li>
+          <li>Telemetry data collected by this extension: none. It does not phone home, because there is no home to phone.</li>
+        </ul>
+      </section>
+
+      <!-- ── Diagnostics ────────────────────────────────────────────────── -->
+      <section class="card wide">
+        <h2>Live diagnostics</h2>
+        <p class="muted">Read straight from the active YouTube tab. Open a video and press play to see it move.</p>
+        <div class="diag" id="diag">
+          <div class="dgrid" id="dgrid"></div>
+          <details>
+            <summary>Recent decisions</summary>
+            <pre id="dlog">—</pre>
+          </details>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="btnReset">Reset to defaults</button>
+          <button type="button" class="btn ghost" id="btnRefresh">Refresh now</button>
+        </div>
+      </section>
+    </div>
+
+    <footer class="foot">
+      YouTube Smooth 1080p · local-only extension · quality is never reduced automatically.
+    </footer>
+  </div>
+
+  <script src="core.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "YouTube Smooth 1080p",
+    "description": "Extension name shown in chrome://extensions and the toolbar."
+  },
+  "extShortName": {
+    "message": "YT Smooth",
+    "description": "Short name."
+  },
+  "extDescription": {
+    "message": "Smoother 1080p playback on slow connections. Monitors the buffer, predicts stalls and pauses briefly to rebuild it — without ever lowering your chosen quality.",
+    "description": "Shown under the extension name."
+  }
+}

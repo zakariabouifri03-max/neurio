@@ -1,0 +1,102 @@
+/* YouTube Smooth 1080p — in-page dashboard (hud.css)
+   Loaded from content.js as a web-accessible stylesheet. All rules are scoped
+   under .yts-hud and use a 2147483000-ish z-index so they sit above the player
+   without interfering with YouTube's own controls, fullscreen or subtitles. */
+
+.yts-hud {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 2147483000;
+  width: 232px;
+  font: 12px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #e8eaed;
+  background: rgba(15, 17, 21, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  user-select: none;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.yts-hud-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 10px;
+  cursor: grab;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  touch-action: none;
+}
+
+.yts-hud-head:active { cursor: grabbing; }
+
+.yts-hud-title {
+  flex: 1;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yts-hud-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+  background: #64748b;
+  box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.18);
+}
+.yts-hud-dot.yts-slow { background: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.20); }
+.yts-hud-dot.yts-medium { background: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.20); }
+.yts-hud-dot.yts-fast { background: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.20); }
+.yts-hud-dot.yts-unknown { background: #64748b; }
+
+.yts-hud-close {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  line-height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #9aa0a6;
+  font-size: 15px;
+  cursor: pointer;
+}
+.yts-hud-close:hover { background: rgba(255, 255, 255, 0.10); color: #fff; }
+
+.yts-hud-rows { padding: 6px 10px 9px; }
+
+.yts-hud-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2.5px 0;
+}
+
+.yts-hud-k { color: #9aa0a6; }
+.yts-hud-v { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+
+.yts-hud-v.yts-c-slow { color: #f87171; }
+.yts-hud-v.yts-c-medium { color: #fbbf24; }
+.yts-hud-v.yts-c-fast { color: #4ade80; }
+.yts-hud-v.yts-c-unknown { color: #cbd5e1; }
+
+.yts-hud-flash { border-color: rgba(245, 158, 11, 0.55); }
+.yts-hud-flash .yts-hud-head { background: rgba(245, 158, 11, 0.10); }
+
+/* Fullscreen: YouTube raises the player, so raise with it. */
+:-webkit-full-screen .yts-hud,
+:fullscreen .yts-hud { z-index: 2147483647; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .yts-hud { transition: border-color 220ms ease; }
+}

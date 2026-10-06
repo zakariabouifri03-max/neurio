@@ -1,0 +1,12 @@
+{
+  "name": "youtube-smooth-1080p",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chrome extension: smoother 1080p playback on slow connections via intelligent buffering. Never lowers quality.",
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "check": "node --check core.js && node --check content.js && node --check page.js && node --check background.js && node --check popup.js && node --check options.js && node tools/make-icons.mjs",
+    "icons": "node tools/make-icons.mjs"
+  },
+  "license": "MIT"
+}

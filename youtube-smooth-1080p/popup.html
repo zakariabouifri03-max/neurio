@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>YouTube Smooth 1080p</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="hdr">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div class="brand-txt">
+        <h1>YouTube Smooth 1080p</h1>
+        <p class="sub">Buffer manager · never lowers your quality</p>
+      </div>
+    </div>
+    <div class="status" id="statusPill">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Connecting…</span>
+    </div>
+  </header>
+
+  <section class="metrics" id="metrics">
+    <div class="metric">
+      <span class="k">Selected Quality</span>
+      <span class="v" id="mQuality">—</span>
+    </div>
+    <div class="metric">
+      <span class="k">Connection</span>
+      <span class="v" id="mConn">—</span>
+    </div>
+    <div class="metric">
+      <span class="k">Buffer</span>
+      <span class="v" id="mBuffer">—</span>
+    </div>
+    <div class="metric">
+      <span class="k">Playback</span>
+      <span class="v" id="mPlayback">—</span>
+    </div>
+    <div class="metric wide">
+      <span class="k">Estimated speed <em id="mSpeedSource" class="src"></em></span>
+      <span class="v" id="mSpeed">—</span>
+    </div>
+  </section>
+
+  <section class="runway">
+    <div class="runway-head">
+      <span>Playable runway</span>
+      <span id="runwayLabel">—</span>
+    </div>
+    <div class="bar" role="img" aria-label="Buffered runway">
+      <i class="fill" id="runwayFill"></i>
+      <i class="mark" id="runwayLow" title="Protection triggers here"></i>
+      <i class="mark resume" id="runwayResume" title="Playback resumes here"></i>
+    </div>
+    <p class="hint" id="runwayHint">Waiting for the player…</p>
+  </section>
+
+  <section class="actions">
+    <button class="btn primary" id="btnSmart" type="button" aria-pressed="true">
+      <span class="btn-txt">Smart Buffer <b id="smartState">ON</b></span>
+      <span class="switch"><i></i></span>
+    </button>
+    <button class="btn" id="btnMax" type="button" aria-pressed="false">
+      <span class="btn-txt">Maximum Smoothness</span>
+      <span class="switch"><i></i></span>
+    </button>
+    <button class="btn ghost" id="btnHud" type="button" aria-pressed="false">
+      <span class="btn-txt">In-page dashboard</span>
+      <span class="switch"><i></i></span>
+    </button>
+    <button class="btn link" id="btnSettings" type="button">Settings &amp; privacy</button>
+  </section>
+
+  <section class="notice" id="notice" hidden></section>
+
+  <footer class="ftr">
+    <p>
+      This extension <b>cannot increase your bandwidth</b>. A 2&nbsp;Mbps line stays
+      a 2&nbsp;Mbps line — it makes 1080p feel smoother by keeping more of the video
+      downloaded ahead of the playhead and pacing playback when the buffer runs thin.
+    </p>
+    <p class="meta">
+      <span id="ftrVersion">v1.0.0</span> · No tracking · No servers · YouTube only
+    </p>
+  </footer>
+
+  <script src="core.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
