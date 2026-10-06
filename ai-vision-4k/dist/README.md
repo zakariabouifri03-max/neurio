@@ -10,6 +10,19 @@ Both files are produced by `.github/workflows/ai-vision-4k-apk.yml` and committe
 branch by that workflow, because the artifact download hosts are not reachable from every
 development environment. Nothing here is hand-edited.
 
+## Downloading
+
+`git clone` is not needed to get the APK. Every successful build is also attached to a GitHub
+release, so the download link is short and permanent:
+
+<https://github.com/zakariabouifri03-max/neurio/releases/download/ai-vision-4k-latest/AIVision4K-debug.apk>
+
+The tag `ai-vision-4k-latest` is a moving pointer: the workflow replaces its three assets
+(`AIVision4K-debug.apk`, `AIVision4K-release-unsigned-key.apk`, `SHA256SUMS.txt`) after every
+green build, so that URL always serves the newest APK and never 404s. Each asset carries a
+GitHub-computed `sha256:` digest, which is the same number as in `SHA256SUMS.txt` beside it — a
+quick way to check a download without trusting any text file.
+
 ## Installing
 
 ```bash
