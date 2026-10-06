@@ -1,150 +1,159 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏁 Bash Baqi Racing</title>
-<meta name="theme-color" content="#0ea5e9">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bash Baqi">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/style.css">
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
-</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101218">
+  <meta name="description" content="NEXUS Game Studio — a focused, browser-based 3D game editor with a real-time viewport, playable sample game, and local structured agent tools.">
+  <title>NEXUS Game Studio</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/nexus-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="src/studio.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.js" } }
+  </script>
 </head>
 <body>
-<div id="app"></div>
+  <div id="studio" class="studio">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="NEXUS Game Studio home">
+        <span class="brand-mark"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 5h5l10 13V5h5v18h-5L9 10v13H4z" fill="currentColor"/><circle cx="23" cy="5" r="2" fill="#b5f36d"/></svg></span>
+        <span class="brand-name">NEXUS <b>GAME STUDIO</b></span>
+      </a>
+      <nav class="menubar" aria-label="Main menu">
+        <button class="menu-trigger" data-menu="file">File</button>
+        <button class="menu-trigger" data-menu="edit">Edit</button>
+        <button class="menu-trigger" data-menu="project">Project</button>
+        <button class="menu-trigger" data-menu="build">Build</button>
+        <button class="menu-trigger" data-menu="play">Play</button>
+        <button class="menu-trigger ai-menu-trigger" data-menu="ai"><span class="spark">✳</span> AI</button>
+      </nav>
+      <div class="topbar-spacer"></div>
+      <div class="save-indicator"><span class="save-dot"></span><span id="saveState">All changes saved</span></div>
+      <button class="btn btn-quiet" id="saveProjectBtn" title="Save project (Ctrl+S)"><span>▣</span> Save</button>
+      <button class="btn btn-quiet" id="stopBtn" title="Stop and restore editor scene" hidden>■ Stop</button>
+      <button class="btn btn-play" id="playBtn" title="Play / pause (Ctrl+P)"><span class="play-icon">▶</span><span id="playButtonText">Play</span></button>
+      <button class="avatar-btn" id="workspaceMenuBtn" title="Workspace options">N</button>
+      <div class="menu-popover" id="menuPopover" hidden></div>
+    </header>
 
-<!-- error overlay -->
-<div id="errLog"></div>
-
-<!-- loading -->
-<div id="loading">
-  <div class="loadBox">
-    <div class="loadFlag">🏁</div>
-    <div class="loadTitle">BASH BAQI<br>RACING</div>
-    <div class="loadBar"><div></div></div>
-    <div class="loadTip">warming up the buggies…</div>
-  </div>
-</div>
-
-<!-- speed lines overlay -->
-<div id="speedLines"></div>
-<div id="coinPops"></div>
-
-<!-- ══════════ RACE HUD ══════════ -->
-<div id="hud">
-  <div class="hudTL">
-    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
-    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
-    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
-    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
-  </div>
-
-  <div id="progbar">
-    <span class="flagL">🏁</span>
-    <div class="track"><div id="progMarkers"></div></div>
-    <span class="flagR">🏆</span>
-  </div>
-
-  <button id="btnPauseTop" class="roundBtn">⏸</button>
-
-  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
-
-  <div id="powerSlot" class="powerSlot">
-    <span id="hudPower"></span>
-    <span class="keyHint">SPACE</span>
-  </div>
-
-  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
-
-  <div id="banner"></div>
-
-  <!-- touch controls -->
-  <div id="touchWrap">
-    <div class="tcol left">
-      <button id="tLeft" class="tbtn">◀</button>
-      <button id="tRight" class="tbtn">▶</button>
+    <div class="projectbar">
+      <div class="breadcrumb"><span class="crumb-root">Workspace</span><span class="crumb-chevron">/</span><span id="projectNameLabel">Island Survival</span><span class="crumb-chevron">/</span><span class="crumb-active" id="sceneNameLabel">Island</span></div>
+      <div class="projectbar-center"><span class="engine-pill"><span class="status-led"></span> NEXUS Runtime <b>0.1</b></span><span class="project-target" id="projectTarget">Web · Editor</span></div>
+      <div class="projectbar-actions">
+        <button class="icon-button" id="commandButton" title="Command palette (Ctrl+K)">⌘<small>K</small></button>
+        <button class="icon-button" id="newProjectButton" title="New project">＋</button>
+        <button class="icon-button" id="buildButton" title="Build game">⇧</button>
+      </div>
     </div>
-    <div class="tcol right">
-      <button id="tBrake" class="tbtn brake">▼</button>
-    </div>
+
+    <main class="workspace" id="workspace">
+      <aside class="dock left-dock" id="leftDock">
+        <div class="dock-title"><span>PROJECT</span><button class="panel-icon" id="projectOptionsBtn" title="Project options">•••</button></div>
+        <div class="tab-strip left-tabs" role="tablist">
+          <button class="tab active" data-left-tab="hierarchy">Hierarchy</button>
+          <button class="tab" data-left-tab="assets">Assets</button>
+        </div>
+        <div class="dock-tools">
+          <label class="searchbox"><span>⌕</span><input id="hierarchySearch" placeholder="Search objects" autocomplete="off"><kbd>⌘F</kbd></label>
+          <button class="tiny-icon" id="addObjectButton" title="Create object">＋</button>
+        </div>
+        <section class="left-view" id="hierarchyView" aria-label="Scene hierarchy">
+          <div class="scene-root"><span class="scene-root-icon">◈</span><span id="hierarchySceneName">Island</span><span class="root-count" id="objectCount">0</span><button class="tiny-icon add-root" id="hierarchyAddButton" title="Add object">＋</button></div>
+          <div id="hierarchyTree" class="hierarchy-tree"></div>
+          <div class="empty-search" id="emptyHierarchy" hidden>No objects match this search.</div>
+        </section>
+        <section class="left-view assets-view" id="assetsView" hidden aria-label="Asset browser">
+          <div class="asset-toolbar"><label class="searchbox"><span>⌕</span><input id="assetSearch" placeholder="Search assets" autocomplete="off"></label><button class="tiny-icon" id="importAssetButton" title="Import model">⇧</button></div>
+          <div class="asset-category-label">SCENE OBJECTS <span>DRAG INTO VIEWPORT</span></div>
+          <div class="asset-grid" id="assetGrid"></div>
+          <div class="asset-category-label project-assets-heading" id="projectAssetsHeading" hidden>PROJECT ASSETS <span id="projectAssetCount">0</span></div>
+          <div class="asset-grid" id="projectAssetGrid"></div>
+          <div class="asset-note"><span class="note-icon">i</span><span>GLB, glTF 2.0 and OBJ geometry import are supported. FBX and advanced animation import are not available in this build.</span></div>
+        </section>
+        <div class="dock-footer"><span class="folder-icon">▰</span><span id="projectStorageLabel">Browser workspace</span><button class="tiny-icon" id="projectFolderBtn" title="Export project file">↗</button></div>
+      </aside>
+
+      <div class="resize-handle resize-left" data-resize="left" role="separator" aria-label="Resize project dock"></div>
+
+      <section class="viewport-panel" id="viewportPanel">
+        <div class="viewport-toolbar">
+          <div class="tool-group" aria-label="Transform tools">
+            <button class="tool-button active" data-tool="select" title="Select (Q)">↖</button>
+            <button class="tool-button" data-tool="move" title="Move (W)">✥</button>
+            <button class="tool-button" data-tool="rotate" title="Rotate (E)">⟳</button>
+            <button class="tool-button" data-tool="scale" title="Scale (R)">⤢</button>
+          </div>
+          <span class="tool-divider"></span>
+          <button class="view-button active" id="sceneViewButton" title="Scene view">◈ <span>Scene</span></button>
+          <button class="view-button" id="gameViewButton" title="Game camera preview">▣ <span>Game</span></button>
+          <div class="toolbar-spacer"></div>
+          <span class="viewport-scene-state"><i></i> <span id="viewportState">EDIT MODE</span></span>
+          <button class="tool-button plain" id="focusButton" title="Frame selected (F)">⌕</button>
+          <button class="tool-button plain active" id="gridButton" title="Toggle grid">▦</button>
+          <button class="tool-button plain" id="maximizeViewportButton" title="Maximize viewport">⛶</button>
+        </div>
+        <div class="viewport-wrap" id="viewportWrap">
+          <div class="viewport-canvas" id="viewportCanvas" tabindex="0" aria-label="3D scene viewport">
+            <div class="viewport-drop-hint" id="viewportDropHint"><b>Drop asset to place in scene</b><span>Primitives · low-poly prefabs · imported models</span></div>
+            <div class="selection-label" id="selectionLabel" hidden></div>
+            <div class="game-hud" id="gameHud" hidden>
+              <div class="game-hud-top"><div class="game-brand"><span>✳</span> ISLAND SURVIVAL <small>PLAYTEST</small></div><div class="game-clock" id="gameClock">DAY 01 · 08:00</div></div>
+              <div class="game-hud-bottom"><div class="survival-card"><div class="meter-row"><span>HEALTH</span><b id="gameHealthValue">100</b></div><div class="meter"><i id="gameHealthBar"></i></div><div class="meter-row stamina-row"><span>STAMINA</span><b id="gameStaminaValue">100</b></div><div class="meter stamina"><i id="gameStaminaBar"></i></div><div class="inventory-row"><span>WOOD <b id="inventoryWood">0</b></span><span>STONE <b id="inventoryStone">0</b></span><span>BERRIES <b id="inventoryBerries">0</b></span></div></div><div class="game-controls"><kbd>W A S D</kbd> move <kbd>SPACE</kbd> jump <kbd>SHIFT</kbd> sprint <kbd>E</kbd> gather <kbd>F</kbd> attack <kbd>C</kbd> craft tool</div></div>
+              <div class="game-toast" id="gameToast"></div>
+              <div class="play-pause-overlay" id="playPauseOverlay" hidden><div><span>Ⅱ</span><b>PAUSED</b><small>Press Play to resume</small></div></div>
+            </div>
+            <div class="viewport-corner viewport-corner-tl"><span class="corner-dot"></span><span id="viewportHint">Perspective · Lit</span></div>
+            <div class="viewport-corner viewport-corner-br" id="axisWidget"><span class="axis-y">Y</span><span class="axis-x">X</span><span class="axis-z">Z</span></div>
+            <div class="viewport-perf" id="viewportPerf">0 FPS <span>·</span> 0 objects</div>
+          </div>
+        </div>
+        <div class="viewport-statusbar"><span><i class="status-led"></i><span id="rendererStatus">WebGL renderer ready</span></span><span id="selectionStatus">No selection</span><span class="status-shortcuts"><kbd>RMB</kbd> orbit <kbd>MMB</kbd> pan <kbd>Wheel</kbd> zoom</span></div>
+      </section>
+
+      <div class="resize-handle resize-right" data-resize="right" role="separator" aria-label="Resize inspector"></div>
+
+      <aside class="dock inspector-dock" id="inspectorDock">
+        <div class="dock-title"><span>INSPECTOR</span><button class="panel-icon" id="inspectorMoreBtn" title="Inspector options">•••</button></div>
+        <div class="inspector-scroll" id="inspectorContent"><div class="inspector-empty"><div class="empty-orbit">◉</div><b>Select an object</b><span>Choose an item in the Hierarchy or click it in the viewport to inspect its components.</span></div></div>
+      </aside>
+
+      <div class="resize-handle resize-bottom" data-resize="bottom" role="separator" aria-label="Resize bottom dock"></div>
+
+      <section class="dock bottom-dock" id="bottomDock">
+        <div class="bottom-tabs" role="tablist">
+          <button class="bottom-tab active" data-bottom-tab="console"><span class="tab-glyph console-glyph">›_</span>Console <span class="tab-count" id="consoleBadge">0</span></button>
+          <button class="bottom-tab" data-bottom-tab="problems"><span class="tab-glyph problem-glyph">◉</span>Problems <span class="tab-count error-count" id="problemBadge">0</span></button>
+          <button class="bottom-tab" data-bottom-tab="agent"><span class="tab-glyph ai-glyph">✳</span>AI Agent</button>
+          <button class="bottom-tab" data-bottom-tab="graph"><span class="tab-glyph graph-glyph">⌘</span>Gameplay Graph</button>
+          <button class="bottom-tab" data-bottom-tab="profiler"><span class="tab-glyph profiler-glyph">▥</span>Profiler</button>
+          <button class="bottom-tab" data-bottom-tab="output"><span class="tab-glyph output-glyph">⇩</span>Output</button>
+          <div class="bottom-tab-spacer"></div>
+          <button class="panel-icon" id="clearConsoleButton" title="Clear console">⌫</button>
+          <button class="panel-icon" id="toggleBottomButton" title="Collapse bottom panel">⌄</button>
+        </div>
+        <div class="bottom-content">
+          <section class="bottom-view console-view active" data-bottom-view="console"><div class="console-list" id="consoleList"></div><div class="console-input-wrap"><span class="console-prompt">›</span><input id="consoleInput" placeholder="Run a project command… (type help for commands)" autocomplete="off"><kbd>ENTER</kbd></div></section>
+          <section class="bottom-view problems-view" data-bottom-view="problems"><div class="problems-header"><span>SEVERITY</span><span>MESSAGE</span><span>OBJECT / FILE</span><span></span></div><div id="problemList" class="problem-list"><div class="problems-empty"><span>✓</span> No project problems detected.</div></div></section>
+          <section class="bottom-view agent-view" data-bottom-view="agent"><div class="agent-layout"><div class="agent-conversation" id="agentConversation"><div class="agent-welcome"><div class="agent-avatar">✳</div><div><b>NEXUS Local Agent</b><span>Structured scene tools · local planner · no external model configured</span></div><p>Describe a focused scene change. I will create a reviewable plan and call project tools only after you approve it.</p><div class="agent-suggestions"><button data-prompt="Create a third-person player with health, stamina, and a follow camera">＋ Third-person player</button><button data-prompt="Add a zombie enemy that chases the player">＋ Chasing enemy</button><button data-prompt="Create a forest clearing with wood and stone pickups">＋ Gatherable resources</button><button data-prompt="Add a day and night cycle to this scene">＋ Day / night cycle</button></div></div></div><form class="agent-composer" id="agentForm"><div class="agent-mode"><span class="agent-status-dot"></span> LOCAL PLAN BUILDER <span>·</span> REVIEW BEFORE APPLY</div><div class="agent-prompt-row"><textarea id="agentPrompt" rows="2" placeholder="Ask for a concrete scene or gameplay change…" maxlength="600"></textarea><button class="send-agent" type="submit" title="Plan change">↑</button></div><div class="agent-disclaimer">No cloud AI is connected. Plans use deterministic templates and structured editor tools.</div></form></div></section>
+          <section class="bottom-view graph-view" data-bottom-view="graph"><div class="graph-toolbar"><div><b>Island Survival · Gameplay Graph</b><span>Small, executable event/action chains</span></div><button class="btn btn-small" id="addGraphButton">＋ Add event chain</button></div><div class="graph-canvas" id="graphCanvas"></div></section>
+          <section class="bottom-view profiler-view" data-bottom-view="profiler"><div class="profiler-metrics" id="profilerMetrics"></div><div class="profiler-footnote">Live values come from the active WebGL scene. Memory use is not exposed by all browsers.</div></section>
+          <section class="bottom-view output-view" data-bottom-view="output"><div class="output-summary" id="outputSummary"><span class="output-icon">⇩</span><div><b>Build output</b><span>Build a self-contained HTML game that runs in a modern browser without the editor.</span></div><button class="btn btn-small btn-bright" id="buildFromOutput">Build portable game</button></div><div class="build-log" id="buildLog"></div></section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="statusbar"><div><span class="status-led"></span><span>NEXUS 0.1.0</span><span class="status-separator">|</span><span id="statusProject">Island Survival</span><span class="status-separator">|</span><span id="statusMode">Edit</span></div><div class="statusbar-right"><span id="statusMessage">Ready</span><span class="status-separator">|</span><button id="shortcutsButton">Keyboard shortcuts</button></div></footer>
   </div>
-</div>
 
-<!-- ══════════ GARAGE UI ══════════ -->
-<div id="garageUI">
-  <div id="topbar">
-    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
-    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
-    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
-    <div class="spacer"></div>
-    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
-    <button id="btnMusic" class="miniBtn">🎵</button>
-    <button id="btnSfx" class="miniBtn">🔊</button>
-    <button id="btnFull" class="miniBtn">⛶</button>
+  <input id="assetInput" type="file" accept=".glb,.gltf,.obj" multiple hidden>
+  <input id="projectInput" type="file" accept=".nexus.json,.json,application/json" hidden>
+  <div class="context-menu" id="contextMenu" hidden></div>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="scrim" id="modalScrim" hidden>
+    <section class="modal" id="modal" role="dialog" aria-modal="true"></section>
   </div>
-
-  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
-  <div id="carNamePlate"></div>
-
-  <div id="menuBar">
-    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
-    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
-    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
-    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
-    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
-    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
-  </div>
-</div>
-
-<!-- ══════════ Shop / panels ══════════ -->
-<div id="panel">
-  <div class="panelBox">
-    <div class="panelHead">
-      <h2 id="panelTitle">SHOP</h2>
-      <div id="panelTabs"></div>
-      <button id="panelClose" class="roundBtn">✖</button>
-    </div>
-    <div id="panelBody"></div>
-  </div>
-</div>
-
-<!-- results -->
-<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
-<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
-
-<!-- pause -->
-<div id="pauseModal">
-  <div class="modalBox">
-    <div class="rtitle">⏸ PAUSED</div>
-    <div class="rbtns">
-      <button id="btnResume" class="big race">▶ RESUME</button>
-      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
-<div id="confetti"></div>
-
-<script type="module" src="src/main.js"></script>
-<script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-</script>
+  <div class="command-overlay" id="commandOverlay" hidden><div class="command-box"><div class="command-search"><span>⌕</span><input id="commandInput" placeholder="Type a command or search…" autocomplete="off"><kbd>ESC</kbd></div><div class="command-results" id="commandResults"></div><div class="command-footer"><span>Use <kbd>↑</kbd><kbd>↓</kbd> to navigate</span><span><kbd>ENTER</kbd> to run</span></div></div></div>
+  <script type="module" src="src/studio.js"></script>
 </body>
 </html>

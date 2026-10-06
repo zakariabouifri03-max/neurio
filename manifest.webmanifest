@@ -1,18 +1,19 @@
 {
-  "name": "Bash Baqi Racing",
-  "short_name": "Bash Baqi",
-  "description": "3D kart racing: 50 cars, 16 drivers, 50 random tracks. Win races, earn coins, buy everything!",
-  "start_url": "./index.html",
+  "name": "NEXUS Game Studio",
+  "short_name": "NEXUS Studio",
+  "description": "A focused 3D game editor with a playable prototype and an offline standalone game exporter.",
+  "start_url": ".",
   "scope": "./",
-  "display": "fullscreen",
+  "display": "standalone",
   "orientation": "landscape",
-  "background_color": "#2f9be8",
-  "theme_color": "#0ea5e9",
-  "lang": "en",
-  "categories": ["games", "racing"],
+  "background_color": "#0c0e12",
+  "theme_color": "#101218",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icons/nexus-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
   ]
 }

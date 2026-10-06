@@ -1,0 +1,13 @@
+{
+  "name": "nexus-game-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Focused browser-based 3D game editor with an offline standalone game exporter.",
+  "scripts": {
+    "start": "python3 -m http.server 8000 --bind 0.0.0.0",
+    "test": "node --test tests/*.test.js",
+    "check": "node --check src/studio.js && node --check src/engine.js && node --check src/agent.js && node --check src/asset-import.js && node --check src/project.js && node --check src/exporter.js && node --check src/graph.js"
+  },
+  "license": "MIT"
+}
