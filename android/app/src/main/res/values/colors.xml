@@ -1,0 +1,6 @@
+<resources>
+    <color name="brand_teal">#187D77</color>
+    <color name="brand_navy">#172432</color>
+    <color name="status_bar">#F4F7FB</color>
+    <color name="launcher_background">#176E72</color>
+</resources>

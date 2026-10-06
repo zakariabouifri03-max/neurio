@@ -3,3 +3,8 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# Android/Gradle build output and machine-local SDK path
+/android/.gradle/
+/android/local.properties
+/android/app/build/

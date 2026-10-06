@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7fb">
+  <meta name="description" content="Neurio — متصفح خفيف، واضح، ومناسب للهاتف.">
+  <title>Neurio — متصفحك الخفيف</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Neurio — الصفحة الرئيسية">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M10 29V11l20 18V11"/><path d="M10 11h4l16 14v4"/></svg></span>
+        <span class="brand-word">neurio<span class="brand-dot">.</span><small>متصفح خفيف</small></span>
+      </a>
+      <div class="topbar-actions">
+        <span class="connection-pill" id="connectionPill"><i></i><span id="connectionText">جاري فحص الاتصال</span></span>
+        <button class="top-icon install-button" id="installButton" type="button" hidden title="تثبيت التطبيق" aria-label="تثبيت التطبيق"><span>⇩</span></button>
+        <button class="top-icon theme-button" id="themeButton" type="button" title="تغيير المظهر" aria-label="تغيير المظهر"><span aria-hidden="true">◐</span></button>
+        <button class="profile-button" id="aboutButton" type="button" aria-label="حول Neurio"><span class="profile-orb">N</span><span class="profile-label">نسخة تجريبية</span></button>
+      </div>
+    </header>
+
+    <div class="browser-layout">
+      <aside class="side-rail" aria-label="أدوات المتصفح">
+        <button class="rail-action active" id="newTabButton" type="button"><span class="rail-icon">＋</span><span>تبويب جديد</span></button>
+        <div class="rail-separator"></div>
+        <button class="rail-action" data-panel="bookmarks" type="button"><span class="rail-icon">☆</span><span>العلامات</span></button>
+        <button class="rail-action" data-panel="history" type="button"><span class="rail-icon">◷</span><span>السجل</span></button>
+        <button class="rail-action" data-panel="downloads" type="button"><span class="rail-icon">↓</span><span>التنزيلات</span></button>
+        <div class="rail-spacer"></div>
+        <div class="lite-card">
+          <div class="lite-card-icon">✦</div>
+          <div><b>توفير البيانات</b><small id="liteStatus">متوقف في المعاينة</small></div>
+          <button id="liteToggle" class="switch" type="button" role="switch" aria-checked="false" aria-label="توفير البيانات"><i></i></button>
+        </div>
+        <div class="rail-foot"><span class="shield-mini">✓</span><span>خصوصيتك أولاً</span></div>
+      </aside>
+
+      <main class="main-panel">
+        <section class="browser-top" aria-label="شريط التصفح">
+          <div class="tab-strip" id="tabStrip" role="tablist" aria-label="علامات التبويب"></div>
+          <div class="toolbar">
+            <div class="nav-buttons">
+              <button class="round-control" id="backButton" type="button" title="رجوع" aria-label="رجوع" disabled>‹</button>
+              <button class="round-control" id="forwardButton" type="button" title="تقدم" aria-label="تقدم" disabled>›</button>
+              <button class="round-control" id="homeButton" type="button" title="الرئيسية" aria-label="الرئيسية">⌂</button>
+            </div>
+            <form class="address-form" id="addressForm" autocomplete="off">
+              <span class="address-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></span>
+              <input id="addressInput" type="text" inputmode="url" dir="auto" spellcheck="false" autocapitalize="off" placeholder="بحث في Google أو إدخال عنوان موقع" aria-label="بحث أو عنوان موقع">
+              <button id="clearAddress" class="clear-address" type="button" aria-label="مسح" hidden>×</button>
+              <button class="go-button" type="submit" aria-label="بحث أو فتح الموقع"><span>↵</span></button>
+            </form>
+            <button class="round-control bookmark-current" id="bookmarkCurrent" type="button" title="حفظ الصفحة" aria-label="حفظ الصفحة">☆</button>
+            <button class="tab-count" id="tabCountButton" type="button" aria-label="عرض علامات التبويب"><span class="tab-count-icon">▢</span><b id="tabCount">1</b></button>
+            <button class="round-control menu-control" id="menuButton" type="button" aria-label="القائمة">•••</button>
+          </div>
+          <div class="suggestions" id="suggestions" hidden>
+            <button type="button" data-query="YouTube"><span class="suggestion-search">⌕</span><span>YouTube</span><small>بحث في Google</small></button>
+            <button type="button" data-query="Wikipedia"><span class="suggestion-search">⌕</span><span>Wikipedia</span><small>بحث في Google</small></button>
+            <button type="button" data-query="الطقس اليوم"><span class="suggestion-search">⌕</span><span>الطقس اليوم</span><small>بحث في Google</small></button>
+          </div>
+          <div class="native-note"><span class="note-mark">i</span><span>هذه معاينة الواجهة. تطبيق Android يفتح المواقع داخل المتصفح؛ النسخة هنا تفتحها في تبويب خارجي.</span></div>
+        </section>
+
+        <section class="home-view" id="homeView">
+          <div class="hero-block">
+            <div class="hero-emblem"><div class="hero-emblem-inner"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M10 29V11l20 18V11"/><path d="M10 11h4l16 14v4"/></svg></div><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span></div>
+            <p class="eyebrow">خفيف على هاتفك. واضح في كل خطوة.</p>
+            <h1>أهلاً بك في <span>Neurio</span></h1>
+            <p class="hero-copy">بحث، فيديو، ومواقعك المفضلة — من واجهة بسيطة كتخليك توصل للمهم بسرعة.</p>
+            <form class="hero-search" id="heroSearchForm" autocomplete="off">
+              <span class="hero-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></span>
+              <input id="heroSearchInput" type="text" inputmode="search" dir="auto" placeholder="شنو بغيتي تقلب عليه؟" aria-label="اكتب بحثك">
+              <button type="submit">بحث <span>↵</span></button>
+            </form>
+            <div class="search-hint"><span class="hint-key">Google</span><span>بحث سريع من شريط العنوان</span><span class="hint-dot">·</span><span class="hint-key">HTTPS</span><span>اتصال آمن للمواقع الداعمة</span></div>
+          </div>
+
+          <div class="content-grid">
+            <section class="quick-section">
+              <div class="section-heading"><div><span class="section-kicker">وصول سريع</span><h2>مواقع كتستعملها بزاف</h2></div><button class="text-button" id="editShortcuts" type="button">تخصيص</button></div>
+              <div class="shortcut-grid">
+                <button class="shortcut-card youtube" data-url="https://www.youtube.com" data-title="YouTube" type="button"><span class="shortcut-logo">▶</span><span class="shortcut-info"><b>YouTube</b><small>فيديو وترفيه</small></span><span class="shortcut-arrow">↗</span></button>
+                <button class="shortcut-card google" data-url="https://www.google.com" data-title="Google" type="button"><span class="shortcut-logo">G</span><span class="shortcut-info"><b>Google</b><small>بحث الويب</small></span><span class="shortcut-arrow">↗</span></button>
+                <button class="shortcut-card wiki" data-url="https://www.wikipedia.org" data-title="Wikipedia" type="button"><span class="shortcut-logo">W</span><span class="shortcut-info"><b>Wikipedia</b><small>المعرفة للجميع</small></span><span class="shortcut-arrow">↗</span></button>
+                <button class="shortcut-card maps" data-url="https://maps.google.com" data-title="Maps" type="button"><span class="shortcut-logo">⌖</span><span class="shortcut-info"><b>Maps</b><small>خرائط واتجاهات</small></span><span class="shortcut-arrow">↗</span></button>
+              </div>
+            </section>
+
+            <section class="speed-card">
+              <div class="speed-card-top"><span class="speed-icon">✦</span><span class="speed-chip">معلومة مهمة</span></div>
+              <h2>التصفح الخفيف، بلا وعود كاذبة</h2>
+              <p>المتصفح يقدر يقلل تحميل الصور والبيانات غير الضرورية، ولكن ما يقدرش يخلق سرعة إنترنت أكثر من سرعة الـ Wi‑Fi.</p>
+              <div class="quality-tip"><span class="quality-icon">▶</span><div><b>بالنسبة ليوتيوب</b><small>خلي الجودة على Auto باش يتفادى التقطيع. الجودة العالية كتحتاج اتصال أسرع.</small></div></div>
+            </section>
+
+            <section class="privacy-card">
+              <div class="privacy-icon">✓</div><div><b>المواقع كتبقى ديالك</b><p>Android كيعرض صفحات الويب بمحرك WebView ديال الجهاز، وكيحترم حماية المواقع وحقوق الفيديو.</p></div><button class="arrow-link" data-panel="about" type="button" aria-label="معلومات أكثر">←</button>
+            </section>
+          </div>
+          <footer class="home-footer"><span><span class="footer-dot"></span> تجربة خفيفة ومصممة للهاتف</span><span>Neurio Browser <b>·</b> نسخة أولية</span></footer>
+        </section>
+
+        <section class="external-preview" id="externalPreview" hidden>
+          <div class="preview-card">
+            <div class="preview-site-icon" id="previewIcon">↗</div>
+            <p class="section-kicker">جاهز للتصفح</p>
+            <h2 id="previewTitle">فتح الموقع</h2>
+            <p id="previewUrl" class="preview-url"></p>
+            <p class="preview-copy">فنسخة المعاينة، الموقع كيتفتح في تبويب آخر باش تبقى الواجهة واضحة. تطبيق Android الحقيقي كيعرض الموقع هنا داخل المتصفح.</p>
+            <div class="preview-actions"><a id="openExternalLink" class="primary-link" href="https://www.google.com" target="_blank" rel="noopener noreferrer">فتح الموقع <span>↗</span></a><button id="returnHome" class="secondary-button" type="button">رجوع للرئيسية</button></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <nav class="mobile-nav" aria-label="التنقل">
+      <button class="mobile-nav-item selected" id="mobileHome" type="button"><span>⌂</span><small>الرئيسية</small></button>
+      <button class="mobile-nav-item" data-panel="bookmarks" type="button"><span>☆</span><small>العلامات</small></button>
+      <button class="mobile-nav-item" data-panel="downloads" type="button"><span>↓</span><small>التنزيلات</small></button>
+      <button class="mobile-nav-item" id="mobileTabs" type="button"><span>▢<i id="mobileTabCount">1</i></span><small>التبويبات</small></button>
+      <button class="mobile-nav-item" id="mobileMenu" type="button"><span>•••</span><small>المزيد</small></button>
+    </nav>
+
+    <div class="sheet-backdrop" id="sheetBackdrop" hidden>
+      <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head"><div><span class="section-kicker">Neurio</span><h2 id="sheetTitle">القائمة</h2></div><button id="closeSheet" class="close-sheet" type="button" aria-label="إغلاق">×</button></div>
+        <div class="sheet-content" id="sheetContent"></div>
+      </section>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="./app.js" defer></script>
+  <script>if ('serviceWorker' in navigator && location.protocol.startsWith('http')) addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));</script>
+</body>
+</html>

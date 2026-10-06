@@ -1,3 +1,15 @@
+# 📱 Neurio Browser — Android browser app
+
+A lightweight Arabic/Darija browser app source project is available in [`android/`](android/), with a mobile-first interface preview in [`browser/`](browser/). It uses Android System WebView for real websites and includes tabs, bookmarks, browsing history, system downloads, fullscreen video, desktop mode, and an optional image-saving mode.
+
+- **Build instructions and important limitations:** [`browser/README.md`](browser/README.md)
+- **Web preview:** run `python3 -m http.server 8000 --directory browser` and open `http://localhost:8000`.
+- **APK build:** open `android/` in Android Studio (JDK 17 + Android SDK 35), or run `gradle :app:assembleDebug` from that folder. A GitHub Actions workflow can also publish a debug APK artifact after the Android source is pushed.
+
+> The browser cannot increase the speed of a slow Wi-Fi link or force YouTube to stream high quality without enough bandwidth. The existing `BashBaqiRacing.apk` in this repository is still the racing game, not this browser. This sandbox has no Android SDK/JDK, so a new APK has not been compiled here.
+
+---
+
 # 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
