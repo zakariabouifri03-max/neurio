@@ -39,7 +39,7 @@ const outDir = path.join(root, 'dist', 'game');
 fs.rmSync(outDir, { recursive: true, force: true });
 fs.mkdirSync(outDir, { recursive: true });
 execSync(
-  `npx electron-packager "${res.outputPath}" IslandSurvival --platform=win32 --arch=x64 --out="${outDir}" --overwrite`,
+  `npx electron-packager "${res.outputPath}" IslandSurvival --platform=win32 --arch=x64 --out="${outDir}" --overwrite --no-prune`,
   { stdio: 'inherit', cwd: root },
 );
 

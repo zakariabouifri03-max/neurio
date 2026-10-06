@@ -72,7 +72,9 @@ run('npm install --omit=dev --no-audit --no-fund', { cwd: staging });
 
 console.log('[4/4] Packaging ' + APP_NAME + '.exe…');
 fs.rmSync(outDir, { recursive: true, force: true });
-run(`npx electron-packager "${staging}" "${APP_NAME}" --platform=win32 --arch=x64 --out="${outDir}" --overwrite`);
+// --no-prune: our staging install is already production-only; galactus's
+  // node_modules walk is what crashes packaging on Windows.
+  run(`npx electron-packager "${staging}" "${APP_NAME}" --platform=win32 --arch=x64 --out="${outDir}" --overwrite --no-prune`);
 
 console.log(`
 ── PACKAGING COMPLETE ──

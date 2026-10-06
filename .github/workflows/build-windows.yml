@@ -40,8 +40,9 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          if ! npx tsx Electron/build-game-win.mts 2>&1 | tee /tmp/game-pkg.log; then
-            tail -c 900 /tmp/game-pkg.log | tr '\n' '·' | sed 's/"/\"/g' | xargs -I{} echo "::error title=Game packaging failed::{}"
+          mkdir -p dist/logs
+          if ! npx tsx Electron/build-game-win.mts 2>&1 | tee dist/logs/game-packaging.log; then
+            printf '::error title=Game packaging failed::%s\n' "$(tail -c 800 dist/logs/game-packaging.log | tr '\n' '|')"
             exit 1
           fi
 
@@ -49,10 +50,21 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          if ! node Electron/package-win.mjs 2>&1 | tee /tmp/editor-pkg.log; then
-            tail -c 900 /tmp/editor-pkg.log | tr '\n' '·' | sed 's/"/\"/g' | xargs -I{} echo "::error title=Editor packaging failed::{}"
+          if ! node Electron/package-win.mjs 2>&1 | tee dist/logs/editor-packaging.log; then
+            printf '::error title=Editor packaging failed::%s\n' "$(tail -c 800 dist/logs/editor-packaging.log | tr '\n' '|')"
             exit 1
           fi
+
+      - name: Publish failure diagnostics (ci-diagnostics branch)
+        if: failure()
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -B ci-diagnostics
+          git add -f dist/logs 2>/dev/null || true
+          git commit -q -m "CI diagnostics: packaging logs" || true
+          git push origin HEAD:ci-diagnostics --force
 
       - name: Zip packages + collect direct-play HTML
         shell: pwsh
