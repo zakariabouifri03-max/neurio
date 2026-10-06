@@ -15,6 +15,11 @@ on:
       - '.github/workflows/android-build.yml'
   workflow_dispatch:
 
+# Needed so the build can publish the APK as a GitHub Release asset, which (unlike
+# a workflow artifact) can be downloaded with a plain link, without signing in.
+permissions:
+  contents: write
+
 jobs:
   build:
     name: assembleDebug
@@ -67,7 +72,10 @@ jobs:
       - name: Collect APKs
         run: |
           mkdir -p artifacts
-          find lan-game-stream/app/build/outputs/apk -name '*.apk' -exec cp -v {} artifacts/ \;
+          cp -v lan-game-stream/app/build/outputs/apk/debug/app-debug.apk \
+                artifacts/neurio-lan-game-stream-debug.apk
+          cp -v lan-game-stream/app/build/outputs/apk/release/app-release.apk \
+                artifacts/neurio-lan-game-stream.apk
           ls -la artifacts
 
       - name: Upload APKs
@@ -76,3 +84,25 @@ jobs:
           name: lan-game-stream-apks
           path: artifacts/*.apk
           if-no-files-found: error
+
+      # Publishes the APKs to a rolling pre-release so anyone can install them with
+      # a direct link: .../releases/download/apk-latest/neurio-lan-game-stream.apk
+      # (Release assets are public; workflow artifacts require a GitHub login.)
+      - name: Publish APKs as a release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/arena/40bae685-neurio'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES="Installable prototype builds of LAN Game Stream.
+
+          * \`neurio-lan-game-stream.apk\` - release build (debug-signed so it installs directly)
+          * \`neurio-lan-game-stream-debug.apk\` - debug build
+
+          Built from commit \`${GITHUB_SHA:0:12}\` on $(date -u '+%Y-%m-%d %H:%M UTC').
+
+          Install on both phones, then: HOST GAME on the phone that has the game, JOIN GAME on the other one. Everything stays on your local Wi-Fi."
+          gh release view apk-latest >/dev/null 2>&1 \
+            || gh release create apk-latest --title "LAN Game Stream - latest APK" \
+                 --notes "$NOTES" --prerelease --target "$GITHUB_SHA"
+          gh release edit apk-latest --notes "$NOTES"
+          gh release upload apk-latest artifacts/*.apk --clobber
