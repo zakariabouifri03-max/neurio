@@ -41,11 +41,28 @@ jobs:
 
       - name: Build debug APK
         working-directory: lan-game-stream
-        run: ./gradlew --no-daemon --stacktrace :app:assembleDebug
+        run: |
+          set +e
+          ./gradlew --no-daemon --stacktrace --console=plain :app:assembleDebug 2>&1 | tee "$RUNNER_TEMP/build.log"
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            # Surface compiler/resource errors as check-run annotations + step summary
+            # so they are readable through the GitHub API from any tooling.
+            {
+              echo "### Build failed"
+              echo '```'
+              grep -E "^(e: |.*error: |.*error; |error: )|\.java:[0-9]+: |\.xml:[0-9]+: |FAILURE:|Execution failed" "$RUNNER_TEMP/build.log" | head -80
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY" || true
+            grep -E "\.java:[0-9]+: |\.xml:[0-9]+: |error: " "$RUNNER_TEMP/build.log" | head -60 | while IFS= read -r line; do
+              echo "::error ::${line}"
+            done
+            exit "$status"
+          fi
 
       - name: Build release APK
         working-directory: lan-game-stream
-        run: ./gradlew --no-daemon :app:assembleRelease
+        run: ./gradlew --no-daemon --console=plain :app:assembleRelease
 
       - name: Collect APKs
         run: |
