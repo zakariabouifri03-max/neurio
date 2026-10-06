@@ -113,3 +113,27 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 📶 Neurio — LAN Game Streaming (Android)
+
+The main deliverable of this branch is a **real Android Studio project** in
+[`android/`](android/): a LAN game-streaming platform where the supported
+phone (HOST) runs the game (e.g. eFootball) and streams the live display to
+an unsupported phone (CLIENT) over local Wi-Fi — the client only ever
+receives **video / audio / input / session data**, never the game itself.
+
+- MediaProjection → hardware MediaCodec encoder → authenticated UDP → hardware decoder → fullscreen SurfaceView
+- NSD/mDNS host discovery, 6-digit pairing, HMAC-signed packets
+- Virtual controller (joystick / ABXY / d-pad / shoulders) with draggable, resizable, persisted layouts + physical gamepad support
+- Adaptive streaming (1080p60 → 720p60 → 720p30 → 480p30) driven by RTT / loss / jitter / decode time
+- Accessibility-based input injection — the only legitimate stock-Android path (limits documented honestly in `android/README.md`)
+
+```bash
+cd android
+./gradlew assembleDebug   # build the APK
+./gradlew test            # protocol / adaptation / stats unit tests
+```
+
+Full architecture and limitation notes: [`android/README.md`](android/README.md).

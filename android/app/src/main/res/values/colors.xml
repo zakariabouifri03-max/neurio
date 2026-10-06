@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_deep">#06080F</color>
+    <color name="bg_panel">#0C1220</color>
+    <color name="bg_card">#121A2E</color>
+    <color name="bg_card_raised">#182238</color>
+    <color name="stroke_soft">#23304F</color>
+    <color name="accent_cyan">#22D3EE</color>
+    <color name="accent_violet">#8B5CF6</color>
+    <color name="text_main">#EAEFF8</color>
+    <color name="text_dim">#93A0B8</color>
+    <color name="good">#34D399</color>
+    <color name="warn">#FBBF24</color>
+    <color name="bad">#FB5565</color>
+    <color name="black_stream">#000000</color>
+    <color name="ic_launcher_background">#0B1120</color>
+</resources>

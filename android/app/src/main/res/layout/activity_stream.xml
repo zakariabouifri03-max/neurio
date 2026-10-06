@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootStream"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_stream"
+    android:keepScreenOn="true">
+
+    <!-- Video surface + mirror-touch layer -->
+    <FrameLayout
+        android:id="@+id/surfaceContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.neurio.client.StreamSurfaceView
+            android:id="@+id/streamSurface"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <!-- Virtual controller -->
+    <com.neurio.client.ControllerOverlay
+        android:id="@+id/controllerOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- HUD -->
+    <LinearLayout
+        android:id="@+id/hudTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvStreamTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_pill"
+            android:ellipsize="end"
+            android:maxWidth="160dp"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:singleLine="true"
+            android:text="@string/app_name"
+            android:textColor="@color/text_main"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvHudRes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_pill"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="—"
+            android:textColor="@color/text_main"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvHudFps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_pill"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="@string/hud_ping_na"
+            android:textColor="@color/accent_cyan"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvHudPing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_pill"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="@string/hud_ping_na"
+            android:textColor="@color/text_main"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvHudQuality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_pill"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="…"
+            android:textColor="@color/text_main"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Menu button -->
+    <ImageButton
+        android:id="@+id/btnMenu"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="10dp"
+        android:background="@drawable/bg_pill"
+        android:contentDescription="@string/menu_controls"
+        android:src="@drawable/ic_menu" />
+
+    <!-- Menu panel -->
+    <LinearLayout
+        android:id="@+id/menuPanel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/bg_card"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btnToggleControls"
+            style="@style/NeurioDarkButton"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="start|center_vertical"
+            android:text="@string/menu_controls"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnEditLayout"
+            style="@style/NeurioDarkButton"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="start|center_vertical"
+            android:text="@string/menu_edit"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnMirrorTouch"
+            style="@style/NeurioDarkButton"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="start|center_vertical"
+            android:text="@string/mirror_touch_on"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnPerf"
+            style="@style/NeurioDarkButton"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="start|center_vertical"
+            android:text="@string/menu_perf"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnDisconnect"
+            style="@style/NeurioDangerButton"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:text="@string/menu_disconnect"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <!-- Layout editing panel -->
+    <LinearLayout
+        android:id="@+id/editPanel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="18dp"
+        android:background="@drawable/bg_card"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btnResizeDown"
+            style="@style/NeurioDarkButton"
+            android:layout_width="52dp"
+            android:layout_height="44dp"
+            android:text="@string/resize_minus"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnResizeUp"
+            style="@style/NeurioDarkButton"
+            android:layout_width="52dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:text="@string/resize_plus"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnEditDone"
+            style="@style/NeurioBigButton"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:paddingStart="22dp"
+            android:paddingEnd="22dp"
+            android:text="@string/edit_done"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <!-- Connection status -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:id="@+id/progressStream"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:indeterminate="true" />
+
+        <TextView
+            android:id="@+id/tvStreamStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/text_main"
+            android:textSize="14sp" />
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Neurio</string>
+    <string name="title_host">Host Mode</string>
+    <string name="title_join">Join Game</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_performance">Performance</string>
+
+    <!-- Accessibility service -->
+    <string name="accessibility_service_label">Neurio Input Service</string>
+    <string name="accessibility_service_description">Lets the host phone apply remote controls (from the streaming client) to the running game using Android\'s official gesture injection. Used only while you are streaming.</string>
+
+    <!-- Main screen -->
+    <string name="main_title">NEURIO</string>
+    <string name="main_subtitle">LAN GAME STREAMING</string>
+    <string name="main_host_title">HOST GAME</string>
+    <string name="main_host_desc">Run the game here, stream it over Wi-Fi</string>
+    <string name="main_join_title">JOIN GAME</string>
+    <string name="main_join_desc">Play a host\'s game on this screen</string>
+    <string name="main_settings_title">SETTINGS</string>
+    <string name="main_settings_desc">Quality, audio, controller</string>
+    <string name="main_perf_title">PERFORMANCE</string>
+    <string name="main_perf_desc">Live FPS / latency diagnostics</string>
+    <string name="wifi_ok">Wi-Fi network connected</string>
+    <string name="wifi_missing">No Wi-Fi network detected</string>
+    <string name="wifi_hint">Connect both phones to the same 5 GHz Wi-Fi (or use a hotspot) before streaming.</string>
+    <string name="footer_note">No cloud • No game downloads • Android %1$s</string>
+
+    <!-- Host -->
+    <string name="host_step_game">SELECT A GAME TO STREAM</string>
+    <string name="host_empty">No launchable apps detected.</string>
+    <string name="host_selected">Selected game</string>
+    <string name="start_game_stream">START GAME STREAM</string>
+    <string name="stop_stream">STOP STREAM</string>
+    <string name="state_idle">Idle</string>
+    <string name="state_waiting">Waiting for player…</string>
+    <string name="state_paired">Player paired</string>
+    <string name="state_streaming">LIVE</string>
+    <string name="pairing_code_label">PAIRING CODE</string>
+    <string name="pair_hint">Enter this code on the joining phone. Only paired clients can receive the stream.</string>
+    <string name="new_code">NEW CODE</string>
+    <string name="no_client">No client</string>
+    <string name="stat_label_client">Connected</string>
+    <string name="stat_label_res">Resolution</string>
+    <string name="stat_label_fps">Encode FPS</string>
+    <string name="stat_label_bitrate">Bitrate</string>
+    <string name="stat_label_encode">Encoder latency</string>
+    <string name="stat_fps">%.0f fps</string>
+    <string name="stat_mbps">%.1f Mbps</string>
+    <string name="stat_ms">%.1f ms</string>
+    <string name="input_card_title">REMOTE INPUT</string>
+    <string name="input_ready">Input service enabled — controls will be applied to the game</string>
+    <string name="input_missing">Input service disabled — video streams, controls won\'t reach the game</string>
+    <string name="enable_input_service">ENABLE INPUT SERVICE</string>
+    <string name="input_service_title">Remote input is off</string>
+    <string name="input_service_body">To apply the client\'s controls to the game, enable the Neurio Input Service in Android accessibility settings. Without it the client can watch but not play.</string>
+    <string name="open_settings">Open settings</string>
+    <string name="continue_anyway">Stream video only</string>
+    <string name="capture_consent_title">Start screen capture?</string>
+    <string name="capture_consent_body">Android will ask permission to capture this display. The capture streams %1$s to the paired client over your local Wi-Fi only.</string>
+    <string name="start_capture">Continue</string>
+    <string name="capture_denied">Screen capture permission is required to host.</string>
+    <string name="audio_perm_note">Microphone permission denied: falling back to internal capture only.</string>
+    <string name="already_streaming">A stream is already running on this device.</string>
+    <string name="adapted_to">Adapted to %1$s quality</string>
+
+    <!-- Audio notes -->
+    <string name="audio_note_none">Audio: video-only (no capturable source)</string>
+    <string name="audio_note_mic">Audio: microphone fallback (picks up the speaker)</string>
+    <string name="audio_note_silent">Audio: game blocks playback capture — stream is silent or on mic fallback</string>
+    <string name="audio_note_internal">Audio: internal playback capture active</string>
+
+    <!-- Client -->
+    <string name="scan_searching">Searching for hosts on your network…</string>
+    <plurals name="scan_found">
+        <item quantity="one">%d host found</item>
+        <item quantity="other">%d hosts found</item>
+    </plurals>
+    <string name="available_hosts">AVAILABLE HOSTS</string>
+    <string name="no_hosts">No hosts yet. Start HOST GAME on the other phone.</string>
+    <string name="manual_ip_hint">192.168.1.42</string>
+    <string name="manual_connect">CONNECT BY IP</string>
+    <string name="enter_ip">Type the host\'s IP address first.</string>
+    <string name="bad_ip">That doesn\'t look like a valid IP address.</string>
+    <string name="host_idle">idle</string>
+    <string name="host_detail">%1$s • %2$s</string>
+    <string name="ping_value">%1$d ms</string>
+    <string name="connect">CONNECT</string>
+    <string name="pairing_card_title">ENTER PAIRING CODE</string>
+    <string name="pair_with">Host: %1$s (%2$s)</string>
+    <string name="pair_with_manual">Host: %1$s</string>
+    <string name="code_hint">6-digit code shown on the host</string>
+
+    <!-- Stream view -->
+    <string name="session_missing">No pending session — pick a host first.</string>
+    <string name="status_connecting">Connecting to %1$s…</string>
+    <string name="status_starting">Starting stream…</string>
+    <string name="status_adapting">Adaptive quality: %1$dx%2$d @ %3$d fps</string>
+    <string name="status_error">Connection failed</string>
+    <string name="stream_ended">Stream ended</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="disconnect_q">Disconnect?</string>
+    <string name="disconnect_body">The host keeps running the game; you can rejoin later with a new pairing code.</string>
+    <string name="menu_controls">Show / hide controls</string>
+    <string name="menu_edit">Edit controller layout</string>
+    <string name="menu_perf">Performance screen</string>
+    <string name="menu_disconnect">Disconnect</string>
+    <string name="mirror_touch_on">Mirror touch: ON</string>
+    <string name="mirror_touch_off">Mirror touch: OFF</string>
+    <string name="resize_minus">−</string>
+    <string name="resize_plus">+</string>
+    <string name="edit_done">DONE</string>
+    <string name="layout_saved">Controller layout saved</string>
+    <string name="hud_fps">%.0f FPS</string>
+    <string name="hud_ping">%.0f ms</string>
+    <string name="hud_ping_na">— ms</string>
+    <string name="quality_excellent">EXCELLENT</string>
+    <string name="quality_good">GOOD</string>
+    <string name="quality_weak">WEAK</string>
+
+    <!-- Settings -->
+    <string name="settings_video">VIDEO</string>
+    <string name="settings_resolution">Preferred resolution</string>
+    <string name="settings_fps">Preferred frame rate</string>
+    <string name="settings_codec">Video codec</string>
+    <string name="settings_max_bitrate">Bitrate cap</string>
+    <string name="bitrate_value">%1$d Mbps</string>
+    <string name="settings_audio">AUDIO</string>
+    <string name="audio_auto">Auto (internal, mic fallback)</string>
+    <string name="audio_internal">Internal capture only</string>
+    <string name="audio_mic">Microphone only</string>
+    <string name="audio_off">Off (video only)</string>
+    <string name="settings_input">INPUT &amp; CONTROLLER</string>
+    <string name="mirror_touch_default">Mirror touch by default</string>
+    <string name="mirror_touch_hint">Touches on the stream are forwarded to the same relative position on the host.</string>
+    <string name="reset_layout">Reset controller layout</string>
+    <string name="layout_reset">Layout reset to defaults</string>
+    <string name="accessibility_settings">Open accessibility settings</string>
+    <string name="settings_about">ABOUT &amp; LIMITS</string>
+    <string name="limitations">Read limitations</string>
+    <string name="version_line">Neurio prototype %1$s</string>
+    <string name="limitations_title">Honest limitations</string>
+    <string name="limitations_body">1. INPUT — Stock Android has no public API to inject touches into another app. Neurio uses AccessibilityService.dispatchGesture, which requires your explicit opt-in and works for touch-controlled games. Titles that need a physical controller or block injected input will not respond.\n\n2. AUDIO — Internal game audio (AudioPlaybackCapture) only works when the game opts in; most big titles do not, so Neurio detects silence and can fall back to the microphone.\n\n3. ADAPTIVE — Resolution changes restart the encoder (brief pause); bitrate changes are seamless.\n\n4. SCOPE — Single client per host, LAN only, no internet routing, pairing-code + HMAC session auth.</string>
+
+    <!-- Performance -->
+    <string name="perf_title">GAMING PERFORMANCE</string>
+    <string name="perf_idle">No active session</string>
+    <string name="perf_active">Live session</string>
+    <string name="perf_idle_body">Start hosting or join a stream to see live FPS, latency, jitter, loss and bitrate here.</string>
+    <string name="perf_role">Role</string>
+    <string name="perf_state">State</string>
+    <string name="perf_fps">Rendered FPS</string>
+    <string name="perf_rtt">Network latency (RTT)</string>
+    <string name="perf_jitter">Jitter</string>
+    <string name="perf_loss">Packet loss</string>
+    <string name="perf_bitrate">Bitrate</string>
+    <string name="perf_res">Resolution</string>
+    <string name="perf_decode">Decoder latency</string>
+    <string name="perf_encode">Encoder latency</string>
+    <string name="perf_dropped">Dropped frames</string>
+    <string name="perf_temp">Battery temperature</string>
+    <string name="temp_value">%.1f °C</string>
+    <string name="close">CLOSE</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_stream">Game streaming</string>
+    <string name="notif_streaming_title">Neurio host</string>
+    <string name="notif_waiting_client">Waiting for a player to join…</string>
+</resources>
