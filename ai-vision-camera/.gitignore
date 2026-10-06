@@ -1,0 +1,4 @@
+# build intermediates produced by tools/android/build_apk.py
+app/build/
+# apksigner v4 signature sidecar (not needed to install)
+*.idsig
