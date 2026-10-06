@@ -28,6 +28,34 @@ The game is a full **PWA** (Progressive Web App): installable, fullscreen, **wor
 
 ---
 
+## 🎬 Marketing videos — فيديوهات الدعاية
+
+Two ready-to-post promo clips live in `video/` (rendered frame-by-frame, no browser needed):
+
+| File | Format | Where to use it |
+| --- | --- | --- |
+| `video/bash-baqi-intro.mp4` | 1280×720 · 10s · H.264 + audio | YouTube, website header, WhatsApp status |
+| `video/bash-baqi-intro-vertical.mp4` | 1080×1920 · 10s · H.264 + audio | TikTok, Instagram Reels, YouTube Shorts |
+| `video/bash-baqi-poster.jpg` | 1280×720 | YouTube thumbnail / cover |
+
+Each clip: fade-in on the beach road → the buggy in full drift with dust and rival karts →
+title **BASH BAQI RACING** + Arabic subtitle «سباق باغي على الشاطئ» → end card **PLAY FREE ▶**.
+
+**Regenerate / re-cut them in any size** (needs only Python + ffmpeg):
+
+```bash
+pip install --break-system-packages imageio-ffmpeg pillow arabic-reshaper python-bidi
+python3 video/make_trailer.py video/bash-baqi-intro.mp4                  # 16:9
+python3 video/make_trailer.py video/bash-baqi-intro-vertical.mp4 \
+        --w 1080 --h 1920                                                # 9:16
+python3 video/make_trailer.py promo.mp4 --w 1920 --h 1080 --dur 15       # anything else
+```
+
+> كل إطار كيتصنع بـ Pillow (سماء، شاطئ، طريق بالمنظور، باغي، عجاج، HUD، النصوص)، ومن بعد
+> ffmpeg كيجمعهم فـ H.264 و كيزيد صوت المحرك والتأثيرات — بلا GPU و بلا متصفح.
+
+---
+
 ## 🎮 The Game
 
 You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
