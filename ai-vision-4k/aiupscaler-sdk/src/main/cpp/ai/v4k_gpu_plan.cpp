@@ -1,6 +1,6 @@
 #include "v4k_gpu_plan.h"
 
-#include "v4k_log.h"
+#include "../core/v4k_log.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -403,6 +403,9 @@ bool buildGpuPlan(const Model& model, uint32_t inputWidth, uint32_t inputHeight,
              out.output.height);
     for (const std::string& warning : out.warnings) {
         V4K_LOGV("gpu plan warning: %s", warning.c_str());
+        // The macro is empty in a release build, so mark the loop variable used
+        // rather than letting -Wunused-variable fire in that configuration.
+        (void)warning;
     }
     return true;
 }
