@@ -1,150 +1,644 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏁 Bash Baqi Racing</title>
-<meta name="theme-color" content="#0ea5e9">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bash Baqi">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/style.css">
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
-</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hidden Winner Finder - Chrome Extension Preview & Download</title>
+  <link rel="icon" href="extension/icons/icon32.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0c16;
+      --bg-surface: #111427;
+      --bg-card: rgba(22, 27, 51, 0.7);
+      --border: rgba(99, 102, 241, 0.25);
+      --accent-primary: #6366f1;
+      --accent-gold: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-dark);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 50%),
+                  radial-gradient(circle at bottom left, rgba(245, 158, 11, 0.1), transparent 45%),
+                  var(--bg-dark);
+    }
+
+    /* Top Global Header */
+    .showcase-header {
+      background: rgba(17, 20, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #312e81, #1e1b4b);
+      border: 1px solid rgba(129, 140, 248, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-title span {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub {
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-download-zip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #ffffff;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 16px rgba(234, 88, 12, 0.4);
+      transition: all 0.2s;
+    }
+
+    .btn-download-zip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(234, 88, 12, 0.55);
+    }
+
+    .btn-guide {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn-guide:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Main Showcase Canvas */
+    .showcase-main {
+      flex: 1;
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 24px;
+      width: 100%;
+    }
+
+    /* Mode Navigation Tabs */
+    .mode-nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .mode-tab-btn {
+      background: rgba(22, 27, 51, 0.8);
+      border: 1px solid var(--border);
+      color: #94a3b8;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .mode-tab-btn:hover {
+      color: #fff;
+      border-color: rgba(99, 102, 241, 0.6);
+    }
+
+    .mode-tab-btn.active {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(49, 46, 129, 0.4));
+      border-color: #6366f1;
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Simulator Views */
+    .simulator-container {
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .simulator-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mock Chrome Browser Window */
+    .chrome-mock-window {
+      background: #1e243e;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+      overflow: hidden;
+    }
+
+    .chrome-mock-header {
+      background: #14182e;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot.red { background: #ff5f56; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #27c93f; }
+
+    .chrome-omnibox {
+      flex: 1;
+      background: #0d1021;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chrome-omnibox span.domain {
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    .chrome-extensions-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ext-icon-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #4f46e5, #312e81);
+      border: 1px solid #6366f1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+
+    /* Popup Frame Layout */
+    .popup-frame-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      background: radial-gradient(circle at center, #161b36 0%, #0d1021 100%);
+    }
+
+    .popup-viewport {
+      width: 440px;
+      height: 600px;
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      overflow: hidden;
+      background: #0a0c16;
+    }
+
+    .popup-viewport iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Side Panel Frame Layout */
+    .sidepanel-split-layout {
+      display: flex;
+      height: 640px;
+    }
+
+    .marketplace-pane {
+      flex: 1;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidepanel-pane {
+      width: 420px;
+      background: #0a0c16;
+    }
+
+    .sidepanel-split-layout iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Guide & Documentation Cards */
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .guide-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .guide-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .guide-card p {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .steps-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 13px;
+      color: #e2e8f0;
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .code-pill {
+      background: #1e1b4b;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #fbbf24;
+    }
+
+    /* Footer */
+    .showcase-footer {
+      background: rgba(10, 12, 22, 0.95);
+      border-top: 1px solid var(--border);
+      padding: 18px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      margin-top: auto;
+    }
+  </style>
 </head>
 <body>
-<div id="app"></div>
-
-<!-- error overlay -->
-<div id="errLog"></div>
-
-<!-- loading -->
-<div id="loading">
-  <div class="loadBox">
-    <div class="loadFlag">🏁</div>
-    <div class="loadTitle">BASH BAQI<br>RACING</div>
-    <div class="loadBar"><div></div></div>
-    <div class="loadTip">warming up the buggies…</div>
-  </div>
-</div>
-
-<!-- speed lines overlay -->
-<div id="speedLines"></div>
-<div id="coinPops"></div>
-
-<!-- ══════════ RACE HUD ══════════ -->
-<div id="hud">
-  <div class="hudTL">
-    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
-    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
-    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
-    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
-  </div>
-
-  <div id="progbar">
-    <span class="flagL">🏁</span>
-    <div class="track"><div id="progMarkers"></div></div>
-    <span class="flagR">🏆</span>
-  </div>
-
-  <button id="btnPauseTop" class="roundBtn">⏸</button>
-
-  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
-
-  <div id="powerSlot" class="powerSlot">
-    <span id="hudPower"></span>
-    <span class="keyHint">SPACE</span>
-  </div>
-
-  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
-
-  <div id="banner"></div>
-
-  <!-- touch controls -->
-  <div id="touchWrap">
-    <div class="tcol left">
-      <button id="tLeft" class="tbtn">◀</button>
-      <button id="tRight" class="tbtn">▶</button>
+  <!-- Global Top Header -->
+  <header class="showcase-header">
+    <div class="brand-group">
+      <div class="brand-icon-wrap">
+        <img src="extension/icons/icon32.png" width="26" height="26" alt="Icon">
+      </div>
+      <div>
+        <div class="brand-title">HIDDEN WINNER <span>FINDER</span></div>
+        <div class="brand-sub">Google Chrome Extension · Manifest V3</div>
+      </div>
     </div>
-    <div class="tcol right">
-      <button id="tBrake" class="tbtn brake">▼</button>
+
+    <div class="header-actions">
+      <a href="/download-extension" class="btn-download-zip">
+        <span>⬇️</span> Download Extension (.ZIP)
+      </a>
+      <a href="#install-guide" class="btn-guide" onclick="switchSimulatorMode('mode-guide')">
+        📖 Installation Guide
+      </a>
     </div>
-  </div>
-</div>
+  </header>
 
-<!-- ══════════ GARAGE UI ══════════ -->
-<div id="garageUI">
-  <div id="topbar">
-    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
-    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
-    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
-    <div class="spacer"></div>
-    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
-    <button id="btnMusic" class="miniBtn">🎵</button>
-    <button id="btnSfx" class="miniBtn">🔊</button>
-    <button id="btnFull" class="miniBtn">⛶</button>
-  </div>
+  <!-- Main Workspace -->
+  <main class="showcase-main">
+    <!-- Simulator Mode Navigation Tabs -->
+    <nav class="mode-nav">
+      <button class="mode-tab-btn active" data-mode="mode-popup">
+        <span>📱</span> Extension Popup Frame (440px)
+      </button>
+      <button class="mode-tab-btn" data-mode="mode-sidepanel">
+        <span>📑</span> Chrome Side Panel Split-View
+      </button>
+      <button class="mode-tab-btn" data-mode="mode-inpage">
+        <span>🛒</span> Live Marketplace In-Page Demo
+      </button>
+      <button class="mode-tab-btn" data-mode="mode-guide">
+        <span>⚙️</span> Architecture & Install Guide
+      </button>
+    </nav>
 
-  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
-  <div id="carNamePlate"></div>
+    <!-- View 1: Popup Mode -->
+    <section id="mode-popup" class="simulator-container active">
+      <div class="chrome-mock-window">
+        <div class="chrome-mock-header">
+          <div class="window-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <div class="chrome-omnibox">
+            <span>🔒</span>
+            <span class="domain">chrome-extension://hidden-winner-finder/</span>popup.html
+          </div>
+          <div class="chrome-extensions-bar">
+            <div class="ext-icon-badge" title="Hidden Winner Finder Extension Icon">
+              <img src="extension/icons/icon16.png" width="16" height="16" alt="Icon">
+            </div>
+          </div>
+        </div>
 
-  <div id="menuBar">
-    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
-    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
-    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
-    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
-    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
-    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
-  </div>
-</div>
+        <div class="popup-frame-wrapper">
+          <div class="popup-viewport">
+            <iframe src="extension/popup.html" title="Extension Popup Simulator"></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<!-- ══════════ Shop / panels ══════════ -->
-<div id="panel">
-  <div class="panelBox">
-    <div class="panelHead">
-      <h2 id="panelTitle">SHOP</h2>
-      <div id="panelTabs"></div>
-      <button id="panelClose" class="roundBtn">✖</button>
-    </div>
-    <div id="panelBody"></div>
-  </div>
-</div>
+    <!-- View 2: Side Panel Mode -->
+    <section id="mode-sidepanel" class="simulator-container">
+      <div class="chrome-mock-window">
+        <div class="chrome-mock-header">
+          <div class="window-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <div class="chrome-omnibox">
+            <span>🔒</span>
+            <span class="domain">https://www.etsy.com/</span>search?q=Personalized+Halloween+Pet+Ornament
+          </div>
+          <div class="chrome-extensions-bar">
+            <span style="font-size: 11.5px; color: #a5b4fc; font-weight: 600;">Chrome Side Panel Docked</span>
+          </div>
+        </div>
 
-<!-- results -->
-<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
-<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
+        <div class="sidepanel-split-layout">
+          <div class="marketplace-pane">
+            <iframe src="mock_marketplace.html" title="Marketplace Search View"></iframe>
+          </div>
+          <div class="sidepanel-pane">
+            <iframe src="extension/sidepanel.html" title="Extension Side Panel View"></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<!-- pause -->
-<div id="pauseModal">
-  <div class="modalBox">
-    <div class="rtitle">⏸ PAUSED</div>
-    <div class="rbtns">
-      <button id="btnResume" class="big race">▶ RESUME</button>
-      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
-    </div>
-  </div>
-</div>
+    <!-- View 3: In-Page Injection Mode -->
+    <section id="mode-inpage" class="simulator-container">
+      <div class="chrome-mock-window">
+        <div class="chrome-mock-header">
+          <div class="window-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <div class="chrome-omnibox">
+            <span>🔒</span>
+            <span class="domain">https://www.etsy.com/</span>search?q=Personalized+Halloween+Pet+Ornament
+          </div>
+          <div class="chrome-extensions-bar">
+            <span style="font-size: 11.5px; color: #10b981; font-weight: 600;">Content Script Injected ✓</span>
+          </div>
+        </div>
 
-<div id="toast"></div>
-<div id="confetti"></div>
+        <div style="height: 640px;">
+          <iframe src="mock_marketplace.html" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+      </div>
+    </section>
 
-<script type="module" src="src/main.js"></script>
-<script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-</script>
+    <!-- View 4: Guide & Documentation -->
+    <section id="mode-guide" class="simulator-container">
+      <div class="guide-grid">
+        <div class="guide-card" id="install-guide">
+          <h3>🚀 How to Load Extension in Chrome</h3>
+          <p>Hidden Winner Finder is fully built as a real Manifest V3 Google Chrome Extension. You can load and use it in 60 seconds:</p>
+          <ul class="steps-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div>
+                Click the <a href="/download-extension" style="color: #fbbf24; font-weight: 700;">Download Extension (.ZIP)</a> button above.
+              </div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div>
+                Unzip the downloaded archive to a folder on your computer.
+              </div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div>
+                Open Google Chrome (or Brave, Edge, Opera) and navigate to <span class="code-pill">chrome://extensions</span>.
+              </div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div>
+                Toggle on <strong>"Developer mode"</strong> in the top-right corner.
+              </div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <div>
+                Click <strong>"Load unpacked"</strong> and select the unzipped <span class="code-pill">extension</span> directory.
+              </div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">6</span>
+              <div>
+                Pin the <strong>Hidden Winner Finder</strong> icon to your toolbar and start finding winning products!
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="guide-card">
+          <h3>🛡️ Low-Competition Detector</h3>
+          <p>Calculates competition scores from 0–100 (0–30 Low, 31–60 Medium, 61–80 High, 81–100 Very High) using 8 observable marketplace signals:</p>
+          <ul class="steps-list">
+            <li class="step-item">
+              <span class="step-num">•</span>
+              <div><strong>Competing Listings Count:</strong> Identifies uncrowded search niches (<1,500 listings).</div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">•</span>
+              <div><strong>Strong Competitors (>100 reviews):</strong> Measures if the first page is dominated by review giants.</div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">•</span>
+              <div><strong>Median Review Barrier:</strong> Verifies whether a new store can catch up in 30–60 days.</div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">•</span>
+              <div><strong>Listing Quality Deficit:</strong> Spotlights niches where existing competitors have poor images or weak SEO.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="guide-card">
+          <h3>📈 Demand & Trend Detectors</h3>
+          <p>Evaluates real buyer intent and transaction signals:</p>
+          <ul class="steps-list">
+            <li class="step-item">
+              <span class="step-num">•</span>
+              <div><strong>Sales Signals:</strong> Estimated units (300–500/mo) and monthly revenue ($4,500–$7,500).</div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">•</span>
+              <div><strong>Public Favorites & In-Cart:</strong> Observes buyer urgency signals ("in 40+ carts right now").</div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">•</span>
+              <div><strong>Trend Trajectory:</strong> Analyzes 30-day and 90-day momentum (🔥 Rising, ➡️ Stable, 📉 Declining).</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="guide-card">
+          <h3>🏭 Sourcing & Profit Calculator</h3>
+          <p>Direct supplier matching and fee models:</p>
+          <ul class="steps-list">
+            <li class="step-item">
+              <span class="step-num">•</span>
+              <div><strong>8 Sourcing Channels:</strong> Alibaba, AliExpress, CJdropshipping, Printful, Printify, Local Manufacturers, Craft Blanks, Digital Downloads.</div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">•</span>
+              <div><strong>Fee Schedules:</strong> Exact calculation for Etsy (6.5%+3%+$0.45), Amazon (15%), eBay (13.25%), TikTok Shop (6%), Shopify.</div>
+            </li>
+            <li class="step-item">
+              <span class="step-num">•</span>
+              <div><strong>Full Product Ideas:</strong> 5 variations, 5 unique angles, 5 customer avatars, 5 SEO titles, and 10 high-intent keywords.</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Showcase Footer -->
+  <footer class="showcase-footer">
+    Hidden Winner Finder · Manifest V3 Google Chrome Extension · Built with Clean Architecture & Local Storage
+  </footer>
+
+  <script>
+    function switchSimulatorMode(modeId) {
+      document.querySelectorAll('.mode-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === modeId);
+      });
+      document.querySelectorAll('.simulator-container').forEach(c => {
+        c.classList.toggle('active', c.id === modeId);
+      });
+    }
+
+    document.querySelectorAll('.mode-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchSimulatorMode(btn.dataset.mode);
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,115 +1,186 @@
-# 🏁 Bash Baqi Racing
+# 🔎 Hidden Winner Finder — Google Chrome Extension (Manifest V3)
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+**Hidden Winner Finder** is a professional AI-driven e-commerce product research Chrome Extension. Unlike traditional spy tools that return thousands of saturated bestsellers, its sole purpose is to isolate **one undisputed winning product opportunity** that combines:
 
-**▶ Play:** serve the folder with any static server and open it:
+* **High Demand** ↑
+* **Strong Sales Potential** ↑
+* **Low Competition** ↓
+* **Good Profit Margin** ↑
+* **Room for a New Seller to Enter**
 
+---
+
+## ⚡ Core Features
+
+### 1. `[ FIND MY WINNING PRODUCT ]`
+One click analyzes available marketplace data across search density, review barriers, seller monopolization, and profit margins, returning **ONLY the #1 best opportunity**:
+* **Product:** "Personalized Halloween Pet Ornament"
+* **Demand Score:** `94/100` (High)
+* **Competition:** `Low (21/100)`
+* **Estimated Monthly Sales:** `300–500 units`
+* **Estimated Monthly Revenue:** `$4,500–$7,500`
+* **Average Price:** `$14.99`
+* **Estimated Profit Margin:** `65%`
+* **Trend:** `🔥 Rising`
+* **Opportunity Score:** `95/100`
+
+### 2. 💡 "WHY THIS PRODUCT?"
+Beginner-friendly breakdown of why this product won:
+* Strong customer buying velocity (active "in cart" signals)
+* Few strong competitors (top review median is under 30)
+* Healthy selling price and gross margin
+* Surging seasonal and holiday search interest
+* Low return rates and non-breakable fulfillment
+
+### 3. 🏬 "FIND WHERE TO SELL IT"
+Cross-platform opportunity evaluation:
+* **Best Marketplace:** Etsy (`Opportunity: Excellent`, `Demand: High`, `Competition: Low`)
+* Compares Etsy, Amazon, eBay, Walmart Marketplace, TikTok Shop, and Shopify stores with platform fee schedules and pros/cons.
+
+### 4. 📦 "FIND WHERE TO SOURCE IT" (SOURCE IT)
+Instant matching to 8 sourcing channels with estimated costs, shipping, MOQs, profit margins, and direct search links:
+1. **Alibaba** (Wholesale / Private Label)
+2. **AliExpress** (Zero MOQ / Dropshipping test)
+3. **CJdropshipping** (Warehoused API dropshipping)
+4. **Printful** (Premium on-demand printing)
+5. **Printify** (Competitive print-on-demand network)
+6. **Local Manufacturers** (Domestic US/UK fabricators)
+7. **Handmade / Custom Suppliers** (Unfinished blanks)
+8. **Digital-Product Alternatives** (Templates & downloads with 90%+ margins)
+
+### 5. 🛡️ LOW-COMPETITION DETECTOR
+Evaluates 8 observable marketplace signals:
+* Number of competing listings
+* Number of strong competitors (>100 reviews)
+* Median review count of top listings
+* Listing quality deficit (unoptimized competitor listings)
+* Established seller dominance ratio
+* Search result density and ad load
+* Price competition / price war risk
+* Product similarity
+
+**Scoring Scale:**
+* `0–30`: **Low Competition** (Prime Sweet Spot)
+* `31–60`: **Medium Competition**
+* `61–80`: **High Competition**
+* `81–100`: **Very High Competition**
+
+### 6. 📈 DEMAND DETECTOR
+Calculates demand scores (0–100) using:
+* Sales volume signals
+* Review accumulation velocity
+* Public favorites and "in cart" urgency indicators
+* Search presence and impression breadth
+* Listing growth rate
+
+### 7. 📊 PRODUCT DISCOVERY (`[ SCAN MARKET ]`)
+Scans any niche or category and produces a ranked leaderboard of opportunities (`#1`, `#2`, `#3`...). Clicking any item opens its complete dossier.
+
+### 8. 🧮 INTERACTIVE PROFIT CALCULATOR
+Real-time calculator accounting for:
+* Selling Price
+* Product Cost (COGS)
+* Packaging & Shipping
+* Marketplace Fees (Etsy 6.5%+3%+$0.45, Amazon 15%, eBay 13.25%, TikTok Shop 6%, Shopify)
+* Net Profit, Margin %, and Return on Investment (ROI)
+
+### 9. 🔥 TREND ANALYSIS
+* Trajectory: `🔥 Rising`, `➡️ Stable`, `📉 Declining`
+* 30-Day and 90-Day growth tracking (`+28%`, `+74%`)
+* Sparkline historical momentum
+
+### 10. 🎨 PRODUCT IDEAS & DIFFERENTIATION
+* 5 Product Variations (e.g. Dog breed, Cat edition, Memorial, Festive)
+* 5 Unique Angles & Value Propositions
+* 5 Target Customer Avatars
+* 5 SEO Title Ideas (with one-click copy)
+* 10 Keyword Ideas (with search volume & intent tags)
+* Suggested Price Range & Sweet Spot
+
+### 11. 📣 WHERE TO FIND CUSTOMERS
+Evaluates 7 acquisition channels (Etsy Search, Pinterest, TikTok, Instagram, Google, YouTube Shorts, Facebook Groups) and highlights the **#1 primary traffic source** with marketing strategies.
+
+### 12. 💾 SAVED WINNERS & LOCAL STORAGE
+Persists saved winning products locally using `chrome.storage.local` with quick JSON export.
+
+---
+
+## 🚀 How to Install & Load in Google Chrome
+
+1. Clone or download this repository.
+2. In Google Chrome, go to `chrome://extensions` in the address bar.
+3. Turn on the **"Developer mode"** toggle (top-right corner).
+4. Click the **"Load unpacked"** button (top-left corner).
+5. Select the `extension` folder inside this repository:
+   ```
+   /home/user/neurio/extension
+   ```
+6. The **Hidden Winner Finder** icon will appear in your Chrome toolbar!
+
+---
+
+## 📁 Project Architecture
+
+```
+extension/
+├── manifest.json              # Chrome Manifest V3 configuration
+├── background.js              # Service worker (context menus, side panel, messages)
+├── content.js                 # In-page marketplace scraper & floating widget
+├── content.css                # Styling for floating in-page badge
+├── popup.html                 # Main extension popup interface
+├── popup.css                  # Modern dark glassmorphism styling
+├── popup.js                   # Popup UI controller & state management
+├── sidepanel.html             # Chrome Side Panel interface
+├── sidepanel.css              # Side panel responsive styles
+├── icons/                     # Extension icons (16px, 32px, 48px, 128px)
+├── engine/
+│   ├── storage_adapter.js     # Unified Chrome storage & localStorage wrapper
+│   ├── competition.js         # Low-Competition Detector (0–100 score)
+│   ├── demand.js              # Demand Detector (0–100 score & revenue)
+│   ├── profit.js              # Multi-marketplace fee & profit calculator
+│   ├── trend.js               # Trend analysis & momentum tracker
+│   ├── sourcing.js            # 8-channel supplier discovery engine
+│   ├── marketplaces.js        # Cross-marketplace comparison engine
+│   ├── ideas.js               # Product ideas, angles & keyword generator
+│   ├── channels.js            # Customer acquisition traffic analyzer
+│   └── scanner.js             # Discovery ranking & #1 winner isolation
+└── data/
+    └── curated_database.js    # Curated opportunity catalog & on-the-fly analyzer
+```
+
+---
+
+## 🧪 Testing the Extension
+
+Run the verification test suite:
 ```bash
-python3 -m http.server 8000
-# → http://localhost:8000
+node -e '
+const StorageAdapter = require("./extension/engine/storage_adapter.js");
+const CompetitionDetector = require("./extension/engine/competition.js");
+const DemandDetector = require("./extension/engine/demand.js");
+const ProfitCalculator = require("./extension/engine/profit.js");
+const TrendAnalyzer = require("./extension/engine/trend.js");
+const SourcingEngine = require("./extension/engine/sourcing.js");
+const MarketplaceAnalyzer = require("./extension/engine/marketplaces.js");
+const ProductIdeasGenerator = require("./extension/engine/ideas.js");
+const CustomerChannelsEngine = require("./extension/engine/channels.js");
+global.CompetitionDetector = CompetitionDetector;
+global.DemandDetector = DemandDetector;
+global.ProfitCalculator = ProfitCalculator;
+global.TrendAnalyzer = TrendAnalyzer;
+global.SourcingEngine = SourcingEngine;
+global.MarketplaceAnalyzer = MarketplaceAnalyzer;
+global.ProductIdeasGenerator = ProductIdeasGenerator;
+global.CustomerChannelsEngine = CustomerChannelsEngine;
+const CuratedDatabase = require("./extension/data/curated_database.js");
+global.CuratedDatabase = CuratedDatabase;
+const MarketScanner = require("./extension/engine/scanner.js");
+console.log(MarketScanner.findWinningProduct({ marketplace: "etsy" }));
+'
 ```
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
-
----
-
-## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
-
-A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
-soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
-
-title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
-
-Everything is generated from code (no stock footage/music):
-
+To run the live interactive browser preview server:
 ```bash
-python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
-python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
+node server.js
 ```
-
-See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
-
----
-
-## 📱 Install on your phone — كأنها APK!
-
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
-
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
-
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
-**Offline play** is built-in: a service worker caches all game files on first visit.
-
----
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
-|---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
-
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
-```
-
-Made with ❤️ and Three.js
-
----
-
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
-
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
-
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
-
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+Open `http://localhost:3000` to interact with the Extension Popup Simulator, Side Panel Split-View, and Live In-Page Scanner.

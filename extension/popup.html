@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hidden Winner Finder</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app" class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon-wrap">
+          <img src="icons/icon32.png" alt="HWF Logo" class="app-logo">
+        </div>
+        <div class="logo-text">
+          <h1 class="logo-title">HIDDEN WINNER <span class="accent-text">FINDER</span></h1>
+          <p class="logo-subtitle">AI Product Opportunity & Low-Competition Detector</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-saved-toggle" class="icon-btn" title="Saved Winning Products">
+          <span class="icon">💾</span>
+          <span id="saved-badge-count" class="badge-count" style="display: none;">0</span>
+        </button>
+        <button id="btn-help-toggle" class="icon-btn" title="How It Works & Confidence Scoring">
+          <span class="icon">ℹ️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Navigation Bar -->
+    <nav class="main-nav">
+      <button class="nav-tab active" data-tab="tab-main">
+        <span class="tab-icon">🎯</span> Finder
+      </button>
+      <button class="nav-tab" data-tab="tab-discovery">
+        <span class="tab-icon">📊</span> Scan Market
+      </button>
+      <button class="nav-tab" data-tab="tab-calculator">
+        <span class="tab-icon">🧮</span> Calculator
+      </button>
+      <button class="nav-tab" data-tab="tab-saved">
+        <span class="tab-icon">⭐</span> Saved
+      </button>
+    </nav>
+
+    <!-- Tab 1: Main Winner Finder View -->
+    <main id="tab-main" class="tab-pane active">
+      <!-- Search & Filters Card -->
+      <section class="card filter-card">
+        <div class="primary-action-wrap">
+          <button id="btn-find-winner" class="btn-primary-glow">
+            <span class="btn-glow-bg"></span>
+            <span class="btn-content">
+              <span class="btn-icon">🔥</span>
+              <span class="btn-label">FIND MY WINNING PRODUCT</span>
+            </span>
+          </button>
+        </div>
+
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="filter-market">Market:</label>
+            <div class="select-wrapper">
+              <select id="filter-market">
+                <option value="etsy" selected>Etsy ▼</option>
+                <option value="amazon">Amazon ▼</option>
+                <option value="ebay">eBay ▼</option>
+                <option value="walmart">Walmart Marketplace ▼</option>
+                <option value="tiktok">TikTok Shop ▼</option>
+                <option value="shopify">Shopify Stores ▼</option>
+                <option value="any">All Marketplaces ▼</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label for="filter-country">Country:</label>
+            <div class="select-wrapper">
+              <select id="filter-country">
+                <option value="us" selected>United States ▼</option>
+                <option value="uk">United Kingdom ▼</option>
+                <option value="ca">Canada ▼</option>
+                <option value="au">Australia ▼</option>
+                <option value="de">Germany ▼</option>
+                <option value="global">Global ▼</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label for="filter-category">Category:</label>
+            <div class="select-wrapper">
+              <select id="filter-category">
+                <option value="any" selected>Any ▼</option>
+                <option value="Pets">Pets ▼</option>
+                <option value="Home & Living">Home & Living ▼</option>
+                <option value="Print on Demand">Print on Demand ▼</option>
+                <option value="Jewelry & Accessories">Jewelry & Accessories ▼</option>
+                <option value="Crafts & Supplies">Crafts & Supplies ▼</option>
+                <option value="Digital Products">Digital Products ▼</option>
+                <option value="Kitchen & Dining">Kitchen & Dining ▼</option>
+                <option value="Kids & Baby">Kids & Baby ▼</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label for="filter-budget">Budget:</label>
+            <div class="select-wrapper">
+              <select id="filter-budget">
+                <option value="100">$0–$100 ▼</option>
+                <option value="250">$0–$250 ▼</option>
+                <option value="500" selected>$0–$500 ▼</option>
+                <option value="1000">$500–$1,000 ▼</option>
+                <option value="9999">$1,000+ ▼</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="custom-query-row">
+          <input type="text" id="input-custom-search" placeholder="Target specific niche (e.g. pet ornament, wall art, punch needle)..." />
+          <button id="btn-quick-scan" class="btn-secondary" title="Scan this marketplace niche">
+            <span>Scan Niche</span>
+          </button>
+        </div>
+
+        <div id="live-page-alert" class="live-page-banner" style="display: none;">
+          <span class="live-dot"></span>
+          <span id="live-page-text">Active marketplace detected.</span>
+          <button id="btn-use-live-page" class="btn-micro">Analyze Current Page</button>
+        </div>
+      </section>
+
+      <!-- Loading State -->
+      <div id="scanning-state" class="scanning-container" style="display: none;">
+        <div class="scanner-radar">
+          <div class="radar-sweep"></div>
+          <div class="radar-dot dot-1"></div>
+          <div class="radar-dot dot-2"></div>
+          <div class="radar-dot dot-3"></div>
+        </div>
+        <h3 class="scanning-title">Scanning Marketplace Opportunities</h3>
+        <p id="scanning-status" class="scanning-sub">Measuring review barriers and search velocity...</p>
+        <div class="progress-bar-wrap">
+          <div id="scanning-progress-bar" class="progress-bar-inner"></div>
+        </div>
+      </div>
+
+      <!-- Winning Product Showcase Container -->
+      <div id="winner-result-container">
+        <!-- Rendered by popup.js -->
+      </div>
+    </main>
+
+    <!-- Tab 2: Market Discovery / Scan Market View -->
+    <section id="tab-discovery" class="tab-pane">
+      <div class="discovery-header-card">
+        <div class="discovery-title-row">
+          <div>
+            <h2 class="section-heading">MARKET OPPORTUNITY SCANNER</h2>
+            <p class="section-subheading">Ranked by composite Opportunity Score (Demand ↑, Competition ↓, Margin ↑, Trend ↑)</p>
+          </div>
+          <button id="btn-scan-market-tab" class="btn-action-primary">
+            <span>⚡ SCAN MARKET</span>
+          </button>
+        </div>
+        <div class="discovery-filters-compact">
+          <span class="filter-pill active" data-filter="all">All</span>
+          <span class="filter-pill" data-filter="Pets">Pets</span>
+          <span class="filter-pill" data-filter="Home & Living">Home</span>
+          <span class="filter-pill" data-filter="Print on Demand">Print on Demand</span>
+          <span class="filter-pill" data-filter="Digital Products">Digital</span>
+          <span class="filter-pill" data-filter="Crafts & Supplies">Crafts</span>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="opportunity-table">
+          <thead>
+            <tr>
+              <th>Rank & Product</th>
+              <th>Demand</th>
+              <th>Competition</th>
+              <th>Margin</th>
+              <th>Trend</th>
+              <th>Opp. Score</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="discovery-table-body">
+            <!-- Injected dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="discovery-footer-note">
+        <p>💡 Tip: Click <strong>"FIND MY WINNING PRODUCT"</strong> anytime to immediately zero in on the undisputed #1 highest-potential opportunity.</p>
+      </div>
+    </section>
+
+    <!-- Tab 3: Interactive Profit & Fee Calculator -->
+    <section id="tab-calculator" class="tab-pane">
+      <div class="card calc-container">
+        <h2 class="section-heading">🧮 INTERACTIVE PROFIT CALCULATOR</h2>
+        <p class="section-subheading">Tweak pricing, product cost, shipping, and platform fee structures in real-time.</p>
+
+        <div class="calc-grid">
+          <div class="calc-inputs">
+            <div class="calc-field">
+              <label>Target Marketplace</label>
+              <select id="calc-marketplace-select">
+                <option value="etsy" selected>Etsy (6.5% + $0.20 + 3% + $0.25)</option>
+                <option value="amazon">Amazon (15% Referral Fee)</option>
+                <option value="ebay">eBay (13.25% + $0.30)</option>
+                <option value="walmart">Walmart (15% Referral)</option>
+                <option value="tiktok">TikTok Shop (6% + $0.30)</option>
+                <option value="shopify">Shopify / DTC (2.9% + $0.30)</option>
+              </select>
+            </div>
+
+            <div class="calc-field">
+              <label>Selling Price ($)</label>
+              <div class="currency-input-wrap">
+                <span class="currency-prefix">$</span>
+                <input type="number" id="calc-price-input" step="0.01" value="14.99" min="0.5">
+              </div>
+            </div>
+
+            <div class="calc-field">
+              <label>Product Cost / Sourcing ($)</label>
+              <div class="currency-input-wrap">
+                <span class="currency-prefix">$</span>
+                <input type="number" id="calc-cost-input" step="0.01" value="3.20" min="0">
+              </div>
+            </div>
+
+            <div class="calc-field">
+              <label>Shipping / Packaging ($)</label>
+              <div class="currency-input-wrap">
+                <span class="currency-prefix">$</span>
+                <input type="number" id="calc-shipping-input" step="0.01" value="2.10" min="0">
+              </div>
+            </div>
+
+            <div class="calc-field">
+              <label>Estimated Units Sold / Month</label>
+              <input type="number" id="calc-units-input" value="350" min="1">
+            </div>
+          </div>
+
+          <div class="calc-results-card">
+            <div class="calc-net-profit-banner">
+              <span class="banner-label">ESTIMATED NET PROFIT / SALE</span>
+              <div class="banner-value" id="calc-net-profit">$7.97</div>
+              <div class="banner-sub" id="calc-profit-margin">65% Profit Margin</div>
+            </div>
+
+            <div class="calc-breakdown-list">
+              <div class="calc-row">
+                <span>Selling Price:</span>
+                <strong id="calc-out-price">$14.99</strong>
+              </div>
+              <div class="calc-row">
+                <span>Product Cost:</span>
+                <strong class="text-rose" id="calc-out-cost">-$3.20</strong>
+              </div>
+              <div class="calc-row">
+                <span>Shipping:</span>
+                <strong class="text-rose" id="calc-out-ship">-$2.10</strong>
+              </div>
+              <div class="calc-row">
+                <span>Marketplace Fees:</span>
+                <strong class="text-rose" id="calc-out-fees">-$1.72</strong>
+              </div>
+              <div class="calc-divider"></div>
+              <div class="calc-row highlight">
+                <span>Estimated Monthly Net:</span>
+                <strong class="text-emerald" id="calc-out-monthly-net">$2,789.50</strong>
+              </div>
+              <div class="calc-row">
+                <span>Return on Investment (ROI):</span>
+                <strong class="text-emerald" id="calc-out-roi">150%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Saved Winners -->
+    <section id="tab-saved" class="tab-pane">
+      <div class="saved-header-row">
+        <div>
+          <h2 class="section-heading">⭐ SAVED WINNING PRODUCTS</h2>
+          <p class="section-subheading">Your personal portfolio of high-opportunity items stored locally.</p>
+        </div>
+        <button id="btn-export-all-saved" class="btn-micro">Export JSON</button>
+      </div>
+
+      <div id="saved-list-container" class="saved-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- Info / Disclaimer Modal -->
+    <div id="modal-info" class="modal-backdrop" style="display: none;">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>ℹ️ Data Methodology & Confidence</h3>
+          <button id="btn-close-modal" class="modal-close">✕</button>
+        </div>
+        <div class="modal-content">
+          <h4>How Hidden Winner Finder Works</h4>
+          <p>Unlike ordinary spy tools that push overcrowded bestsellers, Hidden Winner Finder isolates <strong>low-competition anomalies</strong> where high buyer interest meets weak existing competition and generous profit margins.</p>
+          
+          <h4>The 5 Core Indicators</h4>
+          <ul>
+            <li><strong>Demand Score (0–100):</strong> Evaluates daily sales velocity, review acceleration, cart urgency tags, and search frequency.</li>
+            <li><strong>Competition Score (0–100):</strong> Analyzes search result density, review moat (0–30 = Low Competition), listing quality, and brand monopolization.</li>
+            <li><strong>Profit Margin:</strong> Models exact marketplace fees, realistic COGS, and shipping costs.</li>
+            <li><strong>Trend Trajectory:</strong> Monitors 30-day and 90-day momentum (Rising 🔥, Stable ➡️, Declining 📉).</li>
+            <li><strong>Room for New Sellers:</strong> Measures if first-time stores can realistically rank on page 1 within 30–60 days.</li>
+          </ul>
+
+          <div class="disclaimer-callout">
+            <strong>Public-Data Based & Estimated:</strong>
+            <p>All sales estimates, monthly revenues, and volumes are approximations derived from publicly observable marketplace signals and category fee models. Always conduct sample testing before placing bulk wholesale orders.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="toast" style="display: none;">
+      <span id="toast-message">Product saved to favorites!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span class="status-indicator"></span>
+        <span class="status-text">AI Opportunity Engine Active</span>
+      </div>
+      <div class="footer-right">
+        <span class="version-tag">v1.0.0 · Manifest V3</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="engine/storage_adapter.js"></script>
+  <script src="engine/competition.js"></script>
+  <script src="engine/demand.js"></script>
+  <script src="engine/profit.js"></script>
+  <script src="engine/trend.js"></script>
+  <script src="engine/sourcing.js"></script>
+  <script src="engine/marketplaces.js"></script>
+  <script src="engine/ideas.js"></script>
+  <script src="engine/channels.js"></script>
+  <script src="data/curated_database.js"></script>
+  <script src="engine/scanner.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

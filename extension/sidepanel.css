@@ -1,0 +1,14 @@
+/* Hidden Winner Finder - Chrome Side Panel Adaptations */
+
+.sidepanel-body {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 320px;
+  height: 100vh;
+  max-height: 100vh;
+}
+
+.sidepanel-body .app-container {
+  min-height: 100vh;
+  height: 100%;
+}

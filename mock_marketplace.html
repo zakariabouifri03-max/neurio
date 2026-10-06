@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Etsy - Personalized Halloween Pet Ornament Search Results</title>
+  <link rel="stylesheet" href="extension/content.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #fdfbf7; color: #222; }
+    
+    .etsy-navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: #ffffff;
+      border-bottom: 1px solid #e1e3df;
+      gap: 16px;
+    }
+    .etsy-logo { font-family: Georgia, serif; font-size: 26px; font-weight: 700; color: #f1641e; letter-spacing: -1px; }
+    .etsy-search-bar {
+      flex: 1;
+      max-width: 650px;
+      position: relative;
+      display: flex;
+    }
+    .etsy-search-bar input {
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid #222;
+      font-size: 14px;
+      outline: none;
+    }
+    .etsy-nav-links { display: flex; gap: 16px; font-size: 13px; font-weight: 500; }
+    
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px 24px; }
+    .search-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .search-title { font-size: 18px; font-weight: 600; color: #222; }
+    .results-count { font-size: 13px; color: #595959; }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .etsy-card {
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e1e3df;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .etsy-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .card-thumb {
+      height: 180px;
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-size: 38px;
+    }
+    .badge-in-cart {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #d82c0d;
+      color: #fff;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 4px;
+    }
+    .badge-bestseller {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: #fde047;
+      color: #713f12;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .card-body { padding: 12px; }
+    .card-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #222;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .card-seller { font-size: 11px; color: #757575; margin-bottom: 6px; }
+    .card-price-row { display: flex; align-items: baseline; gap: 6px; }
+    .currency-value { font-size: 15px; font-weight: 700; color: #222; }
+    .card-reviews { font-size: 11px; color: #595959; margin-top: 4px; }
+    .stars { color: #f59e0b; }
+  </style>
+</head>
+<body>
+  <header class="etsy-navbar">
+    <div class="etsy-logo">Etsy</div>
+    <div class="etsy-search-bar">
+      <input type="text" name="search_query" value="Personalized Halloween Pet Ornament" readonly>
+    </div>
+    <div class="etsy-nav-links">
+      <span>Favorites (14)</span>
+      <span>Cart (2)</span>
+      <span>Sign In</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="search-meta-row">
+      <h1 class="search-title">"Personalized Halloween Pet Ornament"</h1>
+      <span class="results-count wt-text-caption--subtle" data-search-results-count="840">
+        (840 results with Ads)
+      </span>
+    </div>
+
+    <div class="products-grid">
+      <!-- Item 1: Winning Product Example -->
+      <div class="etsy-card">
+        <div class="card-thumb" style="background: linear-gradient(135deg, #fed7aa, #f97316);">
+          🐶🎃
+          <span class="badge-in-cart">In 42 carts</span>
+          <span class="badge-bestseller">Bestseller</span>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Personalized Halloween Pet Ornament Custom Dog Name Keepsake</div>
+          <div class="card-seller">PumpkinPawsCrafts · Star Seller</div>
+          <div class="card-price-row">
+            <span class="currency-value">USD 14.99</span>
+          </div>
+          <div class="card-reviews">
+            <span class="stars">★★★★★</span> (38) · Fast Shipping
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="etsy-card">
+        <div class="card-thumb" style="background: linear-gradient(135deg, #e9d5ff, #c084fc);">
+          🐱👻
+          <span class="badge-in-cart">In 18 carts</span>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Spooky Cat Ghost Wood Ornament Personalized Kitty Keepsake</div>
+          <div class="card-seller">WhimsicalWhiskers · Star Seller</div>
+          <div class="card-price-row">
+            <span class="currency-value">USD 16.50</span>
+          </div>
+          <div class="card-reviews">
+            <span class="stars">★★★★★</span> (24)
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="etsy-card">
+        <div class="card-thumb" style="background: linear-gradient(135deg, #cbd5e1, #94a3b8);">
+          🐕⭐
+        </div>
+        <div class="card-body">
+          <div class="card-title">Custom Acrylic Dog Breed Silhouette Halloween Memorial</div>
+          <div class="card-seller">EvergreenLaserStudio</div>
+          <div class="card-price-row">
+            <span class="currency-value">USD 15.99</span>
+          </div>
+          <div class="card-reviews">
+            <span class="stars">★★★★☆</span> (19)
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 4 -->
+      <div class="etsy-card">
+        <div class="card-thumb" style="background: linear-gradient(135deg, #fef08a, #eab308);">
+          🐾🎃
+          <span class="badge-in-cart">In 26 carts</span>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Personalized 3D Layered Wood Dog Paw Halloween Ornament</div>
+          <div class="card-seller">RusticWoodEngravers</div>
+          <div class="card-price-row">
+            <span class="currency-value">USD 18.00</span>
+          </div>
+          <div class="card-reviews">
+            <span class="stars">★★★★★</span> (45)
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Injected Content Script Simulator -->
+  <script src="extension/content.js"></script>
+</body>
+</html>

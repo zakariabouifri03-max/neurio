@@ -1,0 +1,72 @@
+{
+  "manifest_version": 3,
+  "name": "Hidden Winner Finder - AI Product Opportunity Detector",
+  "short_name": "Hidden Winner",
+  "version": "1.0.0",
+  "description": "Automatically find the #1 hidden winning e-commerce product with high demand, low competition, strong profit margin, and room for new sellers.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Hidden Winner Finder"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "contextMenus",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "*://*.etsy.com/*",
+    "*://*.amazon.com/*",
+    "*://*.ebay.com/*",
+    "*://*.walmart.com/*",
+    "*://*.aliexpress.com/*",
+    "*://*.tiktok.com/*",
+    "*://*.cjdropshipping.com/*",
+    "*://*.printify.com/*",
+    "*://*.printful.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.etsy.com/*",
+        "*://*.amazon.com/*",
+        "*://*.ebay.com/*",
+        "*://*.walmart.com/*",
+        "*://*.aliexpress.com/*",
+        "*://*.tiktok.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/*",
+        "popup.html",
+        "sidepanel.html"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
