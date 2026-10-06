@@ -272,10 +272,6 @@ public final class StreamServer {
             regeneratePairingCode();
         }
 
-        @Override
-        public void onError(String message) {
-            leave(message);
-        }
     }
 
     private void startClientPipeline(PairingService.HandshakeResult handshake) {
