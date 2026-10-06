@@ -76,6 +76,19 @@ fun StreamScreen(actions: UiActions, onExit: () -> Unit) {
             Modifier.fillMaxHeight().aspectRatio(aspect)
         }
 
+        // Tap anywhere that is *not* a control to toggle the pad visibility.
+        // It sits BELOW the gamepad in z-order on purpose: Compose hit-tests
+        // top-down, so the virtual buttons keep their own gestures while taps
+        // on empty space still reach this layer.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { controlsVisible = !controlsVisible }
+        )
+
         Box(modifier = videoModifier.align(Alignment.Center)) {
             GameSurface(
                 modifier = Modifier.fillMaxSize(),
@@ -88,17 +101,6 @@ fun StreamScreen(actions: UiActions, onExit: () -> Unit) {
                 )
             }
         }
-
-        // Tap anywhere to toggle the controls (indication disabled: nothing
-        // should flash on top of the game).
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { controlsVisible = !controlsVisible }
-        )
 
         StatsOverlay(
             fps = stats.fps.toInt(),
