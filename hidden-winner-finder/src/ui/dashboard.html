@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hidden Winner Finder — product research dashboard</title>
+  <meta name="description" content="Find ONE hidden winning product: strong demand, low competition, good profit potential — with where to sell it and where to source it.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard">
+  <div id="root" aria-live="polite">
+    <div class="scroll-area" style="padding:40px">
+      <div class="skeleton" style="width:60%"></div>
+      <div class="skeleton" style="width:40%;margin-top:10px"></div>
+      <p class="note" style="margin-top:14px">Loading Hidden Winner Finder…</p>
+    </div>
+  </div>
+  <script type="module">
+    import { mount } from './app.js';
+    mount(document.getElementById('root'), { mode: 'dashboard' });
+  </script>
+</body>
+</html>

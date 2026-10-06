@@ -1,0 +1,30 @@
+{
+  "name": "hidden-winner-finder",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Chrome Extension (Manifest V3) that finds ONE hidden winning product: strong demand, low competition, good profit potential - plus where to sell and source it.",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "test:engine": "node --test tests/engine.test.js",
+    "test:observe": "node --test tests/observe.test.js",
+    "build:scanner": "node tools/build-scanner.mjs",
+    "build:icons": "node tools/make-icons.mjs",
+    "build:preview": "node tools/make-preview.mjs",
+    "build": "npm run build:scanner && npm run build:icons && npm run build:preview",
+    "preview": "node tools/serve.mjs",
+    "validate": "node tools/validate.mjs",
+    "verify": "npm run build && npm run validate && npm test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "chrome-extension",
+    "manifest-v3",
+    "product-research",
+    "etsy",
+    "dropshipping"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "Hidden Winner Finder",
+  "version": "1.0.0",
+  "description": "Find ONE hidden winning product with strong demand, low competition and real profit - plus where to sell it and where to source it.",
+  "minimum_chrome_version": "114",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Hidden Winner Finder - find one winning product",
+    "default_popup": "src/ui/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "options_page": "src/ui/dashboard.html",
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab",
+    "contextMenus"
+  ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
+  "commands": {
+    "scan-market": {
+      "suggested_key": {
+        "default": "Alt+Shift+S",
+        "mac": "Alt+Shift+S"
+      },
+      "description": "Scan the marketplace page in the active tab"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "offline_enabled": true,
+  "short_name": "Winner Finder"
+}

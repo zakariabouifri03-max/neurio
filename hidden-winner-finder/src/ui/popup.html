@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hidden Winner Finder</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="popup">
+  <div id="root" aria-live="polite"></div>
+  <script type="module">
+    import { mount } from './app.js';
+    mount(document.getElementById('root'), { mode: 'popup' });
+  </script>
+</body>
+</html>

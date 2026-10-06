@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preview — Hidden Winner Finder — product research dashboard</title>
+  <meta name="description" content="Find ONE hidden winning product: strong demand, low competition, good profit potential — with where to sell it and where to source it.">
+  <link rel="stylesheet" href="src/ui/styles.css">
+</head>
+<body class="dashboard">
+  <div class="preview-ribbon"><strong>Preview</strong> · extension UI running without the Chrome host · page scanning simulated</div>
+  <div id="root" aria-live="polite">
+    <div class="scroll-area" style="padding:40px">
+      <div class="skeleton" style="width:60%"></div>
+      <div class="skeleton" style="width:40%;margin-top:10px"></div>
+      <p class="note" style="margin-top:14px">Loading Hidden Winner Finder…</p>
+    </div>
+  </div>
+  
+  <script>
+    // Preview mode: no extension host. platform.js runs the engine locally and
+    // live page scanning is simulated so every screen is explorable.
+    window.HWF_AUTORUN = true;
+  </script>
+  <style>
+    .preview-ribbon {
+      position: fixed; left: 14px; bottom: 14px; z-index: 60;
+      background: rgba(8, 11, 22, 0.92); border: 1px solid rgba(255,255,255,0.16);
+      color: #a3adc8; font: 500 11px/1.4 "Inter", system-ui, sans-serif;
+      padding: 7px 11px; border-radius: 999px; backdrop-filter: blur(8px);
+    }
+    .preview-ribbon strong { color: #eef2ff; }
+  </style>
+  <script type="module">
+    import { mount } from './src/ui/app.js';
+    mount(document.getElementById('root'), { mode: 'dashboard' });
+  </script>
+</body>
+</html>
