@@ -124,8 +124,22 @@ jobs:
           fi
           release_url="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${tag}"
           apk_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}/Neurio-LAN-Stream-debug.apk"
+
+          # Also refresh a fixed "latest" tag so the download URL never changes.
+          latest_tag="neurio-lanstream-latest"
+          latest_title="Neurio LAN Stream - latest debug APK"
+          if gh release view "$latest_tag" >/dev/null 2>&1; then
+            gh release upload "$latest_tag" "$apk" "$checksums" --clobber
+          else
+            gh release create "$latest_tag" "$apk" "$checksums" \
+              --target "$GITHUB_SHA" --prerelease --title "$latest_title" \
+              --notes "Always-fresh CI build of \`android/\` (commit ${GITHUB_SHA:0:7}). The download URL does not change: install this APK on BOTH phones, one hosts, one joins. Debug build, unsigned for release, not yet validated on real devices."
+          fi
+          latest_apk_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${latest_tag}/Neurio-LAN-Stream-debug.apk"
+
           {
             echo '## Direct APK download'
-            echo "- APK: [Download Neurio-LAN-Stream-debug.apk](${apk_url})"
+            echo "- Latest (fixed URL): [Download Neurio-LAN-Stream-debug.apk](${latest_apk_url})"
+            echo "- This commit: [${tag}](${apk_url})"
             echo "- Release and checksum: [${title}](${release_url})"
           } >> "$GITHUB_STEP_SUMMARY"

@@ -32,6 +32,22 @@ prerecorded video, no mockups. Same APK on both phones.
 
 ## 2. Build & install
 
+### Prebuilt APK (CI)
+
+Every push to this project builds an installable debug APK with GitHub Actions
+and publishes it as a **prerelease**. The URL below always points at the newest
+build:
+
+**<https://github.com/zakariabouifri03-max/neurio/releases/download/neurio-lanstream-latest/Neurio-LAN-Stream-debug.apk>**
+
+Install the **same** APK on both phones (one hosts, one joins). It is a *debug*
+build (`com.neurio.lanstream.debug`, debug signing key) and it has **not** been
+validated on real devices yet — see [docs/TEST_PLAN.md](docs/TEST_PLAN.md).
+Release page (with SHA-256):
+<https://github.com/zakariabouifri03-max/neurio/releases/tag/neurio-lanstream-latest>
+
+### From source
+
 ```bash
 cd android                      # open THIS folder in Android Studio
 # if Studio reports a missing wrapper jar:
@@ -40,8 +56,10 @@ cd android                      # open THIS folder in Android Studio
 ./gradlew :app:installDebug     # repeat for the second phone
 ```
 
-The Gradle wrapper **properties** are committed; the wrapper **jar** is not
-(binary), so let Studio or `gradle wrapper` fetch it once.
+The committed `gradlew` bootstraps Gradle 8.9 itself (SHA-256 verified) because
+the wrapper **jar** is a binary and is not committed — `./gradlew :app:assembleDebug`
+works on a fresh clone. If Android Studio insists on a wrapper jar, run
+`./gradlew wrapper --gradle-version 8.9` once.
 
 ## 3. First session (two phones)
 
