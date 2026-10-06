@@ -85,12 +85,6 @@ std::string toStdString(JNIEnv* env, jstring value) {
     return result;
 }
 
-// Returns a Java string, or nullptr when `message` is empty (success).
-jstring errorOrNull(JNIEnv* env, const std::string& message) {
-    if (message.empty()) return nullptr;
-    return env->NewStringUTF(message.c_str());
-}
-
 jstring toJavaString(JNIEnv* env, const std::string& value) {
     return env->NewStringUTF(value.c_str());
 }

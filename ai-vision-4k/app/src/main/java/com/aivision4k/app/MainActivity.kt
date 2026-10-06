@@ -48,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -117,6 +118,8 @@ private enum class Route { Settings, Benchmark }
 
 @Composable
 private fun AppRoot(vm: AppViewModel = viewModel()) {
+    // The composition's context is the activity here; used to start the demo.
+    val context = LocalContext.current
     val state = vm.state
     val snackbar = remember { SnackbarHostState() }
     var tab by remember { mutableStateOf(Tab.Dashboard) }
@@ -171,9 +174,12 @@ private fun AppRoot(vm: AppViewModel = viewModel()) {
                             onOpenGames = { tab = Tab.Games },
                             // Its own activity: the demo takes the whole screen,
                             // forces landscape and owns a Vulkan device, so it must
-                            // not share a lifecycle with the dashboard.
+                            // not share a lifecycle with the dashboard. The context
+                            // comes from the composition because AppRoot is a
+                            // top-level composable, not a member of the activity --
+                            // there is no Activity receiver to call startActivity on.
                             onOpenDemo = {
-                                startActivity(Intent(this@MainActivity, DemoActivity::class.java))
+                                context.startActivity(Intent(context, DemoActivity::class.java))
                             },
                         )
                         Tab.Games -> GamesScreen(vm)

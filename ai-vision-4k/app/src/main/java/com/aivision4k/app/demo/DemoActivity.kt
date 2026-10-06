@@ -728,7 +728,7 @@ private fun LadderCard(state: DemoUiState, onConfig: (JSONObject) -> Unit) {
             Hint(
                 "Render and output are the same size: this is a native render, so " +
                     "the AI stage stays off.",
-                WarnAmber,
+                accent = WarnAmber,
             )
         }
     }
