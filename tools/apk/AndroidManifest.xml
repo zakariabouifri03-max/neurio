@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.montaj.pro"
-    android:versionCode="2"
-    android:versionName="1.0.1">
+    android:versionCode="3"
+    android:versionName="1.0.2">
 
     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="30" />
 
@@ -21,17 +21,23 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 
+        <!-- entry point: installs the crash reporter first, then opens the editor -->
         <activity
-            android:name="com.montaj.pro.MainActivity"
+            android:name="com.montaj.pro.SplashActivity"
             android:exported="true"
-            android:screenOrientation="fullSensor"
-            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|density"
-            android:windowSoftInputMode="adjustResize"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.montaj.pro.MainActivity"
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|density"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleTop" />
     </application>
 </manifest>

@@ -190,14 +190,18 @@ def main():
         '--min-sdk-version', '21', '--target-sdk-version', '30',
         '--auto-add-overlay', res_zip])
 
-    # 5. add classes.dex to the archive
+    # 5. add classes.dex, then align + store what Android mmaps.
+    #    Without this the dex/manifest sit misaligned (and deflated) inside the
+    #    archive and the process dies the moment the activity starts.
     with zipfile.ZipFile(unsigned, 'a', zipfile.ZIP_DEFLATED) as z:
         z.write(dex, 'classes.dex')
+    aligned = os.path.join(BUILD, 'aligned.apk')
+    sh([sys.executable, os.path.join(APKDIR, 'zipalign.py'), unsigned, aligned])
 
     # 6. sign (v1 + v2 + v3)
     keyp, certp = make_keystore()
     out = os.path.join(ROOT, out_name)
-    sh(['node', os.path.join(APKDIR, 'sign-apk.mjs'), unsigned, out, keyp, certp])
+    sh(['node', os.path.join(APKDIR, 'sign-apk.mjs'), aligned, out, keyp, certp])
 
     # 7. verify
     print('\n== verifying ==')
@@ -207,6 +211,9 @@ def main():
         for n in ('AndroidManifest.xml', 'classes.dex', 'resources.arsc', 'assets/app/index.html'):
             print(' ', 'OK ' if n in names else 'MISSING ', n)
         print(' signature files:', [n for n in names if n.startswith('META-INF')])
+    r3 = subprocess.run([sys.executable, os.path.join(APKDIR, 'zipalign.py'), '--check', out],
+                        capture_output=True, text=True)
+    print(' ', (r3.stdout or r3.stderr).strip().splitlines()[-1] if (r3.stdout or r3.stderr).strip() else '')
     r = subprocess.run([aapt2, 'dump', 'badging', out], capture_output=True, text=True)
     for line in (r.stdout or '').splitlines()[:6]:
         print(' ', line)

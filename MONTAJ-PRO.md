@@ -7,10 +7,10 @@
 
 | الملف | الحجم | إمضاء | الأحجام |
 |---|---|---|---|
-| `MontajPro-v1.0.1.apk` | 372 KB | APK Signature v1+v2+v3 | `63381e34cc195d84…` |
+| `MontajPro-v1.0.2.apk` | 376 KB | APK Signature v1+v2+v3 | `1d2f34989aabb075…` |
 | `MontajPro-Windows.exe` | 950 KB | portable (بلا تنصيب) | `ee92df63d874bfeff…` |
 
-> نسخة التطبيق: `com.montaj.pro` • versionName **1.0.1** (versionCode 2) • Android 5.0+ (minSdk 21) • Windows 10/11
+> نسخة التطبيق: `com.montaj.pro` • versionName **1.0.2** (versionCode 3) • Android 5.0+ (minSdk 21) • Windows 10/11
 
 ---
 
@@ -18,31 +18,42 @@
 
 | الملف | رابط مباشر (يبدا التحميل دغيا) |
 |---|---|
-| 📱 **APK** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-v1.0.1.apk |
+| 📱 **APK** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-v1.0.2.apk |
 | 💻 **EXE** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-Windows.exe |
 
 > قبل الدمج استعمل رابط الفرع:
-> `https://github.com/zakariabouifri03-max/neurio/raw/arena/d1960a3c-neurio/MontajPro-v1.0.1.apk`
+> `https://github.com/zakariabouifri03-max/neurio/raw/arena/d1960a3c-neurio/MontajPro-v1.0.2.apk`
 >
-> ولا من صفحة الملف فـGitHub: زر **Download raw file**: `…/blob/main/MontajPro-v1.0.1.apk`
+> ولا من صفحة الملف فـGitHub: زر **Download raw file**: `…/blob/main/MontajPro-v1.0.2.apk`
 
 ---
 
-## 🩹 آخر تحديث — v1.0.1 (مهم)
+## 🩹 آخر تحديث — v1.0.2 (إصلاح الانهيار عند الفتح) 🔴
 
-- **إصلاح:** التطبيق كان **كيتسد فور الفتح** على الأندرويد. السبب كان ريجستر غلط فالدالة
-  `mimeOf` (كانت كتستعمل `p1` فدالة static عندها بارامتر واحد فقط = `p0`) — هادشي كيدير
-  `VerifyError` عند نظام أندرويد وكيتوقف التطبيق دغيا. تصحّح.
-- **إضافة:** أي مشكل فالتشغيل ولا فتحميل الواجهة دابا كيبان لك **مكتوب فالشاشة بالعربية**
-  (بلاصة ما يتسد التطبيق بلا كلام) — يمكن تصوّرو وتصيفطو.
-- **إضافة:** فحص تلقائي (`tools/apk/lint-smali.py`) كيدوز مع كل بناء باش هاد النوع من الأخطاء ما يرجعش.
-- **إصلاح:** الصلاحيات على أندرويد 5.0/5.1 (كانت كتعيّط دالة ماكايناش قبل API 23).
+**السبب الحقيقي:** ملفات الـAPK كانت **مضغوطة و ماشي مرتّبة (misaligned)**. أندرويد كيقرا
+`classes.dex` و`AndroidManifest.xml` و`resources.arsc` مباشرة من داخل الـAPK (mmap) — إلا كانو
+مضغوطين ولا ما بداوش على حدود 4 بايت، النظام كيرفضهم و**التطبيق كيتسد فور ما تتفتح**.
+هادشي هو اللي كان كيوقع. دابا زدت مرحلة **zipalign** فالبناء:
+- `AndroidManifest.xml` ✅ STORED + مرتّب
+- `resources.arsc` ✅ STORED + مرتّب (4096)
+- `classes.dex` ✅ **STORED** (بلا ضغط، كيفما كيلزم من أندرويد 11) + مرتّب على 4096
+
+كنتحقق منها أوتوماتيكياً **من بعد الإمضاء** فكل بناء (`tools/apk/zipalign.py --check`).
+
+**زيادة مهمة — تقرير الخطأ:** دابا التطبيق كيدير **مسجّل أخطاء** قبل ما يحل المحرر، وأي انهيار
+كيتكتب فملف ويتعرض ليك **مكتوب فالشاشة** ملي تفتح التطبيق من جديد، مع زر «متابعة إلى المحرر».
+يعني إلى وقع شي حاجة، **صوّر الشاشة وصيفط ليا** التقرير — غادي نشوف السبب بالضبط.
+
+**من v1.0.1:** تصحّح ريجستر غلط فـ`mimeOf` (كان كيدير VerifyError) + رسائل خطأ بالعربية فالشاشة
++ إصلاح الصلاحيات على أندرويد 5.x.
+**من v1.0.2:** زيد الأداة `tools/apk/lint-smali.py` كتفحص كل ملفات smali قبل البناء (0 مشاكل)،
+وكتلقط حتى «class descriptor داخل register list».
 
 ---
 
 ## 📱 1. التثبيت على الهاتف (APK)
 
-1. نزّل `MontajPro-v1.0.1.apk` وحطّه فالهاتف (Downloads / التنزيلات).
+1. نزّل `MontajPro-v1.0.2.apk` وحطّه فالهاتف (Downloads / التنزيلات).
 2. حلّ: **الإعدادات → التطبيقات → وصول خاص / مصادر غير معروفة** للملفات (ولا ملي كتضغط على الـ APK الهاتف غادي يعطيك رابط مباشر باش تسمح).
 3. ضغط على الملف ← **تثبيت** ← تلقى أيقونة **مونتاج برو** فالشاشة الرئيسية.
 

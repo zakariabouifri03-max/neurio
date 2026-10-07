@@ -89,6 +89,9 @@ def lint_file(path):
                     if lab != '..':
                         labels_used.add(lab)
                 labels_used.add(c.group(2))
+            rl = re.search(r'\{([^}]*)\}', l)
+            if rl and re.search(r'\{[^}]*\b[L\[]', l):
+                problems.append((ln, 'class descriptor inside a register list (use const-class)', l.strip()))
             ins = INS.match(l)
             if ins and regs is not None:
                 for kind, num in REG.findall(ins.group(2) or ''):
