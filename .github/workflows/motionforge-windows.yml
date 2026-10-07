@@ -75,7 +75,13 @@ jobs:
         shell: pwsh
         run: |
           Get-ChildItem dist | Format-Table Name, Length
-          python tools/verify_win.py dist *>&1 | Tee-Object -FilePath ci/build.log -Append
+          $targets = @()
+          $tree = Join-Path "${{ runner.temp }}" "mfs-cache\tree\MotionForge Studio"
+          if (Test-Path $tree) { $targets += $tree }
+          $targets += (Get-ChildItem dist/*.zip).FullName
+          $targets += (Get-ChildItem dist/*.exe).FullName
+          "verifying: $($targets -join ', ')"
+          python tools/verify_win.py @targets *>&1 | Tee-Object -FilePath ci/build.log -Append
           if ($LASTEXITCODE -ne 0) { throw "verification failed" }
 
       - name: Unpack and smoke test the portable build

@@ -16,6 +16,7 @@ from __future__ import annotations
 import os
 import struct
 import sys
+import tempfile
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -168,7 +169,7 @@ def verify_zip(path: str) -> int:
         if exe is None:
             print(f"{FAIL} {APP_EXE} missing")
             return problems + 1
-        tmp = os.path.join("/tmp", "mfs_verify_" + os.path.basename(exe))
+        tmp = os.path.join(tempfile.gettempdir(), "mfs_verify_" + os.path.basename(exe))
         with z.open(exe) as src, open(tmp, "wb") as dst:
             dst.write(src.read())
         problems += check_pe(tmp, APP_EXE)
