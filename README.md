@@ -14,6 +14,15 @@ No build step, no external CDN — everything is procedural and vendored (Three.
 
 ---
 
+## 🎬 Neurio Studio — video editor (`studio/`)
+
+A professional on-device video editor (multi-track timeline, GPU effects & transitions, keyframes, chroma key, masks, auto captions, templates, royalty-free sound, MP4 export).
+
+**Download:** Windows installer / portable EXE and Android APK → **[Latest release](https://github.com/zakariabouifri03-max/neurio/releases/latest)**
+Run in a browser: `cd studio && npm install --ignore-scripts && npm run dev`. Details in [`studio/README.md`](studio/README.md).
+
+---
+
 ## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
 
 A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
