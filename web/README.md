@@ -152,9 +152,9 @@ Copy `.env.example` → `.env.local` and adjust. Everything is optional; default
 
 | Variable | Purpose |
 | --- | --- |
-| `DATABASE_URL` / `DATABASE_FILE` | SQLite file (default `dev.db`). `db/schema.sql` documents the Postgres migration path. |
+| `DATABASE_URL` / `DATABASE_FILE` | SQLite file. Defaults to `~/.prism-studio/prism.db` **outside** the repo so data survives a re-deploy; set `PRISM_DATA_DIR` to move it. `db/schema.sql` documents the Postgres path. |
 | `AUTH_SECRET` | Session signing secret. **Change for production.** |
-| `STORAGE_DRIVER` | `local` (default) or `s3`. S3 uses hand-rolled SigV4 — no SDK. |
+| `STORAGE_DRIVER` | `local` (default, `<data dir>/uploads`) or `s3`. S3 uses hand-rolled SigV4 — no SDK. |
 | `S3_*` | Bucket, region, keys, endpoint (R2/MinIO compatible). |
 | `AI_PROVIDER`, `AI_IMAGE_PROVIDER` | `auto` (default) or a specific provider. |
 | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_AI_API_KEY`, `REPLICATE_API_TOKEN`, `STABILITY_API_KEY`, `FAL_API_KEY` | Optional quality upgrades for AI. |

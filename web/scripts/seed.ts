@@ -9,9 +9,10 @@ import { DatabaseSync } from 'node:sqlite';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { databasePath } from '../src/lib/data-path.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const dbPath = resolve(root, process.env.DATABASE_FILE ?? process.env.DATABASE_PATH ?? 'dev.db');
+const dbPath = databasePath();
 
 if (!existsSync(dbPath)) {
   console.error(`[seed] ${dbPath} not found — run "npm run db:migrate" first.`);

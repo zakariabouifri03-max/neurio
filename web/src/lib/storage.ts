@@ -2,6 +2,7 @@ import 'server-only';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { uploadsPath } from './data-path.mjs';
 
 /**
  * Object storage abstraction.
@@ -215,7 +216,7 @@ export function storage(): StorageDriver {
   if (driver === 's3' && process.env.S3_BUCKET && process.env.S3_ACCESS_KEY_ID) {
     cached = new S3Driver();
   } else {
-    cached = new LocalDriver(process.env.STORAGE_LOCAL_DIR ?? './storage');
+    cached = new LocalDriver(uploadsPath());
   }
   return cached;
 }

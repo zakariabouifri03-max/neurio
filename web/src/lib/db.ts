@@ -18,13 +18,14 @@ export type Params = (string | number | null | Uint8Array)[];
 
 const globalForDb = globalThis as unknown as { __prismDb?: DatabaseSync; __prismDbReady?: boolean };
 
+import { databasePath as resolveDatabasePath } from './data-path.mjs';
+
+/**
+ * Absolute path of the SQLite file. Delegates to `data-path.mjs` so the server,
+ * the migrate script and the seeder always open the same database.
+ */
 export function databasePath(): string {
-  const url = process.env.DATABASE_URL ?? 'file:./dev.db';
-  if (url.startsWith('file:')) {
-    const rel = url.slice(5);
-    return path.isAbsolute(rel) ? rel : path.resolve(process.cwd(), rel);
-  }
-  return path.resolve(process.cwd(), 'dev.db');
+  return resolveDatabasePath();
 }
 
 export function db(): DatabaseSync {

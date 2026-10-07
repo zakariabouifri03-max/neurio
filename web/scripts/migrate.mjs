@@ -10,11 +10,10 @@ import { DatabaseSync } from 'node:sqlite';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { databasePath } from '../src/lib/data-path.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const dbPath = process.env.DATABASE_FILE
-  ? resolve(root, process.env.DATABASE_FILE)
-  : resolve(root, process.env.DATABASE_PATH ?? 'dev.db');
+const dbPath = databasePath();
 
 mkdirSync(dirname(dbPath), { recursive: true });
 const schema = readFileSync(resolve(root, 'db/schema.sql'), 'utf8');
