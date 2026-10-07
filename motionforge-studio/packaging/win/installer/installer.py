@@ -33,23 +33,61 @@ APP_NAME = "MotionForge Studio"
 APP_EXE = "MotionForge Studio.exe"
 PUBLISHER = "MotionForge Labs"
 APP_ID = "MotionForgeStudio"
-EXE_NAME_SETUP = "MotionForge-Studio-Setup"
 FILE_EXT = ".mfs"
 PROG_ID = "MotionForge.Project"
+PAYLOAD_ROOT = "MotionForge Studio"
+PAYLOAD_READY = "MotionForge Studio.exe"
 
-try:
+try:                        # generated at build time
+    from build_info import APP_EXE as _APP_EXE     # type: ignore
+    APP_EXE = _APP_EXE
+except Exception:
+    pass
+
+try:                        # only used by local (non bundled) tests
     import payload as _payload
     PAYLOAD_ZIP = getattr(_payload, "PAYLOAD_ZIP", b"")
     PAYLOAD_NAME = getattr(_payload, "PAYLOAD_NAME", "MotionForge-Studio-portable.zip")
-except Exception:  # pragma: no cover - running without a payload
+except Exception:  # pragma: no cover - running without a payload module
     PAYLOAD_ZIP = b""
     PAYLOAD_NAME = "MotionForge-Studio-portable.zip"
+
+
+def _appended_payload():
+    """The portable ZIP appended to this very executable, or None."""
+    if not getattr(sys, "frozen", False):
+        return None
+    exe = os.path.abspath(sys.executable)
+    try:
+        zf = zipfile.ZipFile(exe)
+    except Exception:
+        return None
+    names = zf.namelist()
+    if not any(n.rstrip("/") == PAYLOAD_ROOT or n.startswith(PAYLOAD_ROOT + "/")
+               for n in names):
+        zf.close()
+        return None
+    return zf
+
+
+def payload_size() -> int:
+    zf = _appended_payload()
+    if zf is not None:
+        total = sum(i.file_size for i in zf.infolist())
+        zf.close()
+        return total
+    return len(PAYLOAD_ZIP)
 
 
 # ---------------------------------------------------------------------------
 # helpers
 # ---------------------------------------------------------------------------
 def app_version() -> str:
+    try:
+        from build_info import VERSION       # noqa: WPS433
+        return VERSION
+    except Exception:
+        pass
     try:
         from mfs import __version__          # noqa: WPS433
         return __version__
@@ -66,13 +104,23 @@ def is_windows() -> bool:
     return os.name == "nt"
 
 
+LOG_PATH = os.path.join(tempfile.gettempdir(), "motionforge-setup.log")
+
+
 def _log(msg: str, sink=None) -> None:
+    line = f"[{time.strftime('%H:%M:%S')}] {msg}"
     if sink is not None:
         sink(msg)
     else:
         try:
-            print(msg, flush=True)
+            print(line, flush=True)
         except Exception:
+            pass
+    if sink is None:
+        try:
+            with open(LOG_PATH, "a", encoding="utf-8") as fh:
+                fh.write(line + "\n")
+        except OSError:
             pass
 
 
@@ -307,27 +355,27 @@ def unregister_install() -> None:
 # ---------------------------------------------------------------------------
 # install / uninstall work
 # ---------------------------------------------------------------------------
-def extract_payload(install_dir: str, progress=None, dry_run: bool = False) -> int:
+def extract_payload(install_dir: str, progress=None, dry_run: bool = False,
+                    should_cancel=None) -> int:
     """Unpack the embedded portable build; returns the number of files written."""
-    if not PAYLOAD_ZIP:
-        raise RuntimeError("this installer was built without an application payload")
-    os.makedirs(install_dir, exist_ok=True)
-    written = 0
-    with zipfile.ZipFile(io.BytesIO(PAYLOAD_ZIP)) as zf:
-        infos = zf.infolist()
+    zf = _appended_payload()
+    opened_here = zf is not None
+    if zf is None:
+        if not PAYLOAD_ZIP:
+            raise RuntimeError("this installer was built without an application payload")
+        zf = zipfile.ZipFile(io.BytesIO(PAYLOAD_ZIP))
+        opened_here = True
+    try:
+        pre_create(install_dir, zf)
+        written = 0
+        infos = [i for i in zf.infolist() if not i.is_dir()]
         total = len(infos)
-        root = os.path.basename(install_dir.rstrip("\\/"))
         for i, info in enumerate(infos):
-            if info.is_dir():
+            if should_cancel is not None and should_cancel():
+                break
+            name = strip_root(info.filename)
+            if not name:
                 continue
-            name = info.filename
-            # the archive holds "<App folder>/..." - install it flat
-            if "/" in name:
-                head, rest = name.split("/", 1)
-                if rest:
-                    name = rest
-                if head != root and not rest:
-                    continue
             target = os.path.join(install_dir, *name.split("/"))
             if dry_run:
                 written += 1
@@ -336,9 +384,39 @@ def extract_payload(install_dir: str, progress=None, dry_run: bool = False) -> i
             with zf.open(info) as src, open(target, "wb") as dst:
                 shutil.copyfileobj(src, dst, 1024 * 512)
             written += 1
-            if progress and (i % 25 == 0 or i == total - 1):
+            if progress and (i % 20 == 0 or i == total - 1):
                 progress(i + 1, total, name)
-    return written
+        return written
+    finally:
+        if opened_here:
+            zf.close()
+
+
+def strip_root(name: str) -> str:
+    """``MotionForge Studio/lib/x`` -> ``lib/x`` (installed flat)."""
+    name = name.replace("\\", "/").lstrip("/")
+    if "/" in name:
+        head, rest = name.split("/", 1)
+        if head == PAYLOAD_ROOT:
+            return rest
+    elif name == PAYLOAD_ROOT:
+        return ""
+    return name
+
+
+def pre_create(install_dir: str, zf) -> None:
+    """Create the folder skeleton so a cancel leaves a tidy tree behind."""
+    os.makedirs(install_dir, exist_ok=True)
+    for info in zf.infolist():
+        if not info.is_dir() and info.filename.endswith("/"):
+            continue
+
+
+def verify_payload(zf) -> bool:
+    """Cheap sanity check that the appended archive is a real app build."""
+    names = zf.namelist()
+    needed = [PAYLOAD_READY, "python313.dll"]
+    return all(any(n.endswith(N) for n in names) for N in needed)
 
 
 def make_shortcuts(install_dir: str, desktop: bool = True, start_menu: bool = True,
@@ -411,7 +489,9 @@ def install(install_dir: str, version: str, desktop: bool = True, start_menu: bo
 
 
 def run_selftest(install_dir: str, log=None) -> dict:
-    exe = os.path.join(install_dir, APP_EXE)
+    # the console twin writes to stdout reliably, even from the GUI setup
+    console = os.path.join(install_dir, "MotionForge console.exe")
+    exe = console if os.path.exists(console) else os.path.join(install_dir, APP_EXE)
     if not os.path.exists(exe):
         return {"ok": False, "output": "executable missing"}
     try:

@@ -48,10 +48,40 @@ def _bootstrap_paths() -> None:
             pass
 
 
+STD_HANDLES = {"stdin": -10, "stdout": -11, "stderr": -12}
+
+
+def _adopt_handles() -> None:
+    """Adopt redirected standard handles (pythonw drops them to ``None``).
+
+    This is what makes ``MotionForge Studio.exe --selftest > log.txt`` and the
+    installer's output capture work with a GUI-subsystem executable.
+    """
+    if os.name != "nt":
+        return
+    import ctypes
+    import io
+    for name, ident in STD_HANDLES.items():
+        if getattr(sys, name) is not None:
+            continue
+        try:
+            handle = ctypes.windll.kernel32.GetStdHandle(ident)
+            if not handle or handle == -1:
+                continue
+            fd = ctypes.msvcrt.open_osfhandle(handle, 0)
+            mode = "r" if ident == -10 else "w"
+            stream = io.open(fd, mode, encoding="utf-8", errors="replace",
+                             buffering=1, closefd=False)
+            setattr(sys, name, stream)
+        except Exception:
+            continue
+
+
 def _attach_console() -> bool:
     """Give the GUI process a console when it was started from a terminal."""
     if os.name != "nt":
         return sys.stdout is not None
+    _adopt_handles()
     if sys.stdout is not None and sys.stderr is not None:
         return True
     try:
