@@ -10,6 +10,8 @@ dist
 !.env.example
 dev.db
 dev.db-journal
+dev.db-wal
+dev.db-shm
 prisma/dev.db*
 .storage
 storage

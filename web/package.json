@@ -4,14 +4,21 @@
   "private": true,
   "description": "Prism Studio \u2014 a professional all-in-one visual design platform",
   "scripts": {
+    "predev": "node scripts/ensure-deps.mjs",
     "dev": "next dev -H 0.0.0.0 -p 3000",
+    "prebuild": "node scripts/ensure-deps.mjs",
     "build": "next build",
+    "prestart": "node scripts/ensure-deps.mjs",
     "start": "next start -H 0.0.0.0 -p 3000",
+    "prelint": "node scripts/ensure-deps.mjs",
     "lint": "next lint",
+    "pretypecheck": "node scripts/ensure-deps.mjs",
     "typecheck": "tsc --noEmit",
+    "predb:seed": "node scripts/ensure-deps.mjs",
     "db:seed": "tsx scripts/seed.ts",
+    "db:migrate": "node scripts/migrate.mjs",
     "gen:assets": "node scripts/gen-assets.mjs",
-    "db:migrate": "node scripts/migrate.mjs"
+    "setup": "node scripts/ensure-deps.mjs && node scripts/migrate.mjs && tsx scripts/seed.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
