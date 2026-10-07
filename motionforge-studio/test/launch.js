@@ -6,7 +6,7 @@ async function launch(extraArgs = []) {
   const libs = '/tmp/chromlibs/lib';
   if (!fs.existsSync(libs)) {
     fs.mkdirSync('/tmp/chromlibs', { recursive: true });
-    const br = path.join(require.resolve('@sparticuz/chromium/package.json'), '..', 'bin', 'al2023.tar.br');
+    const br = path.join(__dirname, '..', 'node_modules', '@sparticuz', 'chromium', 'bin', 'al2023.tar.br');
     fs.writeFileSync('/tmp/chromlibs/al.tar', zlib.brotliDecompressSync(fs.readFileSync(br)));
     cp.execSync('tar xf al.tar', { cwd: '/tmp/chromlibs' });
   }
