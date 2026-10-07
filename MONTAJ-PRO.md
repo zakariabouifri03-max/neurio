@@ -7,10 +7,10 @@
 
 | الملف | الحجم | إمضاء | الأحجام |
 |---|---|---|---|
-| `MontajPro-v1.0.apk` | 370 KB | APK Signature v1+v2+v3 | `27d0fdc72189e1eb51a3195feb5ee634…` |
-| `MontajPro-Windows.exe` | 950 KB | portable (بلا تنصيب) | `ee92df63d874bfeff823b6e7385fa4a6…` |
+| `MontajPro-v1.0.1.apk` | 372 KB | APK Signature v1+v2+v3 | `63381e34cc195d84…` |
+| `MontajPro-Windows.exe` | 950 KB | portable (بلا تنصيب) | `ee92df63d874bfeff…` |
 
-> نسخة التطبيق: `com.montaj.pro` • versionName 1.0 • Android 5.0+ (minSdk 21) • Windows 10/11
+> نسخة التطبيق: `com.montaj.pro` • versionName **1.0.1** (versionCode 2) • Android 5.0+ (minSdk 21) • Windows 10/11
 
 ---
 
@@ -18,19 +18,31 @@
 
 | الملف | رابط مباشر (يبدا التحميل دغيا) |
 |---|---|
-| 📱 **APK** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-v1.0.apk |
+| 📱 **APK** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-v1.0.1.apk |
 | 💻 **EXE** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-Windows.exe |
 
-> إلا كان الرابط ديال `main` مازال ما بانش (قبل الدمج)، استعمل نسخة الفرع:
-> `https://github.com/zakariabouifri03-max/neurio/raw/arena/d1960a3c-neurio/MontajPro-v1.0.apk`
+> قبل الدمج استعمل رابط الفرع:
+> `https://github.com/zakariabouifri03-max/neurio/raw/arena/d1960a3c-neurio/MontajPro-v1.0.1.apk`
 >
-> ولا من صفحة الملف فـGitHub: زر **Download raw file**: `…/blob/main/MontajPro-v1.0.apk`
+> ولا من صفحة الملف فـGitHub: زر **Download raw file**: `…/blob/main/MontajPro-v1.0.1.apk`
+
+---
+
+## 🩹 آخر تحديث — v1.0.1 (مهم)
+
+- **إصلاح:** التطبيق كان **كيتسد فور الفتح** على الأندرويد. السبب كان ريجستر غلط فالدالة
+  `mimeOf` (كانت كتستعمل `p1` فدالة static عندها بارامتر واحد فقط = `p0`) — هادشي كيدير
+  `VerifyError` عند نظام أندرويد وكيتوقف التطبيق دغيا. تصحّح.
+- **إضافة:** أي مشكل فالتشغيل ولا فتحميل الواجهة دابا كيبان لك **مكتوب فالشاشة بالعربية**
+  (بلاصة ما يتسد التطبيق بلا كلام) — يمكن تصوّرو وتصيفطو.
+- **إضافة:** فحص تلقائي (`tools/apk/lint-smali.py`) كيدوز مع كل بناء باش هاد النوع من الأخطاء ما يرجعش.
+- **إصلاح:** الصلاحيات على أندرويد 5.0/5.1 (كانت كتعيّط دالة ماكايناش قبل API 23).
 
 ---
 
 ## 📱 1. التثبيت على الهاتف (APK)
 
-1. نزّل `MontajPro-v1.0.apk` وحطّه فالهاتف (Downloads / التنزيلات).
+1. نزّل `MontajPro-v1.0.1.apk` وحطّه فالهاتف (Downloads / التنزيلات).
 2. حلّ: **الإعدادات → التطبيقات → وصول خاص / مصادر غير معروفة** للملفات (ولا ملي كتضغط على الـ APK الهاتف غادي يعطيك رابط مباشر باش تسمح).
 3. ضغط على الملف ← **تثبيت** ← تلقى أيقونة **مونتاج برو** فالشاشة الرئيسية.
 
@@ -117,6 +129,7 @@ python3 tools/make-icons.py .tools/icon-src.png
 
 # 3) الـ APK  (كيحمّل بوحدو: JRE, apktool/aapt2, apk-signer, esbuild)
 python3 tools/apk/build-apk.py                     # --no-icons للبناء السريع
+python3 tools/apk/lint-smali.py                    # فحص smali (كيدوز تلقائياً فالبناء)
 python3 tools/apk/build-apk.py --out MontajPro-v1.1.apk
 
 # 4) الـ EXE  (zig: محمّل محمول، ماكيحتاجش mingw ولا MSVC)

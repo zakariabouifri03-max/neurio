@@ -36,9 +36,51 @@
 .end method
 
 .method public onCreate(Landroid/os/Bundle;)V
-    .registers 5
+    .registers 6
 
     invoke-super {p0, p1}, Landroid/app/Activity;->onCreate(Landroid/os/Bundle;)V
+
+    :try_start
+    invoke-virtual {p0}, Lcom/montaj/pro/MainActivity;->buildUi()V
+
+    :try_end
+    .catch Ljava/lang/Throwable; {:try_start .. :try_end} :catch_err
+
+    return-void
+
+    :catch_err
+    move-exception v0
+
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v2, "تعذر تشغيل التطبيق.\n\n"
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/Throwable;->toString()Ljava/lang/String;
+
+    move-result-object v2
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    const-string v2, "\n\nتأكد أن Android System WebView مفعّل ومحدّث من إعدادات النظام."
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-virtual {p0, v0}, Lcom/montaj/pro/MainActivity;->showErrorText(Ljava/lang/String;)V
+
+    return-void
+.end method
+
+# actual UI construction (kept apart so any failure can be shown on screen)
+.method public buildUi()V
+    .registers 5
 
     const/4 v0, 0x1
 
@@ -119,6 +161,44 @@
     invoke-virtual {v0, v1}, Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
 
     iget-object v0, p0, Lcom/montaj/pro/MainActivity;->webView:Landroid/webkit/WebView;
+
+    invoke-virtual {p0, v0}, Landroid/app/Activity;->setContentView(Landroid/view/View;)V
+
+    return-void
+.end method
+
+.method public showErrorText(Ljava/lang/String;)V
+    .registers 8
+
+    new-instance v0, Landroid/widget/TextView;
+
+    invoke-direct {v0, p0}, Landroid/widget/TextView;-><init>(Landroid/content/Context;)V
+
+    const v1, 0xffe8ecf4
+
+    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setTextColor(I)V
+
+    const v1, 0xff0b0e14
+
+    invoke-virtual {v0, v1}, Landroid/view/View;->setBackgroundColor(I)V
+
+    const/high16 v1, 0x41800000
+
+    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setTextSize(F)V
+
+    const/16 v1, 0x30
+
+    const/16 v2, 0x78
+
+    const/16 v3, 0x30
+
+    invoke-virtual {v0, v1, v2, v3, v1}, Landroid/view/View;->setPadding(IIII)V
+
+    const/4 v1, 0x1
+
+    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setTextIsSelectable(Z)V
+
+    invoke-virtual {v0, p1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
     invoke-virtual {p0, v0}, Landroid/app/Activity;->setContentView(Landroid/view/View;)V
 
@@ -370,6 +450,22 @@
 
     aput-object v2, v0, v1
 
+    sget v2, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    const/16 v3, 0x17
+
+    if-ge v2, v3, :modern
+
+    # API < 23: RECORD_AUDIO is granted at install time, just accept the request
+    invoke-virtual {p1}, Landroid/webkit/PermissionRequest;->getResources()[Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-virtual {p1, v0}, Landroid/webkit/PermissionRequest;->grant([Ljava/lang/String;)V
+
+    return-void
+
+    :modern
     const/16 v1, 0x3eb
 
     invoke-virtual {p0, v0, v1}, Landroid/app/Activity;->requestPermissions([Ljava/lang/String;I)V

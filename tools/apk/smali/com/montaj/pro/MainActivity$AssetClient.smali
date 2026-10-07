@@ -5,10 +5,16 @@
 # serves https://appassets.androidplatform.net/app/... from the bundled assets
 # (gives the editor a real secure origin: storage, workers, codecs)
 
+.field private activity:Lcom/montaj/pro/MainActivity;
+
+.field private triedFallback:Z
+
 .method public constructor <init>(Lcom/montaj/pro/MainActivity;)V
     .registers 2
 
     invoke-direct {p0}, Landroid/webkit/WebViewClient;-><init>()V
+
+    iput-object p1, p0, Lcom/montaj/pro/MainActivity$AssetClient;->activity:Lcom/montaj/pro/MainActivity;
 
     return-void
 .end method
@@ -71,7 +77,7 @@
 
 # last resort: if interception failed, load straight from the assets folder
 .method public onReceivedError(Landroid/webkit/WebView;ILjava/lang/String;Ljava/lang/String;)V
-    .registers 6
+    .registers 8
 
     if-eqz p4, :end
 
@@ -81,9 +87,24 @@
 
     move-result v0
 
-    if-nez v0, :end
+    if-eqz v0, :other_url
 
-    const-string v0, "https://appassets.androidplatform.net/app/index.html"
+    iget-boolean v0, p0, Lcom/montaj/pro/MainActivity$AssetClient;->triedFallback:Z
+
+    if-eqz v0, :show_error
+
+    const/4 v0, 0x1
+
+    iput-boolean v0, p0, Lcom/montaj/pro/MainActivity$AssetClient;->triedFallback:Z
+
+    const-string v0, "file:///android_asset/app/index.html"
+
+    invoke-virtual {p1, v0}, Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
+
+    return-void
+
+    :other_url
+    const-string v0, "file:///android_asset"
 
     invoke-virtual {p4, v0}, Ljava/lang/String;->startsWith(Ljava/lang/String;)Z
 
@@ -91,9 +112,42 @@
 
     if-nez v0, :end
 
-    const-string v0, "file:///android_asset/app/index.html"
+    :show_error
+    new-instance v0, Ljava/lang/StringBuilder;
 
-    invoke-virtual {p1, v0}, Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
+    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v1, "تعذر تحميل واجهة التطبيق.\n\nرمز الخطأ: "
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0, p2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+
+    const-string v1, "\n"
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0, p3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    const-string v1, "\n"
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0, p4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    const-string v1, "\n\nحدّث Android System WebView من متجر Play ثم أعد تشغيل التطبيق."
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    iget-object v1, p0, Lcom/montaj/pro/MainActivity$AssetClient;->activity:Lcom/montaj/pro/MainActivity;
+
+    invoke-virtual {v1, v0}, Lcom/montaj/pro/MainActivity;->showErrorText(Ljava/lang/String;)V
+
+    return-void
 
     :end
     return-void
@@ -104,7 +158,7 @@
 
     const-string v0, ".js"
 
-    invoke-virtual {p1, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
+    invoke-virtual {p0, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
 
     move-result v0
 
@@ -117,7 +171,7 @@
     :n1
     const-string v0, ".css"
 
-    invoke-virtual {p1, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
+    invoke-virtual {p0, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
 
     move-result v0
 
@@ -130,7 +184,7 @@
     :n2
     const-string v0, ".json"
 
-    invoke-virtual {p1, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
+    invoke-virtual {p0, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
 
     move-result v0
 
@@ -143,7 +197,7 @@
     :n3
     const-string v0, ".png"
 
-    invoke-virtual {p1, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
+    invoke-virtual {p0, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
 
     move-result v0
 
@@ -156,7 +210,7 @@
     :n4
     const-string v0, ".jpg"
 
-    invoke-virtual {p1, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
+    invoke-virtual {p0, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
 
     move-result v0
 
@@ -169,7 +223,7 @@
     :n5
     const-string v0, ".woff2"
 
-    invoke-virtual {p1, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
+    invoke-virtual {p0, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
 
     move-result v0
 
@@ -182,7 +236,7 @@
     :n6
     const-string v0, ".svg"
 
-    invoke-virtual {p1, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
+    invoke-virtual {p0, v0}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
 
     move-result v0
 

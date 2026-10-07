@@ -158,6 +158,15 @@ def main():
     shutil.copy(single, os.path.join(assets, 'index.html'))
     print('asset size: %.0f KB' % (os.path.getsize(single) / 1024))
 
+    # 2b. lint the smali — catches register mistakes ART rejects at runtime
+    #     (a bad p-register is structurally valid dex but crashes the app instantly)
+    lint = os.path.join(ROOT, 'tools', 'apk', 'lint-smali.py')
+    r = subprocess.run([sys.executable, lint, os.path.join(APKDIR, 'smali')], capture_output=True, text=True)
+    print(r.stdout.strip().splitlines()[-1] if r.stdout.strip() else '')
+    if r.returncode != 0:
+        print(r.stdout)
+        sys.exit('smali lint failed — fix the problems above before building')
+
     # 3. smali -> classes.dex (apktool's smali library driven by a generated launcher class)
     os.makedirs(os.path.join(launcher_dir, 'src'), exist_ok=True)
     genclass = os.path.join(ROOT, 'tools', 'launcher', 'genclass.py')
