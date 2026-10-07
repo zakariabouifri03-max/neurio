@@ -7,10 +7,10 @@
 
 | الملف | الحجم | إمضاء | الأحجام |
 |---|---|---|---|
-| `MontajPro-v1.0.4.apk` | 380 KB | APK Signature v1+v2+v3 | `6af92a29a84364e0…` |
+| `MontajPro-v1.0.5.apk` | 380 KB | APK Signature v1+v2+v3 | `5d7c1cb7ddef4209…` |
 | `MontajPro-Windows.exe` | 950 KB | portable (بلا تنصيب) | `ee92df63d874bfeff…` |
 
-> نسخة التطبيق: `com.montaj.pro` • versionName **1.0.4** (versionCode 5) • Android 5.0+ (minSdk 21) • Windows 10/11
+> نسخة التطبيق: `com.montaj.pro` • versionName **1.0.5** (versionCode 6) • Android 5.0+ (minSdk 21) • Windows 10/11
 
 ---
 
@@ -18,31 +18,36 @@
 
 | الملف | رابط مباشر (يبدا التحميل دغيا) |
 |---|---|
-| 📱 **APK** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-v1.0.4.apk |
+| 📱 **APK** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-v1.0.5.apk |
 | 💻 **EXE** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-Windows.exe |
 
 > قبل الدمج استعمل رابط الفرع:
-> `https://github.com/zakariabouifri03-max/neurio/raw/arena/d1960a3c-neurio/MontajPro-v1.0.4.apk`
+> `https://github.com/zakariabouifri03-max/neurio/raw/arena/d1960a3c-neurio/MontajPro-v1.0.5.apk`
 >
-> ولا من صفحة الملف فـGitHub: زر **Download raw file**: `…/blob/main/MontajPro-v1.0.4.apk`
+> ولا من صفحة الملف فـGitHub: زر **Download raw file**: `…/blob/main/MontajPro-v1.0.5.apk`
 
 ---
 
-## 🩹 آخر تحديث — v1.0.4 (الشاشة الخاوية) 🔴
+## 🩹 آخر تحديث — v1.0.5 (الإقلاع كان كيطيح) 🔴
 
-**المشكل:** التطبيق كان كيتفتح ولكن الشاشة **كحلة بلا حتى لوجو**.
+**المشكل:** شاشة كحلة بلا والو / «تعذّر إقلاع المحرر».
 
-**السبب:** الواجهة كانت كتحمّل من عنوان صناعي (`appassets.androidplatform.net`) عن طريق اعتراض الطلبات
-— وهادشي ماشي مضمون فكل نسخ WebView: إلا ما تدارش الاعتراض، الصفحة ما كتحملش أصلاً → ما كاين لا لوجو
-لا spinner، غير كحل.
+**السبب (لقيتو بتقرير التشخيص اللي كيبان فالشاشة):**
+```
+DataError: Failed to execute 'put' on 'IDBObjectStore':
+The object store uses in-line keys and the key parameter was provided
+```
+كود الحفظ فـ**IndexedDB** كان كيعطي المفتاح مرتين: مخزن `projects` معرّف بـ`keyPath:'id'`
+(مفتاح داخلي)، ودالة الحفظ كانت كتعيّط `put(value, key)` — وهادشي كيرمي **DataError**،
+وبما أنها كتوقع فأول إقلاع، **التطبيق كامل كيفشل**. نفس الشي كان كيوقع فالأندرويد وفالمتصفح.
 
 **الإصلاح:**
-- الواجهة دابا كتحمّل من **`file:///android_asset/app/index.html`** — الطريق العادي والمضمون اللي
-  كيستعملو كاع التطبيقات، بلا أي اعتراض طلبات.
-- **كتبة فالشاشة**: «جاري تحميل المحرر…» كتبان دغيا؛ إلا ما رسمش الـWebView والو، كتشوف هاد الكتابة
-  (ماشي شاشة كحلة). كتبان حتى الشاشة اللي فيها تقرير الخطأ إلا تأخر الإقلاع 10 ثواني.
-- **localStorage محمي**: بعض الأصول (بحال file://) كيمنعو التخزين — دابا أي منع ما كيوقفش التطبيق.
-- (من قبل) البناء بـes2015 + بدائل CSS قديمة + zipalign + dex بلا ضغط.
+- `idbPut` دابا كتسأل المخزن (`keyPath`): إلا كان عندو مفتاح داخلي كتعيّط `put(value)` فقط،
+  وإلا `put(value, key)`.
+- **كل عمليات التخزين ما بقاوش كيوقفو التطبيق**: أي مشكل فقاعدة البيانات = تحذير فقط، والمحرر كيخدم.
+- **اختبارات حقيقية**: زدت `fake-indexeddb` فالاختبارات → دابا الإقلاع + الحفظ + إعادة الفتح كيتجربو
+  فعلاً (46/46 ✅)، وزدت نافذة ثانية **بلا IndexedDB** باش نتأكد أن التطبيق كيخدم حتى بلا قاعدة بيانات.
+- هاد النوع من الأخطاء كان مخفي حيت بيئة الاختبار ماكانش فيها IndexedDB أصلاً.
 
 **من v1.0.1:** تصحّح ريجستر غلط فـ`mimeOf` (كان كيدير VerifyError) + رسائل خطأ بالعربية فالشاشة
 + إصلاح الصلاحيات على أندرويد 5.x.
@@ -53,7 +58,7 @@
 
 ## 📱 1. التثبيت على الهاتف (APK)
 
-1. نزّل `MontajPro-v1.0.4.apk` وحطّه فالهاتف (Downloads / التنزيلات).
+1. نزّل `MontajPro-v1.0.5.apk` وحطّه فالهاتف (Downloads / التنزيلات).
 2. حلّ: **الإعدادات → التطبيقات → وصول خاص / مصادر غير معروفة** للملفات (ولا ملي كتضغط على الـ APK الهاتف غادي يعطيك رابط مباشر باش تسمح).
 3. ضغط على الملف ← **تثبيت** ← تلقى أيقونة **مونتاج برو** فالشاشة الرئيسية.
 

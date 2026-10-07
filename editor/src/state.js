@@ -241,28 +241,51 @@ export function openDB() {
   return dbP;
 }
 function tx(db, store, mode) { return db.transaction(store, mode).objectStore(store); }
+// NOTE: 'projects' is created with { keyPath: 'id' } (in-line key) — calling
+// put(value, key) on such a store throws a DataError and, because it happens
+// during boot, takes the whole app down. Stores created without a keyPath
+// (blobs/thumbs/meta) do need the explicit key. Ask the store what it wants.
 export async function idbPut(store, key, value) {
   const db = await openDB(); if (!db) return;
-  return new Promise((res, rej) => { const r = tx(db, store, 'readwrite').put(value, key); r.onsuccess = () => res(); r.onerror = () => rej(r.error); });
+  return new Promise((res, rej) => {
+    try {
+      const s = tx(db, store, 'readwrite');
+      const r = s.keyPath ? s.put(value) : s.put(value, key);
+      r.onsuccess = () => res();
+      r.onerror = () => { console.warn('idbPut failed:', store, r.error && r.error.name); rej(r.error); };
+    } catch (e) { console.warn('idbPut threw:', store, e && e.name, e && e.message); rej(e); }
+  });
 }
+// every other helper swallows storage failures: persistence is a bonus, never a
+// reason for the editor to stop working
 export async function idbGet(store, key) {
-  const db = await openDB(); if (!db) return undefined;
-  return new Promise((res, rej) => { const r = tx(db, store, 'readonly').get(key); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  try {
+    const db = await openDB(); if (!db) return undefined;
+    return await new Promise((res, rej) => { const r = tx(db, store, 'readonly').get(key); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  } catch (e) { console.warn('idbGet failed', store, e && e.message); return undefined; }
 }
 export async function idbDel(store, key) {
-  const db = await openDB(); if (!db) return;
-  return new Promise((res) => { const r = tx(db, store, 'readwrite').delete(key); r.onsuccess = () => res(); r.onerror = () => res(); });
+  try {
+    const db = await openDB(); if (!db) return;
+    await new Promise((res) => { const r = tx(db, store, 'readwrite').delete(key); r.onsuccess = () => res(); r.onerror = () => res(); });
+  } catch (e) { console.warn('idbDel failed', store, e && e.message); }
 }
 export async function idbAll(store) {
-  const db = await openDB(); if (!db) return [];
-  return new Promise((res, rej) => { const r = tx(db, store, 'readonly').getAll(); r.onsuccess = () => res(r.result || []); r.onerror = () => rej(r.error); });
+  try {
+    const db = await openDB(); if (!db) return [];
+    return await new Promise((res, rej) => { const r = tx(db, store, 'readonly').getAll(); r.onsuccess = () => res(r.result || []); r.onerror = () => rej(r.error); });
+  } catch (e) { console.warn('idbAll failed', store, e && e.message); return []; }
 }
 export async function saveProjectToDB(p = project) {
   const data = { ...deep({ ...p, media: p.media.map(m => ({ ...m, blob: undefined })) }) };
   data.updatedAt = Date.now();
-  await idbPut('projects', data.id, data);
-  try { localStorage.setItem('montaj.lastProject', data.id); } catch (e) { }
-  await idbPut('meta', 'lastOpen', data.id);
+  try {
+    await idbPut('projects', data.id, data);
+    try { localStorage.setItem('montaj.lastProject', data.id); } catch (e) { }
+    await idbPut('meta', 'lastOpen', data.id);
+  } catch (e) {
+    console.warn('project not persisted:', e && e.message);
+  }
   return data;
 }
 export async function listProjects() {

@@ -78,6 +78,11 @@ def ensure_toolchain():
         os.makedirs(os.path.join(TOOLS, 'signer'), exist_ok=True)
         shutil.copytree(os.path.join(TOOLS, 'dl-signer', 'package'), os.path.join(TOOLS, 'signer', 'package'), dirs_exist_ok=True)
         ok = False
+    # the signer imports these from its dist; a missing one = no signed APK
+    for dep in ('jks-js', 'node-forge', 'pako'):
+        if not os.path.exists(os.path.join(TOOLS, 'node_modules', dep)):
+            print('  fetching signer dependency:', dep)
+            sh(['npm', 'install', '--no-audit', '--no-fund', '--silent', '--prefix', TOOLS, dep])
     if not os.path.exists(os.path.join(TOOLS, 'node_modules', 'esbuild')):
         print('== installing esbuild + jsdom (build & test only) ==')
         subprocess.run(['npm', 'init', '-y'], cwd=TOOLS, capture_output=True)
