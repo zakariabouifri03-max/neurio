@@ -20,7 +20,7 @@ input,select,textarea{font-family:inherit}
 ::-webkit-scrollbar-track{background:#0e131d}
 
 /* splash */
-#splash{position:fixed;inset:0;z-index:5000;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#16213a,#070a11 70%)}
+#splash{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#16213a,#070a11 70%)}
 .splash-inner{text-align:center}
 #splash h1{margin:12px 0 4px;font-size:28px;letter-spacing:.5px}
 #splash p{margin:0;color:var(--dim)}
@@ -30,7 +30,7 @@ input,select,textarea{font-family:inherit}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* layout */
-#app{display:grid;grid-template-rows:var(--topbar) 1fr var(--tl);height:100dvh}
+#app{display:grid;grid-template-rows:var(--topbar) 1fr var(--tl);height:100vh;height:100dvh}
 #topbar{display:flex;align-items:center;gap:8px;padding:0 10px;background:linear-gradient(180deg,#141b28,#0e1420);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:8px;font-size:15px}
 .ibtn{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--fg);transition:.15s}
@@ -95,9 +95,9 @@ input,select,textarea{font-family:inherit}
 .ctl select{appearance:none}
 .ctl-toggle{grid-template-columns:1fr auto}
 .tg{width:44px;height:24px;background:#26314a;border-radius:24px;position:relative;transition:.2s}
-.tg i{position:absolute;top:3px;inset-inline-start:3px;width:18px;height:18px;background:#8fa3c0;border-radius:50%;transition:.2s}
+.tg i{position:absolute;top:3px;right:3px;inset-inline-start:3px;width:18px;height:18px;background:#8fa3c0;border-radius:50%;transition:.2s}
 .tg.on{background:var(--acc)}
-.tg.on i{inset-inline-start:23px;background:#fff}
+.tg.on i{right:23px;inset-inline-start:23px;background:#fff}
 .kf-btn{width:26px;height:26px;border-radius:8px;background:#1b2434;color:var(--dim);font-size:12px}
 .kf-btn.keyed{background:var(--warn);color:#20160a}
 .grid{display:grid;gap:6px;margin:8px 0}
@@ -118,10 +118,10 @@ input,select,textarea{font-family:inherit}
 .media-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .media-card{position:relative;border-radius:10px;overflow:hidden;background:#0d131e;border:1px solid var(--line)}
 .mc-thumb{height:70px;background-size:cover;background-position:center;position:relative;background-color:#1a2333}
-.mc-kind{position:absolute;inset-inline-start:6px;top:5px;font-size:12px}
-.mc-dur{position:absolute;inset-inline-end:6px;bottom:5px;font-size:10px;background:#000a;padding:1px 5px;border-radius:6px}
+.mc-kind{position:absolute;right:6px;inset-inline-start:6px;top:5px;font-size:12px}
+.mc-dur{position:absolute;left:6px;inset-inline-end:6px;bottom:5px;font-size:10px;background:#000a;padding:1px 5px;border-radius:6px}
 .mc-name{font-size:11px;padding:5px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:start}
-.mc-del{position:absolute;inset-inline-end:4px;top:4px;background:#000a;border-radius:6px;width:20px;height:20px;font-size:11px;color:#ffb4b4}
+.mc-del{position:absolute;left:4px;inset-inline-end:4px;top:4px;background:#000a;border-radius:6px;width:20px;height:20px;font-size:11px;color:#ffb4b4}
 .kf-row,.cap-row,.proj-row{display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px solid var(--line)}
 .cap-row input{flex:1;background:#0a0f18;border:1px solid var(--line2);border-radius:6px;color:var(--fg);padding:5px 7px;font-size:12px}
 .mini{background:#1b2434;border-radius:7px;padding:4px 8px;font-size:11px}
@@ -157,11 +157,11 @@ input,select,textarea{font-family:inherit}
 .tl-clip.sel{border-color:var(--acc);box-shadow:0 0 0 2px rgba(79,140,255,.45),0 6px 18px rgba(0,0,0,.5);z-index:3}
 .clip-strip,.clip-wave{display:block;width:100%;height:100%;object-fit:cover}
 .clip-label,.clip-badge{position:absolute;font-size:10px;padding:1px 5px;background:#000a;border-radius:5px;color:#fff}
-.clip-label{inset-inline-start:5px;top:3px;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.clip-badge{inset-inline-end:5px;top:3px}
-.clip-badge.kf{inset-inline-end:5px;top:auto;bottom:3px;color:var(--warn)}
+.clip-label{right:5px;inset-inline-start:5px;top:3px;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clip-badge{left:5px;inset-inline-end:5px;top:3px}
+.clip-badge.kf{left:5px;inset-inline-end:5px;top:auto;bottom:3px;color:var(--warn)}
 .tl-handle{position:absolute;top:0;bottom:0;width:10px;background:linear-gradient(#ffffff22,#ffffff10);cursor:ew-resize}
-.tl-handle.l{inset-inline-start:0}.tl-handle.r{inset-inline-end:0}
+.tl-handle.l{right:0;inset-inline-start:0}.tl-handle.r{left:0;inset-inline-end:0}
 
 /* tabbar (mobile) */
 #tabbar{display:none}
@@ -194,11 +194,11 @@ body.exporting #toast{bottom:auto;top:14px}
   #app{grid-template-rows:var(--topbar) 1fr var(--tl)}
   #stage{grid-template-columns:1fr}
   #rail{display:none}
-  #sheet{position:fixed;inset-inline:0;bottom:0;height:62dvh;z-index:900;transform:translateY(101%);transition:.28s cubic-bezier(.2,.8,.2,1);
+  #sheet{position:fixed;right:0;left:0;inset-inline:0;bottom:0;height:62vh;height:62dvh;z-index:900;transform:translateY(101%);transition:.28s cubic-bezier(.2,.8,.2,1);
     border-radius:18px 18px 0 0;box-shadow:0 -18px 50px rgba(0,0,0,.6);border:1px solid var(--line2);border-bottom:0}
   #sheet.open{transform:translateY(0)}
   #sheet-close{display:grid}
-  #tabbar{display:flex;position:fixed;bottom:0;inset-inline:0;z-index:1000;background:#0e131df2;border-top:1px solid var(--line);padding:4px 2px 6px;backdrop-filter:blur(8px)}
+  #tabbar{display:flex;position:fixed;bottom:0;right:0;left:0;inset-inline:0;z-index:1000;background:#0e131df2;border-top:1px solid var(--line);padding:4px 2px 6px;backdrop-filter:blur(8px)}
   .tabbar-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:9px;color:var(--dim);padding:5px 0}
   .tabbar-btn span{font-size:18px}
   .tabbar-btn.active{color:var(--acc)}
@@ -214,4 +214,40 @@ body.exporting #toast{bottom:auto;top:14px}
   #topbar{gap:4px;padding:0 6px}
   .brand b{display:none}
   .media-grid{grid-template-columns:1fr 1fr}
+}
+
+/* boot diagnostics — shown when the engine is too old to run the editor */
+#boot-panel{position:fixed;inset:0;z-index:9000;background:#0b0e14;color:#e8eefc;padding:18px;overflow:auto;
+  font:13px/1.7 system-ui,"Cairo",sans-serif;direction:rtl;text-align:right}
+#boot-panel h2{margin:6px 0 10px;font-size:19px;color:#fff}
+#boot-panel .why{color:#ffcc4d;margin:0 0 12px}
+#boot-panel pre{white-space:pre-wrap;word-break:break-word;background:#121722;border:1px solid #232d40;
+  border-radius:10px;padding:10px;color:#9fe8c4;font-size:12px;max-height:44vh;overflow:auto;direction:ltr;text-align:left}
+#boot-panel button{margin-top:12px;background:#4f8cff;color:#fff;border:0;border-radius:10px;padding:10px 14px;font:inherit}
+#boot-panel .hint{color:#8fa3c0;font-size:12px;margin-top:10px}
+
+/* ---------------------------------------------------------------------------
+   Fallback layout for engines without CSS grid (Chrome/WebView < 57).
+   Without this the whole shell collapses into an empty screen.
+   --------------------------------------------------------------------------- */
+@supports not (display:grid){
+  #app{display:flex;flex-direction:column}
+  #topbar{flex:0 0 auto}
+  #stage{display:flex;flex-direction:row;flex:1 1 auto;min-height:0}
+  #rail{flex:0 0 auto}
+  #preview-col{flex:1 1 auto;min-width:0;display:flex;flex-direction:column}
+  #sheet{flex:0 0 auto;width:var(--sheet)}
+  #timeline{flex:0 0 auto}
+  #preview-wrap{display:flex;align-items:center;justify-content:center}
+  .ibtn{display:inline-flex;align-items:center;justify-content:center}
+  #splash{display:flex;align-items:center;justify-content:center}
+  .rail-btn,.tabbar-btn,.sheet-close{display:inline-flex;align-items:center;justify-content:center;flex-direction:column}
+  .ctl{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between}
+  .ctl>*{flex:1 1 auto}
+  .media-grid{display:flex;flex-wrap:wrap}
+  .media-grid>*{flex:1 1 44%;margin:4px}
+  .grid{display:flex;flex-wrap:wrap}
+  .grid>*{flex:1 1 auto;margin:3px}
+  body.dragging #dropzone{display:flex;align-items:center;justify-content:center}
+  #tl-main{display:flex}
 }

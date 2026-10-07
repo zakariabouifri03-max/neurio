@@ -58,7 +58,10 @@ async function main() {
     entryPoints: [path.join(editor, 'src/main.js')],
     bundle: true,
     format: 'iife',
-    target: ['es2020'],
+    // es2015, not es2020: a phone with an older Android System WebView must at
+    // least be able to PARSE the bundle (optional chaining / nullish coalescing
+    // are dropped, async is lowered) — a syntax error means a black screen.
+    target: ['es2015'],
     outfile: path.join(editor, 'bundle.js'),
     legalComments: 'none',
     logLevel: 'info',

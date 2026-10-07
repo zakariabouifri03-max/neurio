@@ -10,6 +10,119 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="ui.css">
+<script>
+/* ---------------------------------------------------------------------------
+   Boot guard + diagnostics.  ES5 ONLY on purpose: it has to run (and explain
+   itself) even on an ancient Android WebView where the editor bundle cannot
+   even be parsed. It replaces the classic "black screen and no idea why".
+   --------------------------------------------------------------------------- */
+(function () {
+  var errs = [];
+  window.__bootErrors = errs;
+  window.__bootState = 'starting';
+  function push(msg) { if (errs.length < 60) errs.push(msg); }
+  window.addEventListener('error', function (e) {
+    push('JS: ' + (e.message || 'unknown') + (e.filename ? ' @ ' + e.lineno + ':' + e.colno : ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason;
+    push('Promise: ' + ((r && r.message) || r));
+  });
+
+  function ua() { return navigator.userAgent || '?'; }
+  function version() {
+    var m = /(Chrome|Chromium|Firefox|Edg)\/([0-9]+)[.0-9]*/.exec(ua());
+    return m ? m[1] + ' ' + m[2] : 'غير معروف';
+  }
+  function hasCSS(prop, val) {
+    try { return !!(window.CSS && CSS.supports && CSS.supports(prop, val)); } catch (e) { return false; }
+  }
+  function canParse(src) {
+    try { /* jshint evil:true */ new Function(src); return true; } catch (e) { return false; }
+  }
+  function caps() {
+    var c = [];
+    c.push('WebView/Chrome: ' + version());
+    c.push('دعم بنية جافاسكربت الحديثة (?.) : ' + (canParse('var a={};return a?.b') ? 'نعم' : 'لا'));
+    c.push('async/await : ' + (canParse('return (async function(){})()') ? 'نعم' : 'لا'));
+    c.push('CSS grid : ' + (hasCSS('display', 'grid') ? 'نعم' : 'لا'));
+    c.push('CSS dvh : ' + (hasCSS('height', '100dvh') ? 'نعم' : 'لا'));
+    c.push('CSS inset-inline : ' + (hasCSS('inset-inline-start', '0px') ? 'نعم' : 'لا'));
+    c.push('Canvas 2D : ' + (function () { try { return !!document.createElement('canvas').getContext('2d'); } catch (e) { return false; } }() ? 'نعم' : 'لا'));
+    c.push('WebCodecs (تصدير سريع) : ' + (typeof window.VideoEncoder !== 'undefined' ? 'نعم' : 'لا'));
+    c.push('MediaRecorder : ' + (typeof window.MediaRecorder !== 'undefined' ? 'نعم' : 'لا'));
+    c.push('IndexedDB : ' + (function () { try { return !!window.indexedDB; } catch (e) { return false; } }() ? 'نعم' : 'لا'));
+    c.push('localStorage : ' + (function () { try { return !!window.localStorage; } catch (e) { return false; } }() ? 'نعم' : 'لا'));
+    c.push('سياق آمن (https/localhost) : ' + (window.isSecureContext === false ? 'لا' : 'نعم'));
+    c.push('الشاشة : ' + screen.width + '×' + screen.height + ' · dpr ' + (window.devicePixelRatio || 1));
+    c.push('العنوان : ' + location.href.slice(0, 120));
+    return c;
+  }
+
+  function report() {
+    var txt = 'Montaj Pro — تقرير التشخيص\n' + caps().join('\n');
+    if (errs.length) txt += '\n\nالأخطاء:\n' + errs.slice(-20).join('\n');
+    return txt;
+  }
+  window.__bootReport = report;
+
+  function copy(txt, btn) {
+    var ok = function () { btn.textContent = 'تم النسخ ✓'; };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(ok, fallback); return; }
+    } catch (e) { }
+    fallback();
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.style.cssText = 'width:100%;height:120px;direction:ltr';
+      var pre = btn.previousSibling;
+      if (pre && pre.parentNode) pre.parentNode.insertBefore(ta, btn);
+      try { ta.select(); document.execCommand('copy'); ok(); } catch (e) { btn.textContent = 'حدّد النص وانسخه يدوياً'; }
+    }
+  }
+
+  function panel(title, why) {
+    if (document.getElementById('boot-panel')) return;
+    var d = document.createElement('div');
+    d.id = 'boot-panel';
+    var h = document.createElement('h2');
+    h.textContent = title || 'التطبيق ما قدرش يتشغل';
+    var w = document.createElement('p');
+    w.className = 'why';
+    w.textContent = why || 'هذا تقرير تقني — انسخه وصيفطو للمطوّر.';
+    var pre = document.createElement('pre');
+    pre.textContent = report();
+    var b = document.createElement('button');
+    b.textContent = '📋 نسخ التقرير';
+    b.onclick = function () { copy(report(), b); };
+    var r = document.createElement('button');
+    r.textContent = '↻ إعادة المحاولة';
+    r.style.marginRight = '8px';
+    r.onclick = function () { location.reload(); };
+    var hint = document.createElement('p');
+    hint.className = 'hint';
+    hint.textContent = 'غالباً الحل: حدّث «Android System WebView» و«Chrome» من متجر Play ثم أعد فتح التطبيق.';
+    d.appendChild(h); d.appendChild(w); d.appendChild(pre); d.appendChild(b); d.appendChild(r); d.appendChild(hint);
+    (document.body || document.documentElement).appendChild(d);
+  }
+  window.__bootPanel = panel;
+
+  // an engine that cannot parse modern syntax will never run the editor — say so right away
+  if (!canParse('var a={};return a?.b ?? 1')) {
+    window.__bootState = 'too-old';
+    var show = function () { panel('متصفح النظام قديم جداً', 'النسخة المدمجة في هاتفك لا تدعم بنية جافاسكربت اللي كيحتاجها المحرر.'); };
+    if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
+    return;
+  }
+
+  // watchdog: if the editor has not booted after 10s, show the diagnostics
+  setTimeout(function () {
+    if (window.__app) { window.__bootState = 'ready'; return; }
+    window.__bootState = 'stuck';
+    panel('المحرر ما كملش التحميل', 'بانت الشاشة ولكن المحرر ما دارش الإقلاع. هذا تقرير تقني:');
+  }, 10000);
+})();
+</script>
 <!--FONTS-->
 </head>
 <body>

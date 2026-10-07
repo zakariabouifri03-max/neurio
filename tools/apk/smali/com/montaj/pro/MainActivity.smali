@@ -124,7 +124,7 @@
 
     iget-object v0, p0, Lcom/montaj/pro/MainActivity;->webView:Landroid/webkit/WebView;
 
-    const/4 v1, 0x0
+    const v1, 0xff0b0e14
 
     invoke-virtual {v0, v1}, Landroid/webkit/WebView;->setBackgroundColor(I)V
 
