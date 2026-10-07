@@ -77,6 +77,32 @@ def _fail(message: str) -> int:
     return 1
 
 
+def _child_stdio() -> dict:
+    """Hand the inherited standard handles to the child process.
+
+    A windowed programme has no console, so Windows would give the child a brand
+    new - invisible - one and everything the application prints (``--selftest``,
+    ``--render``, ``--version``) would disappear.  Reusing the handles we
+    inherited keeps redirection such as ``MotionForge Studio.exe --selftest >
+    log.txt`` and any build-script capture working.
+    """
+    stdio: dict = {}
+    try:
+        import ctypes
+        import msvcrt
+        kernel32 = ctypes.windll.kernel32
+        for name, ident, flags in (("stdin", -10, os.O_RDONLY),
+                                   ("stdout", -11, os.O_WRONLY),
+                                   ("stderr", -12, os.O_WRONLY)):
+            handle = kernel32.GetStdHandle(ident)
+            if handle in (0, -1, None):
+                continue
+            stdio[name] = msvcrt.open_osfhandle(handle, flags)
+    except Exception:
+        return {}
+    return stdio
+
+
 def _interpreter(home: str, console: bool) -> str | None:
     order = ((CONSOLE_RUNTIME, GUI_RUNTIME) if console
              else (GUI_RUNTIME, CONSOLE_RUNTIME))
@@ -104,7 +130,7 @@ def main(argv: list[str]) -> int:
                      "looks incomplete - please reinstall MotionForge Studio.")
     cmd = [runtime, script] + list(argv[1:])
     try:
-        return subprocess.call(cmd, cwd=home)
+        return subprocess.call(cmd, cwd=home, **_child_stdio())
     except OSError as exc:
         return _fail(f"MotionForge Studio could not be started with\n\n{cmd[0]}\n\n{exc}")
     except KeyboardInterrupt:

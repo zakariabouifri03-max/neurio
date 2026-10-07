@@ -1,6 +1,9 @@
 # Unpacks the portable Windows package on a real Windows machine and *runs* it:
-# the bundled interpreter, the script form, the windowed entry point the user
-# double-clicks, the version resources Windows shows in the file properties.
+# the bundled interpreter, the script form, the entry point the user
+# double-clicks and the file properties Windows shows for it.
+#
+# Every run has a hard time limit: a pipeline or a dialog that never returns
+# would otherwise block the whole build agent.
 #
 # Everything is written to the log file (default ci/smoke.log) because the CI
 # log of a failing step is not readable from outside the runner; the log file is
@@ -37,9 +40,18 @@ function Check([string]$Label, [bool]$Ok, [string]$Detail = "") {
     return $Ok
 }
 
-# Runs an executable with a hard time limit, capturing every stream into the
-# log file.  A pipeline would happily wait forever for a handle that never
-# closes, so the timeout (and the kill) are part of the harness itself.
+# Quotes one argument the way the Windows command line parser expects it, so
+# that arguments containing spaces survive Start-Process (which merely joins an
+# array with spaces).
+function Quote([string]$Text) {
+    if ($Text -eq "") { return '""' }
+    if ($Text -notmatch '[\s"]') { return $Text }
+    $escaped = $Text -replace '(\\*)"', '$1$1\"'
+    $escaped = $escaped -replace '(\\+)$', '$1$1'
+    return '"' + $escaped + '"'
+}
+
+# Runs an executable with a hard time limit, capturing all output into the log.
 function Invoke-Program([string]$Label, [string]$Exe, [string[]]$ArgList,
                         [string]$Expect = "", [int]$TimeoutSec = 300) {
     Say ""
@@ -53,8 +65,9 @@ function Invoke-Program([string]$Label, [string]$Exe, [string[]]$ArgList,
     $so = Join-Path $env:TEMP "mfs-smoke-out.txt"
     $se = Join-Path $env:TEMP "mfs-smoke-err.txt"
     Remove-Item $so, $se -Force -ErrorAction SilentlyContinue
+    $line = ($ArgList | ForEach-Object { Quote $_ }) -join ' '
     try {
-        $p = Start-Process -FilePath $Exe -ArgumentList $ArgList -PassThru `
+        $p = Start-Process -FilePath $Exe -ArgumentList $line -PassThru `
             -RedirectStandardOutput $so -RedirectStandardError $se -ErrorAction Stop
     } catch {
         Say "   FAIL could not start: $_"
@@ -113,9 +126,9 @@ if (-not (Test-Path $app)) {
 Say "   contents: $((Get-ChildItem $app | Select-Object -ExpandProperty Name) -join ', ')"
 Say "   folder size: $([math]::Round((Get-ChildItem $app -Recurse -File | Measure-Object Length -Sum).Sum / 1MB, 1)) MB"
 
-$gui = Join-Path $app "MotionForge Studio.exe"                  # what the user starts
-$console = Join-Path $app "MotionForge runtime console.exe"     # interpreter, console
-$runtime = Join-Path $app "MotionForge runtime.exe"             # interpreter, windowed
+$gui = Join-Path $app "MotionForge Studio.exe"                 # what the user starts
+$console = Join-Path $app "MotionForge runtime console.exe"    # interpreter, console
+$runtime = Join-Path $app "MotionForge runtime.exe"            # interpreter, windowed
 $launcherPy = Join-Path $app "MotionForge.py"
 
 Check "MotionForge Studio.exe (entry point)" (Test-Path $gui)
@@ -127,7 +140,7 @@ Check "lib/PySide6/QtCore.pyd" (Test-Path (Join-Path $app "lib/PySide6/QtCore.py
 Check "lib/imageio_ffmpeg" (Test-Path (Join-Path $app "lib/imageio_ffmpeg"))
 Check "ffmpeg executable" ([bool](Get-ChildItem (Join-Path $app "lib/imageio_ffmpeg/binaries") -Filter "ffmpeg*.exe" -ErrorAction SilentlyContinue))
 Check "the interpreters were renamed (no python.exe / pythonw.exe)" `
-    (-not (Test-Path (Join-Path $app "python.exe")) -and -not (Test-Path (Join-Path $app "pythonw.exe")))
+    ((-not (Test-Path (Join-Path $app "python.exe"))) -and (-not (Test-Path (Join-Path $app "pythonw.exe"))))
 
 Say ""
 Say "== file properties Windows shows for the entry point"
@@ -141,7 +154,7 @@ foreach ($exe in @($gui, $runtime, $console)) {
     Say "     FileDescription: $($vi.FileDescription)"
     Say "     CompanyName:     $($vi.CompanyName)"
     if ($exe -eq $gui) {
-        Check "$name is branded" ($vi.ProductName -eq "MotionForge Studio" -and $vi.FileVersion -eq "1.0.0")
+        Check "$name is branded" (($vi.ProductName -eq "MotionForge Studio") -and ($vi.FileVersion -eq "1.0.0"))
     } else {
         Check "$name has a readable version resource" ([bool]$vi.ProductName -and [bool]$vi.FileVersion)
     }
@@ -149,13 +162,33 @@ foreach ($exe in @($gui, $runtime, $console)) {
 
 Invoke-Program "bundled interpreter / Qt import" $console @(
     "-c", "import sys, PySide6; print(sys.version); print('PySide6', PySide6.__version__)"
-) "PySide6" -TimeoutSec 120
+) -Expect "PySide6" -TimeoutSec 120
 
-Invoke-Program "script form (interpreter MotionForge.py)" $console @($launcherPy, "--selftest") "RESULT: OK" -TimeoutSec 420
+Invoke-Program "script form (interpreter MotionForge.py)" $console @(
+    $launcherPy, "--selftest"
+) -Expect "RESULT: OK" -TimeoutSec 420
 
-Invoke-Program "entry point --selftest" $gui @("--selftest") "RESULT: OK" -TimeoutSec 420
+Invoke-Program "entry point --selftest" $gui @(
+    "--selftest"
+) -Expect "RESULT: OK" -TimeoutSec 420
 
-Invoke-Program "entry point --version" $gui @("--version") "MotionForge Studio" -TimeoutSec 180
+Invoke-Program "entry point --version" $gui @(
+    "--version"
+) -Expect "MotionForge Studio" -TimeoutSec 180
+
+Say ""
+Say "== log files written by the application"
+$logDirs = @(
+    (Join-Path $env:LOCALAPPDATA "MotionForgeStudio\logs"),
+    (Join-Path $env:APPDATA "MotionForgeStudio\logs")
+)
+foreach ($dir in $logDirs) {
+    if (-not (Test-Path $dir)) { continue }
+    foreach ($f in (Get-ChildItem $dir -Filter *.log -ErrorAction SilentlyContinue)) {
+        Say "   --- $($f.FullName) ---"
+        foreach ($line in (Get-Content $f.FullName -Tail 30)) { Say "   | $line" }
+    }
+}
 
 Say ""
 if ($script:Failed.Count -gt 0) {

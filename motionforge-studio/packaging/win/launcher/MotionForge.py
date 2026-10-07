@@ -116,6 +116,26 @@ def _crash_log(text: str) -> str:
         return ""
 
 
+def _watched() -> bool:
+    """True when a console, pipe or file is attached to our output.
+
+    A dialog must not be opened in that case: on a build agent or inside a
+    scripted run there is nobody to click it away.
+    """
+    if os.name != "nt":
+        return True
+    try:
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        for ident in (-10, -11, -12):
+            handle = kernel32.GetStdHandle(ident)
+            if handle not in (0, -1, None):
+                return True
+    except Exception:
+        return True
+    return False
+
+
 def _report(text: str) -> None:
     log = _crash_log(text)
     tail = text.strip().splitlines()[-12:]
@@ -123,10 +143,16 @@ def _report(text: str) -> None:
     if log:
         message += f"\n\nA full report was written to:\n{log}"
     try:
+        sys.stderr.write(message + "\n")
+    except Exception:
+        pass
+    if _watched():
+        return
+    try:
         import ctypes
         ctypes.windll.user32.MessageBoxW(None, message, f"{APP_NAME} - startup error", 0x10)
     except Exception:
-        sys.stderr.write(message + "\n")
+        pass
 
 
 def main(argv: list[str]) -> int:
