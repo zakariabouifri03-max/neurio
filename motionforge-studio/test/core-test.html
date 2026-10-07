@@ -1,0 +1,39 @@
+<!doctype html><meta charset=utf-8><body><script type=module>
+import * as M from '../src/renderer/js/core/model.js';
+import { S, scene } from '../src/renderer/js/core/state.js';
+import { H } from '../src/renderer/js/core/history.js';
+import * as CB from '../src/renderer/js/core/charbuild.js';
+import * as ML from '../src/renderer/js/core/motionlib.js';
+import { renderScene, makeFrameCanvas } from '../src/renderer/js/core/render.js';
+import { evalLayer, solveCharacter } from '../src/renderer/js/core/rig.js';
+const log=[]; const ok=(c,m)=>{log.push((c?'PASS ':'FAIL ')+m)};
+window.run = async()=>{
+  M.newProject({name:'t'}); const sc=scene();
+  const l = CB.createStarterCharacter('cartoon'); 
+  H.tx('add char',()=>{ sc.layers.push(l); S.selection.layerId=l.id;});
+  ok(l.char.bones.length>15,'bones '+l.char.bones.length);
+  for (const a of S.project.assets) await M.loadAssetImage(a.id);
+  const cv = makeFrameCanvas(sc,0,1280,720);
+  const px = cv.getContext('2d').getImageData(640,300,1,1).data; log.push('px '+[...px]);
+  // bake walk
+  const exp = ML.expandClip('walk',{seconds:2});
+  H.tx('walk',()=>{ ML.bakeClip(l, exp, 0, {}); });
+  const tracks = Object.keys(l.tracks).length; ok(tracks>5,'tracks '+tracks);
+  const ev0 = evalLayer(l,0), ev6=evalLayer(l,6);
+  const th = l.char.bones.find(b=>b.role==='thighR');
+  log.push('thighR@0 '+ev0.bone[th.id].rot+' @6 '+ev6.bone[th.id].rot+' @12 '+evalLayer(l,12).bone[th.id].rot);
+  ok(H.undo(),'undo'); ok(Object.keys(scene().layers[0].tracks).length===0,'undone tracks');
+  ok(H.redo(),'redo'); 
+  // IK
+  const shin = scene().layers[0].char.bones.find(b=>b.role==='shinR'); 
+  const L2=scene().layers[0]; shin.ik={chain:2,on:true}; L2.base['ik.'+shin.id+'.x']=shin.hx-60; L2.base['ik.'+shin.id+'.y']=shin.hy+60; 
+  const sol=solveCharacter(L2, evalLayer(L2,0)); log.push('ik rots '+JSON.stringify(sol.rots&&Object.entries(sol.rots).filter(([k,v])=>v).map(([k,v])=>[k.slice(-4),Math.round(v)])));
+  const bytes = await M.serializeProject();
+  log.push('mfs bytes '+bytes.length);
+  const P2 = await M.loadProject(bytes);
+  ok(P2.scenes[0].layers[0].char.bones.length===l.char.bones.length,'reload');
+  const cv2 = makeFrameCanvas(P2.scenes[0],6,1280,720);
+  window.__png = cv2.toDataURL();
+  return log;
+};
+</script>

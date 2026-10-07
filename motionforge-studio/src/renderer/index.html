@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MotionForge Studio</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="mode-pro">
+<div id="app">
+  <header id="titlebar">
+    <div id="brand"><span id="logo"></span><b>MotionForge</b></div>
+    <nav id="menubar"></nav>
+    <div id="title-center"><span id="doc-title">Untitled</span></div>
+    <div id="title-right">
+      <div id="mode-switch" role="group" aria-label="Interface mode"><button data-mode="beginner" data-tip="Beginner mode||Simple tools: Draw, Animate, Character, AI, Export">Beginner</button><button data-mode="pro" data-tip="Pro mode||All panels: layers, keyframes, graph editor, rigging">Pro</button></div>
+      <button id="btn-palette" class="icon-btn" data-tip="Command palette||Search every command (Ctrl+K)"></button>
+    </div>
+  </header>
+  <main id="workspace">
+    <aside id="toolbar"></aside>
+    <section id="center">
+      <div id="optionsbar"></div>
+      <div id="canvas-host" tabindex="-1"></div>
+      <div id="vsplit" class="splitter h" data-tip="Drag to resize"></div>
+      <div id="dock">
+        <div id="dock-tabs"></div>
+        <div id="transport"></div>
+        <div id="dock-body"></div>
+      </div>
+    </section>
+    <div id="hsplit" class="splitter v"></div>
+    <aside id="right"><div id="right-tabs"></div><div id="right-body"></div></aside>
+  </main>
+  <footer id="status"></footer>
+  <div id="dropzone"><div>Drop files to import<br><small>PNG · JPG · SVG · GIF · PSD · WAV · MP3 · OGG · MP4 · .mfs</small></div></div>
+</div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

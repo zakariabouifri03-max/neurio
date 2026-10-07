@@ -1,0 +1,67 @@
+{
+  "name": "motionforge-studio",
+  "productName": "MotionForge Studio",
+  "version": "1.0.0",
+  "description": "Professional 2D animation studio: frame-by-frame, rigging, keyframes, AI-assisted animation.",
+  "author": "MotionForge <contact@motionforge.local>",
+  "license": "MIT",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "vendor": "node scripts/vendor.js",
+    "test": "node test/run.js",
+    "dist": "electron-builder --win nsis portable --x64",
+    "dist:dir": "electron-builder --win dir --x64"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0"
+  },
+  "optionalDependencies": {
+    "@ffmpeg-installer/win32-x64": "4.1.0",
+    "@ffmpeg-installer/linux-x64": "4.1.0",
+    "@ffmpeg-installer/darwin-x64": "4.1.0",
+    "@ffmpeg-installer/darwin-arm64": "4.1.5"
+  },
+  "devDependencies": {
+    "electron": "33.4.11",
+    "electron-builder": "25.1.8",
+    "fflate": "^0.8.2",
+    "ag-psd": "^31.0.2",
+    "puppeteer-core": "^24.0.0",
+    "@sparticuz/chromium": "^153.0.0"
+  },
+  "build": {
+    "appId": "com.motionforge.studio",
+    "productName": "MotionForge Studio",
+    "copyright": "Copyright © 2026 MotionForge",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["src/**/*", "package.json", "!**/*.map"],
+    "asarUnpack": ["node_modules/@ffmpeg-installer/**"],
+    "fileAssociations": [
+      { "ext": "mfs", "name": "MotionForge Project", "description": "MotionForge Studio Project", "icon": "build/mfs.ico", "role": "Editor" }
+    ],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }, { "target": "portable", "arch": ["x64"] }],
+      "icon": "build/icon.ico",
+      "artifactName": "MotionForge-Studio-${version}-${buildType}-x64.${ext}",
+      "legalTrademarks": "MotionForge Studio",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "MotionForge Studio",
+      "uninstallDisplayName": "MotionForge Studio",
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "artifactName": "MotionForge-Studio-Setup-${version}-x64.${ext}"
+    },
+    "portable": { "artifactName": "MotionForge-Studio-Portable-${version}-x64.${ext}" },
+    "extraMetadata": { "main": "src/main/main.js" }
+  }
+}

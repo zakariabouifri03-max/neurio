@@ -1,0 +1,26 @@
+<!doctype html><meta charset=utf-8><body><script type=module>
+import * as M from '../src/renderer/js/core/model.js';
+import { S, scene, allLayers } from '../src/renderer/js/core/state.js';
+import { H } from '../src/renderer/js/core/history.js';
+import * as CB from '../src/renderer/js/core/charbuild.js';
+import { makeFrameCanvas } from '../src/renderer/js/core/render.js';
+import { evalLayer } from '../src/renderer/js/core/rig.js';
+import { makePlan, applyPlan, describePlan } from '../src/renderer/js/ai/assistant.js';
+const log=[];
+window.run = async(prompt, frames)=>{
+  M.newProject({name:'t', width:960, height:540}); const sc=scene();
+  const l = CB.createStarterCharacter('cartoon'); H.tx('add',()=>{ sc.layers.push(l); S.selection.layerId=l.id; });
+  for (const a of S.project.assets) await M.loadAssetImage(a.id);
+  const r = await makePlan(prompt); const out={plan:r.plan, desc:describePlan(r.plan)};
+  let rep; H.tx('ai',()=>{ rep = applyPlan(r.plan,{prompt}); });
+  out.report = rep; out.dur = sc.duration;
+  for (const a of S.project.assets) await M.loadAssetImage(a.id);
+  out.xs = frames.map(f=>[f, Math.round(evalLayer(l,f).x), Math.round(evalLayer(l,f).y), +evalLayer(l,f).scaleX.toFixed(2)]);
+  // contact sheet
+  const W=320,Hh=180; const sheet=document.createElement('canvas'); sheet.width=W*4; sheet.height=Hh*Math.ceil(frames.length/4); const g=sheet.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,sheet.width,sheet.height);
+  frames.forEach((f,i)=>{ const c=makeFrameCanvas(sc,f,W,Hh,{camera:true}); g.drawImage(c,(i%4)*W,Math.floor(i/4)*Hh); g.fillStyle='#000'; g.font='14px sans-serif'; g.fillText('f'+f,(i%4)*W+6,Math.floor(i/4)*Hh+16); });
+  out.png = sheet.toDataURL();
+  out.layers = allLayers().map(x=>x.name+':'+x.type);
+  return out;
+};
+</script>
