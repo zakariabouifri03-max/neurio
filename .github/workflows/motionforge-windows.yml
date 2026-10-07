@@ -61,15 +61,22 @@ jobs:
 
       - name: Build icon, portable package and installer
         working-directory: motionforge-studio
+        shell: pwsh
         run: |
-          python tools/make_icon.py
-          python tools/build_win.py --cache "${{ runner.temp }}\mfs-cache" --out dist
+          New-Item -ItemType Directory -Force -Path ci | Out-Null
+          python tools/make_icon.py *>&1 | Tee-Object -FilePath ci/build.log
+          if ($LASTEXITCODE -ne 0) { throw "icon generation failed" }
+          python tools/build_win.py --cache "${{ runner.temp }}\mfs-cache" --out dist *>&1 |
+            Tee-Object -FilePath ci/build.log -Append
+          if ($LASTEXITCODE -ne 0) { throw "build failed" }
 
       - name: Verify the produced binaries
         working-directory: motionforge-studio
+        shell: pwsh
         run: |
           Get-ChildItem dist | Format-Table Name, Length
-          python tools/verify_win.py dist
+          python tools/verify_win.py dist *>&1 | Tee-Object -FilePath ci/build.log -Append
+          if ($LASTEXITCODE -ne 0) { throw "verification failed" }
 
       - name: Unpack and smoke test the portable build
         shell: pwsh
@@ -122,6 +129,21 @@ jobs:
             motionforge-studio/dist/BUILD-INFO.txt
           if-no-files-found: error
           retention-days: 30
+
+      - name: Report a failure on the commit
+        if: failure()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $log = ""
+          if (Test-Path motionforge-studio/ci/build.log) {
+            $log = Get-Content motionforge-studio/ci/build.log -Raw
+            if ($log.Length -gt 12000) { $log = $log.Substring($log.Length - 12000) }
+          }
+          $body = "MotionForge Windows build failed on run $env:GITHUB_RUN_ID.`n`n```text`n$log`n```"
+          $body | Out-File -Encoding utf8 ci-failure.md
+          gh api "repos/$env:GITHUB_REPOSITORY/commits/$env:GITHUB_SHA/comments" -F body=@ci-failure.md
 
       - name: Publish to the GitHub release
         if: github.event_name == 'push' || inputs.publish
