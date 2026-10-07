@@ -43,6 +43,8 @@ export const useMediaUI = create<MediaUI>((set) => ({
 }));
 void KV.get<MediaFolder[]>('mediaFolders', []).then((folders) => useMediaUI.setState({ folders, loaded: true }));
 
+const NO_IDS: string[] = [];
+
 export function MediaPanel() {
   const assets = useMedia((s) => s.assets);
   const importing = useMedia((s) => s.importing);
@@ -51,7 +53,7 @@ export function MediaPanel() {
   const { folders, folderId, view, sort } = useMediaUI();
   const favs = useFavorites((s) => s.favs);
   const recents = useFavorites((s) => s.recents);
-  const projectMedia = useProject((s) => s.project?.mediaIds ?? []);
+  const projectMedia = useProject((s) => s.project?.mediaIds) ?? NO_IDS;
   const [menu, setMenu] = useState<{ x: number; y: number; asset: MediaAsset } | null>(null);
   const selected = useSelectedClip();
 

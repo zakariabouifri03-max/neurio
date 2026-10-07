@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Sparkles, Plus, Palette, Upload } from 'lucide-react';
 import { PanelHeader } from './LeftPanels';
 import { SearchBox, Chips, FavButton, Empty, pickFiles } from '../common';
-import { useFavorites, usePresets } from '@/services/favorites';
+import { useFavorites, usePresets, usePresetsOfKind } from '@/services/favorites';
 import { EFFECTS, EFFECT_CATEGORIES, type EffectDef, type EffectCategory } from '@/library/effects';
 import { COLOR_PRESETS, COLOR_PRESET_CATEGORIES, type ColorPreset } from '@/library/colorPresets';
 import { allLuts, parseCube, type LUTDef } from '@/library/luts';
@@ -69,7 +69,7 @@ export function FiltersLibraryPanel() {
   const [tab, setTab] = useState<'filters' | 'luts'>('filters');
   const [cat, setCat] = useState<ColorPreset['category'] | 'Favorites' | 'My presets' | null>(null);
   const fav = useFavorites();
-  const user = usePresets((s) => s.presets.filter((p) => p.kind === 'color'));
+  const user = usePresetsOfKind('color');
   const [, bump] = useState(0);
   const list = useMemo(() => {
     const t = q.trim().toLowerCase();

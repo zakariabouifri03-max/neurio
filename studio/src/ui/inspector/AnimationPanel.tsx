@@ -5,7 +5,7 @@ import { Section, Slider, SelectRow, Empty } from '../common';
 import { MOTION_PRESETS, type MotionPreset } from '@/library/animationPresets';
 import { IN_OUT_ANIMATIONS, LOOP_ANIMATIONS } from '@/library/textAnimations';
 import { STICKER_ANIMATIONS } from '@/library/stickers';
-import { usePresets } from '@/services/favorites';
+import { usePresets, usePresetsOfKind } from '@/services/favorites';
 import { hasKeyframes } from '@/core/keyframes';
 import { Play, Save, RotateCcw } from 'lucide-react';
 
@@ -13,7 +13,7 @@ export function AnimationPanel({ clip }: { clip: VisualClip }) {
   const project = useProject((s) => s.project)!;
   const [inDur, setInDur] = useState(0.6);
   const [outDur, setOutDur] = useState(0.6);
-  const presets = usePresets((s) => s.presets.filter((p) => p.kind === 'animation'));
+  const presets = usePresetsOfKind('animation');
   const t = clip.transform;
   const animated = hasKeyframes(t.position) || hasKeyframes(t.scale) || hasKeyframes(t.rotation) || hasKeyframes(t.opacity);
 

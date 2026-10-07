@@ -5,7 +5,7 @@ import { toast } from '@/core/uiStore';
 import { Section, Slider, Toggle, SelectRow, ColorRow, Chips, SearchBox, pickFiles } from '../common';
 import { allFonts, ensureFont, FONT_CATEGORIES, onFontsChanged, registerUserFont, type FontDef } from '@/library/fonts';
 import { TEXT_PRESETS, TEXT_PRESET_CATEGORIES, type TextPreset } from '@/library/textPresets';
-import { usePresets } from '@/services/favorites';
+import { usePresets, usePresetsOfKind } from '@/services/favorites';
 import { importFile } from '@/engine/MediaManager';
 import { AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, CaseUpper, Upload, Save, Copy } from 'lucide-react';
 import { defaultTextStyle } from '@/core/defaults';
@@ -16,7 +16,7 @@ export function TextPanel({ clip }: { clip: TextClip | CaptionClip }) {
   const s = clip.style;
   const set = (label: string, patch: Partial<TextStyle>, merge = true) => patchClip(clip.id, label, { style: { ...clip.style, ...patch } } as any, merge);
   const [presetCat, setPresetCat] = useState<TextPreset['category'] | null>(null);
-  const userPresets = usePresets((st) => st.presets.filter((p) => p.kind === 'text'));
+  const userPresets = usePresetsOfKind('text');
 
   const applyPreset = (p: TextPreset) => {
     const style = { ...defaultTextStyle(), ...p.style, fontSize: p.style.fontSize ?? s.fontSize };

@@ -16,7 +16,7 @@ import { FONTS, ensureFont } from '@/library/fonts';
 import { projectDuration } from '@/core/commands';
 import { formatBytes, formatDuration, downloadBlob } from '@/core/util';
 import { exportProject, probeCodecs, estimateSize, recommendedBitrate, hasWebCodecs, hasMediaRecorder, CODECS, type ExportSettings, type ExportProgress, type Container, type VideoCodecId } from '@/engine/Exporter';
-import { usePresets } from '@/services/favorites';
+import { usePresets, usePresetsOfKind } from '@/services/favorites';
 import type { MediaAsset } from '@/core/types';
 
 export function Dialogs() {
@@ -269,7 +269,7 @@ function ExportDialog({ onClose }: { onClose: () => void }) {
   const project = useProject((s) => s.project)!;
   const inPoint = usePlayback((s) => s.inPoint);
   const outPoint = usePlayback((s) => s.outPoint);
-  const presets = usePresets((s) => s.presets.filter((p) => p.kind === 'export'));
+  const presets = usePresetsOfKind('export');
   const saved = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem('neurio.export') || 'null');

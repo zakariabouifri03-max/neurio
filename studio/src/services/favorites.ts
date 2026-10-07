@@ -1,5 +1,6 @@
 /** Favorites + recents + user presets (persisted in IndexedDB KV). */
 import { create } from 'zustand';
+import { useMemo } from 'react';
 import { KV } from './db';
 import { uid } from '@/core/util';
 
@@ -79,3 +80,12 @@ export const usePresets = create<PresetStore>((set, get) => ({
   byKind: (kind) => get().presets.filter((p) => p.kind === kind),
   load: async () => set({ presets: await KV.get('presets', []) }),
 }));
+
+/**
+ * Presets of one kind. Selects the stable `presets` array and memoizes the filtered result —
+ * returning a fresh array from a zustand selector would re-render forever ("Maximum update depth exceeded").
+ */
+export function usePresetsOfKind(kind: PresetKind) {
+  const all = usePresets((s) => s.presets);
+  return useMemo(() => all.filter((p) => p.kind === kind), [all, kind]);
+}

@@ -1,7 +1,7 @@
 {
   "name": "neurio-studio",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Neurio Studio — a professional browser-based multi-track video editor",
   "scripts": {

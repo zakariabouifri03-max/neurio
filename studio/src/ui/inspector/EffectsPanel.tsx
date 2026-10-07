@@ -5,14 +5,14 @@ import { useUI } from '@/core/uiStore';
 import { getEffect } from '@/library/effects';
 import { Section, Empty } from '../common';
 import { AnimSlider } from './anim';
-import { usePresets } from '@/services/favorites';
+import { usePresets, usePresetsOfKind } from '@/services/favorites';
 import { Eye, EyeOff, Trash2, ChevronUp, ChevronDown, Plus, Save, RotateCcw } from 'lucide-react';
 import { uid, deepClone } from '@/core/util';
 
 export function EffectsPanel({ clip }: { clip: VisualClip }) {
   const effects = clip.effects;
   const set = (label: string, fx: EffectInstance[], merge = true) => patchClip(clip.id, label, { effects: fx } as any, merge);
-  const presets = usePresets((s) => s.presets.filter((p) => p.kind === 'effect'));
+  const presets = usePresetsOfKind('effect');
   return (
     <>
       <div className="row" style={{ padding: '10px 10px 0' }}>

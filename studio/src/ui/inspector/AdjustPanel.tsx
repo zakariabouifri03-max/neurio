@@ -6,7 +6,7 @@ import { AnimSlider, Row } from './anim';
 import { defaultHSL, defaultCurves, defaultWheels } from '@/core/defaults';
 import { allLuts, parseCube } from '@/library/luts';
 import { COLOR_PRESETS, COLOR_PRESET_CATEGORIES, type ColorPreset } from '@/library/colorPresets';
-import { usePresets } from '@/services/favorites';
+import { usePresets, usePresetsOfKind } from '@/services/favorites';
 import { RotateCcw, Save, Trash2, Upload, Wand2 } from 'lucide-react';
 import { toast } from '@/core/uiStore';
 import { autoColor } from '@/ai/autoColor';
@@ -55,7 +55,7 @@ export function AdjustPanel({ clip }: { clip: VisualClip }) {
     toast(`Grade applied to ${ids.length} clips`, 'success');
   };
   const [presetCat, setPresetCat] = useState<ColorPreset['category'] | null>(null);
-  const userPresets = usePresets((s) => s.presets.filter((p) => p.kind === 'color'));
+  const userPresets = usePresetsOfKind('color');
   const [busy, setBusy] = useState(false);
 
   return (

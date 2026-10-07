@@ -6,7 +6,7 @@ import { Section, Slider, Toggle, Chips } from '../common';
 import { AnimSlider } from './anim';
 import { getAudioBuffer } from '@/engine/MediaManager';
 import { detectBeats, integratedLoudnessDb } from '@/ai/audioAnalysis';
-import { usePresets } from '@/services/favorites';
+import { usePresets, usePresetsOfKind } from '@/services/favorites';
 import { Save, RotateCcw, Activity, Music2 } from 'lucide-react';
 import { defaultAudioFX } from '@/core/defaults';
 import * as cmd from '@/core/commands';
@@ -26,7 +26,7 @@ const EQ_PRESETS: { name: string; low: number; mid: number; high: number }[] = [
 export function AudioPanel({ clip }: { clip: VideoClip | AudioClip }) {
   const fx = clip.audio;
   const set = (label: string, patch: Partial<AudioFX>, merge = true) => patchClip(clip.id, label, { audio: { ...clip.audio, ...patch } } as any, merge);
-  const presets = usePresets((s) => s.presets.filter((p) => p.kind === 'audio'));
+  const presets = usePresetsOfKind('audio');
   const [busy, setBusy] = useState<string | null>(null);
   const halfDur = Math.max(0.05, clip.duration / 2);
 
