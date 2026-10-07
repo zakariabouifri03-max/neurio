@@ -120,7 +120,10 @@ def parse_version_info(blob: bytes, problems: list[str]) -> dict:
         while cursor + 6 <= stop:
             child = node(cursor, f"{label}/{key}")
             here["children"].append(child)
-            step = cursor + max(child["length"], 1)
+            # every structure in a version resource starts on a 32 bit boundary;
+            # writers that pad inside the table (PyInstaller does) declare a
+            # shorter wLength, so align up before the next sibling
+            step = (cursor + max(child["length"], 1) + 3) & ~3
             if step <= cursor:
                 break
             cursor = step

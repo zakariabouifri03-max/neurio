@@ -35,6 +35,7 @@ def _escape(text: str) -> str:
 
 def write_version_file(version, app_exe: str = "MotionForge-Studio-Setup") -> str:
     """PyInstaller version resource description (Windows only)."""
+    app_exe = app_exe[:-4] if app_exe.lower().endswith(".exe") else app_exe
     ver = ".".join(str(p) for p in version)
     ver4 = f"({version[0]}, {version[1]}, {version[2]}, 0)"
     text = f'''VSVersionInfo(
