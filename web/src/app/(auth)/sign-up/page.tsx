@@ -36,9 +36,14 @@ function SignUpForm() {
     event.preventDefault();
     setBusy(true);
     try {
-      await api.post('/api/auth/signup', form);
+      const result = await api.post<{ adopted?: number }>('/api/auth/signup', form);
       await refresh();
-      toast.success('Account created', 'Your workspace is ready.');
+      toast.success(
+        'Account created',
+        result.adopted
+          ? `Your workspace is ready — ${result.adopted} guest design${result.adopted === 1 ? '' : 's'} moved over`
+          : 'Your workspace is ready.',
+      );
       router.push(params.get('next') ?? '/home');
       router.refresh();
     } catch (error) {
@@ -131,6 +136,10 @@ function SignUpForm() {
           Continue with Google
         </Button>
       </form>
+
+      <Link href="/home" className="mt-3 block text-center text-[13px] no-underline" style={{ color: 'var(--brand)' }}>
+        Skip — start designing as a guest
+      </Link>
 
       <p className="mb-0 mt-5 text-center text-[13px]" style={{ color: 'var(--text-muted)' }}>
         Already have an account?{' '}

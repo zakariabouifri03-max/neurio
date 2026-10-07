@@ -23,16 +23,11 @@ const QUICK = [
 
 export function CreateBar({ compact = false }: { compact?: boolean }) {
   const router = useRouter();
-  const { user } = useSession();
   const toast = useToast();
   const [busy, setBusy] = useState<string | null>(null);
   const [custom, setCustom] = useState({ width: 1200, height: 800 });
 
   async function create(opts: { title: string; kind: string; width: number; height: number }) {
-    if (!user) {
-      router.push(`/sign-up?next=${encodeURIComponent('/home')}`);
-      return;
-    }
     setBusy(opts.title);
     try {
       const project = await api.post<{ id: string }>('/api/projects', opts);

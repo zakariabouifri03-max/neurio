@@ -17,6 +17,8 @@ export type SessionUserLite = {
   storageUsed: number;
   storageQuota: number;
   onboarded: boolean;
+  /** Anonymous visitor account — the studio is fully usable without signing up. */
+  guest?: boolean;
 };
 
 type SessionValue = { user: SessionUserLite | null; refresh: () => Promise<void>; setUser: (u: SessionUserLite | null) => void };

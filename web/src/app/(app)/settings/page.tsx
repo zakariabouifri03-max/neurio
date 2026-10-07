@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { User, Lock, Globe, Palette, CreditCard, Shield, Trash2, Loader2, Check } from 'lucide-react';
+import { User, Lock, Globe, Palette, CreditCard, Shield, Trash2, Loader2, Check, Sparkles } from 'lucide-react';
 import { api } from '@/lib/api-client';
 import { useSession, useTheme } from '@/components/providers';
 import { useI18n } from '@/i18n/provider';
@@ -84,6 +85,30 @@ export default function SettingsPage() {
       <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
         Account, language, appearance, plan and security.
       </p>
+
+      {user?.guest ? (
+        <section className="card mt-6 p-5" style={{ borderColor: 'var(--brand)' }}>
+          <h2 className="mb-2 mt-0 flex items-center gap-2 text-[14px] font-semibold">
+            <Sparkles size={15} style={{ color: 'var(--brand)' }} /> You are a guest
+          </h2>
+          <p className="mt-0 text-[13px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            Everything in Prism Studio works without an account, and your designs are already saved on this device.
+            Create a free account to keep them across devices, invite collaborators and unlock sync.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link href="/sign-up" className="no-underline">
+              <Button variant="primary" size="sm">
+                Create free account
+              </Button>
+            </Link>
+            <Link href="/sign-in" className="no-underline">
+              <Button variant="secondary" size="sm">
+                I already have an account
+              </Button>
+            </Link>
+          </div>
+        </section>
+      ) : null}
 
       {/* ------------------------------------------------------------ profile */}
       <section className="card mt-6 p-5">
@@ -199,6 +224,7 @@ export default function SettingsPage() {
       </section>
 
       {/* --------------------------------------------------------- security */}
+      {!user?.guest ? (
       <section className="card mt-4 p-5">
         <h2 className="mb-4 mt-0 flex items-center gap-2 text-[14px] font-semibold">
           <Lock size={15} style={{ color: 'var(--brand)' }} /> Password
@@ -245,8 +271,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </section>
+      ) : null}
 
       {/* ----------------------------------------------------------- danger */}
+      {!user?.guest ? (
       <section className="card mt-4 p-5" style={{ borderColor: 'var(--danger)' }}>
         <h2 className="mb-2 mt-0 flex items-center gap-2 text-[14px] font-semibold" style={{ color: 'var(--danger)' }}>
           <Shield size={15} /> Danger zone
@@ -259,6 +287,7 @@ export default function SettingsPage() {
           Deactivate account
         </Button>
       </section>
+      ) : null}
 
       <Modal
         open={deleteOpen}

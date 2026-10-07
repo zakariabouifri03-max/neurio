@@ -1,9 +1,11 @@
 import 'server-only';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import crypto from 'node:crypto';
 import { cache } from 'react';
-import { db, get, run, now } from './db';
+import { all, get, run, now } from './db';
 import { newId } from './ids';
+import { users as userRepo, run as sqlRun } from './repo';
+import { seedUserDefaults } from './seed';
 
 /**
  * Session management.
@@ -14,6 +16,8 @@ import { newId } from './ids';
  */
 
 const COOKIE_NAME = 'prism_session';
+export const GUEST_COOKIE = 'prism_guest';
+export const GUEST_HEADER = 'x-prism-guest';
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const SCRYPT_N = 16384;
 const SCRYPT_r = 8;
@@ -93,6 +97,8 @@ export type SessionUser = {
   storageQuota: number;
   onboarded: boolean;
   createdAt: number;
+  /** True for the anonymous account auto-created for visitors who never signed up. */
+  guest: boolean;
 };
 
 export async function createSession(
@@ -129,20 +135,11 @@ export async function destroySession(): Promise<void> {
   jar.delete(COOKIE_NAME);
 }
 
-export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
-  const jar = await cookies();
-  const token = jar.get(COOKIE_NAME)?.value;
-  if (!token) return null;
-  const row = get<any>(
-    `SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id
-     WHERE s.token = ? AND s.expires_at > ?`,
-    [sha256(token), now()],
-  );
-  if (!row) return null;
-  if (row.disabled) return null;
+function toSessionUser(row: any): SessionUser {
   return {
     id: row.id,
-    email: row.email,
+    // Guests have no real address; the placeholder stays server-side only.
+    email: row.is_guest ? '' : row.email,
     name: row.name,
     avatarUrl: row.avatar_url,
     role: row.role,
@@ -153,8 +150,137 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     storageQuota: Number(row.storage_quota),
     onboarded: !!row.onboarded,
     createdAt: Number(row.created_at),
+    guest: !!row.is_guest,
   };
+}
+
+/* --------------------------------------------------------------------- guests */
+
+/** Deterministic, collision-free placeholder address for a guest identity. */
+export function guestEmail(guestId: string): string {
+  return `guest_${guestId.replace(/[^a-zA-Z0-9]/g, '')}@prism.local`;
+}
+
+/**
+ * Resolves the browser's guest id to a real user row, creating it on first use.
+ *
+ * Guests are ordinary rows in `users` — every project, upload and comment has a
+ * valid owner, so no storage or permission code needs a special case.
+ */
+export function ensureGuestUser(guestId: string, locale = 'en'): SessionUser {
+  const email = guestEmail(guestId);
+  const existing = get<any>('SELECT * FROM users WHERE email = ?', [email]);
+  if (existing) return toSessionUser(existing);
+  const created = userRepo.create({
+    email,
+    name: 'Guest',
+    locale,
+    role: 'USER',
+    guest: true,
+  });
+  // A starter brand kit keeps the brand panel useful from the first minute.
+  try {
+    seedUserDefaults(created.id);
+  } catch {
+    /* seeding is best-effort; the catalogue seeds lazily anyway */
+  }
+  // Occasional housekeeping: guest rows are cheap, but not free forever.
+  if (Math.random() < 0.05) {
+    try {
+      pruneGuestUsers();
+    } catch {
+      /* ignore — cleanup runs again on the next guest */
+    }
+  }
+  return toSessionUser(get<any>('SELECT * FROM users WHERE id = ?', [created.id])!);
+}
+
+async function guestIdFromRequest(): Promise<string | null> {
+  const headerList = await headers();
+  const fromHeader = headerList.get(GUEST_HEADER);
+  if (fromHeader) return fromHeader;
+  const jar = await cookies();
+  const fromCookie = jar.get(GUEST_COOKIE)?.value;
+  return fromCookie ?? null;
+}
+
+/**
+ * Moves everything a guest created onto a real account, so signing up never
+ * loses work. Runs inside the login/signup handlers.
+ */
+export function adoptGuestWork(guestId: string | null, userId: string): number {
+  if (!guestId) return 0;
+  const guest = userRepo.byEmail(guestEmail(guestId));
+  if (!guest || !guest.isGuest || guest.id === userId) return 0;
+
+  const owned = all<{ id: string }>('SELECT id FROM projects WHERE owner_id = ?', [guest.id]);
+  let moved = 0;
+  for (const project of owned) {
+    sqlRun('UPDATE projects SET owner_id = ? WHERE id = ?', [userId, project.id]);
+    sqlRun('INSERT OR IGNORE INTO shares (id, project_id, user_id, role, created_at) VALUES (?,?,?,?,?)', [
+      newId('shr'),
+      project.id,
+      userId,
+      'OWNER',
+      now(),
+    ]);
+    moved += 1;
+  }
+  // Media, brand kits and favourites follow their owner.
+  sqlRun('UPDATE assets SET owner_id = ? WHERE owner_id = ?', [userId, guest.id]);
+  sqlRun('UPDATE brand_kits SET owner_id = ? WHERE owner_id = ?', [userId, guest.id]);
+  sqlRun('UPDATE folders SET owner_id = ? WHERE owner_id = ?', [userId, guest.id]);
+  sqlRun('UPDATE comments SET author_id = ? WHERE author_id = ?', [userId, guest.id]);
+  sqlRun('UPDATE favorites SET user_id = ? WHERE user_id = ?', [userId, guest.id]);
+  sqlRun('UPDATE media_folders SET owner_id = ? WHERE owner_id = ?', [userId, guest.id]);
+  return moved;
+}
+
+/** Drops guest accounts that have been idle for longer than `maxAgeMs`. */
+export function pruneGuestUsers(maxAgeMs = 30 * 24 * 60 * 60 * 1000): number {
+  const cutoff = now() - maxAgeMs;
+  const stale = all<{ id: string }>(
+    "SELECT id FROM users WHERE is_guest = 1 AND COALESCE(last_seen_at, created_at) < ?",
+    [cutoff],
+  );
+  if (!stale.length) return 0;
+  for (const row of stale) sqlRun('DELETE FROM users WHERE id = ?', [row.id]);
+  return stale.length;
+}
+
+export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
+  const jar = await cookies();
+  const token = jar.get(COOKIE_NAME)?.value;
+  if (token) {
+    const row = get<any>(
+      `SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id
+       WHERE s.token = ? AND s.expires_at > ?`,
+      [sha256(token), now()],
+    );
+    if (row && !row.disabled) return toSessionUser(row);
+  }
+
+  // No account? The studio still works: resolve the anonymous guest identity.
+  const guestId = await guestIdFromRequest();
+  if (!guestId) return null;
+  try {
+    return ensureGuestUser(guestId, await preferredLocale());
+  } catch (error) {
+    console.error('[auth] guest resolution failed', error);
+    return null;
+  }
 });
+
+/** Reads the browser's preferred language so the account starts in the right locale. */
+async function preferredLocale(): Promise<string> {
+  const acceptLanguage = (await headers()).get('accept-language') ?? '';
+  return /^ar/i.test(acceptLanguage.trim()) ? 'ar' : 'en';
+}
+
+/** The signed-in user, or the anonymous guest account for this browser. */
+export async function currentOrGuest(): Promise<SessionUser | null> {
+  return getCurrentUser();
+}
 
 export class AuthError extends Error {
   status: number;

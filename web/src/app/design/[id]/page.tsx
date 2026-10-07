@@ -13,10 +13,7 @@ export default async function DesignPage({ params }: { params: Promise<{ id: str
   if (!project) notFound();
 
   const role = access.roleFor(id, user?.id ?? null);
-  if (!role) {
-    if (!user) redirect(`/sign-in?next=${encodeURIComponent(`/design/${id}`)}`);
-    notFound();
-  }
+  if (!role) notFound();
 
   const pageRecords = projects.pages(id);
   const settings = { ...defaultDocSettings(), ...(project.data ?? {}) };

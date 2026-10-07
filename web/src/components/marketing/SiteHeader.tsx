@@ -18,6 +18,8 @@ const NAV = [
 
 export function SiteHeader() {
   const { user } = useSession();
+  // Guests have a session but no account, so they still get the sign-in affordance.
+  const signedIn = !!user && !user.guest;
   const { theme, toggle } = useTheme();
   const { lang, setLang } = useI18n();
   const pathname = usePathname();
@@ -37,7 +39,7 @@ export function SiteHeader() {
   const switchLang = async () => {
     const next = lang === 'en' ? 'ar' : 'en';
     setLang(next);
-    if (user) {
+    if (signedIn) {
       await fetch('/api/auth/me', {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
@@ -92,7 +94,7 @@ export function SiteHeader() {
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
-          {user ? (
+          {signedIn ? (
             <Link href="/home" className="no-underline">
               <Button variant="primary" icon={<LayoutDashboard size={15} />}>
                 Dashboard
@@ -103,9 +105,9 @@ export function SiteHeader() {
               <Link href="/sign-in" className="no-underline">
                 <Button variant="ghost">Sign in</Button>
               </Link>
-              <Link href="/sign-up" className="no-underline">
+              <Link href="/home" className="no-underline">
                 <Button variant="primary" icon={<Sparkles size={15} />}>
-                  Start free
+                  Start designing
                 </Button>
               </Link>
             </div>
@@ -131,16 +133,16 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            {!user ? (
+            {!signedIn ? (
               <div className="mt-2 flex gap-2 sm:hidden">
                 <Link href="/sign-in" className="flex-1 no-underline">
                   <Button variant="secondary" className="w-full">
                     Sign in
                   </Button>
                 </Link>
-                <Link href="/sign-up" className="flex-1 no-underline">
+                <Link href="/home" className="flex-1 no-underline">
                   <Button variant="primary" className="w-full">
-                    Start free
+                    Start designing
                   </Button>
                 </Link>
               </div>

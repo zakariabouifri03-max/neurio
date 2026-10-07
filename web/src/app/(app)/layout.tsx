@@ -1,9 +1,11 @@
-import { redirect } from 'next/navigation';
 import { AppShell } from '@/components/app/AppShell';
 import { getCurrentUser } from '@/lib/auth';
 
+/**
+ * Every visitor gets an identity (a real anonymous account), so the studio is
+ * usable without signing up — there is no gate here on purpose.
+ */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const user = await getCurrentUser();
-  if (!user) redirect('/sign-in?next=/home');
+  await getCurrentUser();
   return <AppShell>{children}</AppShell>;
 }

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { handler, ok, fail, parseBody, clientKey, rateLimit, tooMany } from '@/lib/api';
-import { createSession, verifyPassword } from '@/lib/auth';
+import { createSession, verifyPassword, adoptGuestWork, GUEST_COOKIE, GUEST_HEADER } from '@/lib/auth';
 import { users } from '@/lib/repo';
 
 export const runtime = 'nodejs';
@@ -28,7 +28,11 @@ export const POST = handler(async (req: NextRequest) => {
     ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim(),
   });
 
+  // Anything created before signing in moves to the real account.
+  const adopted = adoptGuestWork(req.headers.get(GUEST_HEADER) ?? req.cookies.get(GUEST_COOKIE)?.value ?? null, user.id);
+
   return ok({
+    adopted,
     id: user.id,
     email: user.email,
     name: user.name,

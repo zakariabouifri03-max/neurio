@@ -37,6 +37,8 @@ CREATE TABLE IF NOT EXISTS users (
   ai_credits     INTEGER NOT NULL DEFAULT 200,
   onboarded      INTEGER NOT NULL DEFAULT 0,
   disabled       INTEGER NOT NULL DEFAULT 0,
+  -- 1 for anonymous guest accounts auto-created so the studio works without sign-up
+  is_guest       INTEGER NOT NULL DEFAULT 0,
   oauth_provider TEXT,
   oauth_subject  TEXT,
   last_seen_at INTEGER,

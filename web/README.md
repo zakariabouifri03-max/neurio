@@ -11,7 +11,13 @@ npm run db:seed        # optional: warms the template + element catalogue (356 t
 npm run dev            # http://localhost:3000
 ```
 
-Sign in with an existing account or create one — the first account matching `SEED_ADMIN_EMAIL` (`.env`: `demo@prism.studio`) is promoted to administrator.
+## No sign-up required
+
+Open the app and start designing: the first request mints an anonymous **guest** account (a real row in `users`, flagged `is_guest`) and every feature — editor, autosave, uploads, exports, brand kits, comments — works immediately. Nothing is gated behind registration.
+
+Guests keep their work on the device that created it. Signing up or signing in later **adopts** everything the guest made (projects, uploads, brand kits, favourites) into the new account, and the UI reports how many designs moved over. Guest rows idle for more than 30 days are pruned automatically.
+
+Accounts still exist for people who want them: sync across devices, collaboration, sharing by email and an administrator role (the first account matching `SEED_ADMIN_EMAIL` — `demo@prism.studio` in `.env` — is promoted to administrator).
 
 ---
 
@@ -50,6 +56,7 @@ Multi-page documents with A4/A3/Letter presets, margins, bleed, tables, headers/
 PNG (transparent, up to 4×), JPG, WebP, SVG (true vector with embedded images), PDF (multi-page, print quality), ZIP of per-page images, GIF, and video. All rendered from the same scene model with the same style helpers as the editor, so output matches the screen.
 
 ### Account, storage and collaboration
+- Guest access: the whole studio works with no account; signing up adopts the guest's work.
 - Email + password auth (scrypt), sessions, password reset, optional Google sign-in.
 - Projects with folders, favourites, trash, duplicates, search, grid/list views and sorting.
 - Media library with uploads (progress), kind filters, favourites and reuse across designs; pluggable storage drivers (local disk or S3-compatible via SigV4).
@@ -100,6 +107,7 @@ web/
    │  ├─ template/            Live template renderer
    │  └─ ui/                  Design-system primitives
    ├─ store/editor.ts         Zustand store (single source of editor truth)
+   ├─ middleware.ts           Mints the guest identity cookie for every visitor
    ├─ lib/                    db, auth, repo (SQL), storage, ai providers, rbac, api
    ├─ hooks/                  useAutosave, useShortcuts
    ├─ i18n/                   Dictionary + provider (EN/AR, RTL)

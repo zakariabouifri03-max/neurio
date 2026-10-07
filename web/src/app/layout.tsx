@@ -33,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     ? {
         id: user.id,
         name: user.name,
-        email: user.email,
+        email: user.guest ? '' : user.email,
         avatarUrl: user.avatarUrl,
         role: user.role,
         plan: user.plan,
@@ -42,6 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         storageUsed: user.storageUsed,
         storageQuota: user.storageQuota,
         onboarded: user.onboarded,
+        guest: user.guest,
       }
     : null;
 

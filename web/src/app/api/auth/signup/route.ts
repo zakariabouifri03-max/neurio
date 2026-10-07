@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { handler, ok, fail, parseBody, clientKey, rateLimit, tooMany } from '@/lib/api';
-import { createSession, hashPassword, passwordStrength, pruneAuthTables } from '@/lib/auth';
+import { createSession, hashPassword, passwordStrength, pruneAuthTables, adoptGuestWork, GUEST_COOKIE, GUEST_HEADER } from '@/lib/auth';
 import { users, activity } from '@/lib/repo';
 import { seedUserDefaults } from '@/lib/seed';
 
@@ -43,7 +43,11 @@ export const POST = handler(async (req: NextRequest) => {
     ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim(),
   });
 
+  // Designs made as a guest are transferred to the new account.
+  const adopted = adoptGuestWork(req.headers.get(GUEST_HEADER) ?? req.cookies.get(GUEST_COOKIE)?.value ?? null, user.id);
+
   return ok({
+    adopted,
     id: user.id,
     email: user.email,
     name: user.name,

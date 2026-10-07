@@ -70,7 +70,7 @@ const PLANS = [
     note: 'forever',
     features: ['Unlimited designs', 'Hundreds of templates & elements', 'PNG / JPG / PDF export', '5 GB storage', '100 AI credits / month'],
     cta: 'Start free',
-    href: '/sign-up',
+    href: '/home',
     highlight: false,
   },
   {
@@ -387,11 +387,12 @@ export default function LandingPage() {
         >
           <h2 className="text-[30px] font-bold tracking-tight sm:text-[40px]">Open the editor. Make something real.</h2>
           <p className="mx-auto mt-3 max-w-[520px] text-[14.5px]" style={{ color: 'var(--text-muted)' }}>
-            No download, no demo mode — your first design is saved to your account the moment you touch it.
+            No sign-up, no download, no demo mode — open the editor and your work is saved as you go. Create an
+            account any time to keep it across devices.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link href="/sign-up" className="no-underline">
-              <span className="btn btn-primary btn-lg">Create your account</span>
+            <Link href="/home" className="no-underline">
+              <span className="btn btn-primary btn-lg">Start designing — no account needed</span>
             </Link>
             <Link href="/templates" className="no-underline">
               <span className="btn btn-secondary btn-lg">Browse templates</span>

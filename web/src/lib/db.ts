@@ -68,7 +68,25 @@ export function migrate(database: DatabaseSync = db()): void {
       throw err;
     }
   }
+  applyColumnMigrations(database);
   globalForDb.__prismDbReady = true;
+}
+
+/**
+ * Lightweight forward migrations for databases created by an older schema.
+ * SQLite cannot add a column to an existing table through CREATE TABLE, so new
+ * columns are appended here the first time the process boots.
+ */
+const COLUMN_MIGRATIONS: { table: string; column: string; definition: string }[] = [
+  { table: 'users', column: 'is_guest', definition: 'INTEGER NOT NULL DEFAULT 0' },
+];
+
+export function applyColumnMigrations(database: DatabaseSync = db()): void {
+  for (const migration of COLUMN_MIGRATIONS) {
+    const columns = database.prepare(`PRAGMA table_info(${migration.table})`).all() as { name: string }[];
+    if (columns.some((column) => column.name === migration.column)) continue;
+    database.exec(`ALTER TABLE ${migration.table} ADD COLUMN ${migration.column} ${migration.definition};`);
+  }
 }
 
 /* ------------------------------------------------------------------- queries */

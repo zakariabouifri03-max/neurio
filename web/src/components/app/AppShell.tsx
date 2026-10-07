@@ -52,6 +52,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [newOpen, setNewOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[] | null>(null);
+  const [guestNoticeHidden, setGuestNoticeHidden] = useState(false);
+  const isGuest = !!user?.guest;
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
@@ -160,19 +162,68 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={signOut}
-            className="mt-2 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-colors hover:bg-[var(--bg-hover)]"
-            style={{ color: 'var(--text-muted)' }}
-          >
-            <LogOut size={15} /> Sign out
-          </button>
+          {isGuest ? (
+            <div className="mt-2 rounded-xl p-3" style={{ background: 'var(--bg-panel)' }}>
+              <p className="text-[12px] font-medium" style={{ color: 'var(--text)' }}>
+                Designing as a guest
+              </p>
+              <p className="mt-1 text-[11.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                Your work saves on this device. Create a free account to keep it everywhere.
+              </p>
+              <Link href="/sign-up" className="no-underline">
+                <Button variant="primary" size="sm" className="mt-2 w-full" style={{ justifyContent: 'center' }}>
+                  Create free account
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={signOut}
+              className="mt-2 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-colors hover:bg-[var(--bg-hover)]"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              <LogOut size={15} /> Sign out
+            </button>
+          )}
         </div>
       </aside>
 
       {/* -------------------------------------------------------------- main */}
       <div className="flex min-w-0 flex-1 flex-col">
+        {isGuest && !guestNoticeHidden ? (
+          <div
+            className="flex flex-wrap items-center gap-3 px-4 py-2.5 text-[13px]"
+            style={{ background: 'var(--bg-panel)', borderBottom: '1px solid var(--border)' }}
+            role="status"
+          >
+            <Sparkles size={15} style={{ color: 'var(--brand)' }} />
+            <span style={{ color: 'var(--text)' }}>
+              You are using Prism Studio as a guest — everything works, and your designs save on this device.
+            </span>
+            <span className="ms-auto flex items-center gap-2">
+              <Link href="/sign-up" className="no-underline">
+                <Button size="sm" variant="primary">
+                  Create free account
+                </Button>
+              </Link>
+              <Link href="/sign-in" className="no-underline">
+                <Button size="sm" variant="ghost">
+                  Sign in
+                </Button>
+              </Link>
+              <button
+                type="button"
+                onClick={() => setGuestNoticeHidden(true)}
+                aria-label="Dismiss"
+                className="grid h-7 w-7 place-items-center rounded-lg"
+                style={{ color: 'var(--text-faint)' }}
+              >
+                <X size={14} />
+              </button>
+            </span>
+          </div>
+        ) : null}
         <header
           className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b px-4"
           style={{ borderColor: 'var(--border)', background: 'color-mix(in srgb, var(--bg) 88%, transparent)', backdropFilter: 'blur(12px)' }}
@@ -286,14 +337,25 @@ export function AppShell({ children }: { children: ReactNode }) {
                         {item.label}
                       </Link>
                     ))}
-                    <button
-                      type="button"
-                      onClick={signOut}
-                      className="block w-full px-3 py-2 text-start text-[13px] hover:bg-[var(--bg-hover)]"
-                      style={{ color: 'var(--danger)' }}
-                    >
-                      Sign out
-                    </button>
+                    {isGuest ? (
+                      <Link
+                        href="/sign-up"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-3 py-2 text-[13px] no-underline hover:bg-[var(--bg-hover)]"
+                        style={{ color: 'var(--brand)' }}
+                      >
+                        Create free account
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={signOut}
+                        className="block w-full px-3 py-2 text-start text-[13px] hover:bg-[var(--bg-hover)]"
+                        style={{ color: 'var(--danger)' }}
+                      >
+                        Sign out
+                      </button>
+                    )}
                   </div>
                 </>
               ) : null}

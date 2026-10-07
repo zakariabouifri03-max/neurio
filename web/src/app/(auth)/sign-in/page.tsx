@@ -24,9 +24,12 @@ function SignInForm() {
     event.preventDefault();
     setBusy(true);
     try {
-      await api.post('/api/auth/login', form);
+      const result = await api.post<{ adopted?: number }>('/api/auth/login', form);
       await refresh();
-      toast.success('Welcome back');
+      toast.success(
+        'Welcome back',
+        result.adopted ? `${result.adopted} guest design${result.adopted === 1 ? '' : 's'} moved to your account` : undefined,
+      );
       router.push(next);
       router.refresh();
     } catch (error) {
@@ -104,6 +107,10 @@ function SignInForm() {
           Continue with Google
         </Button>
       </form>
+
+      <Link href="/home" className="mt-3 block text-center text-[13px] no-underline" style={{ color: 'var(--brand)' }}>
+        Skip — continue without an account
+      </Link>
 
       <p className="mb-0 mt-5 text-center text-[13px]" style={{ color: 'var(--text-muted)' }}>
         New here?{' '}

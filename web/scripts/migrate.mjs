@@ -42,6 +42,16 @@ for (const statement of statements) {
   }
 }
 
+/** Forward-only column additions for databases created by an older schema. */
+const COLUMN_MIGRATIONS = [{ table: 'users', column: 'is_guest', definition: 'INTEGER NOT NULL DEFAULT 0' }];
+
+for (const migration of COLUMN_MIGRATIONS) {
+  const columns = db.prepare(`PRAGMA table_info(${migration.table})`).all();
+  if (columns.some((column) => column.name === migration.column)) continue;
+  db.exec(`ALTER TABLE ${migration.table} ADD COLUMN ${migration.column} ${migration.definition};`);
+  console.log(`[migrate] added ${migration.table}.${migration.column}`);
+}
+
 db.exec(`CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT, applied_at INTEGER);`);
 db.prepare('INSERT OR IGNORE INTO schema_meta (key, value, applied_at) VALUES (?,?,?)').run(
   'version',

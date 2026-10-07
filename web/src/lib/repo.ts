@@ -31,6 +31,7 @@ export type UserRecord = {
   storageQuota: number;
   onboarded: boolean;
   disabled: boolean;
+  isGuest: boolean;
   oauthProvider: string | null;
   createdAt: number;
   updatedAt: number;
@@ -54,6 +55,7 @@ function mapUser(r: any): UserRecord {
     storageQuota: int(r.storage_quota),
     onboarded: bool(r.onboarded),
     disabled: bool(r.disabled),
+    isGuest: bool(r.is_guest),
     oauthProvider: r.oauth_provider,
     createdAt: int(r.created_at),
     updatedAt: int(r.updated_at),
@@ -82,12 +84,14 @@ export const users = {
     locale?: string;
     role?: string;
     oauth?: { provider: string; subject: string } | null;
+    /** Anonymous visitor account — never shown a password prompt. */
+    guest?: boolean;
   }): UserRecord {
     const id = newId('usr');
     run(
       `INSERT INTO users (id, email, name, password_hash, avatar_url, locale, role,
-         oauth_provider, oauth_subject, email_verified, created_at, updated_at)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+         oauth_provider, oauth_subject, email_verified, is_guest, created_at, updated_at)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [
         id,
         input.email.trim().toLowerCase(),
@@ -99,6 +103,7 @@ export const users = {
         input.oauth?.provider ?? null,
         input.oauth?.subject ?? null,
         input.oauth ? 1 : 0,
+        input.guest ? 1 : 0,
         now(),
         now(),
       ],
@@ -118,6 +123,7 @@ export const users = {
       storageQuota: 'storage_quota',
       onboarded: 'onboarded',
       disabled: 'disabled',
+      isGuest: 'is_guest',
       passwordHash: 'password_hash',
       emailVerified: 'email_verified',
     };

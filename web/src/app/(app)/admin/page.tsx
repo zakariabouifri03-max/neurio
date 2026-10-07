@@ -5,6 +5,7 @@ import { Shield, Users, LayoutTemplate, BarChart3, Search, Loader2, Cpu } from '
 import { api } from '@/lib/api-client';
 import { Button, EmptyState, SearchInput, Select } from '@/components/ui';
 import { useToast } from '@/components/ui/toast';
+import { useSession } from '@/components/providers';
 import { formatBytes } from '@/components/app/AppShell';
 
 type Stats = {
@@ -29,6 +30,7 @@ type AdminUser = {
 };
 
 export default function AdminPage() {
+  const { user } = useSession();
   const toast = useToast();
   const [tab, setTab] = useState<'stats' | 'users' | 'templates' | 'elements'>('stats');
   const [stats, setStats] = useState<Stats | null>(null);
@@ -73,6 +75,22 @@ export default function AdminPage() {
     { id: 'templates' as const, label: 'Templates', icon: LayoutTemplate },
     { id: 'elements' as const, label: 'Elements', icon: Shield },
   ];
+
+  if (user && user.role !== 'ADMIN') {
+    return (
+      <div className="mx-auto max-w-[1180px] px-5 py-7">
+        <EmptyState
+          icon={<Shield size={22} />}
+          title="Administrator access required"
+          description={
+            user.guest
+              ? 'Guest sessions are read-only here. Sign in with an administrator account to manage the platform.'
+              : 'Your account does not have the administrator role. Ask an administrator to grant access from the users table.'
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-[1180px] px-5 py-7">
