@@ -180,12 +180,22 @@ def verify_zip(path: str) -> int:
             problems += check_pe(tmp + ".console", "console twin")
         required = ["python313.dll", "lib/PySide6/QtCore.pyd", "app/mfs/app.py",
                     "app/mfs/ui/session.py", "MotionForge.py", "ReadMe.txt",
-                    "lib/imageio_ffmpeg/binaries/ffmpeg-win-x86_64-v7.1.exe"]
+                    "lib/PySide6/Qt6Core.dll", "lib/numpy/__init__.py",
+                    "lib/imageio_ffmpeg/binaries/", "licenses/THIRD-PARTY-NOTICES.txt"]
         for want in required:
-            hit = any(n.endswith(want) for n in names)
+            hit = any(n.endswith(want) or (want.endswith("/") and want in n) for n in names)
             if not hit:
                 problems += 1
-            print(f"{OK if hit else FAIL} {want}")
+                stem = os.path.basename(want.rstrip("/"))
+                near = [n for n in names if stem and stem.split(".")[0].lower() in n.lower()][:4]
+                print(f"{FAIL} {want}   near={near}")
+            else:
+                print(f"{OK} {want}")
+        print(f"      entry style: {names[500:502]}")
+        if any("\\" in n for n in names):
+            backslashes = [n for n in names if "\\" in n][:3]
+            print(f"{FAIL} archive uses backslash separators, e.g. {backslashes}")
+            problems += 1
         pth = next((n for n in names if n.endswith("python313._pth")), None)
         if pth:
             content = z.read(pth).decode("utf-8")

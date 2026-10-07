@@ -726,7 +726,9 @@ def build_portable_zip(app_dir: str, out: str, version) -> str:
         for root_dir, _dirs, files in os.walk(app_dir):
             for f in files:
                 full = os.path.join(root_dir, f)
-                z.write(full, os.path.relpath(full, base))
+                # zip entries always use forward slashes, on every platform
+                arc = os.path.relpath(full, base).replace(os.sep, "/")
+                z.write(full, arc)
     print(f"  portable zip: {path} ({os.path.getsize(path) / 1e6:.1f} MB)")
     return path
 
