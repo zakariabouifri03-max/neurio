@@ -136,21 +136,29 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Report a failure on the commit
+      - name: Report a failure (ci-reports branch)
         if: failure()
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $log = ""
-          if (Test-Path motionforge-studio/ci/build.log) {
-            $log = Get-Content motionforge-studio/ci/build.log -Raw
-            if ($log.Length -gt 12000) { $log = $log.Substring($log.Length - 12000) }
+          New-Item -ItemType Directory -Force -Path motionforge-studio/ci | Out-Null
+          $out = @()
+          $out += "MotionForge Studio - CI failure report"
+          $out += ""
+          $out += "run:    $env:GITHUB_RUN_ID"
+          $out += "commit: $env:GITHUB_SHA"
+          $out += "ref:    $env:GITHUB_REF"
+          $out += ""
+          foreach ($f in @("motionforge-studio/ci/build.log")) {
+            $out += "===== $f ====="
+            if (Test-Path $f) { $out += (Get-Content $f -Raw) } else { $out += "(missing)" }
+            $out += ""
           }
-          $body = "MotionForge Windows build failed on run $env:GITHUB_RUN_ID.`n`n```text`n$log`n```"
-          @{ body = $body } | ConvertTo-Json -Depth 4 | Out-File -Encoding utf8 ci-failure.json
-          gh api "repos/$env:GITHUB_REPOSITORY/commits/$env:GITHUB_SHA/comments" --input ci-failure.json
-          "posted build failure comment"
+          ($out -join "`n") | Out-File -Encoding utf8 motionforge-studio/ci/report.md
+          git config user.email "ci@motionforge.local"
+          git config user.name "MotionForge CI"
+          git add motionforge-studio/ci/report.md
+          git commit -q -m "CI failure report for $env:GITHUB_SHA" || Write-Host "nothing to commit"
+          git push --force origin "HEAD:refs/heads/ci-reports"
 
       - name: Publish to the GitHub release
         if: github.event_name == 'push' || inputs.publish
