@@ -777,7 +777,13 @@ def main(argv=None) -> int:
     zip_path = build_portable_zip(app_dir, args.out, version)
 
     setup = None
-    if not args.no_installer:
+    installer_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  "build_win_installer.py")
+    if args.no_installer:
+        pass
+    elif not os.path.exists(installer_path):
+        print("  installer: skipped (tools/build_win_installer.py is not present)")
+    else:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from build_win_installer import build_installer
         setup = build_installer(zip_path, args.out, version, ICON, APP_EXE)
