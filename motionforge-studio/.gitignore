@@ -1,0 +1,18 @@
+# local build / development state
+.venv/
+.devlibs/
+.devbuild/
+.cache/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# build outputs (the installers live in the GitHub release, not in git)
+dist/
+build/
+*.spec.bak
+
+# scratch
+/tmp/
+*.log
