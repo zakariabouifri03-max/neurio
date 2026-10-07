@@ -11,9 +11,11 @@ python3 -m http.server 8000 --bind 0.0.0.0
 # open http://localhost:8000
 ```
 
-There is no package install or build step. All editing and media persistence happen in the browser on the user's device. Imported source files are not uploaded.
+There is no package install or build step for the browser version. All editing and media persistence happen on the user's device; imported source files are not uploaded. The Windows desktop wrapper is built with `npm ci` and `npm run dist:win`, or automatically by the GitHub Actions installer workflow.
 
 The `arena/65e7f515-neurio` branch includes a GitHub Actions Pages workflow. Once Pages is enabled for the repository, pushes to that branch publish only the editor shell and its required assets at `https://zakariabouifri03-max.github.io/neurio/`.
+
+A Windows x64 Electron installer is also built and attached to a GitHub prerelease whenever the editor changes on this branch. The installer is unsigned, so Windows SmartScreen may show an unknown-publisher warning. The app runs locally; imported media and project data stay on the device.
 
 ## Working workflows
 
