@@ -113,13 +113,11 @@ if (-not (Test-Path $app)) {
 Say "   contents: $((Get-ChildItem $app | Select-Object -ExpandProperty Name) -join ', ')"
 Say "   folder size: $([math]::Round((Get-ChildItem $app -Recurse -File | Measure-Object Length -Sum).Sum / 1MB, 1)) MB"
 
-$python = Join-Path $app "python.exe"
-$gui = Join-Path $app "MotionForge Studio.exe"
-$console = Join-Path $app "MotionForge runtime console.exe"
-$runtime = Join-Path $app "MotionForge runtime.exe"
+$gui = Join-Path $app "MotionForge Studio.exe"                  # what the user starts
+$console = Join-Path $app "MotionForge runtime console.exe"     # interpreter, console
+$runtime = Join-Path $app "MotionForge runtime.exe"             # interpreter, windowed
 $launcherPy = Join-Path $app "MotionForge.py"
 
-Check "python.exe (payload interpreter)" (Test-Path $python)
 Check "MotionForge Studio.exe (entry point)" (Test-Path $gui)
 Check "MotionForge runtime console.exe" (Test-Path $console)
 Check "MotionForge runtime.exe" (Test-Path $runtime)
@@ -128,28 +126,32 @@ Check "python313.dll" (Test-Path (Join-Path $app "python313.dll"))
 Check "lib/PySide6/QtCore.pyd" (Test-Path (Join-Path $app "lib/PySide6/QtCore.pyd"))
 Check "lib/imageio_ffmpeg" (Test-Path (Join-Path $app "lib/imageio_ffmpeg"))
 Check "ffmpeg executable" ([bool](Get-ChildItem (Join-Path $app "lib/imageio_ffmpeg/binaries") -Filter "ffmpeg*.exe" -ErrorAction SilentlyContinue))
-Check "python.exe was not shipped as the app entry point" (-not (Test-Path (Join-Path $app "pythonw.exe")))
+Check "the interpreters were renamed (no python.exe / pythonw.exe)" `
+    (-not (Test-Path (Join-Path $app "python.exe")) -and -not (Test-Path (Join-Path $app "pythonw.exe")))
 
 Say ""
 Say "== file properties Windows shows for the entry point"
 foreach ($exe in @($gui, $runtime, $console)) {
     if (-not (Test-Path $exe)) { continue }
     $vi = (Get-Item $exe).VersionInfo
-    Say "   $([IO.Path]::GetFileName($exe)):"
+    $name = [IO.Path]::GetFileName($exe)
+    Say "   ${name}:"
     Say "     ProductName:     $($vi.ProductName)"
     Say "     FileVersion:     $($vi.FileVersion)"
     Say "     FileDescription: $($vi.FileDescription)"
     Say "     CompanyName:     $($vi.CompanyName)"
-    Check "version info of $([IO.Path]::GetFileName($exe))" ($vi.ProductName -eq "MotionForge Studio")
+    if ($exe -eq $gui) {
+        Check "$name is branded" ($vi.ProductName -eq "MotionForge Studio" -and $vi.FileVersion -eq "1.0.0")
+    } else {
+        Check "$name has a readable version resource" ([bool]$vi.ProductName -and [bool]$vi.FileVersion)
+    }
 }
 
-Invoke-Program "payload interpreter / Qt import" $python @(
+Invoke-Program "bundled interpreter / Qt import" $console @(
     "-c", "import sys, PySide6; print(sys.version); print('PySide6', PySide6.__version__)"
 ) "PySide6" -TimeoutSec 120
 
-Invoke-Program "script form (python.exe MotionForge.py)" $python @($launcherPy, "--selftest") "RESULT: OK" -TimeoutSec 420
-
-Invoke-Program "console runtime --selftest" $console @("--selftest") "RESULT: OK" -TimeoutSec 420
+Invoke-Program "script form (interpreter MotionForge.py)" $console @($launcherPy, "--selftest") "RESULT: OK" -TimeoutSec 420
 
 Invoke-Program "entry point --selftest" $gui @("--selftest") "RESULT: OK" -TimeoutSec 420
 

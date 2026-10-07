@@ -32,13 +32,48 @@ def _home() -> str:
     return os.path.dirname(os.path.abspath(sys.executable))
 
 
-def _fail(message: str) -> int:
-    """Report a broken installation.  The GUI build has no console of its own."""
+def _watched() -> bool:
+    """True when somebody can see our output (a console, a pipe or a file).
+
+    A dialog must never be opened in that case: on a build agent or in a script
+    there is nobody to click it and the process would hang until it is killed.
+    """
     try:
         import ctypes
-        ctypes.windll.user32.MessageBoxW(None, message, "MotionForge Studio", 0x10)
+        kernel32 = ctypes.windll.kernel32
+        for ident in (-10, -11, -12):        # stdin, stdout, stderr
+            handle = kernel32.GetStdHandle(ident)
+            if handle not in (0, -1, None):
+                return True
     except Exception:
+        return True
+    return False
+
+
+def _fail(message: str) -> int:
+    """Report a broken installation, on screen when possible and in a log always."""
+    written = ""
+    try:
+        base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+        folder = os.path.join(base, "MotionForgeStudio", "logs")
+        os.makedirs(folder, exist_ok=True)
+        written = os.path.join(folder, "launcher.log")
+        with open(written, "a", encoding="utf-8") as fh:
+            fh.write(message + "\n")
+    except OSError:
+        written = ""
+    if written:
+        message += f"\n\nDetails were written to\n{written}"
+    try:
         sys.stderr.write(message + "\n")
+    except Exception:
+        pass
+    if not _watched():
+        try:
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(None, message, "MotionForge Studio", 0x10)
+        except Exception:
+            pass
     return 1
 
 
@@ -71,7 +106,9 @@ def main(argv: list[str]) -> int:
     try:
         return subprocess.call(cmd, cwd=home)
     except OSError as exc:
-        return _fail(f"MotionForge Studio could not be started:\n\n{exc}")
+        return _fail(f"MotionForge Studio could not be started with\n\n{cmd[0]}\n\n{exc}")
+    except KeyboardInterrupt:
+        return 130
 
 
 if __name__ == "__main__":

@@ -11,8 +11,8 @@ Produces two artefacts in ``dist/``:
 The build is self contained: a stock CPython 3.13 *embedded* runtime plus the
 Windows wheels of Qt (PySide6), numpy, imageio-ffmpeg and msvc-runtime are
 fetched from PyPI, then stitched into an application folder whose entry point is
-a renamed, resource patched ``pythonw.exe`` (real icon, real version info, no
-console window).
+a small launcher executable with the studio's icon and version information
+(``MotionForge Studio.exe``) that hands over to the bundled interpreter.
 
     tools/devrun.sh tools/build_win.py                  # full build
     tools/devrun.sh tools/build_win.py --no-installer    # portable zip only
@@ -217,72 +217,8 @@ def fetch_python_payload(cache: str, explicit: str = "") -> str:
 
 
 # ---------------------------------------------------------------------------
-# resource building
+# PE helpers (used by the verifier)
 # ---------------------------------------------------------------------------
-def _utf16z(text: str) -> bytes:
-    return text.encode("utf-16-le") + b"\x00\x00"
-
-
-def _align4(b: bytes) -> bytes:
-    return b + b"\x00" * ((4 - len(b) % 4) % 4)
-
-
-def version_blob(version: tuple[int, int, int], app_name: str, exe_name: str) -> bytes:
-    """A well formed VS_VERSIONINFO blob, ready for an RT_VERSION leaf.
-
-    The layout is the one Windows expects (see the ``VS_VERSIONINFO`` struct
-    documentation): every structure carries its own ``wLength`` in bytes, text
-    values store their length in UTF-16 characters, and the root holds the
-    52 byte ``VS_FIXEDFILEINFO``.  Getting this wrong is invisible on Linux but
-    makes Windows Explorer show an empty "Details" page, so the CI verifier
-    parses it back with the same rules.
-    """
-    def w16(v):
-        return struct.pack("<H", v)
-
-    def w32(v):
-        return struct.pack("<I", v)
-
-    def structure(key: str, value_len: int, value_type: int, value: bytes = b"",
-                  children: bytes = b"") -> bytes:
-        head = w16(0) + w16(value_len) + w16(value_type) + _utf16z(key)
-        body = _align4(head) + value
-        body = _align4(body) + children
-        return w16(len(body)) + body[2:]
-
-    vs = version + (0,)
-    hi, lo = (vs[0] << 16) | vs[1], vs[2] << 16
-    # VS_FIXEDFILEINFO is exactly 13 DWORDs (52 bytes); anything else makes
-    # Windows report the file as having no version information at all
-    fixed = (w32(0xFEEF04BD)                  # dwSignature
-             + w32(0x00010000)                # dwStrucVersion
-             + w32(hi) + w32(lo)              # dwFileVersionMS/LS
-             + w32(hi) + w32(lo)              # dwProductVersionMS/LS
-             + w32(0x3F) + w32(0x00)          # dwFileFlagsMask, dwFileFlags
-             + w32(0x40004) + w32(0x01)       # VOS_NT_WINDOWS32, VFT_APP
-             + w32(0x00) + w32(0x00) + w32(0x00))
-
-    strings = [
-        ("CompanyName", VENDOR),
-        ("FileDescription", f"{app_name} - professional 2D animation studio"),
-        ("FileVersion", ver_text(version)),
-        ("InternalName", os.path.splitext(exe_name)[0]),
-        ("LegalCopyright", f"Copyright (C) 2026 {VENDOR}. All rights reserved."),
-        ("OriginalFilename", exe_name),
-        ("ProductName", app_name),
-        ("ProductVersion", f"{ver_text(version)} (Windows x64)"),
-        ("Comments", "Draw, rig and animate 2D characters - timeline, rigging, audio, AI."),
-    ]
-    items = b"".join(structure(name, len(text) + 1, 1, _utf16z(text))
-                     for name, text in strings)
-    table = structure("040904B0", 0, 1, children=items)
-    strinfo = structure("StringFileInfo", 0, 1, children=table)
-    var = structure("Translation", 4, 0, w32(0x04B00409))
-    varinfo = structure("VarFileInfo", 0, 1, children=var)
-    return structure("VS_VERSION_INFO", len(fixed), 0, fixed,
-                     children=strinfo + varinfo)
-
-
 def pe_imports(path: str) -> set[str]:
     """Lower-case names of the DLLs a PE file imports (empty set if not a PE)."""
     try:
@@ -409,171 +345,6 @@ def prune_qt(pyside: str) -> int:
     return removed
 
 
-def ico_images(path: str) -> dict:
-    """Parse an .ico -> {size: png_bytes}."""
-    data = open(path, "rb").read()
-    _r, _k, count = struct.unpack_from("<HHH", data, 0)
-    out = {}
-    for i in range(count):
-        w, h, _c, _r2, _p, _b, size, offset = struct.unpack_from("<BBBBHHII", data,
-                                                                 6 + 16 * i)
-        out[(w or 256, h or 256)] = data[offset:offset + size]
-    return out
-
-
-def bmp_icon_blob(png: bytes, size: int) -> bytes | None:
-    """RT_ICON bitmap form: BITMAPINFOHEADER + bottom-up BGRA + AND mask."""
-    from PySide6.QtGui import QImage
-    img = QImage.fromData(png, "PNG")
-    if img.isNull():
-        return None
-    img = img.convertToFormat(QImage.Format_ARGB32)
-    w, h = img.width(), img.height()
-    rows = []
-    bits = img.constBits()
-    bpl = img.bytesPerLine()
-    raw = bytes(bits)[: bpl * h]
-    for y in range(h):
-        rows.append(raw[y * bpl:y * bpl + w * 4])
-    xor = b"".join(reversed(rows))
-    row_bytes = ((w + 31) // 32) * 4
-    mask_rows = []
-    for y in range(h):
-        row = bytearray(row_bytes)
-        line = rows[y]
-        for x in range(w):
-            if line[x * 4 + 3] == 0:
-                row[x // 8] |= 0x80 >> (x % 8)
-        mask_rows.append(bytes(row))
-    header = struct.pack("<IiiHHIIiiII", 40, w, h * 2, 1, 32, 0, len(xor), 0, 0, 0, 0)
-    return header + xor + b"".join(reversed(mask_rows))
-
-
-def icon_blobs(icons: dict) -> tuple[list[bytes], bytes]:
-    """Return the RT_ICON payloads and the matching RT_GROUP_ICON blob."""
-    leaves, entries = [], []
-    for idx, size in enumerate(ICON_SIZES, start=1):
-        png = icons.get((size, size))
-        if png is None:
-            continue
-        if size >= 256:
-            leaf = png
-        else:
-            leaf = bmp_icon_blob(png, size)
-            if leaf is None:
-                continue
-        leaves.append(leaf)
-        dim = 0 if size >= 256 else size
-        entries.append(struct.pack("<BBBBHHIH", dim, dim, 0, 0, 1, 32, len(leaf), idx))
-    group = struct.pack("<HHH", 0, 1, len(entries)) + b"".join(entries)
-    return leaves, group
-
-
-def patch_pe_resources(path: str, ico_path: str, version: tuple[int, int, int],
-                       app_name: str, exe_name: str) -> dict:
-    """Replace icon + version resources of a PE file, in place.
-
-    New resource *data* is appended to the ``.rsrc`` section (and the section is
-    grown); the existing RT_ICON / RT_GROUP_ICON / RT_VERSION leaves are simply
-    re-pointed at it, so no directory entry has to move.
-    """
-    data = bytearray(open(path, "rb").read())
-    pe = struct.unpack_from("<I", data, 0x3C)[0]
-    _machine, nsec, _ts, _sym, _nsym, opt_size, _chars = struct.unpack_from(
-        "<HHIIIHH", data, pe + 4)
-    magic = struct.unpack_from("<H", data, pe + 24)[0]
-    ddoff = pe + 24 + (112 if magic == 0x20B else 96)
-    rsrc_rva, _rsrc_size = struct.unpack_from("<II", data, ddoff + 2 * 8)
-    sec = pe + 24 + opt_size
-    rsrc_off = rsrc_sec = None
-    sections = []
-    for i in range(nsec):
-        o = sec + 40 * i
-        name = bytes(data[o:o + 8]).rstrip(b"\x00")
-        vsize, va, rawsize, rawptr = struct.unpack_from("<IIII", data, o + 8)
-        sections.append((o, name, vsize, va, rawsize, rawptr))
-        if name == b".rsrc":
-            rsrc_off, rsrc_sec = rawptr, (o, name, vsize, va, rawsize, rawptr)
-    if rsrc_off is None:
-        raise SystemExit(f"{path}: no .rsrc section")
-
-    def walk(off, path_=()):
-        nname, nid = struct.unpack_from("<HH", data, rsrc_off + off + 12)
-        found = []
-        for i in range(nid):
-            e = rsrc_off + off + 16 + 8 * (nname + i)
-            ident, dataoff = struct.unpack_from("<II", data, e)
-            if dataoff & 0x80000000:
-                found += walk(dataoff & 0x7FFFFFFF, path_ + (ident,))
-            else:
-                found.append((path_ + (ident,), rsrc_off + dataoff))
-        for i in range(nname):
-            e = rsrc_off + off + 16 + 8 * i
-            ident, dataoff = struct.unpack_from("<II", data, e)
-            so = rsrc_off + (ident & 0x7FFFFFFF)
-            ln = struct.unpack_from("<H", data, so)[0]
-            nm = bytes(data[so + 2:so + 2 + 2 * ln]).decode("utf-16-le", "replace")
-            if dataoff & 0x80000000:
-                found += walk(dataoff & 0x7FFFFFFF, path_ + (nm,))
-            else:
-                found.append((path_ + (nm,), rsrc_off + dataoff))
-        return found
-
-    leaves = walk(0)
-    by_type: dict = {}
-    for entry in leaves:
-        by_type.setdefault(entry[0][0], []).append(entry)
-
-    leaves_icon, group = icon_blobs(ico_images(ico_path)) if os.path.exists(ico_path) else ([], b"")
-    ver = version_blob(version, app_name, exe_name)
-
-    raw_size = rsrc_sec[4]
-    appended = bytearray()
-
-    def append(blob: bytes) -> int:
-        off = raw_size + len(appended)
-        appended.extend(_align4(blob))
-        return off
-
-    stats = {"icons": 0, "group": 0, "version": 0}
-    for i, entry in enumerate(by_type.get(3, [])):
-        if i >= len(leaves_icon):
-            break
-        leaf = leaves_icon[i]
-        rva = rsrc_rva + append(leaf)
-        struct.pack_into("<IIII", data, entry[1], rva, len(leaf), 0, 0)
-        stats["icons"] += 1
-    for entry in by_type.get(14, [])[:1]:
-        rva = rsrc_rva + append(group)
-        struct.pack_into("<IIII", data, entry[1], rva, len(group), 0, 0)
-        stats["group"] = 1
-    for entry in by_type.get(16, [])[:1]:
-        rva = rsrc_rva + append(ver)
-        struct.pack_into("<IIII", data, entry[1], rva, len(ver), 1200, 0)
-        stats["version"] = 1
-
-    file_align = struct.unpack_from("<I", data, pe + 24 + 36)[0]
-    new_raw = (raw_size + len(appended) + file_align - 1) // file_align * file_align
-    appended.extend(b"\x00" * (new_raw - raw_size - len(appended)))
-    delta = len(appended)
-    insert_at = rsrc_off + raw_size
-
-    for o, name, _vs, _va, _rs, rawptr in sections:
-        if name != b".rsrc" and rawptr >= insert_at:
-            struct.pack_into("<I", data, o + 20, rawptr + delta)
-    data[insert_at:insert_at] = bytes(appended)
-    struct.pack_into("<II", data, rsrc_sec[0] + 8, new_raw, rsrc_sec[3])
-    struct.pack_into("<II", data, rsrc_sec[0] + 16, new_raw, rsrc_off)
-    struct.pack_into("<II", data, ddoff + 2 * 8, rsrc_rva, new_raw)
-    sec_align = struct.unpack_from("<I", data, pe + 24 + 32)[0]
-    size_of_image = struct.unpack_from("<I", data, pe + 24 + 56)[0]
-    need = (rsrc_rva + new_raw + sec_align - 1) // sec_align * sec_align
-    if need > size_of_image:
-        struct.pack_into("<I", data, pe + 24 + 56, need)
-    open(path, "wb").write(bytes(data))
-    return stats
-
-
 def make_icon_assets() -> None:
     """(Re)build the multi-size .ico from the generated artwork."""
     if not os.path.exists(ICON_SRC):
@@ -666,10 +437,9 @@ def assemble(out: str, payload_dir: str, wheel_dirs: dict, version) -> str:
         dst = os.path.join(app_dir, target)
         shutil.copy2(src, dst)
         os.remove(src)
-        if os.path.exists(ICON):
-            # the interpreters keep the studio's icon and version information so
-            # that the task manager and the file properties are branded too
-            patch_pe_resources(dst, ICON, version, "MotionForge Studio", target)
+        # deliberately *not* resource patched: rewriting the resources of a
+        # signed CPython binary is what makes Windows reject it as "not a valid
+        # Win32 application".  The brand lives on the launcher below.
     build_launcher_exe(app_dir, version)
 
     write_notices(app_dir, payload_dir, lib, version)
@@ -707,7 +477,9 @@ def build_launcher_exe(app_dir: str, version) -> None:
         try:
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
             from build_win_installer import write_version_file
-            cmd += ["--version-file", write_version_file(version, APP_EXE)]
+            cmd += ["--version-file", write_version_file(
+                version, APP_EXE,
+                "MotionForge Studio - professional 2D animation studio")]
         except Exception as exc:            # pragma: no cover - polish only
             print(f"    version resource skipped ({exc})")
     cmd.append(LAUNCHER_MAIN)

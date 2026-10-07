@@ -33,9 +33,11 @@ def _escape(text: str) -> str:
     return text.replace("\\", "\\\\")
 
 
-def write_version_file(version, app_exe: str = "MotionForge-Studio-Setup") -> str:
+def write_version_file(version, app_exe: str = "MotionForge-Studio-Setup",
+                       description: str = "") -> str:
     """PyInstaller version resource description (Windows only)."""
     app_exe = app_exe[:-4] if app_exe.lower().endswith(".exe") else app_exe
+    description = description or "MotionForge Studio 2D animation studio - setup"
     ver = ".".join(str(p) for p in version)
     ver4 = f"({version[0]}, {version[1]}, {version[2]}, 0)"
     text = f'''VSVersionInfo(
@@ -45,7 +47,7 @@ def write_version_file(version, app_exe: str = "MotionForge-Studio-Setup") -> st
   kids=[
     StringFileInfo([StringTable('040904B0', [
         StringStruct('CompanyName', 'MotionForge Labs'),
-        StringStruct('FileDescription', 'MotionForge Studio 2D animation studio - setup'),
+        StringStruct('FileDescription', '{description}'),
         StringStruct('FileVersion', '{ver}'),
         StringStruct('InternalName', '{app_exe}'),
         StringStruct('LegalCopyright', 'Copyright (C) 2026 MotionForge Labs'),

@@ -161,8 +161,13 @@ def parse_version_info(blob: bytes, problems: list[str]) -> dict:
     return out
 
 
-def version_check(path: str, label: str, version: tuple[int, int, int]) -> int:
-    """Everything Windows needs to show a full Details page."""
+def version_check(path: str, label: str, version: tuple[int, int, int],
+                  require_brand: bool = True) -> int:
+    """Everything Windows needs to show a full Details page.
+
+    ``require_brand`` is False for the bundled interpreters: those keep the
+    version resource CPython shipped with, which only has to be *valid*.
+    """
     problems: list[str] = []
     res = pe_resources(path)
     versions = res.get(16, [])
@@ -172,11 +177,9 @@ def version_check(path: str, label: str, version: tuple[int, int, int]) -> int:
     info = parse_version_info(versions[0][2], problems)
     strings = info["strings"]
     wanted = {
-        "ProductName": "MotionForge Studio",
-        "FileVersion": ".".join(str(p) for p in version),
+        "ProductName": "MotionForge Studio" if require_brand else None,
+        "FileVersion": ".".join(str(p) for p in version) if require_brand else None,
         "FileDescription": None,
-        "CompanyName": None,
-        "OriginalFilename": None,
     }
     for key, expected in wanted.items():
         value = strings.get(key, "")
@@ -184,7 +187,7 @@ def version_check(path: str, label: str, version: tuple[int, int, int]) -> int:
         if not good:
             problems.append(f"{key}={value!r} (expected {expected!r})")
         print(f"{OK if good else FAIL} {key:16s} {value!r}")
-    if info["file_version"] != version:
+    if require_brand and info["file_version"] != version:
         problems.append(f"fixed file version {info['file_version']} != {version}")
     if info["translation"] is None:
         problems.append("no translation entry in VarFileInfo")
@@ -196,7 +199,7 @@ def version_check(path: str, label: str, version: tuple[int, int, int]) -> int:
 
 
 def check_pe(path: str, label: str, version: tuple[int, int, int],
-             require_resources: bool = True) -> int:
+             require_resources: bool = True, require_brand: bool = True) -> int:
     """Structural check of an executable, plus its icon and version resource."""
     problems = 0
     with open(path, "rb") as fh:
@@ -233,7 +236,7 @@ def check_pe(path: str, label: str, version: tuple[int, int, int],
           f"{len(groups)} icon group(s), {size/1e6:.1f} MB")
     if require_resources and (not icons or not groups):
         problems += 1
-    problems += version_check(path, label, version)
+    problems += version_check(path, label, version, require_brand)
     _ = magic
     return problems
 
@@ -260,7 +263,9 @@ def verify_zip(path: str) -> int:
         tmp = os.path.join(tempfile.gettempdir(), "mfs_verify_" + os.path.basename(exe))
         with z.open(exe) as src, open(tmp, "wb") as dst:
             dst.write(src.read())
-        problems += check_pe(tmp, APP_EXE, APP_VER)
+        # a Linux build puts a placeholder where the Windows launcher goes;
+        # branding is enforced where it matters, on Windows
+        problems += check_pe(tmp, APP_EXE, APP_VER, require_brand=os.name == "nt")
         leaked = [n for n in names
                   if os.path.basename(n).lower() in ("python.exe", "pythonw.exe")]
         if leaked:
@@ -271,7 +276,8 @@ def verify_zip(path: str) -> int:
         if console:
             with z.open(console) as src, open(tmp + ".console", "wb") as dst:
                 dst.write(src.read())
-            problems += check_pe(tmp + ".console", "console runtime", APP_VER)
+            problems += check_pe(tmp + ".console", "console runtime", APP_VER,
+                                 require_brand=False)
         required = ["python313.dll", "lib/PySide6/QtCore.pyd", "app/mfs/app.py",
                     "app/mfs/ui/session.py", "MotionForge.py", "ReadMe.txt",
                     "lib/PySide6/Qt6Core.dll", "lib/numpy/__init__.py",
