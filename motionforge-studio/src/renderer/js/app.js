@@ -127,7 +127,7 @@ function buildTransport() {
   tFps = h('input.num', { type: 'number', min: 1, max: 120, tip: 'Frames per second (1–120)', style: { width: '56px' }, on: { change: () => { const v = clamp(Math.round(+tFps.value) || 24, 1, 120); H.tx('Frame rate', () => { S.project.fps = v; }); bus.emit('project-loaded'); }, keydown: (e) => { e.stopPropagation(); if (e.key === 'Enter') e.target.blur(); } } });
   t.append(ib('first', 'First frame||Home', 'anim.first'), ib('prev', 'Previous frame||←', 'anim.prev'), tPlay, ib('next', 'Next frame||→', 'anim.next'), ib('last', 'Last frame||End', 'anim.last'), ib('stop', 'Stop||Shift+Space', 'anim.stop'), tLoop, h('span.sepv'),
     h('label.hint', 'Frame'), tFrame, h('span.hint', { id: 'tot' }, '/ 0'), tTime, h('span.sepv'), h('label.hint', 'FPS'), tFps, h('span.grow'),
-    ib('key', 'Insert keyframe||K', 'key.new'), ib('keyadd', 'New blank frame||F', 'frame.new'), ib('copy', 'Duplicate frame||D', 'frame.duplicate'), h('span.sepv'), tAuto, tOnion);
+    ib('key', 'Insert keyframe||K', 'key.new'), ib('keyadd', 'New blank frame||F', 'frame.new'), ib('copy', 'Duplicate frame||D', 'frame.duplicate'), h('span.sepv'), tAuto, tOnion, h('span.sepv'), h('input', { type: 'range', id: 'tl-zoom', min: 2, max: 60, step: 0.5, value: S.ui.tlZoom, tip: 'Timeline zoom (Ctrl+wheel)', style: { width: '84px' }, on: { input: (e) => { S.ui.tlZoom = +e.target.value; bus.emit('timeline-zoom'); } } }));
   syncTransport();
 }
 function syncTransport() {

@@ -1,0 +1,72 @@
+name: MotionForge Studio – test & Windows build
+
+on:
+  push:
+    branches: ['arena/**', main]
+    paths: ['motionforge-studio/**', '.github/workflows/motionforge-windows.yml']
+    tags: ['motionforge-v*']
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: motionforge-studio
+
+jobs:
+  test:
+    name: Headless UI + engine tests
+    runs-on: ubuntu-latest
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: motionforge-studio/package-lock.json }
+      - run: npm ci
+      - run: npm run vendor
+      - run: node test/run.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: test-screenshots, path: motionforge-studio/.test-out/**/*.png, if-no-files-found: ignore }
+
+  windows:
+    name: Build installer + portable (Windows x64)
+    needs: test
+    runs-on: windows-latest
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: motionforge-studio/package-lock.json }
+      - run: npm ci
+      - run: npm run vendor
+      - name: Build NSIS installer + portable exe
+        run: npx electron-builder --win nsis portable --x64 --publish never
+      - name: Packaged-app end-to-end self-test (real Electron, real FFmpeg export)
+        shell: pwsh
+        run: |
+          $exe = Resolve-Path "dist/win-unpacked/MotionForge Studio.exe"
+          $out = Join-Path $env:RUNNER_TEMP "mf-selftest.json"
+          $env:MF_SELFTEST = "1"; $env:MF_SELFTEST_OUT = $out
+          $p = Start-Process -FilePath $exe -PassThru
+          if (-not $p.WaitForExit(240000)) { $p.Kill(); Write-Host "self-test timed out"; if (Test-Path $out) { Get-Content $out }; exit 1 }
+          if (Test-Path $out) { Get-Content $out }
+          if ($p.ExitCode -ne 0) { Write-Host "self-test failed, exit code $($p.ExitCode)"; exit 1 }
+          Write-Host "Packaged self-test OK"
+      - name: List artifacts
+        shell: pwsh
+        run: Get-ChildItem dist -File | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,1)}}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MotionForge-Studio-Windows
+          path: |
+            motionforge-studio/dist/MotionForge-Studio-Setup-*.exe
+            motionforge-studio/dist/MotionForge-Studio-Portable-*.exe
+          if-no-files-found: error
+      - name: Publish release (tags only)
+        if: startsWith(github.ref, 'refs/tags/motionforge-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            motionforge-studio/dist/MotionForge-Studio-Setup-*.exe
+            motionforge-studio/dist/MotionForge-Studio-Portable-*.exe

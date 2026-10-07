@@ -45,8 +45,9 @@ export function build(host) {
   new ResizeObserver(resize).observe(right);
   canvas.addEventListener('pointerdown', onDown); canvas.addEventListener('pointermove', onMove); canvas.addEventListener('pointerup', onUp); canvas.addEventListener('contextmenu', onCtx);
   canvas.addEventListener('dblclick', onDbl);
-  scroller.addEventListener('wheel', (e) => { if (e.ctrlKey) { e.preventDefault(); const f = frameAt(e.offsetX); S.ui.tlZoom = clamp(S.ui.tlZoom * (e.deltaY < 0 ? 1.15 : 0.87), 2, 60); layout(); } else if (e.shiftKey) { scroller.scrollLeft += e.deltaY; e.preventDefault(); } }, { passive: false });
+  scroller.addEventListener('wheel', (e) => { if (e.ctrlKey) { e.preventDefault(); const f = frameAt(e.offsetX); S.ui.tlZoom = clamp(S.ui.tlZoom * (e.deltaY < 0 ? 1.15 : 0.87), 2, 60); layout(); const zs = document.getElementById('tl-zoom'); if (zs) zs.value = S.ui.tlZoom; } else if (e.shiftKey) { scroller.scrollLeft += e.deltaY; e.preventDefault(); } }, { passive: false });
   for (const ev of ['change', 'frame', 'project-loaded', 'scene', 'selection', 'history', 'playing']) bus.on(ev, refreshSoon);
+  bus.on('timeline-zoom', () => layout());
   bus.on('render', drawSoon);
   layout(); return root;
 }

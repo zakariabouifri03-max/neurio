@@ -155,6 +155,7 @@ export function compilePlan(plan, opts = {}) {
             if (Math.abs(x1 - x0) < 0.25 * W) x1 = dir > 0 ? W * 0.12 : W * 0.88;
           }
         }
+        if (Math.abs(x1 - x0) < 4 && s.to != null && !hasFrom && stepStarts.length === 1) { x0 = state.facing > 0 ? X['offscreen-left'] : X['offscreen-right']; hasFrom = true; } // already at the destination → walk in from the side
         if (Math.abs(x1 - x0) < 4) { x1 = x0 + 0.3 * W * state.facing; }
         const dir = sgn(x1 - x0);
         const spd = (isRun ? 1.9 : 0.8) * cH * (s.speed || 1);

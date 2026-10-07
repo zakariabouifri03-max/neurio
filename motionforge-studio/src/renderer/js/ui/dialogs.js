@@ -73,7 +73,7 @@ async function ai(el) {
     const list = h('div.plist');
     for (const p of cfg.providers) list.append(h('div.pitem' + (p.id === sel ? '.sel' : ''), { on: { click: () => { sel = p.id; draw(); } } }, h('span.dot' + (cfg.active === p.id ? '.on' : '')), h('span', p.label || p.id)));
     const types = providerTypes().filter((t) => t.type !== 'offline');
-    list.append(h('div.pitem.add', { on: { click: async () => { const ty = types[0]; const id = 'p' + Math.random().toString(36).slice(2, 7); cfg.providers.push({ id, type: ty.type, label: 'New provider', ...(ty.defaults || {}) }); sel = id; saveSettings(); draw(); } } }, '＋ Add provider'));
+    list.append(h('div.pitem.add', { on: { click: async () => { const ty = types[0]; const id = 'p' + Math.random().toString(36).slice(2, 7); cfg.providers.push({ id, type: ty.type, label: 'New provider', ...(ty.defaults || {}) }); sel = id; saveSettings(); draw(); } } }, '+ Add provider'));
     const p = cfg.providers.find((x) => x.id === sel) || cfg.providers[0]; const form = h('div.pform');
     const meta = providerTypes().find((t) => t.type === p.type) || {};
     form.append(h('div.row', h('label', 'Active'), h('button.btn.small' + (cfg.active === p.id ? '.primary' : ''), { on: { click: () => { cfg.active = p.id; saveSettings(); bus.emit('settings'); draw(); } } }, cfg.active === p.id ? '✓ In use' : 'Use this provider')));

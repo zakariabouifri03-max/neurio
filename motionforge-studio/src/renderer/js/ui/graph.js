@@ -24,7 +24,7 @@ export function build(host) {
   root = h('div', { style: { display: 'flex', flex: 1, minWidth: 0 } });
   list = h('div', { style: { width: '210px', borderRight: '1px solid var(--line)', overflow: 'auto', flex: 'none' } });
   canvas = h('canvas'); g = canvas.getContext('2d'); const wrap = h('div.graph-wrap', canvas); root.append(list, wrap); host.append(root);
-  new ResizeObserver(() => { const r = wrap.getBoundingClientRect(); const d = window.devicePixelRatio || 1; W = r.width; Hh = r.height; canvas.width = W * d; canvas.height = Hh * d; canvas.style.width = W + 'px'; canvas.style.height = Hh + 'px'; draw(); }).observe(wrap);
+  new ResizeObserver(() => { const r = wrap.getBoundingClientRect(); const d = window.devicePixelRatio || 1; W = r.width; Hh = r.height; canvas.width = W * d; canvas.height = Hh * d; canvas.style.width = W + 'px'; canvas.style.height = Hh + 'px'; if (!view.fitted && W > 150) { view.fitted = true; fit(); } else draw(); }).observe(wrap);
   canvas.addEventListener('pointerdown', down); canvas.addEventListener('pointermove', move); canvas.addEventListener('pointerup', up);
   canvas.addEventListener('wheel', (e) => { e.preventDefault(); const f = fFromX(e.offsetX); view.tz = clamp(view.tz * (e.deltaY < 0 ? 1.15 : 0.87), 1.5, 120); view.t0 = f - e.offsetX / view.tz; draw(); }, { passive: false });
   for (const ev of ['change', 'frame', 'selection', 'project-loaded', 'scene']) bus.on(ev, () => { if (root.offsetParent) refresh(); });
@@ -54,7 +54,7 @@ export function refresh() {
 function ops_setEase(o, name, f, e) { H.tx('Set easing', () => { const k = getKey(o.tracks[name], f); if (k) { k.e = e; if (e === 'bezier' && !k.bz) k.bz = [0.25, 0.1, 0.25, 1]; } }); refresh(); }
 function label(n) { const m = /^b\.(.+)\.(\w+)$/.exec(n); if (m) { const l = layerById(S.selection.layerId); const b = l && l.char && l.char.bones.find((x) => x.id === m[1]); return `${b ? b.name : m[1]} ${m[2]}`; } return n; }
 export function fit() {
-  const o = getOwner(); if (!o) return; let f0 = 1e9, f1 = -1e9, mn = 1e9, mx = -1e9;
+  const o = getOwner(); if (!o || W < 150 || Hh < 80) return; let f0 = 1e9, f1 = -1e9, mn = 1e9, mx = -1e9;
   for (const n of vis) { const t = o.tracks[n]; if (!t) continue; for (const k of t) { f0 = Math.min(f0, k.f); f1 = Math.max(f1, k.f); mn = Math.min(mn, k.v); mx = Math.max(mx, k.v); } }
   if (f0 > f1) { f0 = 0; f1 = sceneDuration(); mn = 0; mx = 1; }
   if (f1 - f0 < 2) f1 = f0 + 2; if (mx - mn < 1e-6) mx = mn + 1;
@@ -70,7 +70,7 @@ function handles(item) { // bezier handle positions for segment item.k → next
   return { p1: [X(k.f + bz[0] * dt), Yv(name, k.v + bz[1] * dv)], p2: [X(k.f + bz[2] * dt), Yv(name, k.v + bz[3] * dv)], a: [X(k.f), Yv(name, k.v)], b: [X(nx.f), Yv(name, nx.v)], dt, dv, nx };
 }
 function draw() {
-  if (!g) return; const d = window.devicePixelRatio || 1; g.setTransform(d, 0, 0, d, 0, 0); g.fillStyle = '#10131a'; g.fillRect(0, 0, W, Hh);
+  if (!g || !(view.tz > 0.05) || !Number.isFinite(view.t0) || !(W > 1)) return; const d = window.devicePixelRatio || 1; g.setTransform(d, 0, 0, d, 0, 0); g.fillStyle = '#10131a'; g.fillRect(0, 0, W, Hh);
   g.strokeStyle = '#1d2333'; g.lineWidth = 1; g.beginPath(); const step = view.tz > 30 ? 1 : view.tz > 10 ? 5 : 10; for (let f = Math.floor(view.t0 / step) * step; X(f) < W; f += step) { g.moveTo(Math.round(X(f)) + 0.5, 0); g.lineTo(Math.round(X(f)) + 0.5, Hh); } g.stroke();
   g.fillStyle = '#566'; g.font = '10px Segoe UI'; for (let f = Math.max(0, Math.floor(view.t0 / step) * step); X(f) < W; f += step) g.fillText(String(f + 1), X(f) + 2, Hh - 2);
   const o = getOwner(); if (!o) return;

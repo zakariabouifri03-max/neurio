@@ -90,14 +90,14 @@ export async function exportDialog(preset = {}) {
     const F = FORMATS[o.format]; if (!avail(o.format)) o.format = Object.keys(FORMATS).find(avail) || 'png';
     const chips = h('div.tabs2', Object.entries(FORMATS).map(([k, v]) => h('span.chip' + (o.format === k ? '.on' : '') + (avail(k) ? '' : '.disabled'), { title: avail(k) ? '' : 'This encoder is not available in the bundled FFmpeg', style: avail(k) ? null : { opacity: 0.4 }, on: { click: () => { if (!avail(k)) return; o.format = k; if (!FORMATS[k].alpha) o.transparent = false; render(); } } }, v.label)));
     const Fm = FORMATS[o.format];
-    body.append(chips,
+    body.append(...[chips,
       selectField('Resolution', RESOLUTIONS.map(([v, l]) => [String(v), `${l} — ${outputSize(v).join('×')}`]), String(o.height), (v) => { o.height = +v; upd(); }),
       selectField('Frame rate', [['24', '24 fps'], ['30', '30 fps'], ['60', '60 fps'], ['120', '120 fps'], [String(P.fps), `Project (${P.fps} fps)`]].filter((x, i, a) => a.findIndex((y) => y[0] === x[0]) === i), String(o.fps), (v) => { o.fps = +v; upd(); }),
       P.scenes.length > 1 ? selectField('Scenes', [['scene', 'Current scene'], ['all', `All ${P.scenes.length} scenes in order`]], o.scope, (v) => { o.scope = v; upd(); }) : null,
       selectField('Range', [['all', 'Entire timeline'], ['loop', 'Loop range only' + (Playback.range ? '' : ' (none set)')]], o.range, (v) => { o.range = v; upd(); }),
       !Fm.seq && o.format !== 'gif' ? selectField('Quality', [['draft', 'Draft (small, fast)'], ['normal', 'Normal'], ['high', 'High'], ['final', 'Final (best, large)']], o.quality, (v) => { o.quality = v; upd(); }) : null,
       Fm.alpha ? checkField('Transparent background', o.transparent, (v) => { o.transparent = v; }, 'Keeps the alpha channel (WebM, GIF, PNG)') : h('div.hint', 'This format has no transparency — the scene background colour is used.'),
-      !Fm.noAudio ? checkField('Include audio', o.audio, (v) => { o.audio = v; }) : null, summary);
+      !Fm.noAudio ? checkField('Include audio', o.audio, (v) => { o.audio = v; }) : null, summary].filter(Boolean));
     upd();
   };
   const upd = () => { const segs = segments(o); const n = segs.reduce((a, s) => a + Math.round((s.to - s.from + 1) / P.fps * o.fps), 0); const [w, hh] = outputSize(o.height); summary.textContent = `${n} frames · ${w}×${hh} · ${(n / o.fps).toFixed(1)} s${caps.available ? '' : ' · FFmpeg unavailable (image sequences only)'}`; };
