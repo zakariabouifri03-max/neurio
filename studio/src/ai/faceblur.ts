@@ -12,8 +12,8 @@ import * as cmd from '@/core/commands';
 import { uid } from '@/core/util';
 
 type Visual = VideoClip | ImageClip;
-interface Obs { t: number; x: number; y: number; w: number; h: number }
-interface Track { obs: Obs[] }
+export interface Obs { t: number; x: number; y: number; w: number; h: number }
+export interface Track { obs: Obs[] }
 
 export interface FaceBlurOptions {
   mode?: 'pixelate' | 'blur';
@@ -71,7 +71,7 @@ export async function analyzeFaces(clip: Visual, opts: FaceBlurOptions = {}): Pr
   return { tracks: kept, frames: n, detections };
 }
 
-const smooth = (obs: Obs[], alpha = 0.5): Obs[] => {
+export const smooth = (obs: Obs[], alpha = 0.5): Obs[] => {
   const out = obs.map((o) => ({ ...o }));
   for (let i = 1; i < out.length; i++) {
     out[i].x = out[i - 1].x + (out[i].x - out[i - 1].x) * alpha;

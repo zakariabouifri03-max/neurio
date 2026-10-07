@@ -61,12 +61,13 @@ export function Preview() {
   }, [pw, ph]);
 
   const eyedropper = useUI((s) => s.eyedropper);
+  const regionPick = useUI((s) => s.regionPick);
   useEffect(() => {
-    if (!eyedropper) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && useUI.getState().set({ eyedropper: null });
+    if (!eyedropper && !regionPick) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && useUI.getState().set({ eyedropper: null, regionPick: null });
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [eyedropper]);
+  }, [eyedropper, regionPick]);
 
   return (
     <section className="preview">
@@ -88,6 +89,7 @@ export function Preview() {
                 }}
               />
             )}
+            {regionPick && <RegionPicker label={regionPick.label} onPick={(r) => { useUI.getState().set({ regionPick: null }); regionPick.onPick(r); }} />}
             {showSafe && (
               <>
                 <div className="safe" />
@@ -197,6 +199,40 @@ function SelectionOverlay({ boxW, boxH }: { boxW: number; boxH: number }) {
       <div className="h" style={{ left: 0, top: '50%', cursor: 'ew-resize' }} onMouseDown={(e) => startDrag(e, 'scale', { x: 1, y: 0 })} />
       <div className="h" style={{ left: '100%', top: '50%', cursor: 'ew-resize' }} onMouseDown={(e) => startDrag(e, 'scale', { x: 1, y: 0 })} />
       <div className="h rot" onMouseDown={(e) => startDrag(e, 'rotate')} title="Rotate (Shift = 15° steps)" />
+    </div>
+  );
+}
+
+/** Drag a rectangle on the preview → normalized {x,y,w,h} (top-left origin). */
+function RegionPicker({ label, onPick }: { label: string; onPick: (r: { x: number; y: number; w: number; h: number }) => void }) {
+  const [rect, setRect] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
+  const norm = (e: React.MouseEvent | MouseEvent, el: HTMLElement) => {
+    const r = el.getBoundingClientRect();
+    return { x: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), y: Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)) };
+  };
+  const onDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const el = e.currentTarget;
+    const p = norm(e, el);
+    const cur = { x0: p.x, y0: p.y, x1: p.x, y1: p.y };
+    setRect(cur);
+    const move = (ev: MouseEvent) => { const q = norm(ev, el); cur.x1 = q.x; cur.y1 = q.y; setRect({ ...cur }); };
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+      const x = Math.min(cur.x0, cur.x1), y = Math.min(cur.y0, cur.y1), w = Math.abs(cur.x1 - cur.x0), h = Math.abs(cur.y1 - cur.y0);
+      setRect(null);
+      if (w > 0.005 && h > 0.005) onPick({ x, y, w, h });
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+  const box = rect ? { left: `${Math.min(rect.x0, rect.x1) * 100}%`, top: `${Math.min(rect.y0, rect.y1) * 100}%`, width: `${Math.abs(rect.x1 - rect.x0) * 100}%`, height: `${Math.abs(rect.y1 - rect.y0) * 100}%` } : null;
+  return (
+    <div className="region-picker" style={{ position: 'absolute', inset: 0, cursor: 'crosshair', zIndex: 50 }} onMouseDown={onDown} title="Drag a rectangle (Esc to cancel)">
+      <div className="region-hint">{label} — drag a rectangle · Esc to cancel</div>
+      {box && <div className="region-box" style={box} />}
     </div>
   );
 }

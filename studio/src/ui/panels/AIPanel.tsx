@@ -17,6 +17,7 @@ import { engine } from '@/engine/PlaybackEngine';
 import { formatDuration } from '@/core/util';
 import { Card, Busy } from './aiCommon';
 import { VoiceOverCard, TranslateCaptionsCard, SceneDetectCard, LoudnessCard, FillerWordsCard, FaceBlurCard } from './AIToolsExtra';
+import { DirectorCard, FaceTrackCard, WatermarkCard } from './AIToolsPro';
 
 type Target = VideoClip | AudioClip | ImageClip;
 const isVideo = (c: Clip | null): c is VideoClip => !!c && c.kind === 'video';
@@ -197,6 +198,8 @@ export function AIPanel() {
       <div className="panel-body scroll">
         <div className="muted small" style={{ marginBottom: 8, display: 'flex', gap: 6 }}><Info size={14} style={{ flexShrink: 0 }} /> Everything runs in your browser. Tools that need a model download say so and report when they can't run — nothing is simulated.</div>
 
+        <DirectorCard />
+
         <Card icon={<Scissors size={16} />} title={jumpMode ? 'Jump cut' : 'Silence removal'} desc="Finds quiet gaps in speech and cuts them out, closing the gaps on every track." badge="DSP">
           <Toggle label="Jump-cut mode (tighter, pauses too)" value={jumpMode} onChange={setJumpMode} />
           <Slider label="Threshold" value={silenceDb} min={-60} max={-20} step={1} unit="dB" onChange={setSilenceDb} />
@@ -246,6 +249,8 @@ export function AIPanel() {
           {busy.color ? <Busy {...busy.color} /> : <button className="btn sm primary" style={{ marginTop: 6 }} onClick={runAutoColor} disabled={!isVisual(clip)}>Auto color</button>}
         </Card>
 
+        <FaceTrackCard />
+        <WatermarkCard />
         <VoiceOverCard />
         <TranslateCaptionsCard />
         <FaceBlurCard />

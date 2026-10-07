@@ -4,7 +4,7 @@
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mic2, Languages, Clapperboard, Gauge, MessageSquareOff, ScanFace, Play, Square } from 'lucide-react';
-import { Card, Busy, fmtBytes } from './aiCommon';
+import { Card, Busy, fmtBytes, useBusy } from './aiCommon';
 import { Slider, SelectRow, Toggle } from '../common';
 import { useProject, getSelectedClips, useSelectedClip, patchClip } from '@/core/store';
 import { toast, useUI } from '@/core/uiStore';
@@ -24,20 +24,6 @@ import { engine } from '@/engine/PlaybackEngine';
 import { formatDuration, uid } from '@/core/util';
 import type { ModelProgress } from '@/ai/workerClient';
 
-type Prog = { label: string; progress: number };
-const useBusy = () => {
-  const [busy, setBusy] = useState<Prog | null>(null);
-  const sig = useRef<{ cancelled: boolean }>({ cancelled: false });
-  const start = (label: string) => { sig.current = { cancelled: false }; setBusy({ label, progress: 0 }); return sig.current; };
-  const prog = (p: number, label?: string) => setBusy((b) => ({ label: label ?? b?.label ?? '', progress: Math.max(0, Math.min(1, p)) }));
-  const end = () => setBusy(null);
-  const modelProg = (what: string) => (p: ModelProgress) => {
-    if (p.stage === 'download') prog(p.progress, `Downloading model${p.file ? ` · ${p.file.split('/').pop()}` : ''}${p.total ? ` (${fmtBytes(p.loaded)} / ${fmtBytes(p.total)})` : ''}`);
-    else if (p.stage === 'ready') prog(0, what);
-    else prog(p.progress, what);
-  };
-  return { busy, start, prog, end, modelProg, sig };
-};
 const isVideo = (c: Clip | null): c is VideoClip => !!c && c.kind === 'video';
 const isVisual = (c: Clip | null): c is VideoClip | ImageClip => !!c && (c.kind === 'video' || c.kind === 'image');
 const hasAudio = (c: Clip | null): c is VideoClip | AudioClip => !!c && ((c.kind === 'video' && c.hasAudio !== false) || c.kind === 'audio');

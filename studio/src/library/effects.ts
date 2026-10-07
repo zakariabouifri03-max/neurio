@@ -506,6 +506,60 @@ const EFFECTS_CORE: EffectDef[] = [
     glsl: `vec4 effect(vec2 uv){ vec4 c = texU(uv); float l = dot(c.rgb, normalize(vec3(0.3 + u_p[1] * 0.5, 0.59, 0.11 - u_p[1] * 0.1))); c.rgb = mix(c.rgb, vec3(l), u_p[0]); return premul(c); }`,
   },
   {
+    id: 'watermark',
+    name: 'Watermark Remover',
+    category: 'Basic',
+    icon: '🧽',
+    tags: ['watermark', 'logo', 'remove', 'cover', 'inpaint', 'clean', 'erase'],
+    params: [
+      P('x', 'Region X', 0, 1, 0.75, 0.001),
+      P('y', 'Region Y', 0, 1, 0.9, 0.001),
+      P('w', 'Region width', 0.005, 1, 0.2, 0.001),
+      P('h', 'Region height', 0.005, 1, 0.06, 0.001),
+      P('feather', 'Feather', 0, 1, 0.3),
+      P('mode', 'Mode (0 fill · 1 blur · 2 pixelate · 3 clone)', 0, 3, 0, 1),
+      P('dx', 'Clone offset X', -0.5, 0.5, 0, 0.001),
+      P('dy', 'Clone offset Y', -0.5, 0.5, -0.1, 0.001),
+      P('strength', 'Strength', 0, 1, 0.6),
+    ],
+    glsl: `vec4 effect(vec2 uv){
+      vec2 r0 = vec2(u_p[0], u_p[1]); vec2 r1 = r0 + vec2(u_p[2], u_p[3]);
+      vec2 c = (r0 + r1) * 0.5; vec2 hs = (r1 - r0) * 0.5;
+      vec2 dd = abs(uv - c) - hs; float outside = max(dd.x, dd.y);
+      float fe = 0.002 + u_p[4] * 0.04;
+      float m = 1.0 - smoothstep(-fe, 0.0015, outside);
+      vec4 orig = tex(uv);
+      if (m <= 0.001) return orig;
+      vec4 fill = orig;
+      if (u_p[5] < 0.5) {
+        // content-aware fill: harmonic interpolation of the colours just outside the rectangle
+        vec4 acc = vec4(0.0); float ws = 0.0;
+        for (int i = 0; i < 24; i++) {
+          float a = (float(i) + 0.5) / 24.0 * 6.2831853; vec2 dir = vec2(cos(a), sin(a));
+          float tx = abs(dir.x) < 1e-4 ? 1e9 : (dir.x > 0.0 ? (r1.x - uv.x) : (r0.x - uv.x)) / dir.x;
+          float ty = abs(dir.y) < 1e-4 ? 1e9 : (dir.y > 0.0 ? (r1.y - uv.y) : (r0.y - uv.y)) / dir.y;
+          float t = max(0.0, min(tx, ty)) + 0.003;
+          vec2 sp = uv + dir * t; vec2 n = vec2(-dir.y, dir.x) * 0.004;
+          vec4 s = (tex(sp) + tex(sp + dir * 0.006) + tex(sp + n) + tex(sp - n)) * 0.25;
+          float w = 1.0 / (t * t + 1e-5);
+          acc += s * w; ws += w;
+        }
+        fill = acc / ws;
+        float g = (hash12(uv * u_res + u_seed * 7.0) - 0.5) * 0.03 * u_p[8];
+        fill.rgb = clamp(fill.rgb + g * fill.a, 0.0, 1.0);
+      } else if (u_p[5] < 1.5) {
+        vec4 acc = vec4(0.0); float ws = 0.0; vec2 px = (3.0 + 30.0 * u_p[8]) / u_res / 3.0;
+        for (int i = -3; i <= 3; i++) for (int j = -3; j <= 3; j++) { float g = exp(-float(i * i + j * j) / 5.0); acc += tex(uv + px * vec2(float(i), float(j))) * g; ws += g; }
+        fill = acc / ws;
+      } else if (u_p[5] < 2.5) {
+        vec2 s = (4.0 + 40.0 * u_p[8]) / u_res; vec2 q = (floor(uv / s) + 0.5) * s; fill = tex(q);
+      } else {
+        fill = tex(uv + vec2(u_p[6], u_p[7]));
+      }
+      return mix(orig, fill, m);
+    }`,
+  },
+  {
     id: 'thermal',
     name: 'Thermal',
     category: 'Stylize',

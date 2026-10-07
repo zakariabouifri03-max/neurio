@@ -5,13 +5,13 @@ import { SelectRow, Slider, Toggle, Empty, pickFiles } from '../common';
 import { useProject, getSelectedClips, usePlayback } from '@/core/store';
 import { toast } from '@/core/uiStore';
 import * as cmd from '@/core/commands';
-import { makeCaptionClip, makeTrack } from '@/core/defaults';
 import type { CaptionClip, Clip, VideoClip, AudioClip } from '@/core/types';
 import { CAPTION_STYLES, type CaptionStyleDef } from '@/library/captionStyles';
 import { ensureFont } from '@/library/fonts';
 import { captionsAvailability, transcribeAsset, cancelTranscriptions, groupWords, toSRT, toVTT, parseSubtitles, WHISPER_MODELS, CAPTION_LANGUAGES, type CaptionProgress, type CaptionLine } from '@/ai/captions';
 import { downloadBlob, formatBytes } from '@/core/util';
 import { getAsset } from '@/engine/MediaManager';
+import { placeLines } from '@/ai/captionPlace';
 
 type Source = { clip: VideoClip | AudioClip; label: string };
 
@@ -196,31 +196,6 @@ function StylePreview({ s }: { s: CaptionStyleDef }) {
 }
 
 /** Create caption clips on a dedicated "Captions" text track. */
-function placeLines(lines: (CaptionLine & { clipId: string })[], style: CaptionStyleDef, replace: boolean) {
-  if (style.style.fontFamily) void ensureFont(style.style.fontFamily);
-  useProject.getState().apply('Auto captions', (p0) => {
-    let p = p0;
-    if (replace) p = cmd.removeClips(p, cmd.allClips(p).filter((c) => c.kind === 'caption').map((c) => c.id));
-    let track = p.tracks.find((t) => t.kind === 'text' && t.name === 'Captions');
-    if (!track) {
-      track = makeTrack('text', 'Captions');
-      p = { ...p, tracks: [track, ...p.tracks] };
-    }
-    const clips: Clip[] = lines.map((l) => {
-      const start = Math.max(0, l.start);
-      const c = makeCaptionClip({ trackId: track!.id, text: l.text, words: l.words.map((w) => ({ text: w.text, start: Math.max(0, w.start - start), end: Math.max(0.05, w.end - start) })), start, duration: Math.max(0.3, l.end - l.start), style: style.style, caption: style.caption });
-      if (style.animation) c.animation = { ...c.animation, ...style.animation } as any;
-      return c;
-    });
-    // avoid overlaps on the track: shrink previous to next start
-    clips.sort((a, b) => a.start - b.start);
-    for (let i = 0; i < clips.length - 1; i++) if (clips[i].start + clips[i].duration > clips[i + 1].start) clips[i].duration = Math.max(0.2, clips[i + 1].start - clips[i].start - 0.01);
-    return { ...p, tracks: p.tracks.map((t) => (t.id === track!.id ? { ...t, clips: cmd.sortClips([...t.clips, ...clips]) } : t)) };
-  });
-  const first = lines[0];
-  if (first) usePlayback.getState().seek(Math.max(0, first.start));
-}
-
 function applyStyleToAll(style: CaptionStyleDef) {
   if (style.style.fontFamily) void ensureFont(style.style.fontFamily);
   useProject.getState().apply('Caption style', (p) => ({ ...p, tracks: p.tracks.map((t) => ({ ...t, clips: t.clips.map((c) => (c.kind === 'caption' ? { ...c, style: { ...c.style, ...style.style }, caption: { ...c.caption, ...style.caption }, animation: style.animation ? { ...c.animation, ...style.animation } : c.animation } : c)) })) }) as any);

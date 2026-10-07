@@ -36,6 +36,8 @@ interface UIStore {
   selectedTransition: { clipId: string; edge: 'in' | 'out' } | null;
   /** When set, the next click on the preview reports the color under the cursor. */
   eyedropper: ((rgb: { r: number; g: number; b: number }) => void) | null;
+  /** Draw-a-rectangle mode on the preview (normalized canvas coords, top-left origin). */
+  regionPick: { label: string; onPick: (r: { x: number; y: number; w: number; h: number }) => void } | null;
   theme: 'dark';
   navigate: (r: Route) => void;
   setMode: (m: EditorMode) => void;
@@ -69,6 +71,7 @@ export const useUI = create<UIStore>((set, get) => ({
   toasts: [],
   selectedTransition: null,
   eyedropper: null,
+  regionPick: null,
   previewFit: 1,
   theme: 'dark',
   navigate: (route) => set({ route }),

@@ -1,6 +1,6 @@
 # Neurio Studio
 
-A professional multi-track video editor that runs entirely on-device: WebGL2 compositing, Web Audio mixing, WebCodecs MP4/WebM export, IndexedDB projects, editable templates, a 750-sample CC0 SFX library (Kenney) plus synthesized SFX/music, 870+ Google Fonts, 150+ GPU effects, video scopes, and on-device AI tools (Whisper captions, OPUS-MT caption translation, Kokoro text-to-speech, MediaPipe background removal & face blur, auto-reframe, scene detection, loudness normalization, filler-word removal, silence removal, beat sync, stabilization, auto color).
+A professional multi-track video editor that runs entirely on-device: WebGL2 compositing, Web Audio mixing, WebCodecs MP4/WebM export, IndexedDB projects, editable templates, a 750-sample CC0 SFX library (Kenney) plus synthesized SFX/music, 870+ Google Fonts, 150+ GPU effects, video scopes, and on-device AI tools (an AI director that turns a text brief into a full edit, Whisper captions, OPUS-MT caption translation, Kokoro text-to-speech, MediaPipe background removal, face blur & face tracking, watermark removal, auto-reframe, scene detection, loudness normalization, filler-word removal, silence removal, beat sync, stabilization, auto color).
 
 ## Downloads
 
@@ -48,7 +48,7 @@ npm run icons           # regenerate icon.ico + Android launcher/splash assets f
 src/core      data model, keyframes/easing, commands (pure project transforms), zustand stores (undo/redo)
 src/engine    WebGL2 Renderer + shaders, MediaManager (IndexedDB blobs, proxies), AudioEngine, PlaybackEngine, Exporter (WebCodecs + mp4/webm muxers, MediaRecorder fallback)
 src/library   registries: effects (effects.ts + effectsExtra.ts, 151 shaders), transitions, text animations/presets, caption styles, stickers, fonts (googleFonts.ts, 876 families), LUTs, color/animation presets, SFX (sfxSamples.ts: 750 CC0 files in public/sfx + synth recipes), music synths, templates
-src/ai        captions (Whisper via transformers.js worker), translate (OPUS-MT worker), tts (Kokoro-82M via transformers.js + phonemizer worker), segmentation/face (MediaPipe), faceblur, scenes, loudness (EBU R128-style), fillers, reframe, highlights, silence/jump-cut, beat detection, auto color, stabilization
+src/ai        director + directorApply (brief → EditPlan → real edit steps; brains: keyword rules / local LLM worker / OpenAI-compatible API in llm.ts), faceTrack (follow / pin / tracked mask), watermark (static-region detection + GPU remover effect), captions (Whisper via transformers.js worker), translate (OPUS-MT worker), tts (Kokoro-82M via transformers.js + phonemizer worker), segmentation/face (MediaPipe), faceblur, scenes, loudness (EBU R128-style), fillers, reframe, highlights, silence/jump-cut, beat detection, auto color, stabilization
 src/services  projects/autosave/folders/import-export, favorites & creator presets, clip actions, shortcuts, thumbnails
 src/ui        home (templates/projects/search), editor shell, preview (gizmos), timeline, inspector panels, left panels, dialogs
 src/platform  Capacitor/Electron glue (native save, back button, status bar)
@@ -65,6 +65,7 @@ Everything a button exposes either works on-device or states clearly why it is u
 - **Whisper** (OpenAI, MIT) via [transformers.js](https://github.com/huggingface/transformers.js) (Apache-2.0) — speech-to-text.
 - **OPUS-MT** (Helsinki-NLP, CC-BY-4.0 models) via transformers.js — caption translation.
 - **Kokoro-82M** (hexgrad, Apache-2.0) via transformers.js + [phonemizer](https://www.npmjs.com/package/phonemizer) (Apache-2.0; bundles an espeak-ng WASM build, loaded only when TTS is used) — text-to-speech.
-- **MediaPipe Tasks Vision** (Google, Apache-2.0) — selfie segmentation and face detection.
+- **MediaPipe Tasks Vision** (Google, Apache-2.0) — selfie segmentation, face detection and face tracking.
+- **Local LLMs for the AI director** — SmolLM2-360M-Instruct (HuggingFaceTB, Apache-2.0), Qwen2.5-0.5B/1.5B-Instruct (Alibaba, Apache-2.0) as ONNX via transformers.js. Optional: any OpenAI-compatible API with your own key (stored only in the browser's localStorage; requests go straight to the provider).
 
 Regenerate catalogs: `node scripts/gen-sfx-catalog.mjs`, `node scripts/gen-fonts.mjs`.
