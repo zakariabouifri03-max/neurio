@@ -2502,3 +2502,20 @@ input[type='checkbox'] {
 .fx-thumb[data-cat='Distort'] { background: repeating-radial-gradient(circle at 50% 50%, #14b8a644 0 6px, #10131c 6px 14px); }
 .font-current { font-size: 13px; }
 .eyedropper-layer { position: absolute; inset: 0; cursor: crosshair; z-index: 6; }
+.fx-thumb[data-cat='Distortion'] { background: repeating-radial-gradient(circle at 50% 50%, #14b8a644 0 6px, #10131c 6px 14px); }
+.fx-thumb[data-cat='Color'] { background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e, #3b82f6, #a855f7); }
+.fx-thumb[data-cat='Texture'] { background: radial-gradient(circle at 20% 30%, #ffffff22 0 2px, transparent 3px), radial-gradient(circle at 70% 60%, #ffffff22 0 2px, transparent 3px), radial-gradient(circle at 45% 80%, #ffffff1a 0 1px, transparent 2px), #1a1d28; }
+.fx-thumb[data-cat='Cinematic'] { background: linear-gradient(180deg, #000 0 14%, #1f3a4a 14% 86%, #000 86%); }
+.fx-thumb[data-cat='Motion'] { background: repeating-linear-gradient(0deg, #94a3b833 0 2px, #10131c 2px 9px); }
+.fx-thumb[data-cat='Neon'] { background: radial-gradient(circle at 50% 50%, #f0abfc55, #10131c 70%); }
+.fx-thumb[data-cat='Horror'] { background: radial-gradient(circle at 50% 50%, #3b0a0a, #050505); }
+.fx-thumb[data-cat='Gaming'] { background: repeating-conic-gradient(#22c55e22 0 25%, #10131c 0 50%) 0 0 / 14px 14px; }
+.fx-thumb[data-cat='Social'] { background: linear-gradient(135deg, #f9739244, #fbbf2444, #38bdf844); }
+
+/* ---- video scopes overlay ---- */
+.scopes { position: absolute; right: 8px; bottom: 8px; z-index: 40; background: rgba(10, 12, 18, 0.85); border: 1px solid var(--line); border-radius: 8px; padding: 4px; backdrop-filter: blur(6px); pointer-events: auto; }
+.scopes canvas { display: block; width: 260px; height: 150px; border-radius: 4px; }
+.scopes-tabs { display: flex; gap: 2px; margin-bottom: 4px; }
+.scopes-tabs button { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: transparent; color: var(--text-2); border: 0; cursor: pointer; }
+.scopes-tabs button.active { background: var(--accent); color: #fff; }
+.scopes-tabs button:last-child { margin-left: auto; }

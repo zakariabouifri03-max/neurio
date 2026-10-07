@@ -3,7 +3,7 @@ import { Music2, Play, Pause, Plus, Upload, Volume2, Square } from 'lucide-react
 import { PanelHeader } from './LeftPanels';
 import { SearchBox, Chips, FavButton, Empty } from '../common';
 import { useFavorites } from '@/services/favorites';
-import { SFX, SFX_CATEGORIES, type SfxDef, type SfxCategory } from '@/library/sfx';
+import { SFX, SFX_CATEGORIES, sfxUrl, type SfxDef, type SfxCategory, type SfxSource } from '@/library/sfx';
 import { MUSIC, GENRES, MOODS, renderMusic, type MusicTrack, type Genre, type Mood } from '@/library/music';
 import { renderRecipe, audioBufferToWav } from '@/library/synth';
 import { importFile, useMedia, getAudioContext } from '@/engine/MediaManager';
@@ -60,8 +60,36 @@ function usePreviewKey() {
 }
 
 const sfxCache = new Map<string, Promise<AudioBuffer>>();
+const sfxBlobCache = new Map<string, Promise<Blob>>();
+/** Fetches the original sample file (kept as-is so the timeline asset is the real .ogg). */
+const getSfxBlob = (s: SfxDef) => {
+  const url = sfxUrl(s);
+  if (!url) throw new Error('Not a sample sound');
+  if (!sfxBlobCache.has(s.id))
+    sfxBlobCache.set(
+      s.id,
+      fetch(url).then((r) => {
+        if (!r.ok) throw new Error(`Sound file missing (${r.status})`);
+        return r.blob();
+      }),
+    );
+  return sfxBlobCache.get(s.id)!;
+};
 const getSfxBuffer = (s: SfxDef) => {
-  if (!sfxCache.has(s.id)) sfxCache.set(s.id, renderRecipe(s.recipe));
+  if (!sfxCache.has(s.id)) {
+    if (s.source === 'sample') {
+      sfxCache.set(
+        s.id,
+        getSfxBlob(s)
+          .then((b) => b.arrayBuffer())
+          .then((ab) => getAudioContext().decodeAudioData(ab))
+          .catch((e) => {
+            sfxCache.delete(s.id);
+            throw new Error(`Could not decode this sound (${(e as Error).message || 'Ogg Vorbis not supported by this browser'})`);
+          }),
+      );
+    } else sfxCache.set(s.id, renderRecipe(s.recipe!));
+  }
   return sfxCache.get(s.id)!;
 };
 const musicCache = new Map<string, Promise<AudioBuffer>>();
@@ -98,7 +126,7 @@ export function AudioLibraryPanel() {
   const [tab, setTab] = useState<Tab>('sfx');
   return (
     <>
-      <PanelHeader title="Audio" sub="Royalty-free, synthesized in-app">
+      <PanelHeader title="Audio" sub="All royalty-free">
         <div className="tabs" style={{ marginLeft: 8 }}>
           <button className={tab === 'sfx' ? 'active' : ''} onClick={() => setTab('sfx')}>SFX</button>
           <button className={tab === 'music' ? 'active' : ''} onClick={() => setTab('music')}>Music</button>
@@ -116,27 +144,47 @@ export function AudioLibraryPanel() {
 function SfxTab() {
   const [q, setQ] = useState('');
   const [cat, setCat] = useState<SfxCategory | 'Favorites' | null>(null);
+  const [source, setSource] = useState<SfxSource | 'all'>('all');
+  const [limit, setLimit] = useState(150);
   const fav = useFavorites();
   const playing = usePreviewKey();
   const [bufs, setBufs] = useState<Record<string, AudioBuffer>>({});
   const [busy, setBusy] = useState<string | null>(null);
-  const list = useMemo(() => {
+  const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
-    return SFX.filter((s) => (cat === null ? true : cat === 'Favorites' ? fav.is('sfx', s.id) : s.category === cat)).filter((s) => !t || s.name.toLowerCase().includes(t) || s.tags.some((x) => x.includes(t)) || s.category.toLowerCase().includes(t));
-  }, [q, cat, fav.favs]);
+    const words = t.split(/\s+/).filter(Boolean);
+    return SFX.filter((s) => source === 'all' || s.source === source)
+      .filter((s) => (cat === null ? true : cat === 'Favorites' ? fav.is('sfx', s.id) : s.category === cat))
+      .filter((s) => !words.length || words.every((w) => s.name.toLowerCase().includes(w) || s.tags.some((x) => x.includes(w)) || s.category.toLowerCase().includes(w)));
+  }, [q, cat, source, fav.favs]);
+  useEffect(() => setLimit(150), [q, cat, source]);
+  const list = filtered.length > limit ? filtered.slice(0, limit) : filtered;
+  const counts = useMemo(() => ({ sample: SFX.filter((s) => s.source === 'sample').length, synth: SFX.filter((s) => s.source === 'synth').length }), []);
 
   const preview = async (s: SfxDef) => {
     if (playing === s.id) return stopPreview();
-    const b = await getSfxBuffer(s);
-    setBufs((m) => (m[s.id] ? m : { ...m, [s.id]: b }));
-    void playBuffer(s.id, b);
+    try {
+      const b = await getSfxBuffer(s);
+      setBufs((m) => (m[s.id] ? m : { ...m, [s.id]: b }));
+      void playBuffer(s.id, b);
+    } catch (e) {
+      toast('Could not preview sound', 'error', String((e as Error).message || e));
+    }
   };
   const add = async (s: SfxDef) => {
     setBusy(s.id);
     try {
-      const b = await getSfxBuffer(s);
-      const blob = audioBufferToWav(b);
-      const asset = await importFile(blob, { name: `${s.name}.wav`, type: 'audio', tags: ['sfx', s.category.toLowerCase()] });
+      const tags = ['sfx', s.category.toLowerCase(), s.source === 'sample' ? 'kenney' : 'synth'];
+      let asset;
+      if (s.source === 'sample') {
+        // Real sample: import the original file untouched (small .ogg) so the asset stays lossless-to-source.
+        const blob = await getSfxBlob(s);
+        const safe = s.name.replace(/[^\w\s'"!-]+/g, '').trim();
+        asset = await importFile(blob, { name: `${safe}.ogg`, type: 'audio', tags });
+      } else {
+        const b = await getSfxBuffer(s);
+        asset = await importFile(audioBufferToWav(b), { name: `${s.name}.wav`, type: 'audio', tags });
+      }
       addAssetToTimeline(asset);
       fav.touch('sfx', s.id);
     } catch (e) {
@@ -148,11 +196,17 @@ function SfxTab() {
   return (
     <>
       <div className="panel-body" style={{ paddingBottom: 0, flex: '0 0 auto' }}>
-        <SearchBox value={q} onChange={setQ} placeholder="Search 100+ sound effects…" />
+        <SearchBox value={q} onChange={setQ} placeholder={`Search ${SFX.length}+ sound effects…`} />
+        <div className="tabs" style={{ marginBottom: 6 }}>
+          <button className={source === 'all' ? 'active' : ''} onClick={() => setSource('all')} title="Real recordings and synthesized sounds">All</button>
+          <button className={source === 'sample' ? 'active' : ''} onClick={() => setSource('sample')} title="Real recorded / produced samples by Kenney (CC0 public domain)">Recorded ({counts.sample})</button>
+          <button className={source === 'synth' ? 'active' : ''} onClick={() => setSource('synth')} title="Generated in-app with Web Audio">Synth ({counts.synth})</button>
+        </div>
         <Chips items={['Favorites', ...SFX_CATEGORIES] as (SfxCategory | 'Favorites')[]} value={cat} onChange={setCat} all="All" />
       </div>
       <div className="panel-body flush scroll" style={{ flex: 1 }}>
         {!list.length && <Empty icon={<Volume2 />}>No sounds match.</Empty>}
+        {!!list.length && <div className="hint" style={{ padding: '4px 12px' }}>{filtered.length} sounds · all royalty-free (Kenney CC0 + in-app synth)</div>}
         {list.map((s) => (
           <div key={s.id} className={`list-item ${playing === s.id ? 'active' : ''}`} onDoubleClick={() => add(s)} title="Double-click to add to timeline">
             <button className="icon-btn" onClick={() => preview(s)} title={playing === s.id ? 'Stop' : 'Preview'}>
@@ -161,7 +215,7 @@ function SfxTab() {
             <div className="info">
               <div className="title">{s.name}</div>
               <div className="sub">
-                {s.category} · {formatDuration(s.recipe.duration * (s.recipe.repeat ? s.recipe.repeat.n : 1) + (s.recipe.reverb ? 0.5 : 0))}
+                {s.category} · {s.duration < 10 ? `${s.duration.toFixed(1)}s` : formatDuration(s.duration)} · {s.source === 'sample' ? 'recorded' : 'synth'}
               </div>
               {bufs[s.id] && <Wave buf={bufs[s.id]} />}
             </div>
@@ -173,6 +227,11 @@ function SfxTab() {
             </div>
           </div>
         ))}
+        {filtered.length > limit && (
+          <div style={{ padding: 10, textAlign: 'center' }}>
+            <button className="btn" onClick={() => setLimit((n) => n + 200)}>Show more ({filtered.length - limit} remaining)</button>
+          </div>
+        )}
       </div>
     </>
   );

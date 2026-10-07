@@ -27,6 +27,8 @@ interface UIStore {
   ripple: boolean;
   showSafeZones: boolean;
   showGrid: boolean;
+  /** Video scopes overlay on the preview (null = hidden). */
+  scopes: null | 'waveform' | 'parade' | 'vectorscope' | 'histogram';
   dialog: null | { kind: 'export' } | { kind: 'settings' } | { kind: 'shortcuts' } | { kind: 'record'; mode: 'screen' | 'voice' | 'camera' } | { kind: 'newProject' } | { kind: 'template'; templateId: string } | { kind: 'about' };
   toasts: Toast[];
   previewFit: number;
@@ -62,6 +64,7 @@ export const useUI = create<UIStore>((set, get) => ({
   ripple: false,
   showSafeZones: false,
   showGrid: false,
+  scopes: null,
   dialog: null,
   toasts: [],
   selectedTransition: null,

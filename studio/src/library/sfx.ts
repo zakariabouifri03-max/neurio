@@ -1,30 +1,45 @@
 /**
- * Sound effects library — 100% procedurally synthesized (see synth.ts), so every sound is
- * royalty-free by construction. 20 categories.
+ * Sound effects library.
+ *  - 750 real recorded/produced samples by Kenney (CC0 1.0, public domain) shipped in public/sfx/ (see sfxSamples.ts)
+ *  - ~100 procedurally synthesized sounds (see synth.ts) — royalty-free by construction.
  */
 import type { Recipe, Layer } from './synth';
+import { SFX_SAMPLE_ROWS } from './sfxSamples';
 
 export type SfxCategory =
   | 'Whoosh' | 'Impact' | 'Transition' | 'UI' | 'Notification' | 'Cartoon' | 'Comedy' | 'Horror' | 'Sci-Fi' | 'Nature'
-  | 'Weather' | 'Animals' | 'Human' | 'Vehicles' | 'Weapons' | 'Sports' | 'Music stingers' | 'Gaming' | 'Riser' | 'Glitch';
+  | 'Weather' | 'Animals' | 'Human' | 'Vehicles' | 'Weapons' | 'Sports' | 'Music stingers' | 'Gaming' | 'Riser' | 'Glitch'
+  | 'Voice' | 'Footsteps' | 'Foley' | 'Casino';
 
+export type SfxSource = 'sample' | 'synth';
 export interface SfxDef {
   id: string;
   name: string;
   category: SfxCategory;
   tags: string[];
-  recipe: Recipe;
+  /** 'sample' = real recorded/produced file (public/sfx/…), 'synth' = generated in-app with Web Audio */
+  source: SfxSource;
+  /** approximate length in seconds (for display) */
+  duration: number;
+  /** relative URL under the app base for sample sounds (e.g. "sfx/impact-sounds/impactwood-heavy-000.ogg") */
+  url?: string;
+  /** synth recipe for generated sounds */
+  recipe?: Recipe;
+  /** author / pack credit */
+  credit?: string;
 }
-export const SFX_CATEGORIES: SfxCategory[] = ['Whoosh', 'Impact', 'Transition', 'Riser', 'UI', 'Notification', 'Glitch', 'Cartoon', 'Comedy', 'Horror', 'Sci-Fi', 'Gaming', 'Music stingers', 'Nature', 'Weather', 'Animals', 'Human', 'Vehicles', 'Weapons', 'Sports'];
+export const SFX_CATEGORIES: SfxCategory[] = ['Impact', 'Whoosh', 'Transition', 'Riser', 'UI', 'Notification', 'Glitch', 'Voice', 'Footsteps', 'Foley', 'Cartoon', 'Comedy', 'Horror', 'Sci-Fi', 'Gaming', 'Casino', 'Music stingers', 'Nature', 'Weather', 'Animals', 'Human', 'Vehicles', 'Weapons', 'Sports'];
 
 const L = (l: Layer) => l;
-const def = (id: string, name: string, category: SfxCategory, tags: string[], recipe: Recipe): SfxDef => ({ id, name, category, tags, recipe });
+const recipeDuration = (r: Recipe) => r.duration * (r.repeat ? r.repeat.n : 1) + (r.reverb ? 0.5 : 0);
+const def = (id: string, name: string, category: SfxCategory, tags: string[], recipe: Recipe): SfxDef => ({ id, name, category, tags, recipe, source: 'synth', duration: recipeDuration(recipe) });
 const noiseSweep = (dur: number, f0: number, f1: number, q = 1.5, gain = 0.6, pink = false): Layer => L({ wave: pink ? 'pink' : 'noise', a: dur * 0.3, d: dur * 0.2, s: 0.8, r: dur * 0.4, gain, filter: { type: 'bandpass', f: [f0, f1], q } });
 const thump = (f0 = 120, f1 = 35, dur = 0.5, gain = 0.9): Layer => L({ wave: 'sine', f: [f0, f1], a: 0.002, d: dur * 0.6, s: 0.1, r: dur * 0.3, gain, dur });
 const click = (f = 2000, dur = 0.03, gain = 0.4): Layer => L({ wave: 'square', f: [f, f * 0.7], a: 0.001, d: dur, s: 0, r: 0.01, gain, dur });
 const tone = (f0: number, f1: number, dur: number, wave: Layer['wave'] = 'sine', gain = 0.4, at = 0): Layer => L({ wave, f: [f0, f1], a: 0.01, d: dur * 0.5, s: 0.5, r: dur * 0.4, gain, dur, at });
 
-export const SFX: SfxDef[] = [
+/** Procedurally generated sounds */
+export const SFX_SYNTH: SfxDef[] = [
   // Whoosh
   def('whoosh_fast', 'Fast whoosh', 'Whoosh', ['swipe', 'swish', 'fast'], { duration: 0.4, layers: [noiseSweep(0.4, 300, 4000, 2, 0.7)] }),
   def('whoosh_deep', 'Deep whoosh', 'Whoosh', ['cinematic', 'low'], { duration: 0.9, layers: [noiseSweep(0.9, 80, 900, 1.2, 0.8, true)], reverb: 0.3 }),
@@ -146,4 +161,22 @@ export const SFX: SfxDef[] = [
   def('sport_golf', 'Golf swing', 'Sports', ['swing', 'hit'], { duration: 0.6, layers: [noiseSweep(0.3, 800, 4000, 3, 0.4), { ...click(1500, 0.03, 0.8), at: 0.28 }, { ...thump(500, 200, 0.08, 0.5), at: 0.28 }] }),
 ];
 
-export const getSfx = (id: string) => SFX.find((s) => s.id === id);
+
+/** Real recorded samples (Kenney, CC0) */
+export const SFX_SAMPLES: SfxDef[] = SFX_SAMPLE_ROWS.map(([path, name, category, tags, duration]) => ({
+  id: 'k:' + path.replace(/\.ogg$/, ''),
+  name,
+  category,
+  tags,
+  source: 'sample' as const,
+  duration,
+  url: 'sfx/' + path,
+  credit: 'Kenney.nl (CC0)',
+}));
+
+/** Full library: real samples first, then synthesized sounds. */
+export const SFX: SfxDef[] = [...SFX_SAMPLES, ...SFX_SYNTH];
+const byId = new Map(SFX.map((s) => [s.id, s]));
+export const getSfx = (id: string) => byId.get(id);
+export const sfxUrl = (s: SfxDef) => (s.url ? `${import.meta.env.BASE_URL}${s.url}` : null);
+

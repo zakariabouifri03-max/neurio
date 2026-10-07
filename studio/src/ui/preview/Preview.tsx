@@ -4,12 +4,13 @@ import { useProject, usePlayback, useSelectedClip } from '@/core/store';
 import { useUI } from '@/core/uiStore';
 import { formatTime } from '@/core/util';
 import { projectDuration, findClip } from '@/core/commands';
-import { Play, Pause, SkipBack, SkipForward, StepBack, StepForward, Repeat, Volume2, VolumeX, Maximize, Grid3X3, Scan, Gauge } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, StepBack, StepForward, Repeat, Volume2, VolumeX, Maximize, Grid3X3, Scan, Gauge, Activity } from 'lucide-react';
 import * as act from '@/services/clipActions';
 import type { Clip, VisualClip, Vec2 } from '@/core/types';
 import { vec, num, writeValue, hasKeyframes } from '@/core/keyframes';
 import { getAsset } from '@/engine/MediaManager';
 import { measureText } from '@/engine/TextRenderer';
+import { Scopes } from './Scopes';
 import { updateClip } from '@/core/commands';
 
 /** Natural (scale=1) size of a visual clip in project pixels. */
@@ -39,6 +40,7 @@ export function Preview() {
   const [box, setBox] = useState({ w: 320, h: 180 });
   const showSafe = useUI((s) => s.showSafeZones);
   const showGrid = useUI((s) => s.showGrid);
+  const scopes = useUI((s) => s.scopes);
 
   useEffect(() => {
     const c = canvasRef.current!;
@@ -101,6 +103,7 @@ export function Preview() {
               </>
             )}
             <SelectionOverlay boxW={box.w} boxH={box.h} />
+            {scopes && <Scopes mode={scopes} />}
           </div>
         </div>
       </div>
@@ -209,6 +212,7 @@ function Transport() {
   const duration = useProject((s) => projectDuration(s.project!));
   const showSafe = useUI((s) => s.showSafeZones);
   const showGrid = useUI((s) => s.showGrid);
+  const scopesOn = useUI((s) => !!s.scopes);
   const [stats, setStats] = useState({ frameMs: 0, fps: 0, quality: 1, clips: 0, passes: 0 });
   useEffect(() => {
     const id = setInterval(() => setStats(engine.getStats()), 500);
@@ -252,6 +256,9 @@ function Transport() {
       </button>
       <button className={`icon-btn ${showSafe ? 'active' : ''}`} onClick={() => useUI.getState().set({ showSafeZones: !showSafe })} title="Safe zones">
         <Scan size={15} />
+      </button>
+      <button className={`icon-btn ${scopesOn ? 'active' : ''}`} onClick={() => useUI.getState().set({ scopes: scopesOn ? null : 'waveform' })} title="Video scopes (waveform / RGB parade / vectorscope / histogram)">
+        <Activity size={15} />
       </button>
       <select value={quality} onChange={(e) => usePlayback.getState().set({ previewQuality: e.target.value as any })} title="Preview quality" style={{ height: 26, padding: '0 6px', fontSize: 11 }}>
         <option value="auto">Auto</option>

@@ -119,9 +119,13 @@ function TemplateDialog({ templateId, onClose }: { templateId: string; onClose: 
   useEffect(() => {
     if (def) [theme.font, theme.headingFont].forEach((f) => void ensureFont(f));
   }, [theme.font, theme.headingFont]);
+  const fontOpts = useMemo(() => {
+    const top = FONTS.slice(0, 160);
+    [theme.font, theme.headingFont].forEach((f) => { if (!top.some((x) => x.family === f)) { const d = FONTS.find((x) => x.family === f); if (d) top.unshift(d); } });
+    return top.map((f) => ({ value: f.family, label: f.family }));
+  }, [theme.font, theme.headingFont]);
   if (!def) return null;
   const slots = mediaSlotsOf(def);
-  const fontOpts = FONTS.map((f) => ({ value: f.family, label: f.family }));
   const uploadFor = async (i: number) => {
     const files = await pickFiles('video/*,image/*', true);
     if (!files.length) return;

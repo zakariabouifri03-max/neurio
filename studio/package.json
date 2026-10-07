@@ -1,7 +1,7 @@
 {
   "name": "neurio-studio",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Neurio Studio — a professional browser-based multi-track video editor",
   "scripts": {
@@ -19,7 +19,6 @@
     "android:apk": "npm run android:sync && cd android && ./gradlew assembleDebug assembleRelease",
     "icons": "node scripts/make-ico.mjs && node scripts/android-assets.mjs"
   },
-  "dependencies": {},
   "devDependencies": {
     "@capacitor/android": "^6.2.2",
     "@capacitor/app": "^6.0.3",
@@ -39,6 +38,7 @@
     "idb": "^8.0.4",
     "lucide-react": "^0.544.0",
     "mp4-muxer": "^5.2.2",
+    "phonemizer": "^1.2.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "sharp": "^0.35.5",

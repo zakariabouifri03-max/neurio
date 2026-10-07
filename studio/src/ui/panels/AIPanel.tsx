@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Sparkles, Scissors, Crop, Wand2, Subtitles, Activity, Music, Volume2, UserRoundX, Star, Flame, XCircle, Image as ImageIcon, Info } from 'lucide-react';
+import { Sparkles, Scissors, Crop, Wand2, Subtitles, Activity, Music, Volume2, UserRoundX, Star, Flame, Image as ImageIcon, Info } from 'lucide-react';
 import { PanelHeader } from './LeftPanels';
 import { Slider, SelectRow, Toggle, ColorRow } from '../common';
 import { useProject, getSelectedClips, patchClip, useSelectedClip } from '@/core/store';
@@ -15,37 +15,13 @@ import { captionsAvailability } from '@/ai/captions';
 import { useMedia } from '@/engine/MediaManager';
 import { engine } from '@/engine/PlaybackEngine';
 import { formatDuration } from '@/core/util';
+import { Card, Busy } from './aiCommon';
+import { VoiceOverCard, TranslateCaptionsCard, SceneDetectCard, LoudnessCard, FillerWordsCard, FaceBlurCard } from './AIToolsExtra';
 
 type Target = VideoClip | AudioClip | ImageClip;
 const isVideo = (c: Clip | null): c is VideoClip => !!c && c.kind === 'video';
 const isVisual = (c: Clip | null): c is VideoClip | ImageClip => !!c && (c.kind === 'video' || c.kind === 'image');
 const hasAudio = (c: Clip | null): c is VideoClip | AudioClip => !!c && ((c.kind === 'video' && c.hasAudio !== false) || c.kind === 'audio');
-
-function Card({ icon, title, desc, badge, children, status }: { icon: React.ReactNode; title: string; desc: string; badge?: string; children?: React.ReactNode; status?: { kind: 'ok' | 'warn' | 'off'; text: string } }) {
-  return (
-    <div className="ai-card">
-      <div className="head">
-        <span className="ico">{icon}</span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <b>{title}</b> {badge && <span className="badge" style={{ marginLeft: 6 }}>{badge}</span>}
-          <div className="muted small">{desc}</div>
-        </div>
-      </div>
-      {status && <div className={`ai-status ${status.kind}`}>{status.text}</div>}
-      {children}
-    </div>
-  );
-}
-
-function Busy({ label, progress, onCancel }: { label: string; progress: number; onCancel?: () => void }) {
-  return (
-    <div style={{ marginTop: 6 }}>
-      <div className="row" style={{ justifyContent: 'space-between' }}><span className="small">{label}</span><span className="muted small">{Math.round(progress * 100)}%</span></div>
-      <div className="progress"><div style={{ width: `${Math.round(progress * 100)}%` }} /></div>
-      {onCancel && <button className="btn sm ghost" style={{ marginTop: 4 }} onClick={onCancel}><XCircle size={12} /> Cancel</button>}
-    </div>
-  );
-}
 
 export function AIPanel() {
   const clip = useSelectedClip();
@@ -270,6 +246,13 @@ export function AIPanel() {
           {busy.color ? <Busy {...busy.color} /> : <button className="btn sm primary" style={{ marginTop: 6 }} onClick={runAutoColor} disabled={!isVisual(clip)}>Auto color</button>}
         </Card>
 
+        <VoiceOverCard />
+        <TranslateCaptionsCard />
+        <FaceBlurCard />
+        <SceneDetectCard />
+        <LoudnessCard />
+        <FillerWordsCard />
+
         <Card icon={<Flame size={16} />} title="Highlights & smart trim" desc="Ranks moments by loudness, onsets and motion. Mark them or keep only the best parts." badge="Heuristic">
           <Slider label="Highlights" value={hlCount} min={1} max={10} step={1} onChange={setHlCount} />
           <Slider label="Length" value={hlLen} min={2} max={15} step={1} unit="s" onChange={setHlLen} />
@@ -295,9 +278,9 @@ export function AIPanel() {
           <button className="btn sm" style={{ marginTop: 6 }} onClick={() => (isVideo(clip) ? setRight('stabilize') : needSel('a video clip'))}>Open stabilizer →</button>
         </Card>
 
-        <Card icon={<ImageIcon size={16} />} title="Not available in-browser" desc="Generative upscaling, object removal, AI voice-over and video enhancement need server-side GPU models. Neurio Studio doesn't fake them; they will appear here when a processing backend is configured." status={{ kind: 'off', text: 'Unavailable — no backend configured' }} />
+        <Card icon={<ImageIcon size={16} />} title="Not available in-browser" desc="Generative upscaling, object removal, lip-sync, voice cloning and video enhancement need server-side GPU models. Neurio Studio doesn't fake them; they will appear here when a processing backend is configured." status={{ kind: 'off', text: 'Unavailable — no backend configured' }} />
 
-        <div className="muted small" style={{ marginTop: 8, display: 'flex', gap: 6 }}><Sparkles size={14} style={{ flexShrink: 0 }} /> Models: Whisper (ONNX, Hugging Face), MediaPipe selfie segmentation & BlazeFace. Downloads are cached by the browser.</div>
+        <div className="muted small" style={{ marginTop: 8, display: 'flex', gap: 6 }}><Sparkles size={14} style={{ flexShrink: 0 }} /> Models: Whisper (speech-to-text), Kokoro-82M (voice-over), OPUS-MT (translation) — ONNX via Hugging Face; MediaPipe selfie segmentation & BlazeFace. Downloads are cached by the browser.</div>
       </div>
     </>
   );

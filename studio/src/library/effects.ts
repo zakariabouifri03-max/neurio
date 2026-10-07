@@ -2,6 +2,8 @@
  * Effect registry. Each effect is a single full-screen GLSL pass with up to 12 numeric
  * parameters (u_p[i], in declaration order). Add new effects by appending to the list.
  */
+import { EFFECTS_EXTRA } from './effectsExtra';
+
 export interface EffectParam {
   key: string;
   label: string;
@@ -32,11 +34,13 @@ export type EffectCategory =
   | 'Horror'
   | 'Gaming'
   | 'Social'
+  | 'Color'
+  | 'Texture'
   | 'Basic';
 
 const P = (key: string, label: string, min: number, max: number, def: number, step?: number): EffectParam => ({ key, label, min, max, default: def, step });
 
-export const EFFECTS: EffectDef[] = [
+const EFFECTS_CORE: EffectDef[] = [
   // ---------------- Glitch ----------------
   {
     id: 'glitch',
@@ -680,7 +684,9 @@ export const EFFECTS: EffectDef[] = [
   },
 ];
 
-export const EFFECT_CATEGORIES: EffectCategory[] = ['Glitch', 'Retro', 'Cinematic', 'Blur', 'Motion', 'Light', 'Distortion', 'Stylize', 'Neon', 'Horror', 'Gaming', 'Social', 'Basic'];
+/** Full registry: core effects + the extra batch (effectsExtra.ts). */
+export const EFFECTS: EffectDef[] = [...EFFECTS_CORE, ...EFFECTS_EXTRA];
+export const EFFECT_CATEGORIES: EffectCategory[] = ['Glitch', 'Retro', 'Cinematic', 'Color', 'Blur', 'Motion', 'Light', 'Distortion', 'Stylize', 'Texture', 'Neon', 'Horror', 'Gaming', 'Social', 'Basic'];
 
 const byId = new Map(EFFECTS.map((e) => [e.id, e]));
 export const getEffect = (id: string) => byId.get(id);

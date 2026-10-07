@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import type { TextClip, CaptionClip, TextStyle } from '@/core/types';
 import { patchClip, getSelectedClips, useProject } from '@/core/store';
 import { toast } from '@/core/uiStore';
 import { Section, Slider, Toggle, SelectRow, ColorRow, Chips, SearchBox, pickFiles } from '../common';
-import { allFonts, ensureFont, FONT_CATEGORIES, onFontsChanged, registerUserFont, type FontDef } from '@/library/fonts';
+import { allFonts, ensureFont, fontStatus, FONT_CATEGORIES, onFontsChanged, registerUserFont, type FontDef, type FontScript } from '@/library/fonts';
 import { TEXT_PRESETS, TEXT_PRESET_CATEGORIES, type TextPreset } from '@/library/textPresets';
 import { usePresets, usePresetsOfKind } from '@/services/favorites';
 import { importFile } from '@/engine/MediaManager';
@@ -179,12 +179,18 @@ export function FontPicker({ value, onChange }: { value: string; onChange: (fami
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
   const [cat, setCat] = useState<FontDef['category'] | null>(null);
+  const [script, setScript] = useState<FontScript | null>(null);
+  const [limit, setLimit] = useState(120);
   const [, bump] = useState(0);
   useEffect(() => onFontsChanged(() => bump((v) => v + 1)), []);
   useEffect(() => {
     void ensureFont(value);
   }, [value]);
-  const fonts = allFonts().filter((f) => (!cat || f.category === cat) && (!q || f.family.toLowerCase().includes(q.toLowerCase())));
+  useEffect(() => setLimit(120), [q, cat, script, open]);
+  const all = allFonts();
+  const t = q.trim().toLowerCase();
+  const matches = all.filter((f) => (!cat || f.category === cat) && (!script || f.source === 'user' || (f.scripts ?? ['latin']).includes(script)) && (!t || f.family.toLowerCase().includes(t)));
+  const fonts = matches.length > limit ? matches.slice(0, limit) : matches;
   const upload = async () => {
     const files = await pickFiles('.ttf,.otf,.woff,.woff2', true);
     for (const f of files) {
@@ -213,14 +219,19 @@ export function FontPicker({ value, onChange }: { value: string; onChange: (fami
       </div>
       {open && (
         <div className="font-list">
-          <SearchBox value={q} onChange={setQ} placeholder="Search fonts…" autoFocus />
+          <SearchBox value={q} onChange={setQ} placeholder={`Search ${all.length} fonts…`} autoFocus />
           <Chips items={FONT_CATEGORIES} value={cat} onChange={setCat} all="All" />
+          <Chips items={['arabic', 'cyrillic', 'greek', 'hebrew', 'vietnamese', 'devanagari', 'japanese', 'korean', 'chinese', 'thai'] as FontScript[]} value={script} onChange={setScript} all="Any script" />
           <div className="font-items">
             {fonts.map((f) => (
               <FontItem key={f.family} f={f} active={f.family === value} onPick={() => { onChange(f.family); setOpen(false); }} />
             ))}
+            {matches.length > limit && (
+              <button className="btn sm" style={{ margin: 6 }} onClick={() => setLimit((n) => n + 200)}>Show more ({matches.length - limit} more)</button>
+            )}
             {fonts.length === 0 && <div className="muted small" style={{ padding: 8 }}>No fonts match.</div>}
           </div>
+          <div className="muted small" style={{ padding: '4px 8px' }}>{matches.length} fonts · Google Fonts load on demand (network) · upload .ttf/.otf for offline use</div>
         </div>
       )}
     </div>
@@ -228,13 +239,28 @@ export function FontPicker({ value, onChange }: { value: string; onChange: (fami
 }
 
 function FontItem({ f, active, onPick }: { f: FontDef; active: boolean; onPick: () => void }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [, bump] = useState(0);
+  // Lazy: only request the font's CSS when the row scrolls into view (hundreds of families in the list).
   useEffect(() => {
-    void ensureFont(f.family);
-  }, [f.family]);
+    const el = ref.current;
+    if (!el || f.source !== 'google') return;
+    if (typeof IntersectionObserver === 'undefined') { void ensureFont(f.family).then(() => bump((v) => v + 1)); return; }
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        io.disconnect();
+        void ensureFont(f.family).then(() => bump((v) => v + 1));
+      }
+    }, { rootMargin: '200px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [f.family, f.source]);
+  const st = fontStatus(f.family);
+  const scripts = (f.scripts ?? []).filter((s) => s !== 'latin');
   return (
-    <button className={`font-item ${active ? 'active' : ''}`} onClick={onPick} style={{ fontFamily: `"${f.family}"` }}>
-      <span>{f.family}</span>
-      <span className="muted small" style={{ fontFamily: 'var(--font)' }}>{f.category}</span>
+    <button ref={ref} className={`font-item ${active ? 'active' : ''}`} onClick={onPick} style={{ fontFamily: `"${f.family}"` }} title={st === 'failed' ? 'Could not download this font (offline?) — a fallback font is shown' : `${f.family} · ${f.weights.length} weight${f.weights.length > 1 ? 's' : ''}${f.italic ? ' · italic' : ''}`}>
+      <span>{f.family}{st === 'failed' && <span className="muted small" style={{ fontFamily: 'var(--font)', marginLeft: 6 }}>⚠ offline</span>}</span>
+      <span className="muted small" style={{ fontFamily: 'var(--font)' }}>{f.category}{scripts.length ? ` · ${scripts.slice(0, 2).join(', ')}` : ''}</span>
     </button>
   );
 }
