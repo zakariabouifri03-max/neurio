@@ -21,9 +21,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm, cache-dependency-path: motionforge-studio/package-lock.json }
-      - run: npm ci
+      - run: node scripts/ci-run.js "npm ci" npm ci
       - run: npm run vendor
-      - run: node test/run.js
+      - run: node scripts/ci-run.js "Tests" node test/run.js
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: test-screenshots, path: motionforge-studio/.test-out/**/*.png, if-no-files-found: ignore }
@@ -38,10 +38,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm, cache-dependency-path: motionforge-studio/package-lock.json }
-      - run: npm ci
+      - run: node scripts/ci-run.js "npm ci" npm ci
       - run: npm run vendor
       - name: Build NSIS installer + portable exe
-        run: npx electron-builder --win nsis portable --x64 --publish never
+        run: node scripts/ci-run.js "electron-builder" npx electron-builder --win nsis portable --x64 --publish never
       - name: Packaged-app end-to-end self-test (real Electron, real FFmpeg export)
         shell: pwsh
         run: |
