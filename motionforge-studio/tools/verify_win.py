@@ -182,12 +182,16 @@ def verify_zip(path: str) -> int:
                     "app/mfs/ui/session.py", "MotionForge.py", "ReadMe.txt",
                     "lib/PySide6/Qt6Core.dll", "lib/numpy/__init__.py",
                     "lib/imageio_ffmpeg/binaries/", "licenses/THIRD-PARTY-NOTICES.txt"]
+        # windows checkouts produce "Lib/..." while linux builds write "lib/...",
+        # so every comparison here must be case-insensitive
+        lowered = [(n, n.lower()) for n in names]
         for want in required:
-            hit = any(n.endswith(want) or (want.endswith("/") and want in n) for n in names)
+            w = want.lower()
+            hit = any(l.endswith(w) or (w.endswith("/") and w in l) for _n, l in lowered)
             if not hit:
                 problems += 1
                 stem = os.path.basename(want.rstrip("/"))
-                near = [n for n in names if stem and stem.split(".")[0].lower() in n.lower()][:4]
+                near = [n for _n, l in lowered if stem and stem.split(".")[0].lower() in l][:4]
                 print(f"{FAIL} {want}   near={near}")
             else:
                 print(f"{OK} {want}")
