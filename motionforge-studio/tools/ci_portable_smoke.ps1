@@ -1,10 +1,10 @@
-# Unpacks the portable Windows package on a real Windows machine and runs the
-# packaged application's own self test -- first the payload interpreter, then
-# the console twin, then the normal windowed exe.
+# Unpacks the portable Windows package on a real Windows machine and *runs* it:
+# the bundled interpreter, the script form, the windowed entry point the user
+# double-clicks, the version resources Windows shows in the file properties.
 #
 # Everything is written to the log file (default ci/smoke.log) because the CI
-# log of a failing step is not readable from outside the runner; the log file
-# is committed to the `ci-reports` branch by the workflow when something fails.
+# log of a failing step is not readable from outside the runner; the log file is
+# committed to the `ci-reports` branch by the workflow when something fails.
 #
 # Exit code: 0 when every check passed, 1 otherwise.
 
@@ -37,21 +37,65 @@ function Check([string]$Label, [bool]$Ok, [string]$Detail = "") {
     return $Ok
 }
 
-# Runs a native command, capturing *all* streams into the log file.
-function Invoke-Logged([string]$Label, [string]$Exe, [string[]]$ArgList, [switch]$NoCheck) {
+# Runs a console command, capturing every stream into the log file.
+function Invoke-Logged([string]$Label, [string]$Exe, [string[]]$ArgList, [string]$Expect = "") {
     Say ""
     Say "== $Label"
     Say "   $Exe $($ArgList -join ' ')"
     if (-not (Test-Path $Exe)) {
         Say "   FAIL missing executable"
         $script:Failed += "$Label (missing executable)"
-        return -1
+        return
     }
-    & $Exe @ArgList *>&1 | Out-File -FilePath $LogPath -Append -Encoding utf8
+    $out = & $Exe @ArgList 2>&1 | Out-String
     $code = $LASTEXITCODE
+    foreach ($line in ($out -split "`r?`n")) { if ($line) { Say "   | $line" } }
     Say "   exit code: $code"
-    if (-not $NoCheck -and $code -ne 0) { $script:Failed += "$Label (exit $code)" }
-    return $code
+    if ($code -ne 0) { $script:Failed += "$Label (exit $code)" }
+    if ($Expect) {
+        $found = $out -match [regex]::Escape($Expect)
+        if (-not $found) { $script:Failed += "$Label (output does not contain '$Expect')" }
+        Check "output contains '$Expect'" $found
+    }
+}
+
+# Runs a GUI executable and waits for it, capturing its output into files.
+function Invoke-Gui([string]$Label, [string]$Exe, [string[]]$ArgList, [string]$Expect = "") {
+    Say ""
+    Say "== $Label"
+    Say "   $Exe $($ArgList -join ' ')"
+    if (-not (Test-Path $Exe)) {
+        Say "   FAIL missing executable"
+        $script:Failed += "$Label (missing executable)"
+        return
+    }
+    $so = Join-Path $env:TEMP "mfs-gui-out.txt"
+    $se = Join-Path $env:TEMP "mfs-gui-err.txt"
+    Remove-Item $so, $se -Force -ErrorAction SilentlyContinue
+    try {
+        $p = Start-Process -FilePath $Exe -ArgumentList $ArgList -PassThru -Wait `
+            -RedirectStandardOutput $so -RedirectStandardError $se -ErrorAction Stop
+        $code = $p.ExitCode
+    } catch {
+        Say "   FAIL could not start: $_"
+        $script:Failed += "$Label (start failed)"
+        return
+    }
+    $out = ""
+    foreach ($f in @($so, $se)) {
+        if (Test-Path $f) {
+            $text = Get-Content $f -Raw
+            $out += $text
+            foreach ($line in ($text -split "`r?`n")) { if ($line) { Say "   | $line" } }
+        }
+    }
+    Say "   exit code: $code"
+    if ($code -ne 0) { $script:Failed += "$Label (exit $code)" }
+    if ($Expect) {
+        $found = $out -match [regex]::Escape($Expect)
+        if (-not $found) { $script:Failed += "$Label (output does not contain '$Expect')" }
+        Check "output contains '$Expect'" $found
+    }
 }
 
 Say ""
@@ -81,35 +125,47 @@ if (-not (Test-Path $app)) {
 Say "   contents: $((Get-ChildItem $app | Select-Object -ExpandProperty Name) -join ', ')"
 Say "   folder size: $([math]::Round((Get-ChildItem $app -Recurse -File | Measure-Object Length -Sum).Sum / 1MB, 1)) MB"
 
-$py = Join-Path $app "python.exe"
-$console = Join-Path $app "MotionForge console.exe"
+$python = Join-Path $app "python.exe"
 $gui = Join-Path $app "MotionForge Studio.exe"
+$console = Join-Path $app "MotionForge runtime console.exe"
+$runtime = Join-Path $app "MotionForge runtime.exe"
+$launcherPy = Join-Path $app "MotionForge.py"
 
-Check "python.exe" (Test-Path $py)
-Check "MotionForge console.exe" (Test-Path $console)
-Check "MotionForge Studio.exe" (Test-Path $gui)
+Check "python.exe (payload interpreter)" (Test-Path $python)
+Check "MotionForge Studio.exe (entry point)" (Test-Path $gui)
+Check "MotionForge runtime console.exe" (Test-Path $console)
+Check "MotionForge runtime.exe" (Test-Path $runtime)
+Check "MotionForge.py" (Test-Path $launcherPy)
 Check "python313.dll" (Test-Path (Join-Path $app "python313.dll"))
 Check "lib/PySide6/QtCore.pyd" (Test-Path (Join-Path $app "lib/PySide6/QtCore.pyd"))
 Check "lib/imageio_ffmpeg" (Test-Path (Join-Path $app "lib/imageio_ffmpeg"))
 Check "ffmpeg executable" ([bool](Get-ChildItem (Join-Path $app "lib/imageio_ffmpeg/binaries") -Filter "ffmpeg*.exe" -ErrorAction SilentlyContinue))
+Check "python.exe was not shipped as the app entry point" (-not (Test-Path (Join-Path $app "pythonw.exe")))
 
 Say ""
-Say "== version resource of the main executable"
-if (Test-Path $gui) {
-    $vi = (Get-Item $gui).VersionInfo
-    Say "   ProductName:     $($vi.ProductName)"
-    Say "   FileVersion:     $($vi.FileVersion)"
-    Say "   FileDescription: $($vi.FileDescription)"
+Say "== file properties Windows shows for the entry point"
+foreach ($exe in @($gui, $runtime, $console)) {
+    if (-not (Test-Path $exe)) { continue }
+    $vi = (Get-Item $exe).VersionInfo
+    Say "   $([IO.Path]::GetFileName($exe)):"
+    Say "     ProductName:     $($vi.ProductName)"
+    Say "     FileVersion:     $($vi.FileVersion)"
+    Say "     FileDescription: $($vi.FileDescription)"
+    Say "     CompanyName:     $($vi.CompanyName)"
+    Check "version info of $([IO.Path]::GetFileName($exe))" ($vi.ProductName -eq "MotionForge Studio")
 }
 
-Invoke-Logged "payload interpreter / Qt import" $py @(
-    "-c",
-    "import sys, PySide6; print(sys.version); print('PySide6', PySide6.__version__)"
-)
+Invoke-Logged "payload interpreter / Qt import" $python @(
+    "-c", "import sys, PySide6; print(sys.version); print('PySide6', PySide6.__version__)"
+) "PySide6"
 
-Invoke-Logged "console twin --selftest" $console @("--selftest")
+Invoke-Logged "script form (python.exe MotionForge.py)" $python @($launcherPy, "--selftest") "RESULT: OK"
 
-Invoke-Logged "windowed exe --selftest" $gui @("--selftest")
+Invoke-Logged "console runtime --selftest" $console @("--selftest") "RESULT: OK"
+
+Invoke-Gui "entry point --selftest" $gui @("--selftest") "RESULT: OK"
+
+Invoke-Gui "entry point --version" $gui @("--version")
 
 Say ""
 if ($script:Failed.Count -gt 0) {

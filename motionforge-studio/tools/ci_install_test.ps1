@@ -40,12 +40,30 @@ function Check([string]$Label, [bool]$Ok, [string]$Detail = "") {
 $setupLog = Join-Path $env:TEMP "motionforge-setup.log"
 
 Say ""
+Say "== the setup executable"
+$setupInfo = Get-Item $Setup
+Say "   file:   $($setupInfo.FullName)"
+Say "   size:   $([math]::Round($setupInfo.Length / 1MB, 1)) MB"
+Say "   sha256: $((Get-FileHash $Setup -Algorithm SHA256).Hash)"
+$vi = $setupInfo.VersionInfo
+Say "   version info: $($vi.ProductName) $($vi.FileVersion) - $($vi.FileDescription)"
+Check "setup version info" ($vi.ProductName -eq "MotionForge Studio")
+
+Say ""
 Say "== silent install into $InstallDir"
 Remove-Item $InstallDir -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item $setupLog -Force -ErrorAction SilentlyContinue
-$p = Start-Process -FilePath $Setup -ArgumentList @("/silent", "/dir", "`"$InstallDir`"") -PassThru -Wait
-Say "   installer exit code: $($p.ExitCode)"
-Check "installer exit code 0" ($p.ExitCode -eq 0) "(got $($p.ExitCode))"
+try {
+    $p = Start-Process -FilePath $Setup -ArgumentList @("/silent", "/dir", "`"$InstallDir`"") `
+        -PassThru -Wait -ErrorAction Stop
+    $code = $p.ExitCode
+    Say "   installer exit code: $code"
+    Check "installer exit code 0" ($code -eq 0) "(got $code)"
+} catch {
+    Say "   FAIL the setup executable could not be started: $_"
+    Say "   exception type: $($_.Exception.GetType().FullName)"
+    $script:Failed += "installer start"
+}
 
 Say ""
 Say "== installer log ($setupLog)"
@@ -67,10 +85,12 @@ if (Test-Path $InstallDir) {
 }
 
 $app = Join-Path $InstallDir "MotionForge Studio.exe"
-$console = Join-Path $InstallDir "MotionForge console.exe"
+$console = Join-Path $InstallDir "MotionForge runtime console.exe"
+$runtime = Join-Path $InstallDir "MotionForge runtime.exe"
 $uninstaller = Join-Path $InstallDir "Uninstall.exe"
 Check "MotionForge Studio.exe" (Test-Path $app)
-Check "MotionForge console.exe" (Test-Path $console)
+Check "MotionForge runtime.exe" (Test-Path $runtime)
+Check "MotionForge runtime console.exe" (Test-Path $console)
 Check "Uninstall.exe" (Test-Path $uninstaller)
 Check "python313.dll" (Test-Path (Join-Path $InstallDir "python313.dll"))
 Check "app/mfs/app.py" (Test-Path (Join-Path $InstallDir "app/mfs/app.py"))
@@ -103,11 +123,37 @@ if ($keys) {
 }
 
 Say ""
-Say "== installed application self test"
+Say "== installed application self test (console runtime)"
 if (Test-Path $console) {
-    & $console --selftest *>&1 | Out-File -FilePath $LogPath -Append -Encoding utf8
-    Say "   exit code: $LASTEXITCODE"
-    if ($LASTEXITCODE -ne 0) { $script:Failed += "installed self test (exit $LASTEXITCODE)" }
+    $out = & $console --selftest 2>&1 | Out-String
+    $code = $LASTEXITCODE
+    foreach ($line in ($out -split "`r?`n")) { if ($line) { Say "   | $line" } }
+    Say "   exit code: $code"
+    if ($code -ne 0) { $script:Failed += "installed self test (exit $code)" }
+    if ($out -notmatch "RESULT: OK") { $script:Failed += "installed self test output" }
+}
+
+Say ""
+Say "== installed application self test (the exe the user starts)"
+if (Test-Path $app) {
+    $so = Join-Path $env:TEMP "mfs-installed-out.txt"
+    Remove-Item $so -Force -ErrorAction SilentlyContinue
+    try {
+        $sp = Start-Process -FilePath $app -ArgumentList @("--selftest") -PassThru -Wait `
+            -RedirectStandardOutput $so -ErrorAction Stop
+        Say "   exit code: $($sp.ExitCode)"
+        if (Test-Path $so) {
+            $text = Get-Content $so -Raw
+            foreach ($line in ($text -split "`r?`n")) { if ($line) { Say "   | $line" } }
+            if ($text -notmatch "RESULT: OK") { $script:Failed += "installed entry point output" }
+        } else {
+            Say "   FAIL no output was captured"
+            $script:Failed += "installed entry point output file"
+        }
+    } catch {
+        Say "   FAIL could not start the installed application: $_"
+        $script:Failed += "installed entry point"
+    }
 }
 
 Say ""

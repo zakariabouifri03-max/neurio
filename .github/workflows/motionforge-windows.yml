@@ -56,7 +56,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}\mfs-cache
-          key: mfs-win-cache-${{ runner.os }}-${{ hashFiles('motionforge-studio/tools/build_win.py', 'motionforge-studio/tools/build_win_installer.py') }}
+          key: mfs-win-cache-${{ runner.os }}-${{ hashFiles('motionforge-studio/tools/build_win.py', 'motionforge-studio/tools/build_win_installer.py', 'motionforge-studio/packaging/win/launcher/**') }}
           restore-keys: mfs-win-cache-${{ runner.os }}-
 
       - name: Build icon, portable package and installer

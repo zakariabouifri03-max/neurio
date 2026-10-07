@@ -490,7 +490,7 @@ def install(install_dir: str, version: str, desktop: bool = True, start_menu: bo
 
 def run_selftest(install_dir: str, log=None) -> dict:
     # the console twin writes to stdout reliably, even from the GUI setup
-    console = os.path.join(install_dir, "MotionForge console.exe")
+    console = os.path.join(install_dir, "MotionForge runtime console.exe")
     exe = console if os.path.exists(console) else os.path.join(install_dir, APP_EXE)
     if not os.path.exists(exe):
         return {"ok": False, "output": "executable missing"}

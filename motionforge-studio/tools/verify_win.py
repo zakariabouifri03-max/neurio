@@ -21,7 +21,9 @@ import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from build_win import APP_EXE, pe_imports  # noqa: E402
+from build_win import APP_EXE, app_version, pe_imports  # noqa: E402
+
+APP_VER = app_version()
 
 OK = "  ok  "
 WARN = " warn "
@@ -85,69 +87,151 @@ def pe_resources(path: str) -> dict:
     return out
 
 
-def read_version_strings(blob: bytes) -> dict:
-    """Very small VS_VERSIONINFO reader - enough for a build check."""
-    text = blob.decode("utf-16-le", "replace")
-    out = {}
-    for key in ("CompanyName", "FileDescription", "FileVersion", "ProductName",
-                "ProductVersion", "OriginalFilename"):
-        idx = text.find(key)
-        if idx >= 0:
-            start = idx + len(key)
-            while start < len(text) and text[start] == "\x00":
-                start += 1
-            end = start
-            while end < len(text) and text[end] not in "\x00":
-                end += 1
-            out[key] = text[start:end]
+def parse_version_info(blob: bytes, problems: list[str]) -> dict:
+    """Parse a VS_VERSIONINFO blob the way Windows does.
+
+    Windows silently ignores a blob whose ``wLength`` fields are wrong (an
+    empty "Details" tab in Explorer), so this reader is deliberately strict:
+    every structure must declare its own size, and the root must carry the
+    52 byte ``VS_FIXEDFILEINFO``.
+    """
+    def node(off: int, label: str) -> dict:
+        if off + 6 > len(blob):
+            problems.append(f"{label}: truncated header")
+            return {"key": "", "length": 0, "value": b"", "children": []}
+        length, value_len, value_type = struct.unpack_from("<HHH", blob, off)
+        end_key = off + 6
+        while end_key + 1 < len(blob) and blob[end_key:end_key + 2] != b"\x00\x00":
+            end_key += 2
+        key = blob[off + 6:end_key].decode("utf-16-le", "replace")
+        here = {"key": key, "length": length, "value": b"", "children": [],
+                "value_type": value_type}
+        cursor = (end_key + 2 + 3) & ~3
+        if value_type == 0:
+            here["value"] = blob[cursor:cursor + value_len]
+            cursor = (cursor + value_len + 3) & ~3
+        else:
+            here["value"] = blob[cursor:cursor + value_len * 2]
+            cursor = (cursor + value_len * 2 + 3) & ~3
+        if length == 0 or off + length > len(blob):
+            problems.append(f"{label}/{key}: wLength {length} is invalid")
+            return here
+        stop = off + length
+        while cursor + 6 <= stop:
+            child = node(cursor, f"{label}/{key}")
+            here["children"].append(child)
+            step = cursor + max(child["length"], 1)
+            if step <= cursor:
+                break
+            cursor = step
+        return here
+
+    root = node(0, "")
+    out: dict = {"problems": problems, "key": root["key"], "strings": {},
+                 "translation": None, "file_version": None, "product_version": None}
+
+    def collect(extra: dict) -> None:
+        for child in extra.get("children", []):
+            if child["key"] == "StringFileInfo":
+                for table in child["children"]:
+                    for item in table["children"]:
+                        value = item["value"].decode("utf-16-le", "replace")
+                        out["strings"][item["key"]] = value.split("\x00")[0]
+            elif child["key"] == "VarFileInfo":
+                for var in child["children"]:
+                    if var["key"] == "Translation" and len(var["value"]) >= 4:
+                        out["translation"] = struct.unpack_from("<HH", var["value"], 0)
+            collect(child)
+
+    collect(root)
+    fixed = root["value"]
+    if len(fixed) < 52:
+        problems.append("root: VS_FIXEDFILEINFO is missing")
+    else:
+        signature, _struct_ver, fv_hi, fv_lo = struct.unpack_from("<IIII", fixed, 0)
+        if signature != 0xFEEF04BD:
+            problems.append(f"root: VS_FIXEDFILEINFO signature {signature:#x} is wrong")
+        out["file_version"] = ((fv_hi >> 16) & 0xFFFF, fv_hi & 0xFFFF,
+                               (fv_lo >> 16) & 0xFFFF)
+    if root["key"] != "VS_VERSION_INFO":
+        problems.append(f"root: key is {root['key']!r}")
     return out
 
 
-def check_pe(path: str, label: str) -> int:
+def version_check(path: str, label: str, version: tuple[int, int, int]) -> int:
+    """Everything Windows needs to show a full Details page."""
+    problems: list[str] = []
+    res = pe_resources(path)
+    versions = res.get(16, [])
+    if not versions:
+        print(f"{FAIL} {label}: no RT_VERSION resource")
+        return 1
+    info = parse_version_info(versions[0][2], problems)
+    strings = info["strings"]
+    wanted = {
+        "ProductName": "MotionForge Studio",
+        "FileVersion": ".".join(str(p) for p in version),
+        "FileDescription": None,
+        "CompanyName": None,
+        "OriginalFilename": None,
+    }
+    for key, expected in wanted.items():
+        value = strings.get(key, "")
+        good = bool(value) and (expected is None or value == expected)
+        if not good:
+            problems.append(f"{key}={value!r} (expected {expected!r})")
+        print(f"{OK if good else FAIL} {key:16s} {value!r}")
+    if info["file_version"] != version:
+        problems.append(f"fixed file version {info['file_version']} != {version}")
+    if info["translation"] is None:
+        problems.append("no translation entry in VarFileInfo")
+    if problems:
+        print(f"{FAIL} {label}: version resource problems")
+        for problem in problems:
+            print(f"        - {problem}")
+    return len(problems)
+
+
+def check_pe(path: str, label: str, version: tuple[int, int, int],
+             require_resources: bool = True) -> int:
+    """Structural check of an executable, plus its icon and version resource."""
     problems = 0
     with open(path, "rb") as fh:
         head = fh.read(2)
     if head != b"MZ":
-        print(f"{FAIL} {label}: not a Windows executable")
-        return 1
+        print(f"{WARN} {label}: not a Windows PE (cross platform build), "
+              f"{os.path.getsize(path) / 1e6:.1f} MB")
+        return 0
     size = os.path.getsize(path)
     data = open(path, "rb").read()
     pe = struct.unpack_from("<I", data, 0x3C)[0]
     nsec = struct.unpack_from("<H", data, pe + 6)[0]
     opt_size = struct.unpack_from("<H", data, pe + 20)[0]
     magic = struct.unpack_from("<H", data, pe + 24)[0]
-    size_of_image = struct.unpack_from("<I", data, pe + 24 + 56)[0]
     sec = pe + 24 + opt_size
-    worst = 0
+    problems += 0
     for i in range(nsec):
         o = sec + 40 * i
         _vs, va, rawsize, rawptr = struct.unpack_from("<IIII", data, o + 8)
-        worst = max(worst, rawptr + rawsize)
         if rawptr + rawsize > size:
             print(f"{FAIL} {label}: section {i} runs past the end of the file")
             problems += 1
-    if worst > size:
-        problems += 1
+    layout = []
+    for i in range(nsec):
+        o = sec + 40 * i
+        name = data[o:o + 8].rstrip(b"\x00").decode("latin1")
+        layout.append((name, struct.unpack_from("<I", data, o + 20)[0]))
+    if problems == 0:
+        print(f"      sections: " + ", ".join(n for n, _ in layout))
     res = pe_resources(path)
     icons = res.get(3, [])
     groups = res.get(14, [])
-    versions = res.get(16, [])
-    print(f"{OK if icons and groups else FAIL} {label}: {len(icons)} icons, "
-          f"{len(groups)} icon group(s), {len(versions)} version resource(s), {size/1e6:.1f} MB")
-    if not icons or not groups:
+    print(f"{OK if (icons and groups) else FAIL} {label}: {len(icons)} icons, "
+          f"{len(groups)} icon group(s), {size/1e6:.1f} MB")
+    if require_resources and (not icons or not groups):
         problems += 1
-    if versions:
-        info = read_version_strings(versions[0][2])
-        for key in ("ProductName", "FileVersion", "FileDescription"):
-            value = info.get(key, "")
-            flag = OK if value else FAIL
-            if not value:
-                problems += 1
-            print(f"{flag} {key:16s} {value!r}")
-    else:
-        print(f"{FAIL} {label}: no version information")
-        problems += 1
-    _ = magic, size_of_image
+    problems += version_check(path, label, version)
+    _ = magic
     return problems
 
 
@@ -165,23 +249,32 @@ def verify_zip(path: str) -> int:
             problems += 1
         root = sorted({n.split("/")[0] for n in names})
         print(f"      top level: {root}")
-        exe = next((n for n in names if n.endswith(APP_EXE)), None)
+        exe = next((n for n in names
+                    if n.lower().endswith(APP_EXE.lower())), None)
         if exe is None:
             print(f"{FAIL} {APP_EXE} missing")
             return problems + 1
         tmp = os.path.join(tempfile.gettempdir(), "mfs_verify_" + os.path.basename(exe))
         with z.open(exe) as src, open(tmp, "wb") as dst:
             dst.write(src.read())
-        problems += check_pe(tmp, APP_EXE)
-        console = next((n for n in names if n.endswith("MotionForge console.exe")), None)
+        problems += check_pe(tmp, APP_EXE, APP_VER)
+        leaked = [n for n in names
+                  if os.path.basename(n).lower() in ("python.exe", "pythonw.exe")]
+        if leaked:
+            print(f"{FAIL} the build still contains {leaked}")
+            problems += 1
+        console = next((n for n in names
+                        if n.lower().endswith("motionforge runtime console.exe")), None)
         if console:
             with z.open(console) as src, open(tmp + ".console", "wb") as dst:
                 dst.write(src.read())
-            problems += check_pe(tmp + ".console", "console twin")
+            problems += check_pe(tmp + ".console", "console runtime", APP_VER)
         required = ["python313.dll", "lib/PySide6/QtCore.pyd", "app/mfs/app.py",
                     "app/mfs/ui/session.py", "MotionForge.py", "ReadMe.txt",
                     "lib/PySide6/Qt6Core.dll", "lib/numpy/__init__.py",
-                    "lib/imageio_ffmpeg/binaries/", "licenses/THIRD-PARTY-NOTICES.txt"]
+                    "lib/imageio_ffmpeg/binaries/", "licenses/THIRD-PARTY-NOTICES.txt",
+                    "MotionForge Studio.exe", "MotionForge runtime.exe",
+                    "MotionForge runtime console.exe", "python313._pth"]
         # windows checkouts produce "Lib/..." while linux builds write "lib/...",
         # so every comparison here must be case-insensitive
         lowered = [(n, n.lower()) for n in names]
@@ -258,7 +351,7 @@ def main(argv) -> int:
         elif target.endswith(".zip"):
             problems += verify_zip(target)
         elif target.endswith(".exe"):
-            problems += check_pe(target, os.path.basename(target))
+            problems += check_pe(target, os.path.basename(target), APP_VER)
     print("\n" + ("ALL CHECKS PASSED" if not problems else f"{problems} PROBLEM(S) FOUND"))
     return 1 if problems else 0
 

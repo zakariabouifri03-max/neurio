@@ -8,7 +8,10 @@ no temporary copy of the archive is ever made.
 
     tools/devrun.sh tools/build_win_installer.py dist/MotionForge-Studio-1.0.0-win64-portable.zip
 
-PyInstaller is a build-time dependency only; it is not shipped to users.
+PyInstaller is a build-time dependency only; it is not shipped to users.  Its
+own ``--icon``/``--version-file`` options write the Windows resources, so the
+finished executable is never edited by hand - on a ~110 MB file that is the one
+step that can produce something Windows refuses to start.
 """
 from __future__ import annotations
 
@@ -65,18 +68,6 @@ def append_payload(exe: str, zip_path: str) -> int:
     return os.path.getsize(exe)
 
 
-def patch_installer_resources(exe: str, version, app_name: str = "MotionForge Studio") -> None:
-    """Belt and braces: write our icon + version info into the finished exe."""
-    try:
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from build_win import patch_pe_resources
-        stats = patch_pe_resources(exe, ICON, version, app_name,
-                                   os.path.basename(exe))
-        print(f"  resources: {stats}")
-    except Exception as exc:      # pragma: no cover - optional polish
-        print(f"  resources: skipped ({exc})")
-
-
 def build_installer(zip_path: str, out_dir: str, version, icon_path: str = ICON,
                     app_exe: str = "MotionForge Studio.exe") -> str:
     """Create ``MotionForge-Studio-Setup-<ver>.exe`` and return its path."""
@@ -128,7 +119,6 @@ def build_installer(zip_path: str, out_dir: str, version, icon_path: str = ICON,
     final = os.path.join(out_dir, name + ".exe")
     shutil.copy2(built, final)
     size = append_payload(final, zip_path)
-    patch_installer_resources(final, version)
     print(f"  installer: {final} ({size / 1e6:.1f} MB)")
     _ = struct, app_exe
     shutil.rmtree(work, ignore_errors=True)

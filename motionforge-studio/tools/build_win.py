@@ -36,6 +36,11 @@ PKG = os.path.join(ROOT, "app")
 PY_VERSION = "3.13"
 PY_TAG = "cp313"
 APP_EXE = "MotionForge Studio.exe"
+CONSOLE_EXE = "MotionForge console.exe"
+RUNTIME_EXE = "MotionForge runtime.exe"                  # windowed interpreter
+RUNTIME_CONSOLE = "MotionForge runtime console.exe"      # console interpreter
+LAUNCHER_DIR = os.path.join(ROOT, "packaging", "win", "launcher")
+LAUNCHER_MAIN = os.path.join(LAUNCHER_DIR, "launcher_main.py")
 ICON_SRC = os.path.join(ROOT, "packaging", "win", "icon-source.png")
 ICON = os.path.join(ROOT, "packaging", "win", "motionforge.ico")
 ICON_SIZES = (16, 24, 32, 48, 64, 128, 256)
@@ -223,17 +228,39 @@ def _align4(b: bytes) -> bytes:
 
 
 def version_blob(version: tuple[int, int, int], app_name: str, exe_name: str) -> bytes:
-    """A VS_VERSIONINFO blob ready to drop into an RT_VERSION leaf."""
+    """A well formed VS_VERSIONINFO blob, ready for an RT_VERSION leaf.
+
+    The layout is the one Windows expects (see the ``VS_VERSIONINFO`` struct
+    documentation): every structure carries its own ``wLength`` in bytes, text
+    values store their length in UTF-16 characters, and the root holds the
+    52 byte ``VS_FIXEDFILEINFO``.  Getting this wrong is invisible on Linux but
+    makes Windows Explorer show an empty "Details" page, so the CI verifier
+    parses it back with the same rules.
+    """
     def w16(v):
         return struct.pack("<H", v)
 
     def w32(v):
         return struct.pack("<I", v)
 
+    def structure(key: str, value_len: int, value_type: int, value: bytes = b"",
+                  children: bytes = b"") -> bytes:
+        head = w16(0) + w16(value_len) + w16(value_type) + _utf16z(key)
+        body = _align4(head) + value
+        body = _align4(body) + children
+        return w16(len(body)) + body[2:]
+
     vs = version + (0,)
     hi, lo = (vs[0] << 16) | vs[1], vs[2] << 16
-    fixed = (w32(0xFEEF04BD) + w32(0x00010000) + w32(hi) + w32(lo) +
-             w32(hi) + w32(lo) + w32(hi) + w32(lo) + w32(0x3F))
+    # VS_FIXEDFILEINFO is exactly 13 DWORDs (52 bytes); anything else makes
+    # Windows report the file as having no version information at all
+    fixed = (w32(0xFEEF04BD)                  # dwSignature
+             + w32(0x00010000)                # dwStrucVersion
+             + w32(hi) + w32(lo)              # dwFileVersionMS/LS
+             + w32(hi) + w32(lo)              # dwProductVersionMS/LS
+             + w32(0x3F) + w32(0x00)          # dwFileFlagsMask, dwFileFlags
+             + w32(0x40004) + w32(0x01)       # VOS_NT_WINDOWS32, VFT_APP
+             + w32(0x00) + w32(0x00) + w32(0x00))
 
     strings = [
         ("CompanyName", VENDOR),
@@ -246,23 +273,14 @@ def version_blob(version: tuple[int, int, int], app_name: str, exe_name: str) ->
         ("ProductVersion", f"{ver_text(version)} (Windows x64)"),
         ("Comments", "Draw, rig and animate 2D characters - timeline, rigging, audio, AI."),
     ]
-    sblock = b""
-    for key, value in strings:
-        item = _align4(_utf16z(key) + _utf16z(value))
-        sblock = _align4(sblock + w16(0) + w16(len(item) // 2) + w16(1)
-                         + _utf16z(key) + _utf16z(value))
-    strinfo = _align4(w16(0) + w16(len(sblock) // 2) + w16(1) + b"040904B0" + sblock)
-    var_item = _align4(w16(0) + w16(4) + w16(0) + _utf16z("Translation")
-                       + w32(0x04B00409))
-    varinfo = _align4(w16(0) + w16(len(var_item) // 2) + w16(1) + _utf16z("VarFileInfo")
-                      + var_item)
-    children = (_align4(w16(0) + w16(len(fixed) // 2) + w16(0)
-                        + _utf16z("VS_VERSION_INFO") + fixed)
-                + _align4(w16(0) + w16(len(strinfo) // 2) + w16(1)
-                          + _utf16z("StringFileInfo") + strinfo)
-                + _align4(w16(0) + w16(len(varinfo) // 2) + w16(1)
-                          + _utf16z("VarFileInfo") + varinfo))
-    return _align4(children)
+    items = b"".join(structure(name, len(text) + 1, 1, _utf16z(text))
+                     for name, text in strings)
+    table = structure("040904B0", 0, 1, children=items)
+    strinfo = structure("StringFileInfo", 0, 1, children=table)
+    var = structure("Translation", 4, 0, w32(0x04B00409))
+    varinfo = structure("VarFileInfo", 0, 1, children=var)
+    return structure("VS_VERSION_INFO", len(fixed), 0, fixed,
+                     children=strinfo + varinfo)
 
 
 def pe_imports(path: str) -> set[str]:
@@ -638,19 +656,21 @@ def assemble(out: str, payload_dir: str, wheel_dirs: dict, version) -> str:
         fh.write("python313.zip\n.\nLib\nlib\napp\nimport site\n")
 
     print("  launcher ...")
-    shutil.copy2(os.path.join(ROOT, "packaging", "win", "launcher", "MotionForge.py"),
+    shutil.copy2(os.path.join(LAUNCHER_DIR, "MotionForge.py"),
                  os.path.join(app_dir, "MotionForge.py"))
-    for source, target in (("pythonw.exe", APP_EXE), ("python.exe", "MotionForge console.exe")):
+    for source, target in (("pythonw.exe", RUNTIME_EXE),
+                           ("python.exe", RUNTIME_CONSOLE)):
         src = os.path.join(app_dir, source)
         if not os.path.exists(src):
             continue
         dst = os.path.join(app_dir, target)
         shutil.copy2(src, dst)
+        os.remove(src)
         if os.path.exists(ICON):
-            stats = patch_pe_resources(dst, ICON, version, "MotionForge Studio", target)
-            print(f"    {target}: {stats['icons']} icon frames, version={stats['version']}")
-        shutil.copy2(dst, os.path.join(app_dir, "launcher", os.path.basename(target))) \
-            if False else None
+            # the interpreters keep the studio's icon and version information so
+            # that the task manager and the file properties are branded too
+            patch_pe_resources(dst, ICON, version, "MotionForge Studio", target)
+    build_launcher_exe(app_dir, version)
 
     write_notices(app_dir, payload_dir, lib, version)
     shutil.copy2(os.path.join(ROOT, "packaging", "win", "ReadMe.txt"),
@@ -658,6 +678,50 @@ def assemble(out: str, payload_dir: str, wheel_dirs: dict, version) -> str:
     shutil.copy2(ICON, os.path.join(app_dir, "motionforge.ico"))
     print("  built", app_dir)
     return app_dir
+
+
+def build_launcher_exe(app_dir: str, version) -> None:
+    """Compile the small executable the user starts (icon + version built in).
+
+    A renamed interpreter cannot act as an application entry point - CPython
+    would just start an option parser - so the entry point is a real, tiny
+    launcher programme built with PyInstaller that hands over to the
+    interpreter shipped in the same folder.
+    """
+    target = os.path.join(app_dir, APP_EXE)
+    if os.name != "nt":
+        # PyInstaller cannot cross compile a Windows launcher; the Linux build is
+        # only used for structural checks, CI supplies the real entry point
+        print("    cross platform build: entry point is a placeholder")
+        shutil.copy2(os.path.join(app_dir, RUNTIME_CONSOLE), target)
+        return
+    work = os.path.join(os.path.dirname(app_dir), "launcher-build")
+    shutil.rmtree(work, ignore_errors=True)
+    cmd = [sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean",
+           "--onefile", "--windowed", "--name", os.path.splitext(APP_EXE)[0],
+           "--distpath", app_dir, "--workpath", os.path.join(work, "build"),
+           "--specpath", work, "--paths", LAUNCHER_DIR]
+    if os.name == "nt":
+        if os.path.exists(ICON):
+            cmd += ["--icon", ICON]
+        try:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from build_win_installer import write_version_file
+            cmd += ["--version-file", write_version_file(version, APP_EXE)]
+        except Exception as exc:            # pragma: no cover - polish only
+            print(f"    version resource skipped ({exc})")
+    cmd.append(LAUNCHER_MAIN)
+    started = time.time()
+    proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    if proc.returncode != 0 or not os.path.exists(target):
+        tail = "\n".join((proc.stderr or proc.stdout or "").splitlines()[-12:])
+        print(f"    launcher could not be built ({proc.returncode})")
+        if tail:
+            print("    " + tail.replace("\n", "\n    "))
+        raise SystemExit("the application entry point could not be built")
+    shutil.rmtree(work, ignore_errors=True)
+    print(f"    {APP_EXE}: {os.path.getsize(target) / 1e6:.1f} MB "
+          f"in {time.time() - started:.0f}s")
 
 
 def write_notices(app_dir: str, payload_dir: str, lib: str, version) -> None:
