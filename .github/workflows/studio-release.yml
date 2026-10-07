@@ -32,8 +32,8 @@ jobs:
       run:
         working-directory: studio
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -57,7 +57,7 @@ jobs:
           ls -la
           sha256sum *.exe > SHA256SUMS-windows.txt
           cat SHA256SUMS-windows.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: neurio-studio-windows
           path: |
@@ -72,18 +72,29 @@ jobs:
       run:
         working-directory: studio
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
           cache-dependency-path: studio/package-lock.json
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
-      - uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+      - name: Configure preinstalled Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          if [[ -z "$SDKMANAGER" ]]; then echo "Android SDK command-line tools not found under $SDK_ROOT" >&2; exit 1; fi
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "$(dirname "$SDKMANAGER")" >> "$GITHUB_PATH"
+          echo "$SDK_ROOT/platform-tools" >> "$GITHUB_PATH"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0" >/dev/null
       - name: Install dependencies
         run: npm ci --ignore-scripts
       - name: Build web app + sync Capacitor
@@ -107,17 +118,27 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
         run: |
+          set -o pipefail
           chmod +x gradlew
           VERSION=$(node -p "require('../package.json').version")
-          ./gradlew --no-daemon assembleRelease -PversionCode=${{ github.run_number }} -PversionName="$VERSION"
+          ./gradlew --no-daemon --console=plain assembleRelease -PversionCode=${{ github.run_number }} -PversionName="$VERSION" 2>&1 | tee "$RUNNER_TEMP/gradle-build.log"
+      - name: Gradle failure details
+        if: failure()
+        shell: bash
+        run: |
+          log="$RUNNER_TEMP/gradle-build.log"
+          [[ -f "$log" ]] || exit 0
+          grep -E '(^e: |error:|FAILURE:|What went wrong:|Caused by:|Execution failed for task|A problem occurred|Could not )' "$log" | tail -n 40 | while IFS= read -r line; do echo "::error::$line"; done
+          echo "::group::Last 80 log lines"; tail -n 80 "$log"; echo "::endgroup::"
       - name: Collect
         run: |
           VERSION=$(node -p "require('./package.json').version")
           mkdir -p out
           cp android/app/build/outputs/apk/release/app-release.apk "out/Neurio-Studio-$VERSION-android.apk"
           cd out && sha256sum *.apk > SHA256SUMS-android.txt && ls -la && cat SHA256SUMS-android.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: neurio-studio-android
           path: studio/out/*
@@ -128,8 +149,8 @@ jobs:
     needs: [windows, android]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v6
         with:
           path: artifacts
           merge-multiple: true
