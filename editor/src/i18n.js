@@ -1,0 +1,120 @@
+// Montaj Pro — i18n (darija/arabic default + english)
+export const STR = {
+  ar: {
+    app: 'مونتاج برو', tagline: 'محرر فيديو احترافي',
+    import: 'استيراد', media: 'الوسائط', audio: 'الصوت', text: 'نص', stickers: 'ملصقات', effects: 'تأثيرات',
+    filters: 'فلاتر', adjust: 'تعديل', speed: 'سرعة', transitions: 'انتقالات', animations: 'حركات',
+    export: 'تصدير', settings: 'إعدادات', exportVideo: 'تصدير الفيديو', quality: 'الجودة', fps: 'الإطارات',
+    format: 'الصيغة', bitrate: 'معدل البت', exportNow: 'ابدأ التصدير', cancel: 'إلغاء', close: 'إغلاق',
+    play: 'تشغيل', pause: 'إيقاف', split: 'تقسيم', delete: 'حذف', duplicate: 'تكرار', copy: 'نسخ', paste: 'لصق',
+    undo: 'تراجع', redo: 'إعادة', zoomIn: 'تكبير', zoomOut: 'تصغير', fit: 'ملاءمة', mute: 'كتم', unmute: 'صوت',
+    addTrack: 'مسار جديد', deleteTrack: 'حذف المسار', lock: 'قفل', unlock: 'فتح', hide: 'إخفاء', show: 'إظهار',
+    keyframe: 'إطار مفتاحي', addKey: 'إضافة مفتاح', removeKey: 'حذف المفتاح', keyframes: 'الإطارات المفتاحية',
+    position: 'الموضع', scale: 'الحجم', rotate: 'الدوران', opacity: 'الشفافية', flipH: 'قلب أفقي', flipV: 'قلب عمودي',
+    brightness: 'السطوع', contrast: 'التباين', saturation: 'التشبع', temperature: 'الحرارة', tint: 'الصبغة',
+    blur: 'ضباب', sharpen: 'حدّة', vignette: 'تظليل الحواف', hue: 'تدرج', reset: 'تصفير', intensity: 'القوة',
+    volume: 'الصوت', fadeIn: 'ظهور تدريجي', fadeOut: 'تلاشي تدريجي', reverse: 'عكس', freeze: 'تجميد',
+    duration: 'المدة', startTime: 'البداية', content: 'المحتوى', font: 'الخط', size: 'الحجم', color: 'اللون',
+    stroke: 'الإطار', shadow: 'الظل', background: 'الخلفية', align: 'المحاذاة', animation: 'الحركة',
+    none: 'بدون', project: 'المشروع', newProject: 'مشروع جديد', projects: 'المشاريع', save: 'حفظ', open: 'فتح',
+    aspect: 'أبعاد الفيديو', portrait: 'عمودي 9:16', landscape: 'أفقي 16:9', square: 'مربع 1:1',
+    story: 'ستوري 4:5', cinema: 'سينما 21:9', resolution: 'الدقة', custom: 'مخصص', apply: 'تطبيق',
+    recording: 'جاري التسجيل…', record: 'تسجيل صوتي', stopRec: 'إيقاف التسجيل', voiceover: 'تعليق صوتي',
+    autoCaptions: 'ترجمة تلقائية', captions: 'الترجمات', addCaption: 'إضافة ترجمة', importSrt: 'استيراد SRT',
+    exportSrt: 'تصدير SRT', recognizing: 'جاري التعرف…', speechUnsupported: 'التعرف على الكلام غير متوفر في هذا المتصفح',
+    dropFiles: 'أفلت الملفات هنا أو اضغط للاستيراد', importHint: 'فيديو، صوت، صور',
+    noClips: 'لا يوجد شيء بعد — استورد مقطع فيديو باش تبدا', selectClip: 'اختار مقطع من الخط الزمني',
+    exporting: 'جاري التصدير', done: 'تم التصدير بنجاح ✓', frames: 'إطار', eta: 'الوقت المتبقي',
+    needMedia: 'استورد فيديو أو صوت أولاً', renderMode: 'طريقة التصدير', fast: 'سريع (WebCodecs)',
+    live: 'متوافق (تسجيل مباشر)', savingToDevice: 'جاري الحفظ في الجهاز…', saveToDevice: 'حفظ في الجهاز',
+    saveFailed: 'تعذر حفظ الملف — عاود المحاولة', pickingFolder: 'اختار مكان الحفظ من نافذة الهاتف…',
+    projectSaved: 'تم حفظ المشروع', chroma: 'المفتاح اللوني', chromaKey: 'خلفية خضراء', tolerance: 'التسامح',
+    feather: 'التنعيم', spill: 'إزالة الانعكاس', crop: 'قص', fullscreen: 'شاشة كاملة', lang: 'اللغة',
+    clip: 'مقطع', track: 'مسار', total: 'المدة الكلية', mediaCount: 'ملف', tipDrag: 'اسحب المقطع لتحريكه',
+    exportDone: 'الفيديو جاهز', share: 'مشاركة', retry: 'إعادة', error: 'خطأ', seeConsole: 'شوف وحدة التحكم',
+    deleteProject: 'حذف المشروع', duplicateProject: 'نسخ المشروع', renameProject: 'إعادة تسمية',
+    name: 'الاسم', ok: 'موافق', no: 'لا', yes: 'نعم', confirmDelete: 'متأكد من الحذف؟',
+    beatsAutoCut: 'قص تلقائي على الإيقاع', beatDetect: 'تحليل الصوت', snapping: 'التصاق', grid: 'شبكة',
+    safeArea: 'منطقة آمنة', previewQuality: 'جودة المعاينة', high: 'عالية', medium: 'متوسطة', low: 'منخفضة',
+    keyframeNote: 'المفاتيح تُحفظ تلقائياً', animIn: 'حركة الدخول', animOut: 'حركة الخروج',
+    selectAll: 'تحديد الكل', deselect: 'إلغاء التحديد', colorPick: 'اختيار لون', pickFromScreen: 'من الشاشة',
+  },
+  en: {
+    app: 'Montaj Pro', tagline: 'Professional video editor',
+    import: 'Import', media: 'Media', audio: 'Audio', text: 'Text', stickers: 'Stickers', effects: 'Effects',
+    filters: 'Filters', adjust: 'Adjust', speed: 'Speed', transitions: 'Transitions', animations: 'Animations',
+    export: 'Export', settings: 'Settings', exportVideo: 'Export video', quality: 'Quality', fps: 'FPS',
+    format: 'Format', bitrate: 'Bitrate', exportNow: 'Start export', cancel: 'Cancel', close: 'Close',
+    play: 'Play', pause: 'Pause', split: 'Split', delete: 'Delete', duplicate: 'Duplicate', copy: 'Copy', paste: 'Paste',
+    undo: 'Undo', redo: 'Redo', zoomIn: 'Zoom in', zoomOut: 'Zoom out', fit: 'Fit', mute: 'Mute', unmute: 'Unmute',
+    addTrack: 'Add track', deleteTrack: 'Delete track', lock: 'Lock', unlock: 'Unlock', hide: 'Hide', show: 'Show',
+    keyframe: 'Keyframe', addKey: 'Add keyframe', removeKey: 'Remove keyframe', keyframes: 'Keyframes',
+    position: 'Position', scale: 'Scale', rotate: 'Rotate', opacity: 'Opacity', flipH: 'Flip H', flipV: 'Flip V',
+    brightness: 'Brightness', contrast: 'Contrast', saturation: 'Saturation', temperature: 'Temperature', tint: 'Tint',
+    blur: 'Blur', sharpen: 'Sharpen', vignette: 'Vignette', hue: 'Hue', reset: 'Reset', intensity: 'Intensity',
+    volume: 'Volume', fadeIn: 'Fade in', fadeOut: 'Fade out', reverse: 'Reverse', freeze: 'Freeze',
+    duration: 'Duration', startTime: 'Start', content: 'Content', font: 'Font', size: 'Size', color: 'Color',
+    stroke: 'Stroke', shadow: 'Shadow', background: 'Background', align: 'Align', animation: 'Animation',
+    none: 'None', project: 'Project', newProject: 'New project', projects: 'Projects', save: 'Save', open: 'Open',
+    aspect: 'Aspect ratio', portrait: 'Portrait 9:16', landscape: 'Landscape 16:9', square: 'Square 1:1',
+    story: 'Story 4:5', cinema: 'Cinema 21:9', resolution: 'Resolution', custom: 'Custom', apply: 'Apply',
+    recording: 'Recording…', record: 'Record voice', stopRec: 'Stop recording', voiceover: 'Voiceover',
+    autoCaptions: 'Auto captions', captions: 'Captions', addCaption: 'Add caption', importSrt: 'Import SRT',
+    exportSrt: 'Export SRT', recognizing: 'Recognizing…', speechUnsupported: 'Speech recognition unavailable in this browser',
+    dropFiles: 'Drop files here or tap to import', importHint: 'Video, audio, images',
+    noClips: 'Nothing yet — import a video clip to start', selectClip: 'Select a clip on the timeline',
+    exporting: 'Exporting', done: 'Export finished ✓', frames: 'frames', eta: 'ETA',
+    needMedia: 'Import video or audio first', renderMode: 'Export engine', fast: 'Fast (WebCodecs)',
+    live: 'Compatible (live capture)', savingToDevice: 'Saving to device…', saveToDevice: 'Save to device',
+    saveFailed: 'Could not save the file — please try again', pickingFolder: 'Pick a folder on your phone…',
+    projectSaved: 'Project saved', chroma: 'Chroma key', chromaKey: 'Green screen', tolerance: 'Tolerance',
+    feather: 'Feather', spill: 'Spill removal', crop: 'Crop', fullscreen: 'Fullscreen', lang: 'Language',
+    clip: 'Clip', track: 'Track', total: 'Total duration', mediaCount: 'file', tipDrag: 'Drag the clip to move it',
+    exportDone: 'Video is ready', share: 'Share', retry: 'Retry', error: 'Error', seeConsole: 'See console',
+    deleteProject: 'Delete project', duplicateProject: 'Duplicate project', renameProject: 'Rename',
+    name: 'Name', ok: 'OK', no: 'No', yes: 'Yes', confirmDelete: 'Delete for sure?',
+    beatsAutoCut: 'Auto-cut on beat', beatDetect: 'Analyze audio', snapping: 'Snapping', grid: 'Grid',
+    safeArea: 'Safe area', previewQuality: 'Preview quality', high: 'High', medium: 'Medium', low: 'Low',
+    keyframeNote: 'Keys are stored automatically', animIn: 'In animation', animOut: 'Out animation',
+    selectAll: 'Select all', deselect: 'Deselect', colorPick: 'Pick color', pickFromScreen: 'From screen',
+  },
+};
+export const FONTS = [
+  { id: 'Cairo', label: 'Cairo — القاهرة' },
+  { id: 'Tajawal', label: 'Tajawal — تجوال' },
+  { id: 'Bebas Neue', label: 'Bebas Neue' },
+  { id: 'system-ui', label: 'System' },
+  { id: 'Georgia', label: 'Georgia' },
+  { id: 'Impact', label: 'Impact' },
+  { id: 'Courier New', label: 'Mono' },
+];
+export const ANIMS = ['none', 'fade', 'slideUp', 'slideDown', 'slideLeft', 'slideRight', 'zoomIn', 'zoomOut', 'pop', 'rotateIn', 'blurIn', 'bounce', 'wipeUp'];
+export const FILTERS = [
+  { id: 'none', label: { ar: 'بدون', en: 'None' }, css: '' },
+  { id: 'cinematic', label: { ar: 'سينمائي', en: 'Cinematic' }, css: 'contrast(1.15) saturate(0.9) brightness(0.96) sepia(0.08)' },
+  { id: 'vivid', label: { ar: 'زاهي', en: 'Vivid' }, css: 'saturate(1.45) contrast(1.12)' },
+  { id: 'warm', label: { ar: 'دافي', en: 'Warm' }, css: 'sepia(0.22) saturate(1.25) brightness(1.04)' },
+  { id: 'cool', label: { ar: 'بارد', en: 'Cool' }, css: 'hue-rotate(-12deg) saturate(1.1) brightness(1.02)' },
+  { id: 'bw', label: { ar: 'أبيض وأسود', en: 'B&W' }, css: 'grayscale(1) contrast(1.1)' },
+  { id: 'noir', label: { ar: 'نوار', en: 'Noir' }, css: 'grayscale(1) contrast(1.4) brightness(0.9)' },
+  { id: 'vintage', label: { ar: 'عتيق', en: 'Vintage' }, css: 'sepia(0.45) saturate(0.8) contrast(0.95)' },
+  { id: 'fade', label: { ar: 'باهت', en: 'Faded' }, css: 'contrast(0.88) brightness(1.08) saturate(0.85)' },
+  { id: 'dreamy', label: { ar: 'حالم', en: 'Dreamy' }, css: 'brightness(1.08) saturate(1.15) blur(0.4px)' },
+  { id: 'sunny', label: { ar: 'مشمس', en: 'Sunny' }, css: 'brightness(1.1) saturate(1.3) hue-rotate(-6deg)' },
+  { id: 'coldIce', label: { ar: 'ثلجي', en: 'Ice' }, css: 'hue-rotate(12deg) saturate(1.05) brightness(1.06) contrast(1.05)' },
+  { id: 'retro', label: { ar: 'ريترو', en: 'Retro' }, css: 'sepia(0.3) hue-rotate(-18deg) saturate(1.35) contrast(1.08)' },
+  { id: 'punch', label: { ar: 'قوي', en: 'Punch' }, css: 'contrast(1.35) saturate(1.2)' },
+];
+export const TRANSITIONS = ['none', 'fade', 'dissolve', 'slideLeft', 'slideRight', 'slideUp', 'slideDown', 'zoomIn', 'zoomOut', 'wipeLeft', 'wipeRight', 'wipeUp', 'wipeDown', 'circle', 'blur', 'spin', 'glitch', 'whip'];
+export const STICKERS = ['😎', '🔥', '❤️', '😂', '💯', '⭐', '✨', '🎉', '👍', '💥', '🥳', '😍', '🤯', '👑', '💎', '🌈', '☀️', '🌙', '🍕', '⚽', '🏆', '🎵', '🎬', '📸', '🚀', '🐱', '🐶', '🌹', '💪', '🤙'];
+export const SHAPES = ['rect', 'circle', 'line', 'arrow', 'triangle', 'star', 'heart', 'ring'];
+export const STICKER_EMOJI = STICKERS;
+
+export function makeT() {
+  let lang = localStorage.getItem('montaj.lang') || 'ar';
+  const t = (k) => (STR[lang] && STR[lang][k]) || STR.en[k] || k;
+  t.lang = () => lang;
+  t.set = (l) => { lang = l; localStorage.setItem('montaj.lang', l); document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; document.documentElement.lang = l; };
+  t.isRTL = () => lang === 'ar';
+  return t;
+}

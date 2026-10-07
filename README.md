@@ -1,5 +1,11 @@
 # 🏁 Bash Baqi Racing
 
+> ### 🎬 جديد: مونتاج برو (Montaj Pro)
+> محرّر فيديو احترافي بحال CapCut — **APK للأندرويد** و **EXE لويندوز**، كلشي محلي بلا إنترنت.
+> الملفات: [`MontajPro-v1.0.apk`](MontajPro-v1.0.apk) · [`MontajPro-Windows.exe`](MontajPro-Windows.exe)
+> دليل التثبيت والاستعمال والبناء: **[MONTAJ-PRO.md](MONTAJ-PRO.md)**
+
+
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
 A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
 
