@@ -1,0 +1,173 @@
+name: Neurio Studio — desktop & Android builds
+
+# Builds the Windows installer/portable EXE (Electron) and the Android APK (Capacitor) for studio/,
+# then attaches them to a GitHub Release.
+#   • push a tag like  studio-v0.1.0  → release named after the tag
+#   • "Run workflow" button           → pre-release tagged  studio-build-<run number>
+on:
+  push:
+    tags: ['studio-v*']
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Mark the release as a pre-release'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: studio-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: 22
+
+jobs:
+  windows:
+    name: Windows (.exe)
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: studio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+      # onnxruntime-node's postinstall is irrelevant in the browser bundle and is the only script that needs network;
+      # Electron's own postinstall (binary download) is run explicitly afterwards.
+      - name: Install dependencies
+        run: |
+          npm ci --ignore-scripts
+          node node_modules/electron/install.js
+      - name: Typecheck + build web app
+        run: npm run build
+      - name: Package with electron-builder
+        run: npx electron-builder --win --x64 --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Checksums
+        shell: bash
+        run: |
+          cd release
+          ls -la
+          sha256sum *.exe > SHA256SUMS-windows.txt
+          cat SHA256SUMS-windows.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neurio-studio-windows
+          path: |
+            studio/release/*.exe
+            studio/release/SHA256SUMS-windows.txt
+          if-no-files-found: error
+
+  android:
+    name: Android (.apk)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: studio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Build web app + sync Capacitor
+        run: |
+          npm run build
+          npx cap sync android
+      - name: Restore release keystore (optional secret)
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+            echo "Using release keystore from secrets"
+          else
+            echo "No ANDROID_KEYSTORE_BASE64 secret — APK will be signed with the debug key (still installable)"
+          fi
+      - name: Build APKs
+        working-directory: studio/android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          VERSION=$(node -p "require('../package.json').version")
+          ./gradlew --no-daemon assembleRelease -PversionCode=${{ github.run_number }} -PversionName="$VERSION"
+      - name: Collect
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          mkdir -p out
+          cp android/app/build/outputs/apk/release/app-release.apk "out/Neurio-Studio-$VERSION-android.apk"
+          cd out && sha256sum *.apk > SHA256SUMS-android.txt && ls -la && cat SHA256SUMS-android.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neurio-studio-android
+          path: studio/out/*
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: [windows, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Release metadata
+        id: meta
+        run: |
+          VERSION=$(node -p "require('./studio/package.json').version")
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+            echo "name=Neurio Studio ${GITHUB_REF#refs/tags/studio-}" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=studio-build-${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+            echo "name=Neurio Studio v$VERSION (build ${{ github.run_number }})" >> "$GITHUB_OUTPUT"
+            echo "prerelease=${{ inputs.prerelease }}" >> "$GITHUB_OUTPUT"
+          fi
+          ls -la artifacts
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          target_commitish: ${{ github.sha }}
+          prerelease: ${{ steps.meta.outputs.prerelease == 'true' }}
+          generate_release_notes: false
+          files: artifacts/*
+          body: |
+            ## Downloads
+
+            | Platform | File | Notes |
+            |---|---|---|
+            | **Windows 10/11 (64-bit)** | `Neurio-Studio-Setup-*.exe` | Installer (adds Start-menu + desktop shortcut) |
+            | **Windows portable** | `Neurio-Studio-Portable-*.exe` | No install — run from anywhere |
+            | **Android 7.0+** | `Neurio-Studio-*-android.apk` | Enable *Install unknown apps* for your browser/file manager, then open the APK |
+
+            `SHA256SUMS-*.txt` contain checksums for each file.
+
+            ### Good to know
+            - **Windows SmartScreen** shows "Windows protected your PC" because the EXE is not code-signed yet. Click *More info → Run anyway*. Checksums above let you verify the file.
+            - **Android**: the APK is signed with a CI key (or your release keystore if the `ANDROID_KEYSTORE_*` secrets are set). Exports are saved to *Documents/Neurio*. Screen recording is desktop-only; webcam/mic recording and all editing features work on-device. Phone layouts are usable but the editor is designed for tablets/landscape.
+            - Both builds run **fully offline** after install. Auto-captions (Whisper) and background removal (MediaPipe) download their models on first use.
+            - The same app runs in any modern browser: `cd studio && npm install --ignore-scripts && npm run dev`.

@@ -81,6 +81,14 @@ export function throttle<T extends (...a: any[]) => void>(fn: T, ms: number): T 
   }) as T;
 }
 export function downloadBlob(blob: Blob, filename: string) {
+  // Packaged Android build: WebViews can't download blob: URLs — hand the file to the native layer.
+  if ((window as any).Capacitor?.isNativePlatform?.() && (window as any).Capacitor.getPlatform() === 'android') {
+    void import('@/platform/native').then((m) => m.saveBlobNative(blob, filename)).then(
+      (uri) => import('@/core/uiStore').then(({ toast }) => toast('Saved to Documents/Neurio', 'success', uri.replace(/^file:\/\//, ''))),
+      (e) => import('@/core/uiStore').then(({ toast }) => toast('Could not save file', 'error', String(e?.message || e))),
+    );
+    return;
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

@@ -30,6 +30,7 @@ function mediapipeWasm(): Plugin {
 }
 
 export default defineConfig({
+  base: './',
   plugins: [react(), mediapipeWasm()],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   optimizeDeps: { exclude: ['@huggingface/transformers', 'onnxruntime-web', 'onnxruntime-node', '@mediapipe/tasks-vision'] },
