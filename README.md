@@ -15,7 +15,7 @@ There is no package install or build step for the browser version. All editing a
 
 The `arena/65e7f515-neurio` branch includes a GitHub Actions Pages workflow. Once Pages is enabled for the repository, pushes to that branch publish only the editor shell and its required assets at `https://zakariabouifri03-max.github.io/neurio/`.
 
-A Windows x64 Electron installer is also built and attached to a GitHub prerelease whenever the editor changes on this branch. The installer is unsigned, so Windows SmartScreen may show an unknown-publisher warning. The app runs locally; imported media and project data stay on the device.
+A portable Windows x64 Electron executable is also built and attached to a GitHub prerelease whenever the editor changes on this branch. It is unsigned, so Windows SmartScreen may show an unknown-publisher warning. The app runs locally; imported media and project data stay on the device.
 
 ## Working workflows
 

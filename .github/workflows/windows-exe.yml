@@ -1,4 +1,4 @@
-name: Build Neurio Studio Windows installer
+name: Build Neurio Studio Windows portable EXE
 
 on:
   push:
@@ -21,7 +21,7 @@ permissions:
   contents: write
 
 jobs:
-  build-installer:
+  build-portable:
     runs-on: windows-latest
     steps:
       - name: Check out source
@@ -33,21 +33,21 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
-      - name: Build Windows x64 installer
+      - name: Package portable Windows x64 executable
         run: npm run dist:win
-      - name: Upload installer artifact
+      - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
           name: Neurio-Studio-Windows-x64-${{ github.run_id }}
-          path: dist-electron/Neurio-Studio-Windows-x64-Setup.exe
+          path: dist-electron/Neurio-Studio-Windows-x64.exe
           if-no-files-found: error
           retention-days: 30
 
   publish-release:
-    needs: build-installer
+    needs: build-portable
     runs-on: ubuntu-latest
     steps:
-      - name: Download installer artifact
+      - name: Download EXE artifact
         uses: actions/download-artifact@v4
         with:
           name: Neurio-Studio-Windows-x64-${{ github.run_id }}
@@ -59,11 +59,11 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: Neurio Studio 0.1.0 — Windows x64
           body: |
-            Windows x64 installer generated from the Neurio Studio source on this branch.
+            Portable Windows x64 executable generated from the Neurio Studio source on this branch.
 
             This desktop package runs the local-first editor on your computer. Media files and projects remain on your device. The app does not include hosted AI models or claim MP4/MOV export; browser-based WebM export is available inside the editor.
 
             This is an unsigned prerelease build. Windows SmartScreen may show an unknown-publisher warning.
           prerelease: true
           make_latest: false
-          files: release-assets/Neurio-Studio-Windows-x64-Setup.exe
+          files: release-assets/Neurio-Studio-Windows-x64.exe
