@@ -2,7 +2,7 @@
 
 > ### 🎬 جديد: مونتاج برو (Montaj Pro)
 > محرّر فيديو احترافي بحال CapCut — **APK للأندرويد** و **EXE لويندوز**، كلشي محلي بلا إنترنت.
-> ⬇️ تحميل مباشر: **[📱 APK](https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-v1.0.3.apk)** · **[💻 EXE](https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-Windows.exe)**
+> ⬇️ تحميل مباشر: **[📱 APK](https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-v1.0.4.apk)** · **[💻 EXE](https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-Windows.exe)**
 > دليل التثبيت والاستعمال والبناء: **[MONTAJ-PRO.md](MONTAJ-PRO.md)**
 
 

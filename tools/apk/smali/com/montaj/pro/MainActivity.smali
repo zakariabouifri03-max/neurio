@@ -15,6 +15,8 @@
 
 .field private webView:Landroid/webkit/WebView;
 
+.field private loadingView:Landroid/widget/TextView;
+
 .field private filePathCallback:Landroid/webkit/ValueCallback;
 
 .field private saveStream:Ljava/io/OutputStream;
@@ -124,7 +126,7 @@
 
     iget-object v0, p0, Lcom/montaj/pro/MainActivity;->webView:Landroid/webkit/WebView;
 
-    const v1, 0xff0b0e14
+    const/4 v1, 0x0
 
     invoke-virtual {v0, v1}, Landroid/webkit/WebView;->setBackgroundColor(I)V
 
@@ -154,16 +156,84 @@
 
     invoke-virtual {v0, v1, v2}, Landroid/webkit/WebView;->addJavascriptInterface(Ljava/lang/Object;Ljava/lang/String;)V
 
-    iget-object v0, p0, Lcom/montaj/pro/MainActivity;->webView:Landroid/webkit/WebView;
+    # visible label behind the WebView: if the page never renders the user sees
+    # this instead of an unexplained black screen
+    new-instance v0, Landroid/widget/TextView;
 
-    const-string v1, "https://appassets.androidplatform.net/app/index.html"
+    invoke-direct {v0, p0}, Landroid/widget/TextView;-><init>(Landroid/content/Context;)V
 
-    invoke-virtual {v0, v1}, Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
+    const-string v1, "جاري تحميل المحرر…"
 
-    iget-object v0, p0, Lcom/montaj/pro/MainActivity;->webView:Landroid/webkit/WebView;
+    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
-    invoke-virtual {p0, v0}, Landroid/app/Activity;->setContentView(Landroid/view/View;)V
+    const v1, 0xffe8eefc
 
+    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setTextColor(I)V
+
+    const/high16 v1, 0x41a00000
+
+    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setTextSize(F)V
+
+    const/16 v1, 0x11
+
+    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setGravity(I)V
+
+    iput-object v0, p0, Lcom/montaj/pro/MainActivity;->loadingView:Landroid/widget/TextView;
+
+    new-instance v1, Landroid/widget/FrameLayout;
+
+    invoke-direct {v1, p0}, Landroid/widget/FrameLayout;-><init>(Landroid/content/Context;)V
+
+    const v2, 0xff0b0e14
+
+    invoke-virtual {v1, v2}, Landroid/view/View;->setBackgroundColor(I)V
+
+    invoke-virtual {v1, v0}, Landroid/view/ViewGroup;->addView(Landroid/view/View;)V
+
+    const/4 v0, -0x1
+
+    new-instance v2, Landroid/widget/FrameLayout$LayoutParams;
+
+    invoke-direct {v2, v0, v0}, Landroid/widget/FrameLayout$LayoutParams;-><init>(II)V
+
+    iget-object v3, p0, Lcom/montaj/pro/MainActivity;->webView:Landroid/webkit/WebView;
+
+    invoke-virtual {v1, v3, v2}, Landroid/view/ViewGroup;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
+
+    # PRIMARY load: straight from the assets folder — no synthetic origin, no
+    # interception, just the plain path every WebView app uses.
+    iget-object v2, p0, Lcom/montaj/pro/MainActivity;->webView:Landroid/webkit/WebView;
+
+    const-string v3, "file:///android_asset/app/index.html"
+
+    invoke-virtual {v2, v3}, Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
+
+    invoke-virtual {p0, v1}, Landroid/app/Activity;->setContentView(Landroid/view/View;)V
+
+    return-void
+.end method
+
+# called from the WebView client once the page is rendered
+.method public hideLoading()V
+    .registers 3
+
+    iget-object v0, p0, Lcom/montaj/pro/MainActivity;->loadingView:Landroid/widget/TextView;
+
+    if-nez v0, :end
+
+    :try_start
+    const/16 v1, 0x8
+
+    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setVisibility(I)V
+    :try_end
+    .catch Ljava/lang/Exception; {:try_start .. :try_end} :catch_err
+
+    goto :end
+
+    :catch_err
+    move-exception v0
+
+    :end
     return-void
 .end method
 

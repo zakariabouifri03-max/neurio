@@ -150,8 +150,9 @@ def main():
 
     # 2. web assets (single file editor)
     single = os.path.join(ROOT, 'editor', 'dist', 'montaj-pro.html')
-    if not os.path.exists(single):
-        sh(['node', os.path.join(ROOT, 'tools', 'editor', 'build.mjs')])
+    # ALWAYS rebuild: shipping a stale editor because the dist file happened to
+    # exist is exactly how a fix silently fails to reach the phone.
+    sh(['node', os.path.join(ROOT, 'tools', 'editor', 'build.mjs')])
     assets = os.path.join(BUILD, 'assets', 'app')
     shutil.rmtree(os.path.join(BUILD, 'assets'), ignore_errors=True)
     os.makedirs(assets, exist_ok=True)

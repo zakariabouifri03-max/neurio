@@ -66,6 +66,13 @@ export function download(blob, name) {
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
+// localStorage throws on some origins (file:// in a WebView, private mode, quota)
+// — every call goes through here so a denied storage can never kill the app.
+export const store = {
+  get(k, fallback = null) { try { const v = localStorage.getItem(k); return v == null ? fallback : v; } catch (e) { return fallback; } },
+  set(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+};
+
 export function toast(msg, ms = 2200) {
   const el = document.getElementById('toast');
   if (!el) return;

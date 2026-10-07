@@ -76,6 +76,19 @@
 .end method
 
 # last resort: if interception failed, load straight from the assets folder
+.method public onPageFinished(Landroid/webkit/WebView;Ljava/lang/String;)V
+    .registers 3
+
+    iget-object v0, p0, Lcom/montaj/pro/MainActivity$AssetClient;->activity:Lcom/montaj/pro/MainActivity;
+
+    if-nez v0, :end
+
+    invoke-virtual {v0}, Lcom/montaj/pro/MainActivity;->hideLoading()V
+
+    :end
+    return-void
+.end method
+
 .method public onReceivedError(Landroid/webkit/WebView;ILjava/lang/String;Ljava/lang/String;)V
     .registers 8
 

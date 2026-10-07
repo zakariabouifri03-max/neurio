@@ -261,7 +261,7 @@ export async function saveProjectToDB(p = project) {
   const data = { ...deep({ ...p, media: p.media.map(m => ({ ...m, blob: undefined })) }) };
   data.updatedAt = Date.now();
   await idbPut('projects', data.id, data);
-  localStorage.setItem('montaj.lastProject', data.id);
+  try { localStorage.setItem('montaj.lastProject', data.id); } catch (e) { }
   await idbPut('meta', 'lastOpen', data.id);
   return data;
 }

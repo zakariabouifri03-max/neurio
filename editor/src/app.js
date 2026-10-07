@@ -1,5 +1,5 @@
 // Montaj Pro — application shell & wiring
-import { qs, qa, uid, clamp, fmtTime, toast, download, deep, debounce, isMobile, bytesToBase64, supports } from './util.js';
+import { qs, qa, uid, clamp, fmtTime, toast, download, deep, debounce, isMobile, bytesToBase64, supports, store } from './util.js';
 import { makeT } from './i18n.js';
 import {
   getProject, setProject, newProject, addTrack, addClip, newClip, updateClip, removeClip, clipById,
@@ -46,7 +46,7 @@ export class App {
     T.set(T.lang());
     // load last project or create one
     try {
-      const last = localStorage.getItem('montaj.lastProject');
+      const last = store.get('montaj.lastProject');
       let p = null;
       if (last) p = await loadProjectFromDB(last);
       if (!p) {
@@ -527,7 +527,7 @@ export class App {
     this.timeline.render();
     renderInspector(this);
     await saveProjectToDB(p);
-    localStorage.setItem('montaj.lastProject', p.id);
+    store.set('montaj.lastProject', p.id);
   }
   async saveProject() {
     await saveProjectToDB(this.project);
@@ -556,7 +556,7 @@ export class App {
         this.provider.project = loaded;
         this.selected = []; this.time = 0;
         this.preview.fit(); this.timeline.render(); renderInspector(this);
-        localStorage.setItem('montaj.lastProject', loaded.id);
+        store.set('montaj.lastProject', loaded.id);
         modal.close();
       });
       mk('نسخ', async () => {

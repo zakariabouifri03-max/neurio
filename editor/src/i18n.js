@@ -111,10 +111,11 @@ export const SHAPES = ['rect', 'circle', 'line', 'arrow', 'triangle', 'star', 'h
 export const STICKER_EMOJI = STICKERS;
 
 export function makeT() {
-  let lang = localStorage.getItem('montaj.lang') || 'ar';
+  let lang = 'ar';
+  try { lang = localStorage.getItem('montaj.lang') || 'ar'; } catch (e) { }
   const t = (k) => (STR[lang] && STR[lang][k]) || STR.en[k] || k;
   t.lang = () => lang;
-  t.set = (l) => { lang = l; localStorage.setItem('montaj.lang', l); document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; document.documentElement.lang = l; };
+  t.set = (l) => { lang = l; try { localStorage.setItem('montaj.lang', l); } catch (e) { } document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; document.documentElement.lang = l; };
   t.isRTL = () => lang === 'ar';
   return t;
 }
