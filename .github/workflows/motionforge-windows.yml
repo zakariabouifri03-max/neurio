@@ -148,8 +148,9 @@ jobs:
             if ($log.Length -gt 12000) { $log = $log.Substring($log.Length - 12000) }
           }
           $body = "MotionForge Windows build failed on run $env:GITHUB_RUN_ID.`n`n```text`n$log`n```"
-          $body | Out-File -Encoding utf8 ci-failure.md
-          gh api "repos/$env:GITHUB_REPOSITORY/commits/$env:GITHUB_SHA/comments" -F body=@ci-failure.md
+          @{ body = $body } | ConvertTo-Json -Depth 4 | Out-File -Encoding utf8 ci-failure.json
+          gh api "repos/$env:GITHUB_REPOSITORY/commits/$env:GITHUB_SHA/comments" --input ci-failure.json
+          "posted build failure comment"
 
       - name: Publish to the GitHub release
         if: github.event_name == 'push' || inputs.publish
