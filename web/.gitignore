@@ -1,0 +1,19 @@
+node_modules
+.next
+out
+dist
+*.log
+# Real secrets live in .env (never committed); .env.example documents every option.
+.env
+.env.local
+.env*.local
+!.env.example
+dev.db
+dev.db-journal
+prisma/dev.db*
+.storage
+storage
+.DS_Store
+next-env.d.ts
+tsconfig.tsbuildinfo
+public/generated
