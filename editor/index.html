@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>مونتاج برو — Montaj Pro</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0e14">
+<meta name="description" content="محرر فيديو احترافي في المتصفح — بلا إنترنت، بلا رفع، كل المعالجة في جهازك.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="ui.css">
+<script>
+/* ---------------------------------------------------------------------------
+   Boot guard + diagnostics.  ES5 ONLY on purpose: it has to run (and explain
+   itself) even on an ancient Android WebView where the editor bundle cannot
+   even be parsed. It replaces the classic "black screen and no idea why".
+   --------------------------------------------------------------------------- */
+(function () {
+  var errs = [];
+  window.__bootErrors = errs;
+  window.__bootState = 'starting';
+  function push(msg) { if (errs.length < 60) errs.push(msg); }
+  window.addEventListener('error', function (e) {
+    push('JS: ' + (e.message || 'unknown') + (e.filename ? ' @ ' + e.lineno + ':' + e.colno : ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason;
+    push('Promise: ' + ((r && r.message) || r));
+  });
+
+  function ua() { return navigator.userAgent || '?'; }
+  function version() {
+    var m = /(Chrome|Chromium|Firefox|Edg)\/([0-9]+)[.0-9]*/.exec(ua());
+    return m ? m[1] + ' ' + m[2] : 'غير معروف';
+  }
+  function hasCSS(prop, val) {
+    try { return !!(window.CSS && CSS.supports && CSS.supports(prop, val)); } catch (e) { return false; }
+  }
+  function canParse(src) {
+    try { /* jshint evil:true */ new Function(src); return true; } catch (e) { return false; }
+  }
+  function caps() {
+    var c = [];
+    c.push('WebView/Chrome: ' + version());
+    c.push('دعم بنية جافاسكربت الحديثة (?.) : ' + (canParse('var a={};return a?.b') ? 'نعم' : 'لا'));
+    c.push('async/await : ' + (canParse('return (async function(){})()') ? 'نعم' : 'لا'));
+    c.push('CSS grid : ' + (hasCSS('display', 'grid') ? 'نعم' : 'لا'));
+    c.push('CSS dvh : ' + (hasCSS('height', '100dvh') ? 'نعم' : 'لا'));
+    c.push('CSS inset-inline : ' + (hasCSS('inset-inline-start', '0px') ? 'نعم' : 'لا'));
+    c.push('Canvas 2D : ' + (function () { try { return !!document.createElement('canvas').getContext('2d'); } catch (e) { return false; } }() ? 'نعم' : 'لا'));
+    c.push('WebCodecs (تصدير سريع) : ' + (typeof window.VideoEncoder !== 'undefined' ? 'نعم' : 'لا'));
+    c.push('MediaRecorder : ' + (typeof window.MediaRecorder !== 'undefined' ? 'نعم' : 'لا'));
+    c.push('IndexedDB : ' + (function () { try { return !!window.indexedDB; } catch (e) { return false; } }() ? 'نعم' : 'لا'));
+    c.push('localStorage : ' + (function () { try { return !!window.localStorage; } catch (e) { return false; } }() ? 'نعم' : 'لا'));
+    c.push('سياق آمن (https/localhost) : ' + (window.isSecureContext === false ? 'لا' : 'نعم'));
+    c.push('الشاشة : ' + screen.width + '×' + screen.height + ' · dpr ' + (window.devicePixelRatio || 1));
+    c.push('العنوان : ' + location.href.slice(0, 120));
+    return c;
+  }
+
+  function report() {
+    var txt = 'Montaj Pro — تقرير التشخيص\n' + caps().join('\n');
+    if (errs.length) txt += '\n\nالأخطاء:\n' + errs.slice(-20).join('\n');
+    return txt;
+  }
+  window.__bootReport = report;
+
+  function copy(txt, btn) {
+    var ok = function () { btn.textContent = 'تم النسخ ✓'; };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(ok, fallback); return; }
+    } catch (e) { }
+    fallback();
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.style.cssText = 'width:100%;height:120px;direction:ltr';
+      var pre = btn.previousSibling;
+      if (pre && pre.parentNode) pre.parentNode.insertBefore(ta, btn);
+      try { ta.select(); document.execCommand('copy'); ok(); } catch (e) { btn.textContent = 'حدّد النص وانسخه يدوياً'; }
+    }
+  }
+
+  function panel(title, why) {
+    if (document.getElementById('boot-panel')) return;
+    var d = document.createElement('div');
+    d.id = 'boot-panel';
+    var h = document.createElement('h2');
+    h.textContent = title || 'التطبيق ما قدرش يتشغل';
+    var w = document.createElement('p');
+    w.className = 'why';
+    w.textContent = why || 'هذا تقرير تقني — انسخه وصيفطو للمطوّر.';
+    var pre = document.createElement('pre');
+    pre.textContent = report();
+    var b = document.createElement('button');
+    b.textContent = '📋 نسخ التقرير';
+    b.onclick = function () { copy(report(), b); };
+    var r = document.createElement('button');
+    r.textContent = '↻ إعادة المحاولة';
+    r.style.marginRight = '8px';
+    r.onclick = function () { location.reload(); };
+    var hint = document.createElement('p');
+    hint.className = 'hint';
+    hint.textContent = 'غالباً الحل: حدّث «Android System WebView» و«Chrome» من متجر Play ثم أعد فتح التطبيق.';
+    d.appendChild(h); d.appendChild(w); d.appendChild(pre); d.appendChild(b); d.appendChild(r); d.appendChild(hint);
+    (document.body || document.documentElement).appendChild(d);
+  }
+  window.__bootPanel = panel;
+
+  // an engine that cannot parse modern syntax will never run the editor — say so right away
+  if (!canParse('var a={};return a?.b ?? 1')) {
+    window.__bootState = 'too-old';
+    var show = function () { panel('متصفح النظام قديم جداً', 'النسخة المدمجة في هاتفك لا تدعم بنية جافاسكربت اللي كيحتاجها المحرر.'); };
+    if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
+    return;
+  }
+
+  // watchdog: if the editor has not booted after 10s, show the diagnostics
+  setTimeout(function () {
+    if (window.__app) { window.__bootState = 'ready'; return; }
+    window.__bootState = 'stuck';
+    panel('المحرر ما كملش التحميل', 'بانت الشاشة ولكن المحرر ما دارش الإقلاع. هذا تقرير تقني:');
+  }, 10000);
+})();
+</script>
+<!--FONTS-->
+</head>
+<body>
+<div id="splash">
+  <div class="splash-inner">
+    <div class="logo-mark">🎬</div>
+    <h1>مونتاج برو</h1>
+    <p>محرر فيديو احترافي — بلا إنترنت</p>
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<div id="app">
+  <header id="topbar">
+    <div class="brand"><span class="logo-mark small">🎬</span><b>مونتاج برو</b></div>
+    <div class="spacer"></div>
+    <button class="ibtn" id="btn-undo" title="تراجع"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M9 14H5V10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10l4-4M5 10c3-4 8-5 11-3s4 6 2 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button class="ibtn" id="btn-redo" title="إعادة"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M15 14h4v-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 10l-4-4M19 10c-3-4-8-5-11-3s-4 6-2 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button class="ibtn" id="btn-save" title="حفظ"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 4h11l3 3v13H5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 4v6h7V4M8 20v-6h8v6" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+    <button class="ibtn" id="btn-projects" title="المشاريع"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 7h6l2 2h10v10H3z" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+    <button class="ibtn hide-sm" id="btn-full" title="شاشة كاملة"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button class="btn primary" id="btn-export">⬆ تصدير</button>
+  </header>
+
+  <main id="stage">
+    <aside id="rail">
+      <button class="rail-btn active" data-tab="media"><span>🎞</span><i>الوسائط</i></button>
+      <button class="rail-btn" data-tab="audio"><span>🎵</span><i>الصوت</i></button>
+      <button class="rail-btn" data-tab="text"><span>🅣</span><i>نص</i></button>
+      <button class="rail-btn" data-tab="stickers"><span>😀</span><i>ملصقات</i></button>
+      <button class="rail-btn" data-tab="effects"><span>✨</span><i>تأثيرات</i></button>
+      <button class="rail-btn" data-tab="motion"><span>🎯</span><i>حركة</i></button>
+      <button class="rail-btn" data-tab="speed"><span>⏩</span><i>سرعة</i></button>
+      <button class="rail-btn" data-tab="captions"><span>💬</span><i>ترجمة</i></button>
+      <button class="rail-btn" data-tab="export"><span>⬆</span><i>تصدير</i></button>
+    </aside>
+
+    <section id="preview-col">
+      <div id="preview-wrap">
+        <canvas id="preview-canvas"></canvas>
+        <div id="preview-overlays"></div>
+        <div id="clip-box">
+          <span class="hb nw"></span><span class="hb ne"></span><span class="hb sw"></span><span class="hb se"></span><span class="hb rot"></span>
+        </div>
+      </div>
+      <div id="transport">
+        <button class="ibtn" id="btn-split" title="تقسيم">✂</button>
+        <button class="ibtn big" id="btn-play" title="تشغيل"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M8 5l12 7-12 7z" fill="currentColor"/></svg></button>
+        <span id="time-display" class="time">00:00:00</span>
+        <div class="spacer"></div>
+        <button class="ibtn hide-sm" id="btn-zoom-out" title="تصغير">−</button>
+        <button class="ibtn hide-sm" id="btn-zoom-fit" title="ملاءمة">⤢</button>
+        <button class="ibtn hide-sm" id="btn-zoom-in" title="تكبير">＋</button>
+      </div>
+    </section>
+
+    <aside id="sheet">
+      <div id="sheet-head">
+        <b id="sheet-title">الوسائط</b>
+        <button class="ibtn" id="sheet-close">✕</button>
+      </div>
+      <div id="inspector"></div>
+    </aside>
+  </main>
+
+  <section id="timeline">
+    <div id="tl-toolbar">
+      <button class="mini" id="btn-add-overlay-track" title="مسار تراكب">+ مسار</button>
+      <button class="mini" id="btn-add-video-track" title="مسار فيديو">+ فيديو</button>
+      <button class="mini" id="btn-add-audio-track" title="مسار صوت">+ صوت</button>
+      <div class="spacer"></div>
+      <span class="hint-inline">اسحب المقاطع • اضغط مرتين للتحرير</span>
+    </div>
+    <div id="tl-main">
+      <div id="tl-headers"></div>
+      <div id="tl-scroll">
+        <div id="tl-ruler"></div>
+        <div id="tl-head">
+          <div class="tl-head-bubble">00:00:00</div>
+          <div class="tl-head-line"></div>
+        </div>
+        <div id="tl-lanes"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav id="tabbar">
+  <button class="tabbar-btn active" data-tab="media"><span>🎞</span><i>وسائط</i></button>
+  <button class="tabbar-btn" data-tab="effects"><span>✨</span><i>تأثيرات</i></button>
+  <button class="tabbar-btn" data-tab="text"><span>🅣</span><i>نص</i></button>
+  <button class="tabbar-btn" data-tab="audio"><span>🎵</span><i>صوت</i></button>
+  <button class="tabbar-btn" data-tab="motion"><span>🎯</span><i>حركة</i></button>
+  <button class="tabbar-btn" data-tab="export"><span>⬆</span><i>تصدير</i></button>
+</nav>
+
+<dialog id="modal-export">
+  <h3>تصدير الفيديو</h3>
+  <div id="exp-info" class="hint"></div>
+  <div class="exp-row"><span>محرك التصدير</span><b id="exp-engine">—</b></div>
+  <div class="progress"><div id="exp-bar"></div></div>
+  <div id="exp-status" class="hint">جاهز</div>
+  <div id="exp-log" class="hint dim"></div>
+  <div class="dlg-actions">
+    <button class="btn" onclick="document.getElementById('modal-export').close()">إغلاق</button>
+    <button class="btn" id="exp-cancel">إلغاء</button>
+    <button class="btn primary" onclick="document.getElementById('modal-export').close();window.__app.openExportModal(true)">تصدير</button>
+  </div>
+</dialog>
+
+<dialog id="modal-projects">
+  <h3>المشاريع</h3>
+  <div id="projects-list"></div>
+  <div class="dlg-actions">
+    <button class="btn" onclick="document.getElementById('modal-projects').close()">إغلاق</button>
+    <button class="btn primary" onclick="document.getElementById('modal-projects').close();window.__app.newProjectFlow()">مشروع جديد</button>
+  </div>
+</dialog>
+
+<div id="ctx-menu"></div>
+<div id="toast"></div>
+<div id="dropzone"><div>أفلت الملفات هنا 📥</div></div>
+<script src="bundle.js"></script>
+</body>
+</html>

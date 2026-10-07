@@ -3,3 +3,13 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# --- Montaj Pro build artifacts & toolchain ---
+.tools/
+node_modules/
+editor/dist/
+editor/bundle.js
+editor/fonts.css
+tools/win/app_html.h
+tools/win/montaj.res
+*.pdb
