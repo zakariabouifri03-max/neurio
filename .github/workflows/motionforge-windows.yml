@@ -85,45 +85,22 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "verification failed" }
 
       - name: Unpack and smoke test the portable build
+        working-directory: motionforge-studio
         shell: pwsh
         run: |
-          $portable = Join-Path "${{ runner.temp }}" "portable"
-          Expand-Archive -Path motionforge-studio/dist/*portable*.zip -DestinationPath $portable -Force
-          $app = Join-Path $portable "MotionForge Studio"
-          "== console twin --selftest"
-          & (Join-Path $app "MotionForge console.exe") --selftest
-          if ($LASTEXITCODE -ne 0) { throw "portable self test failed ($LASTEXITCODE)" }
-          "== gui exe --selftest"
-          & (Join-Path $app "MotionForge Studio.exe") --selftest 2>&1 | Tee-Object -Variable out
-          if ($LASTEXITCODE -ne 0) { throw "portable GUI self test failed ($LASTEXITCODE)" }
-          "== version resource"
-          (Get-Item (Join-Path $app "MotionForge Studio.exe")).VersionInfo | Format-List ProductName,FileVersion,CompanyName
+          $zip = (Get-ChildItem dist/*portable*.zip | Select-Object -First 1).FullName
+          if (-not $zip) { throw "no portable package was built" }
+          & tools/ci_portable_smoke.ps1 -Zip $zip
+          if ($LASTEXITCODE -ne 0) { throw "portable smoke test failed ($LASTEXITCODE)" }
 
       - name: Silent install on the runner, then test the installed app
+        working-directory: motionforge-studio
         shell: pwsh
         run: |
-          $setup = Get-ChildItem motionforge-studio/dist/*Setup*.exe | Select-Object -First 1
-          $dir = Join-Path "${{ runner.temp }}" "mfstest"
-          "== installing to $dir"
-          $p = Start-Process -FilePath $setup.FullName -ArgumentList @('/silent', '/dir', "`"$dir`"") -PassThru -Wait
-          "installer exit code: $($p.ExitCode)"
-          Get-Content "$env:TEMP\motionforge-setup.log" -Tail 40
-          if (-not (Test-Path (Join-Path $dir "MotionForge Studio.exe"))) { throw "install produced no application" }
-          "== installed app self test"
-          & (Join-Path $dir "MotionForge console.exe") --selftest
-          if ($LASTEXITCODE -ne 0) { throw "installed app self test failed ($LASTEXITCODE)" }
-          "== shortcuts and uninstall entry"
-          Get-ChildItem (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\MotionForge Studio") |
-            Format-Table Name
-          $keys = Get-ChildItem "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
-          $keys | Where-Object { $_.PSChildName -like "*MotionForge*" } | Select-Object PSChildName
-          "== uninstall"
-          $un = Join-Path $dir "Uninstall.exe"
-          $u = Start-Process -FilePath $un -ArgumentList @('--uninstall', '--silent', '--dir', "`"$dir`"") -PassThru -Wait
-          "uninstaller exit code: $($u.ExitCode)"
-          Start-Sleep -Seconds 4
-          if (Test-Path (Join-Path $dir "MotionForge Studio.exe")) { throw "uninstall left files behind" }
-          "uninstall cleaned up"
+          $setup = (Get-ChildItem dist/*Setup*.exe | Select-Object -First 1).FullName
+          if (-not $setup) { throw "no installer was built" }
+          & tools/ci_install_test.ps1 -Setup $setup
+          if ($LASTEXITCODE -ne 0) { throw "install test failed ($LASTEXITCODE)" }
 
       - name: Upload build artefacts
         uses: actions/upload-artifact@v4
@@ -148,7 +125,7 @@ jobs:
           $out += "commit: $env:GITHUB_SHA"
           $out += "ref:    $env:GITHUB_REF"
           $out += ""
-          foreach ($f in @("motionforge-studio/ci/build.log")) {
+          foreach ($f in (Get-ChildItem motionforge-studio/ci/*.log | Select-Object -ExpandProperty FullName)) {
             $out += "===== $f ====="
             if (Test-Path $f) { $out += (Get-Content $f -Raw) } else { $out += "(missing)" }
             $out += ""
