@@ -5,11 +5,24 @@ An all-in-one visual design platform: a real editor for social graphics, present
 This is not a mock-up. Every panel, dialog and button in the product is wired to real state, real persistence and real rendering.
 
 ```bash
-npm install
-npm run db:migrate     # creates dev.db from db/schema.sql
-npm run db:seed        # optional: warms the template + element catalogue (356 templates, 205 elements)
+npm run setup          # installs deps (if missing), creates dev.db, seeds the catalogue
 npm run dev            # http://localhost:3000
 ```
+
+Step by step, and what to do when something looks broken:
+
+```bash
+npm install            # or `npm ci` for the exact locked versions
+npm run db:migrate     # creates dev.db from db/schema.sql (idempotent)
+npm run db:seed        # warms the catalogue: 356 templates, 205 elements
+npm run dev            # dev server on 0.0.0.0:3000
+```
+
+Every npm script that needs dependencies runs `scripts/ensure-deps.mjs` first, so if
+`node_modules` was wiped (some sandboxes and hosts do not persist it) the install happens
+automatically instead of surfacing as build errors in the browser. The database also
+migrates and seeds itself on first request, so a clean checkout works without any manual
+step beyond `npm run dev`.
 
 ## No sign-up required
 
