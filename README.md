@@ -1,115 +1,48 @@
-# 🏁 Bash Baqi Racing
+# Neurio Studio
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+Neurio Studio is a local-first, browser-based multitrack video editor. The current build is a self-contained static application: it imports local media, edits clips and overlays in a timeline, previews the composite in a canvas, and records a WebM export in real time using the browser's `MediaRecorder` API.
 
-**▶ Play:** serve the folder with any static server and open it:
+## Run it
 
-```bash
-python3 -m http.server 8000
-# → http://localhost:8000
-```
-
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
-
----
-
-## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
-
-A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
-soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
-
-title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
-
-Everything is generated from code (no stock footage/music):
+Serve the repository root over HTTP (ES modules, IndexedDB and service workers need a secure web origin):
 
 ```bash
-python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
-python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
+python3 -m http.server 8000 --bind 0.0.0.0
+# open http://localhost:8000
 ```
 
-See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
+There is no package install or build step. All editing and media persistence happen in the browser on the user's device. Imported source files are not uploaded.
 
----
+The `arena/65e7f515-neurio` branch includes a GitHub Actions Pages workflow. Once Pages is enabled for the repository, pushes to that branch publish only the editor shell and its required assets at `https://zakariabouifri03-max.github.io/neurio/`.
 
-## 📱 Install on your phone — كأنها APK!
+## Working workflows
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
+- Import video, image, audio and local font files into the project media bin.
+- Add media at the playhead or drag media onto a timeline track.
+- Work with multiple video/overlay/text/audio tracks; add and remove tracks, lock, hide or mute them.
+- Select one or more clips, move them, snap to nearby edit points, trim either edge, split at the playhead, duplicate, copy/paste, and undo/redo.
+- Scrub and step through the edit frame by frame; preview image/video, text, stickers, effects, transitions and audio together.
+- Adjust transform, opacity, speed, volume, fades and supported color controls; animate transform values with keyframes and easing.
+- Add editable titles and graphic overlays, procedural music/SFX, reusable starter templates, and local audio silence analysis.
+- Save project state automatically in IndexedDB, restore the last autosave, duplicate projects, and import/export a `.neurio` project-edit file.
+- Export a real-time WebM recording with browser-supported VP8/VP9 options, resolution, FPS, and bitrate controls.
 
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
+## Honest capability boundaries
 
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
+This repository does not bundle a remote processing service or licensed stock-media catalogue. Music and sound effects in the library are generated locally from original oscillator/noise synthesis; they are not stock recordings. Browser export uses `MediaRecorder` and produces WebM only. MP4/MOV encoding, caption transcription, background/object removal, face detection, video stabilization, upscaling, advanced HSL/curves/LUTs, professional audio mastering, and other model- or encoder-backed tools require services/models that are not configured here. The AI panel identifies these as not connected instead of simulating their work.
 
-**Offline play** is built-in: a service worker caches all game files on first visit.
+Browser codec, resolution, media format and local-storage support vary by device. For larger edits, use a current desktop browser and keep an independent copy of source files and exported project files.
 
----
+## Code layout
 
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
-|---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
-
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
+```text
+index.html                 # Editor shell and main application layout
+src/editor.css             # Workspace, preview, inspector and timeline styling
+src/editor/main.js         # Editor state, media import, playback, timeline, canvas and export
+src/editor/catalog.js      # Track colors, effects, transitions, text styles, templates and sound definitions
+src/editor/audio.js        # Procedural, original WAV sound/music synthesis
+src/editor/storage.js      # IndexedDB project/media persistence with local recovery fallback
+sw.js                      # Offline cache for the editor shell
 ```
 
-Made with ❤️ and Three.js
-
----
-
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
-
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
-
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
-
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+The project and source media use separate IndexedDB stores so timeline operations remain independent of the imported blobs. Clip records are plain, serializable data structures with per-clip transforms, color, transitions and keyframes. This is an intentionally browser-native foundation; model services or a server-side renderer can be integrated behind explicit adapters as the product grows.
