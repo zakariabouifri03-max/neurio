@@ -7,8 +7,8 @@ android {
         applicationId "com.neurio.studio"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode (project.hasProperty('versionCode') ? project.property('versionCode').toInteger() : 1)
-        versionName (project.hasProperty('versionName') ? project.property('versionName') : "0.1.0")
+        versionCode = project.hasProperty('versionCode') ? project.property('versionCode').toInteger() : 1
+        versionName = project.hasProperty('versionName') ? project.property('versionName').toString() : "0.1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -33,8 +33,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            def ksPath = System.getenv("ANDROID_KEYSTORE_PATH")
-            signingConfig (ksPath != null && file(ksPath).exists()) ? signingConfigs.release : signingConfigs.debug
+            def releaseKs = System.getenv("ANDROID_KEYSTORE_PATH")
+            if (releaseKs != null && file(releaseKs).exists()) {
+                signingConfig = signingConfigs.release
+            } else {
+                signingConfig = signingConfigs.debug
+            }
         }
     }
 }
