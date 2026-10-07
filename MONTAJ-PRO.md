@@ -14,6 +14,20 @@
 
 ---
 
+## ⬇️ تحميل مباشر من GitHub
+
+| الملف | رابط مباشر (يبدا التحميل دغيا) |
+|---|---|
+| 📱 **APK** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-v1.0.apk |
+| 💻 **EXE** | https://github.com/zakariabouifri03-max/neurio/raw/main/MontajPro-Windows.exe |
+
+> إلا كان الرابط ديال `main` مازال ما بانش (قبل الدمج)، استعمل نسخة الفرع:
+> `https://github.com/zakariabouifri03-max/neurio/raw/arena/d1960a3c-neurio/MontajPro-v1.0.apk`
+>
+> ولا من صفحة الملف فـGitHub: زر **Download raw file**: `…/blob/main/MontajPro-v1.0.apk`
+
+---
+
 ## 📱 1. التثبيت على الهاتف (APK)
 
 1. نزّل `MontajPro-v1.0.apk` وحطّه فالهاتف (Downloads / التنزيلات).
