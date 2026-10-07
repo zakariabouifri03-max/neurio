@@ -113,3 +113,24 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 🎨 Etsy Design Pack — 10 designs (1:1, 3000×3000)
+
+**10 disingat raaijin, kamel 1:1 (3000×3000 px), transparent PNG, salihin l Etsy** —
+kol design f niche fiha monafasa qlila (disc golf, mahjong, pickleball, hedgehog mom,
+Bernese dog mom, ham radio, sourdough, stargazer, bird nerd, home brew).
+
+**[→ lba9i lkitabat f `designs/`](designs/README.md)** — niche analysis, Etsy titles,
+13 tags w listing description likola design.
+
+```bash
+python3 designs/make_designs.py    # regenerates the whole pack
+```
+
+| | |
+|---|---|
+| Format | PNG RGBA, transparent background |
+| Size | **3000 × 3000 px — exactly 1:1** |
+| Ready for | Printful / Printify / Gelato · Etsy listing photos in `designs/previews/` |
