@@ -37,8 +37,11 @@ function Check([string]$Label, [bool]$Ok, [string]$Detail = "") {
     return $Ok
 }
 
-# Runs a console command, capturing every stream into the log file.
-function Invoke-Logged([string]$Label, [string]$Exe, [string[]]$ArgList, [string]$Expect = "") {
+# Runs an executable with a hard time limit, capturing every stream into the
+# log file.  A pipeline would happily wait forever for a handle that never
+# closes, so the timeout (and the kill) are part of the harness itself.
+function Invoke-Program([string]$Label, [string]$Exe, [string[]]$ArgList,
+                        [string]$Expect = "", [int]$TimeoutSec = 300) {
     Say ""
     Say "== $Label"
     Say "   $Exe $($ArgList -join ' ')"
@@ -47,39 +50,26 @@ function Invoke-Logged([string]$Label, [string]$Exe, [string[]]$ArgList, [string
         $script:Failed += "$Label (missing executable)"
         return
     }
-    $out = & $Exe @ArgList 2>&1 | Out-String
-    $code = $LASTEXITCODE
-    foreach ($line in ($out -split "`r?`n")) { if ($line) { Say "   | $line" } }
-    Say "   exit code: $code"
-    if ($code -ne 0) { $script:Failed += "$Label (exit $code)" }
-    if ($Expect) {
-        $found = $out -match [regex]::Escape($Expect)
-        if (-not $found) { $script:Failed += "$Label (output does not contain '$Expect')" }
-        Check "output contains '$Expect'" $found
-    }
-}
-
-# Runs a GUI executable and waits for it, capturing its output into files.
-function Invoke-Gui([string]$Label, [string]$Exe, [string[]]$ArgList, [string]$Expect = "") {
-    Say ""
-    Say "== $Label"
-    Say "   $Exe $($ArgList -join ' ')"
-    if (-not (Test-Path $Exe)) {
-        Say "   FAIL missing executable"
-        $script:Failed += "$Label (missing executable)"
-        return
-    }
-    $so = Join-Path $env:TEMP "mfs-gui-out.txt"
-    $se = Join-Path $env:TEMP "mfs-gui-err.txt"
+    $so = Join-Path $env:TEMP "mfs-smoke-out.txt"
+    $se = Join-Path $env:TEMP "mfs-smoke-err.txt"
     Remove-Item $so, $se -Force -ErrorAction SilentlyContinue
     try {
-        $p = Start-Process -FilePath $Exe -ArgumentList $ArgList -PassThru -Wait `
+        $p = Start-Process -FilePath $Exe -ArgumentList $ArgList -PassThru `
             -RedirectStandardOutput $so -RedirectStandardError $se -ErrorAction Stop
-        $code = $p.ExitCode
     } catch {
         Say "   FAIL could not start: $_"
-        $script:Failed += "$Label (start failed)"
+        $script:Failed += "$Label (could not start)"
         return
+    }
+    if ($p.WaitForExit($TimeoutSec * 1000)) {
+        $code = $p.ExitCode
+        Say "   exit code: $code"
+        if ($code -ne 0) { $script:Failed += "$Label (exit $code)" }
+    } else {
+        Say "   FAIL still running after $TimeoutSec s - terminating it"
+        $script:Failed += "$Label (timeout after $TimeoutSec s)"
+        & taskkill /PID $p.Id /T /F 2>&1 | ForEach-Object { Say "   | $_" }
+        Start-Sleep -Seconds 3
     }
     $out = ""
     foreach ($f in @($so, $se)) {
@@ -89,8 +79,6 @@ function Invoke-Gui([string]$Label, [string]$Exe, [string[]]$ArgList, [string]$E
             foreach ($line in ($text -split "`r?`n")) { if ($line) { Say "   | $line" } }
         }
     }
-    Say "   exit code: $code"
-    if ($code -ne 0) { $script:Failed += "$Label (exit $code)" }
     if ($Expect) {
         $found = $out -match [regex]::Escape($Expect)
         if (-not $found) { $script:Failed += "$Label (output does not contain '$Expect')" }
@@ -155,17 +143,17 @@ foreach ($exe in @($gui, $runtime, $console)) {
     Check "version info of $([IO.Path]::GetFileName($exe))" ($vi.ProductName -eq "MotionForge Studio")
 }
 
-Invoke-Logged "payload interpreter / Qt import" $python @(
+Invoke-Program "payload interpreter / Qt import" $python @(
     "-c", "import sys, PySide6; print(sys.version); print('PySide6', PySide6.__version__)"
-) "PySide6"
+) "PySide6" -TimeoutSec 120
 
-Invoke-Logged "script form (python.exe MotionForge.py)" $python @($launcherPy, "--selftest") "RESULT: OK"
+Invoke-Program "script form (python.exe MotionForge.py)" $python @($launcherPy, "--selftest") "RESULT: OK" -TimeoutSec 420
 
-Invoke-Logged "console runtime --selftest" $console @("--selftest") "RESULT: OK"
+Invoke-Program "console runtime --selftest" $console @("--selftest") "RESULT: OK" -TimeoutSec 420
 
-Invoke-Gui "entry point --selftest" $gui @("--selftest") "RESULT: OK"
+Invoke-Program "entry point --selftest" $gui @("--selftest") "RESULT: OK" -TimeoutSec 420
 
-Invoke-Gui "entry point --version" $gui @("--version")
+Invoke-Program "entry point --version" $gui @("--version") "MotionForge Studio" -TimeoutSec 180
 
 Say ""
 if ($script:Failed.Count -gt 0) {

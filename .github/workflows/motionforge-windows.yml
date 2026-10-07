@@ -30,7 +30,7 @@ permissions:
 
 concurrency:
   group: motionforge-windows-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -86,6 +86,7 @@ jobs:
 
       - name: Unpack and smoke test the portable build
         working-directory: motionforge-studio
+        timeout-minutes: 20
         shell: pwsh
         run: |
           $zip = (Get-ChildItem dist/*portable*.zip | Select-Object -First 1).FullName
@@ -95,6 +96,7 @@ jobs:
 
       - name: Silent install on the runner, then test the installed app
         working-directory: motionforge-studio
+        timeout-minutes: 20
         shell: pwsh
         run: |
           $setup = (Get-ChildItem dist/*Setup*.exe | Select-Object -First 1).FullName
