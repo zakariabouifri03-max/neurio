@@ -1,0 +1,170 @@
+{
+  "id": "fb-event",
+  "name": "Facebook Event Cover",
+  "category": "Facebook",
+  "width": 1200,
+  "height": 630,
+  "description": "Event cover with date block and title.",
+  "tags": [
+    "facebook",
+    "event"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_facebook-event-cover",
+        "name": "Facebook Event Cover",
+        "width": 1200,
+        "height": 630,
+        "background": {
+          "type": "gradient",
+          "color": "#0077B6",
+          "gradient": {
+            "type": "linear",
+            "color": "#03045E",
+            "stops": [
+              {
+                "color": "#03045E",
+                "offset": 0
+              },
+              {
+                "color": "#0077B6",
+                "offset": 1
+              }
+            ],
+            "angle": 90
+          }
+        },
+        "nodes": [
+          {
+            "id": "sh_09sc58cjce",
+            "kind": "shape",
+            "name": "Date block",
+            "visible": true,
+            "locked": false,
+            "x": 84,
+            "y": 138.6,
+            "width": 192,
+            "height": 352.8,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 4,
+            "shape": "rect",
+            "fill": {
+              "type": "solid",
+              "color": "#F4FBFD",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_ik2spyy3wc",
+            "kind": "text",
+            "name": "Date",
+            "visible": true,
+            "locked": false,
+            "x": 84,
+            "y": 201.6,
+            "width": 192,
+            "height": 189,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "12\nSEP",
+            "fontFamily": "Inter",
+            "fontSize": 101,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 0,
+            "lineHeight": 1,
+            "fill": {
+              "type": "solid",
+              "color": "#0077B6",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_httyjatnbw",
+            "kind": "text",
+            "name": "Title",
+            "visible": true,
+            "locked": false,
+            "x": 348,
+            "y": 126,
+            "width": 768,
+            "height": 315,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "SUMMER\nSOUND\nFESTIVAL",
+            "fontFamily": "Inter",
+            "fontSize": 82,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": -2,
+            "lineHeight": 1,
+            "fill": {
+              "type": "solid",
+              "color": "#F4FBFD",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_byt2e62d55",
+            "kind": "text",
+            "name": "Details",
+            "visible": true,
+            "locked": false,
+            "x": 348,
+            "y": 466.2,
+            "width": 768,
+            "height": 51.2,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "Harbour Stage · 8pm · All ages",
+            "fontFamily": "Inter",
+            "fontSize": 32,
+            "fontWeight": 500,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": 0,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#00B4D8",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}

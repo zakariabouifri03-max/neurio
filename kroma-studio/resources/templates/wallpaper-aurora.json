@@ -1,0 +1,176 @@
+{
+  "id": "wallpaper-aurora",
+  "name": "Wallpaper — Aurora",
+  "category": "Wallpapers",
+  "width": 2560,
+  "height": 1440,
+  "description": "Layered gradient wallpaper with soft bands.",
+  "tags": [
+    "wallpaper",
+    "gradient"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_wallpaper-aurora",
+        "name": "Wallpaper — Aurora",
+        "width": 2560,
+        "height": 1440,
+        "background": {
+          "type": "gradient",
+          "color": "#05010F",
+          "gradient": {
+            "type": "linear",
+            "color": "#05010F",
+            "stops": [
+              {
+                "color": "#05010F",
+                "offset": 0
+              },
+              {
+                "color": "#12102A",
+                "offset": 1
+              }
+            ],
+            "angle": 160
+          }
+        },
+        "nodes": [
+          {
+            "id": "sh_71dygp11q8",
+            "kind": "shape",
+            "name": "Band 1",
+            "visible": true,
+            "locked": false,
+            "x": -256,
+            "y": 259.2,
+            "width": 3072,
+            "height": 316.8,
+            "rotation": 0,
+            "opacity": 0.65,
+            "cornerRadius": 0,
+            "shape": "rect",
+            "fill": {
+              "type": "linear",
+              "color": "#00F0FF",
+              "stops": [
+                {
+                  "color": "#00F0FF",
+                  "offset": 0
+                },
+                {
+                  "color": "#00000000",
+                  "offset": 1
+                }
+              ],
+              "angle": 90
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "sh_rvgeqbzyf6",
+            "kind": "shape",
+            "name": "Band 2",
+            "visible": true,
+            "locked": false,
+            "x": -256,
+            "y": 604.8,
+            "width": 3072,
+            "height": 230.4,
+            "rotation": 0,
+            "opacity": 0.55,
+            "cornerRadius": 0,
+            "shape": "rect",
+            "fill": {
+              "type": "linear",
+              "color": "#FF2EC4",
+              "stops": [
+                {
+                  "color": "#FF2EC4",
+                  "offset": 0
+                },
+                {
+                  "color": "#00000000",
+                  "offset": 1
+                }
+              ],
+              "angle": 90
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "sh_ebk68q0ea1",
+            "kind": "shape",
+            "name": "Glow",
+            "visible": true,
+            "locked": false,
+            "x": 1792,
+            "y": 144,
+            "width": 1008,
+            "height": 1008,
+            "rotation": 0,
+            "opacity": 0.4,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "linear",
+              "color": "#00F0FF",
+              "stops": [
+                {
+                  "color": "#00F0FF",
+                  "offset": 0
+                },
+                {
+                  "color": "#00000000",
+                  "offset": 1
+                }
+              ],
+              "angle": 90
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_1a1ab1r23e",
+            "kind": "text",
+            "name": "Label",
+            "visible": true,
+            "locked": false,
+            "x": 153.6,
+            "y": 1152,
+            "width": 1024,
+            "height": 137.6,
+            "rotation": 0,
+            "opacity": 0.7,
+            "text": "AURORA",
+            "fontFamily": "Inter",
+            "fontSize": 86,
+            "fontWeight": 800,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": 20,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#F8F8FF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}

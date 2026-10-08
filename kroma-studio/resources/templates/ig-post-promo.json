@@ -1,0 +1,239 @@
+{
+  "id": "ig-post-promo",
+  "name": "Instagram Post — Promo Drop",
+  "category": "Instagram",
+  "width": 1080,
+  "height": 1080,
+  "description": "Sale announcement with badge and price band.",
+  "tags": [
+    "instagram",
+    "promo",
+    "sale"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_instagram-post-promo-drop",
+        "name": "Instagram Post — Promo Drop",
+        "width": 1080,
+        "height": 1080,
+        "background": {
+          "type": "gradient",
+          "color": "#FF4FA3",
+          "gradient": {
+            "type": "linear",
+            "color": "#FF4FA3",
+            "stops": [
+              {
+                "color": "#FF4FA3",
+                "offset": 0
+              },
+              {
+                "color": "#6C5CE7",
+                "offset": 1
+              }
+            ],
+            "angle": 135
+          }
+        },
+        "nodes": [
+          {
+            "id": "sh_cteivpmyy9",
+            "kind": "shape",
+            "name": "Badge",
+            "visible": true,
+            "locked": false,
+            "x": 669.6,
+            "y": 86.4,
+            "width": 324,
+            "height": 324,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "solid",
+              "color": "#FFF8F0",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": {
+              "color": "#000000",
+              "blur": 28,
+              "offsetX": 0,
+              "offsetY": 12,
+              "opacity": 0.28
+            }
+          },
+          {
+            "id": "tx_pgfuz5lf9z",
+            "kind": "text",
+            "name": "Badge text",
+            "visible": true,
+            "locked": false,
+            "x": 669.6,
+            "y": 205.2,
+            "width": 324,
+            "height": 108,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "50%",
+            "fontFamily": "Inter",
+            "fontSize": 97,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 0,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#FF4FA3",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_d71bmqeopv",
+            "kind": "text",
+            "name": "Headline",
+            "visible": true,
+            "locked": false,
+            "x": 86.4,
+            "y": 475.2,
+            "width": 907.2,
+            "height": 280.8,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "MID-SEASON\nDROP",
+            "fontFamily": "Inter",
+            "fontSize": 140,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": -3,
+            "lineHeight": 1,
+            "fill": {
+              "type": "solid",
+              "color": "#FFF8F0",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_1tv6q6e3yt",
+            "kind": "text",
+            "name": "Sub",
+            "visible": true,
+            "locked": false,
+            "x": 108,
+            "y": 777.6,
+            "width": 864,
+            "height": 56,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "This weekend only · free shipping over $60",
+            "fontFamily": "Inter",
+            "fontSize": 35,
+            "fontWeight": 500,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 0,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#6C5CE7",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "sh_04lgkf950q",
+            "kind": "shape",
+            "name": "CTA",
+            "visible": true,
+            "locked": false,
+            "x": 302.4,
+            "y": 885.6,
+            "width": 475.2,
+            "height": 108,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "pill",
+            "fill": {
+              "type": "solid",
+              "color": "#FFF8F0",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": {
+              "color": "#000000",
+              "blur": 28,
+              "offsetX": 0,
+              "offsetY": 12,
+              "opacity": 0.28
+            }
+          },
+          {
+            "id": "tx_5x5o1t2sjc",
+            "kind": "text",
+            "name": "CTA text",
+            "visible": true,
+            "locked": false,
+            "x": 302.4,
+            "y": 918,
+            "width": 475.2,
+            "height": 54,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "SHOP THE DROP",
+            "fontFamily": "Inter",
+            "fontSize": 35,
+            "fontWeight": 800,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 2,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#4ECDC4",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}

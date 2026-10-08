@@ -1,0 +1,155 @@
+{
+  "id": "slide-title",
+  "name": "Presentation — Title Slide",
+  "category": "Presentations",
+  "width": 1920,
+  "height": 1080,
+  "description": "Clean 16:9 title slide with accent column.",
+  "tags": [
+    "presentation",
+    "slide"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_presentation-title-slide",
+        "name": "Presentation — Title Slide",
+        "width": 1920,
+        "height": 1080,
+        "background": {
+          "type": "solid",
+          "color": "#F5F3FF"
+        },
+        "nodes": [
+          {
+            "id": "sh_fpwnz5gkem",
+            "kind": "shape",
+            "name": "Column",
+            "visible": true,
+            "locked": false,
+            "x": 0,
+            "y": 0,
+            "width": 115.2,
+            "height": 1080,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "rect",
+            "fill": {
+              "type": "solid",
+              "color": "#7C5CFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_z1p4es6h1g",
+            "kind": "text",
+            "name": "Kicker",
+            "visible": true,
+            "locked": false,
+            "x": 211.2,
+            "y": 259.2,
+            "width": 1152,
+            "height": 68.8,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "Q3 REVIEW",
+            "fontFamily": "Inter",
+            "fontSize": 43,
+            "fontWeight": 800,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": 10,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#7C5CFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_y0s1tnsvcd",
+            "kind": "text",
+            "name": "Title",
+            "visible": true,
+            "locked": false,
+            "x": 211.2,
+            "y": 345.6,
+            "width": 1420.8,
+            "height": 367.2,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "Design systems\nthat scale",
+            "fontFamily": "Inter",
+            "fontSize": 140,
+            "fontWeight": 800,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": -3,
+            "lineHeight": 1.04,
+            "fill": {
+              "type": "solid",
+              "color": "#0F1024",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_msj1j8tsbl",
+            "kind": "text",
+            "name": "Footer",
+            "visible": true,
+            "locked": false,
+            "x": 211.2,
+            "y": 799.2,
+            "width": 1344,
+            "height": 51.2,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "Prepared by the Brand & Product team · 12 October",
+            "fontFamily": "Inter",
+            "fontSize": 32,
+            "fontWeight": 500,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": 0,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#C9B8FF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}

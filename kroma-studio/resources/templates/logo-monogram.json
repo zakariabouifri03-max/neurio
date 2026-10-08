@@ -1,0 +1,122 @@
+{
+  "id": "logo-monogram",
+  "name": "Logo — Monogram Mark",
+  "category": "Logos",
+  "width": 1000,
+  "height": 1000,
+  "description": "Geometric monogram with wordmark lockup.",
+  "tags": [
+    "logo",
+    "brand",
+    "mark"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_logo-monogram-mark",
+        "name": "Logo — Monogram Mark",
+        "width": 1000,
+        "height": 1000,
+        "background": {
+          "type": "transparent",
+          "color": "#00000000"
+        },
+        "nodes": [
+          {
+            "id": "sh_n2l6bxcy3i",
+            "kind": "shape",
+            "name": "Mark",
+            "visible": true,
+            "locked": false,
+            "x": 200,
+            "y": 160,
+            "width": 600,
+            "height": 600,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 18,
+            "shape": "rect",
+            "fill": {
+              "type": "solid",
+              "color": "#7C5CFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_x4pv8vix4q",
+            "kind": "text",
+            "name": "Monogram",
+            "visible": true,
+            "locked": false,
+            "x": 200,
+            "y": 360,
+            "width": 600,
+            "height": 200,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "KV",
+            "fontFamily": "Inter",
+            "fontSize": 280,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": -8,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#F5F3FF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_ybbmie1xsf",
+            "kind": "text",
+            "name": "Wordmark",
+            "visible": true,
+            "locked": false,
+            "x": 100,
+            "y": 820,
+            "width": 800,
+            "height": 120,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "KROMA VISUAL",
+            "fontFamily": "Inter",
+            "fontSize": 75,
+            "fontWeight": 800,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 10,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#0F1024",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}

@@ -1,0 +1,237 @@
+{
+  "id": "ig-story-launch",
+  "name": "Instagram Story — Launch",
+  "category": "Instagram",
+  "width": 1080,
+  "height": 1920,
+  "description": "Vertical story with a stacked headline and CTA pill.",
+  "tags": [
+    "story",
+    "launch",
+    "vertical"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_instagram-story-launch",
+        "name": "Instagram Story — Launch",
+        "width": 1080,
+        "height": 1920,
+        "background": {
+          "type": "gradient",
+          "color": "#0F1024",
+          "gradient": {
+            "type": "linear",
+            "color": "#0F1024",
+            "stops": [
+              {
+                "color": "#0F1024",
+                "offset": 0
+              },
+              {
+                "color": "#2B2D63",
+                "offset": 1
+              }
+            ],
+            "angle": 160
+          }
+        },
+        "nodes": [
+          {
+            "id": "sh_4xxjpamhg6",
+            "kind": "shape",
+            "name": "Halo",
+            "visible": true,
+            "locked": false,
+            "x": 194.4,
+            "y": 384,
+            "width": 777.6,
+            "height": 777.6,
+            "rotation": 0,
+            "opacity": 0.7,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "linear",
+              "color": "#7C5CFF",
+              "stops": [
+                {
+                  "color": "#7C5CFF",
+                  "offset": 0
+                },
+                {
+                  "color": "#00000000",
+                  "offset": 1
+                }
+              ],
+              "angle": 90
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_vleipcck43",
+            "kind": "text",
+            "name": "Kicker",
+            "visible": true,
+            "locked": false,
+            "x": 108,
+            "y": 960,
+            "width": 864,
+            "height": 86.4,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "NEW",
+            "fontFamily": "Inter",
+            "fontSize": 54,
+            "fontWeight": 800,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 12,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#7C5CFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_96d4xi0plr",
+            "kind": "text",
+            "name": "Headline",
+            "visible": true,
+            "locked": false,
+            "x": 86.4,
+            "y": 1056,
+            "width": 907.2,
+            "height": 307.2,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "Studio 2.0\nis live",
+            "fontFamily": "Inter",
+            "fontSize": 146,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": -3,
+            "lineHeight": 1.02,
+            "fill": {
+              "type": "solid",
+              "color": "#F5F3FF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_uv7mysz2qk",
+            "kind": "text",
+            "name": "Body",
+            "visible": true,
+            "locked": false,
+            "x": 129.6,
+            "y": 1382.4,
+            "width": 820.8,
+            "height": 134.4,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "Faster exports, new AI layouts and a rebuilt text engine.",
+            "fontFamily": "Inter",
+            "fontSize": 41,
+            "fontWeight": 400,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 0,
+            "lineHeight": 1.4,
+            "fill": {
+              "type": "solid",
+              "color": "#C9B8FF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "sh_ubbnlr81o2",
+            "kind": "shape",
+            "name": "CTA",
+            "visible": true,
+            "locked": false,
+            "x": 216,
+            "y": 1593.6,
+            "width": 648,
+            "height": 105.6,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "pill",
+            "fill": {
+              "type": "solid",
+              "color": "#7C5CFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_ek82vesp1a",
+            "kind": "text",
+            "name": "CTA text",
+            "visible": true,
+            "locked": false,
+            "x": 216,
+            "y": 1622.4,
+            "width": 648,
+            "height": 57.6,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "Try it free",
+            "fontFamily": "Inter",
+            "fontSize": 43,
+            "fontWeight": 800,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 0,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#FFFFFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}

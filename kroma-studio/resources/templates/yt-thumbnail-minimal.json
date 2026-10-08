@@ -1,0 +1,153 @@
+{
+  "id": "yt-thumbnail-minimal",
+  "name": "YouTube Thumbnail — Clean Cut",
+  "category": "YouTube",
+  "width": 1280,
+  "height": 720,
+  "description": "Minimal thumbnail with a large serif headline and rule.",
+  "tags": [
+    "youtube",
+    "minimal"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_youtube-thumbnail-clean-cut",
+        "name": "YouTube Thumbnail — Clean Cut",
+        "width": 1280,
+        "height": 720,
+        "background": {
+          "type": "solid",
+          "color": "#F5F3FF"
+        },
+        "nodes": [
+          {
+            "id": "sh_12rmt3hbg0",
+            "kind": "shape",
+            "name": "Accent rule",
+            "visible": true,
+            "locked": false,
+            "x": 102.4,
+            "y": 144,
+            "width": 204.8,
+            "height": 8.64,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "rect",
+            "fill": {
+              "type": "solid",
+              "color": "#8A8A8F",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_0eds4tom0c",
+            "kind": "text",
+            "name": "Headline",
+            "visible": true,
+            "locked": false,
+            "x": 102.4,
+            "y": 187.2,
+            "width": 768,
+            "height": 316.8,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "The quiet\nupgrade",
+            "fontFamily": "Georgia",
+            "fontSize": 115,
+            "fontWeight": 600,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": -3,
+            "lineHeight": 1.02,
+            "fill": {
+              "type": "solid",
+              "color": "#111111",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_6qolcpyvlm",
+            "kind": "text",
+            "name": "Label",
+            "visible": true,
+            "locked": false,
+            "x": 102.4,
+            "y": 547.2,
+            "width": 640,
+            "height": 51.2,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "Episode 42",
+            "fontFamily": "Inter",
+            "fontSize": 32,
+            "fontWeight": 700,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": 4,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#3A3A3D",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "sh_z1tcanp9kv",
+            "kind": "shape",
+            "name": "Dot",
+            "visible": true,
+            "locked": false,
+            "x": 998.4,
+            "y": 230.4,
+            "width": 259.2,
+            "height": 259.2,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "linear",
+              "color": "#8A8A8F",
+              "stops": [
+                {
+                  "color": "#8A8A8F",
+                  "offset": 0
+                },
+                {
+                  "color": "#C9B8FF",
+                  "offset": 1
+                }
+              ],
+              "angle": 90
+            },
+            "stroke": null,
+            "shadow": null
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}

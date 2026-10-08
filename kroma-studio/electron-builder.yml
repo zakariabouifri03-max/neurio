@@ -1,0 +1,63 @@
+appId: studio.kroma.desktop
+productName: Kroma Studio
+copyright: Copyright © 2026 Kroma Studio Team
+
+directories:
+  buildResources: build
+  output: dist
+
+files:
+  - out/**/*
+  - resources/**/*
+  - package.json
+  - "!**/*.map"
+
+asar: true
+asarUnpack:
+  - resources/**/*
+
+# Project / template / asset data lives outside the asar so it survives updates
+extraResources:
+  - from: resources
+    to: resources
+    filter:
+      - "**/*"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - arm64
+    - target: portable
+      arch:
+        - x64
+  icon: build/icon.ico
+  artifactName: ${productName}-${version}-Setup.${ext}
+  requestedExecutionLevel: asInvoker
+  signAndEditExecutable: false
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Kroma Studio
+  deleteAppDataOnUninstall: false
+
+portable:
+  artifactName: ${productName}-${version}-Portable.${ext}
+
+linux:
+  target:
+    - AppImage
+  category: Graphics
+  icon: build/icon.png
+
+mac:
+  target:
+    - dmg
+  category: public.app-category.graphics-design
+
+publish: null

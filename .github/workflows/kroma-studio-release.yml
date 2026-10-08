@@ -1,0 +1,91 @@
+name: Kroma Studio — Windows installer
+
+# Builds the Kroma Studio Windows installer (NSIS .exe + portable .exe) and
+# publishes it as a GitHub Release asset.
+#   • push a tag  ->  builds and attaches the installer to that release
+#   • manual run  ->  builds and uploads the installer as a workflow artifact
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version label for the build (e.g. 0.1.0)'
+        required: false
+        default: 'manual'
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    name: Typecheck & tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: kroma-studio/package-lock.json
+      - name: Install dependencies
+        working-directory: kroma-studio
+        run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+      - name: Typecheck
+        working-directory: kroma-studio
+        run: npm run typecheck
+      - name: Unit tests
+        working-directory: kroma-studio
+        run: npm test
+
+  build-windows:
+    name: Build Windows installer
+    needs: verify
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: kroma-studio/package-lock.json
+      - name: Install dependencies
+        working-directory: kroma-studio
+        run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+      - name: Build app bundle
+        working-directory: kroma-studio
+        run: npm run build:only
+
+      - name: Package installer (electron-builder)
+        working-directory: kroma-studio
+        run: npx electron-builder --win --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          EP_PRESET: 'true'
+
+      - name: List build output
+        working-directory: kroma-studio
+        run: Get-ChildItem -Recurse dist | Select-Object FullName, Length | Format-Table -AutoSize
+        shell: pwsh
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kroma-studio-windows-${{ github.ref_name }}
+          path: |
+            kroma-studio/dist/*.exe
+            kroma-studio/dist/*.yml
+          if-no-files-found: error
+
+      - name: Publish to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            kroma-studio/dist/*.exe
+          draft: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,126 @@
+{
+  "id": "ig-post-quote",
+  "name": "Instagram Post — Quote Card",
+  "category": "Instagram",
+  "width": 1080,
+  "height": 1080,
+  "description": "Centred quote card with generous typography.",
+  "tags": [
+    "instagram",
+    "quote",
+    "minimal"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_instagram-post-quote-card",
+        "name": "Instagram Post — Quote Card",
+        "width": 1080,
+        "height": 1080,
+        "background": {
+          "type": "solid",
+          "color": "#0B0B0C"
+        },
+        "nodes": [
+          {
+            "id": "sh_dyxhmwicjj",
+            "kind": "shape",
+            "name": "Frame",
+            "visible": true,
+            "locked": false,
+            "x": 86.4,
+            "y": 86.4,
+            "width": 907.2,
+            "height": 907.2,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "rect",
+            "fill": {
+              "type": "solid",
+              "color": "#00000000",
+              "angle": 0
+            },
+            "stroke": {
+              "color": "#8A8A8F",
+              "width": 3,
+              "align": "outside"
+            },
+            "shadow": null
+          },
+          {
+            "id": "tx_m1d46sfc1m",
+            "kind": "text",
+            "name": "Quote",
+            "visible": true,
+            "locked": false,
+            "x": 172.8,
+            "y": 302.4,
+            "width": 734.4,
+            "height": 453.6,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "“Design is\nintelligence\nmade visible.”",
+            "fontFamily": "Georgia",
+            "fontSize": 92,
+            "fontWeight": 500,
+            "italic": true,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 0,
+            "lineHeight": 1.28,
+            "fill": {
+              "type": "solid",
+              "color": "#FFFFFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_tfe3bkzkp2",
+            "kind": "text",
+            "name": "Footer",
+            "visible": true,
+            "locked": false,
+            "x": 172.8,
+            "y": 799.2,
+            "width": 734.4,
+            "height": 48,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "STUDIO NOTES",
+            "fontFamily": "Inter",
+            "fontSize": 30,
+            "fontWeight": 700,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 8,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#8A8A8F",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}

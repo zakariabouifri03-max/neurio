@@ -1,0 +1,56 @@
+/* Kroma Studio design tokens — original visual identity. */
+:root {
+  --k-accent: #7c5cff;
+  --k-accent-2: #9c86ff;
+  --k-accent-ink: #ffffff;
+
+  --k-bg: #0b0b12;
+  --k-bg-2: #101018;
+  --k-panel: #15151f;
+  --k-panel-2: #1b1b27;
+  --k-panel-3: #232331;
+  --k-line: #2b2b3b;
+  --k-line-soft: #22222e;
+
+  --k-text: #eceaf6;
+  --k-text-dim: #a29fbb;
+  --k-text-mute: #6f6c88;
+
+  --k-ok: #38d39f;
+  --k-warn: #ffb84d;
+  --k-danger: #ff5f7a;
+  --k-info: #57b8ff;
+
+  --k-r-sm: 6px;
+  --k-r: 10px;
+  --k-r-lg: 14px;
+  --k-r-xl: 20px;
+
+  --k-shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --k-shadow-2: 0 10px 30px rgb(0 0 0 / 0.45);
+  --k-shadow-3: 0 30px 80px rgb(0 0 0 / 0.55);
+
+  --k-rail: 68px;
+  --k-left: 296px;
+  --k-right: 308px;
+  --k-top: 52px;
+  --k-pages: 96px;
+
+  --k-font: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --k-mono: 'JetBrains Mono', 'Cascadia Code', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --k-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+[data-theme='light'] {
+  --k-bg: #f4f3fa;
+  --k-bg-2: #eceaf5;
+  --k-panel: #ffffff;
+  --k-panel-2: #f6f5fb;
+  --k-panel-3: #eceaf5;
+  --k-line: #ddd9ea;
+  --k-line-soft: #e8e5f2;
+  --k-text: #1b1a26;
+  --k-text-dim: #5b5871;
+  --k-text-mute: #8b88a0;
+}

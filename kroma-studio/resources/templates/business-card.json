@@ -1,0 +1,209 @@
+{
+  "id": "business-card",
+  "name": "Business Card — Studio",
+  "category": "Business",
+  "width": 1050,
+  "height": 600,
+  "description": "Double-sided style card with mark and contact block.",
+  "tags": [
+    "business",
+    "card"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_business-card-studio",
+        "name": "Business Card — Studio",
+        "width": 1050,
+        "height": 600,
+        "background": {
+          "type": "solid",
+          "color": "#F5F3FF"
+        },
+        "nodes": [
+          {
+            "id": "sh_dgygb5hy0o",
+            "kind": "shape",
+            "name": "Edge",
+            "visible": true,
+            "locked": false,
+            "x": 0,
+            "y": 0,
+            "width": 36.75,
+            "height": 600,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "rect",
+            "fill": {
+              "type": "solid",
+              "color": "#7C5CFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_r4z06aygd6",
+            "kind": "text",
+            "name": "Mark",
+            "visible": true,
+            "locked": false,
+            "x": 94.5,
+            "y": 96,
+            "width": 525,
+            "height": 153.6,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "KROMA",
+            "fontFamily": "Inter",
+            "fontSize": 96,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": -1,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#0F1024",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_zxrxemohul",
+            "kind": "text",
+            "name": "Tag",
+            "visible": true,
+            "locked": false,
+            "x": 99.75,
+            "y": 216,
+            "width": 525,
+            "height": 43.2,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "DESIGN STUDIO",
+            "fontFamily": "Inter",
+            "fontSize": 27,
+            "fontWeight": 700,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": 6,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#7C5CFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "sh_7ipd4ou09l",
+            "kind": "shape",
+            "name": "Rule",
+            "visible": true,
+            "locked": false,
+            "x": 94.5,
+            "y": 312,
+            "width": 315,
+            "height": 3.6,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "rect",
+            "fill": {
+              "type": "solid",
+              "color": "#C9B8FF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_3xv0ecpv08",
+            "kind": "text",
+            "name": "Contact",
+            "visible": true,
+            "locked": false,
+            "x": 94.5,
+            "y": 348,
+            "width": 525,
+            "height": 180,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "Amara Vance\nCreative Director\namara@kroma.studio",
+            "fontFamily": "Inter",
+            "fontSize": 30,
+            "fontWeight": 500,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": 0,
+            "lineHeight": 1.7,
+            "fill": {
+              "type": "solid",
+              "color": "#2B2D63",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "sh_14oy31apyy",
+            "kind": "shape",
+            "name": "Dot",
+            "visible": true,
+            "locked": false,
+            "x": 777,
+            "y": 180,
+            "width": 240,
+            "height": 240,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "linear",
+              "color": "#7C5CFF",
+              "stops": [
+                {
+                  "color": "#7C5CFF",
+                  "offset": 0
+                },
+                {
+                  "color": "#C9B8FF",
+                  "offset": 1
+                }
+              ],
+              "angle": 90
+            },
+            "stroke": null,
+            "shadow": null
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}

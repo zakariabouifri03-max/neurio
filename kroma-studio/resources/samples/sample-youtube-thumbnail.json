@@ -1,0 +1,221 @@
+{
+  "name": "YouTube Thumbnail — Demo",
+  "tags": [
+    "sample"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_youtube-thumbnail-demo",
+        "name": "YouTube Thumbnail — Demo",
+        "width": 1280,
+        "height": 720,
+        "background": {
+          "type": "gradient",
+          "color": "#0F1024",
+          "gradient": {
+            "type": "linear",
+            "color": "#0F1024",
+            "stops": [
+              {
+                "color": "#0F1024",
+                "offset": 0
+              },
+              {
+                "color": "#2B2D63",
+                "offset": 1
+              }
+            ],
+            "angle": 135
+          }
+        },
+        "nodes": [
+          {
+            "id": "sh_nquoau0q0x",
+            "kind": "shape",
+            "name": "Frame",
+            "visible": true,
+            "locked": false,
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "rect",
+            "fill": {
+              "type": "solid",
+              "color": "#00000000",
+              "angle": 0
+            },
+            "stroke": {
+              "color": "#7C5CFF",
+              "width": 8,
+              "align": "outside"
+            },
+            "shadow": null
+          },
+          {
+            "id": "sh_uta6jyk4q6",
+            "kind": "shape",
+            "name": "Glow",
+            "visible": true,
+            "locked": false,
+            "x": 793.6,
+            "y": 72,
+            "width": 648,
+            "height": 648,
+            "rotation": 0,
+            "opacity": 0.55,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "linear",
+              "color": "#7C5CFF",
+              "stops": [
+                {
+                  "color": "#7C5CFF",
+                  "offset": 0
+                },
+                {
+                  "color": "#00000000",
+                  "offset": 1
+                }
+              ],
+              "angle": 90
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_5dha7qwsym",
+            "kind": "text",
+            "name": "Kicker",
+            "visible": true,
+            "locked": false,
+            "x": 76.8,
+            "y": 115.2,
+            "width": 563.2,
+            "height": 80,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "WAIT…",
+            "fontFamily": "Inter",
+            "fontSize": 50,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": 6,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#7C5CFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_9djs5qmftz",
+            "kind": "text",
+            "name": "Headline",
+            "visible": true,
+            "locked": false,
+            "x": 76.8,
+            "y": 201.6,
+            "width": 716.8,
+            "height": 302.4,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "THIS CHANGED\nEVERYTHING",
+            "fontFamily": "Inter",
+            "fontSize": 108,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": -3,
+            "lineHeight": 0.98,
+            "fill": {
+              "type": "solid",
+              "color": "#F5F3FF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_opeu1fn7bq",
+            "kind": "text",
+            "name": "Sub",
+            "visible": true,
+            "locked": false,
+            "x": 76.8,
+            "y": 518.4,
+            "width": 640,
+            "height": 57.6,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "Full breakdown inside",
+            "fontFamily": "Inter",
+            "fontSize": 36,
+            "fontWeight": 500,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "left",
+            "valign": "middle",
+            "letterSpacing": 0,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#C9B8FF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "sh_zystrla3ru",
+            "kind": "shape",
+            "name": "Arrow bar",
+            "visible": true,
+            "locked": false,
+            "x": 76.8,
+            "y": 604.8,
+            "width": 281.6,
+            "height": 57.6,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "pill",
+            "fill": {
+              "type": "solid",
+              "color": "#7C5CFF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  }
+}

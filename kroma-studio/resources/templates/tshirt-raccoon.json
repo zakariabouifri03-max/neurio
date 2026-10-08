@@ -1,0 +1,254 @@
+{
+  "id": "tshirt-raccoon",
+  "name": "T-Shirt — Halloween Raccoon",
+  "category": "T-Shirts",
+  "width": 4500,
+  "height": 5400,
+  "description": "Vintage badge tee with arched headline.",
+  "tags": [
+    "tshirt",
+    "halloween",
+    "vintage"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_t-shirt-halloween-raccoon",
+        "name": "T-Shirt — Halloween Raccoon",
+        "width": 4500,
+        "height": 5400,
+        "background": {
+          "type": "transparent",
+          "color": "#00000000"
+        },
+        "nodes": [
+          {
+            "id": "sh_fiop1oe31k",
+            "kind": "shape",
+            "name": "Badge ring",
+            "visible": true,
+            "locked": false,
+            "x": 630,
+            "y": 1890,
+            "width": 3240,
+            "height": 3240,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "solid",
+              "color": "#00000000",
+              "angle": 0
+            },
+            "stroke": {
+              "color": "#FF7B00",
+              "width": 54,
+              "align": "outside"
+            },
+            "shadow": null
+          },
+          {
+            "id": "sh_ojwc8r04ou",
+            "kind": "shape",
+            "name": "Inner disc",
+            "visible": true,
+            "locked": false,
+            "x": 855,
+            "y": 2115,
+            "width": 2790,
+            "height": 2790,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "solid",
+              "color": "#0B0710",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_1tbr0wwi45",
+            "kind": "text",
+            "name": "Arch top",
+            "visible": true,
+            "locked": false,
+            "x": 630,
+            "y": 1980,
+            "width": 3240,
+            "height": 990,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "MIDNIGHT SNACKS",
+            "fontFamily": "Inter",
+            "fontSize": 338,
+            "fontWeight": 800,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 36,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#F5EFE6",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": {
+              "kind": "arc",
+              "amount": 40
+            },
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_z96blhdzk1",
+            "kind": "text",
+            "name": "Arch bottom",
+            "visible": true,
+            "locked": false,
+            "x": 630,
+            "y": 3690,
+            "width": 3240,
+            "height": 900,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "EST. 1993",
+            "fontFamily": "Inter",
+            "fontSize": 248,
+            "fontWeight": 800,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 27,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#FFD166",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": {
+              "kind": "arcReverse",
+              "amount": 40
+            },
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "sh_yo2qvcvrnl",
+            "kind": "shape",
+            "name": "Snout",
+            "visible": true,
+            "locked": false,
+            "x": 1890,
+            "y": 2790,
+            "width": 720,
+            "height": 720,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "solid",
+              "color": "#FFD166",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "sh_jvqi0g86e3",
+            "kind": "shape",
+            "name": "Ear left",
+            "visible": true,
+            "locked": false,
+            "x": 1485,
+            "y": 2385,
+            "width": 540,
+            "height": 540,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "solid",
+              "color": "#2A1B3D",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "sh_n8z9lre3go",
+            "kind": "shape",
+            "name": "Ear right",
+            "visible": true,
+            "locked": false,
+            "x": 2475,
+            "y": 2385,
+            "width": 540,
+            "height": 540,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "circle",
+            "fill": {
+              "type": "solid",
+              "color": "#2A1B3D",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_bwpro0z3i2",
+            "kind": "text",
+            "name": "Centre",
+            "visible": true,
+            "locked": false,
+            "x": 1080,
+            "y": 3150,
+            "width": 2340,
+            "height": 720,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "RACCOON\nCREW",
+            "fontFamily": "Inter",
+            "fontSize": 315,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": -2,
+            "lineHeight": 1,
+            "fill": {
+              "type": "solid",
+              "color": "#FF7B00",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}

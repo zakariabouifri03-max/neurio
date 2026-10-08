@@ -1,0 +1,155 @@
+{
+  "id": "tiktok-cover",
+  "name": "TikTok Cover — Neon",
+  "category": "TikTok",
+  "width": 1080,
+  "height": 1920,
+  "description": "Neon vertical cover with glow shapes.",
+  "tags": [
+    "tiktok",
+    "neon",
+    "vertical"
+  ],
+  "document": {
+    "version": 3,
+    "pages": [
+      {
+        "id": "pg_tiktok-cover-neon",
+        "name": "TikTok Cover — Neon",
+        "width": 1080,
+        "height": 1920,
+        "background": {
+          "type": "solid",
+          "color": "#05010F"
+        },
+        "nodes": [
+          {
+            "id": "sh_hxqo9tb7x0",
+            "kind": "shape",
+            "name": "Glow band",
+            "visible": true,
+            "locked": false,
+            "x": 0,
+            "y": 691.2,
+            "width": 1080,
+            "height": 537.6,
+            "rotation": 0,
+            "opacity": 0.9,
+            "cornerRadius": 0,
+            "shape": "rect",
+            "fill": {
+              "type": "linear",
+              "color": "#00F0FF",
+              "stops": [
+                {
+                  "color": "#00F0FF",
+                  "offset": 0
+                },
+                {
+                  "color": "#FF2EC4",
+                  "offset": 1
+                }
+              ],
+              "angle": 90
+            },
+            "stroke": null,
+            "shadow": null
+          },
+          {
+            "id": "tx_8u4t9zudnt",
+            "kind": "text",
+            "name": "Headline",
+            "visible": true,
+            "locked": false,
+            "x": 64.8,
+            "y": 729.6,
+            "width": 950.4,
+            "height": 384,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "NIGHT\nMODE",
+            "fontFamily": "Inter",
+            "fontSize": 205,
+            "fontWeight": 900,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": -4,
+            "lineHeight": 0.95,
+            "fill": {
+              "type": "solid",
+              "color": "#F8F8FF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "tx_qlh9tkccyo",
+            "kind": "text",
+            "name": "Sub",
+            "visible": true,
+            "locked": false,
+            "x": 64.8,
+            "y": 1267.2,
+            "width": 950.4,
+            "height": 86.4,
+            "rotation": 0,
+            "opacity": 1,
+            "text": "part 3 · the finale",
+            "fontFamily": "Inter",
+            "fontSize": 54,
+            "fontWeight": 600,
+            "italic": false,
+            "underline": false,
+            "strikethrough": false,
+            "align": "center",
+            "valign": "middle",
+            "letterSpacing": 4,
+            "lineHeight": 1.2,
+            "fill": {
+              "type": "solid",
+              "color": "#00F0FF",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "curve": null,
+            "boxMode": "fixed",
+            "padding": 0
+          },
+          {
+            "id": "sh_yvbjcf7ez1",
+            "kind": "shape",
+            "name": "Sparkle",
+            "visible": true,
+            "locked": false,
+            "x": 777.6,
+            "y": 345.6,
+            "width": 259.2,
+            "height": 259.2,
+            "rotation": 0,
+            "opacity": 1,
+            "cornerRadius": 0,
+            "shape": "star",
+            "fill": {
+              "type": "solid",
+              "color": "#FF2EC4",
+              "angle": 0
+            },
+            "stroke": null,
+            "shadow": null,
+            "points": 8
+          }
+        ],
+        "safeArea": 0
+      }
+    ]
+  },
+  "assets": []
+}
