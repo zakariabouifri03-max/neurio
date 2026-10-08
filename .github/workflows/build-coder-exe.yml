@@ -10,7 +10,7 @@ on:
       - ".github/workflows/build-coder-exe.yml"
 
 permissions:
-  contents: read
+  contents: write   # needed to publish the release (manual runs only)
 
 jobs:
   build:
@@ -41,6 +41,22 @@ jobs:
         run: |
           .\dist\OfflineCoder.exe "snake game" -o snake-smoke.html
           if (-not (Select-String -Path snake-smoke.html -Pattern "<canvas" -Quiet)) { exit 1 }
+
+      - name: Publish direct-download release (manual run only)
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "offline-coder-latest"
+          $notes = "Offline Coder for Windows. Download OfflineCoder.exe below, double-click it, and use it in your browser. No API key and no install needed. Built from commit $env:GITHUB_SHA."
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag dist/OfflineCoder.exe --clobber
+            gh release edit $tag --notes $notes
+          } else {
+            gh release create $tag dist/OfflineCoder.exe --title "Offline Coder (.exe) - latest" --notes $notes --target $env:GITHUB_SHA
+          }
 
       - uses: actions/upload-artifact@v4
         with:
