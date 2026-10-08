@@ -3,3 +3,22 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# ---- Unreal Engine 5 (GameProject/) ----
+# Build output and caches are regenerable and huge; never commit them.
+GameProject/Binaries/
+GameProject/Intermediate/
+GameProject/DerivedDataCache/
+GameProject/Saved/
+GameProject/.vs/
+GameProject/.vscode/
+GameProject/*.VC.db
+GameProject/*.sln
+GameProject/*.suo
+GameProject/*.xcodeproj
+GameProject/*.xcworkspace
+GameProject/Content/**/*.uasset
+GameProject/Content/**/*.umap
+
+# Native voxel core test build output
+GameProject/Development/Test/VoxelCoreTests/build/
