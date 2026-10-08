@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: lumora/package-lock.json
 
@@ -30,10 +30,29 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
-      - name: Build and package (NSIS .exe)
-        run: npm run package
+      - name: Build main process
+        run: npm run build:main
+
+      - name: Build renderer
+        run: npm run build:renderer
+
+      - name: Show build output
+        run: |
+          dir dist-electron
+          dir dist-renderer
+        shell: cmd
+
+      - name: Package NSIS installer
+        run: npx --no-install electron-builder --win nsis --x64 --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          DEBUG: 'electron-builder'
+
+      - name: List dist
+        if: always()
+        run: dir dist
+        shell: cmd
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
