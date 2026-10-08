@@ -29,7 +29,17 @@ Everything except cloud AI works with no internet: canvas, text, shapes, layers,
 
 ---
 
-## 2. Quick start (development)
+## 2. Download the installer (no build needed)
+
+**[⬇ Lumora-Studio-Setup-1.0.0.exe](https://github.com/zakariabouifri03-max/neurio/releases/download/v1.0.2-win/Lumora-Studio-Setup-1.0.0.exe)** · [all releases](https://github.com/zakariabouifri03-max/neurio/releases)
+
+Built automatically on a Windows runner by [`.github/workflows/build-windows.yml`](../.github/workflows/build-windows.yml).
+The installer is unsigned, so Windows SmartScreen shows "More info → Run anyway" on first launch.
+Push a new `v*` tag (or run the workflow manually from the Actions tab) to publish a fresh build.
+
+---
+
+## 3. Quick start (development)
 
 ```bash
 cd lumora
@@ -69,7 +79,7 @@ Replace `build/icon.png` with a 256×256 `build/icon.ico` for a custom installer
 
 ---
 
-## 3. Configuring AI API keys
+## 4. Configuring AI API keys
 
 1. Launch the app → **Settings → AI Providers**.
 2. Paste a key for OpenAI, Google AI, a custom OpenAI-compatible endpoint, and/or a background-removal service.
@@ -85,7 +95,7 @@ No key configured? The app stays useful: the **offline design composer** lays ou
 
 ---
 
-## 4. Keyboard shortcuts
+## 5. Keyboard shortcuts
 
 | Action | Shortcut |
 | --- | --- |
@@ -104,7 +114,7 @@ No key configured? The app stays useful: the **offline design composer** lays ou
 
 ---
 
-## 5. Project structure
+## 6. Project structure
 
 ```
 lumora/
@@ -148,7 +158,7 @@ Projects are atomic JSON documents (`write temp → fsync → rename`) in
 
 ---
 
-## 6. Security
+## 7. Security
 
 * `contextIsolation: true`, `nodeIntegration: false`, preload `contextBridge` only.
 * No remote content: external links open in the system browser, in-app navigation is blocked, permission requests are denied.
@@ -158,12 +168,12 @@ Projects are atomic JSON documents (`write temp → fsync → rename`) in
 
 ---
 
-## 7. First run
+## 8. First run
 
 On first launch Lumora seeds **five original demo projects** (YouTube thumbnail, Halloween t-shirt, Instagram post, gig poster, business flyer) and shows a welcome dialog with **Create Blank Design / Choose Template / AI Generate**.
 
 ---
 
-## 8. Licensing
+## 9. Licensing
 
 MIT for the application code. All bundled templates, icons, stickers and artwork are original works created for Lumora Studio. Fonts referenced in the picker are the system fonts installed on the user's machine; uploaded fonts stay local to the user's session.
