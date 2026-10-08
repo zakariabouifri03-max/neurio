@@ -1,0 +1,49 @@
+# Builds OfflineCoder.exe (Windows, single file, no Python needed on the PC).
+# Trigger: manual run, or a push that touches tools/coder/.
+name: Build Offline Coder (.exe)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tools/coder/**"
+      - ".github/workflows/build-coder-exe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: tools/coder
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: python -m pip install --upgrade pip pyinstaller
+
+      - name: Run tests
+        run: python -m unittest -v test_coder.py
+
+      - name: Build single-file exe
+        run: >
+          pyinstaller --onefile --console --name OfflineCoder
+          --add-data "ui.html;."
+          --noconfirm --clean main.py
+
+      - name: Smoke test the exe (offline template build)
+        run: |
+          .\dist\OfflineCoder.exe "snake game" -o snake-smoke.html
+          if (-not (Select-String -Path snake-smoke.html -Pattern "<canvas" -Quiet)) { exit 1 }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OfflineCoder-windows
+          path: tools/coder/dist/OfflineCoder.exe
+          if-no-files-found: error

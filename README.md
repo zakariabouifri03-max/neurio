@@ -113,3 +113,14 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 🧩 Offline Coder — مولّد الألعاب والتطبيقات بلا API
+
+A small offline tool that builds **complete games & apps** as single HTML files (Snake, Pong, Breakout, Tic-Tac-Toe, Memory, To-Do, Calculator, Pomodoro, Expenses, Password generator), understanding English, French, Arabic and Darija. It runs **on your PC** with no API key; an optional local Ollama model can handle other ideas.
+
+- Windows: download the **OfflineCoder-windows** artifact from the *Build Offline Coder (.exe)* workflow and double-click it.
+- Python: `python3 tools/coder/main.py "snake game" -o snake.html`
+
+See **[`tools/coder/README.md`](tools/coder/README.md)**.

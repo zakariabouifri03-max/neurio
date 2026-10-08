@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Offline Coder</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,"Segoe UI",Tahoma,Arial,sans-serif;background:#0b1020;color:#e5e7eb;min-height:100vh}
+header{padding:14px 20px;border-bottom:1px solid #1f2937;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+header h1{font-size:20px;margin:0 8px 0 0}
+.pill{font-size:12px;padding:4px 10px;border-radius:999px;background:#111827;border:1px solid #334155;color:#94a3b8}
+.pill.ok{border-color:#16a34a;color:#4ade80}
+main{padding:16px 20px;display:grid;gap:12px}
+form{display:flex;gap:8px;flex-wrap:wrap}
+input[type=text]{flex:1;min-width:240px;padding:12px 14px;border-radius:10px;border:1px solid #334155;background:#111827;color:#f9fafb;font-size:16px}
+select,button{padding:10px 14px;border-radius:10px;border:1px solid #334155;background:#111827;color:#e5e7eb;font-size:14px;cursor:pointer}
+button.primary{background:#6366f1;border-color:#6366f1;color:#fff}
+button:disabled{opacity:.5;cursor:default}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:13px;padding:5px 10px;border-radius:999px;background:#111827;border:1px solid #334155;cursor:pointer;color:#cbd5e1}
+.chip:hover{border-color:#6366f1}
+.msg{font-size:14px;color:#94a3b8;min-height:20px}
+.msg.err{color:#f87171}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:62vh}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.panel{background:#111827;border:1px solid #1f2937;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:50vh}
+.panel h2{font-size:13px;font-weight:600;margin:0;padding:10px 12px;border-bottom:1px solid #1f2937;color:#94a3b8;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions button{padding:6px 10px;font-size:13px}
+textarea#code{flex:1;border:0;background:#0b1020;color:#c7d2fe;font:13px/1.45 ui-monospace,Consolas,monospace;padding:12px;resize:none;outline:none;min-height:50vh}
+iframe#preview{flex:1;border:0;background:#fff;min-height:50vh;width:100%}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧩 Offline Coder</h1>
+  <span class="pill" id="st-tpl">loading…</span>
+  <span class="pill" id="st-ai">AI: checking…</span>
+  <span class="pill">100% on this PC · no API key · no internet</span>
+</header>
+<main>
+  <form id="f">
+    <input type="text" id="prompt" placeholder="e.g. snake game · لعبة ثعبان · app dyal to-do · mot de passe" autocomplete="off">
+    <select id="backend" title="Which engine to use">
+      <option value="auto">Auto</option>
+      <option value="template">Offline templates only</option>
+      <option value="ollama">Local AI (Ollama)</option>
+    </select>
+    <button class="primary" id="go" type="submit">Generate</button>
+  </form>
+  <div class="chips" id="chips"></div>
+  <div class="msg" id="msg"></div>
+  <div class="grid">
+    <section class="panel">
+      <h2><span>index.html — edit if you like</span>
+        <span class="actions">
+          <button id="copy" type="button">Copy</button>
+          <button id="dl" type="button">Download .html</button>
+          <button id="open" type="button">Open in tab</button>
+        </span>
+      </h2>
+      <textarea id="code" spellcheck="false" placeholder="Generated code appears here"></textarea>
+    </section>
+    <section class="panel">
+      <h2><span>Preview</span><button id="refresh" type="button">Refresh preview</button></h2>
+      <iframe id="preview" sandbox="allow-scripts allow-forms" title="Preview"></iframe>
+    </section>
+  </div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+let current = null;
+
+function say(text, err) {
+  $('msg').textContent = text;
+  $('msg').className = 'msg' + (err ? ' err' : '');
+}
+function currentHtml() { return $('code').value; }
+function showPreview() { $('preview').srcdoc = currentHtml(); }
+
+async function loadStatus() {
+  try {
+    const s = await (await fetch('/api/status')).json();
+    $('st-tpl').textContent = s.templates.length + ' offline templates ✓';
+    $('st-tpl').classList.add('ok');
+    if (s.ollama) {
+      $('st-ai').textContent = 'AI: Ollama ✓ ' + (s.models.length ? '(' + s.models.join(', ') + ')' : '(no models yet)');
+      $('st-ai').classList.add('ok');
+    } else {
+      $('st-ai').textContent = 'AI: Ollama not running (optional)';
+    }
+    $('chips').innerHTML = '';
+    const examples = ['snake game', 'pong', 'breakout', 'tic tac toe', 'memory game',
+                      'todo app', 'calculator', 'pomodoro timer', 'expense tracker', 'password generator'];
+    examples.forEach(ex => {
+      const b = document.createElement('span');
+      b.className = 'chip';
+      b.textContent = ex;
+      b.onclick = () => { $('prompt').value = ex; generate(); };
+      $('chips').appendChild(b);
+    });
+  } catch (e) {
+    say('Cannot reach the local server: ' + e, true);
+  }
+}
+
+async function generate() {
+  const prompt = $('prompt').value.trim();
+  if (!prompt) { say('Write what you want to build first.', true); return; }
+  $('go').disabled = true;
+  say('Generating…');
+  try {
+    const r = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt, backend: $('backend').value }),
+    });
+    const d = await r.json();
+    if (!d.ok) { say(d.message, true); return; }
+    current = d;
+    $('code').value = d.html;
+    showPreview();
+    say(d.message + '  [engine: ' + d.backend + ']');
+  } catch (e) {
+    say('Error: ' + e, true);
+  } finally {
+    $('go').disabled = false;
+  }
+}
+
+function download() {
+  const blob = new Blob([currentHtml()], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (current && current.name ? current.name : 'app') + '.html';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function openTab() {
+  const url = URL.createObjectURL(new Blob([currentHtml()], { type: 'text/html' }));
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+async function copyCode() {
+  try {
+    await navigator.clipboard.writeText(currentHtml());
+    say('Code copied to clipboard.');
+  } catch (e) {
+    $('code').select();
+    say('Select-all done — press Ctrl+C to copy.');
+  }
+}
+
+$('f').addEventListener('submit', e => { e.preventDefault(); generate(); });
+$('dl').onclick = download;
+$('open').onclick = openTab;
+$('copy').onclick = copyCode;
+$('refresh').onclick = showPreview;
+loadStatus();
+</script>
+</body>
+</html>
