@@ -2,8 +2,12 @@
   "name": "animai-studio",
   "productName": "ANIMAI STUDIO",
   "version": "1.0.0",
-  "description": "ANIMAI STUDIO — local-first AI-assisted 2D animation for Windows.",
+  "description": "ANIMAI STUDIO - local-first AI-assisted 2D animation for Windows.",
   "author": "ANIMAI STUDIO",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zakariabouifri03-max/neurio.git"
+  },
   "license": "MIT",
   "main": "electron/main.cjs",
   "type": "commonjs",
@@ -54,10 +58,6 @@
       "target": [
         {
           "target": "portable",
-          "arch": ["x64"]
-        },
-        {
-          "target": "nsis",
           "arch": ["x64"]
         }
       ]

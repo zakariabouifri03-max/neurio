@@ -55,6 +55,7 @@ jobs:
         run: Get-ChildItem -Recurse release | Select-Object FullName, Length
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ANIMAI-STUDIO-windows
@@ -63,6 +64,7 @@ jobs:
             animai-studio/release/**/*.exe
 
       - name: Publish GitHub Release
+        if: always()
         uses: softprops/action-gh-release@v2
         with:
           tag_name: animai-studio-v1.0.0
@@ -70,9 +72,8 @@ jobs:
           body: |
             Download ANIMAI STUDIO for Windows:
 
-            - **ANIMAI-STUDIO.exe** — portable (no install)
-            - **ANIMAI-STUDIO-Setup.exe** — installer
+            - **ANIMAI-STUDIO.exe** — portable, no installer needed. Double-click to run.
 
             If Windows SmartScreen warns, choose More info → Run anyway (unsigned build).
-          files: animai-studio/release/**/*.exe
+          files: animai-studio/release/ANIMAI-STUDIO.exe
           make_latest: true
