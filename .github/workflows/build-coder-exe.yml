@@ -10,7 +10,7 @@ on:
       - ".github/workflows/build-coder-exe.yml"
 
 permissions:
-  contents: write   # needed to publish the release (manual runs only)
+  contents: write   # needed to publish the release
 
 jobs:
   build:
@@ -42,8 +42,8 @@ jobs:
           .\dist\OfflineCoder.exe "snake game" -o snake-smoke.html
           if (-not (Select-String -Path snake-smoke.html -Pattern "<canvas" -Quiet)) { exit 1 }
 
-      - name: Publish direct-download release (manual run only)
-        if: github.event_name == 'workflow_dispatch'
+      - name: Publish direct-download release
+        if: github.event_name == 'push'
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
