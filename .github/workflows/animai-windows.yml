@@ -39,7 +39,16 @@ jobs:
         run: npx vite build
 
       - name: Package Windows exe
-        run: npx electron-builder --win --publish never --verbose
+        shell: pwsh
+        run: |
+          $out = npx electron-builder --win --publish never 2>&1 | Out-String
+          Write-Host $out
+          if ($LASTEXITCODE -ne 0) {
+            $tail = if ($out.Length -gt 2800) { $out.Substring($out.Length - 2800) } else { $out }
+            $tail = $tail -replace "`r"," " -replace "`n"," | "
+            Write-Host "::error::electron-builder failed: $tail"
+            exit 1
+          }
 
       - name: List output
         if: always()
