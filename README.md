@@ -113,3 +113,11 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## Lumora Studio (`/lumora`)
+
+This repository also contains **Lumora Studio** — an original Electron + React + TypeScript desktop graphic design editor
+(AI-assisted, offline-first, packaged for Windows with electron-builder).
+See [`lumora/README.md`](lumora/README.md) for features, build and `.exe` packaging instructions.
