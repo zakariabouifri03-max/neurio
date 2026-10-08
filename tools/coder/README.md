@@ -3,10 +3,12 @@
 A small **desktop coder** that builds **complete games and apps** as single HTML files.
 Everything runs **on your PC**: no API key, no account, no internet needed while it generates.
 
-- 🎮 **Games:** Snake · Pong · Breakout · Tic-Tac-Toe (vs computer) · Memory
-- 📱 **Apps:** To-Do · Calculator · Pomodoro timer · Expense tracker (+ CSV export) · Password generator
-- 🗣️ Understands English, French, Arabic and Darija (`lo3ba dyal snake`, `app dyal to-do`, `لعبة ثعبان`, `mot de passe`)
-- 🧠 Optional: if you run **[Ollama](https://ollama.com)** on your PC, ideas outside the templates can be sent to a local model. Still no API.
+- 🎮 **10 games:** Snake · Pong · Breakout · Tic-Tac-Toe (vs computer) · Memory · Flappy · Shooter · Catch · Whack-a-Mole · Simon
+- 📱 **9 apps:** To-Do · Calculator · Pomodoro · Expense tracker (+ CSV) · Password generator · Notes · Converter · Dice · Stopwatch
+- 🎨 **Themes from your words:** `space`, `beach`, `jungle`, `night`, `desert`, `candy`, `snow`, `fire` change colours and emoji (`space shooter`, `لعبة ثعبان فالشاطئ`, `jungle pong`)
+- ⚡ **Difficulty from your words:** `hard` / `صعب` (faster), `easy` / `سهل` (slower)
+- 🗣️ Understands English, French, Arabic and Darija (`lo3ba dyal snake`, `app dyal notes`, `لعبة ثعبان`, `mot de passe`)
+- 🔒 **No AI model, no download, no API.** Everything is rule-based and runs on your PC. Optional: a local Ollama model for ideas that match nothing (see below).
 
 Every generated file is standalone (inline CSS + JS, no CDN). Double-click it to play/use it, even offline.
 
@@ -40,7 +42,7 @@ Run the tests (stdlib only):
 python -m unittest -v tools/coder/test_coder.py
 ```
 
-## Optional — local AI with Ollama (still no API)
+## Optional — local model with Ollama (only for ideas outside the templates)
 
 ```bash
 ollama pull qwen2.5-coder:7b          # once, downloads the model to your PC
@@ -81,23 +83,23 @@ prompt ──► engine.generate()
 |---|---|
 | `main.py` | CLI + starts the local UI and opens the browser |
 | `engine.py` | prompt matching, Ollama client, HTML validation |
-| `templates.py` | the 10 game/app templates + keywords |
+| `templates.py` | the 19 game/app templates, themes, difficulty words + keywords |
 | `server.py` | local HTTP server (binds to `127.0.0.1` only) + JSON API |
 | `ui.html` | the web UI (single file, no dependencies) |
 | `test_coder.py` | unit + API tests (uses a fake Ollama, no real model needed) |
 
 ## Add your own template
 
-In `templates.py`, write a function that returns a full HTML page using `_page(title, css, body, script)`, then register it:
+In `templates.py`, write a function `def mygame(theme=None, level=1.0)` that returns a full HTML page using `_page(title, css, body, script, theme, level)`. Inside scripts you can use `THEME.accent`, `THEME.field`, `THEME.icon`, `THEME.enemy`, `THEME.item` and `LEVEL` (speed multiplier). Then register it:
 
 ```python
-_reg("flappy", "Flappy", "game", ["flappy", "flap", "طائر"], flappy)
+_reg("mygame", "My Game", "game", ["mygame", "my game", "لعبتي"], mygame)
 ```
 
 Add a test case to `MatchingTests.CASES` in `test_coder.py`, and run the tests.
 
 ## Limits (honest)
 
-- Templates are **fixed**: they cover the 10 items above well, but they do not write arbitrary new code by themselves. For anything else you need the optional local model (Ollama).
+- It is **not an AI that invents code**. It picks one of the 19 templates from your words, then applies a theme and a difficulty. Ideas outside those 19 are not built unless you add a template (or use the optional local Ollama model).
 - A small local model is weaker than a large cloud model. Good prompts (what it does, controls, colours) work best.
 - The Windows `.exe` is built by GitHub Actions; the sandbox used to write this could not produce a Windows binary itself.

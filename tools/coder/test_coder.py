@@ -45,6 +45,19 @@ class MatchingTests(unittest.TestCase):
         "password generator": "password",
         "mot de passe": "password",
         "كلمة السر": "password",
+        "flappy bird": "flappy",
+        "tayer": "flappy",
+        "space shooter": "shooter",
+        "catch game": "catch",
+        "whack a mole": "whack",
+        "simon says": "simon",
+        "notes app": "notes",
+        "convertisseur": "converter",
+        "لعبة الخلد": "whack",
+        "dice": "dice",
+        "zar": "dice",
+        "stopwatch": "stopwatch",
+        "ساعة ايقاف": "stopwatch",
         # generic fall-backs
         "a game": "snake",
         "lo3ba": "snake",
@@ -73,6 +86,33 @@ class MatchingTests(unittest.TestCase):
         self.assertEqual(engine.normalize("إكس أو"), engine.normalize("اكس او"))
 
 
+class ThemeAndLevelTests(unittest.TestCase):
+    def test_theme_detection(self):
+        self.assertEqual(engine.detect_theme("space snake")["key"], "space")
+        self.assertEqual(engine.detect_theme("لعبة ثعبان فالشاطئ")["key"], "beach")
+        self.assertEqual(engine.detect_theme("lo3ba dyal snake b nar")["key"], "fire")
+        self.assertEqual(engine.detect_theme("snake game")["key"], "default")
+
+    def test_level_detection(self):
+        self.assertEqual(engine.detect_level("hard pong"), 1.4)
+        self.assertEqual(engine.detect_level("easy snake"), 0.7)
+        self.assertEqual(engine.detect_level("صعب"), 1.4)
+        self.assertEqual(engine.detect_level("pong"), 1.0)
+
+    def test_theme_is_applied_to_output(self):
+        r = engine.generate("space flappy bird, hard")
+        self.assertTrue(r.ok)
+        self.assertEqual(r.name, "flappy")
+        self.assertIn("#a855f7", r.html)          # space accent colour
+        self.assertIn("<title>Space Flappy</title>", r.html)
+        self.assertIn("const LEVEL=1.4", r.html)
+        self.assertIn("theme: Space", r.message)
+
+    def test_default_theme_title(self):
+        r = engine.generate("snake")
+        self.assertIn("<title>Snake</title>", r.html)
+
+
 class TemplateOutputTests(unittest.TestCase):
     def test_every_template_is_a_complete_page(self):
         for tpl in T.TEMPLATES.values():
@@ -87,6 +127,14 @@ class TemplateOutputTests(unittest.TestCase):
                 self.assertNotIn("<link", page)
                 self.assertNotIn("src=\"http", page)
                 self.assertNotIn("src='http", page)
+
+    def test_every_template_builds_with_every_theme(self):
+        for tpl in T.TEMPLATES.values():
+            for theme in T.THEMES.values():
+                with self.subTest(tpl=tpl.key, theme=theme["key"]):
+                    page = tpl.build(theme=theme, level=1.4)
+                    self.assertIn("</html>", page)
+                    self.assertIn("const THEME=", page)
 
     def test_templates_are_unique_and_registered(self):
         self.assertEqual(len(T.TEMPLATES), len({t.key for t in T.TEMPLATES.values()}))

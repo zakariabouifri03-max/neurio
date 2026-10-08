@@ -42,7 +42,7 @@ iframe#preview{flex:1;border:0;background:#fff;min-height:50vh;width:100%}
 </header>
 <main>
   <form id="f">
-    <input type="text" id="prompt" placeholder="e.g. snake game · لعبة ثعبان · app dyal to-do · mot de passe" autocomplete="off">
+    <input type="text" id="prompt" placeholder="e.g. space shooter hard · لعبة ثعبان فالشاطئ · app dyal notes · mot de passe" autocomplete="off">
     <select id="backend" title="Which engine to use">
       <option value="auto">Auto</option>
       <option value="template">Offline templates only</option>
@@ -92,8 +92,10 @@ async function loadStatus() {
       $('st-ai').textContent = 'AI: Ollama not running (optional)';
     }
     $('chips').innerHTML = '';
-    const examples = ['snake game', 'pong', 'breakout', 'tic tac toe', 'memory game',
-                      'todo app', 'calculator', 'pomodoro timer', 'expense tracker', 'password generator'];
+    const examples = ['snake game', 'space shooter', 'flappy bird hard', 'beach catch game', 'whack a mole',
+                      'simon says', 'fire breakout', 'jungle pong', 'memory game', 'tic tac toe',
+                      'todo app', 'calculator', 'pomodoro timer', 'expense tracker', 'password generator',
+                      'notes app', 'converter', 'dice', 'stopwatch'];
     examples.forEach(ex => {
       const b = document.createElement('span');
       b.className = 'chip';

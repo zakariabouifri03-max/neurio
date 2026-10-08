@@ -69,6 +69,25 @@ def match_template(prompt: str) -> Optional[T.Template]:
     return None
 
 
+def detect_theme(prompt: str) -> dict:
+    """First theme whose word appears in the prompt; otherwise the default look."""
+    text = normalize(prompt)
+    for key, words in T.THEME_WORDS.items():
+        if any(_has_keyword(text, w) for w in words):
+            return T.THEMES[key]
+    return T.THEMES["default"]
+
+
+def detect_level(prompt: str) -> float:
+    """Speed multiplier from words like 'hard' / 'easy' (any language listed in templates)."""
+    text = normalize(prompt)
+    if any(_has_keyword(text, w) for w in T.HARD_WORDS):
+        return 1.4
+    if any(_has_keyword(text, w) for w in T.EASY_WORDS):
+        return 0.7
+    return 1.0
+
+
 def slugify(prompt: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", normalize(prompt)).strip("-")[:40].strip("-")
     return slug or "app"
@@ -181,10 +200,18 @@ def generate(prompt: str, backend: str = "auto", model: Optional[str] = None) ->
     if backend in ("auto", "template"):
         tpl = match_template(prompt)
         if tpl:
+            theme = detect_theme(prompt)
+            level = detect_level(prompt)
+            extras = []
+            if theme["key"] != "default":
+                extras.append(f"theme: {theme['name']}")
+            if level != 1.0:
+                extras.append("hard" if level > 1 else "easy")
+            suffix = (" · " + ", ".join(extras)) if extras else ""
             return Result(
                 True,
-                f"Built “{tpl.title}” ({tpl.kind}) offline from a template.",
-                name=tpl.key, html=tpl.build(), backend="template",
+                f"Built “{tpl.title}” ({tpl.kind}) offline from a template{suffix}.",
+                name=tpl.key, html=tpl.build(theme=theme, level=level), backend="template",
             )
         if backend == "template":
             return _no_match()
