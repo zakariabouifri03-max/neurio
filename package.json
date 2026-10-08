@@ -1,0 +1,72 @@
+{
+  "name": "ai-download-manager-pro",
+  "version": "1.0.0",
+  "description": "A trustworthy Windows download manager using byte ranges, bounded parallel connections, resume support and integrity checks.",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.js",
+  "author": "AI Download Manager Pro",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dev": "node tools/preview-server.mjs",
+    "test": "node --test tests/*.test.js",
+    "build:native-host": "pkg electron/native-host-cli.cjs --target node22-win-x64 --output build/native-messaging-host.exe",
+    "build:win": "npm run build:native-host && electron-builder --win --x64 && node tools/copy-windows-exe.mjs",
+    "build:win:installer": "npm run build:native-host && electron-builder --win nsis --x64",
+    "build:win:portable": "npm run build:native-host && electron-builder --win portable --x64 && node tools/copy-windows-exe.mjs",
+    "build:dir": "electron-builder --dir"
+  },
+  "devDependencies": {
+    "electron": "^44.7.0",
+    "electron-builder": "^26.17.0",
+    "@yao-pkg/pkg": "^6.23.0"
+  },
+  "build": {
+    "appId": "com.aidownloadmanager.pro",
+    "productName": "AI Download Manager Pro",
+    "executableName": "AI-Download-Manager-Pro",
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "electron/**/*",
+      "engine/**/*",
+      "desktop/renderer/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "build/native-messaging-host.exe",
+        "to": "native-messaging-host.exe"
+      },
+      {
+        "from": "browser-bridge/extension",
+        "to": "browser-bridge/extension"
+      }
+    ],
+    "win": {
+      "icon": "assets/app.ico",
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "artifactName": "AI-Download-Manager-Pro-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AI Download Manager Pro",
+      "runAfterFinish": true,
+      "include": "installer/installer.nsh",
+      "artifactName": "AI-Download-Manager-Pro-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "AI-Download-Manager-Pro-${version}-${arch}.${ext}"
+    }
+  }
+}

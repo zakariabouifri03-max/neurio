@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "AI Download Manager Pro — Link Handoff",
+  "version": "1.0.0",
+  "description": "Send a link you explicitly choose to AI Download Manager Pro. No browsing-history permission.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4tGWVeXFbmCRiRQHAAQewimrlMssA+sd4cNnKnLdNqpmiZic0vzX567Dc4MUXJCNlPJSGCCvOCQDaM1zd2JV95YOv01L/+ZwnAIggqMeDFpjpsRYYCvIi6qhaTFztDLUKl1p36mz3kfcJKc2YlGKsCjC/jg6It7sEn6xMCU71tqyevJakVPfDjp/lMv3jrDhW0fM7PPMIAemxZsv15YiTpUWN3sK6Pmy4ohiMc89ZdkXuq9Mws0spUzKAlMtqsh3u+muxPEDXojB3o93hD45ekvDNI8NO4g47nV3YFwgOUjmxcADiQ4mF9haXXrZ92l56+lPwwHC36PISj2WDpdZswIDAQAB",
+  "permissions": ["contextMenus", "nativeMessaging", "activeTab"],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_title": "AI Download Manager Pro",
+    "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "ai-download-manager-pro@local",
+      "strict_min_version": "128.0"
+    }
+  }
+}

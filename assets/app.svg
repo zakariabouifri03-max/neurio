@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="28" y1="18" x2="228" y2="238" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#68a7ff"/>
+      <stop offset=".52" stop-color="#477bff"/>
+      <stop offset="1" stop-color="#6857eb"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="100" y1="34" x2="177" y2="216" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#dce9ff"/>
+    </linearGradient>
+    <filter id="shadow" x="0" y="0" width="256" height="256" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#172e71" flood-opacity=".38"/>
+    </filter>
+  </defs>
+  <rect x="10" y="10" width="236" height="236" rx="58" fill="url(#bg)"/>
+  <path d="M15 71C40 33 79 15 128 15c53 0 92 20 115 57" fill="none" stroke="#fff" stroke-opacity=".17" stroke-width="7" stroke-linecap="round"/>
+  <path d="M137 35 75 132h44l-7 90 69-109h-45l13-78Z" fill="url(#bolt)" filter="url(#shadow)"/>
+  <path d="M180 174c-14 17-33 27-55 29" fill="none" stroke="#fff" stroke-opacity=".34" stroke-width="7" stroke-linecap="round"/>
+</svg>

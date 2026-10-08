@@ -3,3 +3,10 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+node_modules/
+build/
+release/
+dist/
+out/
+coverage/
+.aiddm-preview/

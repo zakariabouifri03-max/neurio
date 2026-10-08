@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'">
+  <meta name="theme-color" content="#0b0f17">
+  <title>AI Download Manager Pro</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#dashboard" data-nav="dashboard" aria-label="AI Download Manager Pro dashboard">
+        <span class="brand-mark"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M15.8 2.8 6.6 15h6.3l-.8 10.2L21.4 13h-6.1l.5-10.2Z"/></svg></span>
+        <span class="brand-copy"><strong>AI DOWNLOAD</strong><small>MANAGER <b>PRO</b></small></span>
+      </a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <button class="nav-item is-active" data-nav="dashboard"><span class="nav-icon" data-icon="grid"></span><span>Dashboard</span><span class="nav-count" id="nav-active-count">0</span></button>
+        <button class="nav-item" data-nav="downloads"><span class="nav-icon" data-icon="download"></span><span>Downloads</span></button>
+        <button class="nav-item" data-nav="queue"><span class="nav-icon" data-icon="queue"></span><span>Queue</span><span class="nav-count" id="nav-queue-count">0</span></button>
+        <button class="nav-item" data-nav="completed"><span class="nav-icon" data-icon="check-circle"></span><span>Completed</span></button>
+        <div class="nav-divider"></div>
+        <div class="workspace-label tools-label">TOOLS</div>
+        <button class="nav-item" data-nav="scheduler"><span class="nav-icon" data-icon="calendar"></span><span>Scheduler</span></button>
+        <button class="nav-item" data-nav="settings"><span class="nav-icon" data-icon="settings"></span><span>Settings</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-folder">
+          <span class="folder-icon" data-icon="folder"></span>
+          <div class="folder-copy"><small>DOWNLOAD LOCATION</small><strong id="sidebar-download-path">Loading…</strong></div>
+          <button class="icon-button folder-open" data-action="browse-folder" aria-label="Choose download folder" title="Choose folder"><span data-icon="edit"></span></button>
+        </div>
+        <div class="engine-status"><span class="status-dot"></span><span>Engine ready</span><span class="engine-version">LOCAL</span></div>
+        <div class="sidebar-legal">Direct downloads only<br>Server and network limits apply.</div>
+      </div>
+    </aside>
+
+    <section class="main-column">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu icon-button" data-action="toggle-sidebar" aria-label="Toggle navigation"><span data-icon="menu"></span></button>
+          <div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><strong id="page-breadcrumb">Dashboard</strong></div>
+        </div>
+        <div class="top-actions">
+          <button class="button button-quiet" data-action="import-urls"><span data-icon="upload"></span><span>Import URLs</span></button>
+          <button class="button button-primary" data-action="open-add"><span data-icon="plus"></span><span>Add URL</span></button>
+          <span class="topbar-divider"></span>
+          <div class="account-chip" title="Local desktop app"><span class="account-avatar">A</span><span class="account-label">Local app</span><span class="local-lock" data-icon="lock"></span></div>
+        </div>
+      </header>
+
+      <main class="page-content" id="page-content" tabindex="-1"></main>
+      <div class="app-footer"><span><i class="footer-dot"></i>Downloads run directly between you and the source server.</span><span id="footer-build">AI Download Manager Pro <b>1.0</b></span></div>
+    </section>
+  </div>
+
+  <div id="modal-root"></div>
+  <div id="toast-root" class="toast-root" aria-live="polite" aria-atomic="true"></div>
+  <input id="import-file-input" type="file" accept=".txt,.csv,.list,text/plain,text/csv" hidden multiple>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
