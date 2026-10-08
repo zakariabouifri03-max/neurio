@@ -1,0 +1,132 @@
+# SwiftLoad — build the Windows installer on GitHub's Windows runners.
+#
+# Two ways to run it, so it never interferes with the rest of this repository:
+#
+#   * manually (Actions → SwiftLoad installer → Run workflow) — uploads the
+#     installer as a build artifact;
+#   * by pushing a `swiftload-v*` tag — additionally publishes a GitHub Release
+#     with `SwiftLoad-Setup.exe` attached, which gives a permanent public
+#     download link:
+#       https://github.com/zakariabouifri03-max/neurio/releases/latest/download/SwiftLoad-Setup.exe
+#
+# It runs the same pipeline as `swiftload/tools/build-installer.ps1`:
+# type-check, `cargo test`, then the NSIS bundle.
+#
+# Note: signing is not configured. The produced installer is unsigned, so
+# Windows SmartScreen will warn on first run (see swiftload/docs/BUILD.md).
+
+name: SwiftLoad installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: "Skip the Rust test suite (faster, for a quick artifact)"
+        type: boolean
+        default: false
+  push:
+    tags:
+      - "swiftload-v*"
+
+defaults:
+  run:
+    working-directory: swiftload
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Windows installer
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            swiftload/src-tauri/target
+          key: swiftload-${{ runner.os }}-${{ hashFiles('swiftload/src-tauri/Cargo.toml') }}
+          restore-keys: swiftload-${{ runner.os }}-
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: swiftload/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Type-check the interface
+        run: npm run typecheck
+
+      - name: Run the Rust tests
+        if: ${{ !inputs.skip_tests }}
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Build the application and the NSIS installer
+        run: npm run tauri build -- --bundles nsis
+
+      - name: Collect the installer
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem -Path src-tauri/target/release/bundle/nsis -Filter *-setup.exe |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $installer) { throw "no installer produced" }
+          New-Item -ItemType Directory -Force -Path dist-installer | Out-Null
+          Copy-Item $installer.FullName dist-installer/SwiftLoad-Setup.exe -Force
+          (Get-FileHash -Algorithm SHA256 dist-installer/SwiftLoad-Setup.exe).Hash.ToLower() + "  SwiftLoad-Setup.exe" |
+            Set-Content dist-installer/SwiftLoad-Setup.exe.sha256 -Encoding ASCII
+          Get-Item dist-installer/SwiftLoad-Setup.exe | Select-Object Name, Length
+
+      - name: Upload the installer as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SwiftLoad-Setup
+          path: |
+            swiftload/dist-installer/SwiftLoad-Setup.exe
+            swiftload/dist-installer/SwiftLoad-Setup.exe.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish the GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/swiftload-v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $notes = @"
+          SwiftLoad 1.0.0 — Windows download manager.
+
+          Download **SwiftLoad-Setup.exe** below and run it. The installer is per-user
+          (no administrator prompt), creates a Start Menu entry, offers an optional
+          desktop shortcut and installs a standard uninstaller. Requires Windows 10/11
+          x64; the WebView2 runtime is bootstrapped if it is missing.
+
+          The build is unsigned, so Windows SmartScreen will show a warning on first
+          run (More info → Run anyway).
+
+          SHA-256 of the installer is attached as SwiftLoad-Setup.exe.sha256.
+          "@
+          $notes | Set-Content -Path release-notes.md -Encoding utf8
+          gh release view $tag 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag dist-installer/SwiftLoad-Setup.exe dist-installer/SwiftLoad-Setup.exe.sha256 --clobber
+          } else {
+            gh release create $tag dist-installer/SwiftLoad-Setup.exe dist-installer/SwiftLoad-Setup.exe.sha256 `
+              --title "SwiftLoad 1.0.0" --notes-file release-notes.md
+          }

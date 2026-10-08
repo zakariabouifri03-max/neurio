@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permissions for the SwiftLoad main window. `core:default` covers exactly what the interface needs: calling SwiftLoad's own commands and listening to engine events. Filesystem, clipboard, registry, dialog and notification operations all happen inside Rust, so no plugin permission is granted to the webview.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

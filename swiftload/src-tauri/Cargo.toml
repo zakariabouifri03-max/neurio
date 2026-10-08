@@ -1,0 +1,77 @@
+[package]
+name = "swiftload"
+version = "1.0.0"
+description = "SwiftLoad — a lightweight, professional Windows download manager"
+authors = ["SwiftLoad Contributors"]
+license = "MIT"
+repository = "https://github.com/zakariabouifri03-max/neurio"
+edition = "2021"
+rust-version = "1.77.2"
+
+# The library holds the whole application so that it can be unit/integration
+# tested without a WebView (see ../tests/engine.rs).
+[lib]
+name = "swiftload_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# --- Application shell -------------------------------------------------------
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-autostart = "2"
+tauri-plugin-single-instance = "2"
+
+# --- Byte/stream plumbing ----------------------------------------------------
+bytes = "1"
+tokio-stream = "0.1"
+
+# --- Windows-native APIs (free disk space) -----------------------------------
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = [
+    "Win32_Foundation",
+    "Win32_Storage_FileSystem",
+    "Win32_System_IO",
+    "Win32_System_Registry",
+] }
+
+# --- Serialization -----------------------------------------------------------
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# --- Async runtime + networking ---------------------------------------------
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "io-util", "sync", "time", "net"] }
+# rustls-tls-native-roots -> TLS verification uses the Windows certificate store.
+# Certificate verification is never disabled. Automatic content decoding ("gzip")
+# is deliberately NOT enabled: transparent decompression would invalidate
+# Content-Length / byte-range arithmetic.
+reqwest = { version = "0.12", default-features = false, features = [
+    "rustls-tls-native-roots",
+    "stream",
+    "http2",
+    "socks",
+] }
+
+# --- Storage / helpers -------------------------------------------------------
+rusqlite = { version = "0.32", features = ["bundled"] }
+url = "2"
+percent-encoding = "2"
+sha2 = "0.10"
+hex = "0.4"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std", "serde"] }
+thiserror = "2"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "io-util", "sync", "time", "net"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

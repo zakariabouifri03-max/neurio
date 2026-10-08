@@ -1,0 +1,25 @@
+{
+  "name": "swiftload",
+  "private": true,
+  "version": "1.0.0",
+  "description": "SwiftLoad — lightweight professional Windows download manager (Tauri + Rust)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "preview:web": "vite --host 0.0.0.0 --port 4173",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "installer": "tauri build --bundles nsis"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.1.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

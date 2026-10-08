@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>SwiftLoad</title>
+    <link rel="icon" type="image/png" href="/icon.png" />
+  </head>
+  <body>
+    <!-- The whole interface is rendered by src/main.ts. Keeping the shell empty
+         means the first paint happens as soon as the engine state arrives. -->
+    <div id="app" class="app-shell">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="content" id="content"></main>
+      <footer class="statusbar" id="statusbar"></footer>
+    </div>
+    <div id="modal-root"></div>
+    <div id="menu-root"></div>
+    <div id="toast-root" class="toast-root"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
