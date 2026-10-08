@@ -32,7 +32,17 @@ jobs:
         run: npm test
 
       - name: Build Windows x64 NSIS installer
-        run: npm run dist:win
+        shell: pwsh
+        run: |
+          $logFile = Join-Path $env:RUNNER_TEMP 'aidmp-electron-builder.log'
+          & npm.cmd run dist:win *>&1 | Tee-Object -FilePath $logFile
+          $buildExit = $LASTEXITCODE
+          if ($buildExit -ne 0) {
+            $diagnostic = (Get-Content $logFile -Tail 35) -join ' | '
+            $diagnostic = $diagnostic -replace '%', '%25' -replace "`r", '%0D' -replace "`n", '%0A'
+            Write-Output "::error file=.github/workflows/windows-installer.yml,line=38,title=Windows installer build failed::$diagnostic"
+            exit $buildExit
+          }
 
       - name: Publish downloadable GitHub release
         shell: pwsh
