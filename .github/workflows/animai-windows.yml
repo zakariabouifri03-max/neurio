@@ -1,0 +1,64 @@
+name: ANIMAI STUDIO Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - arena/d15f1de3-neurio
+    paths:
+      - "animai-studio/**"
+      - ".github/workflows/animai-windows.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: animai-studio
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: animai-studio/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Build Windows exe + installer
+        run: npm run dist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ANIMAI-STUDIO-windows
+          if-no-files-found: error
+          path: |
+            animai-studio/release/ANIMAI-STUDIO.exe
+            animai-studio/release/ANIMAI-STUDIO-Setup.exe
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: animai-studio-v1.0.0
+          name: ANIMAI STUDIO 1.0.0
+          body: |
+            Download ANIMAI STUDIO for Windows:
+
+            - **ANIMAI-STUDIO.exe** — portable (no install)
+            - **ANIMAI-STUDIO-Setup.exe** — installer
+
+            Right-click → Properties → Unblock if Windows SmartScreen warns (unsigned build).
+          files: |
+            animai-studio/release/ANIMAI-STUDIO.exe
+            animai-studio/release/ANIMAI-STUDIO-Setup.exe
+          make_latest: true

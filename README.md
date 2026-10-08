@@ -1,3 +1,17 @@
+# ANIMAI STUDIO
+
+Professional local-first 2D animation studio (Windows desktop + web).
+
+**See [`animai-studio/README.md`](animai-studio/README.md)** for install, development, and `.exe` packaging (`ANIMAI-STUDIO.exe` / `ANIMAI-STUDIO-Setup.exe`).
+
+```bash
+cd animai-studio
+npm install
+npm run dev
+```
+
+---
+
 # 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
