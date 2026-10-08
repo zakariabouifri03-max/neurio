@@ -38,14 +38,23 @@ jobs:
 
       - name: Build installer
         working-directory: PianoPro/installer
-        run: '& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" PianoPro.iss'
+        shell: pwsh
+        run: |
+          $log = "..\build\installer-build.log"
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" PianoPro.iss *> $log
+          $compilerExitCode = $LASTEXITCODE
+          Get-Content $log | Out-Host
+          Get-Content $log | Add-Content $env:GITHUB_STEP_SUMMARY
+          if ($compilerExitCode -ne 0) { exit $compilerExitCode }
 
       - name: Upload app and installer
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: piano-pro-windows-x64
-          if-no-files-found: error
+          if-no-files-found: warn
           path: |
             PianoPro/build/bin/Release/PianoPro.exe
             PianoPro/build/stage/**
             PianoPro/build/installer/PianoPro_Setup.exe
+            PianoPro/build/installer-build.log
