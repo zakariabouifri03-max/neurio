@@ -1,3 +1,9 @@
+# Piano Pro (native desktop project)
+
+A separate, offline C++/JUCE piano app with local sampled instruments lives in [`PianoPro/`](PianoPro/). See its [README and Windows build/test instructions](PianoPro/README.md). Piano Pro has its own CMake project, source tree, sample assets, installer configuration and tests; it does not depend on the browser game below.
+
+---
+
 # 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!

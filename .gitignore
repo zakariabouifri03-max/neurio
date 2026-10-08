@@ -3,3 +3,17 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# CMake / Visual Studio build outputs
+/build/
+/PianoPro/build/
+/cmake-build-*/
+/out/
+/.vs/
+*.exe
+*.dll
+*.pdb
+*.ilk
+*.obj
+*.lib
+CMakeUserPresets.json

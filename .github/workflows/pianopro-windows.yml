@@ -1,0 +1,51 @@
+name: Piano Pro Windows build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "PianoPro/**"
+      - ".github/workflows/pianopro-windows.yml"
+  pull_request:
+    paths:
+      - "PianoPro/**"
+      - ".github/workflows/pianopro-windows.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  windows-x64:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S PianoPro -B PianoPro/build -A x64 -DPIANOPRO_BUILD_DESKTOP_APP=ON -DPIANOPRO_BUILD_TESTS=ON
+
+      - name: Build Release
+        run: cmake --build PianoPro/build --config Release --parallel
+
+      - name: Run headless tests
+        run: ctest --test-dir PianoPro/build -C Release --output-on-failure
+
+      - name: Stage portable app
+        run: cmake --install PianoPro/build --config Release --prefix PianoPro/build/stage
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress --yes
+
+      - name: Build installer
+        working-directory: PianoPro/installer
+        run: '& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" PianoPro.iss'
+
+      - name: Upload app and installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: piano-pro-windows-x64
+          if-no-files-found: error
+          path: |
+            PianoPro/build/bin/Release/PianoPro.exe
+            PianoPro/build/stage/**
+            PianoPro/build/installer/PianoPro_Setup.exe
