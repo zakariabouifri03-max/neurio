@@ -10,6 +10,20 @@ body {
   overscroll-behavior: none;
 }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+/* Foundation overlays are intentionally replaceable by the eventual HUD/UI layer. */
+.foundation-interaction-prompt {
+  position: fixed; left: 50%; bottom: 18%; transform: translateX(-50%); z-index: 70;
+  padding: 9px 16px; border: 2px solid rgba(255,255,255,.85); border-radius: 12px;
+  background: rgba(13, 42, 84, .86); color: #fff; font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none;
+}
+.foundation-debug {
+  position: fixed; top: 10px; left: 10px; z-index: 120; margin: 0; padding: 8px 10px;
+  color: #9effb0; background: rgba(0, 16, 22, .78); border: 1px solid rgba(158,255,176,.55);
+  border-radius: 8px; font: 12px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+  pointer-events: none;
+}
 #app, #app canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 
 /* ── error overlay ── */

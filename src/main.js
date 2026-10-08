@@ -7,6 +7,10 @@ import { Garage, openShop, openCustomize, openUpgrades, openSeries, openHelp, sh
 import { BloomFX } from './post.js';
 import { audio } from './audio.js';
 import { clamp, fmt } from './util.js';
+import { GameProjectCore } from './foundation/game-core.js';
+import { VoxelWorldManager } from './foundation/voxel.js';
+import { InteractionSystem } from './foundation/interaction.js';
+import { DebugOverlay } from './foundation/debug.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -32,6 +36,7 @@ const game = {
   _shake: 0,
   _pendingSeason: null,
   _fpsT: 0, _fpsN: 0, _fpsLow: 0,
+  foundation: null,
 };
 window.GAME = game;
 
@@ -109,6 +114,8 @@ game.togglePause = () => {
 
 // ── state transitions ────────────────────────────────────────────────────────
 function disposeRace() {
+  game.foundation?.interaction?.destroy();
+  if (game.foundation) game.foundation.interaction = null;
   if (game.race) { game.race.dispose(); game.race = null; }
 }
 
@@ -120,6 +127,15 @@ game.startRace = () => {
   $('pauseModal').classList.remove('open');
   const map = MAPS[(Math.random() * MAPS.length) | 0];
   game.race = new Race(game, map, onRaceFinish);
+  if (!game.race.scene.getObjectByName('VoxelPrototypeChunk')) {
+    const preview = game.foundation.prototypeChunk.component.group;
+    preview.name = 'VoxelPrototypeChunk'; preview.position.set(-8, 0, -8);
+    game.race.scene.add(preview);
+  }
+  // The interaction system is camera/scene scoped, so future vehicle/interior
+  // cameras can replace it without changing the player-facing API.
+  game.foundation.interaction?.destroy();
+  game.foundation.interaction = new InteractionSystem({ camera: game.race.camera, scene: game.race.scene });
   game.state = 'race';
   $('hud').classList.add('on');
   $('garageUI').classList.remove('on');
@@ -198,6 +214,16 @@ function boot() {
   $('app').appendChild(renderer.domElement);
   game.renderer = renderer;
   game.fx = new BloomFX(renderer);
+  game.foundation = {
+    core: new GameProjectCore({ save: game.save, persist: game.persist, getRuntime: () => game }),
+    voxel: new VoxelWorldManager({ chunkSize: 8 }),
+    debug: new DebugOverlay(),
+    interaction: null,
+  };
+  // One deliberately tiny, original prototype chunk proves the chunk/data
+  // boundary without pretending this is the final voxel meshing solution.
+  game.foundation.prototypeChunk = game.foundation.voxel.createTestChunk();
+  game.foundation.debug.setEnabled(new URLSearchParams(location.search).has('debug'));
 
   const clock = new THREE.Clock();
   renderer.setAnimationLoop(() => {
@@ -212,6 +238,8 @@ function boot() {
 
     if (game.state === 'race' && game.race) {
       if (!game.paused) game.race.update(dt);
+      game.foundation.interaction?.update();
+      game.foundation.debug.update({ camera: game.race.camera, voxel: game.foundation.voxel, state: game.state });
       game._shake = Math.max(0, game._shake - dt * 2.2);
       game.fx.render(game.race.scene, game.race.camera);
     } else if (game.state === 'garage' && game.garage) {
