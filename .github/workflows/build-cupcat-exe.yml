@@ -1,0 +1,66 @@
+# Builds Cupcat.exe (Windows, single file): the Cupcat montage as a PC app.
+# Runs on pushes that touch tools/cupcat/ or the montage video.
+name: Build Cupcat (.exe)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tools/cupcat/**"
+      - "video/cupcat-montage-30s.mp4"
+      - ".github/workflows/build-cupcat-exe.yml"
+
+permissions:
+  contents: write   # needed to publish the release
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: tools/cupcat
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: python -m pip install --upgrade pip pyinstaller
+
+      - name: Self-test
+        run: python main.py --check
+
+      - name: Build single-file exe
+        run: >
+          pyinstaller --onefile --console --name Cupcat
+          --add-data "assets\cupcat.png;."
+          --add-data "index.html;."
+          --add-data "..\..\video\cupcat-montage-30s.mp4;."
+          --noconfirm --clean main.py
+
+      - name: Smoke test the exe
+        run: .\dist\Cupcat.exe --check
+
+      - name: Publish direct-download release
+        if: github.event_name == 'push'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "cupcat-latest"
+          $notes = "Cupcat, the montage as a Windows app. Download Cupcat.exe below and double-click it. Runs on this PC only. Built from commit $env:GITHUB_SHA."
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag dist/Cupcat.exe --clobber
+            gh release edit $tag --notes $notes
+          } else {
+            gh release create $tag dist/Cupcat.exe --title "Cupcat (.exe) - latest" --notes $notes --target $env:GITHUB_SHA
+          }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Cupcat-windows
+          path: tools/cupcat/dist/Cupcat.exe
+          if-no-files-found: error

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cupcat — Montage</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(#3b0764,#1e1b4b);color:#fff;font-family:system-ui,"Segoe UI",Tahoma,Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center}
+h1{margin:0;font-size:clamp(28px,5vw,48px);color:#ff5caa;text-shadow:3px 4px 0 #000;letter-spacing:2px}
+img#cat{width:130px;height:auto;animation:bob 1.6s ease-in-out infinite;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+@keyframes bob{50%{transform:translateY(-10px) rotate(-3deg)}}
+video{width:min(960px,95vw);border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.5);background:#000}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+button{background:#ff5caa;color:#fff;border:0;border-radius:12px;padding:12px 22px;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #9d174d}
+button:active{transform:translateY(2px);box-shadow:0 2px 0 #9d174d}
+button.alt{background:#0891b2;box-shadow:0 4px 0 #155e75}
+p{margin:0;color:#c4b5fd;font-size:15px}
+</style>
+</head>
+<body>
+<img id="cat" src="/cupcat.png" alt="Cupcat mascot">
+<h1>CUPCAT · MONTAGE</h1>
+<video id="v" src="/montage.mp4" controls playsinline preload="auto"></video>
+<div class="row">
+  <button id="play" type="button">▶ Play</button>
+  <button id="replay" class="alt" type="button">↺ Replay</button>
+</div>
+<p>Offline Coder — games &amp; apps · no API · runs on this PC</p>
+<script>
+const v = document.getElementById('v');
+document.getElementById('play').onclick = () => v.play().catch(() => {});
+document.getElementById('replay').onclick = () => { v.currentTime = 0; v.play().catch(() => {}); };
+// Space = play/pause, R = replay
+addEventListener('keydown', e => {
+  if (e.key === ' ') { e.preventDefault(); v.paused ? v.play() : v.pause(); }
+  if (e.key === 'r' || e.key === 'R') { v.currentTime = 0; v.play(); }
+});
+</script>
+</body>
+</html>
