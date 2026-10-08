@@ -1,0 +1,58 @@
+name: Build Windows Installer
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: lumora
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: lumora/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build and package (NSIS .exe)
+        run: npm run package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lumora-Studio-Windows-Setup
+          path: |
+            lumora/dist/*.exe
+            lumora/dist/*.exe.blockmap
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('build-{0}', github.run_number) }}
+          name: Lumora Studio ${{ github.ref_type == 'tag' && github.ref_name || format('build {0}', github.run_number) }}
+          body: |
+            Lumora Studio — Windows installer built automatically from commit ${{ github.sha }}.
+
+            **Download:** `Lumora-Studio-Setup-1.0.0.exe`
+          files: lumora/dist/*.exe
+          draft: false
+          prerelease: false
