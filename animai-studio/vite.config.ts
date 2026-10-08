@@ -1,18 +1,8 @@
 import { defineConfig } from "vite";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const root = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  root,
   base: "./",
-  publicDir: path.join(root, "public"),
-  resolve: {
-    alias: {
-      "@": path.join(root, "src"),
-    },
-  },
+  publicDir: "public",
   server: {
     host: "0.0.0.0",
     port: 5173,
@@ -25,12 +15,9 @@ export default defineConfig({
     strictPort: true,
   },
   build: {
-    outDir: path.join(root, "dist"),
+    outDir: "dist",
     emptyOutDir: true,
     sourcemap: true,
     target: "es2022",
-    rollupOptions: {
-      input: path.join(root, "index.html"),
-    },
   },
 });

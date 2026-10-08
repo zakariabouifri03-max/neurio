@@ -18,6 +18,9 @@ jobs:
     defaults:
       run:
         working-directory: animai-studio
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,17 +28,22 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: animai-studio/package-lock.json
 
       - name: Install
         run: npm ci
 
-      - name: Build Windows exe + installer
-        run: npm run dist
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build renderer
+        run: npx vite build
+
+      - name: Package Windows exe
+        run: npx electron-builder --win portable nsis --publish never
+
+      - name: List output
+        if: always()
+        run: Get-ChildItem -Recurse release | Select-Object FullName, Length
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -43,8 +51,7 @@ jobs:
           name: ANIMAI-STUDIO-windows
           if-no-files-found: error
           path: |
-            animai-studio/release/ANIMAI-STUDIO.exe
-            animai-studio/release/ANIMAI-STUDIO-Setup.exe
+            animai-studio/release/**/*.exe
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
@@ -57,8 +64,6 @@ jobs:
             - **ANIMAI-STUDIO.exe** — portable (no install)
             - **ANIMAI-STUDIO-Setup.exe** — installer
 
-            Right-click → Properties → Unblock if Windows SmartScreen warns (unsigned build).
-          files: |
-            animai-studio/release/ANIMAI-STUDIO.exe
-            animai-studio/release/ANIMAI-STUDIO-Setup.exe
+            If Windows SmartScreen warns, choose More info → Run anyway (unsigned build).
+          files: animai-studio/release/**/*.exe
           make_latest: true

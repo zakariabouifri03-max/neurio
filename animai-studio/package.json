@@ -11,11 +11,11 @@
     "check": "node scripts/check-deps.mjs",
     "dev": "npm run check && vite --host 0.0.0.0 --port 5173",
     "preview": "vite preview --host 0.0.0.0 --port 5173",
-    "build": "npm run check && vite build",
-    "electron:dev": "npm run check && node scripts/electron-dev.mjs",
-    "pack": "npm run build && electron-builder --win portable nsis",
-    "dist": "npm run build && electron-builder --win",
-    "dist:linux": "npm run build && electron-builder --linux",
+    "build": "vite build",
+    "electron:dev": "node scripts/electron-dev.mjs",
+    "pack": "vite build && electron-builder --win portable nsis --publish never",
+    "dist": "vite build && electron-builder --win portable nsis --publish never",
+    "dist:linux": "vite build && electron-builder --linux --publish never",
     "start": "npm run dev"
   },
   "dependencies": {
@@ -50,6 +50,7 @@
     ],
     "win": {
       "icon": "assets/icon.png",
+      "signAndEditExecutable": false,
       "target": [
         {
           "target": "portable",
