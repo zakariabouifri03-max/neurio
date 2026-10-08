@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neurio Chat</title>
+<meta name="description" content="Chat with 500+ AI models using your own Puter account. Built with Puter.js.">
+<meta name="theme-color" content="#7c5cff">
+<link rel="icon" href="../icons/icon-192.png" type="image/png">
+<link rel="stylesheet" href="styles.css">
+<!-- Puter.js: auth, AI models, and cloud storage. Must be served over http(s). -->
+<script src="https://js.puter.com/v2/"></script>
+<script type="module" src="js/app.js"></script>
+<script>
+  // Module scripts do not run from file://, so show the hint from a classic script.
+  if (location.protocol === 'file:') {
+    document.addEventListener('DOMContentLoaded', function () {
+      var status = document.getElementById('welcomeStatus');
+      if (status) status.textContent = 'Open this app through a web server (for example: python3 -m http.server), not by double-clicking the file. Puter.js needs an http:// origin.';
+    });
+  }
+</script>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ═════════ sidebar ═════════ -->
+  <aside id="sidebar" class="sidebar" aria-label="Chats">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">✦</span>
+      <span>Neurio Chat</span>
+    </div>
+
+    <button id="newChatBtn" class="btn primary full" type="button">+ New chat</button>
+
+    <nav class="conv-nav" aria-label="Recent chats">
+      <h2 class="section-label">Recent</h2>
+      <ul id="convList" class="conv-list"></ul>
+      <p id="convEmpty" class="muted small">No chats yet. Your conversations will appear here.</p>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div id="userBox" class="user-box hidden">
+        <span id="userName" class="user-name"></span>
+        <button id="signOutBtn" class="link-btn" type="button">Sign out</button>
+      </div>
+      <button id="settingsBtn" class="btn ghost full" type="button">⚙ Settings</button>
+      <p class="powered">Powered by <a href="https://developer.puter.com" target="_blank" rel="noopener noreferrer">Puter</a></p>
+    </div>
+  </aside>
+  <div id="scrim" class="scrim" aria-hidden="true"></div>
+
+  <!-- ═════════ main ═════════ -->
+  <main class="main">
+    <header class="topbar">
+      <button id="menuBtn" class="icon-btn menu-btn" type="button" aria-label="Show or hide chats">☰</button>
+      <h1 id="chatTitle" class="chat-title">New chat</h1>
+      <div class="topbar-actions">
+        <label class="sr-only" for="modelSelect">AI model</label>
+        <select id="modelSelect" class="model-select" title="AI model"></select>
+        <button id="renameBtn" class="icon-btn" type="button" aria-label="Rename chat" title="Rename chat" disabled>✎</button>
+        <button id="deleteBtn" class="icon-btn" type="button" aria-label="Delete chat" title="Delete chat" disabled>🗑</button>
+      </div>
+    </header>
+
+    <div id="banner" class="banner hidden" role="alert"></div>
+
+    <!-- shown until the user signs in with Puter -->
+    <section id="welcome" class="welcome" aria-labelledby="welcomeTitle">
+      <div class="welcome-card">
+        <div class="hero-mark" aria-hidden="true">✦</div>
+        <h2 id="welcomeTitle">Chat with 500+ AI models</h2>
+        <p class="muted">Sign in with your Puter account to start. Replies are streamed live, and your conversations are saved to your account.</p>
+        <button id="signInBtn" class="btn primary" type="button" disabled>Sign in with Puter</button>
+        <p id="welcomeStatus" class="muted small">Connecting to Puter…</p>
+      </div>
+    </section>
+
+    <section id="thread" class="thread hidden" role="log" aria-label="Conversation">
+      <div id="messages" class="messages"></div>
+    </section>
+
+    <footer class="composer-wrap hidden" id="composerWrap">
+      <form id="composer" class="composer">
+        <label class="sr-only" for="input">Message</label>
+        <textarea id="input" rows="1" placeholder="Message Neurio…" autocomplete="off"></textarea>
+        <button id="sendBtn" class="send-btn" type="submit" aria-label="Send message" title="Send (Enter)">➤</button>
+        <button id="stopBtn" class="stop-btn hidden" type="button" aria-label="Stop generating">■ Stop</button>
+      </form>
+      <p class="hint">Enter to send · Shift+Enter for a new line · AI answers may be inaccurate. Check important facts.</p>
+    </footer>
+  </main>
+
+</div>
+
+<!-- ═════════ settings ═════════ -->
+<dialog id="settingsDialog" aria-labelledby="settingsTitle">
+  <form id="settingsForm" class="settings-form">
+    <h2 id="settingsTitle">Settings</h2>
+
+    <label class="field">
+      <span>Default model for new chats</span>
+      <select id="defaultModel"></select>
+    </label>
+
+    <label class="field">
+      <span>System prompt <small class="muted">(sent with every message)</small></span>
+      <textarea id="systemPrompt" rows="5" maxlength="4000" placeholder="e.g. You are a concise assistant. Answer in French."></textarea>
+    </label>
+
+    <label class="field">
+      <span>Theme</span>
+      <select id="theme">
+        <option value="system">Match system</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </label>
+
+    <div class="dialog-actions">
+      <button id="settingsCancel" class="btn ghost" type="button">Cancel</button>
+      <button class="btn primary" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+</body>
+</html>

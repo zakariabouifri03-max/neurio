@@ -1,0 +1,11 @@
+{
+  "name": "neurio-chat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Neurio Chat — an AI chat app built on Puter.js. No build step; the tests run on plain Node.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/markdown.test.mjs tests/store.test.mjs"
+  },
+  "license": "UNLICENSED"
+}

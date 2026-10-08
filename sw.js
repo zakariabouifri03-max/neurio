@@ -37,6 +37,10 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  // The Neurio Chat app lives under /chat/, which this worker also controls.
+  // Leave those requests to the network so its files are never served from
+  // this game cache (which would keep stale copies after an update).
+  if (/\/chat(\/|$)/.test(new URL(e.request.url).pathname)) return;
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then((hit) => {
       if (hit) return hit;
