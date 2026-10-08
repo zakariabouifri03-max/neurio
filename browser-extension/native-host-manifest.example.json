@@ -1,0 +1,8 @@
+{
+  "name": "com.neurio.aidownloadmanagerpro",
+  "description": "AI Download Manager Pro native browser bridge",
+  "path": "C:\\Path\\To\\AI Download Manager Pro.exe",
+  "type": "stdio",
+  "args": ["--native-host"],
+  "allowed_origins": ["chrome-extension://REPLACE_WITH_EXTENSION_ID/"]
+}

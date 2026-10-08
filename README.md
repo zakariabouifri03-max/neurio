@@ -1,115 +1,97 @@
-# 🏁 Bash Baqi Racing
+# AI Download Manager Pro
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+**Use Your Available Internet Speed More Efficiently.**
 
-**▶ Play:** serve the folder with any static server and open it:
+AI Download Manager Pro is a real desktop download manager built around a separate Node.js download engine and a secure Electron UI. It confirms byte-range support with an actual `GET Range` request, downloads verified segments concurrently when the server supplies a stable validator, writes directly to disk, retries from the last saved byte, and verifies the final size before atomically renaming `.part` to the requested filename.
+
+> Download speed depends on your internet connection, server bandwidth, network conditions, and whether the server supports parallel connections. This application cannot increase your ISP plan, exceed a server's limits, or bypass authentication, access controls, DRM, paywalls, or rate limits.
+
+## What is implemented
+
+- HTTP/HTTPS metadata inspection: `HEAD` when useful, `Content-Length`, `Accept-Ranges`, `Content-Type`, `ETag`, `Last-Modified`, disposition filename, and optional source digests.
+- Real byte-range confirmation and configurable **1 / 2 / 4 / 8 / 16** parallel connections (default **8**). If ranges are unavailable, the engine uses one connection from the start; if a server stops honoring ranges mid-transfer, it discards the segmented partial data and safely restarts as a single full request.
+- Stable-validator checks (`ETag` or `Last-Modified`) to prevent combining bytes from different versions. If a host offers ranges without a stable validator, parallel mode is deliberately disabled.
+- Disk-backed random-access segment writing; no whole-file buffering. Partial progress and segment offsets are stored in `filename.part` plus `filename.part.json`.
+- Resume after pause, network interruption, or application restart where byte ranges and validators permit it. Unsafe resumes restart from zero rather than risking a corrupt output.
+- Exponential retry and `Retry-After` handling, slow/error adaptation, shared aggregate bandwidth limiting, keep-alive HTTP agents, and a configurable concurrent queue.
+- Final size verification and validation of `Digest` / `Content-MD5` values when the source provides them. Only verified files are marked complete and renamed.
+- Priority, queue reorder, pause/resume/cancel all, scheduler, optional file organization, duplicate handling, diagnostics, and a local-only Native Messaging browser integration.
+- Windows installer configuration that bundles Electron/Chromium and the Node runtime; the user does not need to install Python, Node.js, or FFmpeg.
+
+## Run the real engine and UI in development
+
+Requires Node.js 22 or newer for development/testing. Runtime downloads themselves use only Node built-ins.
 
 ```bash
-python3 -m http.server 8000
-# → http://localhost:8000
+npm install
+npm run dev
 ```
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+Open the URL printed by the server (normally `http://localhost:4173/`). This development server runs the **same DownloadManager engine** through a local API; it is not a simulated download preview. Its test downloads and state are stored under the operating system's temporary directory (`ai-download-manager-pro-preview`). Set `AIDMP_DOWNLOAD_DIR` to choose another destination.
 
----
-
-## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
-
-A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
-soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
-
-title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
-
-Everything is generated from code (no stock footage/music):
+To run the native desktop shell locally:
 
 ```bash
-python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
-python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
+npm start
 ```
 
-See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
+## Build the Windows EXE and installer
 
----
+Build on a Windows 10/11 x64 machine (or a configured Windows build runner):
 
-## 📱 Install on your phone — كأنها APK!
-
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
-
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
-
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
-**Offline play** is built-in: a service worker caches all game files on first visit.
-
----
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
-|---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
-
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
+```powershell
+npm install
+npm run dist:win
 ```
 
-Made with ❤️ and Three.js
+The packaged outputs are written to `release/`:
 
----
+- `AI-Download-Manager-Pro.exe` (the installed application executable)
+- `AI-Download-Manager-Pro-Setup-1.0.0.exe` (the NSIS installer)
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+Electron includes Chromium and its Node runtime in the application/installer. The configured installer is per-user (`asInvoker`), has no mandatory runtime prerequisites, and does not require administrator rights.
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+**This checkout does not contain a prebuilt Windows installer.** Run `npm run dist:win` from a Windows 10/11 x64 machine or a configured compatible build runner to generate the installer. A source checkout or web preview is not a generated Windows EXE.
 
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
+## Tests
 
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+```bash
+npm test
+npm run check
+```
+
+The tests use local HTTP fixtures (no third-party download host) to verify byte correctness for real range and non-range servers, clean fallback, retries, pause/resume and restart recovery, checksum failure, truncated partial-file safety, duplicate choices, deferred queue behavior, and scheduler rules.
+
+## Browser integration (optional)
+
+The extension uses the browser's **Native Messaging** protocol, not an unauthenticated localhost service. It transmits only a link the user explicitly selects from the context menu or types into the extension popup; it does not request or store browsing history. See [`browser-extension/README.md`](browser-extension/README.md). The packaged app includes the extension source and `scripts/register-native-host.ps1` as extra resources.
+
+## Architecture
+
+```text
+electron/                  Desktop window, safe IPC preload, Native Messaging host
+engine/                    UI-independent Node download engine
+  download-manager.mjs     State machine, events, persistence, queue, scheduler
+  http-client.mjs          Redirect-safe HTTP(S), metadata probe, range checks
+  segment-manager.mjs      Byte-range partitioning and coverage checks
+  connection-manager.mjs   Adaptive connection limits
+  retry-manager.mjs        Backoff, Retry-After, abortable waits
+  resume-manager.mjs       Atomic .part.json metadata
+  file-writer.mjs          Streaming positional disk writes
+  integrity-checker.mjs    Final size and optional source-digest validation
+  bandwidth-limiter.mjs    Shared, enforced aggregate rate cap
+desktop/                   Dark Windows-style renderer UI
+browser-extension/         Chrome/Edge/Firefox Native Messaging extension
+tools/dev-server.mjs       Local API harness using the production engine
+test/                      Local deterministic HTTP integration tests
+```
+
+## Safety notes
+
+- No speed or progress values are fabricated. The UI displays bytes written by the engine.
+- Range support is verified at runtime; an `Accept-Ranges` header alone is not enough.
+- A server returning `200 OK` to a segmented request triggers a clean single-connection restart, never a blind merge.
+- 403/429 responses are not bypassed. The engine reduces connection use and reports the server response; `429` honors `Retry-After`.
+- Existing files are never silently overwritten. Replace, rename, skip, or resume are explicit choices.
+- Automatic category folders are off by default.
+- Logs omit URL query strings to avoid writing signed download tokens to the diagnostic log.

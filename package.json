@@ -1,0 +1,71 @@
+{
+  "name": "ai-download-manager-pro",
+  "version": "1.0.0",
+  "description": "A transparent Windows download manager with safe HTTP range transfers and resumable downloads.",
+  "author": "AI Download Manager Pro",
+  "productName": "AI Download Manager Pro",
+  "executableName": "AI-Download-Manager-Pro",
+  "type": "module",
+  "main": "electron/main.mjs",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "node tools/dev-server.mjs",
+    "test": "node --test",
+    "check": "node --check electron/main.mjs && node --check electron/native-host.mjs && node --check electron/preload.mjs && node --check electron/preload.cjs && node --check desktop/app.mjs && node --check tools/dev-server.mjs && node --check tools/build-singlefile.mjs && node --check tools/make-icons.mjs && node --check engine/bandwidth-limiter.mjs && node --check engine/browser-bridge.mjs && node --check engine/connection-manager.mjs && node --check engine/download-manager.mjs && node --check engine/errors.mjs && node --check engine/file-writer.mjs && node --check engine/http-client.mjs && node --check engine/integrity-checker.mjs && node --check engine/logger.mjs && node --check engine/path-utils.mjs && node --check engine/queue-manager.mjs && node --check engine/resume-manager.mjs && node --check engine/retry-manager.mjs && node --check engine/scheduler.mjs && node --check engine/segment-manager.mjs && node --check engine/settings-manager.mjs && node --check test/download-engine.test.mjs && node --check test/queue-and-duplicates.test.mjs && node --check test/partial-file-safety.test.mjs && node --check browser-extension/background.js && node --check browser-extension/popup.js",
+    "dist:win": "electron-builder --win nsis --x64",
+    "dist:win:dir": "electron-builder --win dir --x64"
+  },
+  "devDependencies": {
+    "electron": "^44.6.0",
+    "electron-builder": "^26.17.0"
+  },
+  "build": {
+    "appId": "com.neurio.aidownloadmanagerpro",
+    "productName": "AI Download Manager Pro",
+    "executableName": "AI-Download-Manager-Pro",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "engine/**/*",
+      "desktop/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "browser-extension",
+        "to": "browser-extension"
+      },
+      {
+        "from": "scripts/register-native-host.ps1",
+        "to": "register-native-host.ps1"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "AI-Download-Manager-Pro-Setup-${version}.${ext}",
+      "requestedExecutionLevel": "asInvoker",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AI Download Manager Pro",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}

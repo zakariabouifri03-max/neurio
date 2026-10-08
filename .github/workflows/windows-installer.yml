@@ -1,0 +1,65 @@
+name: Build and publish Windows installer
+
+on:
+  push:
+    branches:
+      - arena/2f410cab-neurio
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out the requested branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Check syntax
+        run: npm run check
+
+      - name: Run download-engine tests
+        run: npm test
+
+      - name: Build Windows x64 NSIS installer
+        run: npm run dist:win
+
+      - name: Publish downloadable GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $tag = "aidmp-v$version"
+          $installer = "release/AI-Download-Manager-Pro-Setup-$version.exe"
+          if (-not (Test-Path $installer)) {
+            throw "Expected installer was not produced: $installer"
+          }
+
+          $hash = (Get-FileHash $installer -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $(Split-Path $installer -Leaf)" | Set-Content -Path release/SHA256SUMS.txt -Encoding ascii
+          @"
+          Windows x64 NSIS installer for AI Download Manager Pro v$version.
+
+          The app bundles Electron/Chromium and its Node runtime. This build is unsigned; Windows SmartScreen may display a warning. Only install it if you trust this repository.
+
+          Download behavior respects server and network limits. Speed depends on the connection, server, network conditions, and HTTP range support. The app does not bypass authentication, access controls, DRM, paywalls, CAPTCHA, or rate limits.
+
+          SHA-256 checksum is included as SHA256SUMS.txt.
+          "@ | Set-Content -Path release/release-notes.txt -Encoding utf8
+
+          gh release create $tag $installer release/SHA256SUMS.txt `
+            --repo $env:GITHUB_REPOSITORY `
+            --title "AI Download Manager Pro v$version" `
+            --target $env:GITHUB_SHA `
+            --notes-file release/release-notes.txt

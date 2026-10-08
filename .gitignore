@@ -1,5 +1,11 @@
 .DS_Store
 Thumbs.db
 *.log
+*.tmp
 __pycache__/
 *.pyc
+node_modules/
+release/
+dist/
+coverage/
+.aidmp-preview/

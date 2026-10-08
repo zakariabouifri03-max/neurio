@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "AI Download Manager Pro",
+  "version": "1.0.0",
+  "description": "Send a link you explicitly select to AI Download Manager Pro. Does not read browsing history.",
+  "permissions": ["contextMenus", "nativeMessaging"],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_title": "AI Download Manager Pro",
+    "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": { "id": "aidmp@neurio.local", "strict_min_version": "115.0" }
+  }
+}

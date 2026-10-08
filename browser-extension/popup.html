@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Download Manager Pro</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <div class="brand"><span class="brand-icon">↓</span><div><strong>AI Download Manager</strong><small>Browser bridge</small></div></div>
+    <p>Send a direct HTTP or HTTPS link to the desktop queue.</p>
+    <form id="send-form">
+      <label for="url">Download URL</label>
+      <input id="url" type="url" placeholder="https://example.com/file.zip" required>
+      <button type="submit">Add to desktop queue <span>↗</span></button>
+    </form>
+    <div id="status" role="status">This extension only sends links you choose. It does not collect browsing history.</div>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

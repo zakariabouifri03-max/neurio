@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0d14">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <title>AI Download Manager Pro</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-lockup">
+        <div class="brand-mark"><span>↓</span><i></i></div>
+        <div class="brand-copy"><strong>AI DOWNLOAD</strong><strong>MANAGER <em>PRO</em></strong></div>
+      </div>
+      <div class="sidebar-caption">WORKSPACE</div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-item selected" data-view="dashboard"><span class="nav-icon">◫</span><span>Dashboard</span><span class="nav-pip"></span></button>
+        <button class="nav-item" data-view="downloads"><span class="nav-icon">⇩</span><span>Downloads</span><span class="nav-count" id="nav-active-count">0</span></button>
+        <button class="nav-item" data-view="queue"><span class="nav-icon">☷</span><span>Queue</span><span class="nav-count" id="nav-queue-count">0</span></button>
+        <button class="nav-item" data-view="completed"><span class="nav-icon">✓</span><span>Completed</span></button>
+        <div class="nav-divider"></div>
+        <button class="nav-item" data-view="scheduler"><span class="nav-icon">◷</span><span>Scheduler</span></button>
+        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span><span>Settings</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="connection-card">
+          <div class="connection-icon"><span class="pulse-dot"></span></div>
+          <div><b>Engine status</b><small id="side-engine-status">Starting…</small></div>
+          <span class="online-dot"></span>
+        </div>
+        <div class="sidebar-disclaimer">Performance depends on your connection, server bandwidth, network conditions, and range support.</div>
+        <div class="sidebar-version">AI DOWNLOAD MANAGER PRO <span>v1.0.0</span></div>
+      </div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="eyebrow" id="top-eyebrow">YOUR DOWNLOADS, IN CONTROL</div>
+          <h1 id="top-title">Dashboard</h1>
+        </div>
+        <div class="topbar-actions">
+          <div class="engine-pill"><span class="online-dot"></span><span id="top-engine-status">Local engine ready</span></div>
+          <button class="button button-subtle" id="import-urls"><span class="button-icon">⇧</span> Import URLs</button>
+          <button class="button button-primary" id="add-url"><span class="plus-icon">＋</span> Add URL</button>
+        </div>
+      </header>
+
+      <main id="main-view" class="main-view" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <input id="import-file" type="file" accept=".txt,.csv,text/plain,text/csv" multiple hidden>
+  <div id="modal-root"></div>
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
