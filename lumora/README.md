@@ -85,6 +85,12 @@ Replace `build/icon.png` with a 256×256 `build/icon.ico` for a custom installer
 2. Paste a key for OpenAI, Google AI, a custom OpenAI-compatible endpoint, and/or a background-removal service.
 3. Choose which provider handles text, images, background removal and upscaling, and adjust base URLs / model names.
 
+**No budget? Free routes that work out of the box**
+
+* **Images:** Image provider → *Free community endpoint (no key, no account)*.
+* **Text:** Google AI free tier (`gemini-2.0-flash`), Groq (`https://api.groq.com/openai/v1`), OpenRouter free models, or a fully local Ollama / LM Studio server via the custom OpenAI-compatible endpoint.
+* **Background removal / upscaling:** local, offline, always free.
+
 **Security model**
 
 * Keys are written through `ipcRenderer.invoke` to the **main process only** and encrypted with the OS keychain via Electron `safeStorage` (`%APPDATA%/Lumora Studio/data/secrets.bin`).

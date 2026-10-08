@@ -15,6 +15,31 @@ export class ImageGenerator {
     const fullPrompt = req.style ? `${prompt}. Style: ${req.style}.` : prompt;
     const s = settings.get().ai;
 
+    if (s.imageProvider === 'free') {
+      // Key-less community endpoint (Pollinations): free, rate-limited, no account needed.
+      const [w, h] = (req.size ?? '1024x1024').split('x').map((n) => parseInt(n, 10));
+      const url =
+        `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}` +
+        `?width=${w || 1024}&height=${h || 1024}&nologo=true&model=flux&seed=${Math.floor(Math.random() * 1e6)}`;
+      let res: Response;
+      try {
+        res = await fetch(url, { signal: AbortSignal.timeout(180_000) });
+      } catch (err) {
+        throw new AIError(
+          `Could not reach the free image service. Check your connection. (${(err as Error).message})`,
+          'network'
+        );
+      }
+      if (!res.ok) {
+        throw new AIError(`Free image service failed (HTTP ${res.status}). Try again in a moment.`, 'provider_error');
+      }
+      const buf = Buffer.from(await res.arrayBuffer());
+      if (buf.length < 1000) throw new AIError('The free image service returned an empty image.', 'empty_response');
+      const ct = res.headers.get('content-type');
+      const mime = ct && ct.startsWith('image/') ? ct : 'image/jpeg';
+      return { dataUrl: `data:${mime};base64,${buf.toString('base64')}` };
+    }
+
     if (s.imageProvider === 'google') {
       const key = keyFor('google');
       const url = `${s.googleBaseUrl.replace(/\/$/, '')}/models/${s.googleImageModel}:predict?key=${encodeURIComponent(key)}`;

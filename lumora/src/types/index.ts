@@ -39,7 +39,7 @@ export type ProviderId = 'openai' | 'google' | 'custom';
 
 export interface AIProviderSettings {
   textProvider: ProviderId;
-  imageProvider: ProviderId;
+  imageProvider: ProviderId | 'free';
   backgroundRemovalProvider: 'local' | 'custom';
   upscaleProvider: 'local' | 'custom';
   removeBgUrl: string;

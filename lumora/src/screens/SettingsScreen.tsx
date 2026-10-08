@@ -166,6 +166,7 @@ export function SettingsScreen() {
             </Field>
             <Field label="Image provider">
               <select className="select" value={ai.imageProvider} onChange={(e) => setAi({ imageProvider: e.target.value as any })}>
+                <option value="free">Free community endpoint (no key, no account)</option>
                 <option value="openai">OpenAI (or compatible)</option>
                 <option value="google">Google AI</option>
                 <option value="custom">Custom endpoint</option>
