@@ -3,7 +3,7 @@
 #define AppPublisher "Piano Pro"
 
 [Setup]
-AppId={{A9A64BCC-CF69-43B6-9C56-E954AB7298AA}}
+AppId={{A9A64BCC-CF69-43B6-9C56-E954AB7298AA}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppPublisher={#AppPublisher}
