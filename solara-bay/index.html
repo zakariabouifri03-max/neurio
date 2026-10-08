@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SOLARA BAY — سولارا باي | Voxel Open World</title>
+<meta name="theme-color" content="#ff7a3d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../vendor/three.module.js",
+    "three/addons/": "../vendor/"
+  }
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--orange:#ff7a3d;--pink:#ff4d8a;--violet:#5a2a83;--neon:#00ffd0;--neon2:#ffea00;--dark:#0f0f14;--glass:rgba(15,15,20,0.72)}
+html,body{width:100%;height:100%;overflow:hidden;background:#0f0f14;font-family:'Cairo','Space Grotesk',system-ui,sans-serif}
+#canvas{position:fixed;inset:0;width:100%;height:100%;display:block;outline:none}
+
+/* LOADING */
+#loading{position:fixed;inset:0;z-index:100;background:radial-gradient(1200px 600px at 50% 0%, #ff7a3d 0%, #ff4d8a 35%, #5a2a83 70%, #0f0f14 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s}
+#loading.hide{opacity:0;pointer-events:none}
+.loadLogo{font-size:42px;font-weight:800;letter-spacing:3px;color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.5),0 0 30px rgba(255,255,255,.6)}
+.loadLogo span{color:var(--neon)}
+.loadSub{color:rgba(255,255,255,.9);margin-top:8px;font-size:13px;letter-spacing:4px}
+.loadBar{width:320px;height:8px;background:rgba(0,0,0,.3);border-radius:999px;margin-top:28px;overflow:hidden;backdrop-filter:blur(6px)}
+.loadBar i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--neon),var(--neon2));box-shadow:0 0 15px var(--neon);transition:width .2s}
+.loadTip{color:rgba(255,255,255,.7);font-size:11px;margin-top:12px}
+.voxelGrid{position:absolute;inset:auto 0 0 0;height:180px;background:repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 40px),repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 40px);mask:linear-gradient(to top, black, transparent);pointer-events:none}
+
+/* HUD */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10}
+.topBar{position:absolute;top:14px;left:14px;right:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.hudGroup{display:flex;gap:8px;align-items:center}
+.chip{background:var(--glass);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);color:#fff;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.chip b{font-size:15px}
+.stars{display:flex;gap:3px}
+.star{width:18px;height:18px;border-radius:3px;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:11px;transition:.3s;border:1px solid rgba(255,255,255,.1)}
+.star.on{background:#ff3b30;color:#fff;box-shadow:0 0 12px #ff3b30;border-color:#ff3b30;transform:scale(1.08)}
+.timeChip{background:linear-gradient(135deg, rgba(255,122,61,.9), rgba(255,77,138,.9));border:none}
+.minimapWrap{position:absolute;bottom:14px;right:14px;width:168px;height:168px;background:var(--glass);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);border-radius:20px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.minimapWrap canvas{width:100%;height:100%;display:block}
+.minimapLabel{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:9px;padding:3px 8px;border-radius:999px;letter-spacing:1px}
+.speedo{position:absolute;bottom:14px;left:14px;background:var(--glass);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);padding:14px 18px;border-radius:18px;color:#fff;min-width:140px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.speedo b{font-size:28px;line-height:1;color:var(--neon);text-shadow:0 0 12px var(--neon)}
+.speedo span{font-size:9px;letter-spacing:2px;opacity:.7}
+.speedo small{font-size:11px;opacity:.8;display:block;margin-top:4px}
+.cross{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;pointer-events:none}
+.cross:before,.cross:after{content:'';position:absolute;background:rgba(255,255,255,.9);box-shadow:0 0 6px rgba(0,255,208,.8)}
+.cross:before{left:9px;top:0;width:2px;height:20px;border-radius:2px}
+.cross:after{top:9px;left:0;width:20px;height:2px;border-radius:2px}
+.cross.dot{width:6px;height:6px;background:var(--neon);border-radius:50%;box-shadow:0 0 10px var(--neon)}
+.cross.dot:before,.cross.dot:after{display:none}
+.prompt{position:absolute;bottom:28%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);backdrop-filter:blur(10px);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:700;border:1px solid rgba(255,255,255,.15);display:none;gap:10px;align-items:center;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.prompt kbd{background:var(--neon);color:#000;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:800}
+.wantBanner{position:absolute;top:18%;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff3b30,#ff7a3d);color:#fff;padding:10px 22px;border-radius:999px;font-weight:800;font-size:13px;letter-spacing:1px;display:none;box-shadow:0 8px 30px rgba(255,59,48,.6);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.04)}}
+.missionBox{position:absolute;top:70px;left:14px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);padding:12px 14px;border-radius:14px;color:#fff;min-width:260px;max-width:320px}
+.missionBox h4{font-size:11px;letter-spacing:2px;opacity:.6;margin-bottom:6px}
+.missionBox p{font-size:13px;line-height:1.4;font-weight:600}
+.missionBox .progress{height:4px;background:rgba(255,255,255,.15);border-radius:999px;margin-top:8px;overflow:hidden}
+.missionBox .progress i{display:block;height:100%;width:0%;background:var(--neon);transition:width .3s}
+.controls{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:90vw}
+.ckbd{background:rgba(15,15,20,.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.85);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:600;display:flex;gap:6px;align-items:center}
+.ckbd b{color:var(--neon)}
+
+/* Menus */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);display:none;place-items:center;padding:18px}
+.modal.show{display:grid}
+.modalBox{background:linear-gradient(180deg, #1a1a22 0%, #0f0f14 100%);border:1px solid rgba(255,255,255,.12);border-radius:22px;overflow:hidden;max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+.modalHead{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08);background:radial-gradient(600px 200px at 0% 0%, rgba(255,122,61,.15), transparent)}
+.modalHead h2{color:#fff;font-size:18px}
+.modalHead p{color:rgba(255,255,255,.6);font-size:12px}
+.closeBtn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;display:grid;place-items:center}
+.modalBody{padding:16px;overflow:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;color:#fff}
+.card h3{font-size:14px;margin-bottom:4px}
+.card p{font-size:12px;opacity:.7;line-height:1.4}
+.card .price{color:var(--neon);font-weight:800;margin-top:6px}
+.btn{appearance:none;border:none;padding:10px 16px;border-radius:999px;font-weight:800;cursor:pointer;transition:.2s;display:inline-flex;gap:8px;align-items:center;justify-content:center}
+.btnPrimary{background:linear-gradient(135deg,var(--orange),var(--pink));color:#fff;box-shadow:0 8px 20px rgba(255,122,61,.4)}
+.btnGhost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.12)}
+.btn:active{transform:scale(.97)}
+.shopGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:640px){.shopGrid{grid-template-columns:repeat(2,1fr)}}
+.shopItem{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;text-align:center;color:#fff;cursor:pointer;transition:.2s}
+.shopItem:hover{border-color:var(--neon);transform:translateY(-2px)}
+.shopItem .ico{font-size:28px}
+.shopItem b{display:block;margin-top:6px;font-size:12px}
+.shopItem small{opacity:.6;font-size:11px}
+
+/* Pause */
+.pauseBox{max-width:420px}
+.bigBtn{width:100%;padding:14px;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;border:none}
+.bigPrimary{background:linear-gradient(135deg,var(--neon),#00b8ff);color:#000}
+.bigGhost{background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(255,255,255,.1);margin-top:8px}
+
+/* toast */
+#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toastItem{background:rgba(15,15,20,.9);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 16px;border-radius:999px;font-size:12px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:toastIn .4s}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* district label */
+.district{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;opacity:0;transition:.6s}
+.district.show{opacity:1}
+.district h2{font-size:42px;font-weight:800;color:#fff;text-shadow:0 8px 30px rgba(0,0,0,.6),0 0 20px rgba(255,255,255,.3);letter-spacing:2px}
+.district p{color:var(--neon);letter-spacing:6px;font-size:12px;margin-top:6px;text-shadow:0 0 12px var(--neon)}
+
+#errLog{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#ff3b30;color:#fff;padding:10px 14px;border-radius:10px;z-index:999;display:none;max-width:90vw;font-size:12px}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="errLog"></div>
+
+<div id="loading">
+  <div class="voxelGrid"></div>
+  <div class="loadLogo">SOLARA <span>BAY</span></div>
+  <div class="loadSub">VOXEL OPEN WORLD • SUNSET CITY</div>
+  <div class="loadBar"><i id="loadFill"></i></div>
+  <div class="loadTip" id="loadTip">نبني المدينة مكعباً بمكعب…</div>
+</div>
+
+<div id="hud">
+  <div class="topBar">
+    <div class="hudGroup">
+      <div class="chip">💰 <b id="hudMoney">$2,500</b></div>
+      <div class="chip">❤️ <b id="hudHealth">100</b></div>
+      <div class="chip timeChip">🕓 <b id="hudTime">18:30</b> <small id="hudDay" style="opacity:.8;font-size:11px">غروب</small></div>
+    </div>
+    <div class="hudGroup">
+      <div class="chip" id="wantedChip" style="gap:6px">🚨 <div class="stars" id="hudStars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div></div>
+      <div class="chip">📦 <b id="hudMissions">1/12</b></div>
+      <button class="chip" style="pointer-events:auto;cursor:pointer" id="btnPause">⏸</button>
+    </div>
+  </div>
+
+  <div class="cross dot" id="cross"></div>
+  <div class="prompt" id="prompt"><kbd id="promptKey">E</kbd> <span id="promptText">ادخل المتجر</span></div>
+  <div class="wantBanner" id="wantBanner">🚨 مطلوب! اهرب من الشرطة</div>
+
+  <div class="missionBox" id="missionBox">
+    <h4>المهمة الحالية</h4>
+    <p id="missionTitle">أول توصيلة — أوصل الطرد إلى المارينا قبل الغروب</p>
+    <div class="progress"><i id="missionProg" style="width:35%"></i></div>
+  </div>
+
+  <div class="district" id="districtLabel"><h2 id="districtName">MARINA BAY</h2><p id="districtSub">الشاطئ • غروب سينمائي</p></div>
+
+  <div class="minimapWrap">
+    <canvas id="minimap" width="168" height="168"></canvas>
+    <div class="minimapLabel">MAP • V — تبديل المنظور</div>
+  </div>
+
+  <div class="speedo" id="speedo" style="display:none">
+    <span>SPEED</span><br><b id="speedVal">0</b> <span>KM/H</span>
+    <small id="gearVal">PARK</small>
+  </div>
+
+  <div class="controls">
+    <span class="ckbd"><b>WASD</b> حركة</span>
+    <span class="ckbd"><b>SHIFT</b> ركض</span>
+    <span class="ckbd"><b>SPACE</b> قفز / فرملة يد</span>
+    <span class="ckbd"><b>E</b> تفاعل</span>
+    <span class="ckbd"><b>F</b> ركوب/نزول</span>
+    <span class="ckbd"><b>V</b> أول/ثالث</span>
+    <span class="ckbd"><b>G</b> راديو</span>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Shop Modal -->
+<div class="modal" id="shopModal">
+  <div class="modalBox">
+    <div class="modalHead">
+      <div><h2 id="shopTitle">🏪 المتجر</h2><p id="shopDesc">اختر ما تريد شراءه</p></div>
+      <button class="closeBtn" id="shopClose">✕</button>
+    </div>
+    <div class="modalBody" id="shopBody"></div>
+  </div>
+</div>
+
+<!-- Pause Modal -->
+<div class="modal" id="pauseModal">
+  <div class="modalBox pauseBox">
+    <div class="modalHead"><div><h2>⏸ متوقف</h2><p>SOLARA BAY — سولارا باي</p></div><button class="closeBtn" id="pauseClose">✕</button></div>
+    <div class="modalBody">
+      <button class="bigBtn bigPrimary" id="btnResume">▶ متابعة اللعب</button>
+      <button class="bigBtn bigGhost" id="btnRestart">🔄 إعادة التجربة</button>
+      <button class="bigBtn bigGhost" id="btnMap">🗺️ خريطة كاملة (قريباً)</button>
+      <div style="margin-top:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;color:#fff">
+        <h4 style="font-size:12px;letter-spacing:1px;opacity:.7">عن اللعبة</h4>
+        <p style="font-size:12px;opacity:.7;line-height:1.5;margin-top:6px">عالم مفتوح voxel ساحلي — قد، استكشف، نفّذ مهام، واهرب من الشرطة. هذه نسخة Prototype قابلة للتوسع إلى 5×5 كم. اضغط V لتبديل أول/ثالث، F للركوب، E للتفاعل مع المتاجر.</p>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <a href="../SOLARA_BAY_GDD.md" target="_blank" class="btn btnGhost" style="flex:1;text-decoration:none;text-align:center">📄 وثيقة التصميم GDD</a>
+        <button class="btn btnPrimary" style="flex:1" id="btnDownload">⬇️ تحميل EXE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mission Complete -->
+<div class="modal" id="missionModal">
+  <div class="modalBox" style="max-width:480px;text-align:center">
+    <div class="modalBody" style="padding:28px">
+      <div style="font-size:48px">🏆</div>
+      <h2 style="color:#fff;margin-top:8px" id="missionDoneTitle">مهمة مكتملة!</h2>
+      <p style="color:rgba(255,255,255,.7);margin-top:6px" id="missionDoneDesc">أحسنت! حصلت على مكافأة</p>
+      <div style="background:rgba(0,255,208,.1);border:1px solid rgba(0,255,208,.3);color:var(--neon);padding:12px;border-radius:12px;margin-top:16px;font-weight:800" id="missionReward">+ $1,500</div>
+      <button class="btn btnPrimary" style="margin-top:16px;width:100%" id="missionNext">متابعة ⏭️</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,3 +1,28 @@
+# 🌴 SOLARA BAY — سولارا باي | Voxel Open World
+
+> **لعبة عالم مفتوح voxel ساحلية — هوية أصلية 100% — جاهزة للـ PC**
+> **الوثيقة الكاملة:** [`SOLARA_BAY_GDD.md`](SOLARA_BAY_GDD.md) — 12 مهمة رئيسية + 20 جانبية + 10 أحداث عشوائية + أنظمة شرطة واقتصاد وليل/نهار
+
+**▶ العب الآن (بدون تثبيت):**
+- **المعاينة الحية:** [`solara-bay/`](solara-bay/) — اضغط Click لقفل الماوس → `WASD` حركة, `SHIFT` ركض, `SPACE` قفز/درفت, `F` ركوب/نزول, `V` أول/ثالث, `E` متاجر, `G` راديو
+- **تحميل PC (Offline):** [`SolaraBay.html`](SolaraBay.html) — **543 KB ملف واحد** — دبل كليك ويعمل حتى بدون إنترنت (مثل الـ EXE)
+- **حزمة محمولة:** [`SolaraBay-Portable.zip`](SolaraBay-Portable.zip) — فك الضغط وشغّل
+- **مشغّل Linux:** `./SolaraBay` — تنفيذي أصلي 16 KB
+- **EXE ويندوز:** شغّل `build-exe.bat` على ويندوز → ينتج `SolaraBay.exe Portable` (Electron) في 30 ثانية
+
+**وثيقة التصميم (GDD):** كل الأنظمة + الخريطة 5×5 كم + NPC AI + خطة 3 مراحل + كود Unity جاهز — انظر [`SOLARA_BAY_GDD.md`](SOLARA_BAY_GDD.md)
+
+```
+📁 solara-bay/         # اللعبة القابلة للعب (Three.js voxel + 520×520 مدينة + 34 NPC + شرطة + محلات)
+📄 SolaraBay.html      # نسخة PC أحادية الملف — Offline (دبل كليك)
+📄 SOLARA_BAY_GDD.md   # وثيقة تصميم كاملة بالعربية (A-G)
+📦 SolaraBay-Portable.zip # الحزمة المحمولة
+```
+
+**الخريطة:** 4 أحياء (Marina Bay شاطئ نيون، Neon Downtown، Suburbs، Industrial) قابلة للتوسع إلى 5×5 كم — كل مبنى voxel بإضاءة غروب سينمائية
+
+---
+
 # 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!

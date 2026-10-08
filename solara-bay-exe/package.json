@@ -1,0 +1,27 @@
+{
+  "name": "solara-bay",
+  "version": "0.1.0",
+  "description": "SOLARA BAY — Voxel Open World (PC)",
+  "main": "electron-main.js",
+  "author": "SOLARA BAY Team",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win portable --x64",
+    "build:linux": "electron-builder --linux AppImage --x64",
+    "build:dir": "electron-builder --win --x64 --dir"
+  },
+  "build": {
+    "appId": "com.solarabay.game",
+    "productName": "Solara Bay",
+    "files": ["electron-main.js","../solara-bay/**/*","../vendor/**/*","../icons/**/*"],
+    "directories": {"buildResources": "build"},
+    "win": {"target": "portable", "icon": "../icons/icon-512.png"},
+    "linux": {"target": "AppImage", "icon": "../icons/icon-512.png"},
+    "portable": {"artifactName": "SolaraBay-${version}-${os}-${arch}.${ext}"}
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.9.1"
+  }
+}

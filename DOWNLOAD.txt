@@ -1,0 +1,18 @@
+🌴 SOLARA BAY — روابط التحميل المباشرة (PC)
+===========================================
+
+1) النسخة الفورية (بدون تثبيت):
+   - SolaraBay.html  — 543 KB — دبل كليك للعب
+   - تعمل Offline حتى بدون إنترنت
+
+2) الحزمة المحمولة:
+   - SolaraBay-Portable.zip — 492 KB — فك الضغط وشغّل SolaraBay.html
+
+3) مشغّل Linux الأصلي:
+   - SolaraBay (16 KB ELF) — ./SolaraBay في الطرفية
+
+4) EXE ويندوز الحقيقي (يبنى بضغطة):
+   - شغّل build-exe.bat على ويندوز — ينتج SolaraBay.exe Portable
+
+المعاينة الحية:
+   http://localhost:8000/solara-bay/  (أو رابط الـ Preview الخاص بك)
