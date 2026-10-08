@@ -3,3 +3,6 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+local-coder/build/
+local-coder/dist/
+local-coder/*.spec

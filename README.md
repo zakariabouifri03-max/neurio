@@ -113,3 +113,11 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 🧑‍💻 Neurio Coder — local desktop assistant
+
+This repository also includes an independent Windows desktop coding assistant in **[`local-coder/`](local-coder/)**. It can scaffold browser games/apps and use a coding model already installed on the computer through Ollama. No cloud API key is used; generated files are reviewed before being applied.
+
+Build the Windows executable with `local-coder/build_windows.bat`. Setup instructions, local-model requirements, privacy details, and tests are in [`local-coder/README.md`](local-coder/README.md).
