@@ -43,11 +43,29 @@ jobs:
         shell: cmd
 
       - name: Package NSIS installer
-        run: npx --no-install electron-builder --win nsis --x64 --publish never
+        id: pack
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npx --no-install electron-builder --win nsis --x64 --publish never 2>&1 | tee ../build-log.txt
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Report packaging log
+        if: always()
+        shell: bash
+        working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-          DEBUG: 'electron-builder'
+        run: |
+          tail -c 50000 build-log.txt > log-tail.txt || echo "no log" > log-tail.txt
+          gh issue create --title "CI packaging log (run ${{ github.run_number }}, ${{ steps.pack.outcome }})" \
+            --body "$(printf '```\n%s\n```' "$(cat log-tail.txt)")" || true
+
+      - name: Fail if packaging failed
+        if: steps.pack.outcome == 'failure'
+        run: exit 1
 
       - name: List dist
         if: always()
