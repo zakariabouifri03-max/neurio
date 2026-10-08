@@ -44,9 +44,9 @@ jobs:
           $out = npx electron-builder --win --publish never 2>&1 | Out-String
           Write-Host $out
           if ($LASTEXITCODE -ne 0) {
-            $tail = if ($out.Length -gt 2800) { $out.Substring($out.Length - 2800) } else { $out }
-            $tail = $tail -replace "`r"," " -replace "`n"," | "
-            Write-Host "::error::electron-builder failed: $tail"
+            $head = if ($out.Length -gt 3500) { $out.Substring(0, 3500) } else { $out }
+            $head = $head -replace "`r"," " -replace "`n"," | "
+            Write-Host "::error::electron-builder failed: $head"
             exit 1
           }
 
