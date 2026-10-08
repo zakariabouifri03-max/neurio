@@ -1,0 +1,22 @@
+name: Publish PianoPro.exe
+
+on:
+  push:
+    branches: ['arena/2151fe7f-neurio']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Attach EXE to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload pianopro-v1.0 PianoPro.exe PianoPro_Setup.exe --clobber
+          echo "Uploaded:"
+          gh release view pianopro-v1.0
