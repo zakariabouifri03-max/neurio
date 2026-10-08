@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Neurio Futsal — 5v5 Indoor Football</title>
+  <meta name="description" content="Original 5-a-side futsal game in the browser. Quick Match, Tournament, Training and AI vs AI.">
+  <link rel="stylesheet" href="./src/style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "../vendor/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="stage">
+    <div id="view"></div>
+    <div id="hud" class="hidden">
+      <div id="scoreboard">
+        <div class="team home"><span id="hName">HOME</span><span class="badge" id="hBadge"></span></div>
+        <div class="score"><span id="hScore">0</span><span class="sep">:</span><span id="aScore">0</span></div>
+        <div class="team away"><span class="badge" id="aBadge"></span><span id="aName">AWAY</span></div>
+        <div class="clock"><span id="clock">00:00</span><span id="half"></span></div>
+      </div>
+      <div id="control" class="panel">
+        <div class="row"><span id="ctlName">—</span><span id="ctlMeta"></span></div>
+        <div class="bar"><div id="stamina"></div></div>
+        <div class="bar charge"><div id="charge"></div></div>
+      </div>
+      <div id="camLabel" class="pill">Broadcast</div>
+      <div id="banner" class="hidden"></div>
+      <div id="restartLabel" class="hidden"></div>
+      <div id="hints" class="panel small"></div>
+    </div>
+    <div id="overlay" class="hidden">
+      <div id="screen" class="screen"></div>
+    </div>
+    <div id="flash" class="hidden"></div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

@@ -113,3 +113,66 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## ⚽ Neurio Futsal — 5v5 indoor football (`futsal/`)
+
+An original 3D futsal game that runs in the browser (Three.js, no build step). Open
+`futsal/index.html` through any static server, e.g. from the repo root:
+
+```bash
+python3 -m http.server 8000
+# → http://localhost:8000/futsal/
+```
+
+**Delivery note:** this is a browser game served as static files. It is **not** a native Windows `.exe`;
+building one needs an Electron/Tauri-style wrapper, which is not part of this build. Fullscreen /
+borderless / windowed are handled in the page (Fullscreen API and letterboxing at 16:9 or 16:10).
+
+### What is in this build
+- **Match engine** (`futsal/src/sim/`): 5v5 (GK + 4 outfield per side), passing, through balls, shots
+  (power/tap/lob), dribbling, sprint, tackles, interceptions, blocks, switching, goalkeeper saves and rush,
+  corners, kick-ins, goal kicks, free kicks, penalties, fouls, advantage, yellow/red cards, stoppage time.
+- **Modes:** Quick Match, Tournament (four-team knockout), Training (free practice and a 60 s shooting drill),
+  AI vs AI, and a live AI match behind the menus.
+- **Teams:** eight original fictional teams with generated kits and attributes (speed, acceleration, shooting,
+  passing, dribbling, strength, stamina, ball control, defending, reaction, goalkeeping).
+- **Rendering:** procedural futsal hall, boards, goals with nets, stepped stands and a crowd (instanced),
+  kit-coloured players with numbers and procedural run / tackle poses. Camera modes: Broadcast, Player,
+  Close, Training (V cycles).
+- **Graphics presets:** LOW / MEDIUM / HIGH / ULTRA (pixel ratio, shadows, shadow-map size, crowd size,
+  light count, fog, player shadows).
+- **Audio:** all sounds synthesised in WebAudio (kick, bounce, whistle, goal roar, card beep, crowd bed). No music.
+- **Input:** keyboard (WASD, Shift, Space, J, K, L, Q, E, C, R, F lob, V camera, Esc pause) and gamepad
+  (left stick move, right stick aim, A pass, B shoot, X tackle, Y through, LB/RB switch, LT sprint,
+  R3 press, L3 skill, D-pad up keeper rush, Back camera, Start pause). Menus work with keys, pad and mouse.
+- **Post-match:** score, possession, shots (on target), pass accuracy, fouls, corners, saves, cards,
+  goal log and top-rated players.
+- **Persistence:** settings, match history and tournament progress in `localStorage` (key `neurio-futsal-v1`).
+
+### Not in this build
+- **Career** (menu item is disabled), **Penalty Shootout mode**, and **Local 2-player** are not implemented.
+- The tournament decides knockout draws with a penalty decider weighted by team strength; there is no
+  shootout mode yet.
+
+### Known limits
+- Pass completion is around 35–45% in the headless simulation; real futsal is higher. Pass selection is
+  the main area still being tuned.
+- Kicks made with the ball sitting beside or behind the kicker (mostly goalkeeper distribution) are
+  "flicks" that can move the ball up to about 2 m in one frame; the view damps this so it does not look like a teleport.
+- The 60 FPS target is designed for a GPU. Software WebGL (headless testing) runs far slower.
+- Shots-on-target is counted from the shot aim, not the outcome.
+
+### Tests
+```bash
+node --test futsal/tests/
+```
+The tests cover the config, team data, match setup, a five-minute simulation (no NaN, bounded ball step),
+determinism, a full quick match, the tournament bracket and save-data fallbacks.
+
+### Layout
+`futsal/index.html` (entry) · `futsal/src/main.js` (app flow and loop) · `futsal/src/sim/` (MatchManager,
+BallController, AIController, GoalkeeperAI, PlayerController, TeamManager, FormationManager, Referee, MatchStats) ·
+`futsal/src/render/` (arena, playerModel, matchView, camera) · `futsal/src/ui/UIManager.js` · `futsal/src/input.js` ·
+`futsal/src/audio.js` · `futsal/src/save.js` · `futsal/src/tournament.js` · `futsal/src/config.js` (all tuning).

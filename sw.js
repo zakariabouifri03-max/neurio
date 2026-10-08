@@ -37,6 +37,8 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  // the futsal game is served network-first from its own folder: never serve it from this cache
+  if (new URL(e.request.url).pathname.includes('/futsal/')) return;
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then((hit) => {
       if (hit) return hit;
