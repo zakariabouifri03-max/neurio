@@ -3,3 +3,9 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# neurio minecraft addon build artifacts
+minecraft/build/
+minecraft/node_modules/
+minecraft/addon/resource_pack/sounds/neurio/tts_*
+minecraft/addon/resource_pack/sounds/neurio/word_*

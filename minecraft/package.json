@@ -1,0 +1,6 @@
+{
+  "name": "neurio-minecraft",
+  "private": true,
+  "type": "module",
+  "description": "Minecraft Bedrock AI-villager addon + voice/companion tools"
+}

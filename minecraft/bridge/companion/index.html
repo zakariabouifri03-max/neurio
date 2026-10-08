@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>⌬ Neurio — صاحبك القروي</title>
+<style>
+  :root{ --bg:#0e1c22; --card:#16303a; --ink:#eaf6f2; --dim:#8fb3ab; --acc:#4ee2ff; --gold:#f0c85a; --bad:#ff6b5e; }
+  *{box-sizing:border-box} body{margin:0;font:16px/1.6 system-ui,"Segoe UI",Tahoma,sans-serif;background:linear-gradient(180deg,#0b171d,#12262e);color:var(--ink);min-height:100vh}
+  header{padding:14px 18px;display:flex;gap:12px;align-items:center;background:#0b171d;position:sticky;top:0;z-index:5;border-bottom:1px solid #1d3a44}
+  header .logo{font-size:26px} h1{font-size:18px;margin:0} header small{color:var(--dim)}
+  main{max-width:720px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--card);border:1px solid #24505c;border-radius:16px;padding:14px}
+  .persona{display:flex;gap:12px;align-items:center}
+  .face{width:64px;height:64px;border-radius:12px;background:#20454f;display:grid;place-items:center;font-size:34px}
+  .mood{color:var(--gold);font-size:13px}
+  #log{min-height:180px;max-height:46vh;overflow:auto;display:flex;flex-direction:column;gap:8px}
+  .msg{padding:9px 12px;border-radius:12px;max-width:88%;white-space:pre-wrap}
+  .me{align-self:flex-start;background:#2b5b68;border:1px solid #3b7f91}
+  .him{align-self:flex-end;background:#3a2c17;border:1px solid #6b5324}
+  .him .who{display:block;color:var(--gold);font-size:12px;margin-bottom:2px}
+  .him .emo{color:var(--dim);font-size:11px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button{font:inherit;border:0;border-radius:12px;padding:10px 14px;cursor:pointer;background:#22444f;color:var(--ink)}
+  button.primary{background:var(--acc);color:#06222b;font-weight:700}
+  button.mic{width:74px;height:74px;border-radius:50%;font-size:30px;background:#22444f;flex:0 0 auto}
+  button.mic.on{background:var(--bad);animation:pulse 1s infinite}
+  @keyframes pulse{50%{transform:scale(1.06)}}
+  textarea,input,select{font:inherit;background:#0d2129;color:var(--ink);border:1px solid #24505c;border-radius:12px;padding:10px;width:100%}
+  label{font-size:13px;color:var(--dim)}
+  .hint{color:var(--dim);font-size:13px}
+  .status{display:flex;gap:8px;flex-wrap:wrap;font-size:12px}
+  .pill{background:#0d2129;border:1px solid #24505c;border-radius:99px;padding:3px 10px}
+  .pill.ok{border-color:#3f9d63;color:#9fe0b4}
+  footer{color:var(--dim);font-size:12px;text-align:center;padding:10px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">⌬</div>
+  <div>
+    <h1>Neurio — صاحبك القروي</h1>
+    <small>هضر بصوتك، وهو يجاوبك بصوتو — نفس الدماغ اللي فاللعبة</small>
+  </div>
+</header>
+
+<main>
+  <div class="card persona">
+    <div class="face" id="face">🧑🌾</div>
+    <div style="flex:1">
+      <div id="pname" style="font-size:17px;font-weight:700">…</div>
+      <div class="mood" id="pmeta"></div>
+      <div class="row" style="margin-top:6px">
+        <button id="reroll">🎲 قروي آخر</button>
+        <label>لغتك معاه
+          <select id="lang">
+            <option value="auto">auto (نفس لغتك)</option>
+            <option value="dz">Darija (Arabizi)</option>
+            <option value="ar">الدارجة (عربي)</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div id="log"></div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="align-items:flex-end">
+      <button class="mic" id="mic" title="هضر">🎙</button>
+      <div style="flex:1">
+        <textarea id="say" rows="2" placeholder="كتب ولا هضر… salam khoya, kif dayr?"></textarea>
+        <div class="row" style="margin-top:8px">
+          <button class="primary" id="send" style="flex:1">➤ صيفط</button>
+          <button id="toGame" title="يكتبها فاللعبة">🎮 صيفطها ل Minecraft</button>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label>لغة الميكروفون
+        <select id="micLang">
+          <option value="ar-MA">🇦 الدارجة (ar-MA)</option>
+          <option value="ar-SA">العربية (ar-SA)</option>
+          <option value="fr-FR">Français</option>
+          <option value="en-US">English</option>
+        </select>
+      </label>
+      <label style="flex:1">صوتو
+        <select id="voice">
+          <option value="ar-MA-MounaNeural">Mouna (مرا) — edge-tts</option>
+          <option value="ar-MA-JamalNeural">Jamal (راجل) — edge-tts</option>
+          <option value="browser">صوت المتصفح</option>
+        </select>
+      </label>
+    </div>
+    <div class="status" id="status" style="margin-top:10px"></div>
+    <div class="hint" style="margin-top:8px">
+      «صيفطها ل Minecraft» كتكتب فاللعبة: <code>/scriptevent neurio:say …</code> — حل الشات فاللعبة قبل، والقروي القريب غادي يجاوبك بصوتو داخل اللعبة.
+    </div>
+  </div>
+  <footer>⌬ Neurio AI Villagers — نفس الدماغ: <code>addon/behavior_pack/scripts/brain.js</code></footer>
+</main>
+
+<script type="module">
+import { makePersona } from '/brain/persona.js';
+import { createBrain } from '/brain/brain.js';
+
+const $ = (id) => document.getElementById(id);
+const log = $('log');
+let persona, brain;
+
+function say(msg, cls, who, emo) {
+  const d = document.createElement('div');
+  d.className = 'msg ' + cls;
+  if (who) d.innerHTML = `<span class="who">${who}${emo ? ' · ' + emo : ''}</span>`;
+  d.appendChild(document.createTextNode(msg));
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+  return d;
+}
+
+function newVillager(seed) {
+  persona = makePersona(seed || ('c-' + Math.random().toString(36).slice(2)), { profession: Math.floor(Math.random() * 15) });
+  brain = createBrain(persona, {});
+  $('pname').textContent = persona.name.ar + ' — ' + persona.job.ar;
+  $('pmeta').textContent = `${persona.age} سنة · ${persona.traits.map(t => t.ar).join('، ')} · "${persona.catchphrase.ar}"`;
+  $('face').textContent = persona.gender === 'f' ? '👩‍🌾' : (persona.age > 55 ? '🧓' : '🧑‍🌾');
+  log.innerHTML = '';
+  const g = brain.bark('first_meet', { lang: $('lang').value === 'auto' ? 'dz' : $('lang').value, tags: new Set(['clear', 'day']) });
+  if (g) { say(g.text, 'him', persona.name.ar, g.emotion); speak(g.text); }
+}
+
+async function speak(text) {
+  const mode = $('voice').value;
+  if (mode !== 'browser') {
+    try {
+      const r = await fetch('/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, voice: mode }) });
+      if (r.ok) { const b = await r.blob(); const a = new Audio(URL.createObjectURL(b)); a.play(); return; }
+    } catch (e) { /* fall through */ }
+  }
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = /[\u0600-\u06FF]/.test(text) ? 'ar-SA' : 'en-US';
+    u.rate = 1.0;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+async function send(text) {
+  text = (text || '').trim();
+  if (!text) return;
+  say(text, 'me');
+  $('say').value = '';
+  const lang = $('lang').value;
+  const r = brain.hear(text, { lang, playerName: 'صاحبك', tags: new Set(['clear', 'day']), times: 2, rep: 2 });
+  await new Promise(res => setTimeout(res, 120));
+  say(r.text, 'him', persona.name.ar, r.emotion + ' · ' + r.intent);
+  speak(r.text);
+  return r.text;
+}
+
+async function toGame(text) {
+  text = (text || $('say').value || '').trim();
+  if (!text) return;
+  const cmd = '/scriptevent neurio:say ' + text.slice(0, 200);
+  const r = await fetch('/api/type', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: cmd }) });
+  const j = await r.json();
+  if (!j.ok) {
+    await navigator.clipboard?.writeText(cmd).catch(() => {});
+    say('ما قدرناش نكتبو فاللعبة — نسخت الأمر لل clipboard: ' + cmd, 'him', '⌬');
+  } else say('تصيفط للعبة ✔', 'him', '⌬');
+}
+
+/* ---------------- mic (Web Speech API) ---------------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, listening = false;
+if (!SR) $('mic').title = 'المتصفح ما كيدعمش الميكروفون';
+$('mic').onclick = () => {
+  if (!SR) { say('المتصفح ما كيدعمش التعرف على الصوت — جرب Chrome.', 'him', '⌬'); return; }
+  if (listening) { rec.stop(); return; }
+  rec = new SR();
+  rec.lang = $('micLang').value;
+  rec.interimResults = true;
+  rec.continuous = false;
+  rec.onstart = () => { listening = true; $('mic').classList.add('on'); };
+  rec.onend = () => { listening = false; $('mic').classList.remove('on'); };
+  rec.onresult = (e) => {
+    const t = [...e.results].map(r => r[0].transcript).join(' ');
+    $('say').value = t;
+    if (e.results[e.results.length - 1].isFinal) send(t);
+  };
+  rec.start();
+};
+
+$('send').onclick = () => send($('say').value);
+$('say').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send($('say').value); } });
+$('toGame').onclick = () => toGame();
+$('reroll').onclick = () => newVillager();
+
+(async function status() {
+  try {
+    const j = await (await fetch('/api/state')).json();
+    const pills = [
+      ['edge-tts (صوت حقيقي)', j.edge_tts],
+      ['LLM', j.llm],
+      ['كتابة فاللعبة', j.can_type],
+    ];
+    $('status').innerHTML = pills.map(([t, ok]) => `<span class="pill ${ok ? 'ok' : ''}">${ok ? '✔' : '✖'} ${t}</span>`).join('')
+      + `<span class="pill">platform: ${j.platform}</span>`;
+  } catch (e) { $('status').innerHTML = '<span class="pill">server offline</span>'; }
+  newVillager();
+})();
+</script>
+</body>
+</html>

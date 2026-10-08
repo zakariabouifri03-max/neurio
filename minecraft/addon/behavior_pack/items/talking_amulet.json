@@ -1,0 +1,23 @@
+{
+  "format_version": "1.20.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "neurio:talking_amulet",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "texture": "neurio_amulet"
+      },
+      "minecraft:display_name": {
+        "value": "\u00a7b\u232c Villager Amulet \u00a77| \u00a7e\u0623\u0645\u0648\u0644\u0629 \u0627\u0644\u0642\u0631\u0648\u064a\u064a\u0646"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true,
+      "minecraft:hover_text_color": "aqua",
+      "minecraft:hand_equipped": true
+    }
+  }
+}

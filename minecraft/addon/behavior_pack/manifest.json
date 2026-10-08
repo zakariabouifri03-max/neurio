@@ -1,0 +1,57 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "pack.name",
+    "description": "pack.description",
+    "uuid": "21a1be62-0010-436d-9f8e-7e50c408dd83",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      20,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "description": "AI villagers that talk, answer and speak (Darija / Arabizi / Arabic / English / French)",
+      "type": "script",
+      "language": "javascript",
+      "uuid": "078051f9-cd71-43c9-b482-cbd96bae4b35",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "entry": "scripts/main.js"
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.10.0"
+    },
+    {
+      "module_name": "@minecraft/server-ui",
+      "version": "2.2.0"
+    },
+    {
+      "uuid": "b91ca0f8-5964-4dce-afef-da026d3abdda",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "metadata": {
+    "authors": [
+      "Neurio"
+    ],
+    "license": "MIT",
+    "product_type": "addon"
+  }
+}

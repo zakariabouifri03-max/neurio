@@ -113,3 +113,17 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 🧑🌾 New: **Neurio AI Villagers** — Minecraft Bedrock mode
+
+Villagers that **talk to you with AI**: Moroccan Darija (Arabizi + Arabic), English, French —
+they answer about what they see (night, rain, zombies, your reputation...), remember you,
+trade, give quests, get angry when you hit them, and **speak out loud** (offline voice bank,
+or a real Moroccan neural voice if you build it).
+
+- **Download:** [`minecraft/dist/Neurio-AI-Villagers.mcaddon`](minecraft/dist/Neurio-AI-Villagers.mcaddon) — open it with Minecraft.
+- **Guide (Darija + English):** [`minecraft/README.md`](minecraft/README.md)
+- **Voice portal (speak with your mic):** `python3 minecraft/bridge/server.py` → http://localhost:8787
+- **No experimental toggles, no API key, works offline.**
