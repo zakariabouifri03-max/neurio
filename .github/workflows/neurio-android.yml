@@ -12,7 +12,7 @@ on:
       - ".github/workflows/neurio-android.yml"
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build-apk:
     runs-on: ubuntu-latest
@@ -37,3 +37,21 @@ jobs:
             android/out/package-info.txt
           if-no-files-found: error
           retention-days: 14
+      - name: Publish direct-download preview release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          TAG=neurio-android-v0.1.0-preview
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "This version is already published; leaving its assets unchanged."
+          else
+            gh release create "$TAG" \
+              android/out/Neurio-0.1.0-preview.apk \
+              android/out/Neurio-0.1.0-preview.apk.sha256 \
+              android/out/package-info.txt \
+              --target "$COMMIT" --prerelease --latest=false \
+              --title "Neurio Android 0.1.0 — Preview APK" \
+              --notes-file android/RELEASE-NOTES.md
+          fi
