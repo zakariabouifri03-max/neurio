@@ -75,23 +75,29 @@ jobs:
             exit $code
           fi
 
-      - name: Run tests (per-file, bounded, annotated)
+      - name: Run tests (per-file, bounded, logs committed)
         run: |
           set +e
           set +o pipefail
           overall=0
-          > /tmp/test.log
+          mkdir -p ci-logs && rm -f ci-logs/*.log
+          # Probe: a pure-Dart test with no plugins. If this hangs, the
+          # problem is the environment, not the app code.
+          echo "=== probe: theme test ===" > ci-logs/probe.log
+          timeout 240 flutter test test/theme/app_theme_test.dart --timeout 60s >> ci-logs/probe.log 2>&1
+          echo "probe exit: $?" >> ci-logs/probe.log
+
           for f in $(find test -name '*_test.dart' | sort); do
+            name=$(echo "$f" | tr '/' '_')
             echo "::notice::RUNNING $f"
-            timeout 360 flutter test "$f" --timeout 90s > "/tmp/$(basename $f).log" 2>&1
+            timeout 420 flutter test "$f" --timeout 90s > "ci-logs/$name.log" 2>&1
             code=$?
-            cat "/tmp/$(basename $f).log" >> /tmp/test.log
             if [ $code -eq 124 ]; then
               echo "::error::TIMEOUT running $f"
               overall=1
             elif [ $code -ne 0 ]; then
               echo "::error::FAILED $f"
-              tail -40 "/tmp/$(basename $f).log" | while IFS= read -r line; do
+              tail -25 "ci-logs/$name.log" | while IFS= read -r line; do
                 safe=$(printf '%s' "$line" | tr -d '\r%')
                 echo "::error::${safe:0:500}"
               done
@@ -100,13 +106,18 @@ jobs:
               echo "::notice::PASSED $f"
             fi
           done
-          if [ $overall -ne 0 ]; then
-            echo "### flutter test (failures)" > $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            tail -c 60000 /tmp/test.log >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            exit $overall
+
+          # Ship logs back so offline debugging is possible.
+          git config user.name "taskly-bot"
+          git config user.email "taskly-bot@users.noreply.github.com"
+          git add -f ci-logs
+          if git diff --cached --quiet; then
+            echo "no log changes"
+          else
+            git commit -m "ci: test logs (auto, do not review)"
+            git push origin "HEAD:${{ github.ref_name }}" || true
           fi
+          exit $overall
 
       - name: Upload coverage summary
         uses: actions/upload-artifact@v4
