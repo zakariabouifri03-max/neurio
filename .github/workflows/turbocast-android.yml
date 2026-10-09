@@ -39,7 +39,21 @@ jobs:
 
       - name: Run unit tests and assemble debug APK
         working-directory: android
-        run: ./gradlew --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug
+        shell: bash
+        run: |
+          set +e
+          ./gradlew --no-daemon --console=plain --stacktrace :app:testDebugUnitTest :app:assembleDebug 2>&1 | tee gradle-build.log
+          result=${PIPESTATUS[0]}
+          if [ "$result" -ne 0 ]; then
+            {
+              echo '### Gradle failure details'
+              echo '```text'
+              grep -E '(^e:|error:|^FAILURE:|What went wrong:|Execution failed for task|Could not resolve|Unresolved reference|^> )' gradle-build.log | tail -n 60
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            while IFS= read -r line; do echo "::error::$line"; done < <(grep -E '(^e:|error:|^FAILURE:|What went wrong:|Execution failed for task|Could not resolve|Unresolved reference|^> )' gradle-build.log | tail -n 60)
+            exit "$result"
+          fi
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
