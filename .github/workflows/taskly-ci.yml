@@ -19,6 +19,7 @@ jobs:
   analyze-and-test:
     name: Analyze & test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: taskly
@@ -78,7 +79,7 @@ jobs:
         run: |
           set +e
           set +o pipefail
-          flutter test 2>&1 | tee /tmp/test.log
+          flutter test --timeout 60s 2>&1 | tee /tmp/test.log
           code=${PIPESTATUS[0]}
           if [ $code -ne 0 ]; then
             echo "### flutter test" > $GITHUB_STEP_SUMMARY
@@ -103,6 +104,7 @@ jobs:
     name: Release Android App Bundle
     needs: analyze-and-test
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     defaults:
       run:
         working-directory: taskly
