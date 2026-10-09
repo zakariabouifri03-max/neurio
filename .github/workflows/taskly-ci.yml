@@ -67,7 +67,7 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             head -c 60000 /tmp/analyze.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            tail -30 /tmp/analyze.log | while IFS= read -r line; do
+            cat /tmp/analyze.log | while IFS= read -r line; do
               safe=$(printf '%s' "$line" | tr -d '\r%')
               echo "::error::${safe:0:240}"
             done

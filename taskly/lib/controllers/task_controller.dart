@@ -80,11 +80,11 @@ class TaskController extends ChangeNotifier {
   /// Creates a task from editor input. Returns the stored task.
   Future<Task> addTask({
     required String title,
-    required String description,
+    String description = '',
     required DateTime dueDate,
     int? dueMinutes,
-    required TaskPriority priority,
-    required TaskCategory category,
+    TaskPriority priority = TaskPriority.medium,
+    TaskCategory category = TaskCategory.personal,
     bool reminderEnabled = false,
   }) async {
     final now = _clock();
