@@ -69,7 +69,7 @@ jobs:
           retention-days: 30
 
       - name: Publish pre-release APK when explicitly requested
-        if: success() && github.event_name == 'push' && github.event.head_commit.message == 'Publish TurboCast 60 debug APK'
+        if: success() && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Publish TurboCast 60 debug APK')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
