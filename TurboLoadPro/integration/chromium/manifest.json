@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "TurboLoad Pro — direct link handoff",
+  "version": "1.0.0",
+  "description": "Send a user-selected direct HTTP/HTTPS link to TurboLoad Pro.",
+  "permissions": ["contextMenus"],
+  "background": {
+    "service_worker": "service-worker.js"
+  }
+}

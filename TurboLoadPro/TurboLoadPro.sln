@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurboLoadPro.Core", "src\TurboLoadPro.Core\TurboLoadPro.Core.csproj", "{DC0D0C1E-B7A2-44A2-A37F-5D77909E2A12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurboLoadPro.App", "src\TurboLoadPro.App\TurboLoadPro.App.csproj", "{8C64058D-36A0-494A-8C40-78E565829BC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurboLoadPro.Core.Tests", "tests\TurboLoadPro.Core.Tests\TurboLoadPro.Core.Tests.csproj", "{7B09F515-3F56-4FA6-A13A-55E576DA03A4}"
+EndProject
+Global
+  GlobalSection(SolutionConfigurationPlatforms) = preSolution
+    Debug|Any CPU = Debug|Any CPU
+    Release|Any CPU = Release|Any CPU
+  EndGlobalSection
+  GlobalSection(ProjectConfigurationPlatforms) = postSolution
+    {DC0D0C1E-B7A2-44A2-A37F-5D77909E2A12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {DC0D0C1E-B7A2-44A2-A37F-5D77909E2A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {DC0D0C1E-B7A2-44A2-A37F-5D77909E2A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {DC0D0C1E-B7A2-44A2-A37F-5D77909E2A12}.Release|Any CPU.Build.0 = Release|Any CPU
+    {8C64058D-36A0-494A-8C40-78E565829BC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {8C64058D-36A0-494A-8C40-78E565829BC1}.Debug|Any CPU.Build.0 = Release|Any CPU
+    {8C64058D-36A0-494A-8C40-78E565829BC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {8C64058D-36A0-494A-8C40-78E565829BC1}.Release|Any CPU.Build.0 = Release|Any CPU
+    {7B09F515-3F56-4FA6-A13A-55E576DA03A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {7B09F515-3F56-4FA6-A13A-55E576DA03A4}.Debug|Any CPU.Build.0 = Release|Any CPU
+    {7B09F515-3F56-4FA6-A13A-55E576DA03A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {7B09F515-3F56-4FA6-A13A-55E576DA03A4}.Release|Any CPU.Build.0 = Release|Any CPU
+  EndGlobalSection
+EndGlobal

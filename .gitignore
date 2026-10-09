@@ -3,3 +3,11 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# TurboLoad Pro build outputs
+TurboLoadPro/**/bin/
+TurboLoadPro/**/obj/
+TurboLoadPro/artifacts/
+TurboLoadPro/.vs/
+*.user
+*.suo
