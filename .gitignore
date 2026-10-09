@@ -3,3 +3,13 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+node_modules/
+test-results/
+playwright-report/
+.screenshots/
+
+.venv/
+
+android/out/
+*.keystore
+*.jks

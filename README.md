@@ -1,115 +1,71 @@
-# 🏁 Bash Baqi Racing
+# Neurio · Your creator companion
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+A responsive, installable Instagram **planning prototype** with an English / Moroccan Darija interface. Built with plain JavaScript, local assets, and no runtime CDN dependencies.
 
-**▶ Play:** serve the folder with any static server and open it:
+> **Important:** this version does not connect to Instagram or an AI provider. Dashboard metrics and sample reel scores are explicitly illustrative. The coach is rule-based, writing tools use local templates, and personal video reviews use a transparent self-assessment checklist. It never promises follower growth.
 
-```bash
-python3 -m http.server 8000
-# → http://localhost:8000
-```
+## Android APK
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+A native offline wrapper is available in `android/`. It supports Android 8.0+ with an updated System WebView, native video selection, JSON export, and clipboard access. The CI workflow builds a development-signed preview APK; it does not add live Instagram or AI integration. See [`android/README.md`](android/README.md) for build and signing limitations.
 
----
-
-## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
-
-A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
-soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
-
-title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
-
-Everything is generated from code (no stock footage/music):
+## Run locally
 
 ```bash
-python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
-python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
+npm ci
+npm run dev
 ```
 
-See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
+Open `http://localhost:3000`. The server binds to `0.0.0.0` and accepts the live preview host. There are no browser-facing localhost API calls. No build step is required; you can also run:
 
----
-
-## 📱 Install on your phone — كأنها APK!
-
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
-
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
-
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
-**Offline play** is built-in: a service worker caches all game files on first visit.
-
----
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
-|---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
-
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
+```bash
+python3 -m http.server 3000 --bind 0.0.0.0
 ```
 
-Made with ❤️ and Three.js
+For deployment, serve the repository on an HTTPS static host. Relative asset paths support subdirectory hosting. Production hosting should publish only `index.html`, `src/neurio.js`, `src/neurio.css`, `assets/`, Neurio's icons, the manifest, and `sw.js`—not the test tooling or legacy game.
 
----
+## Working features
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+- **Overview:** illustrative growth chart with two periods, sample metrics, personal daily tasks, recent content, and a goal roadmap.
+- **Content library:** searchable/filterable sample reels and user drafts, private local video preview (MP4 / WebM / MOV, up to 100 MB), manually entered metrics, and a five-criterion review worth 20 points per criterion. Video playback depends on browser codec support.
+- **Content planner:** date-aware weekly view, custom dates, adding/deleting tasks, task completion, and persisted plans. Times are manually chosen local wall-clock times. Nothing is automatically published.
+- **Growth goals:** create/edit/delete goals, update numeric progress, automatically mark a target achieved when progress reaches it, and manually mark milestones complete. The 100K, 1M, and 10M milestones are editable ambitions, not predictions.
+- **Guided coach:** local topic-based advice about posting frequency, stories, hooks, and goals; persisted chat history; English and Darija responses.
+- **Six creator tools:** editable caption, hook, story, bio, hashtag, and research-plan templates. These do not browse Instagram or verify trends/accounts.
+- **Profile checklist:** practical manual guidance on a recognizable picture, a clear name, a useful bio, and highlights. No visual profile-picture analysis is performed.
+- **Settings:** edit local profile details, export a JSON backup, install instructions, and a confirmed workspace reset. Export is one-way; an import UI is not implemented.
+- **Mobile / accessibility:** responsive layouts down to 320px, mobile bottom navigation, RTL support, local Arabic fonts, keyboard-focusable controls, dialog focus trapping and restoration, reduced-motion support, and live status messages.
+- **PWA:** installable web manifest and local icons; offline application shell after one successful visit. Settings → Install Neurio provides platform-specific instructions. The browser version is a PWA; an optional Android preview wrapper is documented in [`android/README.md`](android/README.md).
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+## Data and privacy
 
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
+Workspace state is stored under `neurio-workspace-v1` in browser `localStorage`. It includes profile details, draft metadata, manual ratings, goals, task status, and coach messages. It does not sync between devices and is not encrypted. Clearing site data removes it, so use JSON export to keep a copy.
 
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+Uploaded videos are previewed using revocable local object URLs. They are never transmitted, cached, or persisted. Returning to a saved draft restores its title/metrics/review, **not its video**. The workspace never requests an Instagram password or an access token.
+
+The demo account name is customizable but editing it does not authenticate, fetch metrics, or alter the fixed sample analytics. Sample imagery was AI-generated for the interface; it does not represent imported Instagram content. Fonts are self-hosted and their licenses are included in `assets/fonts/`.
+
+## Tests
+
+```bash
+npm run check
+npm test
+```
+
+The Playwright suite covers all views, task persistence, chart periods, content searching/filtering, draft creation/review/deletion, file validation, cross-month planning, goal progress, every template tool, coach history, escaping user text, focus management, workspace export/reset, mobile/RTL layouts, and offline loading.
+
+A packaged Chromium dev dependency supports the sandbox's Linux test environment without a browser CDN download. To use another compatible local Chromium installation, set `PLAYWRIGHT_EXECUTABLE_PATH`. The default test setup extracts bundled Chromium and its Linux libraries into the system temporary directory; these are not application assets and are not committed.
+
+## What production integration still requires
+
+1. A secure backend and user authentication, storage policy, and account/data deletion flows.
+2. A Meta app with the appropriate Instagram API product, eligible professional account requirements, OAuth consent, approved permissions/review as applicable, and server-side token handling. Do not place app secrets or long-lived access tokens in client code.
+3. Authorized media and Insights imports; rate limiting, token expiry handling, explicit data provenance, and reliable error/loading states.
+4. An actual AI/video-analysis pipeline: user consent, secure uploads, retention limits, frame/audio processing, model integration, evidence-based scores, and human-editable recommendations.
+5. Officially permitted discovery/research integrations. No credential scraping or unauthorized access to other creators' content.
+6. Backend scheduling and separate explicit publishing permissions if automatic publication is added. Push reminders would also require a real notification service and consent.
+
+These integrations are intentionally not simulated as successful in this prototype.
+
+## Repository history
+
+This checkout originally contained **Bash Baqi Racing**. Its source and assets remain intact. The former entry page is preserved as [`legacy-racing.html`](legacy-racing.html), the original documentation as [`LEGACY-RACING.md`](LEGACY-RACING.md), and the standalone game remains in `bash-baqi-racing.html`. The root entry page, manifest, and service worker now belong to Neurio; the old game's PWA installation/offline instructions no longer apply to that legacy entry.
