@@ -190,7 +190,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Keyboard.Focus(UrlBox);
     }
 
-    private void UrlBox_KeyDown(object sender, KeyEventArgs e)
+    private void UrlBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key != Key.Enter) return;
         e.Handled = true;
@@ -323,7 +323,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             await _settingsStore.SaveAsync(_settings);
             await _manager.UpdateSettingsAsync(_settings);
             StartupRegistry.Apply(_settings.StartWithWindows);
-            ThemeManager.Apply(Application.Current, _settings.Theme == "Dark");
+            ThemeManager.Apply(System.Windows.Application.Current, _settings.Theme == "Dark");
             DownloadDirectoryLabel = _settings.DownloadDirectory;
             ConfigureClipboardMonitor();
         }
@@ -385,20 +385,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         await AddDownloadAsync(url);
     }
 
-    private void Window_DragEnter(object sender, DragEventArgs e)
+    private void Window_DragEnter(object sender, System.Windows.DragEventArgs e)
     {
         e.Effects = TryGetDroppedUrl(e.Data, out _) ? DragDropEffects.Copy : DragDropEffects.None;
         e.Handled = true;
     }
 
-    private async void Window_Drop(object sender, DragEventArgs e)
+    private async void Window_Drop(object sender, System.Windows.DragEventArgs e)
     {
         e.Handled = true;
         if (!TryGetDroppedUrl(e.Data, out var url) || url is null) return;
         await ImportUrlAsync(url);
     }
 
-    private static bool TryGetDroppedUrl(IDataObject data, out string? url)
+    private static bool TryGetDroppedUrl(System.Windows.IDataObject data, out string? url)
     {
         url = null;
         if (data.GetDataPresent(DataFormats.UnicodeText) || data.GetDataPresent(DataFormats.Text))

@@ -11,7 +11,7 @@ using TurboLoadPro.Infrastructure;
 
 namespace TurboLoadPro;
 
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     private DownloadManager? _manager;
     private SafeHttpClient? _http;

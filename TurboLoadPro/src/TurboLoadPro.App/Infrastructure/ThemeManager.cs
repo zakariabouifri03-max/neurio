@@ -5,7 +5,7 @@ namespace TurboLoadPro.Infrastructure;
 
 public static class ThemeManager
 {
-    public static void Apply(Application application, bool dark)
+    public static void Apply(System.Windows.Application application, bool dark)
     {
         Set(application, "AppBackgroundBrush", dark ? "#10131A" : "#F3F5F9");
         Set(application, "SidebarBrush", dark ? "#151923" : "#FFFFFF");
@@ -21,7 +21,7 @@ public static class ThemeManager
         Set(application, "DangerBrush", dark ? "#FF788B" : "#C43B4F");
     }
 
-    private static void Set(Application application, string key, string color)
+    private static void Set(System.Windows.Application application, string key, string color)
     {
         var value = (Color)ColorConverter.ConvertFromString(color)!;
         application.Resources[key] = new SolidColorBrush(value);
