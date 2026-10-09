@@ -54,3 +54,7 @@ android/*.keystore
 # Symbolication related
 app.*.symbols
 app.*.map.json
+
+# CI report artifacts
+taskly/analyze-report.txt
+taskly/test-report.txt

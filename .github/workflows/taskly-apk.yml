@@ -1,0 +1,73 @@
+name: Taskly APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/7f1f7495-neurio]
+    paths:
+      - "taskly/**"
+      - ".github/workflows/taskly-apk.yml"
+
+concurrency:
+  group: taskly-apk
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Fetch dependencies
+        working-directory: taskly
+        run: flutter pub get
+
+      - name: Analyze (report only)
+        working-directory: taskly
+        continue-on-error: true
+        run: |
+          flutter analyze --no-fatal-infos --no-fatal-warnings | tee analyze-report.txt || true
+
+      - name: Automated tests (report only)
+        working-directory: taskly
+        continue-on-error: true
+        run: flutter test --reporter expanded | tee test-report.txt || true
+
+      - name: Build release APK (debug-signed, installable)
+        working-directory: taskly
+        run: flutter build apk --release
+
+      - name: Publish direct-download release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete taskly-apk --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" || true
+          gh release create taskly-apk \
+            "taskly/build/app/outputs/flutter-apk/app-release.apk#taskly-v1.0.0.apk" \
+            "taskly/analyze-report.txt#analyze-report.txt" \
+            "taskly/test-report.txt#test-report.txt" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Taskly — Android APK (direct download)" \
+            --prerelease \
+            --notes "Installable APK of the Taskly Flutter app (release build, debug-signed for side-loading).
+          Direct link: https://github.com/${GITHUB_REPOSITORY}/releases/download/taskly-apk/taskly-v1.0.0.apk
+          For Google Play, build a signed .aab locally per taskly/docs/RELEASE.md."
