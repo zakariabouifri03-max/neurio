@@ -59,6 +59,7 @@ jobs:
       - name: Analyze
         run: |
           set +e
+          set +o pipefail
           flutter analyze --fatal-infos 2>&1 | tee /tmp/analyze.log
           code=${PIPESTATUS[0]}
           if [ $code -ne 0 ]; then
@@ -72,6 +73,7 @@ jobs:
       - name: Run tests
         run: |
           set +e
+          set +o pipefail
           flutter test 2>&1 | tee /tmp/test.log
           code=${PIPESTATUS[0]}
           if [ $code -ne 0 ]; then
