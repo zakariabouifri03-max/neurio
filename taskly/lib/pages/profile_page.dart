@@ -346,10 +346,10 @@ class _RemindersCardState extends State<_RemindersCard> {
               subtitle: const Text('Nudges for tasks you set a reminder on'),
               value: remindersOn,
               onChanged: (value) async {
-                await widget.settings.setRemindersEnabled(value);
-                if (!mounted) return;
-                // Re-sync existing alarms to match the new preference.
+                // Capture before awaiting so no BuildContext is used across
+                // the async gap.
                 final tasks = context.read<TaskController>();
+                await widget.settings.setRemindersEnabled(value);
                 await tasks.resyncReminders();
               },
             ),
