@@ -57,8 +57,10 @@ class _RootGateState extends State<_RootGate> {
         () {
       if (mounted) setState(() => _splashDone = true);
     });
-    // Load tasks as early as possible so Home is ready instantly.
-    context.read<TasksStore>().load();
+    // Load tasks right after the first frame so no listener is
+    // notified while the tree is still building.
+    final store = context.read<TasksStore>();
+    WidgetsBinding.instance.addPostFrameCallback((_) => store.load());
   }
 
   @override

@@ -52,11 +52,14 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: store.load,
-          child: store.isLoading && !store.hasTasks
-              ? const Center(child: CircularProgressIndicator())
-              : ListView(
+          child: ListView(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
                   children: <Widget>[
+                    if (store.isLoading && !store.hasTasks)
+                      const SizedBox(
+                        height: 260,
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
                     _Header(
                       greeting: _greeting(now),
                       name: settings.greetingName,

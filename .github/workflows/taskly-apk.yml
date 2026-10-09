@@ -81,6 +81,9 @@ jobs:
           {
             echo "ci: taskly run ${{ github.run_id }} reports"
             echo
+            echo "EXCEPTION MESSAGES:"
+            grep -A8 'EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK' taskly/test-report.txt | head -n 80 || echo "(none)"
+            echo
             echo "FIRST FAILURE BLOCKS:"
             grep -B60 -m2 '\[E\]' taskly/test-report.txt | tail -n 150 || echo "(none)"
             echo

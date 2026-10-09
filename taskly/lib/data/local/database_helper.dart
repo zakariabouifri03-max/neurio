@@ -69,7 +69,7 @@ class TaskSchema {
       return;
     }
     if (oldVersion < 2) {
-      final columns = await db.query('pragma_table_info(tasks)');
+      final columns = await db.rawQuery("SELECT name FROM pragma_table_info('tasks')");
       final names = columns.map((c) => c['name'] as String).toSet();
       if (!names.contains('reminder_enabled')) {
         await db.execute(
