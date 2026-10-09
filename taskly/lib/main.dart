@@ -19,7 +19,7 @@ Future<void> main() async {
 
   runApp(
     MultiProvider(
-      providers: <SingleChildWidget>[
+      providers: [
         Provider<ReminderScheduler>.value(value: scheduler),
         ChangeNotifierProvider<SettingsStore>(
           create: (_) => SettingsStore(preferences),

@@ -28,7 +28,7 @@ void main() {
     final scheduler = NoopReminderScheduler();
 
     await tester.pumpWidget(MultiProvider(
-      providers: <SingleChildWidget>[
+      providers: [
         Provider<ReminderScheduler>.value(value: scheduler),
         ChangeNotifierProvider<SettingsStore>(
           create: (_) => SettingsStore(preferences),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../core/theme/app_theme.dart';
+import '../data/models/task.dart';
 import '../data/models/task_category.dart';
 import '../data/models/task_priority.dart';
 import '../domain/task_query.dart';
@@ -121,7 +122,7 @@ class _TasksScreenState extends State<TasksScreen> {
                       child: TextButton.icon(
                         onPressed: () {
                           _searchController.clear();
-                          setState(() => _query = const TaskQuery(sort: _query.sort));
+                          setState(() => _query = TaskQuery(sort: _query.sort));
                         },
                         icon: const Icon(Icons.filter_alt_off_outlined,
                             size: 16),

@@ -37,7 +37,6 @@ class _CuteCheckboxState extends State<CuteCheckbox> {
     final theme = Theme.of(context);
     final palette = AppTheme.paletteOf(context);
     return Semantics(
-      checkbox: true,
       checked: widget.value,
       label: widget.semanticsLabel ?? 'Mark task complete',
       child: GestureDetector(

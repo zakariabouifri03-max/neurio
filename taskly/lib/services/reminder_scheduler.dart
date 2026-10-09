@@ -85,7 +85,10 @@ class FlutterLocalReminderScheduler implements ReminderScheduler {
   @override
   Future<bool> areNotificationsEnabled() async {
     try {
-      final enabled = await _plugin.areNotificationsEnabled();
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (android == null) return true; // non-Android: assume available
+      final enabled = await android.areNotificationsEnabled();
       return enabled;
     } catch (e) {
       _lastError = '$e';
