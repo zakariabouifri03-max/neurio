@@ -113,3 +113,13 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 💜 Taskly (Flutter Android app)
+
+This repository also contains **Taskly**, a complete cute & cozy offline-first
+task planner for Android built with Flutter, living in [`taskly/`](taskly/).
+See [`taskly/README.md`](taskly/README.md) for features, architecture, run and
+release instructions, and [`taskly/docs/`](taskly/docs/) for the Google Play
+publishing kit, privacy policy and testing report.

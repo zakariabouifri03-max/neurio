@@ -1,0 +1,49 @@
+name: taskly
+description: "Taskly — a cute, cozy everyday planner. Organize tasks, set reminders and celebrate every little win."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+  flutter: ">=3.27.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Local persistence (SQLite).
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+  # Lightweight key-value persistence for user preferences.
+  shared_preferences: ^2.3.2
+  # State management.
+  provider: ^6.1.2
+  # Real local reminders / notifications.
+  flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
+  # Date formatting.
+  intl: ^0.19.0
+  # App version display in Settings / About.
+  package_info_plus: ^8.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  # In-memory SQLite for repository tests on the host machine.
+  sqflite_common_ffi: ^2.3.3
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Nunito-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Nunito-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Nunito-ExtraBold.ttf
+          weight: 800

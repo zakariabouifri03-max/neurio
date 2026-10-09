@@ -1,0 +1,56 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/*sync/
+.sconsign.dblite
+.tags*
+**/.vagrant/
+**/DerivedData/
+**/Icon?
+**/Pods/
+**/.symlinks/
+profile
+xcuserdata
+**/.generated/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+.dart_tool/
+
+# Android
+android/.gradle/
+android/captures/
+android/local.properties
+android/**/*.apk
+android/**/*.aab
+android/app/src/main/java/io/flutter/
+android/key.properties
+android/*.jks
+android/*.keystore
+
+# Symbolication related
+app.*.symbols
+app.*.map.json
