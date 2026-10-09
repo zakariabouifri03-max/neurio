@@ -194,11 +194,11 @@ private class MpegTsWriter {
     }
 
     private fun encodePts(pts: Long): ByteArray = byteArrayOf(
-        (0x20 or (((pts ushr 30) and 0x07) shl 1) or 1).toByte(),
+        (0x20L or (((pts ushr 30) and 0x07L) shl 1) or 1L).toByte(),
         (pts ushr 22).toByte(),
-        ((((pts ushr 15) and 0x7f) shl 1) or 1).toByte(),
+        ((((pts ushr 15) and 0x7fL) shl 1) or 1L).toByte(),
         (pts ushr 7).toByte(),
-        (((pts and 0x7f) shl 1) or 1).toByte()
+        (((pts and 0x7fL) shl 1) or 1L).toByte()
     )
 
     private fun patSection(): ByteArray = withCrc(
