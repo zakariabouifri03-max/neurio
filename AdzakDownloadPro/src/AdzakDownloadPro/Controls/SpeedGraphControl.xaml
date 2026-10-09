@@ -1,0 +1,21 @@
+<UserControl x:Class="AdzakDownloadPro.Controls.SpeedGraphControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="120" d:DesignWidth="400"
+             Background="Transparent">
+    <Grid>
+        <Canvas x:Name="GraphCanvas" SizeChanged="OnCanvasSizeChanged" />
+        <TextBlock x:Name="MaxLabel" VerticalAlignment="Top" HorizontalAlignment="Right"
+                   Margin="0,2,6,0" FontSize="10"
+                   Foreground="{DynamicResource TextSecondaryBrush}" Text="—" />
+        <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                   Margin="0,0,6,2" FontSize="10"
+                   Foreground="{DynamicResource TextSecondaryBrush}" Text="now" />
+        <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                   Margin="6,0,0,2" FontSize="10"
+                   Foreground="{DynamicResource TextSecondaryBrush}" Text="2 min ago" />
+    </Grid>
+</UserControl>

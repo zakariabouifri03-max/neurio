@@ -1,0 +1,153 @@
+<Window x:Class="AdzakDownloadPro.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Settings — ADZAK DOWNLOAD PRO"
+        Width="560" Height="640"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        TextOptions.TextFormattingMode="Display">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <TextBlock Text="Appearance" Style="{StaticResource TitleTextStyle}" Margin="0,0,0,8" />
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Theme" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <ComboBox x:Name="ThemeCombo" Grid.Column="1" Padding="8,6">
+                        <ComboBoxItem Content="Dark" />
+                        <ComboBoxItem Content="Light" />
+                    </ComboBox>
+                </Grid>
+
+                <TextBlock Text="Downloads" Style="{StaticResource TitleTextStyle}" Margin="0,0,0,8" />
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Default mode" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <ComboBox x:Name="ModeCombo" Grid.Column="1" Padding="8,6">
+                        <ComboBoxItem Content="Low" />
+                        <ComboBoxItem Content="Medium" />
+                        <ComboBoxItem Content="Pro" />
+                    </ComboBox>
+                </Grid>
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Destination folder" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="FolderBox" Grid.Column="1" Padding="8,6" />
+                    <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Content="…" Margin="6,0,0,0"
+                            Click="OnBrowseFolder" />
+                </Grid>
+
+                <TextBlock Text="Connections (per server)" Style="{StaticResource TitleTextStyle}" Margin="0,0,0,8" />
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="LOW mode connections" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="LowConnectionsBox" Grid.Column="1" Padding="8,6" />
+                </Grid>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="MEDIUM mode connections" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="MediumConnectionsBox" Grid.Column="1" Padding="8,6" />
+                </Grid>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="PRO mode connections" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="ProConnectionsBox" Grid.Column="1" Padding="8,6" />
+                </Grid>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Maximum connections (hard limit)" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="MaxConnectionsBox" Grid.Column="1" Padding="8,6" />
+                </Grid>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Simultaneous downloads" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="MaxSimultaneousBox" Grid.Column="1" Padding="8,6" />
+                </Grid>
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Minimum segment size (KB)" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="MinSegmentBox" Grid.Column="1" Padding="8,6" />
+                </Grid>
+
+                <TextBlock Text="Reliability" Style="{StaticResource TitleTextStyle}" Margin="0,0,0,8" />
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Retries per segment" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="MaxRetriesBox" Grid.Column="1" Padding="8,6" />
+                </Grid>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Idle timeout (seconds)" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="IdleTimeoutBox" Grid.Column="1" Padding="8,6" />
+                </Grid>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Response timeout (seconds)" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="ResponseTimeoutBox" Grid.Column="1" Padding="8,6" />
+                </Grid>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Disk buffer size (KB)" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                    <TextBox x:Name="BufferSizeBox" Grid.Column="1" Padding="8,6" />
+                </Grid>
+                <CheckBox x:Name="VerifyChecksumBox" Content="Verify SHA-256 checksum when the server advertises one"
+                          Margin="0,8,0,16" />
+
+                <TextBlock x:Name="ErrorText" Foreground="{DynamicResource DangerBrush}"
+                           TextWrapping="Wrap" Margin="0,0,0,8" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Style="{StaticResource SecondaryButtonStyle}" Content="Cancel" Margin="0,0,8,0" Click="OnCancel" />
+            <Button Style="{StaticResource PrimaryButtonStyle}" Content="Save" Click="OnSave" />
+        </StackPanel>
+    </Grid>
+</Window>

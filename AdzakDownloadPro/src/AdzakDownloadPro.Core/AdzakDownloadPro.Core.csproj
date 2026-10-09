@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>AdzakDownloadPro.Core</RootNamespace>
+    <AssemblyName>AdzakDownloadPro.Core</AssemblyName>
+    <Description>ADZAK DOWNLOAD PRO — core download engine (segmented HTTP downloads, resume, checksums, honest speed measurement).</Description>
+    <Authors>ADZAK</Authors>
+    <Product>ADZAK DOWNLOAD PRO</Product>
+  </PropertyGroup>
+
+</Project>

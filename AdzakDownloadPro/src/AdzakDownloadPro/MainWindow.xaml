@@ -1,0 +1,277 @@
+<Window x:Class="AdzakDownloadPro.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:AdzakDownloadPro.ViewModels"
+        xmlns:controls="clr-namespace:AdzakDownloadPro.Controls"
+        Title="ADZAK DOWNLOAD PRO"
+        Width="1080" Height="720" MinWidth="820" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        TextOptions.TextFormattingMode="Display">
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ============ Title bar ============ -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,12" LastChildFill="False">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <TextBlock Text="ADZAK DOWNLOAD PRO" Style="{StaticResource TitleTextStyle}" FontSize="18" VerticalAlignment="Center" />
+                <TextBlock Text="· honest, measured downloads" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" Margin="8,0,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ToggleHistoryCommand}"
+                        Content="History" Margin="0,0,8,0" ToolTip="Show download history" />
+                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ToggleThemeCommand}"
+                        Content="Theme" Margin="0,0,8,0" ToolTip="Switch between dark and light theme" />
+                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenSettingsCommand}"
+                        Content="Settings" ToolTip="Connection limits, retries, buffers, folder" />
+            </StackPanel>
+        </DockPanel>
+
+        <!-- ============ Add download ============ -->
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Row="0" Grid.Column="0"
+                         Style="{StaticResource UrlTextBoxStyle}"
+                         Text="{Binding UrlInput, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="Direct HTTP/HTTPS link to a file" />
+                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource SecondaryButtonStyle}"
+                        Command="{Binding BrowseDestinationCommand}" Content="Browse…" Margin="8,0,0,0"
+                        ToolTip="Choose the destination folder" />
+                <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding AddDownloadCommand}" Content="Download" Margin="8,0,0,0" />
+
+                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,12,0,0">
+                    <TextBlock Text="Mode:" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <RadioButton GroupName="DownloadMode" Style="{StaticResource ModeButtonStyle}"
+                                 Content="LOW · 1 connection" IsChecked="{Binding IsLowMode}"
+                                 ToolTip="One connection, lowest CPU and memory. Best for weak PCs and unstable lines." />
+                    <RadioButton GroupName="DownloadMode" Style="{StaticResource ModeButtonStyle}"
+                                 Content="MEDIUM · parallel" IsChecked="{Binding IsMediumMode}" Margin="8,0,0,0"
+                                 ToolTip="Several connections when the server supports ranges; retries and resume." />
+                    <RadioButton GroupName="DownloadMode" Style="{StaticResource ModeButtonStyle}"
+                                 Content="PRO · segmented" IsChecked="{Binding IsProMode}" Margin="8,0,0,0"
+                                 ToolTip="Splits files into byte ranges, adapts concurrency to real performance, verifies checksums." />
+                    <TextBlock Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" Margin="16,0,0,0"
+                               Text="Folder:" />
+                    <TextBlock Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" Margin="6,0,0,0"
+                               Text="{Binding DestinationFolder}" TextTrimming="CharacterEllipsis" MaxWidth="320" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ============ Toolbar ============ -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,2,0,10">
+            <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding PauseAllCommand}" Content="Pause all" Margin="0,0,8,0" />
+            <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ResumeAllCommand}" Content="Resume all" Margin="0,0,8,0" />
+            <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding CancelAllCommand}" Content="Cancel all" Margin="0,0,8,0" />
+            <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ClearCompletedCommand}" Content="Clear finished" Margin="0,0,8,0" />
+            <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenDownloadFolderCommand}" Content="Open folder" />
+        </StackPanel>
+
+        <!-- ============ Downloads list ============ -->
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8">
+            <Grid>
+                <!-- downloads -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Visibility="{Binding IsHistoryVisible, Converter={StaticResource InverseBoolToVisibility}}">
+                    <ItemsControl ItemsSource="{Binding Downloads}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8" Padding="12">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- header: name + mode + status -->
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding FileName}"
+                                                       Style="{StaticResource TitleTextStyle}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <Border Grid.Column="1" CornerRadius="8" Padding="8,2" Margin="8,0,0,0"
+                                                    Background="{DynamicResource SurfaceAltBrush}">
+                                                <TextBlock Text="{Binding ModeText}" FontSize="10"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}" />
+                                            </Border>
+                                            <Border Grid.Column="2" CornerRadius="8" Padding="8,2" Margin="8,0,0,0"
+                                                    Background="{DynamicResource SurfaceAltBrush}">
+                                                <TextBlock Text="{Binding StatusText}" FontSize="10"
+                                                           Foreground="{Binding Status, Converter={StaticResource StatusBrushConverter}}" />
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- url -->
+                                        <TextBlock Grid.Row="1" Text="{Binding Url}" Style="{StaticResource BodyTextStyle}"
+                                                   Opacity="0.7" Margin="0,2,0,6" TextTrimming="CharacterEllipsis" />
+
+                                        <!-- progress -->
+                                        <Grid Grid.Row="2" Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <ProgressBar Grid.Column="0" Height="8" Style="{StaticResource ProgressBarStyle}"
+                                                         Minimum="0" Maximum="1" Value="{Binding Progress}"
+                                                         IsIndeterminate="{Binding IsIndeterminate}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding ProgressText}"
+                                                       Style="{StaticResource BodyTextStyle}"
+                                                       Margin="10,0,0,0" VerticalAlignment="Center" MinWidth="52" TextAlignment="Right" />
+                                        </Grid>
+
+                                        <!-- info + actions -->
+                                        <Grid Grid.Row="3">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding SizeText}" Style="{StaticResource BodyTextStyle}" />
+                                                <TextBlock Text="  ·  " Style="{StaticResource BodyTextStyle}" />
+                                                <TextBlock Text="{Binding SpeedText}" Style="{StaticResource BodyTextStyle}" />
+                                                <TextBlock Text="  ·  ETA " Style="{StaticResource BodyTextStyle}" />
+                                                <TextBlock Text="{Binding EtaText}" Style="{StaticResource BodyTextStyle}" />
+                                                <TextBlock Text="  ·  " Style="{StaticResource BodyTextStyle}" />
+                                                <TextBlock Text="{Binding ConnectionsText}" Style="{StaticResource BodyTextStyle}" />
+                                                <TextBlock Text=" conn" Style="{StaticResource BodyTextStyle}" />
+                                                <TextBlock Text="{Binding ErrorMessage}" Style="{StaticResource BodyTextStyle}"
+                                                           Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap"
+                                                           Margin="12,0,0,0"
+                                                           Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding PauseCommand}"
+                                                        Content="Pause" Margin="0,0,6,0"
+                                                        Visibility="{Binding CanPause, Converter={StaticResource BoolToVisibility}}" />
+                                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ResumeCommand}"
+                                                        Content="Resume" Margin="0,0,6,0"
+                                                        Visibility="{Binding CanResume, Converter={StaticResource BoolToVisibility}}" />
+                                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding RetryCommand}"
+                                                        Content="Retry" Margin="0,0,6,0"
+                                                        Visibility="{Binding CanRetry, Converter={StaticResource BoolToVisibility}}" />
+                                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding CancelCommand}"
+                                                        Content="Cancel" Margin="0,0,6,0"
+                                                        Visibility="{Binding CanCancel, Converter={StaticResource BoolToVisibility}}" />
+                                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenFolderCommand}"
+                                                        Content="Folder" Margin="0,0,6,0"
+                                                        Visibility="{Binding CanOpenFolder, Converter={StaticResource BoolToVisibility}}" />
+                                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding RemoveCommand}"
+                                                        Content="✕" ToolTip="Remove from list" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- empty hint -->
+                <TextBlock Text="No downloads yet — paste a link above and press Download."
+                           Style="{StaticResource BodyTextStyle}" FontSize="14"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Visibility="{Binding Downloads.Count, Converter={StaticResource ZeroCountToVisibility}}" />
+
+                <!-- history -->
+                <Grid Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="4,4,4,8" LastChildFill="False">
+                        <TextBlock Text="DOWNLOAD HISTORY" Style="{StaticResource TitleTextStyle}" DockPanel.Dock="Left" />
+                        <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ClearHistoryCommand}"
+                                Content="Clear history" DockPanel.Dock="Right" />
+                    </DockPanel>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding HistoryEntries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="7"
+                                            Padding="10,6" Margin="0,0,0,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding FileName}" Style="{StaticResource BodyTextStyle}"
+                                                       Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="1" Text="{Binding TotalBytes, Converter={StaticResource SizeConverter}}"
+                                                       Style="{StaticResource BodyTextStyle}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Status}" Style="{StaticResource BodyTextStyle}"
+                                                       Foreground="{Binding Status, Converter={StaticResource StatusBrushConverter}}" />
+                                            <TextBlock Grid.Column="3" Text="{Binding Mode}" Style="{StaticResource BodyTextStyle}" />
+                                            <TextBlock Grid.Column="4" Text="{Binding AverageSpeedBytesPerSecond, Converter={StaticResource SpeedConverter}}"
+                                                       Style="{StaticResource BodyTextStyle}" />
+                                            <Button Grid.Column="5" Style="{StaticResource SecondaryButtonStyle}" Padding="6,2"
+                                                    Command="{Binding DataContext.RemoveHistoryEntryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" Content="✕" ToolTip="Remove from history" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- ============ Speed graph + totals ============ -->
+        <Border Grid.Row="4" Style="{StaticResource CardStyle}" Margin="0,0,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="TOTAL THROUGHPUT — MEASURED BYTES/SECOND" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+                    <controls:SpeedGraphControl Height="86" DataContext="{Binding Graph}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="18,0,0,0" MinWidth="200">
+                    <TextBlock Text="Total speed" Style="{StaticResource BodyTextStyle}" />
+                    <TextBlock Text="{Binding TotalSpeedText}" Style="{StaticResource TitleTextStyle}" FontSize="20" Margin="0,0,0,8" />
+                    <TextBlock Text="Active connections" Style="{StaticResource BodyTextStyle}" />
+                    <TextBlock Text="{Binding ActiveConnectionsText}" Style="{StaticResource TitleTextStyle}" FontSize="16" Margin="0,0,0,8" />
+                    <TextBlock Text="Status" Style="{StaticResource BodyTextStyle}" />
+                    <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource BodyTextStyle}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding ErrorText}" Style="{StaticResource BodyTextStyle}" TextWrapping="Wrap"
+                               Foreground="{DynamicResource DangerBrush}"
+                               Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

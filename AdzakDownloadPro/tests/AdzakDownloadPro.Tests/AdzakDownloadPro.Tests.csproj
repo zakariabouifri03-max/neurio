@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>AdzakDownloadPro.Tests</RootNamespace>
+    <AssemblyName>AdzakDownloadPro.Tests</AssemblyName>
+    <Description>Test suite for the ADZAK DOWNLOAD PRO core engine. Uses a tiny built-in test framework (no external packages).</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AdzakDownloadPro.Core\AdzakDownloadPro.Core.csproj" />
+  </ItemGroup>
+
+</Project>

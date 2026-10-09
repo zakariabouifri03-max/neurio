@@ -1,0 +1,21 @@
+# Build output
+bin/
+obj/
+publish/
+out/
+
+# Sandbox verification harness output
+build/sandbox/out/
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
