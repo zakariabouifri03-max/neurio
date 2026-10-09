@@ -65,10 +65,7 @@ class _SplashPageState extends State<SplashPage>
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: ScaleTransition(
-          scale: CurvedAnimation(
-            parent: _entrance,
-            curve: Curves.easeOutBack,
-          ),
+          scale: CurvedAnimation(parent: _entrance, curve: Curves.easeOutBack),
           child: FadeTransition(
             opacity: _entrance,
             child: Column(
@@ -88,10 +85,7 @@ class _SplashPageState extends State<SplashPage>
                   ),
                 ),
                 const SizedBox(height: 18),
-                Text(
-                  'Taskly',
-                  style: Theme.of(context).textTheme.displaySmall,
-                ),
+                Text('Taskly', style: Theme.of(context).textTheme.displaySmall),
                 const SizedBox(height: 6),
                 Text(
                   'Little plans, big smiles',
@@ -116,4 +110,3 @@ class _SplashPageState extends State<SplashPage>
     );
   }
 }
-

@@ -27,11 +27,7 @@ class HomePage extends StatelessWidget {
     BuildContext context, {
     Task? task,
     DateTime? presetDate,
-  }) =>
-      _openPage(
-        context,
-        TaskEditorPage(task: task, presetDate: presetDate),
-      );
+  }) => _openPage(context, TaskEditorPage(task: task, presetDate: presetDate));
 
   Future<void> _toggle(BuildContext context, Task task) =>
       context.read<TaskController>().toggleComplete(task);
@@ -96,7 +92,9 @@ class HomePage extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 8),
                   child: EmptyState(
                     icon: Icons.wb_sunny_outlined,
-                    title: allDone ? 'You finished it all!' : 'Nothing due today',
+                    title: allDone
+                        ? 'You finished it all!'
+                        : 'Nothing due today',
                     message: allDone
                         ? 'Everything on today\'s list is checked off. Lovely.'
                         : 'Your day is a blank canvas. Let\'s plan something wonderful!',
@@ -106,7 +104,9 @@ class HomePage extends StatelessWidget {
                   ),
                 )
               else
-                ...upNext.take(4).map(
+                ...upNext
+                    .take(4)
+                    .map(
                       (task) => TaskTile(
                         task: task,
                         now: now,
@@ -195,7 +195,10 @@ class _ProgressCard extends StatelessWidget {
             strokeWidth: 10,
             trackColor: theme.colorScheme.outline,
             progressColor: AppColors.lavenderDeep,
-            center: Text('${progress.percent}%', style: theme.textTheme.titleLarge),
+            center: Text(
+              '${progress.percent}%',
+              style: theme.textTheme.titleLarge,
+            ),
           ),
           const SizedBox(width: 18),
           Expanded(
@@ -227,9 +230,9 @@ class _ProgressCard extends StatelessWidget {
     );
   }
 
-  Future<void> _openStats(BuildContext context) => Navigator.of(context).push(
-        fadeSlideRoute<void>(builder: (_) => const StatsPage()),
-      );
+  Future<void> _openStats(BuildContext context) => Navigator.of(
+    context,
+  ).push(fadeSlideRoute<void>(builder: (_) => const StatsPage()));
 }
 
 class _QuickActions extends StatelessWidget {

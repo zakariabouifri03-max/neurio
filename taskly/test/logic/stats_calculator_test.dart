@@ -77,7 +77,11 @@ void main() {
           due: DateTime(2026, 9, 30),
         ),
       ];
-      final week = StatsCalculator.weeklyCompleted(tasks, now, WeekStart.sunday);
+      final week = StatsCalculator.weeklyCompleted(
+        tasks,
+        now,
+        WeekStart.sunday,
+      );
       expect(week, [1, 0, 0, 1, 0, 0, 0]);
     });
 
@@ -90,7 +94,11 @@ void main() {
           due: DateTime(2026, 10, 4),
         ),
       ];
-      final week = StatsCalculator.weeklyCompleted(tasks, now, WeekStart.monday);
+      final week = StatsCalculator.weeklyCompleted(
+        tasks,
+        now,
+        WeekStart.monday,
+      );
       expect(week.last, 1);
       expect(week.first, 0);
     });
@@ -105,8 +113,18 @@ void main() {
   group('StatsCalculator.category counts', () {
     test('completedByCategory skips empty categories', () {
       final tasks = [
-        makeTask(id: 1, category: TaskCategory.work, completed: true, completedAt: now),
-        makeTask(id: 2, category: TaskCategory.work, completed: true, completedAt: now),
+        makeTask(
+          id: 1,
+          category: TaskCategory.work,
+          completed: true,
+          completedAt: now,
+        ),
+        makeTask(
+          id: 2,
+          category: TaskCategory.work,
+          completed: true,
+          completedAt: now,
+        ),
         makeTask(id: 3, category: TaskCategory.health),
       ];
       final counts = StatsCalculator.completedByCategory(tasks);
@@ -117,7 +135,12 @@ void main() {
     test('openByCategory counts only open tasks', () {
       final tasks = [
         makeTask(id: 1, category: TaskCategory.study),
-        makeTask(id: 2, category: TaskCategory.study, completed: true, completedAt: now),
+        makeTask(
+          id: 2,
+          category: TaskCategory.study,
+          completed: true,
+          completedAt: now,
+        ),
       ];
       final counts = StatsCalculator.openByCategory(tasks);
       expect(counts[TaskCategory.study], 1);
@@ -136,12 +159,32 @@ void main() {
     test('difference is honest', () {
       final tasks = [
         // This week: 2
-        makeTask(id: 1, completed: true, completedAt: DateTime(2026, 10, 5), due: DateTime(2026, 10, 5)),
-        makeTask(id: 2, completed: true, completedAt: DateTime(2026, 10, 6), due: DateTime(2026, 10, 6)),
+        makeTask(
+          id: 1,
+          completed: true,
+          completedAt: DateTime(2026, 10, 5),
+          due: DateTime(2026, 10, 5),
+        ),
+        makeTask(
+          id: 2,
+          completed: true,
+          completedAt: DateTime(2026, 10, 6),
+          due: DateTime(2026, 10, 6),
+        ),
         // Last week: 1
-        makeTask(id: 3, completed: true, completedAt: DateTime(2026, 10, 1), due: DateTime(2026, 10, 1)),
+        makeTask(
+          id: 3,
+          completed: true,
+          completedAt: DateTime(2026, 10, 1),
+          due: DateTime(2026, 10, 1),
+        ),
         // Two weeks ago: ignored
-        makeTask(id: 4, completed: true, completedAt: DateTime(2026, 9, 20), due: DateTime(2026, 9, 20)),
+        makeTask(
+          id: 4,
+          completed: true,
+          completedAt: DateTime(2026, 9, 20),
+          due: DateTime(2026, 9, 20),
+        ),
       ];
       final trend = StatsCalculator.weeklyTrend(tasks, now, WeekStart.monday);
       expect(trend.thisWeek, 2);
@@ -160,10 +203,9 @@ void main() {
     });
 
     test('celebration when everything is done', () {
-      final progress = StatsCalculator.dailyProgress(
-        [makeTask(id: 1, due: now, completed: true, completedAt: now)],
-        now,
-      );
+      final progress = StatsCalculator.dailyProgress([
+        makeTask(id: 1, due: now, completed: true, completedAt: now),
+      ], now);
       final line = Motivational.pick(progress, now);
       expect(line.length, greaterThan(0));
     });

@@ -30,9 +30,7 @@ void main() {
 
   Future<TaskController> controller() async {
     final c = TaskController(
-      repository: TaskRepository(
-        debugPath: '${tempDir.path}/tasks.db',
-      ),
+      repository: TaskRepository(debugPath: '${tempDir.path}/tasks.db'),
       reminderScheduler: NoopReminderScheduler(),
       clock: fixedNow,
     );
@@ -40,24 +38,22 @@ void main() {
     return c;
   }
 
-  testWidgets('empty title shows a friendly validation error',
-      (tester) async {
+  testWidgets('empty title shows a friendly validation error', (tester) async {
     final c = await controller();
     final settings = await makeSettings();
 
     await tester.pumpWidget(
-      testApp(
-        child: const TaskEditorPage(),
-        tasks: c,
-        settings: settings,
-      ),
+      testApp(child: const TaskEditorPage(), tasks: c, settings: settings),
     );
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Add task'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Give your task a name so it feels real.'), findsOneWidget);
+    expect(
+      find.text('Give your task a name so it feels real.'),
+      findsOneWidget,
+    );
     expect(c.tasks, isEmpty, reason: 'nothing saved');
   });
 
@@ -66,11 +62,7 @@ void main() {
     final settings = await makeSettings();
 
     await tester.pumpWidget(
-      testApp(
-        child: const TaskEditorPage(),
-        tasks: c,
-        settings: settings,
-      ),
+      testApp(child: const TaskEditorPage(), tasks: c, settings: settings),
     );
     await tester.pumpAndSettle();
 
@@ -92,11 +84,7 @@ void main() {
     final settings = await makeSettings();
 
     await tester.pumpWidget(
-      testApp(
-        child: const TaskEditorPage(),
-        tasks: c,
-        settings: settings,
-      ),
+      testApp(child: const TaskEditorPage(), tasks: c, settings: settings),
     );
     await tester.pumpAndSettle();
 
@@ -142,17 +130,14 @@ void main() {
     expect(c.tasks, hasLength(1));
   });
 
-  testWidgets('priority and category selection update the draft',
-      (tester) async {
+  testWidgets('priority and category selection update the draft', (
+    tester,
+  ) async {
     final c = await controller();
     final settings = await makeSettings();
 
     await tester.pumpWidget(
-      testApp(
-        child: const TaskEditorPage(),
-        tasks: c,
-        settings: settings,
-      ),
+      testApp(child: const TaskEditorPage(), tasks: c, settings: settings),
     );
     await tester.pumpAndSettle();
 

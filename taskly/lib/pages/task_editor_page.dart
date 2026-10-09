@@ -119,14 +119,16 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
     }
     if (_dueMinutes == null) {
       setState(() {
-        _reminderNotice = 'Pick a due time first so Taskly knows when to '
+        _reminderNotice =
+            'Pick a due time first so Taskly knows when to '
             'remind you.';
       });
       return;
     }
     if (_reminderIsPast()) {
       setState(() {
-        _reminderNotice = 'That time already passed — choose a future time '
+        _reminderNotice =
+            'That time already passed — choose a future time '
             'to get a reminder.';
       });
       return;
@@ -139,7 +141,8 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
       final granted = await service.requestNotificationPermission();
       if (granted == false) {
         setState(() {
-          _reminderNotice = 'Notifications are off for Taskly. Enable them in '
+          _reminderNotice =
+              'Notifications are off for Taskly. Enable them in '
               'system settings to hear the nudge.';
         });
         return;
@@ -171,9 +174,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
           reminderEnabled: _reminderEnabled,
         );
         await controller.updateTask(updated);
-        messenger.showSnackBar(
-          const SnackBar(content: Text('Task updated ✨')),
-        );
+        messenger.showSnackBar(const SnackBar(content: Text('Task updated ✨')));
       } else {
         await controller.addTask(
           title: _title.text,
@@ -205,9 +206,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
     final settings = context.watch<SettingsController>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEdit ? 'Edit task' : 'New task'),
-      ),
+      appBar: AppBar(title: Text(_isEdit ? 'Edit task' : 'New task')),
       body: SafeArea(
         child: Form(
           key: _formKey,
@@ -251,7 +250,10 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                   Expanded(
                     child: _PickerTile(
                       icon: Icons.event_outlined,
-                      label: DateHelper.formatDate(_dueDate, settings.dateFormat),
+                      label: DateHelper.formatDate(
+                        _dueDate,
+                        settings.dateFormat,
+                      ),
                       sublabel: 'Date',
                       onTap: _pickDate,
                     ),
@@ -279,8 +281,8 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                         priority == TaskPriority.high
                             ? Icons.priority_high_rounded
                             : priority == TaskPriority.medium
-                                ? Icons.remove_rounded
-                                : Icons.arrow_downward_rounded,
+                            ? Icons.remove_rounded
+                            : Icons.arrow_downward_rounded,
                         size: 17,
                       ),
                       label: Text(priority.label),
@@ -320,9 +322,9 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                   _dueMinutes == null
                       ? 'Add a due time to enable a gentle nudge'
                       : _reminderEnabled
-                          ? 'Taskly will nudge you at '
-                              '${DateHelper.formatMinutes(_dueMinutes)}'
-                          : 'No reminder will be set',
+                      ? 'Taskly will nudge you at '
+                            '${DateHelper.formatMinutes(_dueMinutes)}'
+                      : 'No reminder will be set',
                 ),
                 value: _reminderEnabled,
                 onChanged: _onReminderToggle,
@@ -403,10 +405,7 @@ class _PickerTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    sublabel,
-                    style: theme.textTheme.labelSmall,
-                  ),
+                  Text(sublabel, style: theme.textTheme.labelSmall),
                   const SizedBox(height: 2),
                   Text(
                     label,

@@ -24,9 +24,8 @@ void main() {
     if (await tempDir.exists()) await tempDir.delete(recursive: true);
   });
 
-  Future<TestHarness> harness() => TestHarness.create(
-        dbPath: '${tempDir.path}/tasks.db',
-      );
+  Future<TestHarness> harness() =>
+      TestHarness.create(dbPath: '${tempDir.path}/tasks.db');
 
   testWidgets('all four destinations render and switch', (tester) async {
     final h = await harness();

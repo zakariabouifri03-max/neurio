@@ -24,12 +24,12 @@ void main() {
     if (await tempDir.exists()) await tempDir.delete(recursive: true);
   });
 
-  Future<TestHarness> harness() => TestHarness.create(
-        dbPath: '${tempDir.path}/tasks.db',
-      );
+  Future<TestHarness> harness() =>
+      TestHarness.create(dbPath: '${tempDir.path}/tasks.db');
 
-  testWidgets('renders the current month with correct day count',
-      (tester) async {
+  testWidgets('renders the current month with correct day count', (
+    tester,
+  ) async {
     final h = await harness();
     await h.controller.load();
 
@@ -48,8 +48,9 @@ void main() {
     expect(find.text('32'), findsNothing);
   });
 
-  testWidgets('navigating to February 2028 shows 29 days (leap year)',
-      (tester) async {
+  testWidgets('navigating to February 2028 shows 29 days (leap year)', (
+    tester,
+  ) async {
     final h = await harness();
     await h.controller.load();
 
@@ -101,8 +102,9 @@ void main() {
     expect(find.text('Wednesday task'), findsNothing);
   });
 
-  testWidgets('jump-to-today button returns to the current month',
-      (tester) async {
+  testWidgets('jump-to-today button returns to the current month', (
+    tester,
+  ) async {
     final h = await harness();
     await h.controller.load();
 

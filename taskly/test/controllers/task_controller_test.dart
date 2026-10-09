@@ -204,8 +204,7 @@ void main() {
       expect(controller.tasks, isEmpty);
     });
 
-    test('repository failure surfaces a friendly error, not a crash',
-        () async {
+    test('repository failure surfaces a friendly error, not a crash', () async {
       // A repository pointing at a directory path will fail to open.
       final controller = TaskController(
         repository: TaskRepository(debugPath: tempDir.path),

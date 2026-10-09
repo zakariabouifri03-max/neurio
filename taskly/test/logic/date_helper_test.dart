@@ -124,14 +124,24 @@ void main() {
     });
 
     test('weekdayLabels order matches the chosen start', () {
-      expect(
-        DateHelper.weekdayLabels(WeekStart.sunday),
-        ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-      );
-      expect(
-        DateHelper.weekdayLabels(WeekStart.monday),
-        ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      );
+      expect(DateHelper.weekdayLabels(WeekStart.sunday), [
+        'Sun',
+        'Mon',
+        'Tue',
+        'Wed',
+        'Thu',
+        'Fri',
+        'Sat',
+      ]);
+      expect(DateHelper.weekdayLabels(WeekStart.monday), [
+        'Mon',
+        'Tue',
+        'Wed',
+        'Thu',
+        'Fri',
+        'Sat',
+        'Sun',
+      ]);
     });
 
     test('leadingBlanks aligns the grid', () {
@@ -143,7 +153,8 @@ void main() {
     });
 
     test('calendar math across a leap February', () {
-      final grid = DateHelper.leadingBlanks(2028, 2, WeekStart.monday) +
+      final grid =
+          DateHelper.leadingBlanks(2028, 2, WeekStart.monday) +
           DateHelper.daysInMonth(2028, 2);
       expect((grid / 7).ceil(), 5, reason: 'Feb 2028 fits in 5 week rows');
     });

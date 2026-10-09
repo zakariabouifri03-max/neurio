@@ -108,8 +108,7 @@ class TaskQuery {
       }
     });
 
-    final sorted = result.toList()
-      ..sort((a, b) => _compare(a, b, now));
+    final sorted = result.toList()..sort((a, b) => _compare(a, b, now));
     return sorted;
   }
 

@@ -26,7 +26,9 @@ class TaskDetailPage extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete this task?'),
-        content: Text('"${task.title}" will be removed. This can\'t be undone.'),
+        content: Text(
+          '"${task.title}" will be removed. This can\'t be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -85,9 +87,7 @@ class TaskDetailPage extends StatelessWidget {
             tooltip: 'Edit',
             icon: const Icon(Icons.edit_outlined),
             onPressed: () => Navigator.of(context).push(
-              fadeSlideRoute<void>(
-                builder: (_) => TaskEditorPage(task: task),
-              ),
+              fadeSlideRoute<void>(builder: (_) => TaskEditorPage(task: task)),
             ),
           ),
           IconButton(
@@ -145,8 +145,9 @@ class TaskDetailPage extends StatelessWidget {
             Text(
               task.title,
               style: theme.textTheme.headlineSmall?.copyWith(
-                decoration:
-                    task.isCompleted ? TextDecoration.lineThrough : null,
+                decoration: task.isCompleted
+                    ? TextDecoration.lineThrough
+                    : null,
               ),
             ),
             if (task.description.isNotEmpty) ...[
@@ -195,8 +196,8 @@ class TaskDetailPage extends StatelessWidget {
                       icon: task.priority == TaskPriority.high
                           ? Icons.priority_high_rounded
                           : task.priority == TaskPriority.medium
-                              ? Icons.remove_rounded
-                              : Icons.arrow_downward_rounded,
+                          ? Icons.remove_rounded
+                          : Icons.arrow_downward_rounded,
                       label: 'Priority',
                       value: task.priority.label,
                     ),

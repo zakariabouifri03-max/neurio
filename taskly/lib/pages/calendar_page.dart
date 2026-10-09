@@ -40,17 +40,17 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
-  Future<void> _openEditor({DateTime? presetDate}) => Navigator.of(context).push(
+  Future<void> _openEditor({DateTime? presetDate}) =>
+      Navigator.of(context).push(
         fadeSlideRoute<void>(
-          builder: (_) => TaskEditorPage(presetDate: presetDate ?? _selectedDay),
+          builder: (_) =>
+              TaskEditorPage(presetDate: presetDate ?? _selectedDay),
         ),
       );
 
-  Future<void> _openDetails(Task task) => Navigator.of(context).push(
-        fadeSlideRoute<void>(
-          builder: (_) => TaskDetailPage(taskId: task.id),
-        ),
-      );
+  Future<void> _openDetails(Task task) => Navigator.of(
+    context,
+  ).push(fadeSlideRoute<void>(builder: (_) => TaskDetailPage(taskId: task.id)));
 
   @override
   Widget build(BuildContext context) {
@@ -182,10 +182,7 @@ class _MonthGrid extends StatelessWidget {
               for (final label in labels)
                 Expanded(
                   child: Center(
-                    child: Text(
-                      label,
-                      style: theme.textTheme.labelSmall,
-                    ),
+                    child: Text(label, style: theme.textTheme.labelSmall),
                   ),
                 ),
             ],
@@ -231,18 +228,19 @@ class _MonthGrid extends StatelessWidget {
     final background = isSelected
         ? AppColors.lavenderDeep
         : isToday
-            ? (dark
-                ? AppColors.lavender.withValues(alpha: 0.18)
-                : AppColors.lavender.withValues(alpha: 0.55))
-            : Colors.transparent;
+        ? (dark
+              ? AppColors.lavender.withValues(alpha: 0.18)
+              : AppColors.lavender.withValues(alpha: 0.55))
+        : Colors.transparent;
     final foreground = isSelected
         ? Colors.white
         : isToday
-            ? AppColors.primaryText
-            : theme.colorScheme.onSurface;
+        ? AppColors.primaryText
+        : theme.colorScheme.onSurface;
 
     return Semantics(
-      label: 'Day $dayNumber, '
+      label:
+          'Day $dayNumber, '
           '${DateHelper.monthName(month.month)}, '
           '${dayTasks.length} tasks',
       button: true,
@@ -279,8 +277,8 @@ class _MonthGrid extends StatelessWidget {
                           color: isSelected
                               ? Colors.white.withValues(alpha: 0.9)
                               : task.isCompleted
-                                  ? theme.colorScheme.outline
-                                  : task.category.deep,
+                              ? theme.colorScheme.outline
+                              : task.category.deep,
                           shape: BoxShape.circle,
                         ),
                       ),

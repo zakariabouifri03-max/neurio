@@ -39,11 +39,7 @@ void main() {
     expect(settings.onboardingComplete, isFalse);
 
     await tester.pumpWidget(
-      testApp(
-        child: const OnboardingPage(),
-        tasks: tasks,
-        settings: settings,
-      ),
+      testApp(child: const OnboardingPage(), tasks: tasks, settings: settings),
     );
     await tester.pumpAndSettle();
 
@@ -53,16 +49,13 @@ void main() {
     expect(settings.onboardingComplete, isTrue);
   });
 
-  testWidgets('Continue advances pages; last page shows Get Started',
-      (tester) async {
+  testWidgets('Continue advances pages; last page shows Get Started', (
+    tester,
+  ) async {
     final settings = await makeSettings();
 
     await tester.pumpWidget(
-      testApp(
-        child: const OnboardingPage(),
-        tasks: tasks,
-        settings: settings,
-      ),
+      testApp(child: const OnboardingPage(), tasks: tasks, settings: settings),
     );
     await tester.pumpAndSettle();
 

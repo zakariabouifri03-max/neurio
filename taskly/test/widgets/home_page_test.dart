@@ -28,17 +28,21 @@ void main() {
     if (await tempDir.exists()) await tempDir.delete(recursive: true);
   });
 
-  Future<TestHarness> harness() => TestHarness.create(
-        dbPath: '${tempDir.path}/tasks.db',
-      );
+  Future<TestHarness> harness() =>
+      TestHarness.create(dbPath: '${tempDir.path}/tasks.db');
 
-  testWidgets('empty dashboard shows the friendly blank-canvas state',
-      (tester) async {
+  testWidgets('empty dashboard shows the friendly blank-canvas state', (
+    tester,
+  ) async {
     final h = await harness();
     await h.controller.load();
 
     await tester.pumpWidget(
-      testApp(child: const HomePage(), tasks: h.controller, settings: h.settings),
+      testApp(
+        child: const HomePage(),
+        tasks: h.controller,
+        settings: h.settings,
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -54,7 +58,11 @@ void main() {
     await h.controller.load();
 
     await tester.pumpWidget(
-      testApp(child: const HomePage(), tasks: h.controller, settings: h.settings),
+      testApp(
+        child: const HomePage(),
+        tasks: h.controller,
+        settings: h.settings,
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -62,8 +70,9 @@ void main() {
     expect(find.text('Hey, superstar! ✨'), findsNothing);
   });
 
-  testWidgets('progress numbers come from real tasks, not fake data',
-      (tester) async {
+  testWidgets('progress numbers come from real tasks, not fake data', (
+    tester,
+  ) async {
     final h = await harness();
     await h.controller.load();
     final now = fixedNow();
@@ -71,7 +80,11 @@ void main() {
     await h.controller.addTask(title: 'B', dueDate: now);
 
     await tester.pumpWidget(
-      testApp(child: const HomePage(), tasks: h.controller, settings: h.settings),
+      testApp(
+        child: const HomePage(),
+        tasks: h.controller,
+        settings: h.settings,
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -89,7 +102,11 @@ void main() {
     await h.controller.load();
 
     await tester.pumpWidget(
-      testApp(child: const HomePage(), tasks: h.controller, settings: h.settings),
+      testApp(
+        child: const HomePage(),
+        tasks: h.controller,
+        settings: h.settings,
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -99,8 +116,9 @@ void main() {
     expect(find.text('What needs doing?'), findsOneWidget);
   });
 
-  testWidgets('all-done state appears only when today is complete',
-      (tester) async {
+  testWidgets('all-done state appears only when today is complete', (
+    tester,
+  ) async {
     final h = await harness();
     await h.controller.load();
     final now = fixedNow();
@@ -108,7 +126,11 @@ void main() {
     await h.controller.toggleComplete(task);
 
     await tester.pumpWidget(
-      testApp(child: const HomePage(), tasks: h.controller, settings: h.settings),
+      testApp(
+        child: const HomePage(),
+        tasks: h.controller,
+        settings: h.settings,
+      ),
     );
     await tester.pumpAndSettle();
 

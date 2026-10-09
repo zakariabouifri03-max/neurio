@@ -24,9 +24,8 @@ void main() {
     if (await tempDir.exists()) await tempDir.delete(recursive: true);
   });
 
-  Future<TestHarness> harness() => TestHarness.create(
-        dbPath: '${tempDir.path}/tasks.db',
-      );
+  Future<TestHarness> harness() =>
+      TestHarness.create(dbPath: '${tempDir.path}/tasks.db');
 
   testWidgets('empty state offers to add the first task', (tester) async {
     final h = await harness();
@@ -74,8 +73,9 @@ void main() {
     expect(find.text('Groceries'), findsNothing);
   });
 
-  testWidgets('filter chips show live counts and filter the list',
-      (tester) async {
+  testWidgets('filter chips show live counts and filter the list', (
+    tester,
+  ) async {
     final h = await harness();
     await h.controller.load();
     final now = fixedNow();
@@ -126,8 +126,9 @@ void main() {
     expect(find.text('Finish me'), findsOneWidget);
   });
 
-  testWidgets('no-match search shows a clear-filters escape hatch',
-      (tester) async {
+  testWidgets('no-match search shows a clear-filters escape hatch', (
+    tester,
+  ) async {
     final h = await harness();
     await h.controller.load();
     await h.controller.addTask(title: 'Only task', dueDate: fixedNow());

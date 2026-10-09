@@ -164,16 +164,22 @@ class TaskController extends ChangeNotifier {
 
   // ---------------- Derived views (real data only) ----------------
 
-  DailyProgress dailyProgress() => StatsCalculator.dailyProgress(tasks, _clock());
+  DailyProgress dailyProgress() =>
+      StatsCalculator.dailyProgress(tasks, _clock());
 
-  List<Task> tasksForDay(DateTime day) => tasks
-      .where((t) => DateHelper.isSameDay(DateHelper.startOfDay(t.dueDate), day))
-      .toList()
-    ..sort((a, b) {
-      final byTime = (a.dueMinutes ?? 24 * 60).compareTo(b.dueMinutes ?? 24 * 60);
-      if (byTime != 0) return byTime;
-      return a.priority.value.compareTo(b.priority.value) * -1;
-    });
+  List<Task> tasksForDay(DateTime day) =>
+      tasks
+          .where(
+            (t) => DateHelper.isSameDay(DateHelper.startOfDay(t.dueDate), day),
+          )
+          .toList()
+        ..sort((a, b) {
+          final byTime = (a.dueMinutes ?? 24 * 60).compareTo(
+            b.dueMinutes ?? 24 * 60,
+          );
+          if (byTime != 0) return byTime;
+          return a.priority.value.compareTo(b.priority.value) * -1;
+        });
 
   /// Open tasks due today, soonest first — the Home "up next" list.
   List<Task> todayUpNext() {

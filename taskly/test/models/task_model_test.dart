@@ -44,7 +44,11 @@ void main() {
     });
 
     test('copyWith can clear nullable fields with sentinels', () {
-      final task = makeTask(minutes: 600, completed: true, completedAt: fixedNow());
+      final task = makeTask(
+        minutes: 600,
+        completed: true,
+        completedAt: fixedNow(),
+      );
       final cleared = task.copyWith(
         dueMinutes: null,
         completedAt: null,
@@ -75,10 +79,7 @@ void main() {
         isFalse,
         reason: 'due today is not overdue',
       );
-      expect(
-        makeTask(due: DateTime(2026, 10, 8)).isOverdue(now),
-        isFalse,
-      );
+      expect(makeTask(due: DateTime(2026, 10, 8)).isOverdue(now), isFalse);
     });
 
     test('dueDateTime combines date and minutes', () {

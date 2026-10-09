@@ -10,8 +10,7 @@ PageRouteBuilder<T> fadeSlideRoute<T>({
     settings: settings,
     transitionDuration: const Duration(milliseconds: 240),
     reverseTransitionDuration: const Duration(milliseconds: 180),
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        builder(context),
+    pageBuilder: (context, animation, secondaryAnimation) => builder(context),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       final disabled = MediaQuery.disableAnimationsOf(context);
       if (disabled) return child;

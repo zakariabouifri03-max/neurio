@@ -41,8 +41,8 @@ class NotificationService {
     _initialized = true;
   }
 
-  AndroidFlutterLocalNotificationsPlugin? get _android =>
-      _plugin.resolvePlatformSpecificImplementation<
+  AndroidFlutterLocalNotificationsPlugin? get _android => _plugin
+      .resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin
       >();
 
@@ -51,7 +51,8 @@ class NotificationService {
   Future<bool?> requestNotificationPermission() =>
       _android?.requestNotificationsPermission();
 
-  Future<bool?> areNotificationsEnabled() => _android?.areNotificationsEnabled();
+  Future<bool?> areNotificationsEnabled() =>
+      _android?.areNotificationsEnabled();
 
   /// Whether the OS will let us schedule *exact* alarms right now.
   Future<bool?> canScheduleExact() => _android?.canScheduleExactNotifications();
@@ -91,8 +92,7 @@ class NotificationService {
       payload: payload,
       // Exact when the OS allows it; otherwise a graceful inexact fallback
       // that still fires within Android's window restrictions.
-      androidScheduleMode:
-          (await canScheduleExact() ?? false)
+      androidScheduleMode: (await canScheduleExact() ?? false)
           ? AndroidScheduleMode.exactAllowWhileIdle
           : AndroidScheduleMode.inexactAllowWhileIdle,
     );

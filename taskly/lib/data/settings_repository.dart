@@ -55,7 +55,8 @@ class SettingsRepository {
   Future<void> setDateFormat(AppDateFormat value) =>
       _prefs.setString(_keyDateFormat, value.name);
 
-  bool get onboardingComplete => _prefs.getBool(_keyOnboardingComplete) ?? false;
+  bool get onboardingComplete =>
+      _prefs.getBool(_keyOnboardingComplete) ?? false;
 
   Future<void> setOnboardingComplete() =>
       _prefs.setBool(_keyOnboardingComplete, true);

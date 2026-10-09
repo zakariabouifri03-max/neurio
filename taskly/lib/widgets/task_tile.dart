@@ -38,7 +38,9 @@ class TaskTile extends StatelessWidget {
 
     final dueLabel = task.dueMinutes != null
         ? DateHelper.formatMinutes(task.dueMinutes)
-        : (showDate ? DateHelper.friendlyDate(task.dueDate, now, dateFormat) : 'Anytime');
+        : (showDate
+              ? DateHelper.friendlyDate(task.dueDate, now, dateFormat)
+              : 'Anytime');
 
     return Semantics(
       label:
@@ -200,7 +202,9 @@ class _CategoryDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final fill = dark ? category.pastel.withValues(alpha: 0.28) : category.pastel;
+    final fill = dark
+        ? category.pastel.withValues(alpha: 0.28)
+        : category.pastel;
     final fg = dark ? Colors.white.withValues(alpha: 0.9) : category.deep;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),

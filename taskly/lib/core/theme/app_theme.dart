@@ -256,9 +256,7 @@ abstract final class AppTheme {
         ),
       ),
       checkboxTheme: CheckboxThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(7),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
         side: BorderSide(color: border, width: 1.8),
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) return primary;
@@ -275,18 +273,14 @@ abstract final class AppTheme {
           return null;
         }),
         trackOutlineColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? null
-              : border,
+          (states) => states.contains(WidgetState.selected) ? null : border,
         ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: surface,
         selectedColor: primaryContainer,
         side: BorderSide(color: border),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         labelStyle: textTheme.labelMedium,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       ),

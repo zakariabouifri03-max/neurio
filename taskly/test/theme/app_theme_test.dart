@@ -42,10 +42,7 @@ void main() {
         reason: 'body text must be AA+ on cards',
       );
       final darkText = dark.textTheme.bodyLarge!.color!;
-      expect(
-        _contrast(darkText, dark.colorScheme.surface),
-        greaterThan(7.0),
-      );
+      expect(_contrast(darkText, dark.colorScheme.surface), greaterThan(7.0));
     });
 
     test('both themes define an accessible error color', () {
@@ -63,8 +60,9 @@ void main() {
 /// WCAG relative-luminance contrast ratio.
 double _contrast(Color a, Color b) {
   double lum(Color c) {
-    double channel(double v) =>
-        v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+    double channel(double v) => v <= 0.03928
+        ? v / 12.92
+        : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
     return 0.2126 * channel(c.r) +
         0.7152 * channel(c.g) +
         0.0722 * channel(c.b);

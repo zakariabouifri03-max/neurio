@@ -39,31 +39,33 @@ void main() {
       await repo.close();
     });
 
-    test('tasks survive a full close + reopen (device restart proxy)',
-        () async {
-      final repo = TaskRepository(debugPath: dbPath);
-      final created = await repo.insert(
-        makeTask(
-          title: 'Persist me',
-          due: DateTime(2026, 12, 25),
-          minutes: 8 * 60 + 15,
-          priority: TaskPriority.high,
-          category: TaskCategory.study,
-          reminder: true,
-        ),
-      );
-      await repo.close();
+    test(
+      'tasks survive a full close + reopen (device restart proxy)',
+      () async {
+        final repo = TaskRepository(debugPath: dbPath);
+        final created = await repo.insert(
+          makeTask(
+            title: 'Persist me',
+            due: DateTime(2026, 12, 25),
+            minutes: 8 * 60 + 15,
+            priority: TaskPriority.high,
+            category: TaskCategory.study,
+            reminder: true,
+          ),
+        );
+        await repo.close();
 
-      final repo2 = TaskRepository(debugPath: dbPath);
-      final loaded = await repo2.findById(created.id);
-      expect(loaded, isNotNull);
-      expect(loaded!.title, 'Persist me');
-      expect(loaded.dueMinutes, 8 * 60 + 15);
-      expect(loaded.priority, TaskPriority.high);
-      expect(loaded.category, TaskCategory.study);
-      expect(loaded.reminderEnabled, isTrue);
-      await repo2.close();
-    });
+        final repo2 = TaskRepository(debugPath: dbPath);
+        final loaded = await repo2.findById(created.id);
+        expect(loaded, isNotNull);
+        expect(loaded!.title, 'Persist me');
+        expect(loaded.dueMinutes, 8 * 60 + 15);
+        expect(loaded.priority, TaskPriority.high);
+        expect(loaded.category, TaskCategory.study);
+        expect(loaded.reminderEnabled, isTrue);
+        await repo2.close();
+      },
+    );
 
     test('update persists edits', () async {
       final repo = TaskRepository(debugPath: dbPath);
@@ -81,10 +83,7 @@ void main() {
       final repo = TaskRepository(debugPath: dbPath);
       final created = await repo.insert(makeTask());
 
-      final done = created.copyWith(
-        isCompleted: true,
-        completedAt: fixedNow(),
-      );
+      final done = created.copyWith(isCompleted: true, completedAt: fixedNow());
       await repo.update(done);
       await repo.close();
 

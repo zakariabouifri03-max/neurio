@@ -130,11 +130,10 @@ class SparklePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final appear = Curves.easeOutBack.transform(
-      progress.clamp(0.0, 1.0),
-    );
+    final appear = Curves.easeOutBack.transform(progress.clamp(0.0, 1.0));
     final fade = progress < 0.7 ? 1.0 : 1.0 - ((progress - 0.7) / 0.3);
-    final paint = Paint()..color = color.withValues(alpha: fade.clamp(0.0, 1.0));
+    final paint = Paint()
+      ..color = color.withValues(alpha: fade.clamp(0.0, 1.0));
 
     final radius = size.shortestSide * 0.38 * appear;
     final path = Path()
@@ -250,16 +249,21 @@ class _BurstPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final distance = size.shortestSide * 0.42 * Curves.easeOut.transform(progress);
+    final distance =
+        size.shortestSide * 0.42 * Curves.easeOut.transform(progress);
     final fade = 1.0 - progress;
     for (var i = 0; i < count; i++) {
       final angle = (math.pi * 2 * i) / count - math.pi / 2;
-      final position = center + Offset(math.cos(angle), math.sin(angle)) * distance;
+      final position =
+          center + Offset(math.cos(angle), math.sin(angle)) * distance;
       final painter = SparklePainter(
         progress: 1,
         color: AppColors.sunnyYellow.withValues(alpha: fade.clamp(0.0, 1.0)),
       );
-      painter.paint(canvas, Offset(position.dx - 9, position.dy - 9) & const Size(18, 18));
+      painter.paint(
+        canvas,
+        Offset(position.dx - 9, position.dy - 9) & const Size(18, 18),
+      );
     }
   }
 

@@ -20,18 +20,44 @@ enum AppDateFormat {
 /// zones and daylight-saving changes.
 abstract final class DateHelper {
   static const List<String> _monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   static const List<String> _monthNamesShort = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   /// Weekday short names indexed by DateTime.weekday (1 = Monday).
   static const List<String> _weekdayShortMonFirst = [
-    'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun',
   ];
 
   static String monthName(int month) => _monthNames[month - 1];
@@ -59,13 +85,7 @@ abstract final class DateHelper {
   /// Combines a calendar day with a minutes-since-midnight value.
   static DateTime atMinutes(DateTime day, int? minutes) {
     if (minutes == null) return startOfDay(day);
-    return DateTime(
-      day.year,
-      day.month,
-      day.day,
-      minutes ~/ 60,
-      minutes % 60,
-    );
+    return DateTime(day.year, day.month, day.day, minutes ~/ 60, minutes % 60);
   }
 
   /// 24h minutes -> friendly 12-hour clock, e.g. 13:45 -> "1:45 PM".
@@ -87,8 +107,8 @@ abstract final class DateHelper {
         AppDateFormat.dmy => '${d.day} ${monthShort(d.month)} ${d.year}',
         AppDateFormat.ymd =>
           '${d.year.toString().padLeft(4, '0')}-'
-          '${d.month.toString().padLeft(2, '0')}-'
-          '${d.day.toString().padLeft(2, '0')}',
+              '${d.month.toString().padLeft(2, '0')}-'
+              '${d.day.toString().padLeft(2, '0')}',
       };
 
   /// "Today", "Tomorrow", "Yesterday", or the preferred date format.

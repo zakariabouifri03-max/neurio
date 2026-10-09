@@ -101,7 +101,10 @@ void main() {
       expect(settings.shouldCelebrate(now), isTrue);
       await settings.markCelebrated(now);
       expect(settings.shouldCelebrate(now), isFalse);
-      expect(settings.shouldCelebrate(now.add(const Duration(days: 1))), isTrue);
+      expect(
+        settings.shouldCelebrate(now.add(const Duration(days: 1))),
+        isTrue,
+      );
     });
   });
 }

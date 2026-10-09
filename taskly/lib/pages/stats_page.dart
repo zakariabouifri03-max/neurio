@@ -34,7 +34,11 @@ class StatsPage extends StatelessWidget {
     final completedTotal = StatsCalculator.totalCompleted(tasks);
     final todayProgress = StatsCalculator.dailyProgress(tasks, now);
     final completedToday = StatsCalculator.completedOn(tasks, now);
-    final week = StatsCalculator.weeklyCompleted(tasks, now, settings.weekStart);
+    final week = StatsCalculator.weeklyCompleted(
+      tasks,
+      now,
+      settings.weekStart,
+    );
     final trend = StatsCalculator.weeklyTrend(tasks, now, settings.weekStart);
     final byCategory = StatsCalculator.completedByCategory(tasks);
 
@@ -125,7 +129,7 @@ class StatsPage extends StatelessWidget {
                         todayProgress.total == 0
                             ? 'Nothing was due today. Rest is progress too.'
                             : '${todayProgress.completed} of '
-                                '${todayProgress.total} tasks done today.',
+                                  '${todayProgress.total} tasks done today.',
                         style: theme.textTheme.bodyMedium,
                       ),
                     ),
@@ -141,25 +145,25 @@ class StatsPage extends StatelessWidget {
                       trend.difference > 0
                           ? Icons.trending_up_rounded
                           : trend.difference < 0
-                              ? Icons.trending_down_rounded
-                              : Icons.trending_flat_rounded,
+                          ? Icons.trending_down_rounded
+                          : Icons.trending_flat_rounded,
                       color: trend.difference > 0
                           ? AppColors.mintDeep
                           : trend.difference < 0
-                              ? theme.colorScheme.error
-                              : theme.colorScheme.onSurfaceVariant,
+                          ? theme.colorScheme.error
+                          : theme.colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         trend.difference == 0
                             ? 'Same as last week (${trend.thisWeek} tasks) '
-                                '— steady is lovely.'
+                                  '— steady is lovely.'
                             : trend.difference > 0
-                                ? '${trend.difference} more task${trend.difference == 1 ? '' : 's'} '
-                                    'than last week (${trend.lastWeek}). Lovely climb!'
-                                : '${-trend.difference} fewer than last '
-                                    'week (${trend.lastWeek}). Be kind to yourself.',
+                            ? '${trend.difference} more task${trend.difference == 1 ? '' : 's'} '
+                                  'than last week (${trend.lastWeek}). Lovely climb!'
+                            : '${-trend.difference} fewer than last '
+                                  'week (${trend.lastWeek}). Be kind to yourself.',
                         style: theme.textTheme.bodyMedium,
                       ),
                     ),
@@ -274,10 +278,7 @@ class WeeklyBars extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    '${values[i]}',
-                    style: theme.textTheme.labelSmall,
-                  ),
+                  Text('${values[i]}', style: theme.textTheme.labelSmall),
                   const SizedBox(height: 4),
                   Expanded(
                     child: Align(
@@ -286,14 +287,13 @@ class WeeklyBars extends StatelessWidget {
                         duration: const Duration(milliseconds: 450),
                         curve: Curves.easeOutCubic,
                         width: 18,
-                        height:
-                            ((values[i] / max) * 86).clamp(4.0, 86.0),
+                        height: ((values[i] / max) * 86).clamp(4.0, 86.0),
                         decoration: BoxDecoration(
                           color: values[i] == 0
                               ? theme.colorScheme.outline
                               : i >= 5
-                                  ? AppColors.pastelPink
-                                  : AppColors.lavender,
+                              ? AppColors.pastelPink
+                              : AppColors.lavender,
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -352,10 +352,7 @@ class CategoryBreakdown extends StatelessWidget {
                     ),
                   ),
                 ),
-                Text(
-                  '${entry.value}',
-                  style: theme.textTheme.labelMedium,
-                ),
+                Text('${entry.value}', style: theme.textTheme.labelMedium),
               ],
             ),
           ),

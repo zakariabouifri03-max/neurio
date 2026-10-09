@@ -43,17 +43,13 @@ class _TasksPageState extends State<TasksPage> {
     if (result != null) _update(result);
   }
 
-  Future<void> _openEditor({Task? task}) => Navigator.of(context).push(
-        fadeSlideRoute<void>(
-          builder: (_) => TaskEditorPage(task: task),
-        ),
-      );
+  Future<void> _openEditor({Task? task}) => Navigator.of(
+    context,
+  ).push(fadeSlideRoute<void>(builder: (_) => TaskEditorPage(task: task)));
 
-  Future<void> _openDetails(Task task) => Navigator.of(context).push(
-        fadeSlideRoute<void>(
-          builder: (_) => TaskDetailPage(taskId: task.id),
-        ),
-      );
+  Future<void> _openDetails(Task task) => Navigator.of(
+    context,
+  ).push(fadeSlideRoute<void>(builder: (_) => TaskDetailPage(taskId: task.id)));
 
   Future<void> _deleteWithConfirm(Task task) async {
     final confirmed = await showDialog<bool>(
@@ -81,9 +77,7 @@ class _TasksPageState extends State<TasksPage> {
     if (confirmed == true && mounted) {
       final messenger = ScaffoldMessenger.of(context);
       await context.read<TaskController>().deleteTask(task);
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Task deleted')),
-      );
+      messenger.showSnackBar(const SnackBar(content: Text('Task deleted')));
     }
   }
 
@@ -112,12 +106,14 @@ class _TasksPageState extends State<TasksPage> {
     final visible = controller.applyQuery(_query);
     final counts = <TaskFilter, int>{
       for (final f in TaskFilter.values)
-        f: controller.applyQuery(
-          _query.copyWith(
-            filter: f,
-            // Category/priority still apply to chips' counts.
-          ),
-        ).length,
+        f: controller
+            .applyQuery(
+              _query.copyWith(
+                filter: f,
+                // Category/priority still apply to chips' counts.
+              ),
+            )
+            .length,
     };
 
     return Scaffold(
@@ -211,7 +207,8 @@ class _TasksPageState extends State<TasksPage> {
                               : '${filter.label} · ${counts[filter]}',
                         ),
                         showCheckmark: false,
-                        avatar: filter == TaskFilter.overdue &&
+                        avatar:
+                            filter == TaskFilter.overdue &&
                                 (counts[filter] ?? 0) > 0
                             ? Icon(
                                 Icons.warning_amber_rounded,
@@ -265,10 +262,12 @@ class _TasksPageState extends State<TasksPage> {
                             padding: const EdgeInsets.only(right: 22),
                             margin: const EdgeInsets.symmetric(vertical: 5),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.error
-                                  .withValues(alpha: 0.14),
-                              borderRadius:
-                                  BorderRadius.circular(AppTheme.radiusM),
+                              color: theme.colorScheme.error.withValues(
+                                alpha: 0.14,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusM,
+                              ),
                             ),
                             child: Icon(
                               Icons.delete_outline_rounded,
@@ -284,8 +283,9 @@ class _TasksPageState extends State<TasksPage> {
                             now: now,
                             dateFormat: settings.dateFormat,
                             showDate: true,
-                            onToggle: (t) =>
-                                context.read<TaskController>().toggleComplete(t),
+                            onToggle: (t) => context
+                                .read<TaskController>()
+                                .toggleComplete(t),
                             onOpen: () => _openDetails(task),
                           ),
                         );
@@ -330,7 +330,8 @@ class _FilterSheet extends StatelessWidget {
                 ChoiceChip(
                   label: const Text('Any'),
                   selected: draft.category == null,
-                  onSelected: (_) => setSheet(() => draft = draft.copyWith(category: null)),
+                  onSelected: (_) =>
+                      setSheet(() => draft = draft.copyWith(category: null)),
                 ),
                 for (final category in TaskCategory.values)
                   ChoiceChip(
@@ -343,8 +344,9 @@ class _FilterSheet extends StatelessWidget {
                     ),
                     label: Text(category.label),
                     selected: draft.category == category,
-                    onSelected: (_) =>
-                        setSheet(() => draft = draft.copyWith(category: category)),
+                    onSelected: (_) => setSheet(
+                      () => draft = draft.copyWith(category: category),
+                    ),
                   ),
               ],
             ),
@@ -358,7 +360,8 @@ class _FilterSheet extends StatelessWidget {
                 ChoiceChip(
                   label: const Text('Any'),
                   selected: draft.priority == null,
-                  onSelected: (_) => setSheet(() => draft = draft.copyWith(priority: null)),
+                  onSelected: (_) =>
+                      setSheet(() => draft = draft.copyWith(priority: null)),
                 ),
                 for (final priority in TaskPriority.values)
                   ChoiceChip(
@@ -366,14 +369,15 @@ class _FilterSheet extends StatelessWidget {
                       priority == TaskPriority.high
                           ? Icons.priority_high_rounded
                           : priority == TaskPriority.medium
-                              ? Icons.remove_rounded
-                              : Icons.arrow_downward_rounded,
+                          ? Icons.remove_rounded
+                          : Icons.arrow_downward_rounded,
                       size: 15,
                     ),
                     label: Text(priority.label),
                     selected: draft.priority == priority,
-                    onSelected: (_) =>
-                        setSheet(() => draft = draft.copyWith(priority: priority)),
+                    onSelected: (_) => setSheet(
+                      () => draft = draft.copyWith(priority: priority),
+                    ),
                   ),
               ],
             ),
@@ -382,9 +386,9 @@ class _FilterSheet extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(
-                      const TaskQuery(filter: TaskFilter.all),
-                    ),
+                    onPressed: () => Navigator.of(
+                      context,
+                    ).pop(const TaskQuery(filter: TaskFilter.all)),
                     child: const Text('Clear all'),
                   ),
                 ),

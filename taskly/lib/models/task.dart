@@ -63,8 +63,9 @@ class Task {
     priority: priority ?? this.priority,
     category: category ?? this.category,
     isCompleted: isCompleted ?? this.isCompleted,
-    completedAt:
-        completedAt == _unset ? this.completedAt : completedAt as DateTime?,
+    completedAt: completedAt == _unset
+        ? this.completedAt
+        : completedAt as DateTime?,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     reminderEnabled: reminderEnabled ?? this.reminderEnabled,
@@ -77,7 +78,8 @@ class Task {
 
   /// Whether this task is due before today and still open.
   bool isOverdue(DateTime now) =>
-      !isCompleted && DateHelper.startOfDay(dueDate).isBefore(DateHelper.startOfDay(now));
+      !isCompleted &&
+      DateHelper.startOfDay(dueDate).isBefore(DateHelper.startOfDay(now));
 
   // ---------------- Persistence ----------------
 

@@ -13,7 +13,10 @@ import 'privacy_policy_page.dart';
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  Future<void> _editName(BuildContext context, SettingsController settings) async {
+  Future<void> _editName(
+    BuildContext context,
+    SettingsController settings,
+  ) async {
     final controller = TextEditingController(text: settings.preferredName);
     final name = await showDialog<String>(
       context: context,
@@ -93,20 +96,16 @@ class ProfilePage extends StatelessWidget {
                       groupValue: settings.themeMode,
                       onChanged: (value) =>
                           value != null && settings.setThemeMode(value),
-                      title: Text(
-                        switch (mode) {
-                          ThemeMode.system => 'Match system',
-                          ThemeMode.light => 'Light',
-                          ThemeMode.dark => 'Dark',
-                        },
-                      ),
-                      secondary: Icon(
-                        switch (mode) {
-                          ThemeMode.system => Icons.brightness_auto_outlined,
-                          ThemeMode.light => Icons.light_mode_outlined,
-                          ThemeMode.dark => Icons.dark_mode_outlined,
-                        },
-                      ),
+                      title: Text(switch (mode) {
+                        ThemeMode.system => 'Match system',
+                        ThemeMode.light => 'Light',
+                        ThemeMode.dark => 'Dark',
+                      }),
+                      secondary: Icon(switch (mode) {
+                        ThemeMode.system => Icons.brightness_auto_outlined,
+                        ThemeMode.light => Icons.light_mode_outlined,
+                        ThemeMode.dark => Icons.dark_mode_outlined,
+                      }),
                     ),
                 ],
               ),
@@ -123,13 +122,11 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   ListTile(
                     title: const Text('Start of week'),
-                    subtitle: Text(
-                      switch (settings.weekStart) {
-                        WeekStart.saturday => 'Saturday',
-                        WeekStart.sunday => 'Sunday',
-                        WeekStart.monday => 'Monday',
-                      },
-                    ),
+                    subtitle: Text(switch (settings.weekStart) {
+                      WeekStart.saturday => 'Saturday',
+                      WeekStart.sunday => 'Sunday',
+                      WeekStart.monday => 'Monday',
+                    }),
                     trailing: DropdownButton<WeekStart>(
                       value: settings.weekStart,
                       underline: const SizedBox.shrink(),
@@ -137,13 +134,11 @@ class ProfilePage extends StatelessWidget {
                         for (final w in WeekStart.values)
                           DropdownMenuItem(
                             value: w,
-                            child: Text(
-                              switch (w) {
-                                WeekStart.saturday => 'Saturday',
-                                WeekStart.sunday => 'Sunday',
-                                WeekStart.monday => 'Monday',
-                              },
-                            ),
+                            child: Text(switch (w) {
+                              WeekStart.saturday => 'Saturday',
+                              WeekStart.sunday => 'Sunday',
+                              WeekStart.monday => 'Monday',
+                            }),
                           ),
                       ],
                       onChanged: (value) =>
@@ -153,13 +148,11 @@ class ProfilePage extends StatelessWidget {
                   Divider(color: theme.colorScheme.outline, height: 1),
                   ListTile(
                     title: const Text('Date format'),
-                    subtitle: Text(
-                      switch (settings.dateFormat) {
-                        AppDateFormat.mdy => 'Mar 9, 2026',
-                        AppDateFormat.dmy => '9 Mar 2026',
-                        AppDateFormat.ymd => '2026-03-09',
-                      },
-                    ),
+                    subtitle: Text(switch (settings.dateFormat) {
+                      AppDateFormat.mdy => 'Mar 9, 2026',
+                      AppDateFormat.dmy => '9 Mar 2026',
+                      AppDateFormat.ymd => '2026-03-09',
+                    }),
                     trailing: DropdownButton<AppDateFormat>(
                       value: settings.dateFormat,
                       underline: const SizedBox.shrink(),
@@ -167,13 +160,11 @@ class ProfilePage extends StatelessWidget {
                         for (final f in AppDateFormat.values)
                           DropdownMenuItem(
                             value: f,
-                            child: Text(
-                              switch (f) {
-                                AppDateFormat.mdy => 'Mar 9, 2026',
-                                AppDateFormat.dmy => '9 Mar 2026',
-                                AppDateFormat.ymd => '2026-03-09',
-                              },
-                            ),
+                            child: Text(switch (f) {
+                              AppDateFormat.mdy => 'Mar 9, 2026',
+                              AppDateFormat.dmy => '9 Mar 2026',
+                              AppDateFormat.ymd => '2026-03-09',
+                            }),
                           ),
                       ],
                       onChanged: (value) =>
@@ -347,9 +338,7 @@ class _RemindersCardState extends State<_RemindersCard> {
           children: [
             SwitchListTile.adaptive(
               title: const Text('Task reminders'),
-              subtitle: const Text(
-                'Nudges for tasks you set a reminder on',
-              ),
+              subtitle: const Text('Nudges for tasks you set a reminder on'),
               value: remindersOn,
               onChanged: (value) async {
                 await widget.settings.setRemindersEnabled(value);
@@ -409,9 +398,8 @@ class _RemindersCardState extends State<_RemindersCard> {
                     'few minutes. Allow exact alarms for best timing.',
                   ),
                   trailing: TextButton(
-                    onPressed: () => context
-                        .read<ReminderScheduler>()
-                        .requestExactAlarms(),
+                    onPressed: () =>
+                        context.read<ReminderScheduler>().requestExactAlarms(),
                     child: const Text('Allow'),
                   ),
                 ),

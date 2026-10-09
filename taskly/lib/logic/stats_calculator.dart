@@ -4,10 +4,7 @@ import '../models/task.dart';
 
 /// Aggregated, honest statistics computed from real task data.
 class DailyProgress {
-  const DailyProgress({
-    required this.completed,
-    required this.total,
-  });
+  const DailyProgress({required this.completed, required this.total});
 
   /// Tasks completed today (by completion timestamp).
   final int completed;

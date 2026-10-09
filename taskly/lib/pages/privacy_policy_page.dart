@@ -42,10 +42,10 @@ class PrivacyPolicyPage extends StatelessWidget {
             _H('Permissions Taskly asks for'),
             const _Bullets([
               'Notifications — requested only when you set your first task '
-              'reminder, so Taskly can show it at the right time.',
+                  'reminder, so Taskly can show it at the right time.',
               'Exact alarms — an optional Android permission you may grant so '
-              'reminders are not delayed by a few minutes. Taskly works '
-              'without it.',
+                  'reminders are not delayed by a few minutes. Taskly works '
+                  'without it.',
             ]),
             _H('What Taskly never does'),
             const _Bullets([
@@ -135,9 +135,9 @@ class _Bullets extends StatelessWidget {
               Expanded(
                 child: Text(
                   item,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    height: 1.5,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(height: 1.5),
                 ),
               ),
             ],
