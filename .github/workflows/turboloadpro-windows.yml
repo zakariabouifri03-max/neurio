@@ -7,6 +7,9 @@ on:
       - 'TurboLoadPro/**'
       - '.github/workflows/turboloadpro-windows.yml'
 
+permissions:
+  contents: write
+
 jobs:
   test-and-publish:
     runs-on: windows-latest
@@ -31,3 +34,34 @@ jobs:
           name: TurboLoadPro-win-x64
           path: .\TurboLoadPro\artifacts\publish\win-x64\TurboLoadPro.exe
           if-no-files-found: error
+
+      - name: Create SHA-256 checksum for the release
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Release TurboLoad Pro v1.0.0')
+        shell: pwsh
+        run: |
+          $exe = '.\TurboLoadPro\artifacts\publish\win-x64\TurboLoadPro.exe'
+          $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          $text = "$hash  TurboLoadPro.exe`n"
+          [System.IO.File]::WriteAllText(
+            '.\TurboLoadPro\artifacts\publish\win-x64\SHA256SUMS.txt',
+            $text,
+            [System.Text.UTF8Encoding]::new($false))
+      - name: Publish direct GitHub release
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Release TurboLoad Pro v1.0.0')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: turboloadpro-v1.0.0
+          target_commitish: ${{ github.sha }}
+          name: TurboLoad Pro v1.0.0
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          body: |
+            Self-contained, single-file Windows x64 build of TurboLoad Pro.
+
+            The Windows CI workflow passed the local-server transfer/recovery tests and published the executable. The app is unsigned; Windows SmartScreen may show a warning. SHA-256 is provided alongside the executable.
+          files: |
+            TurboLoadPro/artifacts/publish/win-x64/TurboLoadPro.exe
+            TurboLoadPro/artifacts/publish/win-x64/SHA256SUMS.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
