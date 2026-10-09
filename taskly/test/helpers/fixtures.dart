@@ -52,7 +52,7 @@ Future<SettingsController> makeSettings({
   ThemeMode themeMode = ThemeMode.system,
   String name = '',
 }) async {
-  SharedPreferences.setMockInitialValues(<String, Object?>{});
+  SharedPreferences.setMockInitialValues(<String, Object>{});
   final prefs = await SharedPreferences.getInstance();
   final controller = SettingsController(SettingsRepository(prefs));
   await controller.load();

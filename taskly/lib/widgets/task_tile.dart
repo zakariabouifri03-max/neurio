@@ -133,7 +133,6 @@ class _CuteCheckbox extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Semantics(
-      checkbox: true,
       checked: value,
       label: value ? 'Mark as not done' : 'Mark as done',
       child: InkWell(

@@ -6,7 +6,6 @@ import 'package:sqflite_common_ffi/sqflite_common_ffi.dart';
 import 'package:taskly/data/task_repository.dart';
 import 'package:taskly/models/category.dart';
 import 'package:taskly/models/priority.dart';
-import 'package:taskly/models/task.dart';
 
 import '../helpers/fixtures.dart';
 
@@ -31,8 +30,8 @@ void main() {
   group('TaskRepository CRUD', () {
     test('insert assigns a stable auto-increment id', () async {
       final repo = TaskRepository(debugPath: dbPath);
-      final a = await repo.insert(makeTask(title: 'One', now: fixedNow()));
-      final b = await repo.insert(makeTask(title: 'Two', now: fixedNow()));
+      final a = await repo.insert(makeTask(title: 'One'));
+      final b = await repo.insert(makeTask(title: 'Two'));
       expect(a.id, greaterThan(0));
       expect(b.id, greaterThan(a.id));
       await repo.close();

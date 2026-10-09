@@ -24,6 +24,7 @@ class TaskDetailPage extends StatelessWidget {
   Future<void> _delete(BuildContext context, Task task) async {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    final controller = context.read<TaskController>();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -48,7 +49,7 @@ class TaskDetailPage extends StatelessWidget {
     );
     if (confirmed != true) return;
 
-    final ok = await context.read<TaskController>().deleteTask(task);
+    final ok = await controller.deleteTask(task);
     if (ok) {
       if (navigator.canPop()) navigator.pop();
       messenger.showSnackBar(const SnackBar(content: Text('Task deleted')));

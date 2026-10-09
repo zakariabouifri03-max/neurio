@@ -249,7 +249,7 @@ class _TasksPageState extends State<TasksPage> {
                         20,
                         8,
                         20,
-                        (FAB_HEIGHT) + theme.padding.bottom + 24,
+                        _fabHeight + MediaQuery.paddingOf(context).bottom + 24,
                       ),
                       itemCount: visible.length,
                       itemBuilder: (context, index) {
@@ -298,7 +298,7 @@ class _TasksPageState extends State<TasksPage> {
     );
   }
 
-  static const double FAB_HEIGHT = 56;
+  static const double _fabHeight = 56;
 }
 
 /// Bottom sheet for category & priority filters.
