@@ -88,26 +88,29 @@ class ProfilePage extends StatelessWidget {
             Text('Appearance', style: theme.textTheme.labelLarge),
             const SizedBox(height: 8),
             Card(
-              child: Column(
-                children: [
-                  for (final mode in ThemeMode.values)
-                    RadioListTile<ThemeMode>(
-                      value: mode,
-                      groupValue: settings.themeMode,
-                      onChanged: (value) =>
-                          value != null && settings.setThemeMode(value),
-                      title: Text(switch (mode) {
-                        ThemeMode.system => 'Match system',
-                        ThemeMode.light => 'Light',
-                        ThemeMode.dark => 'Dark',
-                      }),
-                      secondary: Icon(switch (mode) {
-                        ThemeMode.system => Icons.brightness_auto_outlined,
-                        ThemeMode.light => Icons.light_mode_outlined,
-                        ThemeMode.dark => Icons.dark_mode_outlined,
-                      }),
-                    ),
-                ],
+              child: RadioGroup<ThemeMode>(
+                groupValue: settings.themeMode,
+                onChanged: (value) {
+                  if (value != null) settings.setThemeMode(value);
+                },
+                child: Column(
+                  children: [
+                    for (final mode in ThemeMode.values)
+                      RadioListTile<ThemeMode>(
+                        value: mode,
+                        title: Text(switch (mode) {
+                          ThemeMode.system => 'Match system',
+                          ThemeMode.light => 'Light',
+                          ThemeMode.dark => 'Dark',
+                        }),
+                        secondary: Icon(switch (mode) {
+                          ThemeMode.system => Icons.brightness_auto_outlined,
+                          ThemeMode.light => Icons.light_mode_outlined,
+                          ThemeMode.dark => Icons.dark_mode_outlined,
+                        }),
+                      ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -141,8 +144,9 @@ class ProfilePage extends StatelessWidget {
                             }),
                           ),
                       ],
-                      onChanged: (value) =>
-                          value != null && settings.setWeekStart(value),
+                      onChanged: (value) {
+                        if (value != null) settings.setWeekStart(value);
+                      },
                     ),
                   ),
                   Divider(color: theme.colorScheme.outline, height: 1),
@@ -167,8 +171,9 @@ class ProfilePage extends StatelessWidget {
                             }),
                           ),
                       ],
-                      onChanged: (value) =>
-                          value != null && settings.setDateFormat(value),
+                      onChanged: (value) {
+                        if (value != null) settings.setDateFormat(value);
+                      },
                     ),
                   ),
                 ],
@@ -342,6 +347,7 @@ class _RemindersCardState extends State<_RemindersCard> {
               value: remindersOn,
               onChanged: (value) async {
                 await widget.settings.setRemindersEnabled(value);
+                if (!mounted) return;
                 // Re-sync existing alarms to match the new preference.
                 final tasks = context.read<TaskController>();
                 await tasks.resyncReminders();

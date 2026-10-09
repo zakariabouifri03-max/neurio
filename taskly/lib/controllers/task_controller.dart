@@ -202,6 +202,8 @@ class TaskController extends ChangeNotifier {
 
   bool get hasAnyTasks => tasks.isNotEmpty;
 
+  int get totalCompleted => StatsCalculator.totalCompleted(tasks);
+
   /// True when every task due today is finished (and there was at least one).
   bool get allTodayDone {
     final now = _clock();
