@@ -260,10 +260,10 @@ class _BurstPainter extends CustomPainter {
         progress: 1,
         color: AppColors.sunnyYellow.withValues(alpha: fade.clamp(0.0, 1.0)),
       );
-      painter.paint(
-        canvas,
-        Offset(position.dx - 9, position.dy - 9) & const Size(18, 18),
-      );
+      canvas.save();
+      canvas.translate(position.dx - 9, position.dy - 9);
+      painter.paint(canvas, const Size(18, 18));
+      canvas.restore();
     }
   }
 

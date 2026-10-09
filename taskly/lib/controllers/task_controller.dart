@@ -6,6 +6,7 @@ import '../core/utils/date_helper.dart';
 import '../logic/motivational.dart';
 import '../logic/stats_calculator.dart';
 import '../models/category.dart';
+import '../models/priority.dart';
 import '../models/task.dart';
 import '../models/task_query.dart';
 import '../data/task_repository.dart';

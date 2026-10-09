@@ -30,7 +30,7 @@ class NotificationService {
       android: AndroidInitializationSettings('ic_stat_taskly'),
     );
     await _plugin.initialize(
-      settings,
+      settings: settings,
       onDidReceiveNotificationResponse: (response) {
         final payload = response.payload;
         if (payload != null && payload.startsWith('task:')) {
@@ -48,18 +48,19 @@ class NotificationService {
 
   /// Requests POST_NOTIFICATIONS on Android 13+ (no-op earlier). Returns
   /// whether notifications are granted; null when unanswerable (tests/desktop).
-  Future<bool?> requestNotificationPermission() =>
+  Future<bool?> requestNotificationPermission() async =>
       _android?.requestNotificationsPermission();
 
-  Future<bool?> areNotificationsEnabled() =>
+  Future<bool?> areNotificationsEnabled() async =>
       _android?.areNotificationsEnabled();
 
   /// Whether the OS will let us schedule *exact* alarms right now.
-  Future<bool?> canScheduleExact() => _android?.canScheduleExactNotifications();
+  Future<bool?> canScheduleExact() async =>
+      _android?.canScheduleExactNotifications();
 
   /// Opens the system dialog/screen for granting exact-alarm access.
   /// Returns whether the permission was granted after the request.
-  Future<bool?> requestExactAlarmPermission() =>
+  Future<bool?> requestExactAlarmPermission() async =>
       _android?.requestExactAlarmsPermission();
 
   /// Schedules a reminder. Returns false if the moment already passed.
