@@ -89,7 +89,7 @@ class FlutterLocalReminderScheduler implements ReminderScheduler {
           AndroidFlutterLocalNotificationsPlugin>();
       if (android == null) return true; // non-Android: assume available
       final enabled = await android.areNotificationsEnabled();
-      return enabled;
+      return enabled ?? true; // null = undeterminable, assume OK
     } catch (e) {
       _lastError = '$e';
       return false;
