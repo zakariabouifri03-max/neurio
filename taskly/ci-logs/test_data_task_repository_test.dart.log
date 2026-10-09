@@ -1,0 +1,31 @@
+Resolving dependencies...
+Downloading packages...
+  cupertino_icons 1.0.9 (2.0.0 available)
+  dbus 0.7.15 (0.8.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.15 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+::group::✅ Passing tests
+✅ TaskRepository CRUD insert assigns a stable auto-increment id
+✅ TaskRepository CRUD tasks survive a full close + reopen (device restart proxy)
+✅ TaskRepository CRUD update persists edits
+✅ TaskRepository CRUD completion toggle persists with a timestamp
+✅ TaskRepository CRUD delete removes exactly one row and reports it
+✅ TaskRepository CRUD deleteAll clears the table
+::endgroup::
+::group::❌ TaskRepository migrations v1 databases upgrade to v2 and keep every task (failed)
+Expected: not null
+  Actual: <null>
+
+package:matcher                                     expect
+package:flutter_test/src/widget_tester.dart 473:18  expect
+test/data/task_repository_test.dart 135:7           main.<fn>.<fn>
+::endgroup::
+::group::✅ Passing tests
+✅ TaskRepository migrations fresh databases are created directly at v2
+::endgroup::
+
+::error::7 tests passed, 1 failed.

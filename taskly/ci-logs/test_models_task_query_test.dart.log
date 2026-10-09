@@ -1,0 +1,30 @@
+Resolving dependencies...
+Downloading packages...
+  cupertino_icons 1.0.9 (2.0.0 available)
+  dbus 0.7.15 (0.8.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.15 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+::group::✅ Passing tests
+✅ TaskQuery filters all returns every task
+✅ TaskQuery filters today includes open tasks due today and done-today completions
+✅ TaskQuery filters upcoming returns only open future tasks
+✅ TaskQuery filters overdue returns only open past tasks
+✅ TaskQuery filters completed returns finished tasks
+✅ TaskQuery search matches titles case-insensitively
+✅ TaskQuery search matches descriptions too
+✅ TaskQuery search search composes with filters
+✅ TaskQuery attribute filters by category
+✅ TaskQuery attribute filters by priority
+✅ TaskQuery sorting due date ascending, null-aware
+✅ TaskQuery sorting priority puts high first
+✅ TaskQuery sorting alphabetical
+✅ TaskQuery sorting created date descending-ish deterministic
+✅ TaskQuery metadata hasActiveFilters reflects state
+✅ TaskQuery metadata copyWith can reset nullable fields
+::endgroup::
+
+🎉 16 tests passed.

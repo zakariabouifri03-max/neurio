@@ -1,0 +1,37 @@
+Resolving dependencies...
+Downloading packages...
+  cupertino_icons 1.0.9 (2.0.0 available)
+  dbus 0.7.15 (0.8.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.15 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+::group::✅ Passing tests
+✅ StatsCalculator.dailyProgress empty day reports nothing
+✅ StatsCalculator.dailyProgress counts completed today against open due today
+✅ StatsCalculator.dailyProgress all done when nothing open remains for today
+✅ StatsCalculator.dailyProgress completion must be today to count
+✅ StatsCalculator.weeklyCompleted buckets by week start (Sunday)
+::endgroup::
+::group::❌ StatsCalculator.weeklyCompleted Monday start shifts the buckets (failed)
+Expected: <1>
+  Actual: <0>
+
+package:matcher                                     expect
+package:flutter_test/src/widget_tester.dart 473:18  expect
+test/logic/stats_calculator_test.dart 102:7         main.<fn>.<fn>
+::endgroup::
+::group::✅ Passing tests
+✅ StatsCalculator.weeklyCompleted labels align with buckets
+✅ StatsCalculator.category counts completedByCategory skips empty categories
+✅ StatsCalculator.category counts openByCategory counts only open tasks
+✅ StatsCalculator.category counts totalCompleted
+✅ StatsCalculator.weeklyTrend difference is honest
+✅ Motivational lines blank canvas when there is nothing scheduled
+✅ Motivational lines celebration when everything is done
+✅ Motivational lines line is stable within the hour (no flicker)
+::endgroup::
+
+::error::13 tests passed, 1 failed.

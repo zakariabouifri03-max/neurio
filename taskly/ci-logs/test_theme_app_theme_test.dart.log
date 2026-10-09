@@ -1,0 +1,20 @@
+Resolving dependencies...
+Downloading packages...
+  cupertino_icons 1.0.9 (2.0.0 available)
+  dbus 0.7.15 (0.8.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.15 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+::group::✅ Passing tests
+✅ AppTheme light theme uses the cozy cream palette
+✅ AppTheme dark theme uses deep plum surfaces, never pure black
+✅ AppTheme fonts are the rounded brand font
+✅ AppTheme text contrast survives in both themes
+✅ AppTheme both themes define an accessible error color
+✅ AppTheme theme mode mapping stays intact
+::endgroup::
+
+🎉 6 tests passed.

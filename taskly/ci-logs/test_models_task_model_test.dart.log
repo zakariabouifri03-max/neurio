@@ -1,0 +1,22 @@
+Resolving dependencies...
+Downloading packages...
+  cupertino_icons 1.0.9 (2.0.0 available)
+  dbus 0.7.15 (0.8.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.15 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+::group::✅ Passing tests
+✅ Task model round-trips through its database map
+✅ Task model insert map omits the id so SQLite assigns one
+✅ Task model copyWith can clear nullable fields with sentinels
+✅ Task model isOverdue only counts open past tasks
+✅ Task model dueDateTime combines date and minutes
+✅ Task model category parsing is safe for unknown keys
+✅ Task model priority parsing is safe for unknown values
+✅ Task model midnight storage is stable through DateHelper
+::endgroup::
+
+🎉 8 tests passed.

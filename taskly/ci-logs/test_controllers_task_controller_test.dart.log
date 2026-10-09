@@ -1,0 +1,65 @@
+Resolving dependencies...
+Downloading packages...
+  cupertino_icons 1.0.9 (2.0.0 available)
+  dbus 0.7.15 (0.8.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.15 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+::group::❌ TaskController addTask stores and exposes the task, syncs reminders (failed)
+Expected: an object with length of <1>
+  Actual: []
+   Which: has length of <0>
+
+package:matcher                                     expect
+package:flutter_test/src/widget_tester.dart 473:18  expect
+test/controllers/task_controller_test.dart 56:7     main.<fn>.<fn>
+::endgroup::
+::group::❌ TaskController toggleComplete flips state and updates honest stats (failed)
+Expected: <1>
+  Actual: <0>
+
+package:matcher                                     expect
+package:flutter_test/src/widget_tester.dart 473:18  expect
+test/controllers/task_controller_test.dart 79:7     main.<fn>.<fn>
+::endgroup::
+::group::✅ Passing tests
+✅ TaskController updateTask persists edits and keeps reminders in sync
+::endgroup::
+::group::❌ TaskController deleteTask removes and cancels the reminder (failed)
+Expected: an object with length of <1>
+  Actual: []
+   Which: has length of <0>
+
+package:matcher                                     expect
+package:flutter_test/src/widget_tester.dart 473:18  expect
+test/controllers/task_controller_test.dart 135:7    main.<fn>.<fn>
+::endgroup::
+::group::❌ TaskController todayUpNext orders overdue first, then by time (failed)
+Expected: ['Yesterday', 'This morning', 'Later today']
+  Actual: []
+   Which: at location [0] is [] which shorter than expected
+
+package:matcher                                     expect
+package:flutter_test/src/widget_tester.dart 473:18  expect
+test/controllers/task_controller_test.dart 170:7    main.<fn>.<fn>
+::endgroup::
+::group::❌ TaskController query applies search/filter/sort over stored data (failed)
+Expected: ['Alpha']
+  Actual: MappedListIterable<Task, String>:[]
+   Which: at location [0] is MappedListIterable<Task, String>:[] which shorter than expected
+
+package:matcher                                     expect
+package:flutter_test/src/widget_tester.dart 473:18  expect
+test/controllers/task_controller_test.dart 189:7    main.<fn>.<fn>
+::endgroup::
+::group::✅ Passing tests
+✅ TaskController double load is safe (no duplicate work)
+::endgroup::
+::group::✅ TaskController repository failure surfaces a friendly error, not a crash
+Taskly: failed to load tasks: SqfliteFfiException(sqlite_error: 14, , open_failed: SqliteException(14): while opening the database, unable to open database file, unable to open database file (code 14)}) DatabaseException(open_failed: SqliteException(14): while opening the database, unable to open database file, unable to open database file (code 14))
+::endgroup::
+
+::error::3 tests passed, 5 failed.

@@ -1,0 +1,28 @@
+Resolving dependencies...
+Downloading packages...
+  cupertino_icons 1.0.9 (2.0.0 available)
+  dbus 0.7.15 (0.8.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.15 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+::group::✅ Passing tests
+✅ DateHelper basics startOfDay strips the time
+✅ DateHelper basics isSameDay compares calendar days only
+✅ DateHelper basics friendly day labels
+✅ DateHelper basics formatMinutes renders a 12-hour clock
+✅ DateHelper formats mdy / dmy / ymd
+✅ DateHelper formats friendlyDate prefers relative words
+✅ DateHelper month math daysInMonth is leap-year aware
+✅ DateHelper month math addMonths clamps overflow days
+✅ DateHelper weeks startOfWeek honors Sunday start
+✅ DateHelper weeks startOfWeek honors Monday start
+✅ DateHelper weeks startOfWeek honors Saturday start
+✅ DateHelper weeks weekdayLabels order matches the chosen start
+✅ DateHelper weeks leadingBlanks aligns the grid
+✅ DateHelper weeks calendar math across a leap February
+::endgroup::
+
+🎉 14 tests passed.
