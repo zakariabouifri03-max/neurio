@@ -75,22 +75,37 @@ jobs:
             exit $code
           fi
 
-      - name: Run tests
+      - name: Run tests (per-file, bounded, annotated)
         run: |
           set +e
           set +o pipefail
-          flutter test --timeout 60s 2>&1 | tee /tmp/test.log
-          code=${PIPESTATUS[0]}
-          if [ $code -ne 0 ]; then
-            echo "### flutter test" > $GITHUB_STEP_SUMMARY
+          overall=0
+          > /tmp/test.log
+          for f in $(find test -name '*_test.dart' | sort); do
+            echo "::notice::RUNNING $f"
+            timeout 360 flutter test "$f" --timeout 90s > "/tmp/$(basename $f).log" 2>&1
+            code=$?
+            cat "/tmp/$(basename $f).log" >> /tmp/test.log
+            if [ $code -eq 124 ]; then
+              echo "::error::TIMEOUT running $f"
+              overall=1
+            elif [ $code -ne 0 ]; then
+              echo "::error::FAILED $f"
+              tail -40 "/tmp/$(basename $f).log" | while IFS= read -r line; do
+                safe=$(printf '%s' "$line" | tr -d '\r%')
+                echo "::error::${safe:0:500}"
+              done
+              overall=1
+            else
+              echo "::notice::PASSED $f"
+            fi
+          done
+          if [ $overall -ne 0 ]; then
+            echo "### flutter test (failures)" > $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             tail -c 60000 /tmp/test.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            grep -E "^(\\d+:|Expected:|Actual:|Which:|\\s*(Expected|Actual|Which)|.*(Exception|FAILED|failed))" /tmp/test.log | tail -20 | while IFS= read -r line; do
-              safe=$(printf '%s' "$line" | tr -d '\r%')
-              echo "::error::${safe:0:500}"
-            done
-            exit $code
+            exit $overall
           fi
 
       - name: Upload coverage summary
