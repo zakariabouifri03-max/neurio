@@ -53,6 +53,7 @@ void main() {
   tearDown(() async => database.close());
 
   Future<void> pumpApp(WidgetTester tester) async {
+    TasklyApp.splashDuration = Duration.zero;
     final preferences = await PreferencesStore.init();
     await tester.pumpWidget(buildTestApp(
       dao: TaskDao(database),
@@ -67,7 +68,13 @@ void main() {
   testWidgets('first launch shows onboarding, skip lands on empty home',
       (tester) async {
     await pumpApp(tester);
-    expect(find.byType(OnboardingScreen), findsOneWidget);
+    final visibleTexts = find
+        .byType(Text)
+        .evaluate()
+        .map((e) => (e.widget as Text).data ?? '')
+        .toList();
+    expect(find.byType(OnboardingScreen), findsOneWidget,
+        reason: 'visible texts: $visibleTexts');
     expect(find.text('Skip'), findsOneWidget);
 
     await tester.tap(find.text('Skip'));

@@ -81,6 +81,9 @@ jobs:
           {
             echo "ci: taskly run ${{ github.run_id }} reports"
             echo
+            echo "VISIBLE TREE HINT:"
+            grep -m3 -A3 'visible texts' taskly/test-report.txt || echo "(none)"
+            echo
             echo "EXCEPTION MESSAGES:"
             grep -A8 'EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK' taskly/test-report.txt | head -n 80 || echo "(none)"
             echo

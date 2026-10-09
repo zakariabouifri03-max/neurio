@@ -13,6 +13,10 @@ import 'state/tasks_store.dart';
 class TasklyApp extends StatelessWidget {
   const TasklyApp({super.key});
 
+  /// Overridable so tests (and reduced-motion users) can skip the splash
+  /// wait entirely.
+  static Duration splashDuration = const Duration(milliseconds: 950);
+
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsStore>();
@@ -52,9 +56,8 @@ class _RootGateState extends State<_RootGate> {
   void initState() {
     super.initState();
     final reduced = AppMotion.reducedMotion(context);
-    Future<void>.delayed(
-        reduced ? const Duration(milliseconds: 150) : const Duration(milliseconds: 950),
-        () {
+    final wait = reduced ? Duration.zero : TasklyApp.splashDuration;
+    Future<void>.delayed(wait, () {
       if (mounted) setState(() => _splashDone = true);
     });
     // Load tasks right after the first frame so no listener is
