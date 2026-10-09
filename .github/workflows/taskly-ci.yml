@@ -3,7 +3,13 @@ name: Taskly CI
 on:
   push:
     branches: ["**"]
+    paths:
+      - "taskly/**"
+      - ".github/workflows/taskly-ci.yml"
   pull_request:
+    paths:
+      - "taskly/**"
+      - ".github/workflows/taskly-ci.yml"
   workflow_dispatch:
 
 jobs:
