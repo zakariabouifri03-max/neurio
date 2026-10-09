@@ -73,6 +73,25 @@ jobs:
           git commit -m "ci: failure log for run ${{ github.run_id }}" || true
           git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}" || true
 
+      - name: Commit run summary (test + analyze tails)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "ci: taskly run ${{ github.run_id }} reports"
+            echo
+            echo "TEST REPORT TAIL:"
+            tail -n 25 taskly/test-report.txt || echo "(none)"
+            echo
+            echo "ANALYZE REPORT TAIL:"
+            tail -n 12 taskly/analyze-report.txt || echo "(none)"
+          } > /tmp/summary.txt
+          git config user.name "taskly-ci"
+          git config user.email "ci@users.noreply.github.com"
+          git commit --allow-empty -F /tmp/summary.txt || true
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}" || true
+
       - name: Publish direct-download release
         env:
           GH_TOKEN: ${{ github.token }}
