@@ -67,6 +67,10 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             head -c 60000 /tmp/analyze.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
+            head -25 /tmp/analyze.log | while IFS= read -r line; do
+              safe=$(printf '%s' "$line" | tr -d '\r%')
+              echo "::error::${safe:0:240}"
+            done
             exit $code
           fi
 
@@ -81,6 +85,10 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             tail -c 60000 /tmp/test.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -E "^(\\d+:|Expected:|Actual:|Which:|\\s*(Expected|Actual|Which)|.*(Exception|FAILED|failed))" /tmp/test.log | tail -20 | while IFS= read -r line; do
+              safe=$(printf '%s' "$line" | tr -d '\r%')
+              echo "::error::${safe:0:240}"
+            done
             exit $code
           fi
 
