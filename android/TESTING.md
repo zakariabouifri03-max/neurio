@@ -2,7 +2,7 @@
 
 ## Current test result
 
-No Android build or hardware result is claimed by this repository snapshot. The available coding environment has no Java/JDK, Gradle, Android SDK, emulator, Android phone, or Smart TV. Run the automated tests and the matrix below in Android Studio/on-device before any release claim.
+On 2026-10-09, GitHub Actions run [37911393106](https://github.com/zakariabouifri03-max/neurio/actions/runs/37911393106) successfully completed `:app:testDebugUnitTest` and `:app:assembleDebug` for commit `62e3bcbc4b484f1adfa70261a6ebe539704dca36` using JDK 17 and Android SDK 35. The APK is a debug build. This confirms CI compilation, assembly, and JVM unit tests only; **no phone/TV hardware, receiver interoperability, or end-to-end performance test has been run**. See the Actions run for the downloadable 30-day debug artifact; a separately labeled GitHub pre-release is created only on an explicitly named publish commit.
 
 ## Automated tests
 

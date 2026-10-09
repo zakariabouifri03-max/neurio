@@ -49,6 +49,6 @@ The UI reports actual encoder FPS, dimensions, and bitrate where available. Comp
 
 ## Verification status and hardware limits
 
-Automated unit tests are included for resolution sizing/adaptation, H.264/RTP fragmentation and reassembly, and MPEG-TS/HLS segment generation. The checked-out agent environment has no JDK, Gradle installation, Android SDK, emulator, or attached Android/TV hardware; therefore **APK assembly, Gradle tests, device tests, and receiver interoperability were not run here**. Do not treat the source project as a verified release until it is built and tested on real hardware.
+Automated unit tests cover resolution sizing/adaptation, H.264/RTP fragmentation and reassembly, and MPEG-TS/HLS segment generation. GitHub Actions run [37911393106](https://github.com/zakariabouifri03-max/neurio/actions/runs/37911393106) passed these JVM tests and assembled the debug APK with JDK 17 and SDK 35. The checked-out agent environment itself has no JDK, Gradle installation, or Android SDK, and **no phone/TV device test, receiver interoperability test, or measured end-to-end performance result exists**. Do not treat the debug build as a hardware-verified release.
 
 Use [TESTING.md](TESTING.md) for the required device/network test matrix. Results should be recorded from real devices, not estimated. Encoder throughput, thermals, 60 FPS, Cast compatibility, and HLS buffering vary by model and Wi-Fi topology.

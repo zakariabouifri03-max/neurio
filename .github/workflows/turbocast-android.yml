@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-debug-apk:
@@ -61,9 +61,22 @@ jobs:
           fi
 
       - name: Upload debug APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: turbocast60-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish pre-release APK when explicitly requested
+        if: success() && github.event_name == 'push' && github.event.head_commit.message == 'Publish TurboCast 60 debug APK'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create turbocast60-debug-20261009 \
+            android/app/build/outputs/apk/debug/app-debug.apk \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "TurboCast 60 Debug APK (CI build)" \
+            --notes "Debug-only pre-release. CI unit tests and APK assembly passed for commit $GITHUB_SHA. No phone/TV end-to-end or hardware compatibility tests have been performed. Package ID: com.turbocast60.debug." \
+            --prerelease
