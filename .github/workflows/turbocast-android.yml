@@ -48,10 +48,11 @@ jobs:
             {
               echo '### Gradle failure details'
               echo '```text'
-              tail -n 80 gradle-build.log
+              grep -E -A 8 -B 2 '(^e:|error:|^FAILURE:|What went wrong:|Execution failed for task|Could not resolve)' gradle-build.log | head -n 50
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
-            details=$(tail -n 80 gradle-build.log)
+            details=$(grep -E -A 8 -B 2 '(^e:|error:|^FAILURE:|What went wrong:|Execution failed for task|Could not resolve)' gradle-build.log | head -n 50)
+            if [ -z "$details" ]; then details=$(sed -n '/^FAILURE:/,$p' gradle-build.log | head -n 30); fi
             details=${details//'%'/'%25'}
             details=${details//$'\r'/'%0D'}
             details=${details//$'\n'/'%0A'}
