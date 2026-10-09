@@ -48,10 +48,14 @@ jobs:
             {
               echo '### Gradle failure details'
               echo '```text'
-              grep -E '(^e:|error:|^FAILURE:|What went wrong:|Execution failed for task|Could not resolve|Unresolved reference|^> )' gradle-build.log | tail -n 60
+              tail -n 80 gradle-build.log
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
-            while IFS= read -r line; do echo "::error::$line"; done < <(grep -E '(^e:|error:|^FAILURE:|What went wrong:|Execution failed for task|Could not resolve|Unresolved reference|^> )' gradle-build.log | tail -n 60)
+            details=$(tail -n 80 gradle-build.log)
+            details=${details//'%'/'%25'}
+            details=${details//$'\r'/'%0D'}
+            details=${details//$'\n'/'%0A'}
+            echo "::error title=Gradle failure details::$details"
             exit "$result"
           fi
 
