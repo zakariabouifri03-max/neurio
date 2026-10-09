@@ -12,6 +12,7 @@ import '../logic/stats_calculator.dart';
 import '../models/task.dart';
 import '../app/routes.dart';
 import 'shell.dart';
+import '../widgets/task_tile.dart';
 import 'stats_page.dart';
 import 'task_editor_page.dart';
 
@@ -34,7 +35,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final settings = context.watch<SettingsController>();
     final controller = context.watch<TaskController>();
     final now = DateTime.now();
@@ -125,7 +125,7 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                 ),
-              SizedBox(height: theme.padding.bottom + 8),
+              SizedBox(height: MediaQuery.paddingOf(context).bottom + 8),
             ],
           ),
         ),

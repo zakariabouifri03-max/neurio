@@ -45,6 +45,12 @@ abstract interface class ReminderScheduler {
   Future<void> resyncAll(List<Task> tasks, {required DateTime now});
 
   Future<ReminderDiagnostics> diagnostics();
+
+  /// Opens the OS notification settings for Taskly (deep link).
+  Future<void> openNotificationSettings();
+
+  /// Asks Android for exact-alarm access when supported.
+  Future<void> requestExactAlarms();
 }
 
 /// Production implementation on top of [NotificationService].

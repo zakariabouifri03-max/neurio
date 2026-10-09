@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../controllers/settings_controller.dart';
 import '../core/theme/app_colors.dart';
-import '../core/theme/app_theme.dart';
 import '../core/widgets/common.dart';
 import 'shell.dart';
 
@@ -34,7 +33,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
         transitionDuration: const Duration(milliseconds: 260),
-        pageBuilder: (_, animation, __) => FadeTransition(
+        pageBuilder: (_, animation, _) => FadeTransition(
           opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
           child: const MainShell(),
         ),

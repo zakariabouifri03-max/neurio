@@ -54,7 +54,6 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final settings = context.watch<SettingsController>();
     final controller = context.watch<TaskController>();
     final now = DateTime.now();
