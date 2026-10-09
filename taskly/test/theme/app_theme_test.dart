@@ -30,8 +30,8 @@ void main() {
     });
 
     test('fonts are the rounded brand font', () {
-      expect(light.fontFamily, 'Nunito');
-      expect(dark.fontFamily, 'Nunito');
+      expect(light.textTheme.bodyLarge?.fontFamily, 'Nunito');
+      expect(dark.textTheme.bodyLarge?.fontFamily, 'Nunito');
     });
 
     test('text contrast survives in both themes', () {

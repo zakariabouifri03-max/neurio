@@ -69,7 +69,7 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             grep -E "error .|warning .|info ." /tmp/analyze.log | head -25 | while IFS= read -r line; do
               safe=$(printf '%s' "$line" | tr -d '\r%')
-              echo "::error::${safe:0:240}"
+              echo "::error::${safe:0:500}"
             done
             exit $code
           fi
@@ -87,7 +87,7 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             grep -E "^(\\d+:|Expected:|Actual:|Which:|\\s*(Expected|Actual|Which)|.*(Exception|FAILED|failed))" /tmp/test.log | tail -20 | while IFS= read -r line; do
               safe=$(printf '%s' "$line" | tr -d '\r%')
-              echo "::error::${safe:0:240}"
+              echo "::error::${safe:0:500}"
             done
             exit $code
           fi

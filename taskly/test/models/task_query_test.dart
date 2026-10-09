@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:taskly/models/category.dart';
 import 'package:taskly/models/priority.dart';
-import 'package:taskly/models/task.dart';
 import 'package:taskly/models/task_query.dart';
 
 import '../helpers/fixtures.dart';
