@@ -101,6 +101,14 @@ Made with ❤️ and Three.js
 
 ---
 
+## 📺 TurboCast 60 — native Android screen mirroring
+
+A separate Kotlin/Jetpack Compose Android project is in [`android/`](android/). It contains a user-consented MediaProjection sender, MediaCodec H.264 encoder, encrypted LAN streaming to the included Android TV companion receiver mode, and official Google Cast SDK integration for live HLS on compatible Cast receivers.
+
+A normal TV is **not** automatically compatible: use Google Cast/Chromecast hardware or install the TurboCast app in Receiver Mode on an Android TV/Google TV device. Build requirements, protocol architecture, current verification limits, and a device test matrix are documented in [`android/README.md`](android/README.md) and [`android/TESTING.md`](android/TESTING.md).
+
+---
+
 ## 📦 `BashBaqiRacing.apk` — ملف جاهز!
 
 A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
