@@ -22,14 +22,14 @@ class _NotificationSettingsScreenState
   bool _enabled = false;
   bool _checking = true;
   String? _note;
+  late final ReminderScheduler _scheduler;
 
   @override
   void initState() {
     super.initState();
+    _scheduler = context.read<ReminderScheduler>();
     _refresh();
   }
-
-  ReminderScheduler get _scheduler => context.read<ReminderScheduler>();
 
   Future<void> _refresh() async {
     final enabled = await _scheduler.areNotificationsEnabled();
@@ -49,6 +49,7 @@ class _NotificationSettingsScreenState
 
   Future<void> _toggleReminders(bool value) async {
     final settings = context.read<SettingsStore>();
+    // `settings` is captured before any await below.
     if (value) {
       final permission = await _scheduler.requestPermission();
       if (permission == ReminderPermission.denied) {
