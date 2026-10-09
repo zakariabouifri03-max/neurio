@@ -65,9 +65,13 @@ jobs:
           {
             echo "Taskly CI failure — run ${{ github.run_id }}"
             echo "-----"
-            tail -n 150 taskly/build.log || true
+            tail -n 200 taskly/build.log || true
           } > ci-failure.txt
-          gh gist create ci-failure.txt --desc "taskly ci failure run ${{ github.run_id }}" || true
+          git config user.name "taskly-ci"
+          git config user.email "ci@users.noreply.github.com"
+          git add ci-failure.txt
+          git commit -m "ci: failure log for run ${{ github.run_id }}" || true
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}" || true
 
       - name: Publish direct-download release
         env:
