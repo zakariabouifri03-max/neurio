@@ -112,7 +112,6 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = AppTheme.paletteOf(context);
     return Row(
       children: <Widget>[
         Expanded(

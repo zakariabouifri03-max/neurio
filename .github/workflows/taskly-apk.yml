@@ -81,11 +81,14 @@ jobs:
           {
             echo "ci: taskly run ${{ github.run_id }} reports"
             echo
-            echo "TEST REPORT TAIL:"
-            tail -n 25 taskly/test-report.txt || echo "(none)"
+            echo "FIRST FAILURE BLOCKS:"
+            grep -B60 -m2 '\[E\]' taskly/test-report.txt | tail -n 150 || echo "(none)"
             echo
-            echo "ANALYZE REPORT TAIL:"
-            tail -n 12 taskly/analyze-report.txt || echo "(none)"
+            echo "REPO MIGRATION FAILURE:"
+            grep -A30 'schema migration v1' taskly/test-report.txt | head -n 40 || echo "(none)"
+            echo
+            echo "FAILING LIST:"
+            sed -n '/Failing tests:/,$p' taskly/test-report.txt || echo "(none)"
           } > /tmp/summary.txt
           git config user.name "taskly-ci"
           git config user.email "ci@users.noreply.github.com"
