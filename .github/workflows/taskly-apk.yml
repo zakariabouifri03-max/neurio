@@ -53,7 +53,21 @@ jobs:
 
       - name: Build release APK (debug-signed, installable)
         working-directory: taskly
-        run: flutter build apk --release
+        run: |
+          set -o pipefail
+          flutter build apk --release 2>&1 | tee build.log
+
+      - name: Publish failure tail (readable from anywhere)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "Taskly CI failure — run ${{ github.run_id }}"
+            echo "-----"
+            tail -n 150 taskly/build.log || true
+          } > ci-failure.txt
+          gh gist create ci-failure.txt --desc "taskly ci failure run ${{ github.run_id }}" || true
 
       - name: Publish direct-download release
         env:

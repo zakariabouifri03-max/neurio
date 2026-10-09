@@ -58,3 +58,4 @@ app.*.map.json
 # CI report artifacts
 taskly/analyze-report.txt
 taskly/test-report.txt
+taskly/build.log

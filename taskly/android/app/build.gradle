@@ -10,6 +10,17 @@ if (keystorePropertiesFile.exists()) {
     keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
 }
 
+// Version info comes from pubspec via the Flutter tool; fall back safely
+// if the extension is unavailable in unusual Gradle invocations.
+def tasklyVersionCode = 1
+def tasklyVersionName = "1.0.0"
+try {
+    tasklyVersionCode = flutter.versionCode as int
+    tasklyVersionName = flutter.versionName as String
+} catch (ignored) {
+    logger.warn("Taskly: flutter version properties unavailable, using defaults")
+}
+
 android {
     namespace "com.taskly.app"
     compileSdk 36
@@ -31,8 +42,8 @@ android {
         applicationId "com.taskly.app"
         minSdk 23
         targetSdk 36
-        versionCode flutter.versionCode
-        versionName flutter.versionName
+        versionCode tasklyVersionCode
+        versionName tasklyVersionName
     }
 
     signingConfigs {
