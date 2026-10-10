@@ -6,8 +6,10 @@ offline on modest hardware (8 GB RAM, integrated graphics); online AI features a
 
 > **Status: first working release (0.1.0).** The backend (timeline, FFmpeg rendering, photo layers, converters, audio,
 > subtitles, projects, autosave, secrets handling, assistant) is covered by automated tests that run real FFmpeg and Pillow
-> operations. The Qt user interface is included but **was not exercised interactively in the build sandbox** (no display
-> libraries were available there); the Windows CI workflow starts the packaged app as a smoke test. See
+> operations. The Windows CI run on the session branch (GitHub Actions run 38043026914) passed the tests, the PyInstaller
+> build, a 20-second startup smoke test of the packaged app, and the Inno Setup installer build. The Qt user interface
+> was **not exercised interactively** anywhere (the build sandbox has no display libraries), so button-level behaviour is
+> unverified; the smoke test only checks that the app stays running. See
 > [docs/FEATURES.md](docs/FEATURES.md) for an exact list of what works, what is partial and what is not implemented.
 
 ## Install (end users)
@@ -61,7 +63,7 @@ Steps performed by the build:
 * **Photo & Design**: layers (raster, text, shape, adjustment), brush and eraser, rectangular selection, crop, rotate,
   canvas resize, curves/brightness/contrast/saturation/hue, filters, text outline and shadow, background removal
   (GrabCut, box-guided), object removal (inpainting), layer masks, before/after view, undo/redo, project save (`.adzimg`),
-  export to PNG, JPG, WebP, BMP, TIFF and PDF with quality and size options. Design templates: YouTube thumbnail,
+  export to PNG, JPG, WebP, BMP, TIFF and PDF with quality and size options. Design templates (preset sizes, not yet covered by tests): YouTube thumbnail,
   channel banner, Instagram post/story, A4 poster, A5 flyer, T-shirt print (transparent), logo, product image.
 * **Media Converter**: video, audio and image conversion, video and image compression, batch resize, batch rename with
   preview, GIF from video or images, frame extraction, thumbnails, SRT ↔ VTT subtitle conversion with timing shift,

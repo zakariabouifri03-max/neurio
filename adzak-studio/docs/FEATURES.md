@@ -61,7 +61,7 @@ Status legend: ✅ implemented and covered by automated tests · 🟨 implemente
 | Before / after comparison | 🟨 | toggle in UI |
 | PNG transparency; JPG, PNG, WebP, BMP, TIFF, PDF export with quality and scale | ✅ | export tests |
 | SVG export | ⛔ | explicitly refused with a message |
-| Design templates (YouTube thumbnail, banner, social, poster, flyer, T-shirt, logo, product) | ✅ | sizes defined in `DESIGN_TEMPLATES` |
+| Design templates (YouTube thumbnail, banner, social, poster, flyer, T-shirt, logo, product) | 🟨 | preset canvas sizes defined in `DESIGN_TEMPLATES` (`ui/pages_image.py`); no automated test, no dedicated design module |
 | Brand kit | 🟨 | colours and font stored in settings; not yet applied automatically |
 
 ## Media Converter and Utilities
@@ -127,8 +127,9 @@ exports), `test_converters_audio.py` (converters, compressor, batch tools, GIF, 
 `test_core.py` (database, projects, autosave, history, redaction, secrets, i18n, assistant, provider error mapping,
 capability labels, presets).
 
-Windows: the CI workflow runs the same suite on `windows-latest` before building the installer.
-UI: not covered by automated tests in this release.
+Windows: the CI workflow (`.github/workflows/adzak-windows.yml`) runs the same suite on `windows-latest` before building the installer.
+Latest passing CI run on the session branch (GitHub Actions run 38043026914): tests, PyInstaller build, 20-second startup smoke test of the packaged app, and Inno Setup installer build (about 196 MB artifact) all succeeded.
+UI: not covered by automated tests in this release; the smoke test only checks that the packaged app stays running. Interactive UI behaviour has not been verified.
 
 ## Dependencies and licences
 
