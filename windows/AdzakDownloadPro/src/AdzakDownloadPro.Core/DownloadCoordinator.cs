@@ -883,6 +883,7 @@ public sealed class DownloadCoordinator : IAsyncDisposable
         var received = 0L;
         var lastCheckpoint = 0L;
         var speed = new SpeedWindow();
+        using var hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
 
         try
         {
@@ -894,13 +895,14 @@ public sealed class DownloadCoordinator : IAsyncDisposable
                     break;
 
                 await file.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+                hasher.AppendData(buffer, 0, read);
                 received += read;
                 speed.Add(read);
                 PublishSpeed(id, speed.GetBytesPerSecond());
 
                 if (received - lastCheckpoint >= _options.CheckpointSizeBytes)
                 {
-                    await CommitFullTransferAsync(id, file, path, received, expectedTotal).ConfigureAwait(false);
+                    await CommitFullTransferAsync(id, file, path, received, expectedTotal, hasher).ConfigureAwait(false);
                     lastCheckpoint = received;
                 }
                 if (expectedTotal is { } total && received > total)
@@ -909,23 +911,23 @@ public sealed class DownloadCoordinator : IAsyncDisposable
         }
         catch (OperationCanceledException)
         {
-            await CommitFullTransferAsync(id, file, path, received, expectedTotal).ConfigureAwait(false);
+            await CommitFullTransferAsync(id, file, path, received, expectedTotal, hasher).ConfigureAwait(false);
             throw;
         }
         catch (DownloadException)
         {
-            await CommitFullTransferAsync(id, file, path, received, expectedTotal).ConfigureAwait(false);
+            await CommitFullTransferAsync(id, file, path, received, expectedTotal, hasher).ConfigureAwait(false);
             throw;
         }
         catch (HttpRequestException exception)
         {
-            await CommitFullTransferAsync(id, file, path, received, expectedTotal).ConfigureAwait(false);
+            await CommitFullTransferAsync(id, file, path, received, expectedTotal, hasher).ConfigureAwait(false);
             throw new DownloadException("Connection interrupted while receiving the full response: " + exception.Message,
                 isTransient: true);
         }
         catch (IOException exception)
         {
-            await CommitFullTransferAsync(id, file, path, received, expectedTotal).ConfigureAwait(false);
+            await CommitFullTransferAsync(id, file, path, received, expectedTotal, hasher).ConfigureAwait(false);
             throw new DownloadException("Connection interrupted while receiving the full response: " + exception.Message,
                 isTransient: true);
         }
@@ -934,12 +936,12 @@ public sealed class DownloadCoordinator : IAsyncDisposable
         file.Flush(flushToDisk: true);
         if (expectedTotal is { } advertised && advertised != received)
         {
-            await CommitFullTransferAsync(id, file, path, received, expectedTotal).ConfigureAwait(false);
+            await CommitFullTransferAsync(id, file, path, received, expectedTotal, hasher).ConfigureAwait(false);
             throw new DownloadException("The response ended before its advertised Content-Length was received.",
                 isTransient: true);
         }
 
-        var digest = await HashPrefixAsync(path, received, CancellationToken.None).ConfigureAwait(false);
+        var digest = GetHashSnapshot(hasher);
         transfer = new FullTransfer(path, received, expectedTotal ?? received, digest, IsComplete: true);
         await UpdateJobAsync(id, current => current with
         {
@@ -947,6 +949,7 @@ public sealed class DownloadCoordinator : IAsyncDisposable
             TotalBytes = received,
             CurrentSpeedBytesPerSecond = 0
         }).ConfigureAwait(false);
+        await file.DisposeAsync().ConfigureAwait(false);
         await FinalizeFullDownloadAsync(id, cancellationToken).ConfigureAwait(false);
     }
 
@@ -955,11 +958,12 @@ public sealed class DownloadCoordinator : IAsyncDisposable
         FileStream file,
         string path,
         long received,
-        long? expectedTotal)
+        long? expectedTotal,
+        IncrementalHash hasher)
     {
         await file.FlushAsync(CancellationToken.None).ConfigureAwait(false);
         file.Flush(flushToDisk: true);
-        var hash = await HashPrefixAsync(path, received, CancellationToken.None).ConfigureAwait(false);
+        var hash = GetHashSnapshot(hasher);
         await UpdateJobAsync(id, current => current with
         {
             FullTransfer = new FullTransfer(path, received, expectedTotal, hash, IsComplete: false),
@@ -967,6 +971,9 @@ public sealed class DownloadCoordinator : IAsyncDisposable
             CurrentSpeedBytesPerSecond = 0
         }).ConfigureAwait(false);
     }
+
+    private static string GetHashSnapshot(IncrementalHash hasher) =>
+        Convert.ToHexString(hasher.GetCurrentHash()).ToLowerInvariant();
 
     private async Task PromoteCompletePartialRangeAsync(Guid id)
     {
