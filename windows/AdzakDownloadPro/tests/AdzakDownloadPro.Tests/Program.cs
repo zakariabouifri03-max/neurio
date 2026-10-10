@@ -30,6 +30,15 @@ internal static class Program
             {
                 failures++;
                 Console.Error.WriteLine($"FAIL  {name}\n      {exception}");
+                var diagnostic = exception.ToString()
+                    .Replace("%", "%25", StringComparison.Ordinal)
+                    .Replace("\r", "%0D", StringComparison.Ordinal)
+                    .Replace("\n", "%0A", StringComparison.Ordinal)
+                    .Replace(":", "%3A", StringComparison.Ordinal)
+                    .Replace(",", "%2C", StringComparison.Ordinal);
+                if (diagnostic.Length > 4000)
+                    diagnostic = diagnostic[..4000];
+                Console.Error.WriteLine($"::error title=Recovery scenario failed::{diagnostic}");
             }
         }
 

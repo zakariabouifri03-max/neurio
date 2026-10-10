@@ -23,8 +23,8 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Run recovery-engine scenarios
-        shell: pwsh
-        run: ./windows/AdzakDownloadPro/tests/run-tests.ps1
+        shell: cmd
+        run: dotnet run --project windows/AdzakDownloadPro/tests/AdzakDownloadPro.Tests/AdzakDownloadPro.Tests.csproj --configuration Release
 
       - name: Publish self-contained Windows x64 app
         run: >-
