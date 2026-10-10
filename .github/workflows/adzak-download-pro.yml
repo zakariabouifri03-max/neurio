@@ -24,18 +24,7 @@ jobs:
 
       - name: Run recovery-engine scenarios
         shell: pwsh
-        run: |
-          $log = "recovery-test.log"
-          dotnet run --project windows/AdzakDownloadPro/tests/AdzakDownloadPro.Tests/AdzakDownloadPro.Tests.csproj --configuration Release 2>&1 | Tee-Object -FilePath $log
-          $testExit = $LASTEXITCODE
-          if ($testExit -ne 0) {
-            $details = (Get-Content $log -Raw) -replace "`r?`n", " | "
-            $details = $details.Replace('%', '%25').Replace(':', '%3A').Replace(',', '%2C')
-            if ($details.Length -gt 4000) { $details = $details.Substring(0, 4000) }
-            Write-Output "::error title=Recovery tests or build failed::$details"
-            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ("## Recovery test/build failure`n`n```text`n" + (Get-Content $log -Raw) + "`n```")
-          }
-          exit $testExit
+        run: ./windows/AdzakDownloadPro/tests/run-tests.ps1
 
       - name: Publish self-contained Windows x64 app
         run: >-
