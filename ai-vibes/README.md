@@ -18,6 +18,9 @@ on the audio you actually play.
 
 ## Download / install
 
+**Build status: ✅ green** — DSP unit tests pass and both APKs compile in CI
+(`AI VIBES APK` workflow, run 38056817471).
+
 The CI pipeline builds an installable APK on every push:
 
 * **Latest release APK (fixed URL):**
