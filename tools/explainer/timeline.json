@@ -1,0 +1,77 @@
+{
+  "total": 60.0,
+  "lead": 0.35,
+  "chunks": [
+    {
+      "i": 1,
+      "start": 0.35,
+      "end": 4.55,
+      "dur": 4.2,
+      "file": "/home/user/neurio/tools/explainer/narr_proc/01.wav"
+    },
+    {
+      "i": 2,
+      "start": 4.83,
+      "end": 13.19,
+      "dur": 8.36,
+      "file": "/home/user/neurio/tools/explainer/narr_proc/02.wav"
+    },
+    {
+      "i": 3,
+      "start": 13.43,
+      "end": 17.6,
+      "dur": 4.17,
+      "file": "/home/user/neurio/tools/explainer/narr_proc/03.wav"
+    },
+    {
+      "i": 4,
+      "start": 17.88,
+      "end": 24.1,
+      "dur": 6.22,
+      "file": "/home/user/neurio/tools/explainer/narr_proc/04.wav"
+    },
+    {
+      "i": 5,
+      "start": 24.34,
+      "end": 32.3,
+      "dur": 7.96,
+      "file": "/home/user/neurio/tools/explainer/narr_proc/05.wav"
+    },
+    {
+      "i": 6,
+      "start": 32.58,
+      "end": 38.75,
+      "dur": 6.17,
+      "file": "/home/user/neurio/tools/explainer/narr_proc/06.wav"
+    },
+    {
+      "i": 7,
+      "start": 38.99,
+      "end": 44.45,
+      "dur": 5.46,
+      "file": "/home/user/neurio/tools/explainer/narr_proc/07.wav"
+    },
+    {
+      "i": 8,
+      "start": 44.69,
+      "end": 51.92,
+      "dur": 7.23,
+      "file": "/home/user/neurio/tools/explainer/narr_proc/08.wav"
+    },
+    {
+      "i": 9,
+      "start": 52.2,
+      "end": 55.55,
+      "dur": 3.35,
+      "file": "/home/user/neurio/tools/explainer/narr_proc/09.wav"
+    },
+    {
+      "i": 10,
+      "start": 55.79,
+      "end": 58.5,
+      "dur": 2.71,
+      "file": "/home/user/neurio/tools/explainer/narr_proc/10.wav"
+    }
+  ],
+  "narrdir": "/home/user/neurio/tools/explainer/narr_proc"
+}

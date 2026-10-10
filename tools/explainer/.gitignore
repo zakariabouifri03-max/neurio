@@ -1,0 +1,4 @@
+narr_proc/
+audio/
+__pycache__/
+*.pyc
