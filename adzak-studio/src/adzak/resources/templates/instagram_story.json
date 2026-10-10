@@ -1,0 +1,12 @@
+{
+  "width": 1080,
+  "height": 1920,
+  "background": "#12081f",
+  "items": [
+    {"type": "ellipse", "x": 240, "y": 260, "w": 600, "h": 600, "color": "#7a5cf0", "size": 0, "outline": 0, "shadow": 0, "text": ""},
+    {"type": "text", "x": 90, "y": 980, "w": 900, "h": 260, "color": "#ffffff", "size": 96, "outline": 4, "shadow": 8, "text": "NEW VIDEO OUT NOW"},
+    {"type": "text", "x": 90, "y": 1300, "w": 900, "h": 140, "color": "#c9b8ff", "size": 48, "outline": 0, "shadow": 0, "text": "swipe up • link in bio"},
+    {"type": "rect", "x": 340, "y": 1560, "w": 400, "h": 110, "color": "#e0a63f", "size": 0, "outline": 0, "shadow": 0, "text": ""},
+    {"type": "text", "x": 340, "y": 1575, "w": 400, "h": 90, "color": "#221a05", "size": 44, "outline": 0, "shadow": 0, "text": "WATCH"}
+  ]
+}
