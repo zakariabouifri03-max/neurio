@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write
     defaults:
       run:
         working-directory: adzak-studio
@@ -55,3 +57,16 @@ jobs:
             adzak-studio/output/ADZAK-Creative-Studio-Setup.exe
             adzak-studio/test-results.xml
           if-no-files-found: error
+      - name: Publish installer to GitHub Release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          TAG="adzak-studio-latest"
+          SHA="${GITHUB_SHA}"
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --target "$SHA" --prerelease \
+            --title "ADZAK Creative Studio (test build)" \
+            --notes "Automatic Windows build from branch arena/ca9b5616-neurio. Commit ${SHA}. Unsigned build: Windows SmartScreen may warn; choose 'More info' > 'Run anyway'."
+          gh release upload "$TAG" output/ADZAK-Creative-Studio-Setup.exe --clobber
+          gh release edit "$TAG" --target "$SHA" --notes "Automatic Windows build from branch arena/ca9b5616-neurio. Commit ${SHA}. Unsigned build: Windows SmartScreen may warn; choose 'More info' > 'Run anyway'."
