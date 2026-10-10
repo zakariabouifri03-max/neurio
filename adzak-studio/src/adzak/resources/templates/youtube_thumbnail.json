@@ -1,0 +1,12 @@
+{
+  "width": 1280,
+  "height": 720,
+  "background": "#101318",
+  "items": [
+    {"type": "rect", "x": 0, "y": 560, "w": 1280, "h": 160, "color": "#3b6ef5", "size": 0, "outline": 0, "shadow": 0, "text": ""},
+    {"type": "ellipse", "x": 940, "y": 60, "w": 280, "h": 280, "color": "#e0a63f", "size": 0, "outline": 0, "shadow": 0, "text": ""},
+    {"type": "text", "x": 60, "y": 120, "w": 860, "h": 260, "color": "#ffffff", "size": 96, "outline": 6, "shadow": 12, "text": "BIG TITLE HERE"},
+    {"type": "text", "x": 60, "y": 400, "w": 760, "h": 120, "color": "#9fb4ff", "size": 44, "outline": 0, "shadow": 0, "text": "subtitle line goes here"},
+    {"type": "text", "x": 40, "y": 580, "w": 1200, "h": 120, "color": "#ffffff", "size": 56, "outline": 0, "shadow": 0, "text": "EPISODE 01  •  ADZAK STUDIO"}
+  ]
+}

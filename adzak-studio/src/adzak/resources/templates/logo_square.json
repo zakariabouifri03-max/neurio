@@ -1,0 +1,10 @@
+{
+  "width": 512,
+  "height": 512,
+  "background": "#ffffff",
+  "items": [
+    {"type": "ellipse", "x": 96, "y": 60, "w": 320, "h": 320, "color": "#3b6ef5", "size": 0, "outline": 0, "shadow": 0, "text": ""},
+    {"type": "text", "x": 96, "y": 140, "w": 320, "h": 160, "color": "#ffffff", "size": 120, "outline": 0, "shadow": 0, "text": "A"},
+    {"type": "text", "x": 56, "y": 400, "w": 400, "h": 80, "color": "#222222", "size": 56, "outline": 0, "shadow": 0, "text": "ADZAK"}
+  ]
+}

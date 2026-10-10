@@ -1,0 +1,12 @@
+{
+  "width": 1080,
+  "height": 1080,
+  "background": "#f6f2ec",
+  "items": [
+    {"type": "rect", "x": 90, "y": 90, "w": 900, "h": 900, "color": "#ffffff", "size": 0, "outline": 3, "shadow": 0, "text": ""},
+    {"type": "rect", "x": 150, "y": 700, "w": 780, "h": 220, "color": "#173f35", "size": 0, "outline": 0, "shadow": 0, "text": ""},
+    {"type": "text", "x": 170, "y": 730, "w": 740, "h": 160, "color": "#f4e9d8", "size": 64, "outline": 0, "shadow": 0, "text": "QUOTE OF THE DAY"},
+    {"type": "text", "x": 150, "y": 240, "w": 780, "h": 380, "color": "#1c1c1c", "size": 72, "outline": 0, "shadow": 0, "text": "Write something worth sharing here."},
+    {"type": "text", "x": 150, "y": 120, "w": 780, "h": 80, "color": "#b08948", "size": 40, "outline": 0, "shadow": 0, "text": "@yourhandle"}
+  ]
+}

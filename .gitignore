@@ -3,3 +3,14 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# ADZAK Creative Studio build/test artifacts
+adzak-studio/.venv/
+adzak-studio/build/
+adzak-studio/dist/
+adzak-studio/ffmpeg/
+adzak-studio/.pytest_cache/
+adzak-studio/*.egg-info/
+.venv/
+.shims/
+.pytest_cache/

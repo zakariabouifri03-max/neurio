@@ -1,0 +1,7 @@
+# Runtime dependencies (install with: pip install -r requirements.txt)
+PySide6-Essentials>=6.6
+Pillow>=10.0
+numpy>=1.26
+# Bundles a static FFmpeg build so media tools work out of the box.
+# On Windows you may instead install FFmpeg system-wide and leave this out.
+imageio-ffmpeg>=0.4.9

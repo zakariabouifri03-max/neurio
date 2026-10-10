@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adzak-creative-studio"
+version = "1.0.0"
+description = "All-in-one AI creative studio for Windows: video, photo, design, audio, animation, conversion."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "GPL-3.0-or-later" }
+authors = [{ name = "ADZAK" }]
+dependencies = [
+    "PySide6-Essentials>=6.6",
+    "Pillow>=10.0",
+    "numpy>=1.26",
+    "imageio-ffmpeg>=0.4.9; python_version >= '3.11'",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "pytest-qt>=4.2"]
+
+[project.gui-scripts]
+adzak = "adzak.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["adzak*"]
+
+[tool.setuptools.package-data]
+"adzak.resources.templates" = ["*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
