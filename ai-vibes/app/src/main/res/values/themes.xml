@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme: pure black windows, no action bar. -->
+    <style name="Theme.AiVibes" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/aivibes_black</item>
+        <item name="android:statusBarColor">@color/aivibes_black</item>
+        <item name="android:navigationBarColor">@color/aivibes_black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorAccent">@color/aivibes_purple</item>
+    </style>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI VIBES</string>
+    <string name="app_tagline">Headphone audio, reimagined</string>
+    <string name="notification_channel_name">Playback</string>
+    <string name="notification_channel_desc">Media controls while AI VIBES plays your music</string>
+</resources>

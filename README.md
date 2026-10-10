@@ -1,3 +1,15 @@
+# 🎧 AI VIBES — Android app (this branch)
+
+**Premium Android headphone audio enhancement** built with Kotlin, Jetpack Compose
+and AndroidX Media3: Bass Studio, 10-band EQ, spatial processing, dynamics,
+live visualizer and a local music player — real DSP, honest claims.
+
+* Source: [`ai-vibes/`](ai-vibes/) — full Android Studio project
+* Build & install instructions: [`ai-vibes/README.md`](ai-vibes/README.md)
+* Installable APK (CI-built): **https://github.com/zakariabouifri03-max/neurio/releases/latest/download/AI-VIBES.apk**
+
+---
+
 # 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!

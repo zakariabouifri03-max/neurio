@@ -1,0 +1,115 @@
+name: AI VIBES APK
+
+# Builds the AI VIBES Android app (ai-vibes/) with the real Android SDK,
+# runs its DSP unit tests, and publishes the installable APK as a GitHub
+# Release asset (direct download link, no sign-in needed).
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'ai-vibes/**'
+      - '.github/workflows/ai-vibes-apk.yml'
+  pull_request:
+    paths:
+      - 'ai-vibes/**'
+      - '.github/workflows/ai-vibes-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: test + assemble
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK components
+        run: |
+          echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+          SDKMANAGER="$(command -v sdkmanager || echo "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager")"
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" --install "platforms;android-34" "build-tools;34.0.0" "platform-tools" || true
+
+      - name: DSP unit tests
+        working-directory: ai-vibes
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon --console=plain :app:testDebugUnitTest
+
+      - name: Build debug APK
+        working-directory: ai-vibes
+        run: |
+          set +e
+          ./gradlew --no-daemon --stacktrace --console=plain :app:assembleDebug 2>&1 | tee "$RUNNER_TEMP/build.log"
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            {
+              echo "### Build failed"
+              echo '```'
+              grep -E "^(e: |.*error: |.*error; |error: )|\.kt:[0-9]+: |\.xml:[0-9]+: |FAILURE:|Execution failed" "$RUNNER_TEMP/build.log" | head -80
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY" || true
+            grep -E "\.kt:[0-9]+: |error: " "$RUNNER_TEMP/build.log" | head -60 | while IFS= read -r line; do
+              echo "::error ::${line}"
+            done
+            exit "$status"
+          fi
+
+      - name: Build release APK
+        working-directory: ai-vibes
+        run: ./gradlew --no-daemon --console=plain :app:assembleRelease
+
+      - name: Collect APKs
+        run: |
+          mkdir -p artifacts
+          cp -v ai-vibes/app/build/outputs/apk/debug/app-debug.apk artifacts/AI-VIBES-debug.apk
+          cp -v ai-vibes/app/build/outputs/apk/release/app-release.apk artifacts/AI-VIBES.apk
+          sha256sum artifacts/*.apk > artifacts/SHA256SUMS.txt
+          ls -la artifacts
+
+      - name: Upload APKs (workflow artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-vibes-apks
+          path: artifacts/*
+          if-no-files-found: error
+          retention-days: 90
+
+      # Rolling release with a stable download URL:
+      # https://github.com/OWNER/REPO/releases/latest/download/AI-VIBES.apk
+      - name: Publish APKs as a release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/arena/a2a293fc-neurio'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES="Installable builds of **AI VIBES** — premium Android headphone audio enhancement.
+
+          * \`AI-VIBES.apk\` — release build (debug-key signed so it installs directly via sideload)
+          * \`AI-VIBES-debug.apk\` — debug build
+          * \`SHA256SUMS.txt\` — checksums
+
+          Built from commit \`${GITHUB_SHA:0:12}\` on $(date -u '+%Y-%m-%d %H:%M UTC').
+
+          Install, open the app, grant the music permission, and play a track from your library. All processing applies to audio played inside AI VIBES (Android restriction — see the in-app Settings → Limitations card)."
+          gh release view aivibes-latest >/dev/null 2>&1 \
+            || gh release create aivibes-latest --title "AI VIBES - latest APK" \
+                 --notes "$NOTES" --target "$GITHUB_SHA"
+          gh release edit aivibes-latest --notes "$NOTES" --prerelease=false --latest
+          gh release upload aivibes-latest artifacts/* --clobber
+          {
+            echo "## Direct APK download"
+            echo "- Latest (fixed URL): https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/AI-VIBES.apk"
+            echo "- Release page: https://github.com/${GITHUB_REPOSITORY}/releases/tag/aivibes-latest"
+          } >> "$GITHUB_STEP_SUMMARY"

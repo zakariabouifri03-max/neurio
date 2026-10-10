@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- AI VIBES palette: deep black + neon purple, electric blue, cyan -->
+    <color name="aivibes_black">#FF07070B</color>
+    <color name="aivibes_deep">#FF0B0B14</color>
+    <color name="aivibes_purple">#FFB24BF3</color>
+    <color name="aivibes_blue">#FF3B82F6</color>
+    <color name="aivibes_cyan">#FF22D3EE</color>
+    <color name="aivibes_white">#FFF4F2FF</color>
+    <color name="aivibes_icon_bg">#FF0B0B14</color>
+</resources>
