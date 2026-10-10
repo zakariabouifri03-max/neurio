@@ -731,7 +731,7 @@ public sealed class DownloadCoordinator : IAsyncDisposable
             partialRange.Path,
             FileMode.OpenOrCreate,
             FileAccess.ReadWrite,
-            FileShare.Read,
+            FileShare.ReadWrite,
             bufferSize: 128 * 1024,
             options: FileOptions.Asynchronous | FileOptions.SequentialScan);
 
@@ -876,7 +876,7 @@ public sealed class DownloadCoordinator : IAsyncDisposable
             path,
             FileMode.CreateNew,
             FileAccess.ReadWrite,
-            FileShare.Read,
+            FileShare.ReadWrite,
             bufferSize: 128 * 1024,
             options: FileOptions.Asynchronous | FileOptions.SequentialScan);
         var buffer = new byte[Math.Min(128 * 1024, Math.Max(1, _options.CheckpointSizeBytes))];
