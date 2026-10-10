@@ -41,6 +41,13 @@ jobs:
         run: choco install innosetup -y --no-progress
       - name: Build installer
         run: '& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=0.1.0 packaging\installer.iss'
+      - name: Verify installer size
+        run: |
+          $f = "output\ADZAK-Creative-Studio-Setup.exe"
+          if (-not (Test-Path $f)) { throw "Installer missing: $f" }
+          $mb = [math]::Round((Get-Item $f).Length / 1MB, 1)
+          Write-Host "Installer size: $mb MB"
+          if ($mb -lt 20) { throw "Installer suspiciously small ($mb MB)" }
       - uses: actions/upload-artifact@v4
         with:
           name: ADZAK-Creative-Studio-Windows
