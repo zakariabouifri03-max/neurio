@@ -1,0 +1,6 @@
+-r requirements.txt
+pytest>=8
+pyflakes>=3
+pyinstaller>=6.6
+# Development-only: provides an FFmpeg binary for tests on Linux/macOS. Windows builds bundle ffmpeg.exe instead.
+imageio-ffmpeg>=0.5

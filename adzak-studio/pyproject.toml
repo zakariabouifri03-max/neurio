@@ -1,0 +1,10 @@
+[project]
+name = "adzak-creative-studio"
+version = "0.1.0"
+description = "ADZAK Creative Studio - an offline-first creative suite for video, photo, design, audio and media conversion."
+requires-python = ">=3.10"
+license = { text = "See THIRD_PARTY_LICENSES.md; project code: all rights reserved unless stated" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

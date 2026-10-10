@@ -1,0 +1,50 @@
+name: ADZAK Creative Studio - Windows build
+
+on:
+  push:
+    branches: [arena/ca9b5616-neurio]
+    paths: ["adzak-studio/**", ".github/workflows/adzak-windows.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: adzak-studio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+      - name: Fetch FFmpeg
+        run: python scripts/fetch_ffmpeg.py
+      - name: Run tests
+        env:
+          ADZAK_FFMPEG: ${{ github.workspace }}\adzak-studio\packaging\ffmpeg\ffmpeg.exe
+        run: |
+          python -m pyflakes adzak
+          python -m pytest -q --junitxml=test-results.xml
+      - name: Build executable (PyInstaller)
+        run: python -m PyInstaller --noconfirm packaging/adzak.spec
+      - name: Smoke test packaged app (starts and exits)
+        run: |
+          $p = Start-Process -FilePath "dist\ADZAK-Creative-Studio\ADZAK-Creative-Studio.exe" -PassThru
+          Start-Sleep -Seconds 20
+          if ($p.HasExited) { throw "App exited early with code $($p.ExitCode)" }
+          Stop-Process -Id $p.Id -Force
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Build installer
+        run: '& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=0.1.0 packaging\installer.iss'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ADZAK-Creative-Studio-Windows
+          path: |
+            adzak-studio/output/ADZAK-Creative-Studio-Setup.exe
+            adzak-studio/test-results.xml
+          if-no-files-found: error

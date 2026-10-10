@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+build/
+dist/
+*.egg-info/
+packaging/ffmpeg/
+packaging/output/
+.venv/
+output/
+test-results.xml
+packaging/ffmpeg-download.zip
