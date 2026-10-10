@@ -1,0 +1,5 @@
+{
+    "ImportType": "DataTable",
+    "TargetAsset": "/Game/Data/Economy/DT_Properties",
+    "Note": "Row struct is a Blueprint struct created from the CSV header."
+}

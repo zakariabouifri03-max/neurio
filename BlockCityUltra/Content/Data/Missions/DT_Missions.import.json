@@ -1,0 +1,6 @@
+{
+    "ImportType": "DataTable",
+    "RowStruct": "/Script/BlockCityUltra.BCUMissionDefinition",
+    "TargetAsset": "/Game/Data/Missions/DT_Missions",
+    "Note": "One row per mission. Each row becomes a UBCUMissionDefinition primary asset (primary asset type 'BCUMission'). All story, characters and objectives are original writing."
+}

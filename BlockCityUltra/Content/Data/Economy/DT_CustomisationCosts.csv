@@ -1,0 +1,23 @@
+CategoryId,Level,Cost,UnlockRequirement
+Paint,0,450,
+Paint,1,850,
+Paint,2,1600,
+Paint,3,3000,Rank:Wheelman
+Paint,4,5600,Rank:Crew Regular
+Wheels,0,1200,
+Wheels,1,2200,
+Wheels,2,4100,
+Engine,0,3800,
+Engine,1,7000,
+Engine,2,13000,Rank:Wheelman
+Engine,3,24000,Rank:Crew Regular
+Engine,4,44500,Rank:Made Name
+Handling,0,2600,
+Handling,1,4800,
+Handling,2,8900,
+Brakes,0,1800,
+Brakes,1,3300,
+Brakes,2,6100,
+Decal,0,250,
+BodyKit,0,5200,
+Underglow,0,900,

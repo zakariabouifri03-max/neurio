@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>BLOCK CITY ULTRA — Vertical Slice</title>
+<meta name="description" content="Playable browser vertical slice of BLOCK CITY ULTRA: an original open-world voxel city with driving, traffic, police pursuit and a delivery mission." />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+  <canvas id="view"></canvas>
+
+  <!-- ── HUD ─────────────────────────────────────────────────────────── -->
+  <div id="hud" class="hidden">
+    <div id="hud-top-left">
+      <div id="district">FOUNDRY HEIGHTS</div>
+      <div id="clock">08:30</div>
+    </div>
+
+    <div id="hud-top-right">
+      <div id="cash">$2,500</div>
+      <div id="wanted" class="stars" data-level="0">
+        <span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span>
+      </div>
+      <div id="weather">CLEAR</div>
+    </div>
+
+    <div id="hud-objective">
+      <div id="objective-label">OBJECTIVE</div>
+      <div id="objective-text">Find a vehicle. Press <b>F</b> near a car.</div>
+      <div id="objective-distance"></div>
+    </div>
+
+    <div id="hud-bottom-left">
+      <canvas id="minimap" width="220" height="220"></canvas>
+      <div id="minimap-legend">
+        <span class="k y">&#9632;</span> mission
+        <span class="k r">&#9632;</span> police
+        <span class="k w">&#9632;</span> you
+      </div>
+    </div>
+
+    <div id="hud-bottom-right">
+      <div id="speedo">
+        <div id="speed-value">0</div>
+        <div id="speed-unit">km/h</div>
+        <div id="gear">P</div>
+      </div>
+      <div id="health"><div id="health-fill"></div></div>
+      <div id="prompt" class="hidden"><b>F</b> <span id="prompt-text">Enter vehicle</span></div>
+    </div>
+
+    <div id="toast-container"></div>
+  </div>
+
+  <!-- ── Title screen ────────────────────────────────────────────────── -->
+  <div id="title" class="overlay">
+    <div class="title-inner">
+      <div class="eyebrow">NEURIO INTERACTIVE &mdash; VERTICAL SLICE</div>
+      <h1>BLOCK<span>CITY</span>ULTRA</h1>
+      <p class="tagline">
+        An original open-world city built from real cubic geometry &mdash; not a pixel filter.
+        Drive it, steal from it, outrun it.
+      </p>
+
+      <div class="options">
+        <div class="opt-group">
+          <label for="preset">Graphics preset</label>
+          <select id="preset">
+            <option value="performance">Performance &mdash; 60 fps target, shorter draw distance</option>
+            <option value="balanced">Balanced</option>
+            <option value="quality" selected>Quality &mdash; full city, wet roads, shadows</option>
+            <option value="ultra">Ultra &mdash; max density, rain, reflections</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label for="seed">City seed</label>
+          <input id="seed" type="number" value="20260710" min="1" max="2147483647" />
+        </div>
+        <div class="opt-group">
+          <label for="time">Start time</label>
+          <select id="time">
+            <option value="0.35">Dawn</option>
+            <option value="0.52">Morning</option>
+            <option value="0.75">Sunset</option>
+            <option value="0.93" selected>Night</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="play" class="primary">ENTER THE CITY</button>
+
+      <div class="controls">
+        <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move / drive</div>
+        <div><kbd>Mouse</kbd> look</div>
+        <div><kbd>F</kbd> enter / exit vehicle</div>
+        <div><kbd>Shift</kbd> sprint</div>
+        <div><kbd>Space</kbd> handbrake / jump</div>
+        <div><kbd>M</kbd> big map</div>
+        <div><kbd>R</kbd> restart slice</div>
+        <div><kbd>Esc</kbd> release mouse</div>
+      </div>
+
+      <p class="legal">
+        All city names, districts, vehicles, characters, factions, missions and dialogue in this
+        slice are original creations. Nothing here reproduces any existing game, brand, map,
+        building or asset. See <code>Docs/08_LEGAL_AND_ORIGINALITY.md</code>.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── Loading ─────────────────────────────────────────────────────── -->
+  <div id="loading" class="overlay hidden">
+    <div class="loading-inner">
+      <div class="loading-title">GENERATING VAULT CITY</div>
+      <div class="loading-bar"><div id="loading-fill"></div></div>
+      <div id="loading-stage">road layout</div>
+    </div>
+  </div>
+
+  <!-- ── Map screen ──────────────────────────────────────────────────── -->
+  <div id="map" class="overlay hidden">
+    <div class="map-inner">
+      <div class="map-head">
+        <h2>VAULT CITY</h2>
+        <div id="map-districts"></div>
+        <div class="map-hint">Press <kbd>M</kbd> or <kbd>Esc</kbd> to close</div>
+      </div>
+      <canvas id="map-canvas" width="900" height="900"></canvas>
+    </div>
+  </div>
+
+  <!-- ── Mission complete / busted ───────────────────────────────────── -->
+  <div id="card" class="overlay hidden">
+    <div class="card-inner">
+      <div id="card-title">MISSION COMPLETE</div>
+      <div id="card-sub"></div>
+      <div id="card-reward"></div>
+      <button id="card-button" class="primary">CONTINUE</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

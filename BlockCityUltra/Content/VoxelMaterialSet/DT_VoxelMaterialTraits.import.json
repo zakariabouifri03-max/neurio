@@ -1,0 +1,5 @@
+{
+    "ImportType": "DataTable",
+    "TargetAsset": "/Game/VoxelMaterialSet/DT_VoxelMaterialTraits",
+    "Note": "Row struct is a Blueprint struct created from the CSV header."
+}

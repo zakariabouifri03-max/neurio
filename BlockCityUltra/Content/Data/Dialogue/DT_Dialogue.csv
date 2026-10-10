@@ -1,0 +1,14 @@
+LineId,SpeakerId,Text,DurationSeconds,OnlyWhenWanted
+mara_intro_01,mara_kessel,"Cold store, pier nine. The crate is already packed, so don't open it.",4.5,0
+mara_intro_02,mara_kessel,"Neon Mile garage, ask for Dex. He pays on delivery, not on promises.",4.5,0
+mara_outro_01,mara_kessel,You drove that like it was nothing. It wasn't nothing.,3.5,0
+dex_intro_01,dex_oyelaran,Three laps of the Mile. Six checkpoints. Try not to hit the tram lines.,4.5,0
+dex_taunt_01,dex_oyelaran,That's the corner I told you about. The one with the tram lines.,3.5,0
+silas_intro_01,silas_vane,The storm is the point. Nobody looks up when it's raining sideways.,4.5,0
+silas_intro_02,silas_vane,"Eleven floors down, four bonds, five minutes. Then we are all strangers.",5.0,0
+dispatch_01,dispatcher,"Four fares, one driver. Marbella Row first, and they're already late.",4.5,0
+precinct_01,precinct_desk,"Ironside crew on the north quay. Stolen containers. Off the books, on the record.",5.5,0
+police_bark_01,vault_pd,Stop the vehicle. Now.,2.5,1
+police_bark_02,vault_pd,Last warning. Get on the ground.,3.0,1
+police_bark_03,vault_pd,We lost them. Hold the perimeter.,3.0,1
+police_bark_04,vault_pd,Suspect in custody. Scene is clear.,3.0,1

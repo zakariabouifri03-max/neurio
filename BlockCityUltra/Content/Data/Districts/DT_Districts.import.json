@@ -1,0 +1,6 @@
+{
+    "ImportType": "DataTable",
+    "RowStruct": "/Script/BlockCityUltra.BCUDistrictDataAsset",
+    "TargetAsset": "/Game/Data/Districts/DT_Districts",
+    "Note": "One row per district. Each row becomes a UBCUDistrictDataAsset primary asset (primary asset type 'BCUDistrict')."
+}

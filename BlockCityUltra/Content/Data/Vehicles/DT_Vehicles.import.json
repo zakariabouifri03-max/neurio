@@ -1,0 +1,6 @@
+{
+    "ImportType": "DataTable",
+    "RowStruct": "/Script/BlockCityUltra.BCUVehicleDefinition",
+    "TargetAsset": "/Game/Data/Vehicles/DT_Vehicles",
+    "Note": "One row per drivable vehicle. Imported as a UDataTable with the row struct set to the CDO of UBCUVehicleDefinition. All names, manufacturers and silhouettes are original."
+}

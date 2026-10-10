@@ -1,0 +1,9 @@
+PropertyId,DisplayName,DistrictId,Price,DailyIncome,GarageSlots,IsSafehouse,Description
+prop_rowan_flat,Rowan Park Flat,RowanPark,48000,220,1,1,"A one-bedroom over a launderette. Saves the game, stores one car."
+prop_neon_loft,Neon Mile Loft,NeonMile,186000,640,2,1,"Eleven floors above the signage. Roof access, two parking bays."
+prop_ironside_yard,Ironside Yard,IronsideDocks,96000,520,6,0,"A fenced container yard. Six vehicles, no neighbours asking questions."
+prop_marbella_suite,Marbella Row Suite,MarbellaRow,740000,2400,3,1,"The whole top floor of the Lusso building. Valet, spa, helipad access."
+prop_foundry_office,Foundry Heights Office,FoundryHeights,1250000,4100,4,0,"Forty-two storeys up. Legitimate income, questionable tenants."
+prop_basin_cabin,Ashfall Basin Cabin,AshfallBasin,26000,90,2,1,"Off-grid, off the map, and the only place the police do not patrol."
+prop_granite_hangar,Granite Ridge Hangar,GraniteRidge,310000,780,8,0,A decommissioned forestry hangar. Eight bays and a fuel bowser.
+prop_calder_hanger,Calder Hangar 4,CalderInternational,890000,2600,10,0,"Airside, fenced, and staffed by people who do not read manifests."

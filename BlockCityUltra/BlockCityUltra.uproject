@@ -1,0 +1,100 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.5",
+	"Category": "Game",
+	"Description": "BLOCK CITY ULTRA - next-generation open-world voxel sandbox (original IP). Third-person exploration, drivable vehicles, living city AI, progressive wanted system, missions, dynamic weather and day/night.",
+	"Modules": [
+		{
+			"Name": "BlockCityUltra",
+			"Type": "Runtime",
+			"LoadingPhase": "PostConfigInit",
+			"PlatformAllowList": [
+				"Win64",
+				"Linux",
+				"Mac"
+			]
+		},
+		{
+			"Name": "BlockCityUltraEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit",
+			"PlatformAllowList": [
+				"Win64",
+				"Linux",
+				"Mac"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true
+		},
+		{
+			"Name": "Bridge",
+			"Enabled": true
+		},
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		},
+		{
+			"Name": "Niagara",
+			"Enabled": true
+		},
+		{
+			"Name": "ChaosVehiclesPlugin",
+			"Enabled": true
+		},
+		{
+			"Name": "Water",
+			"Enabled": true
+		},
+		{
+			"Name": "GeometryProcessing",
+			"Enabled": true
+		},
+		{
+			"Name": "GeometryScriptingCore",
+			"Enabled": true
+		},
+		{
+			"Name": "GameplayCameras",
+			"Enabled": true
+		},
+		{
+			"Name": "CameraShakePreviewer",
+			"Enabled": true
+		},
+		{
+			"Name": "Paper2D",
+			"Enabled": false
+		},
+		{
+			"Name": "OnlineSubsystem",
+			"Enabled": false
+		},
+		{
+			"Name": "OnlineSubsystemUtils",
+			"Enabled": false
+		},
+		{
+			"Name": "DLSS",
+			"Enabled": false,
+			"SupportedTargetPlatforms": [
+				"Win64"
+			],
+			"Optional": true,
+			"_Comment": "OPTIONAL. Enable manually after installing the NVIDIA DLSS plugin from the Fab/Marketplace into your engine. See Docs/01_BUILD_AND_SETUP.md step 9. Game code auto-detects it at runtime and falls back to TSR + Dynamic Resolution when absent."
+		},
+		{
+			"Name": "NNE",
+			"Enabled": false
+		}
+	],
+	"TargetPlatforms": [
+		"Windows",
+		"Linux"
+	],
+	"_Legal": "BLOCK CITY ULTRA is an original creation. No assets, names, maps, characters, dialogue, logos or missions are derived from Grand Theft Auto, Minecraft or any other third-party copyrighted work."
+}

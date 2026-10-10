@@ -1,0 +1,14 @@
+ItemId,DisplayName,Category,Price,ResaleValue,RequiredReputation,DistrictRestriction,UnlockId
+food_coffee,Black Coffee,Food,6,0,0,,
+food_noodles,Neon Noodles,Food,14,0,0,NeonMile,
+food_burger,Double Ashfall Burger,Food,22,0,0,,
+med_bandage,Field Bandage,Consumables,180,60,0,,
+med_kit,Trauma Kit,Consumables,640,210,60,,
+armour_vest,Ballistic Vest,Consumables,1450,480,220,,
+clothes_workwear,Ironside Workwear,Clothing,320,90,0,IronsideDocks,outfit_workwear
+clothes_suit,Marbella Tailored Suit,Clothing,2400,700,150,MarbellaRow,outfit_suit
+clothes_leathers,Granite Riding Leathers,Clothing,1800,520,90,,outfit_leathers
+fuel_petrol,Petrol (per litre),Fuel,3,0,0,,
+fuel_diesel,Diesel (per litre),Fuel,4,0,0,,
+repair_bodywork,Bodywork Repair,Repair,900,0,0,,
+repair_full,Full Restoration,Repair,4200,0,220,,

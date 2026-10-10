@@ -1,0 +1,7 @@
+FactionId,DisplayName,TerritoryDistrict,HostileTo,Description
+vault_pd,Vault City Police Department,FoundryHeights,criminal,"The city's police. Original force, original livery, original radio chatter."
+ironside_crew,Ironside Crew,IronsideDocks,vault_pd;marbella_syndicate,Dock workers who found that containers are easier to steal than to unload.
+marbella_syndicate,Marbella Syndicate,MarbellaRow,ironside_crew,"Tailored, patient, and the reason the luxury district has private security."
+foundry_collective,Foundry Collective,FoundryHeights,ironside_crew,White-collar fixers who move money rather than crates.
+ashfall_rangers,Ashfall Rangers,AshfallBasin,none,"Volunteer search-and-rescue for the basin. They help anyone, once."
+calder_port_authority,Calder Port Authority,CalderInternational,none,"Harbour masters, pilots and the people who decide what gets inspected."

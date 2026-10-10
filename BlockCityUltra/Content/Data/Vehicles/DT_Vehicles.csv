@@ -1,0 +1,19 @@
+VehicleId,DisplayName,Manufacturer,VehicleClass,Rarity,MassKg,PeakTorqueNm,PeakTorqueRPM,MaxRPM,TopSpeedKmh,GearRatios,FinalDriveRatio,DriveTrain,BrakeTorqueNm,BodyStyle,BodyVoxelDimensions,VoxelSizeCm,PurchasePrice,ResaleValue,FuelLitresPer100Km,HasEmergencyLightbar
+kestrel_commuter,Kestrel C1,Kestrel Motors,Compact,Common,1240,180,3400,6200,178,3.5;2.2;1.6;1.15;0.88,3.6,FWD,1800,Sedan,8;4;17,12,9800,5400,6.4,0
+bramford_focus,Bramford 240,Bramford,Sedan,Common,1480,240,3600,6400,196,3.6;2.4;1.7;1.25;0.95,3.4,FWD,2100,Sedan,9;4;19,12,16400,9200,7.1,0
+ironside_hauler,Ironside Hauler,Ironside Works,Truck,Common,7400,1450,1800,3800,118,6.2;4.1;2.8;1.9;1.4;1.0,4.9,RWD,5200,Truck,11;8;34,16,64000,31000,24.8,0
+calder_shuttle,Calder Shuttle,Calder Transit,Bus,Common,9800,1600,1700,3400,96,5.4;3.6;2.4;1.7;1.2,5.2,RWD,6800,Bus,12;9;48,16,0,0,31.2,0
+vellum_gt,Vellum GT,Vellum,Super,Legendary,1395,720,5400,8600,338,3.2;2.3;1.75;1.35;1.05;0.85,3.1,RWD,4200,Super,9;3;20,10,284000,196000,13.6,0
+kestrel_rs,Kestrel RS,Kestrel Motors,Muscle,Rare,1720,610,4200,6900,262,3.4;2.2;1.6;1.2;0.95,3.5,RWD,3600,Muscle,9;4;20,12,88000,57000,14.9,0
+rowan_suv,Rowan Trailblazer,Rowan,SUV,Uncommon,2180,420,3200,5800,198,4.1;2.8;1.9;1.4;1.05,3.8,AWD,3200,SUV,10;6;21,14,52000,33000,11.2,0
+ashfall_pickup,Ashfall 1500,Ashfall,Pickup,Common,2340,460,3400,5600,186,4.3;2.9;2.0;1.45;1.1,3.9,AWD,3400,Pickup,10;6;23,14,44000,27000,12.8,0
+marbella_coupe,Marbella Lusso,Marbella Auto,Sedan,Rare,1810,380,4400,7200,248,3.8;2.6;1.85;1.4;1.1;0.9,3.3,RWD,3100,Sedan,9;4;20,11,124000,84000,10.4,0
+neon_van,Neon Courier,Neon Works,Van,Common,2020,320,3000,5200,168,3.9;2.6;1.85;1.35;1.0,3.7,FWD,2600,Van,10;7;24,14,31000,18000,9.8,0
+vault_pd_cruiser,Vault City Cruiser,Vault Fleet,Police,Uncommon,1860,440,3800,6600,232,3.7;2.5;1.75;1.3;1.0,3.4,RWD,3400,Sedan,9;4;20,12,0,0,11.6,1
+vault_pd_interceptor,Vault City Interceptor,Vault Fleet,PoliceInterceptor,Rare,1740,560,4400,7400,278,3.5;2.3;1.7;1.25;0.95,3.3,AWD,3900,Muscle,9;4;20,11,0,0,13.1,1
+vault_pd_van,Vault City Response Van,Vault Fleet,PoliceVan,Uncommon,2480,420,3200,5400,186,4.2;2.9;2.0;1.45;1.1,3.8,RWD,3800,Van,10;7;24,14,0,0,13.4,1
+calder_ambulance,Calder Ambulance,Calder Transit,Ambulance,Uncommon,2760,480,3000,5000,172,4.0;2.7;1.9;1.4;1.05,3.9,RWD,4100,Van,11;8;26,15,0,0,15.2,1
+ironside_engine,Ironside Engine 7,Ironside Works,Fire,Uncommon,8200,1200,1900,3900,126,5.8;3.9;2.7;1.85;1.3,4.8,RWD,6400,Truck,11;8;32,16,0,0,26.4,1
+granite_moto,Granite RR900,Granite,Motorcycle,Epic,198,96,7800,12400,268,2.9;2.2;1.75;1.45;1.22;1.05,2.6,RWD,420,Motorcycle,3;4;11,8,42000,29000,5.2,0
+ashfall_mule,Ashfall Mule,Ashfall,Compact,Common,1120,150,3200,5800,158,3.4;2.1;1.55;1.1;0.85,3.7,FWD,1600,Sedan,8;4;16,12,6400,3100,6.9,0
+marbella_taxi,Marbella Cab,Marbella Auto,Taxi,Common,1560,250,3600,6200,192,3.6;2.4;1.7;1.25;0.95,3.5,FWD,2200,Sedan,9;4;19,12,0,0,8.4,0
