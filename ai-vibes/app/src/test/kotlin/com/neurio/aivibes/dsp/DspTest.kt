@@ -122,11 +122,13 @@ class DspTest {
             buf[i * 2 + 1] = v
         }
         chain.process(buf, n, 2, 48000)
+        // Measure steady state only: filters have a short startup transient.
         var err = 0f
-        for (i in 0 until n) {
+        for (i in 2048 until n) {
             val ref = (0.25f * sin(2.0 * Math.PI * 1000.0 * i / 48000.0)).toFloat()
             err += abs(buf[i * 2] - ref)
         }
-        assertTrue("mean err ${(err / n)} should be tiny", err / n < 0.01f)
+        val steady = err / (n - 2048)
+        assertTrue("steady mean err $steady should be tiny", steady < 0.01f)
     }
 }

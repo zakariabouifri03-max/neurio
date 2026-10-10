@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -101,7 +102,7 @@ fun NeonChip(
                 color = if (selected) accent else Color(0xFF2A2A46),
                 shape = RoundedCornerShape(50)
             )
-            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
+            .then(if (onClick != null) Modifier.clickable { onClick.invoke() } else Modifier)
             .padding(horizontal = 16.dp, vertical = 9.dp)
     ) {
         Text(
