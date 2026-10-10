@@ -3,3 +3,6 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+**/bin/
+**/obj/
+windows/AdzakDownloadPro/artifacts/

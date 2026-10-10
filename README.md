@@ -101,6 +101,12 @@ Made with ❤️ and Three.js
 
 ---
 
+## 🪟 Adzak Download Pro — Windows download recovery engine
+
+A separate .NET 8 Windows x64 download manager with persistent HTTP Range resume, automatic network recovery, a local download queue, a WinForms UI and deterministic recovery tests is available in [`windows/AdzakDownloadPro/`](windows/AdzakDownloadPro/README.md). This checkout is otherwise a browser racing game; the download manager did not previously exist here, so it is provided as an isolated Windows project rather than replacing the game.
+
+---
+
 ## 📦 `BashBaqiRacing.apk` — ملف جاهز!
 
 A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).

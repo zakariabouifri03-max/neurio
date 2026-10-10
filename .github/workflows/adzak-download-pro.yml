@@ -1,0 +1,43 @@
+name: Adzak Download Pro
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'arena/**'
+    paths:
+      - 'windows/AdzakDownloadPro/**'
+      - '.github/workflows/adzak-download-pro.yml'
+
+jobs:
+  test-and-publish:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Run recovery-engine scenarios
+        run: dotnet run --project windows/AdzakDownloadPro/tests/AdzakDownloadPro.Tests/AdzakDownloadPro.Tests.csproj --configuration Release
+
+      - name: Publish self-contained Windows x64 app
+        run: >-
+          dotnet publish windows/AdzakDownloadPro/src/AdzakDownloadPro.WinForms/AdzakDownloadPro.WinForms.csproj
+          --configuration Release --runtime win-x64 --self-contained true
+          -p:PlatformTarget=x64 -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
+          -p:DebugType=None -p:DebugSymbols=false
+          --output windows/AdzakDownloadPro/artifacts/win-x64
+
+      - name: Upload self-contained Windows executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: AdzakDownloadPro-win-x64
+          path: windows/AdzakDownloadPro/artifacts/win-x64/AdzakDownloadPro.WinForms.exe
+          if-no-files-found: error
+          retention-days: 30
