@@ -82,7 +82,7 @@ fun PlayerScreen(
     var playbackState by remember { mutableStateOf(PlayerConstants.PlayerState.UNKNOWN) }
     var availableQualities by remember { mutableStateOf<List<PlaybackQuality>>(emptyList()) }
     var activeQuality by remember { mutableStateOf<PlaybackQuality?>(null) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var playbackError by remember { mutableStateOf<PlayerConstants.PlayerError?>(null) }
     var isFullscreen by rememberSaveable { mutableStateOf(false) }
     var showQualityMenu by remember { mutableStateOf(false) }
     var descriptionExpanded by remember { mutableStateOf(false) }
@@ -152,7 +152,7 @@ fun PlayerScreen(
                     state = state,
                     isFullscreen = isFullscreen,
                     playbackState = playbackState,
-                    errorMessage = errorMessage,
+                    errorMessage = playbackError?.let { playbackErrorText(it) },
                     resolvedQuality = resolvedQuality,
                     availableQualities = availableQualities,
                     activeQuality = activeQuality,
@@ -196,7 +196,7 @@ fun PlayerScreen(
                                 }
                             },
                             onError = { error ->
-                                errorMessage = playbackErrorText(error)
+                                playbackError = error
                                 playbackState = PlayerConstants.PlayerState.UNKNOWN
                             },
                             onCurrentSecond = { second -> viewModel.onProgress(second) },

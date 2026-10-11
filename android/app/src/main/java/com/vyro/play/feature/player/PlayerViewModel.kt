@@ -67,8 +67,7 @@ class PlayerViewModel
                 favoritesRepository.observeIds(),
                 settingsRepository.settings,
                 connectivityRepository.networkClass,
-                resumeSeconds,
-            ) { videoOutcome, relatedOutcome, favoriteIds, settings, network, resume ->
+            ) { videoOutcome, relatedOutcome, favoriteIds, settings, network ->
                 PlayerUiState(
                     videoId = videoId,
                     video = videoOutcome,
@@ -76,9 +75,10 @@ class PlayerViewModel
                     isFavorite = favoriteIds.contains(videoId),
                     settings = settings,
                     network = network,
-                    resumeSeconds = resume,
                 )
-            }.stateIn(
+            }
+                .combine(resumeSeconds) { state, resume -> state.copy(resumeSeconds = resume) }
+                .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = PlayerUiState(videoId = videoId),
@@ -123,7 +123,10 @@ class PlayerViewModel
                     resumeSeconds.value =
                         if (duration > 0L && previousSeconds < duration / 1000f * 0.95f) previousSeconds else 0f
 
-                    related.value = videoRepository.related(videoId = videoId, title = current.title)
+                    related.value =
+                        videoRepository
+                            .related(videoId = videoId, title = current.title)
+                            .map { page -> page.items }
                 }
             }
         }
