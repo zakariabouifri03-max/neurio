@@ -81,6 +81,21 @@ jobs:
           path: android/app/build/outputs/apk/debug/*.apk
           retention-days: 30
 
+      # Also commit the built APK to the branch, so it can be fetched straight from the
+      # repository. `[skip ci]` stops this push from triggering the workflow again.
+      - name: Commit the APK to the branch
+        if: steps.build.outcome == 'success'
+        working-directory: android
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p apk
+          cp app/build/outputs/apk/debug/app-debug.apk apk/vyro-play-debug.apk
+          ls -lh apk/
+          git add -f apk/vyro-play-debug.apk
+          git commit -m "ci: publish VYRO PLAY debug APK [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
       - name: Upload unit test reports
         if: always()
         uses: actions/upload-artifact@v4
