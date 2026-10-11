@@ -1,5 +1,5 @@
 // Bash Baqi Racing — service worker: full offline support
-const VERSION = 'bbr-v1';
+const VERSION = 'bbr-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -17,6 +17,23 @@ const ASSETS = [
   './src/style.css',
   './vendor/three.module.js',
   './vendor/utils/BufferGeometryUtils.js',
+  './vendor/exporters/GLTFExporter.js',
+  './minecraft.html',
+  './src/minecraft/ui.css',
+  './src/minecraft/mcapp.js',
+  './src/minecraft/ui.js',
+  './src/minecraft/voxels.js',
+  './src/minecraft/textures.js',
+  './src/minecraft/noise.js',
+  './src/minecraft/terrain.js',
+  './src/minecraft/structures.js',
+  './src/minecraft/sky.js',
+  './src/minecraft/ocean.js',
+  './src/minecraft/decor.js',
+  './src/minecraft/character.js',
+  './src/minecraft/skin.js',
+  './src/minecraft/mobs.js',
+  './src/minecraft/audio.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
 ];

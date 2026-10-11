@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>⛏️ Minecraft Island — Realistic Voxel Diorama</title>
+<meta name="description" content="A realistic Minecraft-style 3D island built entirely in the browser: procedural voxel terrain, PBR block textures, baked ambient occlusion, soft shadows, bloom and a full day/night cycle.">
+<meta name="theme-color" content="#1b6b3a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Minecraftia&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/minecraft/ui.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/"
+  }
+}
+</script>
+</head>
+<body data-mode="orbit">
+
+<canvas id="c"></canvas>
+
+<!-- ══ loading ═══════════════════════════════════════════════════════════ -->
+<div id="loading">
+  <div class="lcard">
+    <div class="lcube"><span></span><span></span><span></span><span></span></div>
+    <h1>MINECRAFT&nbsp;ISLAND</h1>
+    <p id="loadingLabel">Waking up the renderer…</p>
+    <div id="bar"><div id="barFill"></div></div>
+    <small>100% procedural — no textures, models or audio files are downloaded</small>
+  </div>
+</div>
+
+<!-- ══ title + stats ═════════════════════════════════════════════════════ -->
+<header id="hud">
+  <div id="title">
+    <b>⛏️ Minecraft Island</b>
+    <span id="phase">☀️ Midday</span>
+  </div>
+  <div id="stats">
+    <div><i>FPS</i><b id="fps">–</b></div>
+    <div><i>TRIS</i><b id="tris">–</b></div>
+    <div><i>DRAWS</i><b id="calls">–</b></div>
+    <div><i>BLOCKS</i><b id="blocks">–</b></div>
+    <div><i>CHUNKS</i><b id="chunks">–</b></div>
+  </div>
+</header>
+
+<div id="shotName">🎬 Establishing</div>
+<div id="fpHint">WASD move · mouse look · SHIFT sprint · SPACE jump · ESC exit</div>
+
+<!-- ══ block inspector ═══════════════════════════════════════════════════ -->
+<div id="blockInfo">
+  <span id="blockName">grass_block</span>
+  <em id="blockPos">0 · 0 · 0</em>
+</div>
+
+<!-- ══ control panel ═════════════════════════════════════════════════════ -->
+<aside id="panel">
+  <button id="panelToggle" title="Hide panel">⚙️</button>
+  <div class="scroll">
+
+    <section>
+      <h2>🌤 Time of day</h2>
+      <div class="row">
+        <input id="time" type="range" min="0" max="24" step="0.02" value="9.4">
+        <b id="timeVal" class="tag">09:24</b>
+      </div>
+      <div class="row split">
+        <label class="speed">Speed <input id="speed" type="range" min="0.1" max="12" step="0.1" value="1"><b id="speedVal">1×</b></label>
+        <button id="timePlay" class="btn">▶ Cycle</button>
+      </div>
+      <div class="chips">
+        <button data-hour="1.5">🌙 Night</button>
+        <button data-hour="5.9">🌅 Dawn</button>
+        <button data-hour="9.4">☀️ Day</button>
+        <button data-hour="18.4">🌇 Sunset</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>🎥 Camera</h2>
+      <div class="btns3">
+        <button class="btn on" data-mode="orbit">🌍 Orbit</button>
+        <button class="btn" data-mode="fp">👁 First person</button>
+        <button class="btn" data-mode="cine">🎬 Cinematic</button>
+      </div>
+      <div class="chips">
+        <button data-focus="house">🏠 House</button>
+        <button data-focus="tower">🗼 Tower</button>
+        <button data-focus="farm">🌾 Farm</button>
+        <button data-focus="camp">🔥 Camp</button>
+        <button data-focus="dock">⚓ Dock</button>
+        <button data-focus="mine">⛏ Mine</button>
+        <button data-focus="beach">🏖 Beach</button>
+      </div>
+      <label class="check"><input type="checkbox" id="autoRotate"> Slow auto-orbit</label>
+    </section>
+
+    <section>
+      <h2>🎚 World</h2>
+      <div class="grid2">
+        <label class="check"><input type="checkbox" id="shadows" checked> Soft shadows</label>
+        <label class="check"><input type="checkbox" id="bloom" checked> Bloom</label>
+        <label class="check"><input type="checkbox" id="clouds" checked> Voxel clouds</label>
+        <label class="check"><input type="checkbox" id="grass" checked> Wind-blown grass</label>
+        <label class="check"><input type="checkbox" id="mobs" checked> Farm animals</label>
+        <label class="check"><input type="checkbox" id="chars" checked> Villagers</label>
+        <label class="check"><input type="checkbox" id="water" checked> Ocean waves</label>
+        <label class="check"><input type="checkbox" id="audio" checked> Ambience</label>
+        <label class="check"><input type="checkbox" id="wire"> Wireframe</label>
+        <label class="check"><input type="checkbox" id="pause"> Freeze sim</label>
+      </div>
+      <div class="row split">
+        <label class="speed">Quality
+          <select id="quality">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high" selected>High</option>
+            <option value="ultra">Ultra</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section>
+      <h2>🌱 New island</h2>
+      <div class="row">
+        <input id="seed" type="text" value="20261011" spellcheck="false" inputmode="numeric">
+        <button id="seedBtn" class="btn">Regenerate</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>📤 Export</h2>
+      <div class="row">
+        <select id="exportWhat">
+          <option value="world">Terrain + buildings</option>
+          <option value="char">Characters only</option>
+          <option value="mobs">Animals only</option>
+          <option value="all" selected>Everything</option>
+        </select>
+        <button id="exportBtn" class="btn">⬇ Export .glb</button>
+      </div>
+      <div class="row">
+        <button id="shotBtn" class="btn wide">📸 Screenshot PNG</button>
+        <button id="helpBtn" class="btn">? Keys</button>
+      </div>
+      <p class="note">The .glb keeps the procedural texture atlas, vertex-colour ambient occlusion and every mesh — import it in Blender, three.js or any glTF viewer.</p>
+    </section>
+
+  </div>
+</aside>
+
+<!-- ══ help ══════════════════════════════════════════════════════════════ -->
+<div id="help">
+  <div class="hcard">
+    <button id="helpClose">✕</button>
+    <h2>Controls</h2>
+    <table>
+      <tr><td>Drag</td><td>Orbit the camera</td></tr>
+      <tr><td>Right-drag / Shift-drag</td><td>Pan</td></tr>
+      <tr><td>Wheel / pinch</td><td>Zoom</td></tr>
+      <tr><td>Click a block</td><td>Inspect + frame it</td></tr>
+      <tr><td><b>F</b></td><td>First person (WASD, SHIFT sprint, SPACE jump)</td></tr>
+      <tr><td><b>C</b></td><td>Cinematic tour</td></tr>
+      <tr><td><b>T</b></td><td>Play / pause the day-night cycle</td></tr>
+      <tr><td><b>N</b></td><td>Jump between night and evening</td></tr>
+      <tr><td><b>G</b> · <b>M</b> · <b>B</b> · <b>X</b></td><td>Grass · mobs · bloom · wireframe</td></tr>
+      <tr><td><b>R</b></td><td>Regenerate the island</td></tr>
+      <tr><td><b>P</b></td><td>Screenshot</td></tr>
+      <tr><td><b>H</b></td><td>This help</td></tr>
+    </table>
+    <h2>How it is built</h2>
+    <ul>
+      <li>64 block textures painted pixel-by-pixel on a 256×256 canvas atlas, with derived height → normal and roughness maps for real PBR shading.</li>
+      <li>Voxel chunks are meshed with face culling and baked per-vertex ambient occlusion (the classic 3-neighbour corner formula, with quad flipping to avoid lighting seams).</li>
+      <li>Grass and leaves are tinted per biome through vertex colours; four material layers keep draw calls low (opaque / cutout / water / emissive).</li>
+      <li>The sky dome, sun, moon, stars, ocean swell, campfire embers, fireflies and the whole soundtrack are generated from code — no assets are downloaded.</li>
+      <li>Lighting is image-based: a PMREM probe is re-baked from the sky a couple of times a second, so every material picks up the correct ambient colour as the day moves.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══ touch controls (first person) ═════════════════════════════════════ -->
+<div id="dpad">
+  <button data-key="KeyW" class="up">▲</button>
+  <button data-key="KeyA" class="left">◀</button>
+  <button data-key="KeyS" class="down">▼</button>
+  <button data-key="KeyD" class="right">▶</button>
+</div>
+<div id="fpad">
+  <button data-key="ShiftLeft" id="btnRun">SPRINT</button>
+  <button data-key="Space" id="btnJump">JUMP</button>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { MinecraftViewer } from './src/minecraft/mcapp.js';
+import { UI } from './src/minecraft/ui.js';
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+
+const canvas = document.getElementById('c');
+const app = new MinecraftViewer(canvas, {
+  seed: 20261011,
+  onProgress: (p, label) => bootUI && bootUI.setProgress(p, label),
+  onReady: () => {
+    document.getElementById('loading').classList.add('hidden');
+    bootUI.toast('🌍 Drag to orbit · click a block to inspect · H for keys');
+  },
+});
+const bootUI = new UI(app);
+window.MC = app;
+
+app.initRenderer();
+document.getElementById('quality').value = app.qualityName;
+app.bindInput();
+app.resetOrbit();
+bootUI.syncTime();
+bootUI.syncMode('orbit');
+
+// touch D-pad → the same key states the keyboard handler writes
+if (window.matchMedia('(hover: none), (pointer: coarse)').matches) document.body.classList.add('touch');
+for (const b of document.querySelectorAll('#dpad button, #fpad button')) {
+  const code = b.dataset.key;
+  const on = (e) => { e.preventDefault(); app.keys[code] = true; b.classList.add('down'); };
+  const off = (e) => { e.preventDefault(); app.keys[code] = false; b.classList.remove('down'); };
+  b.addEventListener('pointerdown', on);
+  b.addEventListener('pointerup', off);
+  b.addEventListener('pointercancel', off);
+  b.addEventListener('pointerleave', off);
+}
+
+// honour reduced-motion + small screens
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.getElementById('autoRotate').checked = false;
+}
+if (window.innerWidth < 780) {
+  document.getElementById('quality').value = app.qualityName;
+}
+
+app.buildWorld()
+  .then(() => { app.setQuality(document.getElementById('quality').value); app.start(); })
+  .catch((err) => {
+    console.error(err);
+    const l = document.getElementById('loadingLabel');
+    l.innerHTML = '⚠️ ' + (err && err.message ? err.message : err) + '<br><small>WebGL 2 is required — try a desktop browser or enable hardware acceleration.</small>';
+  });
+</script>
+</body>
+</html>
