@@ -1,6 +1,9 @@
 package com.vyro.play
 
 import com.vyro.core.model.Outcome
+import com.vyro.core.model.dataOrNull
+import com.vyro.core.model.errorOrNull
+import com.vyro.core.model.map
 import com.vyro.play.data.remote.decodeHtmlEntities
 import com.vyro.play.data.remote.toDomain
 import com.vyro.play.data.remote.toPage
