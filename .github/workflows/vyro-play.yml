@@ -30,7 +30,6 @@ jobs:
             tail -n 110 build.log
             echo "::error title=Gradle build output::$(tail -n 80 build.log | tr '\n' '|')"
             grep -E '^e: |^\* What went wrong:|^Caused by:|^> Could|^FAILURE|error:' build.log | head -n 8 | while IFS= read -r line; do echo "::error::$line"; done || true
-' - | sed 's/
 /%0A/g')"
             exit 1
           }
