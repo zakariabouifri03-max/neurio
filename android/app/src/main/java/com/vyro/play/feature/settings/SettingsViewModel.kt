@@ -3,6 +3,7 @@ package com.vyro.play.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
+import coil.annotation.ExperimentalCoilApi
 import com.vyro.core.model.PlaybackQuality
 import com.vyro.core.model.ThemeMode
 import com.vyro.core.model.ThumbnailQuality
@@ -119,6 +120,7 @@ class SettingsViewModel
             viewModelScope.launch { historyRepository.clear() }
         }
 
+        @OptIn(coil.annotation.ExperimentalCoilApi::class)
         fun clearImageCache() {
             imageLoader.memoryCache?.clear()
             imageLoader.diskCache?.clear()

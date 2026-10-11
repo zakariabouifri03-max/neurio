@@ -187,6 +187,20 @@ echo "youtube.api.key=AIza...your-key..." >> local.properties
 Or simply open the `android` directory in Android Studio (Hedgehog / Iguana or newer) and
 press **Run**.
 
+### Prebuilt APKs
+
+Two ready-to-install builds are committed to this repository and refreshed automatically by
+[the CI workflow](../.github/workflows/vyro-play-apk.yml) on every push:
+
+| File | Package | Notes |
+| ---- | ------- | ----- |
+| [`android/apk/vyro-play-debug.apk`](apk/vyro-play-debug.apk) | `com.vyro.play.debug` | Unminified, debuggable — recommended for testing |
+| [`android/apk/vyro-play-release.apk`](apk/vyro-play-release.apk) | `com.vyro.play` | R8-minified and resource-shrunk (~3 MB), signed with the debug key |
+
+Install with `adb install android/apk/vyro-play-debug.apk`, or copy the file to the device
+and open it. Both APKs are built **without** an API key, so on first launch the app asks for
+one in **Settings → YouTube Data API → API key**.
+
 ### Signing the release build
 
 `app/build.gradle.kts` uses the default debug keystore for `debug`. For `release`, add a
