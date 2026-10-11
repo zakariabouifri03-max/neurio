@@ -53,10 +53,28 @@ android {
         buildConfigField("String", "YOUTUBE_API_BASE_URL", "\"https://www.googleapis.com/youtube/v3/\"")
     }
 
+    signingConfigs {
+        // Release signing is supplied through environment variables (see README).
+        create("release") {
+            storeFile = file(System.getenv("VYRO_KEYSTORE") ?: "vyro-release.jks")
+            storePassword = System.getenv("VYRO_KEYSTORE_PASSWORD").orEmpty()
+            keyAlias = System.getenv("VYRO_KEY_ALIAS").orEmpty()
+            keyPassword = System.getenv("VYRO_KEY_PASSWORD").orEmpty()
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            // Without a real keystore in the environment, sign with the debug key so
+            // `assembleRelease` still produces an APK that can be installed.
+            signingConfig =
+                if (System.getenv("VYRO_KEYSTORE").isNullOrBlank()) {
+                    signingConfigs.getByName("debug")
+                } else {
+                    signingConfigs.getByName("release")
+                }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",

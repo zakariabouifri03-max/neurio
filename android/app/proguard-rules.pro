@@ -11,6 +11,7 @@
 # --- kotlinx.serialization ---
 # DTOs are serialised reflectively through the generated companion objects;
 # the generated serializer classes must survive shrinking.
+-keep class com.vyro.play.data.remote.dto.** { *; }
 -keepclassmembers class com.vyro.play.data.remote.dto.** {
     *** Companion;
 }
