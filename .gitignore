@@ -3,3 +3,10 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+.gradle/
+.idea/
+local.properties
+**/build/
+*.jks
+*.keystore
+output/*.apk
