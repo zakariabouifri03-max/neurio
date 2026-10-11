@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
     val cellular = remember { isCellular(context) }
     val configuration = LocalConfiguration.current
     val wide = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val aspect = if (wide) Modifier.fillMaxWidth().weight(1f, fill = false) else Modifier.fillMaxWidth().aspectRatio(16f / 9f)
+    val aspect = if (wide) Modifier.fillMaxWidth().fillMaxHeight(.72f) else Modifier.fillMaxWidth().aspectRatio(16f / 9f)
     BackHandler(full) { full = false; landscape(false) }
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
