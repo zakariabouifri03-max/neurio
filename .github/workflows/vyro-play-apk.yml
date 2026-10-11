@@ -67,18 +67,32 @@ jobs:
             echo "### VYRO PLAY build log (\`${{ steps.build.outcome }}\`)"
             echo
             echo '```'
-            tail -c 55000 android/build.log | sed -e 's/```/~~~ /g' -e 's/\r$//'
+            tail -c 35000 android/build.log | sed -e 's/```/~~~ /g' -e 's/\r$//'
+            if [ -f android/release.log ]; then
+              echo
+              echo '--- release ---'
+              tail -c 18000 android/release.log | sed -e 's/```/~~~ /g' -e 's/\r$//'
+            fi
             echo '```'
           } > /tmp/comment.md
           gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments" \
             -F body=@/tmp/comment.md
 
+      - name: Assemble release APK (minified)
+        id: release
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        working-directory: android
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: ./gradlew :app:assembleRelease --stacktrace 2>&1 | tee release.log
+
       - name: Upload APK
         if: steps.build.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: vyro-play-debug
-          path: android/app/build/outputs/apk/debug/*.apk
+          name: vyro-play-apks
+          path: android/app/build/outputs/apk/*/*.apk
           retention-days: 30
 
       # Also commit the built APK to the branch, so it can be fetched straight from the
@@ -91,9 +105,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           mkdir -p apk
           cp app/build/outputs/apk/debug/app-debug.apk apk/vyro-play-debug.apk
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            cp app/build/outputs/apk/release/app-release.apk apk/vyro-play-release.apk
+          fi
           ls -lh apk/
-          git add -f apk/vyro-play-debug.apk
-          git commit -m "ci: publish VYRO PLAY debug APK [skip ci]"
+          git add -f apk/
+          git commit -m "ci: publish VYRO PLAY APKs [skip ci]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Upload unit test reports
