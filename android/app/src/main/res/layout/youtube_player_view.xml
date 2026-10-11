@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The official android-youtube-player view.
+  `enableAutomaticInitialization="false"` is required so VYRO PLAY can supply its own
+  IFramePlayerOptions (captions on/off, fullscreen button hidden in favour of our own
+  immersive fullscreen toggle).
+-->
+<com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/youtube_player_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:autoPlay="false"
+    app:enableAutomaticInitialization="false"
+    app:handleNetworkEvents="true" />

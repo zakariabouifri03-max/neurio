@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      Compose renders the whole UI, so the activity theme only has to provide the
+      platform window chrome. The Material 3 colour scheme is applied in Compose
+      (see com.vyro.play.ui.theme.VyroTheme), which is what makes the light/dark
+      switch instant instead of an activity recreate.
+    -->
+    <style name="Theme.VyroPlay" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/vyro_black</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+        <item name="android:colorControlNormal">@color/vyro_cyan</item>
+    </style>
+
+    <style name="Theme.VyroPlay.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/vyro_black</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.VyroPlay</item>
+    </style>
+</resources>

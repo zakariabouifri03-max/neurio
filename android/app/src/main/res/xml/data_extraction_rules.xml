@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude
+            domain="database"
+            path="vyro-play.db" />
+        <exclude
+            domain="sharedpref"
+            path="vyro_api_key.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude
+            domain="database"
+            path="vyro-play.db" />
+    </device-transfer>
+</data-extraction-rules>

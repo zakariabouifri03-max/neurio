@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Only tiny preference data is backed up. Favorites and history live on the device:
+  they are private viewing data and must not be uploaded to Google Drive.
+-->
+<full-backup-content>
+    <exclude
+        domain="database"
+        path="vyro-play.db" />
+    <exclude
+        domain="database"
+        path="vyro-play.db-journal" />
+    <exclude
+        domain="database"
+        path="vyro-play.db-wal" />
+    <exclude
+        domain="database"
+        path="vyro-play.db-shm" />
+    <exclude
+        domain="sharedpref"
+        path="vyro_api_key.xml" />
+</full-backup-content>

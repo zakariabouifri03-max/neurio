@@ -113,3 +113,16 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## VYRO PLAY (Android app)
+
+This repository also contains **VYRO PLAY**, a complete Kotlin / Jetpack Compose /
+Material 3 Android client for YouTube that lives in [`android/`](android).
+
+* Real YouTube Data API v3 search, official IFrame-player playback (4K when available),
+  local-file playback via ExoPlayer, favorites, watch history and search history.
+* Build it with `cd android && ./gradlew :app:assembleDebug`.
+* API key setup: [`android/API_SETUP.md`](android/API_SETUP.md).
+* Full overview: [`android/README.md`](android/README.md).

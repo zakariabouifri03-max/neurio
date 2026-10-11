@@ -1,0 +1,14 @@
+## Local build configuration for VYRO PLAY.
+##
+## Copy this file to `local.properties` (same directory) and fill in your own values.
+## `local.properties` is listed in .gitignore and must NEVER be committed.
+
+# Path to your Android SDK. Android Studio writes this line automatically.
+# Linux / macOS:
+sdk.dir=/home/you/Android/Sdk
+# Windows (note the escaped backslashes):
+# sdk.dir=C\:\\Users\\you\\AppData\\Local\\Android\\Sdk
+
+# YouTube Data API v3 key. See API_SETUP.md for how to create one.
+# Leave empty to build without a key: the app then asks the user to enter one in Settings.
+youtube.api.key=

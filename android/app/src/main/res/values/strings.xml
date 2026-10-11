@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VYRO PLAY</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_library">Library</string>
+    <string name="nav_settings">Settings</string>
+    <string name="tab_favorites">Favorites</string>
+    <string name="tab_history">History</string>
+    <string name="tab_offline">Offline</string>
+    <string name="tab_local">My videos</string>
+
+    <!-- Home -->
+    <string name="home_greeting">Discover</string>
+    <string name="home_trending">Trending now</string>
+    <string name="home_explore">Explore</string>
+    <string name="home_see_all">See all</string>
+    <string name="home_local_card_title">Play your own videos</string>
+    <string name="home_local_card_body">Watch any file stored on this phone in full quality.</string>
+    <string name="home_offline_card_title">Offline viewing</string>
+    <string name="home_offline_card_body">How to watch YouTube offline — the official way.</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Search videos</string>
+    <string name="search_empty_title">Find something to watch</string>
+    <string name="search_empty_body">Type a topic, a channel or paste a YouTube link.</string>
+    <string name="search_no_results_title">No results for “%1$s”</string>
+    <string name="search_no_results_body">Try fewer words, or check the spelling.</string>
+    <string name="search_recent">Recent searches</string>
+    <string name="search_clear_recent">Clear recent searches</string>
+    <string name="search_history_disabled">Search history is turned off in Settings.</string>
+    <string name="search_result_count">%1$s results</string>
+
+    <!-- Library -->
+    <string name="favorites_empty_title">No favorites yet</string>
+    <string name="favorites_empty_body">Tap the heart on any video to keep it here for quick access.</string>
+    <string name="history_empty_title">Nothing watched yet</string>
+    <string name="history_empty_body">Videos you play will show up here with your progress.</string>
+    <string name="local_empty_title">No videos on this device</string>
+    <string name="local_empty_body">Copy a video to your phone, then tap Scan again.</string>
+    <string name="library_clear_history">Clear history</string>
+    <string name="library_clear_history_confirm">Remove every entry from your watch history?</string>
+    <string name="library_clear_favorites">Remove all favorites?</string>
+    <string name="library_scan">Scan</string>
+    <string name="library_sort">Sort</string>
+
+    <!-- Offline -->
+    <string name="offline_title">Offline viewing</string>
+    <string name="offline_intro">VYRO PLAY streams with the official YouTube player. Downloading YouTube videos is not permitted by YouTube\'s Terms of Service, so this app never extracts streams or bypasses DRM. Here is what you can do instead.</string>
+    <string name="offline_premium_title">YouTube Premium</string>
+    <string name="offline_premium_body">The only supported way to save YouTube videos for offline playback in the YouTube app. Background play and ad-free viewing are included.</string>
+    <string name="offline_music_title">YouTube Music Premium</string>
+    <string name="offline_music_body">Lets you download music videos and songs for offline listening.</string>
+    <string name="offline_creators_title">Official downloads from creators</string>
+    <string name="offline_creators_body">Many channels offer their own files. Save them to your device, then play them in VYRO PLAY under “My videos”.</string>
+    <string name="offline_local_title">Play your own files</string>
+    <string name="offline_local_body">Any video you own works fully offline — no account, no subscription.</string>
+    <string name="offline_data_saver_title">Save mobile data</string>
+    <string name="offline_data_saver_body">Turn on Data Saver in Settings to cap streaming quality at 480p on mobile networks.</string>
+    <string name="offline_know_more">Read the official policy</string>
+    <string name="offline_open_in_browser">Open in browser</string>
+
+    <!-- Player -->
+    <string name="player_play">Play</string>
+    <string name="player_pause">Pause</string>
+    <string name="player_retry">Retry</string>
+    <string name="player_quality">Quality</string>
+    <string name="player_captions">Captions</string>
+    <string name="player_captions_on">Captions on</string>
+    <string name="player_captions_off">Captions off</string>
+    <string name="player_fullscreen">Fullscreen</string>
+    <string name="player_exit_fullscreen">Exit fullscreen</string>
+    <string name="player_like">Add to favorites</string>
+    <string name="player_unlike">Remove from favorites</string>
+    <string name="player_share">Share</string>
+    <string name="player_open_on_youtube">Open on YouTube</string>
+    <string name="player_up_next">Up next</string>
+    <string name="player_live">LIVE</string>
+    <string name="player_not_playable">This video cannot be played inside the app.</string>
+    <string name="player_video_not_found">Video not found.</string>
+    <string name="player_unknown_error">Playback failed.</string>
+
+    <!-- Local player -->
+    <string name="local_player_title">Local playback</string>
+    <string name="local_player_error">Could not open this file.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_dynamic_color">Dynamic color</string>
+    <string name="settings_dynamic_color_body">Use your wallpaper colors on Android 12+</string>
+    <string name="settings_pure_black">Pure black</string>
+    <string name="settings_pure_black_body">Save battery on OLED screens</string>
+    <string name="settings_reduced_animations">Reduce animations</string>
+    <string name="settings_reduced_animations_body">Faster transitions on low-end phones</string>
+    <string name="settings_playback">Playback</string>
+    <string name="settings_quality">Preferred quality</string>
+    <string name="settings_quality_body">4K is used when the video and connection allow it</string>
+    <string name="settings_captions">Captions</string>
+    <string name="settings_captions_body">Show subtitles by default when available</string>
+    <string name="settings_captions_language">Captions language</string>
+    <string name="settings_autoplay">Autoplay next</string>
+    <string name="settings_data">Data &amp; storage</string>
+    <string name="settings_thumbnails">Thumbnail quality</string>
+    <string name="settings_thumbnails_body">Lower quality uses less data while scrolling</string>
+    <string name="settings_data_saver">Data Saver</string>
+    <string name="settings_data_saver_body">Cap streaming at 480p on mobile data</string>
+    <string name="settings_search">Search</string>
+    <string name="settings_safe_search">Restricted mode</string>
+    <string name="settings_safe_search_body">Hide potentially mature content</string>
+    <string name="settings_region">Content region</string>
+    <string name="settings_history">History</string>
+    <string name="settings_remember_search">Remember searches</string>
+    <string name="settings_history_limit">Maximum history entries</string>
+    <string name="settings_clear_search_history">Clear search history</string>
+    <string name="settings_clear_watch_history">Clear watch history</string>
+    <string name="settings_api">YouTube Data API</string>
+    <string name="settings_api_key">API key</string>
+    <string name="settings_api_key_set">Using a key you provided</string>
+    <string name="settings_api_key_builtin">Using the key bundled at build time</string>
+    <string name="settings_api_key_missing">Missing</string>
+    <string name="settings_api_key_dialog_title">YouTube Data API key</string>
+    <string name="settings_api_key_dialog_body">Paste a key from the Google Cloud console. It is stored only on this device and excluded from backups.</string>
+    <string name="settings_api_key_save">Save</string>
+    <string name="settings_api_key_remove">Remove</string>
+    <string name="settings_api_key_cancel">Cancel</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version %1$s (%2$d)</string>
+    <string name="settings_offline_guide">Offline viewing guide</string>
+    <string name="settings_source">Source code</string>
+    <string name="settings_clear_cache">Clear image cache</string>
+    <string name="settings_clear_cache_done">Image cache cleared</string>
+
+    <!-- States -->
+    <string name="state_loading">Loading…</string>
+    <string name="state_retry">Try again</string>
+    <string name="state_offline_title">You are offline</string>
+    <string name="state_offline_body">Reconnect to search YouTube. Your own videos still play.</string>
+    <string name="state_error_title">Something went wrong</string>
+    <string name="state_no_api_key_title">YouTube API key missing</string>
+    <string name="state_no_api_key_body">Add a key in Settings, or put youtube.api.key=… in local.properties and rebuild. See API_SETUP.md.</string>
+    <string name="state_quota_title">Daily API quota reached</string>
+    <string name="state_quota_body">YouTube limits free requests per day. Add your own key in Settings to keep going.</string>
+    <string name="state_end_of_list">You have reached the end</string>
+
+    <!-- Accessibility -->
+    <string name="cd_video_thumbnail">Thumbnail for %1$s</string>
+    <string name="cd_favorite_toggle">Toggle favorite</string>
+    <string name="cd_navigate_back">Navigate back</string>
+    <string name="cd_clear_query">Clear search field</string>
+    <string name="cd_more_options">More options</string>
+</resources>

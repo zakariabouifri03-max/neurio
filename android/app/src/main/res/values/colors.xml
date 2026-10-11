@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand palette (mirrored in Compose: see ui/theme/Color.kt) -->
+    <color name="vyro_black">#07060B</color>
+    <color name="vyro_pure_black">#000000</color>
+    <color name="vyro_purple">#A855F7</color>
+    <color name="vyro_cyan">#22D3EE</color>
+    <color name="vyro_surface">#12101C</color>
+    <color name="vyro_white">#FFFFFF</color>
+</resources>
