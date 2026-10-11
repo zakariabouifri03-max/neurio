@@ -27,6 +27,8 @@ jobs:
     name: Build debug APK
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -47,19 +49,32 @@ jobs:
         working-directory: android
         run: chmod +x gradlew
 
-      - name: Run unit tests
+      - name: Test and assemble
+        id: build
         working-directory: android
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        run: ./gradlew :core:test :app:testDebugUnitTest --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :core:test :app:testDebugUnitTest :app:assembleDebug --stacktrace 2>&1 | tee build.log
 
-      - name: Assemble debug APK
-        working-directory: android
+      - name: Publish build log as a commit comment
+        if: always()
         env:
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        run: ./gradlew :app:assembleDebug --stacktrace
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "### VYRO PLAY build log (\`${{ steps.build.outcome }}\`)"
+            echo
+            echo '```'
+            tail -c 55000 android/build.log | sed -e 's/```/~~~ /g' -e 's/\r$//'
+            echo '```'
+          } > /tmp/comment.md
+          gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments" \
+            -F body=@/tmp/comment.md
 
       - name: Upload APK
+        if: steps.build.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: vyro-play-debug
