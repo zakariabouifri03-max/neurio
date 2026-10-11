@@ -9,6 +9,7 @@ import com.vyro.core.model.Outcome
 import com.vyro.core.model.UserSettings
 import com.vyro.core.model.Video
 import com.vyro.core.model.WatchHistoryEntry
+import com.vyro.core.model.map
 import com.vyro.play.domain.repository.FavoritesRepository
 import com.vyro.play.domain.repository.HistoryRepository
 import com.vyro.play.domain.repository.SettingsRepository
