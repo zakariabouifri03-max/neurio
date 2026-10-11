@@ -3,3 +3,17 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# Android / Gradle private & intermediate files
+local.properties
+.gradle/
+.idea/
+*.iml
+*.jks
+*.keystore
+build/
+app/build/*
+!app/build/outputs/
+!app/build/outputs/apk/
+!app/build/outputs/apk/debug/
+!app/build/outputs/apk/debug/app-debug.apk

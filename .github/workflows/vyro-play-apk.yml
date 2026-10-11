@@ -1,0 +1,139 @@
+name: VYRO PLAY Android APK
+
+on:
+  push:
+    branches:
+      - 'arena/416388f4-neurio'
+      - 'main'
+    paths:
+      - 'app/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - 'gradlew'
+      - '.github/workflows/vyro-play-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Test + Assemble VYRO PLAY APK
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK 34
+        run: |
+          SDK_ROOT="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+          SDKMANAGER="$(command -v sdkmanager || echo "$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager")"
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" --install "platforms;android-34" "build-tools;34.0.0" "platform-tools" || true
+
+      - name: Run Unit Tests (:app:testDebugUnitTest)
+        run: |
+          set +e
+          chmod +x ./gradlew
+          ./gradlew --no-daemon --console=plain :app:testDebugUnitTest 2>&1 | tee "$RUNNER_TEMP/test.log"
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            {
+              echo "### Unit Test / Compile Failure"
+              echo '```'
+              grep -E "^(e: |.*error: |error: )|\.kt:[0-9]+: |FAILURE:|Execution failed|tests? completed" "$RUNNER_TEMP/test.log" | head -80
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY" || true
+            grep -E "\.(kt|kts|xml):[0-9]+: |^e: |error: " "$RUNNER_TEMP/test.log" | head -60 | while IFS= read -r line; do
+              echo "::error ::${line}"
+            done
+            exit "$status"
+          fi
+
+      - name: Assemble Debug APK (:app:assembleDebug)
+        run: |
+          set +e
+          ./gradlew --no-daemon --stacktrace --console=plain :app:assembleDebug 2>&1 | tee "$RUNNER_TEMP/build.log"
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            {
+              echo "### Assemble Debug Failure"
+              echo '```'
+              grep -E "^(e: |.*error: |.*error; |error: )|\.kt:[0-9]+: |\.xml:[0-9]+: |FAILURE:|Execution failed" "$RUNNER_TEMP/build.log" | head -80
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY" || true
+            grep -E "\.(kt|xml):[0-9]+: |^e: |error: " "$RUNNER_TEMP/build.log" | head -60 | while IFS= read -r line; do
+              echo "::error ::${line}"
+            done
+            exit "$status"
+          fi
+
+      - name: Assemble Release APK (:app:assembleRelease)
+        run: |
+          ./gradlew --no-daemon --console=plain :app:assembleRelease
+
+      - name: Verify & Collect APKs
+        run: |
+          mkdir -p artifacts
+          cp -v app/build/outputs/apk/debug/app-debug.apk VYRO-PLAY-debug.apk
+          cp -v app/build/outputs/apk/debug/app-debug.apk artifacts/VYRO-PLAY-debug.apk
+          cp -v app/build/outputs/apk/release/app-release.apk artifacts/VYRO-PLAY.apk
+          sha256sum artifacts/*.apk > artifacts/SHA256SUMS.txt
+
+          SDK_ROOT="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+          AAPT="$SDK_ROOT/build-tools/34.0.0/aapt"
+          APKSIGNER="$SDK_ROOT/build-tools/34.0.0/apksigner"
+          if [ -x "$AAPT" ]; then
+            "$AAPT" dump badging VYRO-PLAY-debug.apk | head -n 20 | tee artifacts/apk-badging.txt
+          fi
+          if [ -x "$APKSIGNER" ]; then
+            "$APKSIGNER" verify --verbose VYRO-PLAY-debug.apk | tee -a artifacts/apk-badging.txt
+          fi
+          ls -lh VYRO-PLAY-debug.apk app/build/outputs/apk/debug/app-debug.apk artifacts/
+
+      - name: Upload APKs as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vyro-play-apks
+          path: artifacts/*
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Commit verified APK to working branch
+        if: github.ref == 'refs/heads/arena/416388f4-neurio'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f VYRO-PLAY-debug.apk app/build/outputs/apk/debug/app-debug.apk
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(apk): attach verified VYRO-PLAY-debug.apk and app-debug.apk [skip ci]"
+            git push origin HEAD:arena/416388f4-neurio
+          fi
+
+      - name: Publish APKs to GitHub Release
+        if: github.ref == 'refs/heads/arena/416388f4-neurio'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES="Installable Android APK builds of **VYRO PLAY** (Kotlin + Jetpack Compose + Material 3).
+
+          * \`VYRO-PLAY-debug.apk\` — Debug APK (\`com.vyro.play.debug\`)
+          * \`VYRO-PLAY.apk\` — Release APK signed for direct installation (\`com.vyro.play\`)
+          * \`SHA256SUMS.txt\` — SHA-256 checksums"
+          gh release view vyro-play-latest >/dev/null 2>&1 \
+            || gh release create vyro-play-latest --title "VYRO PLAY — Android APK" \
+                 --notes "$NOTES" --target "$GITHUB_SHA"
+          gh release edit vyro-play-latest --notes "$NOTES" --prerelease=false
+          gh release upload vyro-play-latest artifacts/* --clobber

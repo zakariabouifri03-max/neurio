@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.VyroPlay" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/vyro_obsidian</item>
+        <item name="android:statusBarColor">@color/vyro_obsidian</item>
+        <item name="android:navigationBarColor">@color/vyro_obsidian</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorAccent">@color/vyro_purple</item>
+    </style>
+</resources>

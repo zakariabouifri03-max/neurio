@@ -1,0 +1,10 @@
+## Copy this file to local.properties (which is gitignored) and configure your environment:
+
+# Path to your Android SDK (Android Studio sets this automatically)
+# sdk.dir=/Users/yourname/Library/Android/sdk
+
+# Optional: Your YouTube Data API v3 Key from Google Cloud Console.
+# You can also enter or update your API key directly inside VYRO PLAY under:
+#   Settings -> YouTube Data API v3 Key
+# Never commit your private API key to version control!
+YOUTUBE_API_KEY=

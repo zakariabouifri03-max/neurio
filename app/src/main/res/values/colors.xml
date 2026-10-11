@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="vyro_obsidian">#FF07060C</color>
+    <color name="vyro_surface">#FF0F0C1B</color>
+    <color name="vyro_purple">#FF8B5CF6</color>
+    <color name="vyro_purple_deep">#FF4C1D95</color>
+    <color name="vyro_cyan">#FF00F0FF</color>
+    <color name="vyro_white">#FFF8FAFC</color>
+</resources>
