@@ -28,7 +28,10 @@ jobs:
           echo "SDK: ${ANDROID_HOME:-missing}; Java: $(java -version 2>&1 | head -1)"
           gradle :app:testDebugUnitTest :app:assembleDebug --stacktrace > build.log 2>&1 || {
             tail -n 110 build.log
-            echo "::error title=Gradle diagnostic::$(tail -n 110 build.log | sed -e 's/%/%25/g' -e 's//%0D/g' | paste -sd '' - | sed 's//%0A/g')"
+            echo "::error title=Gradle build output::$(tail -n 80 build.log | tr '\n' '|')"
+            grep -E '^e: |^\* What went wrong:|^Caused by:|^> Could|^FAILURE|error:' build.log | head -n 8 | while IFS= read -r line; do echo "::error::$line"; done || true
+' - | sed 's/
+/%0A/g')"
             exit 1
           }
           tail -n 35 build.log
