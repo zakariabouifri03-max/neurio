@@ -141,7 +141,7 @@ are removed by the periodic sweep — 24 hours after they were created.
 ```bash
 git pull
 npm install
-npm run verify                    # typecheck + build + 98 tests
+npm run verify                    # typecheck + build + 100 tests
 npm run build                     # refresh dist/ and dist-electron/
 sudo systemctl restart neurio
 ```

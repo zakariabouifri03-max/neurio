@@ -141,14 +141,15 @@ Every feature below is implemented in the code base and covered by automated tes
 | `npm run dev:server` | Only the API server, restarting on change. |
 | `npm run server` | Run the server as a standalone process (`--port`, `--host`, `--data-dir`, `--static`, `--no-registration`). |
 | `npm run seed` | Create the demo workspace (`operator`, `alice`, `bob`, `carol`, `Neurio HQ`, invite code). |
-| `npm test` | Run all 98 tests (backend, media, permissions, renderer). |
+| `npm test` | Run all 100 tests (backend, media, permissions, renderer). |
 | `npm run test:coverage` | Same, with a coverage report. |
 | `npm run typecheck` | `tsc --noEmit` over the whole project (strict mode). |
 | `npm run build` | Renderer bundle + Electron/server bundles. |
 | `npm run build:win` | Windows installer **and** portable EXE. |
 | `npm run icons` | Regenerate `build/icon.ico` and the PNG icons (pure JS, no ImageMagick). |
-| `npm run verify` | typecheck → build-config check → build → tests, the whole gate in one command. |
+| `npm run verify` | typecheck → build-config check → build → packaging check → tests, the whole gate in one command. |
 | `npm run check:build-config` | Validates the electron-builder configuration against its own schema. |
+| `npm run check:packaging` | Packs the real `app.asar` and asserts the renderer, its assets and the bundled server are inside. |
 
 The server understands a few environment variables, all optional and local:
 `NEURIO_DATA_DIR`, `NEURIO_ICE_SERVERS`, `NEURIO_TURN_USERNAME`, `NEURIO_TURN_CREDENTIAL`,
