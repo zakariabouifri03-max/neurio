@@ -239,13 +239,15 @@ jobs:
           set -o pipefail
           gradle :app:assembleDebug :app:assembleRelease --no-daemon --stacktrace 2>&1 | tee ../build-android.log
 
-      - name: Verify the APKs contain the app UI and a signature
+      - name: Verify the APKs contain the app UI and are signed
         run: |
           set -euo pipefail
           APK_DEBUG=android/app/build/outputs/apk/debug/app-debug.apk
           APK_RELEASE=android/app/build/outputs/apk/release/app-release.apk
           test -f "$APK_DEBUG"  || { echo 'debug APK missing'; exit 1; }
           test -f "$APK_RELEASE" || { echo 'release APK missing'; exit 1; }
+
+          # The UI must really be inside the package…
           python3 - <<'PY'
           import zipfile, sys
           for path in ('android/app/build/outputs/apk/debug/app-debug.apk',
@@ -254,15 +256,20 @@ jobs:
                   names = archive.namelist()
                   needed = ['AndroidManifest.xml', 'classes.dex', 'assets/www/index.html']
                   missing = [n for n in needed if n not in names]
-                  signed = [n for n in names if n.startswith('META-INF/') and n.endswith(('.RSA', '.DSA', '.EC'))]
                   if missing:
                       print(f'{path}: missing {missing}')
                       sys.exit(1)
-                  if not signed:
-                      print(f'{path}: no signature found')
-                      sys.exit(1)
-                  print(f'{path}: ok ({len(names)} entries, UI bundled, signature {signed[0]})')
+                  ui = [n for n in names if n.startswith('assets/www/')]
+                  print(f'{path}: ok ({len(names)} entries, {len(ui)} bundled UI files)')
           PY
+
+          # …and it must be signed (v1 and/or v2 scheme).
+          APKSIGNER="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -name apksigner -type f | sort | tail -1)"
+          echo "using $APKSIGNER"
+          "$APKSIGNER" verify --verbose "$APK_DEBUG"
+          "$APKSIGNER" verify --verbose "$APK_RELEASE"
+          "$APKSIGNER" verify --print-certs "$APK_RELEASE" | head -5
+
           mkdir -p relay
           cp "$APK_DEBUG" relay/Neurio-Android-debug.apk
           cp "$APK_RELEASE" relay/Neurio-Android-1.0.0.apk

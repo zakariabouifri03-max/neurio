@@ -28,7 +28,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
     "seed": "tsx server/seed.ts",
-    "verify": "npm run typecheck && npm run build && npm test"
+    "verify": "npm run typecheck && npm run check:build-config && npm run build && npm test",
+    "check:build-config": "node tools/check-build-config.mjs"
   },
   "dependencies": {},
   "devDependencies": {
@@ -91,7 +92,6 @@
           ]
         }
       ],
-      "publisherName": "Neurio",
       "verifyUpdateCodeSignature": false,
       "signAndEditExecutable": false
     },

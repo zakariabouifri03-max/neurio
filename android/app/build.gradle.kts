@@ -29,6 +29,10 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
             signingConfig = signingConfigs.getByName("debug")
+            // Sign with both schemes: v1 (JAR) so every Android version ≥ 7 accepts the
+            // file, v2 (APK Signature Scheme) so modern Android is happy too.
+            signingConfig.enableV1Signing = true
+            signingConfig.enableV2Signing = true
         }
     }
 
