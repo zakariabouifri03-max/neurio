@@ -28,8 +28,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
     "seed": "tsx server/seed.ts",
-    "verify": "npm run typecheck && npm run check:build-config && npm run build && npm test",
-    "check:build-config": "node tools/check-build-config.mjs"
+    "verify": "npm run typecheck && npm run check:build-config && npm run build && npm run check:packaging && npm test",
+    "check:build-config": "node tools/check-build-config.mjs",
+    "check:packaging": "node tools/check-packaging.mjs"
   },
   "dependencies": {},
   "devDependencies": {

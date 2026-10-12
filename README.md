@@ -11,6 +11,43 @@ Electron + React + TypeScript + Vite   ·   Node.js + WebSocket server   ·   SQ
 
 ---
 
+## Download (no building required)
+
+Every release is built by GitHub Actions on real Windows/Android toolchains and attached here:
+
+**➡️ [Latest downloads](https://github.com/zakariabouifri03-max/neurio/releases/latest)** · [release page with all files](https://github.com/zakariabouifri03-max/neurio/releases/tag/neurio-latest)
+
+| Platform | File | Install |
+| --- | --- | --- |
+| **Windows** (recommended) | `Neurio-Setup-1.0.0.exe` | Run it. Per-user install, no admin prompt, Start-menu + desktop shortcuts. |
+| **Windows** (portable) | `Neurio-Portable-1.0.0.exe` | Run it — nothing is installed. Ideal for a USB stick. |
+| **Android phone/tablet** | `Neurio-Android-1.0.0.apk` | Open the file on the phone → allow "install unknown apps" → install. |
+| **Server** (for several people) | `neurio-server-1.0.0.zip` | Unzip on one machine, run `start-server.cmd` (Windows) or `start-server.sh`, then point everyone's app at that machine's address. |
+| **Web UI** | `neurio-web-1.0.0.zip` | Static files; host them on any web server. The page is also installable as an app (PWA). |
+
+All of them are **unsigned** (no certificate is bought for this project):
+
+* Windows SmartScreen → *More info → Run anyway*.
+* Android → the usual "app from outside the Play Store" warning.
+
+The desktop EXE and the APK both contain the whole app. The EXE starts its own local server on
+first run, so a single person can chat/video-test immediately; the APK asks for the address of
+the server you want to use (the machine running `neurio-server.zip`, or any other Neurio server),
+which is exactly the self-hosting model described in [docs/NETWORKING.md](docs/NETWORKING.md).
+
+### Android app specifics
+
+* The UI is bundled inside the APK, which makes it a *secure context*: microphone and camera
+  capture work even when your server is plain `http://192.168.x.x:8790` on the LAN.
+* On first launch it asks for the server address. **Long-press anywhere** to change it later, or
+  to sign out and clear local data.
+* Voice channels, video calls and screen sharing use the phone's microphone/camera — Android
+  will ask for permission the first time.
+* Built straight from `android/` by `.github/workflows/neurio-release.yml`; nothing device
+  specific and no Google services involved.
+
+---
+
 ## Quick start
 
 ```bash
@@ -110,7 +147,8 @@ Every feature below is implemented in the code base and covered by automated tes
 | `npm run build` | Renderer bundle + Electron/server bundles. |
 | `npm run build:win` | Windows installer **and** portable EXE. |
 | `npm run icons` | Regenerate `build/icon.ico` and the PNG icons (pure JS, no ImageMagick). |
-| `npm run verify` | typecheck → build → tests, the whole gate in one command. |
+| `npm run verify` | typecheck → build-config check → build → tests, the whole gate in one command. |
+| `npm run check:build-config` | Validates the electron-builder configuration against its own schema. |
 
 The server understands a few environment variables, all optional and local:
 `NEURIO_DATA_DIR`, `NEURIO_ICE_SERVERS`, `NEURIO_TURN_USERNAME`, `NEURIO_TURN_CREDENTIAL`,
@@ -219,9 +257,11 @@ electron/      main process + preload bridge (window.neurio)
 server/        Node server: db, stores, REST routes, gateway, uploads, seed, CLI
 shared/        types, permission bitfield, gateway protocol (used by both sides)
 src/           React renderer: lib clients (api/gateway/voice/store) + components + styles
-tools/         dev runner, esbuild bundler, icon generator
+android/       Android shell (WebView host) that packages the renderer into an APK
+tools/         dev runner, esbuild bundler, icon generator, build-config checker
 tests/         vitest suites: messaging, voice, uploads, permissions, units, renderer
 docs/          ARCHITECTURE.md, SELF-HOSTING.md, NETWORKING.md
+.github/       the release pipeline (Windows EXE, portable, APK, server + web bundles)
 build/         generated icons (npm run icons)
 legacy/        unrelated pre-existing project kept in the repo, untouched
 ```

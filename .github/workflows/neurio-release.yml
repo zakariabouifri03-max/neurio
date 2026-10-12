@@ -80,6 +80,12 @@ jobs:
       - name: Build renderer, Electron main and the server bundle
         run: npm run build
 
+      - name: Validate the electron-builder configuration
+        run: npm run check:build-config
+
+      - name: Validate what gets packaged into the app bundle
+        run: npm run check:packaging
+
       - name: Package the server (host it on any machine)
         run: |
           set -euo pipefail
@@ -153,6 +159,9 @@ jobs:
 
       - name: Generate icons
         run: npm run icons
+
+      - name: Validate what gets packaged into the app bundle
+        run: npm run check:packaging
 
       - name: Package with electron-builder (nsis + portable, x64)
         shell: pwsh
@@ -266,10 +275,12 @@ jobs:
 
           # …and it must be signed (v1 and/or v2 scheme).
           APKSIGNER="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -name apksigner -type f | sort | tail -1)"
-          echo "using $APKSIGNER"
-          "$APKSIGNER" verify --verbose "$APK_DEBUG"
-          "$APKSIGNER" verify --verbose "$APK_RELEASE"
-          "$APKSIGNER" verify --print-certs "$APK_RELEASE" | head -5
+          {
+            echo "using $APKSIGNER"
+            "$APKSIGNER" verify --verbose "$APK_DEBUG"
+            "$APKSIGNER" verify --verbose "$APK_RELEASE"
+            "$APKSIGNER" verify --print-certs "$APK_RELEASE"
+          } 2>&1 | tee verify-apk.log
 
           mkdir -p relay
           cp "$APK_DEBUG" relay/Neurio-Android-debug.apk
@@ -286,7 +297,13 @@ jobs:
             echo "### Neurio Android build log (\`${{ job.status }}\`)"
             echo
             echo '```'
-            tail -c 30000 build-android.log 2>/dev/null | sed -e 's/```/~~~ /g' -e 's/\r$//' || echo '(no log)'
+            tail -c 20000 build-android.log 2>/dev/null | sed -e 's/```/~~~ /g' -e 's/\r$//' || echo '(no build log)'
+            echo '```'
+            echo
+            echo '**APK verification**'
+            echo
+            echo '```'
+            cat verify-apk.log 2>/dev/null | sed -e 's/```/~~~ /g' || echo '(no verification log)'
             echo '```'
           } > /tmp/comment.md
           gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments" -F body=@/tmp/comment.md || true

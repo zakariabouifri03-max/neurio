@@ -204,7 +204,26 @@ invite code. If any of that regresses, `npm test` fails.
 Known environment caveats: `node:sqlite` prints an experimental warning on Node 22 (harmless), and
 `tests/server.voice.test.ts` exercises the *signalling* path, not real media (no camera in CI).
 
-## 7. Build pipeline
+## 7. Android shell
+
+`android/` is a plain Gradle/Kotlin-DSL Android project (no React Native, no Capacitor, no
+Node inside the APK) that hosts the **same** renderer in a `WebView`:
+
+* `app/build.gradle.kts` copies `dist/` into `app/src/main/assets/www` at build time and fails
+  loudly if the renderer has not been built (`npm run build:renderer` first).
+* `MainActivity.java` enables JavaScript, DOM storage and file access, requests the microphone /
+  camera at the moment WebRTC asks for them, wires the file chooser to the upload picker, and
+  passes the server address into the WebView as `index.html?server=…`.
+* Because the page is loaded from `file:///android_asset/…`, its origin is a *secure context*, so
+  `getUserMedia` is allowed even when the user's own server is plain HTTP on the LAN — the same
+  trick the desktop app enjoys for free.
+* `AndroidManifest.xml` allows cleartext traffic and user-installed certificates, which is what
+  self-hosting implies; `network_security_config.xml` documents that choice.
+* Release APKs are signed with the standard debug key (v1 + v2 schemes) so a downloaded file
+  installs without any secret in the repository. That is deliberate: a store-quality release
+  would need a keystore the maintainer controls.
+
+## 8. Build pipeline
 
 ```
 npm run build:renderer   vite build           → dist/            (index.html + assets)

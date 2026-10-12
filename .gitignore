@@ -43,3 +43,7 @@ android/build/
 android/app/build/
 android/app/src/main/assets/www/
 android/local.properties
+
+# packaging self-check output
+build/app-check.asar
+build/asar-staging/
