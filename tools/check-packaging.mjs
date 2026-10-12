@@ -99,7 +99,9 @@ const missingInputs = includes.filter(
 for (const entry of REQUIRED) {
   if (!existsSync(join(root, entry))) fail(`missing build output: ${entry} — run "npm run build" first`);
 }
-if (missingInputs.length > 0) fail(`build.files references paths that do not exist: ${missingInputs.join(', ')}`);
+if (missingInputs.length > 0) {
+  fail(`build.files references paths that do not exist: ${missingInputs.join(', ')} — run "npm run icons" / "npm run build" first`);
+}
 if (selected.length === 0) fail('build.files selected no files at all');
 
 /* ------------------------------- stage + pack ----------------------------- */

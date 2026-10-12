@@ -80,6 +80,9 @@ jobs:
       - name: Build renderer, Electron main and the server bundle
         run: npm run build
 
+      - name: Generate the icons that build.files expects
+        run: npm run icons
+
       - name: Validate the electron-builder configuration
         run: npm run check:build-config
 
