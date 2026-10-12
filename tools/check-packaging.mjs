@@ -15,7 +15,7 @@
  */
 import { createRequire } from 'node:module';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
-import { dirname, join, relative, sep } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
@@ -46,9 +46,12 @@ if (!Array.isArray(rules)) fail('package.json has no build.files list to check')
 const includes = rules.filter((rule) => !rule.startsWith('!'));
 const excludes = rules.filter((rule) => rule.startsWith('!')).map((rule) => rule.slice(1));
 
+/** Paths are always handled with forward slashes so the check runs the same on every OS. */
+const toPosix = (value) => value.replace(/\\/g, '/');
+
 /** Minimal glob: supports `*` and `**` in a path segment list. */
 function matches(relativePath, pattern) {
-  const pathParts = relativePath.split(sep);
+  const pathParts = toPosix(relativePath).split('/');
   const patternParts = pattern.split('/');
   const walk = (pathIndex, patternIndex) => {
     if (patternIndex === patternParts.length) return pathIndex === pathParts.length;
@@ -93,6 +96,9 @@ const selected = allFiles.filter(
   (file) => includes.some((pattern) => matches(file, pattern)) && !excludes.some((pattern) => matches(file, pattern)),
 );
 
+console.log(`build.files selects ${selected.length} files (of ${allFiles.length} in the tree)`);
+if (selected.length > 0 && selected.length < 12) console.log(`  ${selected.join(', ')}`);
+
 const missingInputs = includes.filter(
   (pattern) => !allFiles.some((file) => matches(file, pattern)) && !pattern.includes('*'),
 );
@@ -127,9 +133,7 @@ rmSync(staging, { recursive: true, force: true });
 
 /* -------------------------------- assert --------------------------------- */
 
-const packed = new Set(
-  asar.listPackage(archivePath).map((entry) => entry.replace(/^[/\\]/, '').split(sep).join('/')),
-);
+const packed = new Set(asar.listPackage(archivePath).map((entry) => toPosix(entry).replace(/^\//, '')));
 
 const html = readFileSync(join(root, 'dist', 'index.html'), 'utf8');
 const assets = [...html.matchAll(/(?:src|href)="\/?(assets\/[^"]+)"/g)].map((match) => match[1]);
