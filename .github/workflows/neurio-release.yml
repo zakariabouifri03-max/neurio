@@ -411,6 +411,11 @@ jobs:
             echo "- Cross-internet voice/video additionally wants your own STUN/TURN (\`coturn\` is free): \`NEURIO_ICE_SERVERS\`, documented in \`docs/SELF-HOSTING.md\`."
           } > notes.md
 
+          # Keep this moving tag on the commit that was actually built, so browsing the release
+          # shows the source that produced these binaries (GitHub otherwise points a new tag at
+          # the repository's default branch).
+          git push --force origin "${GITHUB_SHA}:refs/tags/${TAG}"
+
           if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
             gh release edit "$TAG" --repo "$REPO" --title "Neurio ${VERSION} — Windows EXE + Android APK" --notes-file notes.md
           else
