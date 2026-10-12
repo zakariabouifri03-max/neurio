@@ -1,0 +1,108 @@
+{
+  "name": "voxora",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Voxora desktop communication",
+  "author": "Voxora contributors",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "concurrently -k \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "tsx watch server/index.ts",
+    "dev:web": "vite --host 0.0.0.0",
+    "desktop": "electron .",
+    "generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:dev": "prisma migrate dev",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && vite build && tsc -p tsconfig.server.json && node tools/desktop-config.cjs",
+    "start": "node dist/server/index.js",
+    "test": "tsx --test tests/*.test.ts",
+    "test:integration": "tsx --test tests/integration/*.test.ts",
+    "package:win": "npm run build && electron-builder --win nsis --x64",
+    "audit:production": "npm audit --omit=dev",
+    "format": "prettier --write \"client/**/*.{ts,tsx,css,html}\" \"server/**/*.ts\" \"tests/**/*.ts\" \"electron/*.cjs\" \"tools/*.{ts,cjs}\" \"*.{json,ts,yaml}\"",
+    "format:check": "prettier --check \"client/**/*.{ts,tsx,css,html}\" \"server/**/*.ts\" \"tests/**/*.ts\" \"electron/*.cjs\" \"tools/*.{ts,cjs}\" \"*.{json,ts,yaml}\""
+  },
+  "dependencies": {
+    "@livekit/components-react": "^2.9.14",
+    "@livekit/components-styles": "^1.1.6",
+    "@prisma/adapter-pg": "^6.19.0",
+    "@prisma/client": "^6.19.0",
+    "@tanstack/react-virtual": "^3.13.12",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "livekit-client": "^2.15.6",
+    "livekit-server-sdk": "^2.14.0",
+    "lucide-react": "^0.468.0",
+    "multer": "^2.0.2",
+    "nodemailer": "^10.1.0",
+    "pg": "^8.23.1",
+    "pino": "^9.14.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^22.19.0",
+    "@types/nodemailer": "^7.0.4",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@types/smtp-server": "^3.5.13",
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.2.1",
+    "electron": "^44.7.0",
+    "electron-builder": "^26.0.12",
+    "embedded-postgres": "^18.4.0-beta.17",
+    "postcss": "^8.5.6",
+    "prettier": "^3.9.10",
+    "prisma": "^6.19.0",
+    "smtp-server": "^3.19.21",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.1"
+  },
+  "build": {
+    "appId": "app.voxora.desktop",
+    "productName": "Voxora",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/client/**/*",
+      "electron/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "artifactName": "Voxora-${version}-${arch}-Setup.${ext}"
+  },
+  "overrides": {
+    "@prisma/config": {
+      "deepmerge-ts": "^8.0.2"
+    }
+  }
+}

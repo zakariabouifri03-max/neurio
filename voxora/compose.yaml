@@ -1,0 +1,29 @@
+name: voxora
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: voxora
+      POSTGRES_PASSWORD: local-development-only
+      POSTGRES_DB: voxora
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: ["postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U voxora -d voxora"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+  mailpit:
+    image: axllent/mailpit:v1.21
+    ports: ["127.0.0.1:1025:1025", "127.0.0.1:8025:8025"]
+  livekit:
+    image: livekit/livekit-server:v1.9.0
+    command: ["--config", "/etc/livekit.yaml"]
+    volumes: ["./infra/livekit.local.yaml:/etc/livekit.yaml:ro"]
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+      - "3478:3478/udp"
+volumes:
+  postgres:

@@ -1,0 +1,8 @@
+chat.YOUR_DOMAIN {
+  encode zstd gzip
+  reverse_proxy 127.0.0.1:3001
+}
+media.YOUR_DOMAIN {
+  reverse_proxy 127.0.0.1:7880
+}
+# TURN/TLS is not HTTP. Expose LiveKit's 5349/TCP directly with its own certificate.

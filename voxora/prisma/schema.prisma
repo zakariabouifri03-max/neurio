@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "client"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  username String @unique
+  displayName String
+  passwordHash String
+  verified Boolean @default(false)
+  status String @default("online")
+  bio String @default("")
+  avatar String?
+  banner String?
+  preferences Json @default("{}")
+  createdAt DateTime @default(now())
+  sessions Session[]
+  tokens AccountToken[]
+  memberships Member[]
+  conversations ConversationMember[]
+  messages Message[]
+  uploads Upload[]
+}
+model Session {
+  id String @id @default(cuid())
+  tokenHash String @unique
+  userId String
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([userId])
+}
+model AccountToken {
+  id String @id @default(cuid())
+  hash String @unique
+  kind String
+  expiresAt DateTime
+  userId String
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+}
+model Friendship {
+  id String @id @default(cuid())
+  fromId String
+  toId String
+  state String @default("pending")
+  createdAt DateTime @default(now())
+  @@unique([fromId,toId])
+}
+model Block {
+  id String @id @default(cuid())
+  userId String
+  targetId String
+  @@unique([userId,targetId])
+}
+model Server {
+  id String @id @default(cuid())
+  name String
+  description String @default("")
+  icon String?
+  ownerId String
+  createdAt DateTime @default(now())
+  members Member[]
+  channels Conversation[]
+  invites Invite[]
+  audits Audit[]
+  bans Ban[]
+}
+model Member {
+  id String @id @default(cuid())
+  userId String
+  serverId String
+  role String @default("member")
+  timeoutUntil DateTime?
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  server Server @relation(fields:[serverId],references:[id],onDelete:Cascade)
+  @@unique([serverId,userId])
+}
+model Ban {
+  id String @id @default(cuid())
+  serverId String
+  userId String
+  server Server @relation(fields:[serverId],references:[id],onDelete:Cascade)
+  @@unique([serverId,userId])
+}
+model Invite {
+  id String @id @default(cuid())
+  code String @unique
+  serverId String
+  expiresAt DateTime
+  maxUses Int @default(10)
+  uses Int @default(0)
+  server Server @relation(fields:[serverId],references:[id],onDelete:Cascade)
+}
+model Conversation {
+  id String @id @default(cuid())
+  name String
+  kind String @default("text")
+  serverId String?
+  private Boolean @default(false)
+  category String @default("General")
+  position Int @default(0)
+  slowMode Int @default(0)
+  participantLimit Int @default(25)
+  createdAt DateTime @default(now())
+  server Server? @relation(fields:[serverId],references:[id],onDelete:Cascade)
+  members ConversationMember[]
+  messages Message[]
+  uploads Upload[]
+}
+model ConversationMember {
+  id String @id @default(cuid())
+  conversationId String
+  userId String
+  lastReadAt DateTime @default(now())
+  muted Boolean @default(false)
+  conversation Conversation @relation(fields:[conversationId],references:[id],onDelete:Cascade)
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  @@unique([conversationId,userId])
+}
+model Message {
+  id String @id @default(cuid())
+  conversationId String
+  authorId String
+  body String
+  replyToId String?
+  pinned Boolean @default(false)
+  createdAt DateTime @default(now())
+  editedAt DateTime?
+  deletedAt DateTime?
+  conversation Conversation @relation(fields:[conversationId],references:[id],onDelete:Cascade)
+  author User @relation(fields:[authorId],references:[id])
+  uploads Upload[]
+  reactions Reaction[]
+  @@index([conversationId,createdAt,id])
+}
+model Reaction {
+  id String @id @default(cuid())
+  messageId String
+  userId String
+  emoji String
+  message Message @relation(fields:[messageId],references:[id],onDelete:Cascade)
+  @@unique([messageId,userId,emoji])
+}
+model Upload {
+  id String @id @default(cuid())
+  userId String
+  conversationId String
+  messageId String?
+  name String
+  mime String
+  size Int
+  key String @unique
+  createdAt DateTime @default(now())
+  user User @relation(fields:[userId],references:[id])
+  conversation Conversation @relation(fields:[conversationId],references:[id],onDelete:Cascade)
+  message Message? @relation(fields:[messageId],references:[id],onDelete:SetNull)
+}
+model Audit {
+  id String @id @default(cuid())
+  serverId String
+  actorId String
+  action String
+  targetId String?
+  createdAt DateTime @default(now())
+  server Server @relation(fields:[serverId],references:[id],onDelete:Cascade)
+}
+model Report {
+  id String @id @default(cuid())
+  userId String
+  targetId String
+  reason String
+  createdAt DateTime @default(now())
+}

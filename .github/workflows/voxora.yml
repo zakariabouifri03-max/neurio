@@ -1,0 +1,61 @@
+name: Voxora checks and Windows package
+on:
+  push:
+    paths: ['voxora/**', '.github/workflows/voxora.yml']
+  pull_request:
+    paths: ['voxora/**', '.github/workflows/voxora.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: voxora
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: voxora/package-lock.json
+      - run: npm ci
+      - run: npm run generate
+      - run: npm run build
+      - run: npm test
+      - run: npm run test:integration
+      - run: npm audit --omit=dev
+  windows:
+    # Packaging is deliberately manual until public endpoints have been provisioned.
+    if: github.event_name == 'workflow_dispatch'
+    needs: checks
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: voxora
+    env:
+      VITE_API_URL: ${{ vars.VOXORA_API_URL }}
+      LIVEKIT_URL: ${{ vars.VOXORA_LIVEKIT_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: voxora/package-lock.json
+      - name: Require public service endpoints
+        shell: pwsh
+        run: |
+          if (-not $env:VITE_API_URL.StartsWith('https://')) { throw 'Set VOXORA_API_URL repository variable to the public HTTPS backend' }
+          if (-not $env:LIVEKIT_URL.StartsWith('wss://')) { throw 'Set VOXORA_LIVEKIT_URL repository variable to the public WSS SFU' }
+      - run: npm ci
+      - run: npm run generate
+      - run: npm run package:win
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Voxora-Windows-x64-unsigned
+          path: voxora/release/*Setup.exe
+          if-no-files-found: error

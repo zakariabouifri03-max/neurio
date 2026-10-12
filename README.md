@@ -113,3 +113,9 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## Voxora communication application
+
+The separate Electron/React/PostgreSQL communication project is in [`voxora/`](voxora/README.md). The original racing game above is preserved. Read its [implementation and verification ledger](voxora/docs/STATUS.md) for supported features, test evidence, and unfinished release requirements.

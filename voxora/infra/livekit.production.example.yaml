@@ -1,0 +1,18 @@
+# Replace ALL uppercase placeholders before use. Never commit the filled file.
+port: 7880
+bind_addresses: ["0.0.0.0"]
+rtc:
+  tcp_port: 7881
+  udp_port: 7882
+  use_external_ip: true
+keys:
+  REPLACE_API_KEY: REPLACE_WITH_RANDOM_SECRET_AT_LEAST_32_CHARACTERS
+turn:
+  enabled: true
+  domain: turn.YOUR_DOMAIN
+  tls_port: 5349
+  udp_port: 3478
+  cert_file: /certs/fullchain.pem
+  key_file: /certs/privkey.pem
+logging:
+  level: warn
