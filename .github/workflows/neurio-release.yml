@@ -163,9 +163,12 @@ jobs:
           npx electron-builder --win --x64 --publish never *>&1 | Tee-Object -FilePath build-win.log
           if ($LASTEXITCODE -ne 0) { Write-Error "electron-builder exited with $LASTEXITCODE"; exit 1 }
 
-      - name: List the produced installers
+      - name: Stage the installers for upload
         shell: pwsh
-        run: Get-ChildItem release -Filter *.exe | Select-Object Name, Length
+        run: |
+          New-Item -ItemType Directory -Force -Path relay | Out-Null
+          Get-ChildItem release -Filter *.exe | ForEach-Object { Copy-Item $_.FullName "relay/$($_.Name)" }
+          Get-ChildItem relay | Select-Object Name, Length
 
       - name: Publish the build log as a commit comment
         if: always()
@@ -186,9 +189,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: neurio-windows
-          path: |
-            release/*.exe
-            build-win.log
+          path: relay/*
           if-no-files-found: error
 
   # --------------------------------------------------------------- android --
@@ -320,12 +321,39 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           mkdir -p upload
-          cp artifacts/*.exe upload/ 2>/dev/null || true
-          cp artifacts/*.apk upload/ 2>/dev/null || true
-          cp artifacts/neurio-web.zip "upload/neurio-web-${VERSION}.zip" 2>/dev/null || true
-          cp artifacts/neurio-server.zip "upload/neurio-server-${VERSION}.zip" 2>/dev/null || true
-          ls -lhR upload
-          test -n "$(ls -A upload)" || { echo 'no artefacts were collected'; exit 1; }
+
+          echo '--- downloaded artefacts ---'
+          find artifacts -type f | sort
+
+          # upload-artifact preserves the path relative to the common ancestor of the uploaded
+          # paths, so the EXEs arrive under release/ and the APKs under relay/. Search for them
+          # instead of assuming a layout, and fail loudly if one is missing.
+          copy_first() {
+            local pattern="$1" target="$2" required="$3"
+            local found
+            found="$(find artifacts -type f -name "$pattern" | sort | head -1)"
+            if [ -z "$found" ]; then
+              if [ "$required" = "required" ]; then
+                echo "::error::missing artefact matching $pattern"
+                exit 1
+              fi
+              echo "  (optional) $pattern not found — skipped"
+              return 0
+            fi
+            cp "$found" "upload/$target"
+            echo "  $found -> upload/$target"
+          }
+
+          copy_first 'Neurio-Setup-*.exe'      "Neurio-Setup-${VERSION}.exe"     required
+          copy_first 'Neurio-Portable-*.exe'   "Neurio-Portable-${VERSION}.exe"  required
+          copy_first 'Neurio-Android-[0-9]*.apk' "Neurio-Android-${VERSION}.apk" required
+          copy_first 'Neurio-Android-debug.apk'  'Neurio-Android-debug.apk'      optional
+          copy_first 'neurio-web.zip'          "neurio-web-${VERSION}.zip"       required
+          copy_first 'neurio-server.zip'       "neurio-server-${VERSION}.zip"    required
+
+          echo '--- uploading ---'
+          ls -lh upload
+          test "$(ls -A upload | wc -l)" -ge 4 || { echo 'not enough artefacts were collected'; exit 1; }
 
       - name: Create or update the "neurio-latest" release
         env:
