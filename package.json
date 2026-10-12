@@ -1,0 +1,130 @@
+{
+  "name": "neurio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Neurio \u2014 a free, open-source, self-hosted Discord-style desktop communication app (Electron + React + TypeScript + Node WebSockets + SQLite + WebRTC)",
+  "author": {
+    "name": "Neurio Contributors",
+    "email": "neurio@localhost"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "dist-electron/electron/main.cjs",
+  "scripts": {
+    "dev": "node tools/dev.mjs",
+    "dev:web": "vite",
+    "dev:server": "tsx watch server/index.ts",
+    "server": "tsx server/index.ts",
+    "build": "npm run build:renderer && npm run build:electron",
+    "build:renderer": "vite build",
+    "build:electron": "node tools/build-electron.mjs",
+    "build:win": "npm run build && electron-builder --win --x64",
+    "build:win:portable": "npm run build && electron-builder --win portable --x64",
+    "pack:dir": "npm run build && electron-builder --win --x64 --dir",
+    "icons": "node tools/make-icons.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "seed": "tsx server/seed.ts",
+    "verify": "npm run typecheck && npm run build && npm test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@types/ws": "^8.5.13",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
+    "electron": "^44.7.0",
+    "electron-builder": "^26.0.12",
+    "esbuild": "^0.24.0",
+    "jsdom": "^25.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vitest": "^2.1.8",
+    "ws": "^8.18.0",
+    "zustand": "^5.0.2"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "build": {
+    "appId": "dev.neurio.desktop",
+    "productName": "Neurio",
+    "copyright": "Neurio contributors \u2014 MIT licensed",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "build/icon.ico",
+      "package.json",
+      "!**/*.map",
+      "!**/*.ts",
+      "!node_modules/.cache"
+    ],
+    "asar": true,
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "publisherName": "Neurio",
+      "verifyUpdateCodeSignature": false,
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Neurio",
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "artifactName": "Neurio-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Neurio-Portable-${version}.${ext}",
+      "requestExecutionLevel": "user"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Network",
+      "icon": "build/icon-512.png"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.social-networking"
+    },
+    "publish": null
+  }
+}

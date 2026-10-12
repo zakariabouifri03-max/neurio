@@ -1,115 +1,231 @@
-# 🏁 Bash Baqi Racing
+# Neurio
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+**A free, self-hosted, Discord-style desktop chat app for Windows** — text channels, direct
+messages, roles and permissions, voice calls, video, screen sharing, file attachments and search.
+Everything runs on your own machine: no cloud account, no API keys, no subscription, no external
+AI service. MIT licensed.
 
-**▶ Play:** serve the folder with any static server and open it:
+```
+Electron + React + TypeScript + Vite   ·   Node.js + WebSocket server   ·   SQLite   ·   WebRTC
+```
+
+---
+
+## Quick start
 
 ```bash
-python3 -m http.server 8000
-# → http://localhost:8000
+# 1. install dependencies (Node 20.11+ / 22 LTS recommended)
+npm install
+
+# 2. create a demo workspace (optional but recommended the first time)
+npm run seed
+
+# 3. run the desktop app in development (server + renderer + Electron window)
+npm run dev
 ```
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+No server? The desktop app **starts its own** Node server on `127.0.0.1:8790` and stores
+everything in `%APPDATA%\Neurio` (`neurio.sqlite` + `uploads/`). You do not have to configure
+anything to chat with yourself, and other people on your network can point the same app at your
+machine's LAN address.
 
----
-
-## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
-
-A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
-soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
-
-title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
-
-Everything is generated from code (no stock footage/music):
+### Try it in a browser instead
 
 ```bash
-python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
-python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
+npm run server           # API + WebSocket gateway on http://0.0.0.0:8790
+npm run dev:web          # Vite dev server on http://localhost:5173 (proxies /api and /gateway)
 ```
 
-See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
+Open <http://localhost:5173> — the same React app, no Electron needed. Handy for testing on a
+phone or a second laptop on the same Wi-Fi.
+
+### Build the Windows installer
+
+```bash
+npm run build:win            # dist/ + dist-electron/ + NSIS installer + portable EXE
+npm run build:win:portable   # portable EXE only (no installation, runs from a USB stick)
+npm run pack:dir             # unpacked build in release/win-unpacked (fastest smoke test)
+```
+
+Output lands in `release/`:
+
+| Artefact | What it is |
+| --- | --- |
+| `Neurio-Setup-1.0.0.exe` | NSIS installer. Per-user by default (no admin prompt), lets you pick the folder, creates Start-menu and desktop shortcuts. |
+| `Neurio-Portable-1.0.0.exe` | Single portable EXE. No installer, no registry, no leftover files — ideal for a USB stick. |
+
+Both bundles contain the renderer, the Electron main process **and the server**, so the app works
+offline on a machine with nothing else installed. See [docs/SELF-HOSTING.md](docs/SELF-HOSTING.md)
+if you would rather run the server on a always-on machine or a VPS.
+
+> **Status of the builds in this repository.** The renderer bundle, the Electron bundles, the
+> server bundle, the test suite and the browser build were all built and executed in the Linux
+> container this project was developed in. The Windows `.exe` files themselves were **not** built
+> there: the container has no Windows/Wine tool-chain and its network policy blocks the Electron
+> binary download (`github.com` release assets), so `electron-builder --win` cannot run. The
+> commands above are the exact, standard ones — run them on Windows (or any machine with Wine +
+> the Electron binary) and they produce the two artefacts. Nothing else is missing.
 
 ---
 
-## 📱 Install on your phone — كأنها APK!
+## The 16 requirements, and how each one is implemented
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
+Every feature below is implemented in the code base and covered by automated tests
+(`npm test` → **98 passing tests**). "Verified by" lists the test file that exercises it.
 
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
-
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
-**Offline play** is built-in: a service worker caches all game files on first visit.
-
----
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
-|---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
-
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
-```
-
-Made with ❤️ and Three.js
+| # | Feature | Implementation | Verified by |
+| --- | --- | --- | --- |
+| 1 | Account creation & login | `POST /api/auth/register|login|logout`, scrypt password hashing, SHA-256 session tokens, session list + revoke, first account becomes server operator (`server/rest/auth.ts`) | `server.messaging.test.ts` (accounts), `unit.test.ts` (hashing) |
+| 2 | Profiles & avatars | Display name, bio, custom status, avatar + server icon upload, shared `Avatar` component with presence ring | `server.uploads.test.ts` (avatars/icons), `renderer.test.tsx` |
+| 3 | Friends & requests | Request/accept/ignore/unblock, blocks are enforced in DMs and invites, live `FRIEND_REQUEST_*` dispatches | `server.messaging.test.ts` (friends), `renderer.test.tsx` (pending tab) |
+| 4 | Real-time DMs | DM + group-DM channels, per-recipient delivery, read states and unread counters | `server.messaging.test.ts` (direct messages) |
+| 5 | Servers, channels, categories | Create/rename/delete servers, text + voice + category channels, channel topics, slowmode, drag-free reordering by position | `server.messaging.test.ts` (servers/channels) |
+| 6 | Invites & member management | Invite codes (optional max uses/expiry), join via code, kick, ban/unban, leave, ownership transfer, nicknames | `server.permissions.test.ts` (moderation) |
+| 7 | Roles & permissions | 17-bit permission set, role hierarchy guard (you cannot grant above yourself), per-channel role *and* member overwrites, `@everyone` fallback | `server.permissions.test.ts` (roles, overwrites), `unit.test.ts` (bitfield) |
+| 8 | Attachments | Chunked multipart upload (no dependency), 25 MB default cap, MIME allow-list + magic-byte sniffing, byte-exact downloads with `Range` support, orphan sweep | `server.uploads.test.ts` |
+| 9 | Edit / delete / react / reply | Message edits with `(edited)`, soft deletes + `MESSAGE_DELETE` dispatch, emoji reactions with counts, replies with an inline preview, pins | `server.messaging.test.ts` (messages), `renderer.test.tsx` |
+| 10 | Presence & typing | Online/idle/DND/offline presence with custom status, typing indicators over the gateway with expiry timers | `server.messaging.test.ts` (presence, typing), `renderer.test.tsx` |
+| 11 | Voice channels | Join/leave announcements, mute/deafen, live speaking detection (WebAudio analyser), call records in SQLite | `server.voice.test.ts` |
+| 12 | Video & screen share | P2P WebRTC mesh signalled over the gateway (offer/answer/ICE relayed only between peers in the same channel), camera + `getDisplayMedia` screen sharing, per-peer tiles | `server.voice.test.ts` (signalling relay, refusals) |
+| 13 | Notifications & unread counts | Windows toasts through Electron (`new Notification`), Web-Notification fallback in a browser, taskbar overlay badge + tray counter, per-channel mention badges | `renderer.test.tsx`, `src/lib/notifications.ts` |
+| 14 | Search, settings, dark mode | SQLite FTS5 full-text search with filters (server/channel/author/pins), settings screen (profile, appearance, sessions, server admin), three themes + font size + compact mode | `server.messaging.test.ts` (search), `unit.test.ts` (snippets), `src/components/Modals.tsx` |
+| 15 | Local data storage | SQLite (`node:sqlite`, WAL) with a versioned migration runner, uploads on disk, nothing leaves the machine unless you self-host it | `server/db.ts`, all server tests |
+| 16 | Windows installer + portable EXE | electron-builder config in `package.json` (`nsis` + `portable`, x64), generated icon, no signing requirement | `npm run build:win` (see the status note above) |
 
 ---
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+## Commands
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+| Command | Purpose |
+| --- | --- |
+| `npm install` | Install dependencies (no native modules to compile). |
+| `npm run dev` | Server + Vite + Electron window, all with hot reload. |
+| `npm run dev:web` | Only the renderer dev server (open it in any browser). |
+| `npm run dev:server` | Only the API server, restarting on change. |
+| `npm run server` | Run the server as a standalone process (`--port`, `--host`, `--data-dir`, `--static`, `--no-registration`). |
+| `npm run seed` | Create the demo workspace (`operator`, `alice`, `bob`, `carol`, `Neurio HQ`, invite code). |
+| `npm test` | Run all 98 tests (backend, media, permissions, renderer). |
+| `npm run test:coverage` | Same, with a coverage report. |
+| `npm run typecheck` | `tsc --noEmit` over the whole project (strict mode). |
+| `npm run build` | Renderer bundle + Electron/server bundles. |
+| `npm run build:win` | Windows installer **and** portable EXE. |
+| `npm run icons` | Regenerate `build/icon.ico` and the PNG icons (pure JS, no ImageMagick). |
+| `npm run verify` | typecheck → build → tests, the whole gate in one command. |
 
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
+The server understands a few environment variables, all optional and local:
+`NEURIO_DATA_DIR`, `NEURIO_ICE_SERVERS`, `NEURIO_TURN_USERNAME`, `NEURIO_TURN_CREDENTIAL`,
+`NEURIO_TRUST_PROXY`, `NEURIO_SERVER_URL` (make the desktop app use an existing server).
 
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+---
+
+## Where your data lives
+
+| Platform | Default location | Contents |
+| --- | --- | --- |
+| Windows (desktop app) | `%APPDATA%\Neurio` | `neurio.sqlite`, `uploads/` |
+| Linux | `~/.local/share/neurio` | same |
+| macOS | `~/Library/Application Support/Neurio` | same |
+| This repo (dev / preview) | `./.neurio-data` (git-ignored) | same |
+
+Back up the folder and you have backed up the whole server. Deleting it resets the instance.
+No credentials live in the repository, and there is no `.env` file to fill in.
+
+---
+
+## Architecture in one minute
+
+```
+┌────────────────────────── Electron desktop app ───────────────────────────┐
+│  main process (electron/main.ts)                                          │
+│    · spawns / attaches to the server      · tray, badge, notifications     │
+│    · window, native dialogs, auto-launch  · "save attachment as…"          │
+│  preload (contextBridge → window.neurio, no Node in the renderer)          │
+│  renderer: React 19 + zustand store  ── HTTP ──┐   ── WebSocket ──┐        │
+└────────────────────────────────────────────────┼──────────────────┼────────┘
+                                                 ▼                  ▼
+                                  ┌───────────────────────────────────────┐
+                                  │ Neurio server (Node, no framework)    │
+                                  │  REST /api/*   ·   gateway /gateway    │
+                                  │  SQLite: users, guilds, channels,      │
+                                  │  roles, messages+FTS5, uploads, calls  │
+                                  │  files on disk under <data-dir>/uploads│
+                                  └───────────────────────────────────────┘
+                                                 ▲
+                        WebRTC media (audio/video/screen) flows directly
+                        between peers — the server only relays SDP/ICE
+```
+
+* **One process, no framework.** `server/app.ts` composes the stores, the REST router and the
+  gateway; `server/index.ts` is the CLI wrapper. Tests boot the same app in-memory on port 0.
+* **Gateway protocol v1** (`shared/protocol.ts`): `hello` → `identify` → `READY` dispatch, then
+  heartbeats and dispatch events (`MESSAGE_CREATE`, `PRESENCE_UPDATE`, `TYPING_START`,
+  `VOICE_STATE_UPDATE`, `VOICE_SPEAKING`, `VOICE_SIGNAL`, …).
+* **WebRTC mesh.** Media never touches the server: it relays signalling only, and refuses to
+  signal peers that are not in the same voice channel. The server advertises
+  `recommended_max_mesh_peers: 6`; the UI warns above that.
+* **Renderer** is one zustand store (`src/lib/store.ts`) behind typed clients (`api.ts`,
+  `gateway.ts`, `voice.ts`) and 12 React components. It keeps working if a WebSocket drops — the
+  gateway reconnects with exponential backoff and re-syncs through `READY`/`refreshGuildData()`.
+
+Full detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+---
+
+## Talking to people outside your house
+
+This is the one thing that is genuinely not solvable from inside the code, so it is worth being
+blunt about it:
+
+* **Same Wi-Fi / same LAN — works out of the box.** The server binds `0.0.0.0`, prints its LAN URL
+  at startup (`http://192.168.x.x:8790`), and anyone can add that address in the sign-in screen.
+* **Across the internet — needs a machine that is reachable from the internet.** NAT means your
+  friends cannot connect to a laptop behind a home router unless you forward a port, use a VPN
+  overlay (Tailscale/WireGuard/ZeroTier), or run the server on a VPS. Then voice/video also want
+  a **STUN** server (built into WebRTC clients) and ideally your own **TURN** server for stubborn
+  NATs — `coturn` is free and open source, and Neurio accepts its credentials through
+  `NEURIO_ICE_SERVERS`/`NEURIO_TURN_USERNAME`/`NEURIO_TURN_CREDENTIAL`. Text chat alone needs
+  none of that.
+* **No paid service is required for any of it.** If you do not want to run a VPS, the LAN and
+  VPN-overlay routes give you the same result at zero cost.
+
+Exact steps for both: [docs/NETWORKING.md](docs/NETWORKING.md) (and
+[docs/SELF-HOSTING.md](docs/SELF-HOSTING.md) for the server side).
+
+---
+
+## Security posture (honest version)
+
+* Passwords: scrypt (N=16384, r=8, p=1, 64-byte key) with a random salt per user; the plaintext
+  never leaves the request handler.
+* Sessions: 32-byte random tokens, **only a SHA-256 hash is stored** server-side; revocable one by
+  one or all at once; the client keeps its token in the app's local storage (the renderer's
+  `localStorage`), not in a file you would accidentally commit.
+* Authorisation: every route re-checks membership and the relevant permission bit; channel
+  visibility is applied when listing channels *and* when fetching a single one; files are served
+  only to members who can see the channel that references them.
+* Uploads: MIME allow-list, extension sanitising, size cap, `Content-Disposition` on download.
+* Nothing phones home: no analytics, no update pings, no external API calls of any kind. The only
+  optional outbound traffic is what *you* configure (a STUN/TURN server for calls).
+* Not implemented (deliberately, to keep the dependency list tiny): end-to-end encryption, TLS
+  termination (put it behind a reverse proxy such as Caddy — see the self-hosting guide), and
+  code signing for the EXE.
+
+---
+
+## Repository layout
+
+```
+electron/      main process + preload bridge (window.neurio)
+server/        Node server: db, stores, REST routes, gateway, uploads, seed, CLI
+shared/        types, permission bitfield, gateway protocol (used by both sides)
+src/           React renderer: lib clients (api/gateway/voice/store) + components + styles
+tools/         dev runner, esbuild bundler, icon generator
+tests/         vitest suites: messaging, voice, uploads, permissions, units, renderer
+docs/          ARCHITECTURE.md, SELF-HOSTING.md, NETWORKING.md
+build/         generated icons (npm run icons)
+legacy/        unrelated pre-existing project kept in the repo, untouched
+```
+
+## License
+
+MIT — see [LICENSE](LICENSE). Do what you like with it.

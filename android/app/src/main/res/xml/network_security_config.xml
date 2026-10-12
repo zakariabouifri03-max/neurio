@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Neurio servers are usually self-hosted: http://192.168.x.x:8790 on a LAN, or a personal
+  server the user runs themselves. Cleartext is therefore allowed, and user-installed
+  certificates are trusted so a self-signed TLS certificate works too.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

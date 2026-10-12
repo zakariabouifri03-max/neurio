@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Neurio</string>
+    <string name="server_dialog_title">Neurio server address</string>
+    <string name="server_dialog_message">Enter the address of the Neurio server you want to use — the computer running `npm run server`. Examples:\n\n• http://192.168.1.20:8790  (server on your Wi-Fi)\n• https://chat.example.com   (self-hosted with TLS)\n\nLong-press anywhere in the app to change it later.</string>
+    <string name="server_dialog_hint">http://192.168.1.20:8790</string>
+    <string name="connect">Connect</string>
+    <string name="cancel">Cancel</string>
+    <string name="change_server">Change server</string>
+    <string name="clear_data">Sign out and clear local data</string>
+    <string name="clear_data_done">Local data cleared.</string>
+    <string name="microphone_needed">Neurio needs microphone access for voice channels.</string>
+    <string name="camera_needed">Neurio needs camera access for video calls.</string>
+    <string name="permissions_needed">Voice and video need microphone/camera permission. Enable them in Android settings, then try again.</string>
+    <string name="first_run_hint">Long-press anywhere to change the server address.</string>
+</resources>

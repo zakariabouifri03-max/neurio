@@ -1,0 +1,346 @@
+name: Neurio — build Windows EXE + Android APK
+
+# Builds every downloadable artefact for Neurio on GitHub's own runners and publishes them as
+# real, clickable download links on the release "neurio-latest":
+#
+#   • Neurio-Setup-<v>.exe        Windows installer (NSIS, per-user, no admin prompt)
+#   • Neurio-Portable-<v>.exe     Windows portable EXE (no install, runs from a USB stick)
+#   • Neurio-Android-<v>.apk      Phone/tablet app (install on Android, grant "unknown sources")
+#   • neurio-server-<v>.zip       The Node server to host on one machine (LAN or VPS)
+#   • neurio-web-<v>.zip          Static UI you can host anywhere (browser + "Install app" PWA)
+#
+# No secrets, no signing keys, no paid services: the APK is signed with the standard debug key
+# and the EXE is left unsigned (Windows shows the usual "unknown publisher" warning).
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['**']
+    paths:
+      - 'server/**'
+      - 'shared/**'
+      - 'src/**'
+      - 'electron/**'
+      - 'tools/**'
+      - 'android/**'
+      - 'tests/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - '.github/workflows/neurio-release.yml'
+  pull_request:
+    paths:
+      - 'server/**'
+      - 'src/**'
+      - 'android/**'
+      - '.github/workflows/neurio-release.yml'
+
+concurrency:
+  group: neurio-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  # ---------------------------------------------------------------- checks --
+  checks:
+    name: Typecheck, tests and bundles
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      # The Electron binary is only needed for packaging; skip the download here.
+      - name: Install dependencies
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests (server, permissions, uploads, voice, renderer)
+        run: npm test
+
+      - name: Build renderer, Electron main and the server bundle
+        run: npm run build
+
+      - name: Package the server (host it on any machine)
+        run: |
+          set -euo pipefail
+          mkdir -p release-server
+          cp -r dist-electron release-server/dist-electron
+          cp package.json release-server/package.json
+          cat > release-server/start-server.cmd <<'EOF'
+          @echo off
+          rem Neurio server — run this on the machine that hosts your chat.
+          rem Requires Node.js 20.11+ (https://nodejs.org).  Keep this window open.
+          setlocal
+          if "%NEURIO_PORT%"=="" set NEURIO_PORT=8790
+          if "%NEURIO_DATA_DIR%"=="" set NEURIO_DATA_DIR=%~dp0data
+          echo.
+          echo   Neurio server  ^|  port %NEURIO_PORT%  ^|  data in %NEURIO_DATA_DIR%
+          echo   First account you create becomes the server admin.
+          echo.
+          node "%~dp0dist-electron\server\index.cjs" --host 0.0.0.0 --port %NEURIO_PORT% --data-dir "%NEURIO_DATA_DIR%" %*
+          pause
+          EOF
+          cat > release-server/start-server.sh <<'EOF'
+          #!/usr/bin/env sh
+          # Neurio server — run this on the machine that hosts your chat.
+          set -e
+          cd "$(dirname "$0")"
+          NEURIO_PORT="${NEURIO_PORT:-8790}"
+          NEURIO_DATA_DIR="${NEURIO_DATA_DIR:-$(pwd)/data}"
+          echo
+          echo "  Neurio server | port ${NEURIO_PORT} | data in ${NEURIO_DATA_DIR}"
+          echo "  First account you create becomes the server admin."
+          echo
+          exec node dist-electron/server/index.cjs --host 0.0.0.0 --port "${NEURIO_PORT}" --data-dir "${NEURIO_DATA_DIR}" "$@"
+          EOF
+          chmod +x release-server/start-server.sh
+          cp README.md release-server/SERVER-README.md
+          (cd release-server && zip -qr ../neurio-server.zip .)
+          ls -lh neurio-server.zip
+
+      - name: Package the web build (host it anywhere, installable as an app)
+        run: |
+          set -euo pipefail
+          (cd dist && zip -qr ../neurio-web.zip .)
+          ls -lh neurio-web.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neurio-web
+          path: |
+            neurio-web.zip
+            neurio-server.zip
+          if-no-files-found: error
+
+  # --------------------------------------------------------------- windows --
+  windows:
+    name: Windows EXE (installer + portable)
+    needs: checks
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies (with the Electron binary)
+        run: npm ci
+
+      - name: Build renderer + Electron + server bundles
+        run: npm run build
+
+      - name: Generate icons
+        run: npm run icons
+
+      - name: Package with electron-builder (nsis + portable, x64)
+        env:
+          # Unsigned build: no certificate, no secret, no signing service.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --win --x64 --publish never
+
+      - name: List the produced installers
+        shell: pwsh
+        run: Get-ChildItem release -Filter *.exe | Select-Object Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neurio-windows
+          path: |
+            release/*.exe
+          if-no-files-found: error
+
+  # --------------------------------------------------------------- android --
+  android:
+    name: Android APK
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Build the renderer that gets bundled inside the APK
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+        run: |
+          npm ci
+          npm run icons
+          npm run build:renderer
+
+      - name: Validate the bundled UI before packaging
+        run: |
+          set -euo pipefail
+          test -f dist/index.html || { echo 'dist/index.html is missing'; exit 1; }
+          grep -q 'src=' dist/index.html || { echo 'dist/index.html has no entry script'; exit 1; }
+          ls -la dist dist/assets | head -20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0 platform-tools'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Compile the debug APK
+        working-directory: android
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Compile the installable release APK
+        working-directory: android
+        run: gradle :app:assembleRelease --no-daemon --stacktrace
+
+      - name: Verify the APKs contain the app UI and a signature
+        run: |
+          set -euo pipefail
+          APK_DEBUG=android/app/build/outputs/apk/debug/app-debug.apk
+          APK_RELEASE=android/app/build/outputs/apk/release/app-release.apk
+          test -f "$APK_DEBUG"  || { echo 'debug APK missing'; exit 1; }
+          test -f "$APK_RELEASE" || { echo 'release APK missing'; exit 1; }
+          python3 - <<'PY'
+          import zipfile, sys
+          for path in ('android/app/build/outputs/apk/debug/app-debug.apk',
+                       'android/app/build/outputs/apk/release/app-release.apk'):
+              with zipfile.ZipFile(path) as archive:
+                  names = archive.namelist()
+                  needed = ['AndroidManifest.xml', 'classes.dex', 'assets/www/index.html', 'META-INF/CERT.RSA']
+                  missing = [n for n in needed if n not in names]
+                  if missing:
+                      print(f'{path}: missing {missing}')
+                      sys.exit(1)
+                  print(f'{path}: ok ({len(names)} entries, UI bundled, signature present)')
+          PY
+          mkdir -p artifacts
+          cp "$APK_DEBUG" artifacts/Neurio-Android-debug.apk
+          cp "$APK_RELEASE" artifacts/Neurio-Android-1.0.0.apk
+          ls -lh artifacts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neurio-android
+          path: artifacts/*.apk
+          if-no-files-found: error
+
+  # --------------------------------------------------------------- release --
+  release:
+    name: Publish download links
+    needs: [checks, windows, android]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Collect and rename artefacts
+        id: collect
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          mkdir -p upload
+          cp artifacts/*.exe upload/ 2>/dev/null || true
+          cp artifacts/Neurio-Android-1.0.0.apk upload/ 2>/dev/null || cp artifacts/neurio-android/*.apk upload/ 2>/dev/null || true
+          cp artifacts/Neurio-Android-*.apk upload/ 2>/dev/null || true
+          cp artifacts/neurio-web.zip  "upload/neurio-web-${VERSION}.zip" 2>/dev/null || true
+          cp artifacts/neurio-server.zip "upload/neurio-server-${VERSION}.zip" 2>/dev/null || true
+          ls -lhR upload
+          test -n "$(ls -A upload)" || { echo 'no artefacts were collected'; exit 1; }
+
+      - name: Create or update the "neurio-latest" release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.collect.outputs.version }}"
+          TAG="neurio-latest"
+          REPO="${GITHUB_REPOSITORY}"
+
+          {
+            echo "## Neurio ${VERSION} — download"
+            echo
+            echo "| What | File | Notes |"
+            echo "| --- | --- | --- |"
+            echo "| **Windows (recommended)** | \`Neurio-Setup-${VERSION}.exe\` | Installer. Per-user install, no admin prompt. |"
+            echo "| **Windows (portable)** | \`Neurio-Portable-${VERSION}.exe\` | No install — run it straight from a USB stick. |"
+            echo "| **Android** | \`Neurio-Android-${VERSION}.apk\` | Install on the phone, allow "install unknown apps". |"
+            echo "| **Server** | \`neurio-server-${VERSION}.zip\` | Run this on one machine (LAN or VPS) so several people share one chat. |"
+            echo "| **Web UI** | \`neurio-web-${VERSION}.zip\` | Static UI to host on any web server; also installable as an app (PWA). |"
+            echo
+            echo "### First run"
+            echo
+            echo "1. Install the EXE (or the APK), or start the server bundle with \`start-server.cmd\` / \`start-server.sh\`."
+            echo "2. In the app's sign-in screen, keep the default address (\`http://127.0.0.1:8790\`) if that machine runs the server, or enter the server's address — e.g. \`http://192.168.1.20:8790\` on your Wi-Fi (the server prints it at startup)."
+            echo "3. Create an account. The first account on a server becomes its admin."
+            echo
+            echo "Nothing here needs an API key, an account with any company, or a subscription. Voice, video and screen sharing are peer-to-peer WebRTC; text chat goes through the server you run."
+            echo
+            echo "### Honest notes"
+            echo
+            echo "- The EXE and the APK are **unsigned** (no paid certificate): Windows SmartScreen shows \"unknown publisher\" → *More info → Run anyway*; Android shows the usual warning for apps installed outside the Play Store."
+            echo "- The APK bundles the UI inside the app and asks for the server address on first launch. Long-press anywhere to change it."
+            echo "- Sharing over the internet needs one reachable machine (a VPS, a port forward, or a free Tailscale/WireGuard network) — see \`docs/NETWORKING.md\` in the repository."
+            echo "- Cross-internet voice/video additionally wants your own STUN/TURN (coturn is free): \`NEURIO_ICE_SERVERS\`, documented in \`docs/SELF-HOSTING.md\`."
+          } > notes.md
+
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release edit "$TAG" --repo "$REPO" --title "Neurio ${VERSION} — Windows EXE + Android APK" --notes-file notes.md
+          else
+            gh release create "$TAG" --repo "$REPO" \
+              --title "Neurio ${VERSION} — Windows EXE + Android APK" \
+              --notes-file notes.md --latest
+          fi
+
+          gh release upload "$TAG" upload/* --repo "$REPO" --clobber
+
+      - name: Print the download links
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          {
+            echo "### Download links"
+            echo
+            echo "- Release page: https://github.com/${GITHUB_REPOSITORY}/releases/tag/neurio-latest"
+            echo "- Latest download page: https://github.com/${GITHUB_REPOSITORY}/releases/latest"
+            echo
+            echo "| File | Direct link |"
+            echo "| --- | --- |"
+            for asset in $(gh release view neurio-latest --repo "${GITHUB_REPOSITORY}" --json assets --jq '.assets[].name'); do
+              echo "| \`${asset}\` | https://github.com/${GITHUB_REPOSITORY}/releases/download/neurio-latest/${asset} |"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat "$GITHUB_STEP_SUMMARY"

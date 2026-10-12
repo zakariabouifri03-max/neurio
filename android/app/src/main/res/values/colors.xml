@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="neurio_background">#FF1A1B1E</color>
+    <color name="neurio_surface">#FF202225</color>
+    <color name="neurio_accent">#FF5865F2</color>
+</resources>

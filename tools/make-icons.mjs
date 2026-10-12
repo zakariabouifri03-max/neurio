@@ -1,176 +1,286 @@
-// Generates icons/icon-192.png, icon-512.png, icon-maskable-512.png
-// Hand-rolled PNG encoder + procedural beach-buggy art.
-import zlib from 'node:zlib';
-import { writeFileSync, mkdirSync } from 'node:fs';
+#!/usr/bin/env node
+/**
+ * Generates the Neurio logo (PNG + Windows .ico + renderer favicon) with plain
+ * JavaScript — no image libraries, no downloads.
+ *
+ *   node tools/make-icons.mjs
+ *
+ * Output:
+ *   build/icon.ico        16/32/48/64/128/256 px, PNG-compressed entries
+ *   build/icon-256.png    high-resolution master
+ *   public/icon.png       favicon used by the renderer
+ */
+import { deflateSync } from 'node:zlib';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-// ── minimal PNG encoder (RGBA, no filter) ──
-const crcTable = (() => {
-  const t = new Uint32Array(256);
-  for (let n = 0; n < 256; n++) {
-    let c = n;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    t[n] = c >>> 0;
+const here = dirname(fileURLToPath(import.meta.url));
+const root = join(here, '..');
+
+/* ----------------------------- PNG encoding ------------------------------ */
+
+function crc32(buffer) {
+  let crc = 0xffffffff;
+  for (const byte of buffer) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = crc & 1 ? (crc >>> 1) ^ 0xedb88320 : crc >>> 1;
+    }
   }
-  return t;
-})();
-function crc32(buf) {
-  let c = 0xffffffff;
-  for (let i = 0; i < buf.length; i++) c = crcTable[(c ^ buf[i]) & 255] ^ (c >>> 8);
-  return (c ^ 0xffffffff) >>> 0;
+  return (crc ^ 0xffffffff) >>> 0;
 }
+
 function chunk(type, data) {
-  const out = Buffer.alloc(12 + data.length);
-  out.writeUInt32BE(data.length, 0);
-  out.write(type, 4);
-  data.copy(out, 8);
-  out.writeUInt32BE(crc32(Buffer.concat([Buffer.from(type), data])), 8 + data.length);
-  return out;
+  const length = Buffer.alloc(4);
+  length.writeUInt32BE(data.length, 0);
+  const typeBuffer = Buffer.from(type, 'ascii');
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(crc32(Buffer.concat([typeBuffer, data])), 0);
+  return Buffer.concat([length, typeBuffer, data, crc]);
 }
-function encodePNG(px, w, h) {
+
+function encodePng(width, height, rgba) {
+  const signature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
   const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4);
-  ihdr[8] = 8; ihdr[9] = 6; // 8-bit RGBA
-  const raw = Buffer.alloc(h * (1 + w * 4));
-  for (let y = 0; y < h; y++) {
-    raw[y * (1 + w * 4)] = 0;
-    Buffer.from(px.buffer, y * w * 4, w * 4).copy(raw, y * (1 + w * 4) + 1);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8; // bit depth
+  ihdr[9] = 6; // RGBA
+  ihdr[10] = 0;
+  ihdr[11] = 0;
+  ihdr[12] = 0;
+
+  const stride = width * 4;
+  const raw = Buffer.alloc((stride + 1) * height);
+  for (let y = 0; y < height; y += 1) {
+    raw[y * (stride + 1)] = 0; // filter: none
+    rgba.copy(raw, y * (stride + 1) + 1, y * stride, y * stride + stride);
   }
   return Buffer.concat([
-    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    signature,
     chunk('IHDR', ihdr),
-    chunk('IDAT', zlib.deflateSync(raw, { level: 9 })),
+    chunk('IDAT', deflateSync(raw, { level: 9 })),
     chunk('IEND', Buffer.alloc(0)),
   ]);
 }
 
-// ── tiny raster canvas ──
-class C {
-  constructor(w, h) { this.w = w; this.h = h; this.px = new Uint8ClampedArray(w * h * 4); }
-  blend(x, y, r, g, b, a) {
-    if (x < 0 || y < 0 || x >= this.w || y >= this.h || a <= 0) return;
-    const i = (y * this.w + x) * 4, ia = a / 255;
-    this.px[i] = r * ia + this.px[i] * (1 - ia);
-    this.px[i + 1] = g * ia + this.px[i + 1] * (1 - ia);
-    this.px[i + 2] = b * ia + this.px[i + 2] * (1 - ia);
-    this.px[i + 3] = Math.max(this.px[i + 3], a);
-  }
-  grad(top, mid, bot) {
-    const [t, m, b] = [top, mid, bot].map((h2) => [parseInt(h2.slice(1, 3), 16), parseInt(h2.slice(3, 5), 16), parseInt(h2.slice(5, 7), 16)]);
-    for (let y = 0; y < this.h; y++) {
-      const f = y / this.h;
-      const c = f < 0.62 ? t.map((v, i) => v + (m[i] - v) * (f / 0.62)) : m.map((v, i) => v + (b[i] - v) * ((f - 0.62) / 0.38));
-      for (let x = 0; x < this.w; x++) this.blend(x, y, c[0], c[1], c[2], 255);
-    }
-  }
-  rect(x0, y0, w, h, col, aa = 255) {
-    const [r, g, b] = hex(col);
-    for (let y = Math.max(0, y0 | 0); y < Math.min(this.h, y0 + h); y++)
-      for (let x = Math.max(0, x0 | 0); x < Math.min(this.w, x0 + w); x++) this.blend(x, y, r, g, b, aa);
-  }
-  circle(cx, cy, rad, col, aa = 255) {
-    const [r, g, b] = hex(col), r2 = rad * rad;
-    for (let y = Math.max(0, (cy - rad - 1) | 0); y < Math.min(this.h, cy + rad + 1); y++)
-      for (let x = Math.max(0, (cx - rad - 1) | 0); x < Math.min(this.w, cx + rad + 1); x++) {
-        const d2 = (x - cx) ** 2 + (y - cy) ** 2;
-        if (d2 <= r2) this.blend(x, y, r, g, b, aa);
-        else if (d2 <= (rad + 1.4) ** 2) this.blend(x, y, r, g, b, aa * 0.35 * (1 - (Math.sqrt(d2) - rad) / 1.4));
+/* --------------------------- logo rasterisation -------------------------- */
+
+const lerp = (a, b, t) => a + (b - a) * t;
+
+/** Distance from point p to the segment ab. */
+function segmentDistance(px, py, ax, ay, bx, by) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const lengthSquared = dx * dx + dy * dy;
+  const t = lengthSquared === 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lengthSquared));
+  const cx = ax + t * dx;
+  const cy = ay + t * dy;
+  return Math.hypot(px - cx, py - cy);
+}
+
+function blend(base, overlay, alpha) {
+  return [
+    Math.round(lerp(base[0], overlay[0], alpha)),
+    Math.round(lerp(base[1], overlay[1], alpha)),
+    Math.round(lerp(base[2], overlay[2], alpha)),
+  ];
+}
+
+/**
+ * Draws the Neurio mark: a rounded square with a violet→cyan gradient and a
+ * three-node neural "N" (two input nodes, one output, connected).
+ */
+function raster(size) {
+  const pixels = Buffer.alloc(size * size * 4);
+  const radius = 0.23;             // corner radius, fraction of the icon
+  const halfStroke = 0.035;        // half line thickness, fraction
+  const nodeRadius = 0.078;        // node radius, fraction
+  const aa = 0.5 / size;           // anti-alias ramp in fraction units
+
+  // Four nodes forming an "N": left column, diagonal, right column.
+  const nodes = [
+    { x: 0.31, y: 0.74 },
+    { x: 0.31, y: 0.26 },
+    { x: 0.71, y: 0.26 },
+    { x: 0.71, y: 0.74 },
+  ];
+  const links = [
+    [0, 1],
+    [1, 3],
+    [3, 2],
+  ];
+
+  const clamp01 = (value) => (value < 0 ? 0 : value > 1 ? 1 : value);
+
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const u = (x + 0.5) / size;
+      const v = (y + 0.5) / size;
+
+      // Rounded-square mask with anti-aliased corners.
+      const dx = Math.max(radius - u, 0, u - (1 - radius));
+      const dy = Math.max(radius - v, 0, v - (1 - radius));
+      const mask = clamp01((radius - Math.hypot(dx, dy)) / aa + 0.5);
+      if (mask <= 0) continue;
+
+      // Background: deep indigo at the edges, violet towards the middle.
+      const centre = Math.hypot(u - 0.5, v - 0.5) / 0.71;
+      const t = 1 - centre * 0.85;
+      let colour = [
+        Math.round(lerp(24, 88, t)),
+        Math.round(lerp(26, 101, t)),
+        Math.round(lerp(40, 242, t)),
+      ];
+
+      // Soft glow under the mark.
+      let nearest = 1;
+      for (const node of nodes) {
+        nearest = Math.min(nearest, Math.hypot(u - node.x, v - node.y));
       }
-  }
-  ellipse(cx, cy, rx, ry, col, aa) {
-    const [r, g, b] = hex(col);
-    for (let y = Math.max(0, (cy - ry - 1) | 0); y < Math.min(this.h, cy + ry + 1); y++)
-      for (let x = Math.max(0, (cx - rx - 1) | 0); x < Math.min(this.w, cx + rx + 1); x++)
-        if (((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1) this.blend(x, y, r, g, b, aa);
-  }
-  thickLine(x1, y1, x2, y2, th, col, aa = 255) {
-    const steps = Math.ceil(Math.hypot(x2 - x1, y2 - y1) * 1.5);
-    for (let i = 0; i <= steps; i++) {
-      const t = i / steps;
-      this.circle(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t, th / 2, col, aa);
+      const glow = clamp01((0.26 - nearest) / 0.26);
+      colour = blend(colour, [170, 190, 255], glow * 0.18);
+
+      // Links.
+      let linkAlpha = 0;
+      for (const [a, b] of links) {
+        const distance = segmentDistance(u, v, nodes[a].x, nodes[a].y, nodes[b].x, nodes[b].y);
+        linkAlpha = Math.max(linkAlpha, clamp01((halfStroke - distance) / aa + 0.5));
+      }
+      if (linkAlpha > 0) colour = blend(colour, [226, 232, 255], linkAlpha);
+
+      // Nodes.
+      let nodeAlpha = 0;
+      for (const node of nodes) {
+        const distance = Math.hypot(u - node.x, v - node.y);
+        nodeAlpha = Math.max(nodeAlpha, clamp01((nodeRadius - distance) / aa + 0.5));
+      }
+      if (nodeAlpha > 0) colour = blend(colour, [255, 255, 255], nodeAlpha);
+
+      const offset = (y * size + x) * 4;
+      pixels[offset] = colour[0];
+      pixels[offset + 1] = colour[1];
+      pixels[offset + 2] = colour[2];
+      pixels[offset + 3] = Math.round(mask * 255);
     }
   }
-  roundMask(rad) { // transparent outside rounded rect
-    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
-      const dx = Math.max(0, Math.max(rad - x, x - (this.w - 1 - rad)));
-      const dy = Math.max(0, Math.max(rad - y, y - (this.h - 1 - rad)));
-      if (dx * dx + dy * dy > rad * rad) this.px[(y * this.w + x) * 4 + 3] = 0;
+  return pixels;
+}
+
+/** The same raster, PNG-encoded. */
+function renderIcon(size) {
+  return encodePng(size, size, raster(size));
+}
+
+/**
+ * Maskable launcher icon: the mark is drawn at 78 % into a square canvas and the
+ * background bleeds to the edges, so Android can crop it to a circle or a squircle
+ * without cutting the logo.
+ */
+function renderMaskable(size) {
+  const pixels = Buffer.alloc(size * size * 4);
+  const innerSize = Math.round(size * 0.78);
+  const offset = Math.round((size - innerSize) / 2);
+  const inner = raster(innerSize);
+
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const target = (y * size + x) * 4;
+      // Background bleeds to the edges: the icon's own corner colour.
+      pixels[target] = 26;
+      pixels[target + 1] = 28;
+      pixels[target + 2] = 44;
+      pixels[target + 3] = 255;
     }
   }
-}
-const hex = (h2) => [parseInt(h2.slice(1, 3), 16), parseInt(h2.slice(3, 5), 16), parseInt(h2.slice(5, 7), 16)];
 
-function drawIcon(S, maskable) {
-  const c = new C(S, S);
-  const u = S / 512; // design unit
-  if (maskable) c.rect(0, 0, S, S, '#2f9be8');
-  c.grad('#2f9be8', '#8fd7ff', '#ffe9a8');
-  // sun + glow
-  c.circle(S * 0.78, S * 0.2, 66 * u, '#fff2c0', 70);
-  c.circle(S * 0.78, S * 0.2, 46 * u, '#fff2c0', 130);
-  c.circle(S * 0.78, S * 0.2, 30 * u, '#fff8dd');
-  // sand
-  c.rect(0, S * 0.8, S, S * 0.2, '#ecd9a0');
-  c.ellipse(S * 0.5, S * 0.81, S * 0.42, S * 0.05, '#5c4a2a', 30);
-  // checkered strip
-  const sq = S / 16;
-  for (let i = 0; i < 16; i++) for (let j = 0; j < 2; j++)
-    c.rect(i * sq, S * 0.9 + j * sq * 0.55, sq, sq * 0.55, (i + j) % 2 ? '#111318' : '#ffffff');
-  // wheels
-  const wy = S * 0.745, rW = 52 * u, rWr = 62 * u, x1 = S * 0.33, x2 = S * 0.7;
-  c.ellipse(S * 0.51, S * 0.805, 150 * u, 15 * u, '#8a6f3f', 70);
-  for (const [cx, r] of [[x1, rW], [x2, rWr]]) {
-    c.circle(cx, wy, r, '#1b1e26');
-    c.circle(cx, wy, r * 0.55, '#8f97a6');
-    c.circle(cx, wy, r * 0.28, '#c8ccd6');
-  }
-  // body (side view buggy)
-  const bx = S * 0.2, by = S * 0.61, bw = S * 0.6, bh = S * 0.11;
-  c.ellipse(bx + bw * 0.5, by + bh * 0.5, bw * 0.55, bh * 0.9, '#e63946'); // rounded main body
-  c.rect(bx + bw * 0.06, by, bw * 0.9, bh, '#e63946');
-  c.rect(bx + bw * 0.06, by, bw * 0.9, bh * 0.3, '#f4f1de'); // stripe
-  // nose + headlight
-  c.ellipse(bx + bw * 0.97, by + bh * 0.5, 22 * u, bh * 0.42, '#e63946');
-  c.circle(bx + bw * 1.03, by + bh * 0.42, 7 * u, '#fff6c9');
-  // rear engine + stacks
-  c.rect(bx - 6 * u, by - 26 * u, 40 * u, 30 * u, '#aab0bd');
-  c.rect(bx + 2 * u, by - 44 * u, 8 * u, 20 * u, '#8f97a6');
-  c.rect(bx + 16 * u, by - 48 * u, 8 * u, 24 * u, '#8f97a6');
-  c.rect(bx + 30 * u, by - 40 * u, 8 * u, 16 * u, '#8f97a6');
-  // driver body + head
-  c.rect(bx + bw * 0.42, by - 34 * u, 40 * u, 38 * u, '#e63946');
-  c.circle(bx + bw * 0.52, by - 44 * u, 20 * u, '#f2c891');
-  c.circle(bx + bw * 0.545, by - 47 * u, 4.6 * u, '#1b1e26'); // eye
-  c.rect(bx + bw * 0.44, by - 66 * u, 36 * u, 10 * u, '#d64545'); // brow band
-  // rollcage
-  const cage = '#23262e';
-  c.thickLine(bx + bw * 0.26, by, bx + bw * 0.34, by - 78 * u, 9 * u, cage);
-  c.thickLine(bx + bw * 0.34, by - 78 * u, bx + bw * 0.62, by - 74 * u, 9 * u, cage);
-  c.thickLine(bx + bw * 0.62, by - 74 * u, bx + bw * 0.56, by - 4 * u, 9 * u, cage);
-  // windshield hint
-  c.thickLine(bx + bw * 0.68, by - 6 * u, bx + bw * 0.76, by - 40 * u, 7 * u, '#bfe8ff', 220);
-  if (!maskable) c.roundMask(S * 0.22);
-  return encodePNG(c.px, S, S);
-}
-
-export function makeIcon(S, maskable) {
-  return drawIcon(S, maskable);
-}
-
-// CLI: writes PWA icons, and (with --mipmap <dir>) Android launcher densities
-if (process.argv[1] && process.argv[1].endsWith('make-icons.mjs')) {
-  mkdirSync('icons', { recursive: true });
-  writeFileSync('icons/icon-192.png', drawIcon(192, false));
-  writeFileSync('icons/icon-512.png', drawIcon(512, false));
-  writeFileSync('icons/icon-maskable-512.png', drawIcon(512, true));
-  const mi = process.argv.indexOf('--mipmap');
-  if (mi >= 0 && process.argv[mi + 1]) {
-    const dir = process.argv[mi + 1];
-    const dens = { mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
-    for (const [d, s] of Object.entries(dens)) {
-      mkdirSync(`${dir}/mipmap-${d}`, { recursive: true });
-      writeFileSync(`${dir}/mipmap-${d}/ic_launcher.png`, drawIcon(s, false));
+  for (let y = 0; y < innerSize; y += 1) {
+    for (let x = 0; x < innerSize; x += 1) {
+      const source = (y * innerSize + x) * 4;
+      const alpha = inner[source + 3] / 255;
+      if (alpha <= 0) continue;
+      const targetX = x + offset;
+      const targetY = y + offset;
+      if (targetX >= size || targetY >= size) continue;
+      const target = (targetY * size + targetX) * 4;
+      for (let channel = 0; channel < 3; channel += 1) {
+        pixels[target + channel] = Math.round(pixels[target + channel] * (1 - alpha) + inner[source + channel] * alpha);
+      }
+      pixels[target + 3] = 255;
     }
-    console.log('mipmap icons →', dir);
   }
-  console.log('icons written');
+  return encodePng(size, size, pixels);
 }
+
+/* ------------------------------ ICO container ---------------------------- */
+
+function buildIco(entries) {
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // type: icon
+  header.writeUInt16LE(entries.length, 4);
+
+  const directory = Buffer.alloc(entries.length * 16);
+  let offset = 6 + entries.length * 16;
+  entries.forEach((entry, index) => {
+    const base = index * 16;
+    directory[base] = entry.size >= 256 ? 0 : entry.size;
+    directory[base + 1] = entry.size >= 256 ? 0 : entry.size;
+    directory[base + 2] = 0; // palette
+    directory[base + 3] = 0; // reserved
+    directory.writeUInt16LE(1, base + 4); // colour planes
+    directory.writeUInt16LE(32, base + 6); // bits per pixel
+    directory.writeUInt32LE(entry.data.length, base + 8);
+    directory.writeUInt32LE(offset, base + 12);
+    offset += entry.data.length;
+  });
+
+  return Buffer.concat([header, directory, ...entries.map((entry) => entry.data)]);
+}
+
+/* --------------------------------- main --------------------------------- */
+
+const sizes = [16, 24, 32, 48, 64, 128, 256];
+const pngs = new Map(sizes.map((size) => [size, renderIcon(size)]));
+
+mkdirSync(join(root, 'build'), { recursive: true });
+mkdirSync(join(root, 'public'), { recursive: true });
+
+const ico = buildIco(sizes.map((size) => ({ size, data: pngs.get(size) })));
+writeFileSync(join(root, 'build', 'icon.ico'), ico);
+writeFileSync(join(root, 'build', 'icon-256.png'), pngs.get(256));
+writeFileSync(join(root, 'build', 'icon-512.png'), renderIcon(512));
+
+/* ------------------------------ web / PWA -------------------------------- */
+
+writeFileSync(join(root, 'public', 'icon.png'), pngs.get(256));
+writeFileSync(join(root, 'public', 'icon-192.png'), renderIcon(192));
+writeFileSync(join(root, 'public', 'icon-512.png'), renderIcon(512));
+// Maskable icons are cropped to a circle by Android: pad the mark into a 512 canvas
+// so nothing important sits near the edge.
+writeFileSync(join(root, 'public', 'icon-maskable-512.png'), renderMaskable(512));
+
+/* ------------------------------- Android --------------------------------- */
+
+const MIPMAPS = [
+  ['mdpi', 48],
+  ['hdpi', 72],
+  ['xhdpi', 96],
+  ['xxhdpi', 144],
+  ['xxxhdpi', 192],
+];
+for (const [density, size] of MIPMAPS) {
+  const dir = join(root, 'android', 'app', 'src', 'main', 'res', `mipmap-${density}`);
+  mkdirSync(dir, { recursive: true });
+  const png = renderIcon(size);
+  writeFileSync(join(dir, 'ic_launcher.png'), png);
+  writeFileSync(join(dir, 'ic_launcher_round.png'), png);
+}
+
+console.log('icons written:');
+console.log('  build/icon.ico        ', ico.length, 'bytes');
+console.log('  build/icon-256.png    ', pngs.get(256).length, 'bytes');
+console.log('  public/icon.png       ', pngs.get(256).length, 'bytes');
+console.log('  public/icon-512.png   ', 'maskable + 192 + 512 px');
+console.log('  android/…/mipmap-*    ', MIPMAPS.map(([d, s]) => `${d}(${s})`).join(' '));
