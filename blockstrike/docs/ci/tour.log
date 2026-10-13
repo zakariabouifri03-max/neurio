@@ -35,17 +35,19 @@ WARNING: All audio drivers failed, falling back to the dummy driver.
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/30_br_plane.png
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/31_br_map.png
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/32_br_skydive.png
-[perf] br q=High fps=9.5 draws=207 tris=155232 static_mem=83MB video_mem=75MB actors=32 loot=153
+[perf] br q=High fps=17.6 draws=35 tris=2604 static_mem=79MB video_mem=71MB actors=32 loot=161
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/33_br_landed.png
+[perf] br q=High fps=13.0 draws=265 tris=106318 static_mem=79MB video_mem=71MB actors=32 loot=160
+[autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/34_br_combat.png
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/35_br_aim.png
 [autoplay] tour match clash_squad
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/40_clash_squad_start.png
-[perf] cs q=High fps=15.9 draws=182 tris=17348 static_mem=72MB video_mem=49MB actors=8 loot=0
+[perf] cs q=High fps=11.9 draws=182 tris=17368 static_mem=69MB video_mem=44MB actors=8 loot=0
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/41_clash_squad_fight.png
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/42_clash_squad_combat.png
 [autoplay] tour match arena_2v2
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/40_arena_2v2_start.png
-[perf] arena q=High fps=16.4 draws=166 tris=18140 static_mem=73MB video_mem=46MB actors=4 loot=0
+[perf] arena q=High fps=12.5 draws=164 tris=18010 static_mem=69MB video_mem=41MB actors=4 loot=0
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/41_arena_2v2_fight.png
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/42_arena_2v2_combat.png
 [autoplay] tour complete
