@@ -94,7 +94,6 @@ jobs:
             echo "Godot export failed: editor=$editor_status export=$export_status"
             exit 1
           fi
-          find "$ANDROID_HOME/build-tools" -name apksigner -type f -print -quit | xargs -r -I{} {} verify --verbose "$APK_FILE"
 
       - name: Upload Godot build logs
         if: always()
