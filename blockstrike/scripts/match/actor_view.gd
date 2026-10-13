@@ -145,6 +145,11 @@ func _process(dt: float) -> void:
 		yaw = lerp_angle(prev_yaw, cur_yaw, f2)
 	rotation = Vector3(0, yaw, 0)
 	vis_pitch = lerpf(vis_pitch, pitch, minf(1.0, dt * 20.0))
+	if rel == 0:
+		# hide our own character when the camera is pushed into it (walls, trees, scoping)
+		var cam := get_viewport().get_camera_3d()
+		if cam:
+			(parts["root"] as Node3D).visible = cam.global_position.distance_to(global_position + Vector3(0, 1.3, 0)) > 1.05
 	if a.vest_lvl != vest or a.helm_lvl != helm:
 		vest = a.vest_lvl
 		helm = a.helm_lvl

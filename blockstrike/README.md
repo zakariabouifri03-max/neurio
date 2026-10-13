@@ -106,15 +106,25 @@ CI (`.github/workflows/blockstrike-android.yml`) runs these, exports and verifie
 screenshot tour and a benchmark with software OpenGL, installs + launches the APK on an Android emulator,
 publishes a GitHub Release and commits logs/screenshots to `docs/ci` and `docs/screenshots`.
 
-## Status / known limitations
+## Status (what is verified, what is not)
 
-See the "Status" section at the end of this file (kept up to date with what CI verified).
+| Area | Status | Evidence |
+|---|---|---|
+| Android APK (arm64-v8a, armeabi-v7a, x86_64) | Done, signed + verified | CI `apksigner verify`, `aapt` (docs/ci/verify.log); GitHub Release per build |
+| Installs and runs on Android | Verified on emulator only | API 30 emulator: install Success, app stays alive, START runs a 32-player BR match (docs/ci/emulator/) |
+| Frame rate on real phones | **Not measured** (no device available) | Emulator with software GPU: 10-17 FPS; GPU budget per preset in docs/TESTING.md |
+| All game modes (BR solo/duo/squad, Clash Squad, 2v2 Arena, Training, offline) | Done | headless `sim` suite plays complete matches of every mode each CI run |
+| Voxel world, maps, building, loot, zone, plane, supply drops, knock/revive, spectate | Done | sim suite + CI screenshots (docs/screenshots/) |
+| Touch controls + layout editor, all menus | Done | CI screenshots; touch input itself not tested on a physical screen |
+| Shop, locker, missions, achievements, levels, ranked seasons, friends list | Done (stored on device) | menu screenshots; rewards logic in Profile.record_match |
+| LAN multiplayer (host, join by code/IP, discovery, ready, teams, chat) | Done; tested over loopback | docs/TESTING.md section 2; broadcast discovery not testable in the sandbox |
+| Online multiplayer (dedicated server, rooms, matchmaking, bot fill) | Done; tested over loopback | docs/TESTING.md; **needs a server you host** (docs/SERVER.md) |
+| Accounts / cloud saves / anti-tamper of progression | Not implemented | progression is local to each device |
+| Reconnect into a running match | Not implemented | a bot takes over a disconnected player |
+| Real-money purchases | Not implemented (intentionally) | coins/gems are earned by playing |
+| Store-ready signing key | No - public dev key in repo | replace it via the GODOT_ANDROID_KEYSTORE_* variables |
 
-## Status
-
-* Verified automatically: all scripts compile; complete bot matches of every mode finish with a winner;
-  collision/raycast/hitbox/codec/inventory unit tests pass; APK export + signature verification.
-* Not verifiable in CI: real-phone frame rates (CI has no GPU), real multi-device LAN/online sessions.
-  The networking code paths are shared with the offline game, but have not been play-tested between phones
-  by the author - please report issues.
-* Online play needs your own dedicated server (docs/SERVER.md); profiles are stored on the device.
+Known issue: on the Android emulator (SwiftShader) Godot logs that some scene-shader variants exceed the
+emulator's 261 fragment-uniform limit. The game still renders and runs there; real GLES3 phone GPUs usually
+expose 224-1024+ uniform vectors, but very old Adreno 3xx devices could be affected. Please report devices
+where models are missing.

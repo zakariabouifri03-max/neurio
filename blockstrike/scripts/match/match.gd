@@ -1457,7 +1457,13 @@ func _shot_fx(a: Actor, v, wid: String, end: Vector3, h: int, block: int, normal
 	if v is ActorView and (v as ActorView).flash:
 		from = (v as ActorView).flash.global_position if (v as ActorView).visible else from
 	if cat != DB.Cat.MELEE:
-		effects.tracer(from, end)
+		if a.id == local_id:
+			# start our own tracers a bit ahead of the muzzle so they never cover the camera
+			var dir := (end - from)
+			if dir.length() > 2.0:
+				effects.tracer(from + dir.normalized() * 1.2, end)
+		else:
+			effects.tracer(from, end)
 	var snd: String = w.get("snd", "shot_ar")
 	var vol := 0.0 if a.id == local_id else -3.0
 	Audio.play_3d(snd, a.pos + Vector3(0, 1.4, 0), vol, randf_range(0.94, 1.06))

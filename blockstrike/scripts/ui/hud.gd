@@ -74,8 +74,9 @@ func setup(match_node: Match, controller: PlayerController) -> void:
 	root.add_child(net_label)
 	feed = UI.vbox(4)
 	feed.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	feed.position = Vector2(-470, 40)
-	feed.size = Vector2(450, 200)
+	feed.position = Vector2(-540, 70)
+	feed.size = Vector2(520, 200)
+	feed.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	feed.alignment = BoxContainer.ALIGNMENT_BEGIN
 	feed.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(feed)
@@ -191,8 +192,11 @@ func toast(text: String) -> void:
 	_toast_tw.tween_property(toast_label, "modulate:a", 0.0, 0.5)
 
 func _feed(text: String, col: Color) -> void:
-	var l := UI.label(text, 19, col, 5)
+	var l := UI.label(text, 18, col, 5)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	l.clip_text = true
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	l.custom_minimum_size = Vector2(520, 0)
 	feed.add_child(l)
 	if feed.get_child_count() > 5:
 		feed.get_child(0).queue_free()

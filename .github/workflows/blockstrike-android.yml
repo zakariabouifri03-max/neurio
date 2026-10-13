@@ -203,27 +203,25 @@ jobs:
           disable-animations: true
           script: |
             mkdir -p emu
-            PKG=com.blockstrike.royale
-            PICS=/sdcard/Android/data/$PKG/files/Pictures
             adb install -r apk/BlockStrikeRoyale.apk | tee emu/install.log
-            adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1
+            adb shell monkey -p com.blockstrike.royale -c android.intent.category.LAUNCHER 1
             sleep 40
-            adb shell am force-stop $PKG
-            adb shell "mkdir -p $PICS && touch $PICS/bsr_capture" || true
-            adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1
+            adb shell am force-stop com.blockstrike.royale
+            adb shell "mkdir -p /sdcard/Android/data/com.blockstrike.royale/files/Pictures && touch /sdcard/Android/data/com.blockstrike.royale/files/Pictures/bsr_capture" || true
+            adb shell monkey -p com.blockstrike.royale -c android.intent.category.LAUNCHER 1
             sleep 70
             adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS > /dev/null || true
-            adb shell pidof $PKG | tee emu/pid.log
+            adb shell pidof com.blockstrike.royale | tee emu/pid.log
             adb shell wm size | tee emu/screen.log
             adb shell input tap 1560 990 || true
             sleep 150
-            adb shell pidof $PKG | tee -a emu/pid.log
-            adb pull $PICS emu/device_screens || true
+            adb shell pidof com.blockstrike.royale | tee -a emu/pid.log
+            adb pull /sdcard/Android/data/com.blockstrike.royale/files/Pictures emu/device_screens || true
             ls -la emu/device_screens || true
             adb logcat -d -s godot:* | tail -300 > emu/logcat_godot.log
             grep "\[perf\]" emu/logcat_godot.log | tail -10 > emu/perf.log || true
             adb logcat -d | grep -E "AndroidRuntime|FATAL" | grep -i blockstrike | tail -60 > emu/logcat_errors.log || true
-            adb shell dumpsys meminfo $PKG | head -40 > emu/meminfo.log || true
+            adb shell dumpsys meminfo com.blockstrike.royale | head -40 > emu/meminfo.log || true
       - name: Commit emulator evidence
         if: always()
         run: |
