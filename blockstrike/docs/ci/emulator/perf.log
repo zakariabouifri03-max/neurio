@@ -1,0 +1,8 @@
+10-13 10:41:01.963  2373  2409 I godot   : [perf] br q=Low fps=17.3 draws=0 tris=144 static_mem=0MB video_mem=76MB actors=32 loot=165
+10-13 10:41:25.840  2373  2409 I godot   : [perf] br q=Low fps=16.7 draws=0 tris=71062 static_mem=0MB video_mem=77MB actors=32 loot=165
+10-13 10:41:37.164  2373  2409 I godot   : [perf] br q=Low fps=17.1 draws=0 tris=81692 static_mem=0MB video_mem=77MB actors=32 loot=147
+10-13 10:41:47.172  2373  2409 I godot   : [perf] br q=Low fps=16.5 draws=0 tris=42630 static_mem=0MB video_mem=77MB actors=32 loot=136
+10-13 10:41:57.216  2373  2409 I godot   : [perf] br q=Low fps=16.5 draws=0 tris=57044 static_mem=0MB video_mem=77MB actors=32 loot=126
+10-13 10:42:07.230  2373  2409 I godot   : [perf] br q=Low fps=13.6 draws=0 tris=56000 static_mem=0MB video_mem=77MB actors=32 loot=124
+10-13 10:42:17.289  2373  2409 I godot   : [perf] br q=Low fps=13.7 draws=0 tris=55460 static_mem=0MB video_mem=77MB actors=32 loot=126
+10-13 10:42:27.333  2373  2409 I godot   : [perf] br q=Low fps=13.7 draws=0 tris=54332 static_mem=0MB video_mem=77MB actors=32 loot=127
