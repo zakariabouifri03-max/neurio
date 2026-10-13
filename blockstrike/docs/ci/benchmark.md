@@ -5,8 +5,8 @@ FPS here is CPU-rasterised and NOT representative of phones; draw calls, triangl
 
 | Preset | FPS on ground (avg) | 1% low | FPS skydiving | Draw calls | Triangles | Static mem (MB) | Video mem (MB) |
 |---|---|---|---|---|---|---|---|
-| Low | 31.0 | 24.3 | 61.5 | 210 | 58177 | 80 | 54 |
-| Medium | 13.6 | 10.7 | 27.1 | 344 | 189663 | 80 | 56 |
-| High | 6.0 | 4.7 | 10.4 | 293 | 158013 | 80 | 65 |
+| Low | 30.8 | 24.1 | 60.9 | 211 | 58497 | 80 | 54 |
+| Medium | 13.9 | 11.0 | 26.3 | 346 | 190161 | 81 | 56 |
+| High | 6.1 | 4.8 | 9.9 | 295 | 156116 | 81 | 65 |
 
-Generated 2026-10-13T11:03:43 with Godot 4.7.2-stable (official).
+Generated 2026-10-13T11:12:19 with Godot 4.7.2-stable (official).

@@ -114,7 +114,7 @@ uses-permission: name='android.permission.CHANGE_WIFI_MULTICAST_STATE'
 uses-permission: name='android.permission.INTERNET'
 uses-permission: name='android.permission.VIBRATE'
 native-code: 'arm64-v8a' 'armeabi-v7a' 'x86_64'
-    28901  2026-10-13 10:58   META-INF/MANIFEST.MF
+    28901  2026-10-13 11:07   META-INF/MANIFEST.MF
 ---------                     -------
-230248919                     251 files
--rw-r--r-- 1 runner runner 79243250 Oct 13 10:58 blockstrike/build/BlockStrikeRoyale.apk
+230249811                     251 files
+-rw-r--r-- 1 runner runner 79243250 Oct 13 11:07 blockstrike/build/BlockStrikeRoyale.apk

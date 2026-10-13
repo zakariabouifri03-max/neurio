@@ -7,20 +7,20 @@ Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 [unit] voxel world / actor
 [unit] codecs
 [sim] arena_2v2 seed 4242
-   ended=true winner=0 after 231 s game time (741 ms wall, 0.11 ms/tick avg, 0.4 ms worst)  kills=13 pickups=0 blocks=38 score=[3, 2]
+   ended=true winner=0 after 190 s game time (630 ms wall, 0.11 ms/tick avg, 0.3 ms worst)  kills=12 pickups=0 blocks=24 score=[3, 2]
 [sim] clash_squad seed 4242
-   ended=true winner=1 after 227 s game time (1616 ms wall, 0.24 ms/tick avg, 1.0 ms worst)  kills=25 pickups=0 blocks=0 score=[1, 4]
+   ended=true winner=0 after 162 s game time (1215 ms wall, 0.25 ms/tick avg, 1.0 ms worst)  kills=18 pickups=0 blocks=0 score=[4, 0]
 [sim] br_solo seed 4242
-   t=100s: alive 13, armed with a gun 8
-   ended=true winner=7 after 347 s game time (4034 ms wall, 0.39 ms/tick avg, 2.2 ms worst)  kills=29 pickups=89 blocks=0 score=[0, 0]
+   t=100s: alive 15, armed with a gun 9
+   ended=true winner=7 after 387 s game time (4021 ms wall, 0.35 ms/tick avg, 2.3 ms worst)  kills=30 pickups=97 blocks=12 score=[0, 0]
 [sim] br_squad seed 4242
-   t=100s: alive 11, armed with a gun 9
-   ended=true winner=0 after 331 s game time (4219 ms wall, 0.42 ms/tick avg, 2.4 ms worst)  kills=29 pickups=77 blocks=8 score=[0, 0]
+   t=100s: alive 15, armed with a gun 9
+   ended=true winner=0 after 319 s game time (4283 ms wall, 0.45 ms/tick avg, 2.3 ms worst)  kills=29 pickups=75 blocks=9 score=[0, 0]
 [sim] clash_squad seed 7
-   ended=true winner=0 after 270 s game time (1909 ms wall, 0.24 ms/tick avg, 1.1 ms worst)  kills=23 pickups=0 blocks=0 score=[4, 1]
+   ended=true winner=0 after 138 s game time (1105 ms wall, 0.27 ms/tick avg, 1.3 ms worst)  kills=16 pickups=0 blocks=0 score=[4, 0]
 [sim] clash_squad seed 99
-   ended=true winner=1 after 167 s game time (1260 ms wall, 0.25 ms/tick avg, 1.1 ms worst)  kills=18 pickups=0 blocks=0 score=[0, 4]
+   ended=true winner=0 after 241 s game time (1742 ms wall, 0.24 ms/tick avg, 1.1 ms worst)  kills=28 pickups=0 blocks=0 score=[4, 1]
 [sim] training
-   training damage dealt by bots in 20 s: 272
+   training damage dealt by bots in 20 s: 319
 failures: 0
 SUITE sim: PASS
