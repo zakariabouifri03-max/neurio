@@ -300,6 +300,32 @@ func _melee(def: Dictionary) -> bool:
 	return hit_any
 
 
+# ---------------------------------------------------------------- grenades
+const GRENADE := preload("res://scripts/weapons/grenade.gd")
+const THROW_COOLDOWN := 0.9
+const THROW_SPEED := 15.0
+var _throw_cd: float = 0.0
+
+
+## Throws one grenade toward aim_point. Returns true if a grenade was thrown.
+func try_throw(aim_point: Vector3) -> bool:
+	if not alive or _throw_cd > 0.0 or reload_t > 0.0 or int(inv.items.get("grenade", 0)) <= 0:
+		return false
+	if arena == null or not arena.has_method("spawn_grenade"):
+		return false
+	inv.items["grenade"] = int(inv.items["grenade"]) - 1
+	_throw_cd = THROW_COOLDOWN
+	var from: Vector3 = global_position + Vector3(0, 1.5, 0) - global_basis.z * 0.4
+	var dir: Vector3 = aim_point - from
+	if dir.length() < 1.0:
+		dir = -global_basis.z
+	dir = dir.normalized()
+	dir.y += 0.28   # lob the grenade slightly upward
+	arena.spawn_grenade(from, dir.normalized() * THROW_SPEED, self)
+	Sfx.play_at("switch", from, -4.0, 0.5)
+	return true
+
+
 # ---------------------------------------------------------------- damage & death
 func receive_damage(amount: float, head: bool, attacker) -> void:
 	if not alive or amount <= 0.0:
@@ -360,6 +386,7 @@ func respawn_at(pos: Vector3) -> void:
 # ---------------------------------------------------------------- physics
 func _physics_process(delta: float) -> void:
 	fire_cd = maxf(0.0, fire_cd - delta)
+	_throw_cd = maxf(0.0, _throw_cd - delta)
 	switch_t = maxf(0.0, switch_t - delta)
 	if reload_t > 0.0:
 		reload_t -= delta

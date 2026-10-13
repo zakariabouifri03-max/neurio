@@ -8,6 +8,11 @@ const MAX_FRAMES := 5600
 var _is_training := false
 var _ui_done := false
 const BD := preload("res://scripts/world/block_defs.gd")
+const GRENADE := preload("res://scripts/weapons/grenade.gd")
+var _grenade_ok := false
+var _grenade_frame := -1
+var _grenade_bot = null
+var _grenade_bot_hp := 0.0
 
 var _menu
 var _match
@@ -86,6 +91,13 @@ func _process(_delta: float) -> void:
 		_pending_build = -1
 		var ok: bool = _match.request_build(_match.player)
 		print("SMOKE build_against_wall=%s blocks_left=%d" % [ok, _match.player.inv.items["blocks"]])
+	if _grenade_frame >= 0 and _frames == _grenade_frame + 200:
+		var in_flight := 0
+		for ch in _match.get_children():
+			if ch.get_script() == GRENADE:
+				in_flight += 1
+		print("SMOKE grenade in_flight_after_fuse=%d" % in_flight)
+		_grenade_ok = _grenade_ok and in_flight == 0
 	if _match.state == "ended" or _frames >= MAX_FRAMES:
 		_finish()
 
@@ -130,6 +142,24 @@ func _exercise_systems() -> void:
 		var got: bool = _match.try_pickup(p)
 		var after := JSON.stringify(p.inv.items) + JSON.stringify(p.inv.ammo) + str(p.inv.slots)
 		print("SMOKE pickup collected=%s changed=%s" % [got, before != after])
+	# grenades: throw one, then check it is gone after its fuse; blast a bot directly and check damage
+	p.inv.items["grenade"] = 2
+	var thrown: bool = p.try_throw(p.aim_point())
+	var left: int = int(p.inv.items["grenade"])
+	var bot = null
+	for c in _match.characters_list():
+		if c != p and c.alive:
+			bot = c
+			break
+	var dealt := 0.0
+	if bot != null:
+		var hp0: float = bot.hp
+		_match.explode_at(bot.global_position + Vector3(0, 0.9, 0), GRENADE.RADIUS, GRENADE.MAX_DAMAGE, p)
+		dealt = hp0 - bot.hp
+	_grenade_bot = bot
+	_grenade_frame = _frames
+	_grenade_ok = thrown and left == 1 and (dealt > 0.0 or (bot != null and not bot.alive))
+	print("SMOKE grenade thrown=%s left=%d blast_dealt=%.1f" % [thrown, left, dealt])
 	# a wall is placed in front of the camera a few frames later, then the build is attempted
 	_pending_build = 4
 	# fire the current weapon once
@@ -146,7 +176,7 @@ func _exercise_systems() -> void:
 func _finish() -> void:
 	# pass only if the UI checks ran and the match reached its expected end state
 	var expected_state := "ended"
-	var ok: bool = _match != null and _ui_done and _match.state == expected_state and _start_alive > 0
+	var ok: bool = _match != null and _ui_done and _grenade_ok and _match.state == expected_state and _start_alive > 0
 	print("SMOKE final state=%s frames=%d alive_at_live=%d kills=%d deaths=%s" % [
 		_match.state if _match else "none", _frames, _start_alive, _match.player_kills if _match else -1, str(_deaths)])
 	if ok:

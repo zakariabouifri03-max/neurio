@@ -38,6 +38,9 @@ func setup(p_kind: String, p_item: String, p_amount: int, at: Vector3) -> void:
 				_add_cube(Vector3(0.34, 0.1, 0.32), Color(0.9, 0.12, 0.12))
 			elif item == "armor_plate":
 				_add_cube(Vector3(0.36, 0.4, 0.12), Color(0.25, 0.5, 0.95))
+			elif item == "grenade":
+				_add_cube(Vector3(0.3, 0.34, 0.3), Color(0.22, 0.3, 0.18))
+				_add_cube(Vector3(0.12, 0.08, 0.12), Color(0.6, 0.6, 0.6))
 			else:
 				_add_cube(Vector3(0.45, 0.45, 0.45), Color(0.7, 0.5, 0.3))
 	_label = Label3D.new()
@@ -66,6 +69,8 @@ func describe() -> String:
 					return "Medkit x%d" % amount
 				"armor_plate":
 					return "Armor plate x%d" % amount
+				"grenade":
+					return "Grenade x%d" % amount
 				_:
 					return "Build blocks x%d" % amount
 	return item

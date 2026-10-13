@@ -113,6 +113,8 @@ func _read_input() -> void:
 			equip_slot(i)
 	if Controls.consume("heal"):
 		use_heal()
+	if Controls.consume("grenade") and alive:
+		try_throw(aim_point())
 	if Controls.consume("use") and arena:
 		arena.try_interact(self)
 	if Controls.consume("build") and arena:

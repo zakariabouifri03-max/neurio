@@ -105,6 +105,8 @@ func _input(event: InputEvent) -> void:
 				press("use")
 			KEY_F:
 				press("heal")
+			KEY_G:
+				press("grenade")
 			KEY_B:
 				press("build")
 			KEY_1:

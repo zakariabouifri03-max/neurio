@@ -22,6 +22,7 @@ const BUTTONS := {
 	"use": {"label": "USE", "pos": Vector2(0.80, 0.41), "d": 0.10, "action": "use"},
 	"heal": {"label": "HEAL", "pos": Vector2(0.93, 0.33), "d": 0.11, "action": "heal"},
 	"build": {"label": "BUILD", "pos": Vector2(0.67, 0.31), "d": 0.10, "action": "build"},
+	"grenade": {"label": "NADE", "pos": Vector2(0.55, 0.52), "d": 0.10, "action": "grenade"},
 	"bag": {"label": "BAG", "pos": Vector2(0.84, 0.10), "d": 0.09, "action": "bag"},
 	"pause": {"label": "II", "pos": Vector2(0.95, 0.10), "d": 0.09, "action": "pause"},
 }

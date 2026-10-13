@@ -478,8 +478,8 @@ func _refresh_inventory() -> void:
 	lines.append("")
 	lines.append("Ammo:  light %d   medium %d   shell %d   heavy %d" % [
 		int(ammo.get("light", 0)), int(ammo.get("medium", 0)), int(ammo.get("shell", 0)), int(ammo.get("heavy", 0))])
-	lines.append("Items: bandage %d   medkit %d   armor plates %d   build blocks %d" % [
-		int(items.get("bandage", 0)), int(items.get("medkit", 0)), int(items.get("armor_plate", 0)), int(items.get("blocks", 0))])
+	lines.append("Items: bandage %d   medkit %d   armor plates %d   grenades %d   build blocks %d" % [
+		int(items.get("bandage", 0)), int(items.get("medkit", 0)), int(items.get("armor_plate", 0)), int(items.get("grenade", 0)), int(items.get("blocks", 0))])
 	_inv_rows.text = "\n".join(lines)
 	var can_heal := int(items.get("bandage", 0)) + int(items.get("medkit", 0)) + int(items.get("armor_plate", 0)) > 0
 	_inv_heal_btn.disabled = not can_heal

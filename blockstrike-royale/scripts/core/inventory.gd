@@ -12,7 +12,7 @@ const HEAL_ITEMS := {
 var slots: Array = [null, null, null]   # each: {"id": String, "mag": int} or null
 var active: int = 0
 var ammo: Dictionary = {"light": 0, "medium": 0, "shell": 0, "heavy": 0}
-var items: Dictionary = {"bandage": 0, "medkit": 0, "armor_plate": 0, "blocks": 0}
+var items: Dictionary = {"bandage": 0, "medkit": 0, "armor_plate": 0, "blocks": 0, "grenade": 0}
 var unlimited_ammo: bool = false   # training ground: reserves never run out
 
 

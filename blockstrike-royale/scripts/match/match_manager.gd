@@ -9,6 +9,7 @@ const VoxelWorld := preload("res://scripts/world/voxel_world.gd")
 const MapGen := preload("res://scripts/world/map_generator.gd")
 const FX := preload("res://scripts/weapons/fx.gd")
 const LootPickup := preload("res://scripts/world/loot_pickup.gd")
+const GRENADE := preload("res://scripts/weapons/grenade.gd")
 const SupplyDrop := preload("res://scripts/world/supply_drop.gd")
 const SafeZone := preload("res://scripts/match/safe_zone.gd")
 const GameModes := preload("res://scripts/match/game_modes.gd")
@@ -247,8 +248,10 @@ func _loadout_ammo() -> Dictionary:
 
 func _loadout_items(is_player: bool) -> Dictionary:
 	if bool(mode["br"]):
-		return {"bandage": 1, "medkit": 0, "armor_plate": 0, "blocks": 12 if is_player else 0}
-	return {"bandage": 3, "medkit": 2, "armor_plate": 2, "blocks": 30}
+		return {"bandage": 1, "medkit": 0, "armor_plate": 0, "blocks": 12 if is_player else 0,
+			"grenade": 1 if is_player else 0}
+	return {"bandage": 3, "medkit": 2, "armor_plate": 2, "blocks": 30,
+		"grenade": 3 if is_player else 0}
 
 
 func characters_list() -> Array:
@@ -305,8 +308,42 @@ func _spawn_random_loot(p: Vector3) -> void:
 			_spawn_pickup("item", "medkit", 1, p)
 	elif r < 0.78:
 		_spawn_pickup("item", "armor_plate", 1, p)
+	elif r < 0.84:
+		_spawn_pickup("item", "grenade", 1, p)
 	else:
 		_spawn_pickup("item", "blocks", 8, p)
+
+
+## Launches a grenade from `from` with velocity `vel`. Called by CharacterBase.try_throw.
+func spawn_grenade(from: Vector3, vel: Vector3, thrower) -> void:
+	var g = GRENADE.new()
+	add_child(g)
+	g.global_position = from
+	g.setup(world, vel, thrower)
+	g.exploded.connect(_on_grenade_exploded.bind(thrower))
+
+
+func _on_grenade_exploded(pos: Vector3, thrower) -> void:
+	fx.burst(pos, Vector3.UP, "explosion", Color(1.0, 0.6, 0.2))
+	Sfx.play_at("explode", pos, 4.0)
+	explode_at(pos, GRENADE.RADIUS, GRENADE.MAX_DAMAGE, thrower)
+
+
+## Damages every living enemy within `radius` of `pos`, falling off linearly with distance.
+## Teammates are not hurt, except the thrower, who can hurt themselves at close range.
+func explode_at(pos: Vector3, radius: float, max_damage: float, source) -> void:
+	for c in _chars:
+		if not c.alive:
+			continue
+		if source != null and c != source and c.team == source.team:
+			continue
+		var d: float = (c.global_position + Vector3(0, 0.9, 0) - pos).length()
+		if d > radius:
+			continue
+		var dmg: float = max_damage * clampf(1.0 - d / radius, 0.1, 1.0)
+		c.receive_damage(dmg, false, source)
+		if source != null and c != source:
+			source.hit_landed.emit(c, dmg, false)
 
 
 func _spawn_pickup(kind: String, item: String, amount: int, at: Vector3):
