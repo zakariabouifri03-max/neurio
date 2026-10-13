@@ -1,6 +1,22 @@
 // ── 3D builders: cars, drivers, tracks, garage ───────────────────────────────
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+// mergeGeometries() needs every input to have the SAME attributes and index layout.
+// Procedural props mix indexed/non-indexed and coloured/uncoloured geometry, so
+// normalise everything to: non-indexed position + normal + color + uv.
+function mergeSafe(list) {
+  const norm = list.map((g) => {
+    let x = g.index ? g.toNonIndexed() : g;
+    const n = x.attributes.position.count;
+    if (!x.attributes.normal) x.computeVertexNormals();
+    if (!x.attributes.color) x.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(n * 3).fill(1), 3));
+    if (!x.attributes.uv) x.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(n * 2), 2));
+    for (const k of Object.keys(x.attributes)) if (!['position', 'normal', 'color', 'uv'].includes(k)) x.deleteAttribute(k);
+    return x;
+  });
+  return mergeGeometries(norm, false);
+}
 import { ARCH, THEMES } from './data.js';
 import { mulberry32, clamp, lerp } from './util.js';
 import * as TEX from './tex.js';
@@ -626,7 +642,7 @@ const PROPS = {
   crystal: (r) => {
     const c = [0xb892ff, 0x8ab6ff, 0x66ffd9][(r() * 3) | 0];
     const g = [xform(tint(new THREE.OctahedronGeometry(0.8 + r() * 0.6, 0), c), 0, 1, 0, 0, r() * 3, 0, 1)];
-    g[0].scale(new THREE.Vector3(1, 1.8, 1));
+    g[0].scale(1, 1.8, 1);
     g[0].translate(0, 0.2, 0);
     return g;
   },
@@ -867,7 +883,7 @@ export function buildTrackWorld(map) {
     const decorList = theme.decor;
     const place = (propFn, x, y, z, s, ry) => {
       for (const gg of propFn(rng)) {
-        gg.scale(new THREE.Vector3(s, s, s));
+        gg.scale(s, s, s);
         gg.rotateY(ry);
         gg.translate(x, y, z);
         geos.push(gg);
@@ -910,7 +926,7 @@ export function buildTrackWorld(map) {
         geos.push(xform(tint(new THREE.ConeGeometry(ww * 0.35, hh * 0.35, 7), 0xffffff), Math.cos(a) * rr, hh * 0.83 - 12, Math.sin(a) * rr));
       }
     }
-    const merged = mergeGeometries(geos, false);
+    const merged = mergeSafe(geos);
     const mesh = new THREE.Mesh(merged, new THREE.MeshLambertMaterial({ vertexColors: true }));
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -1060,13 +1076,13 @@ export function buildGarageWorld() {
     const a = (i / 7) * Math.PI * 2 + 0.4;
     const rr = 10 + rng() * 14;
     for (const gg of PROPS.palm(rng)) {
-      gg.scale(new THREE.Vector3(1.1, 1.1, 1.1));
+      gg.scale(1.1, 1.1, 1.1);
       gg.translate(Math.cos(a) * rr, 0, Math.sin(a) * rr);
       palmGeos.push(gg);
     }
   }
   // cabana house
-  for (const gg of PROPS.house(rng)) { gg.scale(new THREE.Vector3(1.5, 1.5, 1.5)); gg.rotateY(2.4); gg.translate(-14, 0, -10); palmGeos.push(gg); }
+  for (const gg of PROPS.house(rng)) { gg.scale(1.5, 1.5, 1.5); gg.rotateY(2.4); gg.translate(-14, 0, -10); palmGeos.push(gg); }
   for (const gg of PROPS.awning(rng)) { gg.rotateY(-2.2); gg.translate(-9.5, 0, -4); palmGeos.push(gg); }
   for (const gg of PROPS.crate(rng)) { gg.translate(-7, 0, -3); palmGeos.push(gg); }
   for (const gg of PROPS.surf(rng)) { gg.translate(-6.6, 0, -8.6); palmGeos.push(gg); }
@@ -1074,7 +1090,7 @@ export function buildGarageWorld() {
   for (const gg of PROPS.lantern(rng)) { gg.translate(5, 0, -7); palmGeos.push(gg); }
   for (const gg of PROPS.lantern(rng)) { gg.translate(-5, 0, 7); palmGeos.push(gg); }
   for (const gg of PROPS.palm(rng)) { gg.translate(12, 0, -14); palmGeos.push(gg); }
-  const decor = new THREE.Mesh(mergeGeometries(palmGeos, false), new THREE.MeshLambertMaterial({ vertexColors: true }));
+  const decor = new THREE.Mesh(mergeSafe(palmGeos), new THREE.MeshLambertMaterial({ vertexColors: true }));
   decor.castShadow = true;
   decor.receiveShadow = true;
   g.add(decor);

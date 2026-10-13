@@ -1,5 +1,5 @@
 // Bash Baqi Racing — service worker: full offline support
-const VERSION = 'bbr-v1';
+const VERSION = 'bbr-v2';
 const ASSETS = [
   './',
   './index.html',
