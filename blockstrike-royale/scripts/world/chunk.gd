@@ -32,13 +32,17 @@ const FACE_CORNERS: Array = [
 ]
 
 ## UV per corner of each face, matching FACE_CORNERS (0,0 = top-left of the tile).
+## UV per corner, matching FACE_CORNERS index by index.  Godot's texture origin is
+## top-left, so a corner at the bottom of a side face takes v = 1: without that the
+## grass/dirt tiles would hang upside down.  u follows the face's screen-right axis
+## (+x for +z/-z, -z for +x, +z for -x) so side textures are not mirrored.
 const FACE_UVS: Array = [
-	[[0, 0], [0, 1], [1, 1], [1, 0]],   # +Y
-	[[0, 0], [1, 0], [1, 1], [0, 1]],   # -Y
-	[[0, 0], [1, 0], [1, 1], [0, 1]],   # +X
-	[[0, 0], [1, 0], [1, 1], [0, 1]],   # -X
-	[[0, 0], [1, 0], [1, 1], [0, 1]],   # +Z
-	[[0, 0], [1, 0], [1, 1], [0, 1]],   # -Z
+	[[0, 0], [0, 1], [1, 1], [1, 0]],   # +Y  (u = +x, v = +z)
+	[[0, 1], [1, 1], [1, 0], [0, 0]],   # -Y  (u = +x, v = -z)
+	[[0, 1], [1, 1], [1, 0], [0, 0]],   # +X  (u = -z, v = -y)
+	[[0, 1], [1, 1], [1, 0], [0, 0]],   # -X  (u = +z, v = -y)
+	[[0, 1], [1, 1], [1, 0], [0, 0]],   # +Z  (u = +x, v = -y)
+	[[0, 1], [1, 1], [1, 0], [0, 0]],   # -Z  (u = -x, v = -y)
 ]
 
 ## In-plane axes used for ambient occlusion: [u_axis, v_axis] (0=x, 1=y, 2=z),

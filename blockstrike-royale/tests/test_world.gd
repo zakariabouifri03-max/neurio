@@ -54,6 +54,24 @@ func run(t: TestCase) -> void:
 			"tile %s has a positive width" % tile_name)
 		t.greater(float(rect.get("v1", 0.0)), float(rect.get("v0", 0.0)),
 			"tile %s has a positive height" % tile_name)
+		# UVs must be pulled half a texel inside their tile, otherwise nearest
+		# filtering samples the neighbouring tile along the face edges.
+		var index := int(rect.get("index", 0))
+		var column := index % columns
+		var row := index / columns
+		var cell_u0 := float(column) / float(columns)
+		var cell_u1 := float(column + 1) / float(columns)
+		var rows := int(round(float(sheet_height) / float(maxi(1, tile_size))))
+		var cell_v0 := float(row) / float(rows)
+		var cell_v1 := float(row + 1) / float(rows)
+		t.greater(float(rect.get("u0", 0.0)), cell_u0,
+			"tile %s u0 is inset from its cell edge" % tile_name)
+		t.less(float(rect.get("u1", 1.0)), cell_u1,
+			"tile %s u1 is inset from its cell edge" % tile_name)
+		t.greater(float(rect.get("v0", 0.0)), cell_v0,
+			"tile %s v0 is inset from its cell edge" % tile_name)
+		t.less(float(rect.get("v1", 1.0)), cell_v1,
+			"tile %s v1 is inset from its cell edge" % tile_name)
 
 	# Chunk packing: index/unpack must round-trip for the whole chunk volume.
 	var chunk := VoxelChunk.new()

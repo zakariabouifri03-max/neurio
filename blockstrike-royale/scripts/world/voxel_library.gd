@@ -126,17 +126,37 @@ static func load_atlas() -> bool:
 	if typeof(table) != TYPE_DICTIONARY:
 		push_error("VoxelLibrary: atlas.json is not a dictionary")
 		return false
-	var tiles: Variant = (table as Dictionary).get("tiles", {})
+	var table_info: Dictionary = table as Dictionary
+	var tiles: Variant = table_info.get("tiles", {})
 	if typeof(tiles) != TYPE_DICTIONARY:
 		push_error("VoxelLibrary: atlas.json has no tiles block")
 		return false
-	_uv = tiles
+	_uv = _inset_tiles(tiles as Dictionary, table_info)
 	_uv_cache.clear()
 	if ResourceLoader.exists(ATLAS_TEXTURE):
 		_atlas = load(ATLAS_TEXTURE) as Texture2D
 	else:
 		push_warning("VoxelLibrary: atlas.png not imported yet")
 	return _atlas != null
+
+## The atlas packs tiles edge to edge, so sampling exactly on a tile boundary can
+## grab the first texel of the neighbouring tile (a one pixel seam of the wrong
+## colour along every face edge).  Pulling each rect half a texel inwards samples
+## texel centres instead, which is the standard fix and costs nothing at runtime.
+static func _inset_tiles(tiles: Dictionary, table: Dictionary) -> Dictionary:
+	var width := maxf(1.0, float(table.get("width", 0)))
+	var height := maxf(1.0, float(table.get("height", 0)))
+	var half_u := 0.5 / width
+	var half_v := 0.5 / height
+	var out: Dictionary = {}
+	for tile: String in tiles.keys():
+		var entry: Dictionary = (tiles[tile] as Dictionary).duplicate()
+		entry["u0"] = float(entry.get("u0", 0.0)) + half_u
+		entry["u1"] = float(entry.get("u1", 1.0)) - half_u
+		entry["v0"] = float(entry.get("v0", 0.0)) + half_v
+		entry["v1"] = float(entry.get("v1", 1.0)) - half_v
+		out[tile] = entry
+	return out
 
 static func atlas_texture() -> Texture2D:
 	load_atlas()

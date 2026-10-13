@@ -84,6 +84,17 @@ def dot(a, b) -> int:
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 
 
+def mean_direction(one: list, zero: list) -> tuple[int, int, int]:
+    """World direction of increasing UV for a face (exact for axis-aligned quads)."""
+    def average(points: list) -> tuple[float, float, float]:
+        return tuple(sum(p[axis] for p in points) / len(points) for axis in range(3))
+
+    a = average(one)
+    b = average(zero)
+    delta = (a[0] - b[0], a[1] - b[1], a[2] - b[2])
+    return tuple(int(round(value)) for value in delta)
+
+
 def main() -> int:
     source = open(CHUNK, encoding="utf-8").read()
 
@@ -175,7 +186,32 @@ def main() -> int:
     check(ao_level(True, True, True) == ao_level(True, True, False),
           "diagonal must not count when both edges are solid")
 
-    # 8. vertex count: 6 vertices per visible face, matching TRI_ORDER
+    # 8. texture orientation: Godot's UV origin is top-left, so increasing v runs
+    #    down the screen.  For every face the world directions of increasing u and
+    #    increasing v must satisfy cross(u_dir, v_dir) == -normal.  This single
+    #    invariant catches both a vertical flip (grass hanging upside down) and a
+    #    mirrored side texture, which are the two mistakes a hand-written mesher
+    #    makes most often.
+    for face in range(6):
+        table = corners[face]
+        normal = normals[face]
+        u_one = [table[i] for i in range(4) if uvs[face][i][0] == 1]
+        u_zero = [table[i] for i in range(4) if uvs[face][i][0] == 0]
+        v_one = [table[i] for i in range(4) if uvs[face][i][1] == 1]
+        v_zero = [table[i] for i in range(4) if uvs[face][i][1] == 0]
+        check(len(u_one) == 2 and len(v_one) == 2,
+              f"{face_names[face]}: every face needs two u=1 corners and two v=1 corners")
+        if len(u_one) != 2 or len(v_one) != 2:
+            continue
+        u_dir = mean_direction(u_one, u_zero)
+        v_dir = mean_direction(v_one, v_zero)
+        orientation = cross(u_dir, v_dir)
+        check(orientation == (-normal[0], -normal[1], -normal[2]),
+              f"{face_names[face]}: UV axes are wrong - cross(u_dir, v_dir) is "
+              f"{orientation}, expected {(-normal[0], -normal[1], -normal[2])} "
+              f"(a mismatch means a flipped or mirrored tile)")
+
+    # 9. vertex count: 6 vertices per visible face, matching TRI_ORDER
     check(len(tri_order) == 6, "each face must emit exactly 6 vertices")
 
     if FAILURES:
