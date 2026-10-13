@@ -1,0 +1,101 @@
+name: BlockStrike Royale Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - arena/87f553b8-neurio
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    runs-on: ubuntu-24.04
+    env:
+      GODOT_VERSION: 4.7.2
+      GODOT_TAG: 4.7.2-stable
+      APK_PATH: godot/build/BlockStrikeRoyale-debug.apk
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build dependencies
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Install Godot editor and export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot/editor.zip" \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_TAG}/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q "$RUNNER_TEMP/godot/editor.zip" -d "$RUNNER_TEMP/godot/editor"
+          export GODOT_BIN="$RUNNER_TEMP/godot/editor/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          chmod +x "$GODOT_BIN"
+          echo "GODOT_BIN=$GODOT_BIN" >> "$GITHUB_ENV"
+
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot/templates.tpz" \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_TAG}/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          mkdir -p "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          unzip -q "$RUNNER_TEMP/godot/templates.tpz" -d "$RUNNER_TEMP/godot/templates"
+          find "$RUNNER_TEMP/godot/templates" -type f -name 'android_debug.apk' -exec cp {} "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/" \;
+          find "$RUNNER_TEMP/godot/templates" -type f -name 'android_release.apk' -exec cp {} "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/" \;
+          find "$RUNNER_TEMP/godot/templates" -type f -name 'android_source.zip' -exec cp {} "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/" \;
+          test -f "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_debug.apk"
+
+      - name: Configure Godot Android paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.config/godot"
+          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "${ANDROID_SDK_ROOT}"
+          export/android/java_sdk_path = "${JAVA_HOME}"
+          EOF
+
+      - name: Validate and export debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p godot/build
+          "$GODOT_BIN" --headless --editor --path godot --quit
+          "$GODOT_BIN" --headless --path godot --export-debug "Android" "$APK_PATH"
+          test -s "$APK_PATH"
+          find "$ANDROID_HOME/build-tools" -name apksigner -type f -print -quit | xargs -r -I{} {} verify --verbose "$APK_PATH"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BlockStrikeRoyale-debug-apk
+          path: ${{ env.APK_PATH }}
+          if-no-files-found: error
+
+      - name: Publish direct GitHub release APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: blockstrike-royale-v0.1.0
+          name: BlockStrike Royale 0.1.0 Android APK
+          prerelease: true
+          generate_release_notes: false
+          overwrite_files: true
+          files: ${{ env.APK_PATH }}
+          body: |
+            Playable offline prototype build for BlockStrike Royale.
+
+            This APK contains the procedural voxel map, third-person controls, bots, weapons, pickups, safe zone, building, mobile HUD, generated audio, and local progression. Internet multiplayer is not enabled; the LAN transport layer is experimental.
