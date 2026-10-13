@@ -1,0 +1,151 @@
+{
+ "currencies": {
+  "coins": {
+   "name": "Coins",
+   "icon": "icon_coin",
+   "premium": false
+  },
+  "gems": {
+   "name": "Gems",
+   "icon": "icon_gem",
+   "premium": true
+  }
+ },
+ "start_balance": {
+  "coins": 500,
+  "gems": 50
+ },
+ "match_rewards": {
+  "br": {
+   "base": 40,
+   "per_elimination": 25,
+   "placement": [
+    {
+     "min_place": 1,
+     "max_place": 1,
+     "coins": 300,
+     "gems": 6,
+     "xp": 300
+    },
+    {
+     "min_place": 2,
+     "max_place": 3,
+     "coins": 200,
+     "gems": 4,
+     "xp": 220
+    },
+    {
+     "min_place": 4,
+     "max_place": 10,
+     "coins": 120,
+     "gems": 2,
+     "xp": 150
+    },
+    {
+     "min_place": 11,
+     "max_place": 32,
+     "coins": 60,
+     "gems": 0,
+     "xp": 90
+    }
+   ]
+  },
+  "clash": {
+   "base": 30,
+   "per_elimination": 18,
+   "per_round_win": 20,
+   "win_coins": 220,
+   "win_gems": 4,
+   "win_xp": 240,
+   "loss_coins": 90,
+   "loss_xp": 110
+  },
+  "arena": {
+   "base": 25,
+   "per_elimination": 18,
+   "per_round_win": 15,
+   "win_coins": 180,
+   "win_gems": 3,
+   "win_xp": 200,
+   "loss_coins": 80,
+   "loss_xp": 100
+  },
+  "training": {
+   "base": 10,
+   "per_elimination": 2,
+   "per_target": 1,
+   "max_coins_per_match": 60,
+   "xp": 40,
+   "daily_cap": 200
+  }
+ },
+ "first_match_bonus": {
+  "coins": 200,
+  "gems": 10
+ },
+ "daily_login": {
+  "coins": [
+   50,
+   60,
+   75,
+   90,
+   110,
+   140,
+   200
+  ],
+  "gems_on_day_7": 25
+ },
+ "xp_curve": {
+  "base": 400,
+  "growth": 1.18,
+  "max_level": 60
+ },
+ "rank_thresholds": [
+  {
+   "rank": "Bronze",
+   "min_rating": 0,
+   "min_level": 1
+  },
+  {
+   "rank": "Silver",
+   "min_rating": 1100,
+   "min_level": 5
+  },
+  {
+   "rank": "Gold",
+   "min_rating": 1400,
+   "min_level": 12
+  },
+  {
+   "rank": "Platinum",
+   "min_rating": 1700,
+   "min_level": 20
+  },
+  {
+   "rank": "Diamond",
+   "min_rating": 2000,
+   "min_level": 30
+  },
+  {
+   "rank": "Master",
+   "min_rating": 2300,
+   "min_level": 42
+  }
+ ],
+ "ranked": {
+  "enabled": false,
+  "rating_start": 1000,
+  "placement_gain": [
+   40,
+   30,
+   20,
+   10,
+   0,
+   -10
+  ],
+  "abandon_penalty": 25,
+  "per_elimination": 4,
+  "require_server": true
+ },
+ "shop_refund_policy": "no_refunds"
+}

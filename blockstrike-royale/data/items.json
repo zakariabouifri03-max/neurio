@@ -1,0 +1,126 @@
+{
+ "items": [
+  {
+   "id": "ammo_light",
+   "name": "Light Ammo",
+   "kind": "ammo",
+   "stack": 240,
+   "icon": "icon_ammo",
+   "ammo_class": "light",
+   "pickup_amount": 40,
+   "weapons": [
+    "wasp_smg",
+    "zip9",
+    "tick_pistol",
+    "sidearm9"
+   ]
+  },
+  {
+   "id": "ammo_heavy",
+   "name": "Heavy Ammo",
+   "kind": "ammo",
+   "stack": 180,
+   "icon": "icon_ammo",
+   "ammo_class": "heavy",
+   "pickup_amount": 30,
+   "weapons": [
+    "vx7_ranger",
+    "kestrel_carbine",
+    "hammerhead_lmg"
+   ]
+  },
+  {
+   "id": "ammo_shell",
+   "name": "Shells",
+   "kind": "ammo",
+   "stack": 60,
+   "icon": "icon_ammo",
+   "ammo_class": "shell",
+   "pickup_amount": 10,
+   "weapons": [
+    "boulder_sg",
+    "twinhaul"
+   ]
+  },
+  {
+   "id": "ammo_sniper",
+   "name": "Sniper Ammo",
+   "kind": "ammo",
+   "stack": 40,
+   "icon": "icon_ammo",
+   "ammo_class": "sniper",
+   "pickup_amount": 8,
+   "weapons": [
+    "longspike"
+   ]
+  },
+  {
+   "id": "bandage",
+   "name": "Bandage",
+   "kind": "heal",
+   "stack": 6,
+   "icon": "icon_bandage",
+   "heal_amount": 25,
+   "use_time": 2.0,
+   "max_health_percent": 1.0
+  },
+  {
+   "id": "medkit",
+   "name": "Med Kit",
+   "kind": "heal",
+   "stack": 3,
+   "icon": "icon_medkit",
+   "heal_amount": 100,
+   "use_time": 4.5
+  },
+  {
+   "id": "shield_cell",
+   "name": "Shield Cell",
+   "kind": "armor",
+   "stack": 8,
+   "icon": "icon_cell",
+   "armor_amount": 25,
+   "use_time": 2.0
+  },
+  {
+   "id": "armor_plate",
+   "name": "Armor Plate",
+   "kind": "armor",
+   "stack": 3,
+   "icon": "icon_armor",
+   "armor_amount": 100,
+   "armor_tier": 2,
+   "use_time": 4.0
+  },
+  {
+   "id": "build_block",
+   "name": "Build Block",
+   "kind": "build",
+   "stack": 24,
+   "icon": "icon_build",
+   "pickup_amount": 6
+  },
+  {
+   "id": "credits_pack",
+   "name": "Credit Chip",
+   "kind": "credits",
+   "stack": 1,
+   "icon": "icon_coin",
+   "credits": 400
+  }
+ ],
+ "armor_tiers": {
+  "0": {
+   "reduction": 0.0,
+   "max": 0
+  },
+  "1": {
+   "reduction": 0.2,
+   "max": 50
+  },
+  "2": {
+   "reduction": 0.35,
+   "max": 100
+  }
+ }
+}

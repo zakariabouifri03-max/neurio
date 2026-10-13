@@ -1,0 +1,304 @@
+{
+ "daily": [
+  {
+   "id": "daily_play_two",
+   "name": "Warm Up",
+   "description": "Play 2 matches in any mode.",
+   "metric": "matches_played",
+   "target": 2,
+   "reward": {
+    "coins": 150,
+    "xp": 120
+   },
+   "scope": "daily",
+   "reset": "daily"
+  },
+  {
+   "id": "daily_loot_run",
+   "name": "Scavenger",
+   "description": "Pick up 15 items.",
+   "metric": "items_picked",
+   "target": 15,
+   "reward": {
+    "coins": 120,
+    "xp": 100
+   },
+   "scope": "daily",
+   "reset": "daily"
+  },
+  {
+   "id": "daily_elim_three",
+   "name": "Sharp Shooter",
+   "description": "Eliminate 3 opponents.",
+   "metric": "eliminations",
+   "target": 3,
+   "reward": {
+    "coins": 180,
+    "xp": 150
+   },
+   "scope": "daily",
+   "reset": "daily"
+  },
+  {
+   "id": "daily_training",
+   "name": "Range Day",
+   "description": "Hit 10 training targets.",
+   "metric": "targets_hit",
+   "target": 10,
+   "reward": {
+    "coins": 100,
+    "xp": 90
+   },
+   "scope": "daily",
+   "reset": "daily"
+  },
+  {
+   "id": "daily_xp",
+   "name": "Earn Your Keep",
+   "description": "Earn 500 match XP.",
+   "metric": "match_xp",
+   "target": 500,
+   "reward": {
+    "coins": 160,
+    "xp": 0
+   },
+   "scope": "daily",
+   "reset": "daily"
+  }
+ ],
+ "weekly": [
+  {
+   "id": "weekly_matches",
+   "name": "Regular",
+   "description": "Play 12 matches this week.",
+   "metric": "matches_played",
+   "target": 12,
+   "reward": {
+    "coins": 800,
+    "gems": 8,
+    "xp": 600
+   },
+   "scope": "weekly",
+   "reset": "weekly"
+  },
+  {
+   "id": "weekly_squad_win",
+   "name": "Team Effort",
+   "description": "Win a Clash Squad match.",
+   "metric": "clash_wins",
+   "target": 1,
+   "reward": {
+    "coins": 900,
+    "gems": 10,
+    "xp": 700
+   },
+   "scope": "weekly",
+   "reset": "weekly"
+  },
+  {
+   "id": "weekly_dailies",
+   "name": "Consistent",
+   "description": "Complete 10 daily missions.",
+   "metric": "daily_missions_completed",
+   "target": 10,
+   "reward": {
+    "coins": 700,
+    "gems": 6,
+    "xp": 500
+   },
+   "scope": "weekly",
+   "reset": "weekly"
+  },
+  {
+   "id": "weekly_categories",
+   "name": "Arsenal Tour",
+   "description": "Get eliminations with 4 weapon categories.",
+   "metric": "weapon_categories_used",
+   "target": 4,
+   "reward": {
+    "coins": 650,
+    "gems": 5,
+    "xp": 480
+   },
+   "scope": "weekly",
+   "reset": "weekly"
+  },
+  {
+   "id": "weekly_br_play",
+   "name": "Island Regular",
+   "description": "Play 5 Battle Royale matches.",
+   "metric": "br_matches",
+   "target": 5,
+   "reward": {
+    "coins": 750,
+    "gems": 7,
+    "xp": 550
+   },
+   "scope": "weekly",
+   "reset": "weekly"
+  }
+ ],
+ "achievements": [
+  {
+   "id": "ach_first_match",
+   "name": "First Drop",
+   "description": "Finish your first match.",
+   "metric": "matches_played",
+   "target": 1,
+   "reward": {
+    "coins": 200,
+    "gems": 5,
+    "xp": 100
+   }
+  },
+  {
+   "id": "ach_first_win",
+   "name": "First Victory",
+   "description": "Win a match.",
+   "metric": "wins",
+   "target": 1,
+   "reward": {
+    "coins": 400,
+    "gems": 10,
+    "xp": 200
+   }
+  },
+  {
+   "id": "ach_weapon_specialist",
+   "name": "Weapon Specialist",
+   "description": "Get 50 eliminations.",
+   "metric": "eliminations",
+   "target": 50,
+   "reward": {
+    "coins": 900,
+    "gems": 15,
+    "xp": 400
+   }
+  },
+  {
+   "id": "ach_team_player",
+   "name": "Team Player",
+   "description": "Revive or assist 10 teammates.",
+   "metric": "assists",
+   "target": 10,
+   "reward": {
+    "coins": 600,
+    "gems": 10,
+    "xp": 300
+   }
+  },
+  {
+   "id": "ach_survivor",
+   "name": "Survival Expert",
+   "description": "Reach the top 3 in Battle Royale 5 times.",
+   "metric": "top3_finishes",
+   "target": 5,
+   "reward": {
+    "coins": 800,
+    "gems": 12,
+    "xp": 350
+   }
+  },
+  {
+   "id": "ach_arena_champion",
+   "name": "Arena Champion",
+   "description": "Win 5 Clash Squad matches.",
+   "metric": "clash_wins",
+   "target": 5,
+   "reward": {
+    "coins": 1000,
+    "gems": 18,
+    "xp": 500
+   }
+  },
+  {
+   "id": "ach_explorer",
+   "name": "Explorer",
+   "description": "Visit every named place on Emerald Island.",
+   "metric": "places_visited",
+   "target": 12,
+   "reward": {
+    "coins": 700,
+    "gems": 12,
+    "xp": 300
+   }
+  },
+  {
+   "id": "ach_builder",
+   "name": "Builder",
+   "description": "Place 100 build blocks in matches.",
+   "metric": "blocks_placed",
+   "target": 100,
+   "reward": {
+    "coins": 500,
+    "gems": 8,
+    "xp": 250
+   }
+  },
+  {
+   "id": "ach_marksman",
+   "name": "Marksman",
+   "description": "Land 25 headshot eliminations.",
+   "metric": "headshot_elims",
+   "target": 25,
+   "reward": {
+    "coins": 850,
+    "gems": 14,
+    "xp": 380
+   }
+  },
+  {
+   "id": "ach_collector",
+   "name": "Collector",
+   "description": "Own 20 cosmetic items.",
+   "metric": "cosmetics_owned",
+   "target": 20,
+   "reward": {
+    "coins": 1200,
+    "gems": 20,
+    "xp": 500
+   }
+  }
+ ],
+ "events": [
+  {
+   "id": "event_emerald_days",
+   "name": "Emerald Days",
+   "description": "Seasonal island festival: bonus coins for top 10 finishes.",
+   "starts": "2026-01-01",
+   "ends": "2026-12-31",
+   "requires_server_clock": true,
+   "modifiers": {
+    "coins_multiplier": 1.25,
+    "xp_multiplier": 1.1
+   },
+   "missions": [
+    {
+     "id": "event_emerald_top10",
+     "name": "Festival Finalist",
+     "description": "Finish top 10 in Battle Royale 3 times.",
+     "metric": "top10_finishes",
+     "target": 3,
+     "reward": {
+      "coins": 500,
+      "gems": 6,
+      "xp": 300
+     }
+    }
+   ],
+   "rewards": {
+    "coins": 300,
+    "gems": 5
+   },
+   "cosmetics": [
+    "skin_neon",
+    "wpn_neon"
+   ]
+  }
+ ],
+ "metric_caps": {
+  "targets_hit": 500,
+  "blocks_placed": 400,
+  "items_picked": 900
+ }
+}

@@ -1,0 +1,117 @@
+{
+ "rarity_weights_by_zone": {
+  "low": {
+   "common": 62,
+   "uncommon": 26,
+   "rare": 10,
+   "epic": 2,
+   "legendary": 0
+  },
+  "mid": {
+   "common": 42,
+   "uncommon": 32,
+   "rare": 19,
+   "epic": 6,
+   "legendary": 1
+  },
+  "high": {
+   "common": 24,
+   "uncommon": 30,
+   "rare": 28,
+   "epic": 15,
+   "legendary": 3
+  }
+ },
+ "containers": {
+  "crate_wood": {
+   "rolls": 2,
+   "tier": "low",
+   "mesh": "crate",
+   "open_time": 0.6,
+   "material": "wood",
+   "sfx": "res://assets/audio/impact_wood.wav"
+  },
+  "crate_metal": {
+   "rolls": 3,
+   "tier": "mid",
+   "mesh": "crate_metal",
+   "open_time": 0.9,
+   "material": "metal",
+   "sfx": "res://assets/audio/impact_metal.wav"
+  },
+  "supply_drop": {
+   "rolls": 5,
+   "tier": "high",
+   "mesh": "crate_supply",
+   "open_time": 1.2,
+   "material": "metal",
+   "sfx": "res://assets/audio/impact_metal.wav"
+  },
+  "ammo_box": {
+   "rolls": 2,
+   "tier": "low",
+   "mesh": "ammo_box",
+   "open_time": 0.5,
+   "material": "metal",
+   "sfx": "res://assets/audio/impact_metal.wav",
+   "ammo_only": true
+  },
+  "med_box": {
+   "rolls": 2,
+   "tier": "mid",
+   "mesh": "med_box",
+   "open_time": 0.5,
+   "material": "metal",
+   "sfx": "res://assets/audio/impact_metal.wav",
+   "heal_only": true
+  }
+ },
+ "ground_loot_weights": {
+  "ammo": 34,
+  "heal": 22,
+  "armor": 14,
+  "weapon": 24,
+  "utility": 6
+ },
+ "weapon_pool_by_zone": {
+  "low": [
+   "wasp_smg",
+   "zip9",
+   "tick_pistol",
+   "sidearm9",
+   "boulder_sg",
+   "rebar_club",
+   "cutter_blade"
+  ],
+  "mid": [
+   "vx7_ranger",
+   "kestrel_carbine",
+   "boulder_sg",
+   "twinhaul",
+   "fragshard",
+   "smoke_block"
+  ],
+  "high": [
+   "longspike",
+   "hammerhead_lmg",
+   "kestrel_carbine",
+   "fragshard"
+  ]
+ },
+ "item_pool": [
+  "bandage",
+  "medkit",
+  "shield_cell",
+  "armor_plate",
+  "build_block",
+  "ammo_light",
+  "ammo_heavy",
+  "ammo_shell",
+  "ammo_sniper"
+ ],
+ "supply_drop_schedule": {
+  "first_at": 0.35,
+  "interval": 0.2,
+  "count_per_drop": 3
+ }
+}

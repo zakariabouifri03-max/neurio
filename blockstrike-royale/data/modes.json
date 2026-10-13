@@ -1,0 +1,151 @@
+{
+ "modes": [
+  {
+   "id": "br",
+   "name": "Battle Royale",
+   "description": "Drop in, loot up, survive the closing zone.",
+   "map": "emerald_island",
+   "team_size": 1,
+   "max_players": 32,
+   "bot_fill": true,
+   "zones": {
+    "enabled": true
+   },
+   "loot_multiplier": 1.0,
+   "respawn": false,
+   "match_duration_s": 900,
+   "prep_time_s": 20.0,
+   "drop_time_s": 6.0,
+   "scoring": {
+    "per_elimination": 1.0,
+    "placement_curve": "br"
+   },
+   "friendly_fire": false,
+   "spectate": true,
+   "variants": [
+    {
+     "id": "solo",
+     "name": "Solo",
+     "team_size": 1,
+     "max_players": 32
+    },
+    {
+     "id": "duo",
+     "name": "Duo",
+     "team_size": 2,
+     "max_players": 32
+    },
+    {
+     "id": "squad",
+     "name": "Squad",
+     "team_size": 4,
+     "max_players": 32
+    }
+   ]
+  },
+  {
+   "id": "clash",
+   "name": "Clash Squad",
+   "description": "4v4 rounds, buy gear, first to 4 rounds.",
+   "map": "neon_yard",
+   "team_size": 4,
+   "max_players": 8,
+   "bot_fill": true,
+   "zones": {
+    "enabled": false
+   },
+   "loot_multiplier": 0.0,
+   "respawn": false,
+   "rounds_to_win": 4,
+   "max_rounds": 7,
+   "round_time_s": 120.0,
+   "buy_time_s": 20.0,
+   "buy_zone": "spawn",
+   "credits_start": 900,
+   "credits_per_round": 300,
+   "credits_per_elimination": 200,
+   "credits_per_round_win": 400,
+   "prep_time_s": 10.0,
+   "scoring": {
+    "per_elimination": 1.0,
+    "placement_curve": "flat"
+   },
+   "friendly_fire": false,
+   "spectate": true,
+   "loadout": {
+    "primary": "",
+    "secondary": "tick_pistol",
+    "melee": "rebar_club",
+    "throwable": "fragshard"
+   }
+  },
+  {
+   "id": "arena",
+   "name": "2v2 Arena",
+   "description": "Tight 2v2 duels on the canyon floor.",
+   "map": "dust_canyon",
+   "team_size": 2,
+   "max_players": 4,
+   "bot_fill": true,
+   "zones": {
+    "enabled": false
+   },
+   "loot_multiplier": 0.0,
+   "respawn": false,
+   "rounds_to_win": 5,
+   "max_rounds": 9,
+   "round_time_s": 90.0,
+   "buy_time_s": 0.0,
+   "buy_zone": "none",
+   "credits_start": 0,
+   "credits_per_round": 0,
+   "credits_per_elimination": 0,
+   "credits_per_round_win": 0,
+   "prep_time_s": 8.0,
+   "scoring": {
+    "per_elimination": 1.0,
+    "placement_curve": "flat"
+   },
+   "friendly_fire": false,
+   "spectate": true,
+   "ranked_available": false,
+   "loadout": {
+    "primary": "vx7_ranger",
+    "secondary": "tick_pistol",
+    "melee": "rebar_club",
+    "throwable": "fragshard"
+   }
+  },
+  {
+   "id": "training",
+   "name": "Training Ground",
+   "description": "Offline practice: targets, bots, free weapons.",
+   "map": "training_base",
+   "team_size": 1,
+   "max_players": 1,
+   "bot_fill": true,
+   "zones": {
+    "enabled": false
+   },
+   "loot_multiplier": 0.0,
+   "respawn": true,
+   "respawn_delay_s": 3.0,
+   "infinite_ammo": true,
+   "bot_difficulty": "normal",
+   "prep_time_s": 0.0,
+   "scoring": {
+    "per_elimination": 1.0,
+    "placement_curve": "flat"
+   },
+   "friendly_fire": false,
+   "spectate": false,
+   "counts_for_progression": true,
+   "loadout": {
+    "primary": "vx7_ranger",
+    "secondary": "tick_pistol",
+    "melee": "rebar_club",
+    "throwable": "fragshard"
+   }
+  }
+ ]
+}

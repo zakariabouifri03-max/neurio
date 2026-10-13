@@ -1,0 +1,556 @@
+{
+ "items": [
+  {
+   "id": "skin_recruit",
+   "name": "Recruit",
+   "category": "character_skin",
+   "rarity": "common",
+   "price": 0,
+   "currency": "coins",
+   "description": "Standard field uniform.",
+   "palette": {
+    "head": "#c98f5f",
+    "torso": "#4a7a4a",
+    "arms": "#4a7a4a",
+    "legs": "#37506b",
+    "boots": "#2b2f36"
+   },
+   "equip_slot": "skin"
+  },
+  {
+   "id": "skin_scout",
+   "name": "Moss Scout",
+   "category": "character_skin",
+   "rarity": "uncommon",
+   "price": 900,
+   "currency": "coins",
+   "description": "Light recon gear with leaf-green plates.",
+   "palette": {
+    "head": "#b07a4e",
+    "torso": "#5f8f4d",
+    "arms": "#547f45",
+    "legs": "#3f5f3a",
+    "boots": "#2e3a2c"
+   },
+   "equip_slot": "skin"
+  },
+  {
+   "id": "skin_engineer",
+   "name": "Yard Engineer",
+   "category": "character_skin",
+   "rarity": "uncommon",
+   "price": 1100,
+   "currency": "coins",
+   "description": "Warehouse overalls and work gloves.",
+   "palette": {
+    "head": "#a9743f",
+    "torso": "#c8873a",
+    "arms": "#b07730",
+    "legs": "#3b4250",
+    "boots": "#2a2f38"
+   },
+   "equip_slot": "skin"
+  },
+  {
+   "id": "skin_ranger",
+   "name": "Trail Ranger",
+   "category": "character_skin",
+   "rarity": "rare",
+   "price": 1800,
+   "currency": "coins",
+   "description": "Desert patrol colours with a canvas vest.",
+   "palette": {
+    "head": "#b98a58",
+    "torso": "#a08b5e",
+    "arms": "#8f7a50",
+    "legs": "#5a5040",
+    "boots": "#332f28"
+   },
+   "equip_slot": "skin"
+  },
+  {
+   "id": "skin_tech",
+   "name": "Signal Tech",
+   "category": "character_skin",
+   "rarity": "rare",
+   "price": 2000,
+   "currency": "coins",
+   "description": "Relay station crew with high-vis stripe.",
+   "palette": {
+    "head": "#8a6a48",
+    "torso": "#3f6f8f",
+    "arms": "#37627f",
+    "legs": "#2f4a63",
+    "boots": "#242c34"
+   },
+   "equip_slot": "skin"
+  },
+  {
+   "id": "skin_frost",
+   "name": "Frost Patrol",
+   "category": "character_skin",
+   "rarity": "epic",
+   "price": 2600,
+   "currency": "coins",
+   "description": "Insulated arctic gear for Frost Frontier.",
+   "palette": {
+    "head": "#d8b48a",
+    "torso": "#cfe0ea",
+    "arms": "#b9cdd9",
+    "legs": "#5d6f7d",
+    "boots": "#3a444c"
+   },
+   "equip_slot": "skin"
+  },
+  {
+   "id": "skin_neon",
+   "name": "Yard Runner",
+   "category": "character_skin",
+   "rarity": "epic",
+   "price": 70,
+   "currency": "gems",
+   "description": "Neon-trimmed arena kit.",
+   "palette": {
+    "head": "#c98f5f",
+    "torso": "#3a3f7a",
+    "arms": "#5a3f8f",
+    "legs": "#232844",
+    "boots": "#8f3f7a"
+   },
+   "equip_slot": "skin"
+  },
+  {
+   "id": "skin_ember",
+   "name": "Ember Operative",
+   "category": "character_skin",
+   "rarity": "legendary",
+   "price": 140,
+   "currency": "gems",
+   "description": "Legendary loadout with ember accents.",
+   "palette": {
+    "head": "#8f5a3f",
+    "torso": "#6b2f2f",
+    "arms": "#8a3a2a",
+    "legs": "#3a2222",
+    "boots": "#231414"
+   },
+   "equip_slot": "skin"
+  },
+  {
+   "id": "head_cap",
+   "name": "Field Cap",
+   "category": "headwear",
+   "rarity": "common",
+   "price": 350,
+   "currency": "coins",
+   "description": "Simple cloth cap.",
+   "equip_slot": "headwear",
+   "colorway": {
+    "color": "#5f8f4d"
+   },
+   "part": "cap"
+  },
+  {
+   "id": "head_helmet",
+   "name": "Plate Helm",
+   "category": "headwear",
+   "rarity": "rare",
+   "price": 1200,
+   "currency": "coins",
+   "description": "Reinforced voxel helmet (cosmetic only).",
+   "equip_slot": "headwear",
+   "colorway": {
+    "color": "#6f7b88"
+   },
+   "part": "helm"
+  },
+  {
+   "id": "head_crown",
+   "name": "Signal Crown",
+   "category": "headwear",
+   "rarity": "legendary",
+   "price": 90,
+   "currency": "gems",
+   "description": "Light-up relay crown.",
+   "equip_slot": "headwear",
+   "colorway": {
+    "color": "#e8c24a"
+   },
+   "part": "crown"
+  },
+  {
+   "id": "mask_scarf",
+   "name": "Dust Scarf",
+   "category": "mask",
+   "rarity": "uncommon",
+   "price": 600,
+   "currency": "coins",
+   "description": "Cloth wrap for canyon runs.",
+   "equip_slot": "mask",
+   "colorway": {
+    "color": "#a08b5e"
+   },
+   "part": "scarf"
+  },
+  {
+   "id": "mask_visor",
+   "name": "Tac Visor",
+   "category": "mask",
+   "rarity": "epic",
+   "price": 60,
+   "currency": "gems",
+   "description": "Glowing visor band.",
+   "equip_slot": "mask",
+   "colorway": {
+    "color": "#4ad8e8"
+   },
+   "part": "visor"
+  },
+  {
+   "id": "pack_small",
+   "name": "Daypack",
+   "category": "backpack",
+   "rarity": "common",
+   "price": 400,
+   "currency": "coins",
+   "description": "Compact voxel backpack.",
+   "equip_slot": "backpack",
+   "colorway": {
+    "color": "#6b5a3f"
+   },
+   "part": "pack_small"
+  },
+  {
+   "id": "pack_radio",
+   "name": "Relay Pack",
+   "category": "backpack",
+   "rarity": "rare",
+   "price": 1500,
+   "currency": "coins",
+   "description": "Antenna pack with blinking light.",
+   "equip_slot": "backpack",
+   "colorway": {
+    "color": "#3f5f6f"
+   },
+   "part": "pack_radio"
+  },
+  {
+   "id": "pack_supply",
+   "name": "Supply Frame",
+   "category": "backpack",
+   "rarity": "epic",
+   "price": 55,
+   "currency": "gems",
+   "description": "Stacked supply frame.",
+   "equip_slot": "backpack",
+   "colorway": {
+    "color": "#7a4a3a"
+   },
+   "part": "pack_supply"
+  },
+  {
+   "id": "wpn_standard",
+   "name": "Standard Issue",
+   "category": "weapon_skin",
+   "rarity": "common",
+   "price": 0,
+   "currency": "coins",
+   "description": "Factory colourway.",
+   "tint": "#3d434e",
+   "applies_to": [
+    "ar",
+    "smg",
+    "shotgun",
+    "sniper",
+    "pistol",
+    "lmg"
+   ],
+   "equip_slot": "weapon_skin"
+  },
+  {
+   "id": "wpn_moss",
+   "name": "Moss Wrap",
+   "category": "weapon_skin",
+   "rarity": "uncommon",
+   "price": 700,
+   "currency": "coins",
+   "description": "Green fabric wrap.",
+   "tint": "#4f6b3f",
+   "applies_to": [
+    "ar",
+    "smg",
+    "shotgun",
+    "sniper",
+    "pistol",
+    "lmg"
+   ],
+   "equip_slot": "weapon_skin"
+  },
+  {
+   "id": "wpn_sand",
+   "name": "Sand Coat",
+   "category": "weapon_skin",
+   "rarity": "rare",
+   "price": 1400,
+   "currency": "coins",
+   "description": "Canyon sand camo.",
+   "tint": "#a08b5e",
+   "applies_to": [
+    "ar",
+    "smg",
+    "shotgun",
+    "sniper",
+    "pistol",
+    "lmg"
+   ],
+   "equip_slot": "weapon_skin"
+  },
+  {
+   "id": "wpn_ember",
+   "name": "Ember Plate",
+   "category": "weapon_skin",
+   "rarity": "epic",
+   "price": 50,
+   "currency": "gems",
+   "description": "Heat-treated plates.",
+   "tint": "#8a3a2a",
+   "applies_to": [
+    "ar",
+    "smg",
+    "shotgun",
+    "sniper",
+    "pistol",
+    "lmg"
+   ],
+   "equip_slot": "weapon_skin"
+  },
+  {
+   "id": "wpn_neon",
+   "name": "Neon Coil",
+   "category": "weapon_skin",
+   "rarity": "legendary",
+   "price": 110,
+   "currency": "gems",
+   "description": "Coil-lit receiver.",
+   "tint": "#4ad8e8",
+   "applies_to": [
+    "ar",
+    "smg",
+    "shotgun",
+    "sniper",
+    "pistol",
+    "lmg"
+   ],
+   "equip_slot": "weapon_skin"
+  },
+  {
+   "id": "emote_wave",
+   "name": "Friendly Wave",
+   "category": "emote",
+   "rarity": "common",
+   "price": 300,
+   "currency": "coins",
+   "description": "Wave at nearby players.",
+   "equip_slot": "emote",
+   "emote": "wave",
+   "duration": 2.0
+  },
+  {
+   "id": "emote_dance",
+   "name": "Victory Dance",
+   "category": "emote",
+   "rarity": "uncommon",
+   "price": 900,
+   "currency": "coins",
+   "description": "Spin and hop celebration.",
+   "equip_slot": "emote",
+   "emote": "dance",
+   "duration": 4.0
+  },
+  {
+   "id": "emote_taunt",
+   "name": "Shoulder Roll",
+   "category": "emote",
+   "rarity": "rare",
+   "price": 1300,
+   "currency": "coins",
+   "description": "Confident shoulder roll.",
+   "equip_slot": "emote",
+   "emote": "taunt",
+   "duration": 3.0
+  },
+  {
+   "id": "emote_sit",
+   "name": "Take a Seat",
+   "category": "emote",
+   "rarity": "epic",
+   "price": 45,
+   "currency": "gems",
+   "description": "Sit down and rest.",
+   "equip_slot": "emote",
+   "emote": "sit",
+   "duration": 5.0
+  },
+  {
+   "id": "glider_canvas",
+   "name": "Canvas Glider",
+   "category": "glider",
+   "rarity": "common",
+   "price": 500,
+   "currency": "coins",
+   "description": "Simple square-canvas glider.",
+   "equip_slot": "glider",
+   "colorway": {
+    "color": "#c8873a"
+   },
+   "part": "glider_square"
+  },
+  {
+   "id": "glider_wing",
+   "name": "Wing Glider",
+   "category": "glider",
+   "rarity": "rare",
+   "price": 1600,
+   "currency": "coins",
+   "description": "Angular wing glider.",
+   "equip_slot": "glider",
+   "colorway": {
+    "color": "#4a6f9f"
+   },
+   "part": "glider_wing"
+  },
+  {
+   "id": "glider_kite",
+   "name": "Neon Kite",
+   "category": "glider",
+   "rarity": "legendary",
+   "price": 100,
+   "currency": "gems",
+   "description": "Glowing patrol kite.",
+   "equip_slot": "glider",
+   "colorway": {
+    "color": "#7a3f9f"
+   },
+   "part": "glider_kite"
+  },
+  {
+   "id": "banner_default",
+   "name": "Emerald Banner",
+   "category": "banner",
+   "rarity": "common",
+   "price": 0,
+   "currency": "coins",
+   "description": "Emerald Island banner.",
+   "equip_slot": "banner",
+   "colorway": {
+    "color": "#4a8f5f"
+   }
+  },
+  {
+   "id": "banner_quarry",
+   "name": "Quarry Banner",
+   "category": "banner",
+   "rarity": "uncommon",
+   "price": 450,
+   "currency": "coins",
+   "description": "Gravel quarry emblem.",
+   "equip_slot": "banner",
+   "colorway": {
+    "color": "#8a7a5e"
+   }
+  },
+  {
+   "id": "banner_keep",
+   "name": "Stonewatch Banner",
+   "category": "banner",
+   "rarity": "rare",
+   "price": 1200,
+   "currency": "coins",
+   "description": "Keep watchtower emblem.",
+   "equip_slot": "banner",
+   "colorway": {
+    "color": "#6f7b9f"
+   }
+  },
+  {
+   "id": "victory_salute",
+   "name": "Salute",
+   "category": "victory_anim",
+   "rarity": "common",
+   "price": 350,
+   "currency": "coins",
+   "description": "Standard winner salute.",
+   "equip_slot": "victory_anim",
+   "anim": "salute"
+  },
+  {
+   "id": "victory_leap",
+   "name": "Victory Leap",
+   "category": "victory_anim",
+   "rarity": "epic",
+   "price": 65,
+   "currency": "gems",
+   "description": "Leap with a weapon raise.",
+   "equip_slot": "victory_anim",
+   "anim": "leap"
+  }
+ ],
+ "meta": {
+  "categories": [
+   {
+    "id": "character_skin",
+    "name": "Outfits"
+   },
+   {
+    "id": "headwear",
+    "name": "Headwear"
+   },
+   {
+    "id": "mask",
+    "name": "Masks"
+   },
+   {
+    "id": "backpack",
+    "name": "Backpacks"
+   },
+   {
+    "id": "weapon_skin",
+    "name": "Weapon Skins"
+   },
+   {
+    "id": "emote",
+    "name": "Emotes"
+   },
+   {
+    "id": "glider",
+    "name": "Gliders"
+   },
+   {
+    "id": "banner",
+    "name": "Banners"
+   },
+   {
+    "id": "victory_anim",
+    "name": "Victory"
+   }
+  ],
+  "default_owned": [
+   "skin_recruit",
+   "wpn_standard",
+   "banner_default",
+   "emote_wave",
+   "head_cap",
+   "pack_small",
+   "victory_salute",
+   "glider_canvas"
+  ],
+  "rarity_weights": {
+   "common": 0,
+   "uncommon": 1,
+   "rare": 2,
+   "epic": 3,
+   "legendary": 4
+  },
+  "featured_rotation_days": 7
+ }
+}

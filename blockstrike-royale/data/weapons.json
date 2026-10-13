@@ -1,0 +1,1661 @@
+{
+ "weapons": [
+  {
+   "headshot_multiplier": 1.7,
+   "pellets": 1,
+   "projectile": false,
+   "move_penalty": 0.06,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.45,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/fire_rifle.wav",
+    "reload": "res://assets/audio/reload.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "vx7_ranger",
+   "display_name": "VX-7 Ranger",
+   "category": "ar",
+   "rarity": "uncommon",
+   "damage": 22.0,
+   "fire_rate": 8.5,
+   "magazine": 30,
+   "reserve_ammo": 150,
+   "reload_time": 2.1,
+   "effective_range": 60.0,
+   "recoil": 1.15,
+   "spread_deg": {
+    "base": 1.1,
+    "moving": 2.6,
+    "air": 4.5
+   },
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.62,
+       0.11,
+       0.11
+      ],
+      "c": "#3d434e",
+      "t": "metal_plate"
+     },
+     {
+      "p": [
+       0.27,
+       0.04,
+       0.0
+      ],
+      "s": [
+       0.3,
+       0.06,
+       0.08
+      ],
+      "c": "#5a6270",
+      "t": "metal"
+     },
+     {
+      "p": [
+       -0.18,
+       -0.1,
+       0.0
+      ],
+      "s": [
+       0.13,
+       0.16,
+       0.09
+      ],
+      "c": "#2d3238"
+     },
+     {
+      "p": [
+       -0.34,
+       -0.02,
+       0.0
+      ],
+      "s": [
+       0.22,
+       0.09,
+       0.09
+      ],
+      "c": "#7a5a34",
+      "t": "planks"
+     },
+     {
+      "p": [
+       0.06,
+       0.09,
+       0.0
+      ],
+      "s": [
+       0.2,
+       0.05,
+       0.06
+      ],
+      "c": "#4a4f59",
+      "t": "metal"
+     },
+     {
+      "p": [
+       -0.02,
+       -0.2,
+       0.0
+      ],
+      "s": [
+       0.08,
+       0.13,
+       0.08
+      ],
+      "c": "#2d3238"
+     },
+     {
+      "p": [
+       0.4,
+       0.03,
+       0.0
+      ],
+      "s": [
+       0.16,
+       0.05,
+       0.05
+      ],
+      "c": "#20242a"
+     }
+    ],
+    "muzzle": [
+     0.52,
+     0.03,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.8,
+   "pellets": 1,
+   "projectile": false,
+   "move_penalty": 0.08,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.45,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/fire_rifle.wav",
+    "reload": "res://assets/audio/reload.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "kestrel_carbine",
+   "display_name": "Kestrel Carbine",
+   "category": "ar",
+   "rarity": "rare",
+   "damage": 19.0,
+   "fire_rate": 10.0,
+   "magazine": 25,
+   "reserve_ammo": 125,
+   "reload_time": 1.9,
+   "effective_range": 52.0,
+   "recoil": 0.95,
+   "spread_deg": {
+    "base": 1.3,
+    "moving": 3.0,
+    "air": 5.0
+   },
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.55,
+       0.1,
+       0.1
+      ],
+      "c": "#45525e",
+      "t": "metal_plate"
+     },
+     {
+      "p": [
+       0.3,
+       0.03,
+       0.0
+      ],
+      "s": [
+       0.26,
+       0.05,
+       0.07
+      ],
+      "c": "#6d7c8a",
+      "t": "metal"
+     },
+     {
+      "p": [
+       -0.15,
+       -0.11,
+       0.0
+      ],
+      "s": [
+       0.12,
+       0.15,
+       0.08
+      ],
+      "c": "#31383f"
+     },
+     {
+      "p": [
+       -0.3,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.2,
+       0.08,
+       0.08
+      ],
+      "c": "#8a6a3e",
+      "t": "planks"
+     },
+     {
+      "p": [
+       0.02,
+       0.08,
+       0.0
+      ],
+      "s": [
+       0.18,
+       0.05,
+       0.06
+      ],
+      "c": "#55606b",
+      "t": "metal"
+     },
+     {
+      "p": [
+       0.44,
+       0.02,
+       0.0
+      ],
+      "s": [
+       0.14,
+       0.045,
+       0.045
+      ],
+      "c": "#20242a"
+     }
+    ],
+    "muzzle": [
+     0.55,
+     0.02,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.5,
+   "pellets": 1,
+   "projectile": false,
+   "move_penalty": 0.02,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.45,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/fire_smg.wav",
+    "reload": "res://assets/audio/reload.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "wasp_smg",
+   "display_name": "Wasp SMG",
+   "category": "smg",
+   "rarity": "common",
+   "damage": 14.0,
+   "fire_rate": 14.0,
+   "magazine": 32,
+   "reserve_ammo": 160,
+   "reload_time": 1.7,
+   "effective_range": 28.0,
+   "recoil": 0.75,
+   "spread_deg": {
+    "base": 1.8,
+    "moving": 3.4,
+    "air": 5.5
+   },
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.44,
+       0.11,
+       0.1
+      ],
+      "c": "#4d4640",
+      "t": "metal_plate"
+     },
+     {
+      "p": [
+       0.24,
+       0.02,
+       0.0
+      ],
+      "s": [
+       0.2,
+       0.05,
+       0.06
+      ],
+      "c": "#6b6259",
+      "t": "metal"
+     },
+     {
+      "p": [
+       -0.06,
+       -0.13,
+       0.0
+      ],
+      "s": [
+       0.1,
+       0.16,
+       0.08
+      ],
+      "c": "#33302c"
+     },
+     {
+      "p": [
+       -0.2,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.16,
+       0.07,
+       0.07
+      ],
+      "c": "#3b3833"
+     },
+     {
+      "p": [
+       0.34,
+       0.01,
+       0.0
+      ],
+      "s": [
+       0.12,
+       0.04,
+       0.04
+      ],
+      "c": "#20242a"
+     },
+     {
+      "p": [
+       0.02,
+       0.08,
+       0.0
+      ],
+      "s": [
+       0.14,
+       0.04,
+       0.05
+      ],
+      "c": "#5c554e",
+      "t": "metal"
+     }
+    ],
+    "muzzle": [
+     0.45,
+     0.01,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.5,
+   "pellets": 1,
+   "projectile": false,
+   "move_penalty": 0.0,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.45,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/fire_smg.wav",
+    "reload": "res://assets/audio/reload.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "zip9",
+   "display_name": "Zip-9",
+   "category": "smg",
+   "rarity": "uncommon",
+   "damage": 16.0,
+   "fire_rate": 12.0,
+   "magazine": 24,
+   "reserve_ammo": 120,
+   "reload_time": 1.6,
+   "effective_range": 24.0,
+   "recoil": 0.85,
+   "spread_deg": {
+    "base": 2.0,
+    "moving": 3.6,
+    "air": 6.0
+   },
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.4,
+       0.1,
+       0.09
+      ],
+      "c": "#3a4550",
+      "t": "metal_plate"
+     },
+     {
+      "p": [
+       0.22,
+       0.02,
+       0.0
+      ],
+      "s": [
+       0.18,
+       0.045,
+       0.055
+      ],
+      "c": "#5f6b76",
+      "t": "metal"
+     },
+     {
+      "p": [
+       -0.05,
+       -0.12,
+       0.0
+      ],
+      "s": [
+       0.09,
+       0.15,
+       0.07
+      ],
+      "c": "#2c343b"
+     },
+     {
+      "p": [
+       -0.18,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.14,
+       0.06,
+       0.06
+      ],
+      "c": "#333a41"
+     },
+     {
+      "p": [
+       0.31,
+       0.01,
+       0.0
+      ],
+      "s": [
+       0.11,
+       0.035,
+       0.035
+      ],
+      "c": "#20242a"
+     }
+    ],
+    "muzzle": [
+     0.42,
+     0.01,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.35,
+   "pellets": 8,
+   "projectile": false,
+   "move_penalty": 0.12,
+   "falloff_end_mult": 0.25,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.45,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/fire_shotgun.wav",
+    "reload": "res://assets/audio/reload.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "boulder_sg",
+   "display_name": "Boulder SG",
+   "category": "shotgun",
+   "rarity": "uncommon",
+   "damage": 13.0,
+   "fire_rate": 1.1,
+   "magazine": 5,
+   "reserve_ammo": 25,
+   "reload_time": 2.6,
+   "effective_range": 12.0,
+   "recoil": 3.4,
+   "spread_deg": {
+    "base": 6.5,
+    "moving": 8.0,
+    "air": 10.0
+   },
+   "tube_reload": true,
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.58,
+       0.13,
+       0.13
+      ],
+      "c": "#4a3b2e",
+      "t": "planks"
+     },
+     {
+      "p": [
+       0.3,
+       0.02,
+       0.0
+      ],
+      "s": [
+       0.34,
+       0.06,
+       0.06
+      ],
+      "c": "#6f6a63",
+      "t": "metal"
+     },
+     {
+      "p": [
+       0.02,
+       -0.1,
+       0.0
+      ],
+      "s": [
+       0.3,
+       0.06,
+       0.06
+      ],
+      "c": "#5c5852",
+      "t": "metal"
+     },
+     {
+      "p": [
+       -0.26,
+       -0.05,
+       0.0
+      ],
+      "s": [
+       0.2,
+       0.11,
+       0.09
+      ],
+      "c": "#7a5a34",
+      "t": "planks"
+     },
+     {
+      "p": [
+       -0.1,
+       -0.18,
+       0.0
+      ],
+      "s": [
+       0.1,
+       0.14,
+       0.07
+      ],
+      "c": "#2b2b2b"
+     }
+    ],
+    "muzzle": [
+     0.48,
+     0.02,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.3,
+   "pellets": 10,
+   "projectile": false,
+   "move_penalty": 0.15,
+   "falloff_end_mult": 0.2,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.45,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/fire_shotgun.wav",
+    "reload": "res://assets/audio/reload.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "twinhaul",
+   "display_name": "Twinhaul",
+   "category": "shotgun",
+   "rarity": "rare",
+   "damage": 12.0,
+   "fire_rate": 2.2,
+   "magazine": 2,
+   "reserve_ammo": 20,
+   "reload_time": 2.2,
+   "effective_range": 10.0,
+   "recoil": 4.2,
+   "spread_deg": {
+    "base": 7.5,
+    "moving": 9.0,
+    "air": 11.0
+   },
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.5,
+       0.14,
+       0.16
+      ],
+      "c": "#54402c",
+      "t": "planks"
+     },
+     {
+      "p": [
+       0.3,
+       0.03,
+       0.05
+      ],
+      "s": [
+       0.32,
+       0.05,
+       0.05
+      ],
+      "c": "#6f6a63",
+      "t": "metal"
+     },
+     {
+      "p": [
+       0.3,
+       0.03,
+       -0.05
+      ],
+      "s": [
+       0.32,
+       0.05,
+       0.05
+      ],
+      "c": "#6f6a63",
+      "t": "metal"
+     },
+     {
+      "p": [
+       -0.24,
+       -0.04,
+       0.0
+      ],
+      "s": [
+       0.18,
+       0.12,
+       0.1
+      ],
+      "c": "#7a5a34",
+      "t": "planks"
+     },
+     {
+      "p": [
+       -0.08,
+       -0.16,
+       0.0
+      ],
+      "s": [
+       0.09,
+       0.13,
+       0.07
+      ],
+      "c": "#2b2b2b"
+     }
+    ],
+    "muzzle": [
+     0.47,
+     0.03,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 2.2,
+   "pellets": 1,
+   "projectile": false,
+   "move_penalty": 0.2,
+   "falloff_end_mult": 0.75,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 3.4,
+   "swap_time": 0.7,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/fire_sniper.wav",
+    "reload": "res://assets/audio/reload.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "longspike",
+   "display_name": "Longspike DMR",
+   "category": "sniper",
+   "rarity": "epic",
+   "damage": 78.0,
+   "fire_rate": 1.2,
+   "magazine": 5,
+   "reserve_ammo": 25,
+   "reload_time": 3.0,
+   "effective_range": 200.0,
+   "recoil": 4.6,
+   "spread_deg": {
+    "base": 0.25,
+    "moving": 4.0,
+    "air": 7.0
+   },
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.9,
+       0.1,
+       0.1
+      ],
+      "c": "#33404a",
+      "t": "metal_plate"
+     },
+     {
+      "p": [
+       0.5,
+       0.02,
+       0.0
+      ],
+      "s": [
+       0.6,
+       0.045,
+       0.045
+      ],
+      "c": "#1f2529"
+     },
+     {
+      "p": [
+       -0.1,
+       0.1,
+       0.0
+      ],
+      "s": [
+       0.34,
+       0.06,
+       0.07
+      ],
+      "c": "#212a30",
+      "t": "metal"
+     },
+     {
+      "p": [
+       0.02,
+       0.17,
+       0.0
+      ],
+      "s": [
+       0.16,
+       0.06,
+       0.06
+      ],
+      "c": "#0f1418"
+     },
+     {
+      "p": [
+       -0.34,
+       -0.08,
+       0.0
+      ],
+      "s": [
+       0.22,
+       0.12,
+       0.08
+      ],
+      "c": "#2b3238"
+     },
+     {
+      "p": [
+       -0.14,
+       -0.14,
+       0.0
+      ],
+      "s": [
+       0.09,
+       0.12,
+       0.07
+      ],
+      "c": "#20262b"
+     }
+    ],
+    "muzzle": [
+     0.82,
+     0.02,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.6,
+   "pellets": 1,
+   "projectile": false,
+   "move_penalty": 0.0,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.32,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/fire_pistol.wav",
+    "reload": "res://assets/audio/reload.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "tick_pistol",
+   "display_name": "Tick Pistol",
+   "category": "pistol",
+   "rarity": "common",
+   "damage": 18.0,
+   "fire_rate": 6.0,
+   "magazine": 15,
+   "reserve_ammo": 90,
+   "reload_time": 1.4,
+   "effective_range": 35.0,
+   "recoil": 1.0,
+   "spread_deg": {
+    "base": 1.4,
+    "moving": 2.8,
+    "air": 4.5
+   },
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.04,
+       0.0
+      ],
+      "s": [
+       0.26,
+       0.09,
+       0.06
+      ],
+      "c": "#3f4752",
+      "t": "metal_plate"
+     },
+     {
+      "p": [
+       0.16,
+       0.04,
+       0.0
+      ],
+      "s": [
+       0.14,
+       0.035,
+       0.035
+      ],
+      "c": "#20242a"
+     },
+     {
+      "p": [
+       -0.1,
+       -0.06,
+       0.0
+      ],
+      "s": [
+       0.09,
+       0.14,
+       0.06
+      ],
+      "c": "#2c3238"
+     },
+     {
+      "p": [
+       -0.11,
+       0.02,
+       0.0
+      ],
+      "s": [
+       0.05,
+       0.06,
+       0.05
+      ],
+      "c": "#5b6470",
+      "t": "metal"
+     }
+    ],
+    "muzzle": [
+     0.24,
+     0.04,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.5,
+   "pellets": 1,
+   "projectile": false,
+   "move_penalty": 0.0,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.32,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/fire_pistol.wav",
+    "reload": "res://assets/audio/reload.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "sidearm9",
+   "display_name": "Sidearm .9",
+   "category": "pistol",
+   "rarity": "uncommon",
+   "damage": 21.0,
+   "fire_rate": 5.0,
+   "magazine": 12,
+   "reserve_ammo": 84,
+   "reload_time": 1.5,
+   "effective_range": 30.0,
+   "recoil": 1.2,
+   "spread_deg": {
+    "base": 1.6,
+    "moving": 3.0,
+    "air": 5.0
+   },
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.04,
+       0.0
+      ],
+      "s": [
+       0.3,
+       0.1,
+       0.07
+      ],
+      "c": "#4a4038",
+      "t": "metal_plate"
+     },
+     {
+      "p": [
+       0.18,
+       0.04,
+       0.0
+      ],
+      "s": [
+       0.16,
+       0.04,
+       0.04
+      ],
+      "c": "#20242a"
+     },
+     {
+      "p": [
+       -0.12,
+       -0.06,
+       0.0
+      ],
+      "s": [
+       0.1,
+       0.15,
+       0.07
+      ],
+      "c": "#2e2a26"
+     },
+     {
+      "p": [
+       -0.12,
+       0.03,
+       0.0
+      ],
+      "s": [
+       0.05,
+       0.07,
+       0.06
+      ],
+      "c": "#665c52",
+      "t": "metal"
+     }
+    ],
+    "muzzle": [
+     0.26,
+     0.04,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.45,
+   "pellets": 1,
+   "projectile": false,
+   "move_penalty": 0.18,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.15,
+   "swap_time": 0.9,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/fire_lmg.wav",
+    "reload": "res://assets/audio/reload.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "hammerhead_lmg",
+   "display_name": "Hammerhead LMG",
+   "category": "lmg",
+   "rarity": "epic",
+   "damage": 26.0,
+   "fire_rate": 7.0,
+   "magazine": 75,
+   "reserve_ammo": 150,
+   "reload_time": 4.2,
+   "effective_range": 70.0,
+   "recoil": 1.9,
+   "spread_deg": {
+    "base": 2.2,
+    "moving": 4.2,
+    "air": 7.5
+   },
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.72,
+       0.14,
+       0.14
+      ],
+      "c": "#3a4048",
+      "t": "metal_plate"
+     },
+     {
+      "p": [
+       0.34,
+       0.03,
+       0.0
+      ],
+      "s": [
+       0.36,
+       0.06,
+       0.06
+      ],
+      "c": "#585f68",
+      "t": "metal"
+     },
+     {
+      "p": [
+       -0.06,
+       -0.18,
+       0.0
+      ],
+      "s": [
+       0.22,
+       0.22,
+       0.14
+      ],
+      "c": "#2c3138",
+      "t": "metal"
+     },
+     {
+      "p": [
+       -0.36,
+       -0.02,
+       0.0
+      ],
+      "s": [
+       0.24,
+       0.1,
+       0.1
+      ],
+      "c": "#6d5a3c",
+      "t": "planks"
+     },
+     {
+      "p": [
+       0.16,
+       -0.13,
+       0.0
+      ],
+      "s": [
+       0.1,
+       0.16,
+       0.08
+      ],
+      "c": "#31363d"
+     },
+     {
+      "p": [
+       0.06,
+       0.11,
+       0.0
+      ],
+      "s": [
+       0.22,
+       0.05,
+       0.06
+      ],
+      "c": "#4a5158",
+      "t": "metal"
+     }
+    ],
+    "muzzle": [
+     0.6,
+     0.02,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.0,
+   "pellets": 1,
+   "projectile": false,
+   "move_penalty": 0.0,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.3,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/weapon_switch.wav",
+    "reload": "res://assets/audio/ui_click.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "rebar_club",
+   "display_name": "Rebar Club",
+   "category": "melee",
+   "rarity": "common",
+   "damage": 42.0,
+   "fire_rate": 1.3,
+   "magazine": 1,
+   "reserve_ammo": 0,
+   "reload_time": 0.0,
+   "effective_range": 2.6,
+   "recoil": 0.0,
+   "spread_deg": {
+    "base": 0.0,
+    "moving": 0.0,
+    "air": 0.0
+   },
+   "swing_arc_deg": 55.0,
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.08,
+       0.08,
+       0.72
+      ],
+      "c": "#6b6b6b",
+      "t": "metal"
+     },
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.34
+      ],
+      "s": [
+       0.1,
+       0.1,
+       0.14
+      ],
+      "c": "#8a4a3a",
+      "t": "brick"
+     },
+     {
+      "p": [
+       0.0,
+       0.0,
+       -0.3
+      ],
+      "s": [
+       0.07,
+       0.12,
+       0.12
+      ],
+      "c": "#4a4a4a"
+     }
+    ],
+    "muzzle": [
+     0.0,
+     0.0,
+     0.42
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.0,
+   "pellets": 1,
+   "projectile": false,
+   "move_penalty": 0.0,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.28,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/weapon_switch.wav",
+    "reload": "res://assets/audio/ui_click.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "cutter_blade",
+   "display_name": "Cutter Blade",
+   "category": "melee",
+   "rarity": "uncommon",
+   "damage": 28.0,
+   "fire_rate": 2.2,
+   "magazine": 1,
+   "reserve_ammo": 0,
+   "reload_time": 0.0,
+   "effective_range": 2.2,
+   "recoil": 0.0,
+   "spread_deg": {
+    "base": 0.0,
+    "moving": 0.0,
+    "air": 0.0
+   },
+   "swing_arc_deg": 70.0,
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.06,
+       0.06,
+       0.22
+      ],
+      "c": "#2f343a"
+     },
+     {
+      "p": [
+       0.0,
+       0.02,
+       0.24
+      ],
+      "s": [
+       0.1,
+       0.16,
+       0.34
+      ],
+      "c": "#c8d2da",
+      "t": "metal"
+     },
+     {
+      "p": [
+       0.0,
+       -0.02,
+       -0.14
+      ],
+      "s": [
+       0.09,
+       0.09,
+       0.1
+      ],
+      "c": "#3a4046",
+      "t": "metal"
+     }
+    ],
+    "muzzle": [
+     0.0,
+     0.02,
+     0.4
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.0,
+   "pellets": 1,
+   "projectile": true,
+   "move_penalty": 0.0,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.4,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/grenade_throw.wav",
+    "reload": "res://assets/audio/ui_click.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "fragshard",
+   "display_name": "Fragshard Grenade",
+   "category": "throwable",
+   "rarity": "uncommon",
+   "damage": 92.0,
+   "fire_rate": 0.8,
+   "magazine": 1,
+   "reserve_ammo": 3,
+   "reload_time": 0.0,
+   "effective_range": 6.0,
+   "recoil": 0.0,
+   "spread_deg": {
+    "base": 0.0,
+    "moving": 0.0,
+    "air": 0.0
+   },
+   "fuse_time": 2.6,
+   "blast_radius": 6.0,
+   "projectile_speed": 18.0,
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.16,
+       0.2,
+       0.16
+      ],
+      "c": "#4a5b3a",
+      "t": "metal"
+     },
+     {
+      "p": [
+       0.0,
+       0.13,
+       0.0
+      ],
+      "s": [
+       0.06,
+       0.07,
+       0.06
+      ],
+      "c": "#8a8a8a",
+      "t": "metal"
+     },
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.09
+      ],
+      "s": [
+       0.05,
+       0.05,
+       0.02
+      ],
+      "c": "#c85a4a"
+     }
+    ],
+    "muzzle": [
+     0.0,
+     0.05,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  },
+  {
+   "headshot_multiplier": 1.0,
+   "pellets": 1,
+   "projectile": true,
+   "move_penalty": 0.0,
+   "falloff_end_mult": 0.45,
+   "recoil_recovery": 6.0,
+   "ads_zoom": 1.25,
+   "swap_time": 0.4,
+   "tracer_color": "#ffd873",
+   "shop": {
+    "price": 0,
+    "currency": "coins",
+    "available": true
+   },
+   "attachments": [
+    "muzzle",
+    "magazine",
+    "grip"
+   ],
+   "audio": {
+    "fire": "res://assets/audio/grenade_throw.wav",
+    "reload": "res://assets/audio/ui_click.wav",
+    "switch": "res://assets/audio/weapon_switch.wav",
+    "dry": "res://assets/audio/dry_fire.wav"
+   },
+   "id": "smoke_block",
+   "display_name": "Smoke Block",
+   "category": "throwable",
+   "rarity": "common",
+   "damage": 0.0,
+   "fire_rate": 1.0,
+   "magazine": 1,
+   "reserve_ammo": 2,
+   "reload_time": 0.0,
+   "effective_range": 3.0,
+   "recoil": 0.0,
+   "spread_deg": {
+    "base": 0.0,
+    "moving": 0.0,
+    "air": 0.0
+   },
+   "fuse_time": 1.2,
+   "blast_radius": 7.0,
+   "smoke_duration": 9.0,
+   "projectile_speed": 16.0,
+   "models": {
+    "parts": [
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "s": [
+       0.18,
+       0.18,
+       0.18
+      ],
+      "c": "#6a7078",
+      "t": "metal"
+     },
+     {
+      "p": [
+       0.0,
+       0.11,
+       0.0
+      ],
+      "s": [
+       0.06,
+       0.06,
+       0.06
+      ],
+      "c": "#9aa0a8",
+      "t": "metal"
+     },
+     {
+      "p": [
+       0.0,
+       0.0,
+       0.1
+      ],
+      "s": [
+       0.06,
+       0.06,
+       0.02
+      ],
+      "c": "#d8d4c8"
+     }
+    ],
+    "muzzle": [
+     0.0,
+     0.05,
+     0.0
+    ],
+    "scale": 1.0
+   }
+  }
+ ],
+ "default_loadout": {
+  "primary": "",
+  "secondary": "tick_pistol",
+  "melee": "rebar_club",
+  "throwable": "fragshard"
+ },
+ "starting_ammo_multiplier": 1.0
+}

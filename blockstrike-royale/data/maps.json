@@ -1,0 +1,1141 @@
+{
+ "maps": [
+  {
+   "id": "emerald_island",
+   "name": "Emerald Island",
+   "mode_tags": [
+    "br",
+    "training"
+   ],
+   "size_blocks": {
+    "x": 320,
+    "z": 320
+   },
+   "chunk_size": 16,
+   "sea_level": 12,
+   "generator": "emerald_island",
+   "biome": {
+    "base_height": 14,
+    "hill_amplitude": 9.0,
+    "hill_frequency": 0.013,
+    "beach_level": 14,
+    "rock_level": 24,
+    "sand_count": 3,
+    "dirt_depth": 4,
+    "trees": {
+     "count": 620,
+     "min_height": 22,
+     "spacing": 4.2,
+     "clusters": 14,
+     "cluster_radius": 16.0,
+     "cluster_count": 46
+    },
+    "rocks": {
+     "count": 180,
+     "min_height": 20
+    },
+    "bush_count": 260,
+    "ponds": [
+     {
+      "center": [
+       96,
+       96
+      ],
+      "radius": 16.0
+     },
+     {
+      "center": [
+       228,
+       172
+      ],
+      "radius": 13.0
+     }
+    ],
+    "river": {
+     "path": [
+      [
+       150,
+       30
+      ],
+      [
+       156,
+       96
+      ],
+      [
+       172,
+       160
+      ],
+      [
+       186,
+       226
+      ],
+      [
+       196,
+       300
+      ]
+     ],
+     "width": 5
+    }
+   },
+   "sky": {
+    "top": "#4aa3e8",
+    "horizon": "#cfe8f7",
+    "fog_color": "#cfe8f7",
+    "fog_near": 90.0,
+    "fog_far": 260.0,
+    "sun_color": "#fff4d6",
+    "sun_energy": 1.15,
+    "sun_rotation_deg": [
+     52.0,
+     38.0,
+     0.0
+    ],
+    "ambient_energy": 0.42,
+    "water_color": "#3ea6e0",
+    "cloud_height": 78.0,
+    "cloud_count": 26
+   },
+   "loot_tiers": {
+    "low": [
+     "beach_camp",
+     "farmstead",
+     "fishing_dock",
+     "ruins_south"
+    ],
+    "mid": [
+     "greenvale_village",
+     "harbour_warehouses",
+     "pine_ridge",
+     "stonewatch_keep"
+    ],
+    "high": [
+     "ironpeak_outpost",
+     "relay_station",
+     "temple_steps"
+    ]
+   },
+   "places": [
+    {
+     "id": "greenvale_village",
+     "name": "Greenvale Village",
+     "center": [
+      64,
+      60
+     ],
+     "radius": 26.0,
+     "kind": "village",
+     "loot": "mid",
+     "cover": "heavy",
+     "purpose": "close range building fights"
+    },
+    {
+     "id": "harbour_warehouses",
+     "name": "Harbour Warehouses",
+     "center": [
+      246,
+      84
+     ],
+     "radius": 30.0,
+     "kind": "warehouse",
+     "loot": "mid",
+     "cover": "medium",
+     "purpose": "medium range loot and cover"
+    },
+    {
+     "id": "ironpeak_outpost",
+     "name": "Ironpeak Outpost",
+     "center": [
+      178,
+      108
+     ],
+     "radius": 22.0,
+     "kind": "military",
+     "loot": "high",
+     "cover": "medium",
+     "purpose": "high risk high reward loot"
+    },
+    {
+     "id": "stonewatch_keep",
+     "name": "Stonewatch Keep",
+     "center": [
+      102,
+      208
+     ],
+     "radius": 20.0,
+     "kind": "fort",
+     "loot": "mid",
+     "cover": "heavy",
+     "purpose": "vertical interior fights"
+    },
+    {
+     "id": "pine_ridge",
+     "name": "Pine Ridge",
+     "center": [
+      236,
+      244
+     ],
+     "radius": 26.0,
+     "kind": "forest",
+     "loot": "mid",
+     "cover": "light",
+     "purpose": "concealment and rotations"
+    },
+    {
+     "id": "beach_camp",
+     "name": "Suncoast Camp",
+     "center": [
+      46,
+      236
+     ],
+     "radius": 20.0,
+     "kind": "camp",
+     "loot": "low",
+     "cover": "light",
+     "purpose": "drop zone with sparse loot"
+    },
+    {
+     "id": "harbour_docks",
+     "name": "Tidebreak Dock",
+     "center": [
+      274,
+      168
+     ],
+     "radius": 18.0,
+     "kind": "dock",
+     "loot": "low",
+     "cover": "light",
+     "purpose": "rotations along the coast"
+    },
+    {
+     "id": "relay_station",
+     "name": "Relay Station",
+     "center": [
+      64,
+      152
+     ],
+     "radius": 18.0,
+     "kind": "relay",
+     "loot": "high",
+     "cover": "medium",
+     "purpose": "tall sightlines and top loot"
+    },
+    {
+     "id": "temple_steps",
+     "name": "Temple Steps",
+     "center": [
+      148,
+      268
+     ],
+     "radius": 20.0,
+     "kind": "temple",
+     "loot": "high",
+     "cover": "heavy",
+     "purpose": "endgame fights with elevation"
+    },
+    {
+     "id": "gravel_quarry",
+     "name": "Gravel Quarry",
+     "center": [
+      206,
+      196
+     ],
+     "radius": 22.0,
+     "kind": "quarry",
+     "loot": "low",
+     "cover": "medium",
+     "purpose": "open pit with risky rotations"
+    },
+    {
+     "id": "farmstead",
+     "name": "Windmill Farmstead",
+     "center": [
+      120,
+      120
+     ],
+     "radius": 18.0,
+     "kind": "farm",
+     "loot": "low",
+     "cover": "light",
+     "purpose": "mid map landmark"
+    },
+    {
+     "id": "ruins_south",
+     "name": "Vine Ruins",
+     "center": [
+      256,
+      288
+     ],
+     "radius": 20.0,
+     "kind": "ruins",
+     "loot": "low",
+     "cover": "heavy",
+     "purpose": "wall cover for duels"
+    }
+   ],
+   "roads": [
+    {
+     "name": "north_road",
+     "path": [
+      [
+       64,
+       60
+      ],
+      [
+       120,
+       96
+      ],
+      [
+       178,
+       108
+      ],
+      [
+       246,
+       84
+      ]
+     ],
+     "width": 3
+    },
+    {
+     "name": "ring_road",
+     "path": [
+      [
+       102,
+       208
+      ],
+      [
+       148,
+       268
+      ],
+      [
+       236,
+       244
+      ],
+      [
+       256,
+       288
+      ]
+     ],
+     "width": 3
+    },
+    {
+     "name": "west_trail",
+     "path": [
+      [
+       64,
+       152
+      ],
+      [
+       102,
+       208
+      ],
+      [
+       148,
+       268
+      ]
+     ],
+     "width": 2
+    }
+   ],
+   "bridges": [
+    {
+     "center": [
+      156,
+      96
+     ],
+     "axis": "z",
+     "length": 10,
+     "width": 6
+    },
+    {
+     "center": [
+      186,
+      226
+     ],
+     "axis": "z",
+     "length": 10,
+     "width": 6
+    }
+   ],
+   "spawn_points": [
+    [
+     40,
+     40
+    ],
+    [
+     280,
+     40
+    ],
+    [
+     40,
+     280
+    ],
+    [
+     280,
+     280
+    ],
+    [
+     160,
+     30
+    ],
+    [
+     30,
+     160
+    ],
+    [
+     290,
+     160
+    ],
+    [
+     160,
+     290
+    ],
+    [
+     96,
+     232
+    ],
+    [
+     216,
+     60
+    ],
+    [
+     214,
+     132
+    ],
+    [
+     110,
+     176
+    ]
+   ],
+   "loot_zones": [
+    {
+     "place": "ironpeak_outpost",
+     "tier": "high",
+     "count": 14
+    },
+    {
+     "place": "relay_station",
+     "tier": "high",
+     "count": 10
+    },
+    {
+     "place": "temple_steps",
+     "tier": "high",
+     "count": 12
+    },
+    {
+     "place": "harbour_warehouses",
+     "tier": "mid",
+     "count": 16
+    },
+    {
+     "place": "greenvale_village",
+     "tier": "mid",
+     "count": 18
+    },
+    {
+     "place": "pine_ridge",
+     "tier": "mid",
+     "count": 8
+    },
+    {
+     "place": "stonewatch_keep",
+     "tier": "mid",
+     "count": 12
+    },
+    {
+     "place": "beach_camp",
+     "tier": "low",
+     "count": 8
+    },
+    {
+     "place": "harbour_docks",
+     "tier": "low",
+     "count": 6
+    },
+    {
+     "place": "gravel_quarry",
+     "tier": "low",
+     "count": 8
+    },
+    {
+     "place": "farmstead",
+     "tier": "low",
+     "count": 8
+    },
+    {
+     "place": "ruins_south",
+     "tier": "low",
+     "count": 8
+    }
+   ],
+   "building": {
+    "allowed": true,
+    "max_blocks_per_player": 24,
+    "build_distance": 7.0,
+    "mode_default": "limited"
+   },
+   "minimap_scale": 0.55
+  },
+  {
+   "id": "neon_yard",
+   "name": "Neon Yard",
+   "mode_tags": [
+    "clash",
+    "arena"
+   ],
+   "size_blocks": {
+    "x": 96,
+    "z": 96
+   },
+   "chunk_size": 16,
+   "sea_level": 4,
+   "generator": "neon_yard",
+   "biome": {
+    "base_height": 6,
+    "hill_amplitude": 0.0,
+    "hill_frequency": 0.0,
+    "beach_level": 6,
+    "rock_level": 99,
+    "sand_count": 0,
+    "dirt_depth": 3,
+    "trees": {
+     "count": 0,
+     "min_height": 0,
+     "spacing": 6.0,
+     "clusters": 0,
+     "cluster_radius": 0.0,
+     "cluster_count": 0
+    },
+    "rocks": {
+     "count": 0,
+     "min_height": 99
+    },
+    "bush_count": 0,
+    "ponds": [],
+    "river": null
+   },
+   "sky": {
+    "top": "#1b2340",
+    "horizon": "#5a4b8a",
+    "fog_color": "#2b2f52",
+    "fog_near": 40.0,
+    "fog_far": 150.0,
+    "sun_color": "#c9d4ff",
+    "sun_energy": 0.7,
+    "sun_rotation_deg": [
+     60.0,
+     20.0,
+     0.0
+    ],
+    "ambient_energy": 0.55,
+    "water_color": "#2f3f78",
+    "cloud_height": 60.0,
+    "cloud_count": 0
+   },
+   "loot_tiers": {
+    "low": [
+     "neon_center"
+    ],
+    "mid": [
+     "neon_center"
+    ],
+    "high": [
+     "neon_center"
+    ]
+   },
+   "places": [
+    {
+     "id": "neon_center",
+     "name": "The Yard",
+     "center": [
+      48,
+      48
+     ],
+     "radius": 44.0,
+     "kind": "arena",
+     "loot": "mid",
+     "cover": "heavy",
+     "purpose": "symmetric clash arena"
+    }
+   ],
+   "roads": [],
+   "bridges": [],
+   "spawn_points": [
+    [
+     14,
+     14
+    ],
+    [
+     14,
+     82
+    ],
+    [
+     82,
+     14
+    ],
+    [
+     82,
+     82
+    ],
+    [
+     48,
+     10
+    ],
+    [
+     48,
+     86
+    ],
+    [
+     10,
+     48
+    ],
+    [
+     86,
+     48
+    ]
+   ],
+   "loot_zones": [
+    {
+     "place": "neon_center",
+     "tier": "mid",
+     "count": 18
+    }
+   ],
+   "building": {
+    "allowed": false,
+    "max_blocks_per_player": 0,
+    "build_distance": 6.0,
+    "mode_default": "off"
+   },
+   "minimap_scale": 0.9
+  },
+  {
+   "id": "dust_canyon",
+   "name": "Dust Canyon",
+   "mode_tags": [
+    "arena"
+   ],
+   "size_blocks": {
+    "x": 64,
+    "z": 64
+   },
+   "chunk_size": 16,
+   "sea_level": 2,
+   "generator": "dust_canyon",
+   "biome": {
+    "base_height": 6,
+    "hill_amplitude": 4.0,
+    "hill_frequency": 0.06,
+    "beach_level": 4,
+    "rock_level": 10,
+    "sand_count": 6,
+    "dirt_depth": 3,
+    "trees": {
+     "count": 0,
+     "min_height": 99,
+     "spacing": 6.0,
+     "clusters": 0,
+     "cluster_radius": 0.0,
+     "cluster_count": 0
+    },
+    "rocks": {
+     "count": 90,
+     "min_height": 4
+    },
+    "bush_count": 12,
+    "ponds": [],
+    "river": null
+   },
+   "sky": {
+    "top": "#e8b46a",
+    "horizon": "#f2d9a8",
+    "fog_color": "#e8cf9c",
+    "fog_near": 30.0,
+    "fog_far": 110.0,
+    "sun_color": "#ffe9b0",
+    "sun_energy": 1.25,
+    "sun_rotation_deg": [
+     40.0,
+     120.0,
+     0.0
+    ],
+    "ambient_energy": 0.5,
+    "water_color": "#6f5a3a",
+    "cloud_height": 40.0,
+    "cloud_count": 0
+   },
+   "loot_tiers": {
+    "low": [
+     "canyon_floor"
+    ],
+    "mid": [
+     "canyon_floor"
+    ],
+    "high": [
+     "canyon_floor"
+    ]
+   },
+   "places": [
+    {
+     "id": "canyon_floor",
+     "name": "Canyon Floor",
+     "center": [
+      32,
+      32
+     ],
+     "radius": 30.0,
+     "kind": "canyon",
+     "loot": "mid",
+     "cover": "heavy",
+     "purpose": "2v2 arena duels"
+    }
+   ],
+   "roads": [],
+   "bridges": [],
+   "spawn_points": [
+    [
+     8,
+     8
+    ],
+    [
+     8,
+     56
+    ],
+    [
+     56,
+     8
+    ],
+    [
+     56,
+     56
+    ]
+   ],
+   "loot_zones": [
+    {
+     "place": "canyon_floor",
+     "tier": "mid",
+     "count": 10
+    }
+   ],
+   "building": {
+    "allowed": false,
+    "max_blocks_per_player": 0,
+    "build_distance": 6.0,
+    "mode_default": "off"
+   },
+   "minimap_scale": 0.95
+  },
+  {
+   "id": "training_base",
+   "name": "Training Base",
+   "mode_tags": [
+    "training"
+   ],
+   "size_blocks": {
+    "x": 112,
+    "z": 80
+   },
+   "chunk_size": 16,
+   "sea_level": 3,
+   "generator": "training_base",
+   "biome": {
+    "base_height": 5,
+    "hill_amplitude": 0.6,
+    "hill_frequency": 0.03,
+    "beach_level": 4,
+    "rock_level": 99,
+    "sand_count": 2,
+    "dirt_depth": 3,
+    "trees": {
+     "count": 18,
+     "min_height": 8,
+     "spacing": 5.0,
+     "clusters": 3,
+     "cluster_radius": 8.0,
+     "cluster_count": 6
+    },
+    "rocks": {
+     "count": 14,
+     "min_height": 6
+    },
+    "bush_count": 20,
+    "ponds": [],
+    "river": null
+   },
+   "sky": {
+    "top": "#57b6ea",
+    "horizon": "#dff1fb",
+    "fog_color": "#dff1fb",
+    "fog_near": 60.0,
+    "fog_far": 200.0,
+    "sun_color": "#fff6dd",
+    "sun_energy": 1.1,
+    "sun_rotation_deg": [
+     48.0,
+     40.0,
+     0.0
+    ],
+    "ambient_energy": 0.45,
+    "water_color": "#41a8dd",
+    "cloud_height": 60.0,
+    "cloud_count": 10
+   },
+   "loot_tiers": {
+    "low": [
+     "armory"
+    ],
+    "mid": [
+     "armory"
+    ],
+    "high": [
+     "armory"
+    ]
+   },
+   "places": [
+    {
+     "id": "armory",
+     "name": "Armory",
+     "center": [
+      24,
+      40
+     ],
+     "radius": 14.0,
+     "kind": "armory",
+     "loot": "mid",
+     "cover": "medium",
+     "purpose": "weapon testing stations"
+    },
+    {
+     "id": "range",
+     "name": "Firing Range",
+     "center": [
+      72,
+      40
+     ],
+     "radius": 20.0,
+     "kind": "range",
+     "loot": "low",
+     "cover": "none",
+     "purpose": "target practice"
+    },
+    {
+     "id": "course",
+     "name": "Movement Course",
+     "center": [
+      96,
+      20
+     ],
+     "radius": 12.0,
+     "kind": "course",
+     "loot": "low",
+     "cover": "light",
+     "purpose": "jump and sprint course"
+    }
+   ],
+   "roads": [
+    {
+     "name": "range_lane",
+     "path": [
+      [
+       30,
+       40
+      ],
+      [
+       96,
+       40
+      ]
+     ],
+     "width": 3
+    }
+   ],
+   "bridges": [],
+   "spawn_points": [
+    [
+     16,
+     64
+    ],
+    [
+     40,
+     68
+    ],
+    [
+     72,
+     66
+    ],
+    [
+     96,
+     62
+    ]
+   ],
+   "loot_zones": [
+    {
+     "place": "armory",
+     "tier": "mid",
+     "count": 20
+    },
+    {
+     "place": "range",
+     "tier": "low",
+     "count": 6
+    }
+   ],
+   "building": {
+    "allowed": true,
+    "max_blocks_per_player": 64,
+    "build_distance": 8.0,
+    "mode_default": "free"
+   },
+   "minimap_scale": 0.9
+  },
+  {
+   "id": "frost_frontier",
+   "name": "Frost Frontier",
+   "mode_tags": [
+    "br"
+   ],
+   "size_blocks": {
+    "x": 256,
+    "z": 256
+   },
+   "chunk_size": 16,
+   "sea_level": 14,
+   "generator": "frost_frontier",
+   "biome": {
+    "base_height": 16,
+    "hill_amplitude": 8.0,
+    "hill_frequency": 0.015,
+    "beach_level": 15,
+    "rock_level": 26,
+    "sand_count": 2,
+    "dirt_depth": 4,
+    "trees": {
+     "count": 480,
+     "min_height": 22,
+     "spacing": 4.6,
+     "clusters": 12,
+     "cluster_radius": 15.0,
+     "cluster_count": 40
+    },
+    "rocks": {
+     "count": 220,
+     "min_height": 18
+    },
+    "bush_count": 60,
+    "ponds": [
+     {
+      "center": [
+       120,
+       128
+      ],
+      "radius": 18.0
+     }
+    ],
+    "river": {
+     "path": [
+      [
+       60,
+       128
+      ],
+      [
+       128,
+       140
+      ],
+      [
+       196,
+       132
+      ],
+      [
+       252,
+       150
+      ]
+     ],
+     "width": 6
+    }
+   },
+   "sky": {
+    "top": "#8fb6d8",
+    "horizon": "#e8f2fa",
+    "fog_color": "#dfeaf4",
+    "fog_near": 70.0,
+    "fog_far": 220.0,
+    "sun_color": "#eaf3ff",
+    "sun_energy": 0.95,
+    "sun_rotation_deg": [
+     58.0,
+     200.0,
+     0.0
+    ],
+    "ambient_energy": 0.5,
+    "water_color": "#7fc4dd",
+    "cloud_height": 70.0,
+    "cloud_count": 20
+   },
+   "loot_tiers": {
+    "low": [
+     "frozen_dock"
+    ],
+    "mid": [
+     "timber_cabins",
+     "ice_hollow"
+    ],
+    "high": [
+     "north_watchtower"
+    ]
+   },
+   "places": [
+    {
+     "id": "timber_cabins",
+     "name": "Timber Cabins",
+     "center": [
+      58,
+      62
+     ],
+     "radius": 24.0,
+     "kind": "village",
+     "loot": "mid",
+     "cover": "heavy",
+     "purpose": "indoor fights"
+    },
+    {
+     "id": "ice_hollow",
+     "name": "Ice Hollow",
+     "center": [
+      190,
+      90
+     ],
+     "radius": 22.0,
+     "kind": "cave",
+     "loot": "mid",
+     "cover": "heavy",
+     "purpose": "frozen cave loot"
+    },
+    {
+     "id": "north_watchtower",
+     "name": "North Watchtower",
+     "center": [
+      128,
+      36
+     ],
+     "radius": 18.0,
+     "kind": "tower",
+     "loot": "high",
+     "cover": "medium",
+     "purpose": "long sightlines"
+    },
+    {
+     "id": "frozen_dock",
+     "name": "Frozen Dock",
+     "center": [
+      212,
+      208
+     ],
+     "radius": 18.0,
+     "kind": "dock",
+     "loot": "low",
+     "cover": "light",
+     "purpose": "coastal rotation"
+    }
+   ],
+   "roads": [
+    {
+     "name": "snow_road",
+     "path": [
+      [
+       58,
+       62
+      ],
+      [
+       128,
+       36
+      ],
+      [
+       190,
+       90
+      ]
+     ],
+     "width": 3
+    }
+   ],
+   "bridges": [
+    {
+     "center": [
+      128,
+      140
+     ],
+     "axis": "x",
+     "length": 12,
+     "width": 6
+    }
+   ],
+   "spawn_points": [
+    [
+     32,
+     32
+    ],
+    [
+     224,
+     32
+    ],
+    [
+     32,
+     224
+    ],
+    [
+     224,
+     224
+    ],
+    [
+     128,
+     24
+    ],
+    [
+     24,
+     128
+    ],
+    [
+     232,
+     128
+    ],
+    [
+     128,
+     232
+    ]
+   ],
+   "loot_zones": [
+    {
+     "place": "north_watchtower",
+     "tier": "high",
+     "count": 10
+    },
+    {
+     "place": "timber_cabins",
+     "tier": "mid",
+     "count": 14
+    },
+    {
+     "place": "ice_hollow",
+     "tier": "mid",
+     "count": 10
+    },
+    {
+     "place": "frozen_dock",
+     "tier": "low",
+     "count": 8
+    }
+   ],
+   "building": {
+    "allowed": true,
+    "max_blocks_per_player": 24,
+    "build_distance": 7.0,
+    "mode_default": "limited"
+   },
+   "minimap_scale": 0.6
+  }
+ ],
+ "default_map_by_mode": {
+  "br": "emerald_island",
+  "training": "training_base",
+  "clash": "neon_yard",
+  "arena": "dust_canyon"
+ }
+}

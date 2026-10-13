@@ -589,22 +589,26 @@ def build(out_dir: str, preview_dir: str | None, only: list[str] | None = None) 
     return written
 
 
-def make_sheet(paths: list[str], out_path: str, scale: int = 6) -> None:
-    """Builds a contact sheet so the art direction can be reviewed at a glance."""
-    columns = 7
-    cell = 32 * scale
+def make_sheet(paths: list[str], out_path: str, scale: int = 6, columns: int = 7) -> None:
+    """Contact sheet for art review; cells are sized from the largest image."""
+    images = [read_png(p) for p in paths]
+    tile = max(max(w, h) for w, h, _px in images)
+    cell = tile * scale
     pad = 6
     rows = (len(paths) + columns - 1) // columns
     width = columns * (cell + pad) + pad
     height = rows * (cell + pad) + pad
     canvas = [[(20, 22, 28, 255) for _ in range(width)] for _ in range(height)]
-    for i, path in enumerate(paths):
-        _w, _h, px = read_png(path)
+    for i, (_w, _h, px) in enumerate(images):
         cx = pad + (i % columns) * (cell + pad)
         cy = pad + (i // columns) * (cell + pad)
         for y in range(cell):
             for x in range(cell):
-                src = px[(y // scale) % len(px)][(x // scale) % len(px[0])]
+                sy = min(len(px) - 1, (y * len(px)) // cell)
+                sx = min(len(px[0]) - 1, (x * len(px[0])) // cell)
+                src = px[sy][sx]
+                if src[3] == 0:      # keep the sheet background for transparent pixels
+                    continue
                 canvas[cy + y][cx + x] = src
     write_png(out_path, canvas)
 
