@@ -1,0 +1,110 @@
+; BlockStrike Royale - Godot 4 project
+; The Android preset and export notes live in export_presets.cfg and README.md.
+config_version=5
+
+[application]
+config/name="BlockStrike Royale"
+config/description="A polished, original voxel battle royale prototype for Android."
+run/main_scene="res://scenes/main.tscn"
+config/icon="res://assets/icon.svg"
+
+[autoload]
+GameState="*res://scripts/game_state.gd"
+NetworkManager="*res://scripts/network_manager.gd"
+AudioManager="*res://scripts/audio_manager.gd"
+
+[display]
+
+[display/window]
+size/viewport_width=1280
+size/viewport_height=720
+size/window_width_override=1280
+size/window_height_override=720
+stretch/mode="canvas_items"
+handheld/orientation=1
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
+textures/canvas_textures/default_texture_filter=0
+environment/defaults/default_clear_color=Color(0.035, 0.055, 0.09, 1)
+
+[physics]
+3d/default_gravity=18.0
+
+[input]
+move_forward={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"physical_keycode":87,"unicode":119)]
+}
+move_back={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"physical_keycode":83,"unicode":115)]
+}
+move_left={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"physical_keycode":65,"unicode":97)]
+}
+move_right={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"physical_keycode":68,"unicode":100)]
+}
+jump={
+"deadzone": 0.3,
+"events": [Object(InputEventKey,"physical_keycode":32,"unicode":32)]
+}
+fire={
+"deadzone": 0.3,
+"events": [Object(InputEventMouseButton,"button_index":1)]
+}
+aim={
+"deadzone": 0.3,
+"events": [Object(InputEventMouseButton,"button_index":2)]
+}
+reload={
+"deadzone": 0.3,
+"events": [Object(InputEventKey,"physical_keycode":82,"unicode":114)]
+}
+crouch={
+"deadzone": 0.3,
+"events": [Object(InputEventKey,"physical_keycode":67,"unicode":99)]
+}
+interact={
+"deadzone": 0.3,
+"events": [Object(InputEventKey,"physical_keycode":69,"unicode":101)]
+}
+swap_weapon={
+"deadzone": 0.3,
+"events": [Object(InputEventKey,"physical_keycode":81,"unicode":113)]
+}
+build={
+"deadzone": 0.3,
+"events": [Object(InputEventKey,"physical_keycode":66,"unicode":98)]
+}
+pause={
+"deadzone": 0.3,
+"events": [Object(InputEventKey,"physical_keycode":4194305)]
+}
+
+[gui]
+theme/default_font_multichannel_signed_distance_field=true
+
+[android]
+
+[android/permissions]
+INTERNET=true
+ACCESS_NETWORK_STATE=true
+CHANGE_WIFI_MULTICAST_STATE=true
+ACCESS_WIFI_STATE=true
+
+[mobile]
+
+[editor]
+run/main_run_args=""
+
+[layer_names]
+3d_physics/layer_1="World"
+3d_physics/layer_2="Players"
+3d_physics/layer_3="Pickups"
+3d_physics/layer_4="Builds"

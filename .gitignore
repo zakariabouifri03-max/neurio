@@ -3,3 +3,8 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+godot/.godot/
+godot/build/
+*.apk
+*.aab

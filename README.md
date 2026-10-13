@@ -1,3 +1,9 @@
+# BlockStrike Royale — Godot 4 Android prototype
+
+The repository now includes a separate playable Godot 4 3D prototype in [`godot/`](godot/). It is an original voxel-style battle royale sandbox with Android landscape controls, bots, weapons, a shrinking safe zone, procedural map, local progression, cosmetic UI, and an explicit LAN/network boundary. Read [`godot/README.md`](godot/README.md) for run/export instructions and the verified unfinished-feature list. No APK is claimed because this checkout does not include the Godot/Android build toolchain.
+
+---
+
 # 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
@@ -101,15 +107,6 @@ Made with ❤️ and Three.js
 
 ---
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+## 📦 Legacy browser build
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
-
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
-
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+The original Bash Baqi Racing web/PWA build remains in the repository for reference and offline browser play. There is no checked-in Bash Baqi APK in this checkout. The Android deliverable for the new project is the Godot 4 project in [`godot/`](godot/); its export requirements and current APK status are documented in [`godot/README.md`](godot/README.md).
