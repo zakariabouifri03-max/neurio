@@ -13,7 +13,7 @@ var status := ""
 func _ready() -> void:
 	box = UI.vbox(12)
 	var sc := ScrollContainer.new()
-	sc.set_anchors_preset(Control.PRESET_FULL_RECT)
+	sc.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(box)

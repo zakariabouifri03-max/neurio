@@ -68,4 +68,6 @@ lights_and_shadows/directional_shadow/soft_shadow_filter_quality=1
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality.mobile=0
 lights_and_shadows/positional_shadow/atlas_size=0
 anti_aliasing/quality/msaa_3d=0
+limits/opengl/max_lights_per_object=2
+limits/opengl/max_renderable_lights=8
 environment/defaults/default_clear_color=Color(0.47, 0.68, 0.92, 1)

@@ -40,6 +40,8 @@ var ranked_check: CheckButton
 var missions_btn: Button
 var queue_box: Control
 var _orbit := 0.0
+var panel_right := false     # shop/locker open: show the character on the right
+var _look_shift := 0.55
 
 func _ready() -> void:
 	get_tree().root.theme = UI.build_theme()
@@ -47,7 +49,7 @@ func _ready() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	ui = Control.new()
-	ui.set_anchors_preset(Control.PRESET_FULL_RECT)
+	ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.theme = UI.build_theme()
 	layer.add_child(ui)
@@ -55,7 +57,7 @@ func _ready() -> void:
 	_build_nav()
 	_build_play_card()
 	overlay = Control.new()
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.add_child(overlay)
 	Profile.changed.connect(_refresh)
@@ -134,11 +136,11 @@ func _build_lobby() -> void:
 				w.top[x * 16 + z] = 0
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
-	WorldGen._oak(w, 3, w.ground_y(3, 4), 4, rng)
+	WorldGen._oak(w, 2, w.ground_y(2, 2), 2, rng)
 	WorldGen._boulder(w, 12, w.ground_y(12, 11), 11, rng)
-	w.set_b(11, w.ground_y(11, 4), 4, Blocks.CRATE)
-	w.set_b(11, w.ground_y(11, 4) + 1, 4, Blocks.CRATE)
-	w.set_b(12, w.ground_y(12, 4), 4, Blocks.CRATE)
+	w.set_b(12, w.ground_y(12, 3), 3, Blocks.CRATE)
+	w.set_b(12, w.ground_y(12, 3) + 1, 3, Blocks.CRATE)
+	w.set_b(13, w.ground_y(13, 3), 3, Blocks.CRATE)
 	VoxelMesher.prepare()
 	var mi := MeshInstance3D.new()
 	mi.mesh = VoxelMesher.arrays_to_mesh(VoxelMesher.build_chunk(w, 0, 0))
@@ -156,16 +158,16 @@ func _rebuild_preview(cos: Dictionary = {}) -> void:
 	preview_actor = Actor.new()
 	preview_actor.name = Profile.player_name()
 	preview_actor.cosmetics = cos if not cos.is_empty() else Profile.equip_dict()
-	preview_actor.slots[0] = "ar_strike"
-	preview_actor.cur = 0
+	preview_actor.cur = 3
+	preview_actor.slots[3] = ""
 	preview_actor.on_ground = true
 	preview_actor.pos = Vector3(0.6, 0.0, 0.0)
-	preview_actor.yaw = deg_to_rad(-20)
+	preview_actor.yaw = PI - 0.35
 	preview_view = ActorView.new()
 	lobby.add_child(preview_view)
 	preview_view.setup(preview_actor, 0, Settings.is_unlit())
 	preview_view.label.visible = false
-	preview_view.set_weapon("ar_strike", str(preview_actor.cosmetics.get("wrap", "wrap_none")))
+	preview_view.set_weapon("", "")
 	preview_view.snap_to(preview_actor.pos)
 
 ## Shows a cosmetic on the lobby character without buying/equipping it.
@@ -189,14 +191,18 @@ func preview_cosmetic(id: String) -> void:
 		return
 	cos[c["type"]] = id
 	_rebuild_preview(cos)
+	if c["type"] == "wrap":
+		# show the wrap on a rifle held in the aiming pose
+		preview_actor.slots[0] = "ar_strike"
+		preview_actor.cur = 0
+		preview_view.set_weapon("ar_strike", id)
 
 func _process(dt: float) -> void:
-	_orbit += dt * 0.12
-	var vp := get_viewport().get_visible_rect().size
-	var shift := 1.1 * (vp.x / vp.y) / (16.0 / 9.0)
-	var target := Vector3(0.6 - shift * 0.25, 1.05, 0)
-	cam.global_position = target + Vector3(sin(_orbit) * 1.2 + 0.4, 0.55, 5.2 + cos(_orbit) * 0.3)
-	cam.look_at(target + Vector3(-0.6, 0, 0), Vector3.UP)
+	_orbit += dt * 0.35
+	var chest := Vector3(0.6, 1.0, 0.0)
+	_look_shift = lerpf(_look_shift, -1.05 if panel_right else 0.55, minf(1.0, dt * 6.0))
+	cam.global_position = chest + Vector3(sin(_orbit) * 0.45, 0.25, 3.5)
+	cam.look_at(chest + Vector3(_look_shift, 0.05, 0), Vector3.UP)
 
 # ------------------------------------------------------------------ layout
 func _build_top_bar() -> void:
@@ -366,13 +372,16 @@ func open_panel(key: String) -> void:
 	close_panel()
 	var dim := ColorRect.new()
 	dim.color = Color(0, 0, 0, 0.5)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.add_child(dim)
 	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel_right = key in ["shop", "locker"]
+	if panel_right:
+		dim.color = Color(0, 0, 0, 0.12)
 	var p := UI.panel()
-	p.set_anchors_preset(Control.PRESET_FULL_RECT)
+	p.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	p.offset_left = 40
-	p.offset_right = -40
+	p.offset_right = -480 if panel_right else -40
 	p.offset_top = 84
 	p.offset_bottom = -20
 	var v := UI.vbox(10)
@@ -394,10 +403,11 @@ func open_panel(key: String) -> void:
 		(content as RoomsPanel).menu = self
 	else:
 		content = MenuPanels.build(key, self)
-	content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	body.add_child(content)
 
 func close_panel() -> void:
+	panel_right = false
 	for c in overlay.get_children():
 		c.queue_free()
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -406,7 +416,7 @@ func close_panel() -> void:
 func notice(title: String, text: String) -> void:
 	var dim := ColorRect.new()
 	dim.color = Color(0, 0, 0, 0.55)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var p := UI.panel()
 	p.set_anchors_preset(Control.PRESET_CENTER)
 	p.position = Vector2(-330, -170)

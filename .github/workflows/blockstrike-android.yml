@@ -196,7 +196,7 @@ jobs:
         with:
           api-level: 30
           arch: x86_64
-          target: google_apis
+          target: default
           profile: pixel_2
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
@@ -205,16 +205,19 @@ jobs:
             mkdir -p emu
             adb install -r apk/BlockStrikeRoyale.apk | tee emu/install.log
             adb shell monkey -p com.blockstrike.royale -c android.intent.category.LAUNCHER 1
-            sleep 45
+            sleep 90
+            adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS > /dev/null || true
             adb shell pidof com.blockstrike.royale | tee emu/pid.log
-            adb exec-out screencap -p > emu/emulator_menu.png
             adb shell wm size | tee emu/screen.log
+            adb exec-out screencap -p > emu/emulator_menu.png
             adb shell input tap 1560 990 || true
-            sleep 50
-            adb exec-out screencap -p > emu/emulator_after_start.png
+            sleep 120
+            adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS > /dev/null || true
+            adb exec-out screencap -p > emu/emulator_match.png
             adb shell pidof com.blockstrike.royale | tee -a emu/pid.log
-            adb logcat -d -s godot:* | tail -200 > emu/logcat_godot.log
-            adb logcat -d | grep -iE "fatal|crash|AndroidRuntime" | tail -60 > emu/logcat_errors.log || true
+            adb logcat -d -s godot:* | tail -300 > emu/logcat_godot.log
+            grep "\[perf\]" emu/logcat_godot.log | tail -10 > emu/perf.log || true
+            adb logcat -d | grep -E "AndroidRuntime|FATAL" | grep -i blockstrike | tail -60 > emu/logcat_errors.log || true
             adb shell dumpsys meminfo com.blockstrike.royale | head -40 > emu/meminfo.log || true
       - name: Commit emulator evidence
         if: always()

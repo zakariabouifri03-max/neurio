@@ -73,7 +73,11 @@ static func _modes(menu: Node) -> Control:
 # ------------------------------------------------------------------ shop & locker
 static func _shop(menu: Node, locker: bool) -> Control:
 	var root := UI.vbox(10)
-	var tabs := UI.hbox(8)
+	var tabs := UI.hbox(6)
+	var tab_scroll := ScrollContainer.new()
+	tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tab_scroll.custom_minimum_size = Vector2(0, 54)
+	tab_scroll.add_child(tabs)
 	var tab: String = locker_tab if locker else shop_tab
 	var tab_list := ["featured"] + DB.COSMETIC_TYPES if not locker else DB.COSMETIC_TYPES
 	for t in tab_list:
@@ -85,12 +89,12 @@ static func _shop(menu: Node, locker: bool) -> Control:
 			else:
 				shop_tab = tt
 			_rebuild(menu, "locker" if locker else "shop"), "blue" if t == tab else "ghost", Vector2(0, 44), 18))
-	root.add_child(tabs)
+	root.add_child(tab_scroll)
 	var note := UI.label("All items are cosmetic only and never change combat stats. Coins and gems are earned by playing." if not locker
 		else "Equip cosmetics you own. Tap Preview to see them on your character.", 17, UI.DIM)
 	root.add_child(note)
 	var grid := GridContainer.new()
-	grid.columns = 4
+	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 12)
 	grid.add_theme_constant_override("v_separation", 12)
 	var items := []
@@ -106,7 +110,7 @@ static func _shop(menu: Node, locker: bool) -> Control:
 			continue
 		var equipped: bool = Profile.equip_dict().get(c["type"], "") == id
 		var card := UI.panel(UI.BG2, 12, DB.RARITY_COLORS[int(c["rarity"])])
-		card.custom_minimum_size = Vector2(270, 170)
+		card.custom_minimum_size = Vector2(340, 160)
 		var v := UI.vbox(6)
 		v.add_child(UI.label(c["name"], 22, DB.RARITY_COLORS[int(c["rarity"])]))
 		v.add_child(UI.label("%s  -  %s" % [DB.RARITY_NAMES[int(c["rarity"])], DB.COSMETIC_TYPE_NAMES[c["type"]]], 15, UI.DIM))

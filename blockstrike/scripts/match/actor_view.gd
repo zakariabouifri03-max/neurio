@@ -62,8 +62,9 @@ func setup(a: Actor, relation: int, unshaded: bool) -> void:
 	label = Label3D.new()
 	label.text = a.name
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.font_size = 40
-	label.pixel_size = 0.005
+	label.font_size = 48
+	label.pixel_size = 0.0008
+	label.fixed_size = true
 	label.outline_size = 10
 	label.position = Vector3(0, 2.2, 0)
 	label.no_depth_test = relation == 1

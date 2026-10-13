@@ -69,6 +69,7 @@ var _pending_blocks: Array = []
 var _rng := RandomNumberGenerator.new()
 var _correction := Vector3.ZERO
 var recent_shots: Array = []   # [pos, time] for minimap gunfire markers
+var _air_view := false
 var debug_kills := OS.has_environment("BSR_DEBUG_KILLS")
 
 # ================================================================== setup
@@ -114,7 +115,7 @@ func _setup_view() -> void:
 	e.sky = sky
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	e.ambient_light_color = Color(0.62, 0.68, 0.8)
-	e.ambient_light_energy = 0.75
+	e.ambient_light_energy = 0.6
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	e.fog_enabled = true
 	e.fog_mode = Environment.FOG_MODE_DEPTH
@@ -122,7 +123,7 @@ func _setup_view() -> void:
 	e.fog_depth_begin = Settings.view_distance() * 0.55
 	e.fog_depth_end = Settings.view_distance()
 	e.fog_sky_affect = 0.0
-	e.glow_enabled = Settings.quality() >= 2
+	e.glow_enabled = false
 	env.environment = e
 	add_child(env)
 	sun = DirectionalLight3D.new()
@@ -164,7 +165,6 @@ func apply_quality() -> void:
 	sun.shadow_enabled = Settings.shadows_enabled()
 	env.environment.fog_depth_begin = Settings.view_distance() * 0.55
 	env.environment.fog_depth_end = Settings.view_distance()
-	env.environment.glow_enabled = Settings.quality() >= 2
 	effects.particle_scale = [0.4, 0.75, 1.0][Settings.quality()]
 
 # ================================================================== actors
@@ -325,10 +325,23 @@ func _physics_process(_dt: float) -> void:
 	else:
 		_client_tick(TICK)
 
+var _perf_t := 0.0
+var _perf_frames := 0
+
 func _process(dt: float) -> void:
 	if not has_view or loading:
 		return
 	_update_visuals(dt)
+	# periodic performance line (visible in `adb logcat -s godot`)
+	_perf_t += dt
+	_perf_frames += 1
+	if _perf_t >= 10.0:
+		print("[perf] %s q=%s fps=%.1f draws=%d tris=%d static_mem=%dMB video_mem=%dMB actors=%d loot=%d" % [kind, Settings.QUALITY_NAMES[Settings.quality()],
+			_perf_frames / _perf_t, int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
+			int(Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)), int(Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0),
+			int(Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0), actors.size(), loot.size()])
+		_perf_t = 0.0
+		_perf_frames = 0
 
 func _server_tick(dt: float) -> void:
 	time += dt
@@ -1469,7 +1482,16 @@ func _update_visuals(dt: float) -> void:
 	# zone wall
 	var z := zone_view_dict()
 	if not z.is_empty():
-		effects.set_zone(z["c"], z["r"], z["on"])
+		effects.set_zone(z["c"], z["r"], z["on"], float(maxi(world.sx, world.sz)))
+	# see the whole island from the sky: extend fog + chunk visibility while airborne
+	var me := local_actor()
+	var air := me != null and me.in_air_phase()
+	if air != _air_view:
+		_air_view = air
+		var dist := maxf(Settings.view_distance(), 150.0 if Settings.quality() == 0 else 200.0) if air else Settings.view_distance()
+		terrain.apply_quality(dist, Settings.shadows_enabled() and not air)
+		env.environment.fog_depth_begin = dist * (0.75 if air else 0.55)
+		env.environment.fog_depth_end = dist * (1.25 if air else 1.0)
 	# local view correction smoothing (network clients)
 	if not is_server:
 		_correction = _correction.lerp(Vector3.ZERO, minf(1.0, dt * 10.0))

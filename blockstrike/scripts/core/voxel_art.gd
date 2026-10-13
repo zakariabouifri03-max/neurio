@@ -16,7 +16,8 @@ static var _built := false
 const LIT_SHADER := """
 shader_type spatial;
 render_mode diffuse_lambert, specular_disabled;
-uniform sampler2DArray atlas : source_color, filter_nearest_mipmap, repeat_enable;
+uniform sampler2DArray atlas : filter_nearest_mipmap, repeat_enable;
+vec3 to_linear(vec3 c) { return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)); }
 varying flat float v_layer;
 varying flat float v_emit;
 void vertex() {
@@ -25,16 +26,18 @@ void vertex() {
 }
 void fragment() {
 	vec4 t = texture(atlas, vec3(UV, v_layer));
-	ALBEDO = t.rgb * COLOR.rgb;
+	vec3 c = to_linear(t.rgb);
+	ALBEDO = c * COLOR.rgb;
 	ROUGHNESS = 1.0;
-	EMISSION = t.rgb * v_emit * 1.4;
+	EMISSION = c * v_emit * 1.4;
 }
 """
 
 const UNLIT_SHADER := """
 shader_type spatial;
 render_mode unshaded;
-uniform sampler2DArray atlas : source_color, filter_nearest_mipmap, repeat_enable;
+uniform sampler2DArray atlas : filter_nearest_mipmap, repeat_enable;
+vec3 to_linear(vec3 c) { return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)); }
 uniform vec3 light_tint = vec3(1.0, 1.0, 1.0);
 varying flat float v_layer;
 varying float v_shade;
@@ -46,14 +49,15 @@ void vertex() {
 }
 void fragment() {
 	vec4 t = texture(atlas, vec3(UV, v_layer));
-	ALBEDO = t.rgb * COLOR.rgb * v_shade * light_tint;
+	ALBEDO = to_linear(t.rgb) * COLOR.rgb * v_shade * light_tint;
 }
 """
 
 const TRANS_SHADER := """
 shader_type spatial;
 render_mode blend_mix, depth_draw_opaque, cull_disabled, diffuse_lambert;
-uniform sampler2DArray atlas : source_color, filter_nearest_mipmap, repeat_enable;
+uniform sampler2DArray atlas : filter_nearest_mipmap, repeat_enable;
+vec3 to_linear(vec3 c) { return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)); }
 uniform float water_layer = 5.0;
 varying flat float v_layer;
 void vertex() {
@@ -63,7 +67,7 @@ void fragment() {
 	float is_water = 1.0 - step(0.25, abs(v_layer - water_layer));
 	vec2 uv = UV + is_water * vec2(TIME * 0.06, TIME * 0.035);
 	vec4 t = texture(atlas, vec3(uv, v_layer));
-	ALBEDO = t.rgb * COLOR.rgb;
+	ALBEDO = to_linear(t.rgb) * COLOR.rgb;
 	ALPHA = t.a;
 	ROUGHNESS = mix(0.9, 0.12, is_water);
 	SPECULAR = mix(0.2, 0.6, is_water);
@@ -92,16 +96,19 @@ static func build() -> void:
 	mat_trans.render_priority = 1
 	mat_vcolor = StandardMaterial3D.new()
 	mat_vcolor.vertex_color_use_as_albedo = true
+	mat_vcolor.vertex_color_is_srgb = true
 	mat_vcolor.roughness = 0.75
 	mat_vcolor.metallic = 0.15
 	mat_vcolor_unshaded = StandardMaterial3D.new()
 	mat_vcolor_unshaded.vertex_color_use_as_albedo = true
+	mat_vcolor_unshaded.vertex_color_is_srgb = true
 	mat_vcolor_unshaded.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat_glow = StandardMaterial3D.new()
 	mat_glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat_glow.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat_glow.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	mat_glow.vertex_color_use_as_albedo = true
+	mat_glow.vertex_color_is_srgb = true
 	mat_glow.cull_mode = BaseMaterial3D.CULL_DISABLED
 	mat_glow.no_depth_test = false
 

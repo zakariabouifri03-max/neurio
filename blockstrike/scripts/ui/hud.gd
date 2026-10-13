@@ -40,12 +40,12 @@ func setup(match_node: Match, controller: PlayerController) -> void:
 	pc = controller
 	layer = 5
 	root = Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.theme = UI.build_theme()
 	add_child(root)
 	overlay = Control.new()
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	overlay.draw.connect(_draw_overlay)
 	root.add_child(overlay)
@@ -114,7 +114,7 @@ func setup(match_node: Match, controller: PlayerController) -> void:
 	spectate_bar = _make_spectate_bar()
 	root.add_child(spectate_bar)
 	modal = Control.new()
-	modal.set_anchors_preset(Control.PRESET_FULL_RECT)
+	modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	modal.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(modal)
 	_make_loading()
@@ -126,7 +126,7 @@ func setup(match_node: Match, controller: PlayerController) -> void:
 func _make_loading() -> void:
 	loading = ColorRect.new()
 	(loading as ColorRect).color = Color(0.04, 0.05, 0.09)
-	loading.set_anchors_preset(Control.PRESET_FULL_RECT)
+	loading.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.add_child(loading)
 	var v := UI.vbox(18)
 	v.set_anchors_preset(Control.PRESET_CENTER)
@@ -371,7 +371,7 @@ func _modal_panel(title: String, sz: Vector2) -> PanelContainer:
 	_close_modal()
 	var dim := ColorRect.new()
 	dim.color = Color(0, 0, 0, 0.55)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	modal.add_child(dim)
 	var p := UI.panel()
@@ -620,8 +620,10 @@ func _process(dt: float) -> void:
 		"br":
 			top_label.text = "ALIVE %d    KILLS %d" % [int(sm.get("alive", 0)), a.kills if a else 0]
 			var z := m.zone_view_dict()
-			if ph == "plane":
-				top_sub.text = "Plane departs - jump when ready"
+			if a and a.state == Actor.St.PLANE:
+				top_sub.text = "Press JUMP to leave the plane"
+			elif a and (a.state == Actor.St.SKYDIVE or a.state == Actor.St.PARACHUTE):
+				top_sub.text = "Steer to a landing spot - the parachute opens automatically"
 			elif not z.is_empty() and int(z.get("i", -1)) >= 0:
 				var left := float(z.get("t1", 0)) - m.time
 				top_sub.text = ("Zone shrinking  " if str(z.get("st", "")) == "shrink" else "Safe zone shrinks in  ") + UI.fmt_time(left)
@@ -745,17 +747,22 @@ func _draw_overlay() -> void:
 	var low := clampf((35.0 - a.hp) / 35.0, 0.0, 1.0) if a.state == Actor.St.ALIVE else (0.7 if a.state == Actor.St.KNOCKED else 0.0)
 	var vig := maxf(hurt_k * 0.45, low * (0.25 + 0.1 * sin(Time.get_ticks_msec() * 0.006)))
 	if vig > 0.01:
+		# soft gradient frame: opaque red at the screen edge fading to transparent inwards
 		var col := Color(0.85, 0.05, 0.05, vig)
-		var e := sz.y * 0.16
-		overlay.draw_rect(Rect2(0, 0, sz.x, e), col)
-		overlay.draw_rect(Rect2(0, sz.y - e, sz.x, e), col)
-		overlay.draw_rect(Rect2(0, e, e, sz.y - 2 * e), col)
-		overlay.draw_rect(Rect2(sz.x - e, e, e, sz.y - 2 * e), col)
+		var c0 := Color(0.85, 0.05, 0.05, 0.0)
+		var e := sz.y * 0.22
+		var W := sz.x
+		var H := sz.y
+		var cols := PackedColorArray([col, col, c0, c0])
+		overlay.draw_polygon(PackedVector2Array([Vector2(0, 0), Vector2(W, 0), Vector2(W - e, e), Vector2(e, e)]), cols)
+		overlay.draw_polygon(PackedVector2Array([Vector2(W, 0), Vector2(W, H), Vector2(W - e, H - e), Vector2(W - e, e)]), cols)
+		overlay.draw_polygon(PackedVector2Array([Vector2(W, H), Vector2(0, H), Vector2(e, H - e), Vector2(W - e, H - e)]), cols)
+		overlay.draw_polygon(PackedVector2Array([Vector2(0, H), Vector2(0, 0), Vector2(e, e), Vector2(e, H - e)]), cols)
 	# outside the zone
 	var z := m.zone_view_dict()
 	if not z.is_empty() and bool(z.get("on", false)) and a.is_alive() and not a.in_air_phase():
 		if Vector2(a.pos.x, a.pos.z).distance_to(z["c"]) > float(z["r"]):
-			overlay.draw_rect(Rect2(Vector2.ZERO, sz), Color(0.2, 0.4, 1.0, 0.12))
+			overlay.draw_rect(Rect2(Vector2.ZERO, sz), Color(0.2, 0.4, 1.0, 0.08))
 			overlay.draw_string_outline(font, Vector2(0, sz.y * 0.3), "YOU ARE OUTSIDE THE SAFE ZONE", HORIZONTAL_ALIGNMENT_CENTER, sz.x, 28, 7, Color.BLACK)
 			overlay.draw_string(font, Vector2(0, sz.y * 0.3), "YOU ARE OUTSIDE THE SAFE ZONE", HORIZONTAL_ALIGNMENT_CENTER, sz.x, 28, Color(0.5, 0.75, 1.0))
 	# scope

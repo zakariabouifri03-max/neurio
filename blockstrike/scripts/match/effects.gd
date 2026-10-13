@@ -5,7 +5,7 @@ extends Node3D
 var _tracers: Array[MeshInstance3D] = []
 var _bursts: Array[CPUParticles3D] = []
 var _numbers: Array[Label3D] = []
-var _lights: Array[OmniLight3D] = []
+var _flashes: Array[MeshInstance3D] = []
 var _smokes: Array[CPUParticles3D] = []
 var _ti := 0
 var _bi := 0
@@ -22,16 +22,19 @@ shader_type spatial;
 render_mode unshaded, cull_disabled, depth_draw_never, blend_mix;
 uniform vec4 col : source_color = vec4(0.25, 0.55, 1.0, 0.4);
 void fragment() {
-	float stripes = step(0.5, fract(UV.x * 160.0 + TIME * 0.6));
-	float fade = smoothstep(0.0, 0.05, UV.y) * smoothstep(1.0, 0.6, UV.y);
-	ALBEDO = col.rgb * (0.8 + stripes * 0.4);
-	ALPHA = col.a * (0.55 + stripes * 0.45) * (0.4 + fade * 0.6);
+	float d = length(VERTEX);
+	float near = smoothstep(0.6, 4.0, d) * (1.0 - smoothstep(28.0, 75.0, d));
+	float stripes = 0.5 + 0.5 * sin(UV.x * 900.0 + UV.y * 40.0 - TIME * 2.0);
+	float fade = smoothstep(0.0, 0.04, UV.y) * smoothstep(1.0, 0.55, UV.y);
+	ALBEDO = col.rgb * (0.85 + stripes * 0.3);
+	ALPHA = col.a * (0.5 + stripes * 0.3) * fade * near;
 }
 """
 
 func _ready() -> void:
 	cube_mat = StandardMaterial3D.new()
 	cube_mat.vertex_color_use_as_albedo = true
+	cube_mat.vertex_color_is_srgb = true
 	cube_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	var tracer_mesh := Models.boxes_mesh([[Vector3(0, 0, -0.5), Vector3(0.035, 0.035, 1.0), Color(1.0, 0.9, 0.55, 0.85)]], false)
 	for i in 28:
@@ -43,7 +46,7 @@ func _ready() -> void:
 		add_child(t)
 		_tracers.append(t)
 	var cube := BoxMesh.new()
-	cube.size = Vector3(0.09, 0.09, 0.09)
+	cube.size = Vector3(0.07, 0.07, 0.07)
 	cube.material = cube_mat
 	for i in 18:
 		var p := CPUParticles3D.new()
@@ -93,18 +96,21 @@ func _ready() -> void:
 		l.no_depth_test = true
 		l.font_size = 64
 		l.outline_size = 14
-		l.pixel_size = 0.004
-		l.fixed_size = false
+		l.pixel_size = 0.0007
+		l.fixed_size = true
 		l.visible = false
 		add_child(l)
 		_numbers.append(l)
+	# explosion flash: additive glowing cubes instead of dynamic lights (no extra light shader variants on weak GPUs)
+	var flash_mesh := Models.boxes_mesh([[Vector3.ZERO, Vector3(1, 1, 1), Color(1.0, 0.7, 0.3, 0.55)], [Vector3.ZERO, Vector3(0.6, 1.4, 0.6), Color(1.0, 0.9, 0.5, 0.5)]], false)
 	for i in 3:
-		var o := OmniLight3D.new()
-		o.light_color = Color(1.0, 0.65, 0.3)
-		o.visible = false
-		o.shadow_enabled = false
-		add_child(o)
-		_lights.append(o)
+		var fm := MeshInstance3D.new()
+		fm.mesh = flash_mesh
+		fm.material_override = VoxelArt.mat_glow
+		fm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		fm.visible = false
+		add_child(fm)
+		_flashes.append(fm)
 	# zone wall cylinder (UV.x around, UV.y height)
 	var cyl := CylinderMesh.new()
 	cyl.top_radius = 1.0
@@ -125,8 +131,8 @@ func _ready() -> void:
 	zone_wall.visible = false
 	add_child(zone_wall)
 
-func set_zone(center: Vector2, radius: float, visible_: bool) -> void:
-	zone_wall.visible = visible_ and radius > 0.5
+func set_zone(center: Vector2, radius: float, visible_: bool, map_size := 1e9) -> void:
+	zone_wall.visible = visible_ and radius > 0.5 and radius < map_size * 0.7
 	zone_wall.position = Vector3(center.x, 50.0, center.y)
 	zone_wall.scale = Vector3(maxf(radius, 0.5), 1.0, maxf(radius, 0.5))
 
@@ -164,13 +170,12 @@ func explosion(pos: Vector3, radius: float) -> void:
 	burst(pos, Vector3.UP, Color(1.0, 0.6, 0.15), 26, 2.2)
 	burst(pos + Vector3(0, 0.3, 0), Vector3.UP, Color(0.35, 0.33, 0.3), 18, 1.4)
 	burst(pos, Vector3.UP, Color(1.0, 0.9, 0.4), 12, 3.0)
-	var l := _lights[_li]
-	_li = (_li + 1) % _lights.size()
-	l.global_position = pos + Vector3(0, 1, 0)
-	l.omni_range = radius * 2.5
-	l.light_energy = 5.0
-	l.visible = true
-	_active.append([l, 1, Time.get_ticks_msec(), 350, null])
+	var fl := _flashes[_li]
+	_li = (_li + 1) % _flashes.size()
+	fl.global_position = pos + Vector3(0, 0.8, 0)
+	fl.scale = Vector3.ONE * radius * 0.5
+	fl.visible = true
+	_active.append([fl, 1, Time.get_ticks_msec(), 300, radius])
 
 func smoke(pos: Vector3, duration: float) -> void:
 	for s in _smokes:
@@ -208,7 +213,7 @@ func _process(_dt: float) -> void:
 			continue
 		match int(e[1]):
 			1:
-				(e[0] as OmniLight3D).light_energy = 5.0 * (1.0 - k)
+				(e[0] as Node3D).scale = Vector3.ONE * float(e[4]) * (0.5 + k * 0.9) * (1.0 - k * 0.6)
 			3:
 				var l: Label3D = e[0]
 				l.global_position = (e[4] as Vector3) + Vector3(0, 0.4 + k * 1.1, 0)

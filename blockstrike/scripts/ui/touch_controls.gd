@@ -42,7 +42,7 @@ var _mouse_finger := -99
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for id in DEFAULTS:
 		var d: Dictionary = DEFAULTS[id]
 		buttons[id] = {"p": d["p"], "r": d["r"], "icon": d["icon"], "kind": d["kind"], "look": d.get("look", false),
