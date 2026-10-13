@@ -113,6 +113,7 @@ const ACTION_DEFAULTS := {
 	"slot_primary": [KEY_1], "slot_secondary": [KEY_2], "slot_melee": [KEY_3],
 	"slot_throwable": [KEY_4], "use_heal": [KEY_H], "toggle_inventory": [KEY_I],
 	"toggle_map": [KEY_M], "emote_wheel": [KEY_Z], "pause": [KEY_ESCAPE],
+	"scoreboard": [KEY_TAB],
 	"ping": [KEY_V], "toggle_build": [KEY_B], "start_match": [KEY_ENTER],
 }
 

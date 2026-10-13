@@ -55,6 +55,47 @@ VARIANT_TYPES = {
     "PackedColorArray", "PackedVector4Array", "void", "Nil", "Object",
 }
 
+def mask_comments_and_strings(source: str) -> str:
+    """Blanks out comments and string literals (same length, same offsets)."""
+    out = list(source)
+    index = 0
+    length = len(source)
+    while index < length:
+        char = source[index]
+        if char == "#":
+            while index < length and source[index] != "\n":
+                out[index] = " "
+                index += 1
+        elif char in ("\"", "'"):
+            quote = char
+            out[index] = " "
+            index += 1
+            while index < length:
+                if source[index] == "\\":
+                    out[index] = " "
+                    if index + 1 < length:
+                        out[index + 1] = " "
+                    index += 2
+                    continue
+                if source[index] == quote:
+                    out[index] = " "
+                    index += 1
+                    break
+                if source[index] == "\n":
+                    break
+                out[index] = " "
+                index += 1
+        else:
+            index += 1
+    return "".join(out)
+
+
+def is_inside_comment_or_string(source: str, offset: int) -> bool:
+    """True when `offset` falls inside a comment or a string literal."""
+    masked = mask_comments_and_strings(source)
+    return offset < len(masked) and masked[offset] == " " and source[offset] not in (" ", "\t")
+
+
 GODOT3_PATTERNS = [
     (r"\byield\s*\(", "GDScript 2 removed yield(); use await"),
     (r"(?<!@)\bonready\s+var\b", "Godot 3 onready syntax; use @onready"),
@@ -576,6 +617,9 @@ class Project:
                                      f"classes that are meant to be extended)")
 
     def check_types(self, gd: GdFile, known: set) -> None:
+        # Enums declared in the same script are valid type annotations.
+        local_known = set(known) | set(gd.enums.keys())
+
         def validate(type_text: str, where: str, line: int) -> None:
             if not type_text:
                 return
@@ -593,7 +637,7 @@ class Project:
             t = t.lstrip("^")
             if t in ("", "void"):
                 return
-            if t not in known:
+            if t not in local_known:
                 self.report.error(gd.rel, f"{where} (line {line}): unknown type '{t}'")
 
         for name, typ in gd.vars.items():
@@ -615,7 +659,7 @@ class Project:
                     validate(parts[1], "cast", node.get("r", 0))
             elif node["t"] == "type":
                 text = child_text(node).strip()
-                if text and text not in known and not text.startswith("Array"):
+                if text and text not in local_known and not text.startswith("Array"):
                     parent_line = node.get("r", 0)
                     # Only complains for standalone type nodes we have not validated
                     # (function/var/param types are handled above).
@@ -655,11 +699,17 @@ class Project:
                                           f"project.godot")
 
     def check_godot3isms(self, gd: GdFile) -> None:
+        # Only real code counts: comments and string literals may legitimately
+        # mention old names ("Camera-relative input").  Blank them out but keep
+        # the byte offsets intact so reported line numbers stay correct.
+        masked = mask_comments_and_strings(gd.src)
         for pattern, message in GODOT3_PATTERNS:
             if "still valid" in message:
                 continue
-            for m in re.finditer(pattern, gd.src, re.MULTILINE):
+            for m in re.finditer(pattern, masked, re.MULTILINE):
                 line = gd.src[:m.start()].count("\n") + 1
+                if is_inside_comment_or_string(gd.src, m.start()):
+                    continue
                 self.report.error(gd.rel, f"line {line}: {message}  ->  '{m.group(0)}'")
 
     # --------------------------- call checking --------------------------- #
@@ -683,7 +733,7 @@ class Project:
             script = self.autoloads[head].replace("res://", "")
             for rel, other in self.files.items():
                 if other.rel == script or rel.endswith(os.path.basename(script)):
-                    return other.class_name or other.rel
+                    return other.class_name if other.class_name else "@" + other.rel
             return None
         return None
 
@@ -691,6 +741,23 @@ class Project:
         """Walks `a.b.c` returning the type of the final member."""
         if not typ:
             return None
+        if typ.startswith("@"):        # autoload script without class_name
+            target = self.files.get(typ[1:])
+            if target is None:
+                return None
+            parts = chain.split(".")
+            for part in parts[1:]:
+                member_type = target.vars.get(part, "")
+                if not member_type:
+                    return None
+                typ = member_type
+                if typ in self.by_class:
+                    target = self.by_class[typ]
+                elif typ in self.api.classes:
+                    return typ
+                else:
+                    return None
+            return typ
         if typ in self.by_class:
             current = self.by_class[typ].class_name
             gd = self.by_class[typ]
@@ -730,30 +797,70 @@ class Project:
                 yield from Project.ast_walk_functions(node)
 
     def local_types_in(self, gd: GdFile, fnode: Dict[str, Any]) -> Dict[str, str]:
-        """Static types of local variables inside one function body."""
+        """Static types of local variables inside one function body (final state)."""
+        declarations = self.local_declarations(gd, fnode)
         types: Dict[str, str] = {}
-        for name, typ in gd.funcs.get(self.func_name_of(fnode), GdFunc("", {"ch": []})).params:
+        for declaration in declarations:
+            types[declaration["name"]] = declaration["type"]
+        return types
+
+    def local_declarations(self, gd: GdFile, fnode: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Local variable declarations with the byte offset they become visible at.
+
+        Sibling loops in one function may reuse a variable name with a different
+        type (e.g. two pooled players); a receiver is therefore resolved against
+        the most recent declaration *before* it, exactly like the parser does.
+        """
+        declarations: List[Dict[str, Any]] = []
+        fn = gd.funcs.get(self.func_name_of(fnode), GdFunc("", {"ch": []}))
+        for name, typ in fn.params:
             if typ:
-                types[name] = typ
+                declarations.append({"name": name, "type": typ, "at": -1})
+        seen_types: Dict[str, str] = {d["name"]: d["type"] for d in declarations}
+
+        def expression_type(node: Dict[str, Any]) -> str:
+            if node["t"] == "identifier":
+                return seen_types.get(node.get("s", ""), "")
+            return self.type_of_expr(gd, node, seen_types)
+
         for node in walk(fnode):
             if node["t"] == "variable_statement":
                 name, typ = "", ""
-                for c in node.get("ch", []):
+                children = node.get("ch", [])
+                for index, c in enumerate(children):
                     if c["t"] == "name":
                         name = c.get("s", "")
                     elif c["t"] == "type":
                         typ = child_text(c)
-                    elif c["t"] == "inferred_type":
-                        typ = self.infer_value_type(gd, node, types)
-                if name and typ:
-                    types[name] = typ
+                    elif c["t"] == "inferred_type" and name:
+                        if index + 1 < len(children):
+                            typ = expression_type(children[index + 1])
+                if name:
+                    if not typ and name in seen_types:
+                        typ = seen_types[name]
+                    declarations.append({"name": name, "type": typ, "at": node.get("a", 0)})
+                    seen_types[name] = typ
             elif node["t"] == "for_statement":
-                # `for x in collection:` - only typed loops resolve
                 text = child_text(node)
                 m = re.match(r"for\s+(\w+)\s*:\s*(\w+)", text)
                 if m:
-                    types[m.group(1)] = m.group(2)
-        return types
+                    declarations.append({"name": m.group(1), "type": m.group(2),
+                                         "at": node.get("a", 0)})
+                    seen_types[m.group(1)] = m.group(2)
+        return declarations
+
+    def type_at(self, declarations: List[Dict[str, Any]], name: str, byte_offset: int) -> str:
+        """Effective type of `name` at a byte offset (most recent declaration wins)."""
+        best = ""
+        best_at = -10
+        for declaration in declarations:
+            if declaration["name"] != name:
+                continue
+            at = int(declaration["at"])
+            if at < byte_offset and at > best_at:
+                best_at = at
+                best = str(declaration["type"])
+        return best
 
     def func_name_of(self, fnode: Dict[str, Any]) -> str:
         for c in fnode.get("ch", []):
@@ -870,9 +977,8 @@ class Project:
         return ""
 
     def check_calls(self, gd: GdFile) -> None:
-        origin = gd.class_name or gd.rel
-        funcs = [self.func_name_of(f) for f in self.ast_walk_functions(gd.ast)]
         for fnode in self.ast_walk_functions(gd.ast):
+            declarations = self.local_declarations(gd, fnode)
             local_types = self.local_types_in(gd, fnode)
             for node in walk(fnode):
                 if node["t"] not in ("attribute", "attribute_call"):
@@ -888,7 +994,8 @@ class Project:
                 line = node.get("r", 0)
                 if not base_text:
                     continue
-                typ = self.resolve_receiver(gd, base_text, local_types)
+                typ = self.resolve_receiver_at(gd, base_text, node.get("a", 0), declarations,
+                                               local_types)
                 if not typ:
                     typ = self.type_of_expr(gd, base_node, local_types)
                 if not typ:
@@ -907,7 +1014,40 @@ class Project:
                     if member:
                         self.check_member_access(gd, typ, member, line, base_text)
 
+    def resolve_receiver_at(self, gd: GdFile, receiver: str, byte_offset: int,
+                            declarations: List[Dict[str, Any]],
+                            local_types: Dict[str, str]) -> Optional[str]:
+        """Position-aware receiver resolution for chained expressions."""
+        if not receiver:
+            return None
+        head = receiver.split(".")[0]
+        head_type = self.type_at(declarations, head, byte_offset)
+        if not head_type:
+            head_type = local_types.get(head, "")
+        if not head_type and head in gd.vars:
+            head_type = gd.vars[head]
+        if not head_type:
+            return None
+        if head_type in self.by_class:
+            return self.follow_member_types(head_type, receiver)
+        if head_type in self.api.classes:
+            return self.follow_member_types(head_type, receiver)
+        return None
+
     def check_method_call(self, gd: GdFile, typ: str, method: str, line: int, receiver: str) -> None:
+        if typ.startswith("@"):
+            target = self.files.get(typ[1:])
+            if target is not None and self.script_has_method(target, method):
+                return
+            if target is not None:
+                base = self.engine_base_of(target)
+                if base and self.api.has_method(base, method):
+                    return
+                if method == "new":
+                    return
+                self.report.error(gd.rel, f"line {line}: {receiver}.{method}() - "
+                                          f"{target.rel} has no method '{method}'")
+            return
         if typ in self.by_class:
             target = self.by_class[typ]
             if self.script_has_method(target, method):
@@ -1007,12 +1147,18 @@ class Project:
                                       f"'{member}' in Godot {self.api.version}")
 
     def check_signals_connected(self) -> None:
-        """signal.connect(handler) - handler must exist in the same script (or be a Callable)."""
-        pattern = re.compile(r"\.connect\(\s*([A-Za-z_][A-Za-z0-9_]*)")
+        """signal.connect(handler) - handler must exist in the script, or be a value
+        (a Callable parameter, variable or constant) that the script declares."""
+        # A lambda is a valid callable: .connect(func() -> void: ...)
+        pattern = re.compile(r"\.connect\(\s*(?!func\b|\\)([A-Za-z_][A-Za-z0-9_]*)")
         for rel, gd in self.files.items():
+            known_values = set(gd.vars) | set(gd.consts)
+            for fname, fn in gd.funcs.items():
+                for pname, _ptype in fn.params:
+                    known_values.add(pname)
             for m in pattern.finditer(gd.src):
                 handler = m.group(1)
-                if handler in gd.funcs:
+                if handler in gd.funcs or handler in known_values or handler in self.by_class:
                     continue
                 line = gd.src[:m.start()].count("\n") + 1
                 self.report.error(rel, f"line {line}: .connect({handler}) - no such method in "
@@ -1100,7 +1246,7 @@ REQUIRED_WEAPON_FIELDS = [
     "magazine", "reserve_ammo", "reload_time", "effective_range", "recoil", "spread_deg",
     "projectile", "rarity", "models", "audio",
 ]
-WEAPON_CATEGORIES = {"ar", "smg", "shotgun", "sniper", "pistol", "melee", "throwable"}
+WEAPON_CATEGORIES = {"ar", "lmg", "smg", "shotgun", "sniper", "pistol", "melee", "throwable"}
 RARITIES = {"common", "uncommon", "rare", "epic", "legendary"}
 
 

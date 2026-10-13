@@ -21,6 +21,8 @@ signal connection_succeeded()
 signal room_updated(room: Dictionary)
 signal discovery_updated(rooms: Array)
 signal clock_synced(offset_seconds: float)
+signal snapshot_received(payload: Dictionary)
+signal peer_state_received(peer_id: int, state: Dictionary)
 
 enum Kind { NONE, LAN_HOST, LAN_CLIENT, INTERNET_HOST, INTERNET_CLIENT }
 
@@ -363,6 +365,30 @@ func _remove_player(peer_id: int) -> void:
 			_broadcast_room()
 			return
 	_broadcast_room()
+
+## Host -> clients gameplay snapshot.  Unreliable and ordered, because a dropped
+## snapshot is always superseded by the next one; the match state is cumulative.
+func send_snapshot(payload: Dictionary) -> void:
+	if not is_server() or not is_connected_session():
+		return
+	rpc("receive_snapshot", payload)
+
+@rpc("authority", "call_remote", "unreliable_ordered")
+func receive_snapshot(payload: Dictionary) -> void:
+	snapshot_received.emit(payload)
+
+## Clients send their own input/state intent to the host (validated host-side).
+func send_player_state(state: Dictionary) -> void:
+	if is_server() or not is_connected_session():
+		return
+	rpc_id(1, "receive_player_state", state)
+
+@rpc("any_peer", "call_remote", "unreliable_ordered")
+func receive_player_state(state: Dictionary) -> void:
+	if not is_server():
+		return
+	var sender := multiplayer.get_remote_sender_id()
+	peer_state_received.emit(sender, state)
 
 func _broadcast_room() -> void:
 	var snapshot := _public_room()

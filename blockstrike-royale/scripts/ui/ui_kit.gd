@@ -258,6 +258,25 @@ static func currency_label(amount: int, currency: String) -> Control:
 	row.add_child(text(str(amount), FONT_BODY, TEXT))
 	return row
 
+## Places a floating widget by anchoring it to a screen edge or the centre and
+## giving it an explicit size in design units (1280x720 base, scaled by the
+## stretch mode).  Offsets are measured from the anchor, so passing
+## PRESET_BOTTOM_LEFT with `offset = Vector2(24, -164)` and
+## `widget_size = Vector2(360, 140)` pins a 360x140 panel to the bottom-left
+## corner on every aspect ratio - which is what the HUD and the modal menus need.
+static func place(control: Control, preset: int, offset: Vector2,
+				  widget_size: Vector2 = Vector2.ZERO) -> Control:
+	control.set_anchors_preset(preset)
+	var width := widget_size.x if widget_size.x > 0.0 else control.get_combined_minimum_size().x
+	var height := widget_size.y if widget_size.y > 0.0 else control.get_combined_minimum_size().y
+	control.offset_left = offset.x
+	control.offset_top = offset.y
+	control.offset_right = offset.x + width
+	control.offset_bottom = offset.y + height
+	if widget_size.x > 0.0 and widget_size.y > 0.0:
+		control.custom_minimum_size = widget_size
+	return control
+
 static func dim_overlay(alpha: float = 0.55) -> ColorRect:
 	var rect := ColorRect.new()
 	rect.color = Color(0.02, 0.03, 0.06, alpha)

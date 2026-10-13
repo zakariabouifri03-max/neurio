@@ -55,6 +55,17 @@ func set_mode(mode_id: String, variant_id: String = "") -> void:
 	SaveManager.mark_dirty()
 	mode_changed.emit(selected_mode, selected_variant)
 
+## Overrides the mode's default loadout with the player's saved choice when the
+## mode allows custom weapons (Battle Royale loot and buy-phase modes decide for
+## themselves at spawn time, so only offline/training/menu-driven play uses this).
+func _apply_saved_loadout(settings: Dictionary) -> void:
+	var saved: Dictionary = SaveManager.data.flags.get("loadout", {})
+	if saved.is_empty():
+		return
+	if str(settings.get("mode", "")) in ["br"]:
+		return
+	settings["loadout"] = saved.duplicate()
+
 func set_map(map_id: String) -> void:
 	if ContentDB.map_data(map_id).is_empty():
 		return
@@ -91,6 +102,7 @@ func start_offline_match(human_players: int = 1, bot_count: int = -1) -> GameRes
 	settings["bot_count"] = bots
 	settings["human_players"] = human_players
 	settings["server_authoritative"] = false
+	_apply_saved_loadout(settings)
 	var check := MatchConfig.validate(settings)
 	if not check.succeeded():
 		error.emit(check.error_text())
@@ -124,6 +136,7 @@ func _start_training_with(difficulty: String, bot_count: int) -> GameResult:
 		{"bot_difficulty": difficulty, "bots_allowed": true})
 	settings["bot_count"] = bot_count
 	settings["human_players"] = 1
+	_apply_saved_loadout(settings)
 	var check := MatchConfig.validate(settings)
 	if not check.succeeded():
 		error.emit(check.error_text())

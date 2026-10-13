@@ -38,7 +38,7 @@ func _ensure_buses() -> void:
 		if bus_name == "Master":
 			continue
 		AudioServer.add_bus()
-		var index := AudioServer.get_bus_count() - 1
+		var index := AudioServer.bus_count - 1
 		AudioServer.set_bus_name(index, bus_name)
 		AudioServer.set_bus_send(index, str(BUSES[bus_name]["send"]))
 
@@ -49,6 +49,7 @@ func _build_pool() -> void:
 		player.max_distance = 90.0
 		player.unit_size = 6.0
 		player.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+		player.max_db = 3.0
 		player.name = "Sfx3D_%d" % i
 		add_child(player)
 		_pool_3d.append(player)
@@ -59,7 +60,13 @@ func _build_pool() -> void:
 		add_child(player)
 		_pool_ui.append(player)
 
+## Accepts either a bare sound id ("impact_wood") or a full res:// path, so data
+## files may reference sounds by id or by asset path.
 func stream_path(sound_name: String) -> String:
+	if sound_name.begins_with("res://"):
+		return sound_name
+	if sound_name.get_extension() == "wav" or sound_name.get_extension() == "ogg":
+		return SFX_DIR + sound_name
 	return SFX_DIR + sound_name + ".wav"
 
 ## Loads (and caches) a sound.  Returns null when the asset is not imported yet,
