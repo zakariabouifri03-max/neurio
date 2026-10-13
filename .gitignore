@@ -3,3 +3,13 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# BlockStrike Royale / Godot
+blockstrike-royale/.godot/
+blockstrike-royale/android/
+blockstrike-royale/export/
+blockstrike-royale/build/
+tools/gdcheck/gdcheck
+*.apk
+*.aab
+*.keystore
