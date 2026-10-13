@@ -175,7 +175,23 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and mouse_input_enabled and _look_index == -2:
 		_update_touch(-2, (event as InputEventMouseMotion).position)
 
+## True when a point is inside one of the visible action buttons, so a tap on a
+## button never doubles as a look-drag (which would jerk the camera mid-fight).
+func _over_button(point: Vector2) -> bool:
+	for id: String in buttons.keys():
+		var button: TouchButton = buttons[id]
+		if not button.visible:
+			continue
+		if Rect2(button.global_position, button.size).has_point(point):
+			return true
+	if _editor_button != null and _editor_button.visible \
+			and Rect2(_editor_button.global_position, _editor_button.size).has_point(point):
+		return true
+	return false
+
 func _begin_touch(index: int, point: Vector2) -> void:
+	if _over_button(point):
+		return
 	var left_half := point.x < size.x * 0.45
 	if _left_handed:
 		left_half = not left_half

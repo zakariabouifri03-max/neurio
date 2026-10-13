@@ -81,6 +81,10 @@ func _process(delta: float) -> void:
 		circle_updated.emit(center, radius, target_center, target_radius)
 		if t >= 1.0:
 			_advance_phase()
+	elif phase_time > wait_time:
+		# A phase with a zero shrink time (the final one) holds its circle and
+		# then hands over to the next phase as soon as the wait elapses.
+		_advance_phase()
 	_apply_damage(delta, float(entry.get("dps", 1.0)))
 
 func _advance_phase() -> void:

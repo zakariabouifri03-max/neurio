@@ -1,6 +1,6 @@
 # Development status
 
-Last updated: 2026-10-13 (end of Phase 1).
+Last updated: 2026-10-13 (end of Phase 1 - see `docs/PHASE_1_REPORT.md`).
 Engine target: **Godot 4.4.1-stable**. Every claim below was verified without
 running the engine in this environment - see "How this was verified".
 
@@ -56,9 +56,10 @@ running the engine in this environment - see "How this was verified".
    internet play are deliberately not reachable from the menu yet.
 3. **Shop/mission screens are missing** - the data and services exist, the screens
    do not, so those menu entries are not shown.
-4. **Round transitions in Clash Squad/Arena** are simplified: a round ends and the
-   match ends, but between-round reset (new round, credits per round, spectate
-   between rounds) is not yet sequenced.
+4. **Spectating between rounds** is not sequenced yet: rounds do reset (players
+   respawn with the mode loadout, credits are paid, the buy phase restarts and the
+   first team to N rounds wins), but a player who died keeps the free camera instead
+   of being parked until the next round starts.
 5. **Bots do not revive teammates or use vehicles** (there are none yet).
 6. **No haptics** yet on Android (vibration permission is already declared).
 7. **Audio** has no 3D occlusion and only one music track per context.

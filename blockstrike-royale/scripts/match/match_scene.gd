@@ -49,6 +49,8 @@ func _build_ui() -> void:
 		touch.enabled = true
 	pause_menu = PauseMenu.new()
 	pause_menu.name = "PauseMenu"
+	# The menu must keep responding while the tree is paused.
+	pause_menu.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 	ui_root.add_child(pause_menu)
 	pause_menu.bind(touch, false)
 	pause_menu.resume_requested.connect(_resume)
@@ -75,13 +77,20 @@ func start_with(match_settings: Dictionary) -> GameResult:
 	if not configured.succeeded() or match_ref.world == null:
 		return GameResult.fail(GameResult.Code.INVALID, configured.error_text())
 	var networked := bool(settings.get("server_authoritative", false))
-	match_ref.is_offline = not networked
-	match_ref.is_authoritative = not networked
+	if networked:
+		# Explicit barrier: LAN/internet matches are the multiplayer phases' work.
+		# Refusing loudly here is the honest option - starting a "networked" match
+		# that is really single player would be faking multiplayer.
+		return GameResult.fail(GameResult.Code.OFFLINE,
+			"Networked matches are not implemented yet (offline play works)")
+	match_ref.is_offline = true
+	match_ref.is_authoritative = true
 	var local_id := NetworkManager.local_player_id
 	if local_id.is_empty():
 		local_id = "local"
 	var display_name := str(SaveManager.data.profile.get("display_name", "Player"))
-	var local := match_ref.spawn_local_player(local_id, display_name, 1)
+	# Team 0 means "let the match decide" (solo modes stay free-for-all).
+	var local := match_ref.spawn_local_player(local_id, display_name, 0)
 	match_ref.populate_from_settings()
 	hud.bind(match_ref, local)
 	router.bind(local, touch)

@@ -90,7 +90,7 @@ func configure(config_settings: Dictionary, seed_value: int = 0) -> GameResult:
 	if match_seed == 0:
 		match_seed = int(Time.get_ticks_usec() & 0x7fffffff)
 	_rng.seed = match_seed
-	teams_size = maxi(1, int(settings.get("teams_size", 1)))
+	teams_size = maxi(1, int(settings.get("team_size", 1)))
 	score.clear()
 	_eliminated_order.clear()
 	round_number = 1
@@ -176,9 +176,15 @@ func _on_world_ready() -> void:
 	match_ready.emit()
 
 ## Spawns the human player.  `player_id` is the local account id ("local" offline).
-func spawn_local_player(player_id: String, display_name: String, team: int = 1) -> PlayerController:
-	var spawn := _next_spawn(team)
-	var player := Players.spawn_player(self, world, player_id, display_name, team, spawn, true)
+## In team modes the player takes a real team slot; in solo modes everyone is
+## team 0 so the hostility rules treat the match as free-for-all.
+func spawn_local_player(player_id: String, display_name: String, team: int = 0) -> PlayerController:
+	var resolved_team := team
+	if resolved_team <= 0:
+		resolved_team = 1 if teams_size > 1 else 0
+	var spawn := _next_spawn(resolved_team)
+	var player := Players.spawn_player(self, world, player_id, display_name, resolved_team, spawn,
+		true)
 	local_player = player
 	_register_player(player)
 	player.respawn_enabled = bool(mode_data.get("respawn", false))
@@ -377,7 +383,21 @@ func _tick_active(delta: float) -> void:
 		_tick_supply_drops()
 	if float(mode_data.get("round_time_s", 0.0)) > 0.0 \
 			and phase_timer > float(mode_data.get("round_time_s")):
-		_end_round("draw")
+		if mode_id == "clash" or mode_id == "arena":
+			# Running out of time hands the round to whichever team is intact.
+			var surviving := 0
+			for team: int in teams_present():
+				if alive_team_count(team) > 0:
+					surviving = team
+					break
+			if surviving != 0:
+				score["rounds_%d" % surviving] = int(score.get("rounds_%d" % surviving, 0)) + 1
+				notice.emit("Time - round to team %d" % surviving,
+					GameConfig.team_color(surviving))
+				round_number += 1
+				_start_round()
+			return
+		_end_match("draw")
 
 func _tick_supply_drops() -> void:
 	_next_supply_drop -= get_process_delta_time()
@@ -482,21 +502,10 @@ func _check_mode_end() -> void:
 		"br":
 			var alive := alive_players()
 			if players.size() > 1 and alive.size() <= 1:
-				_end_round("victory" if alive.size() == 1 else "last_standing")
+				_end_match("victory" if alive.size() == 1 else "last_standing")
 		"clash", "arena":
-			var target_score := int(mode_data.get("rounds_to_win", 4))
-			var winning_team := 0
-			for team: int in teams_present():
-				if int(score.get(team, 0)) >= target_score:
-					winning_team = team
-					break
-			if winning_team == 0:
-				for team: int in teams_present():
-					if alive_team_count(team) == 0:
-						winning_team = _other_team(team)
-						break
-			if winning_team != 0:
-				_end_round("team_%d" % winning_team)
+			# Round handling runs from _check_team_win every active tick.
+			pass
 		_:
 			pass
 
@@ -507,17 +516,72 @@ func _other_team(team: int) -> int:
 	return 0
 
 func _check_team_win() -> void:
-	if teams_size <= 1:
+	if teams_size <= 1 or mode_id == "training":
+		return
+	if mode_id == "clash" or mode_id == "arena":
+		_check_round_end()
 		return
 	var alive_teams: Array = []
 	for team: int in teams_present():
 		if alive_team_count(team) > 0:
 			alive_teams.append(team)
-	if alive_teams.size() == 1 and teams_present().size() > 1 and mode_id != "training":
-		_end_round("team_%d" % alive_teams[0])
+	if alive_teams.size() == 1 and teams_present().size() > 1:
+		_end_match("team_%d" % alive_teams[0])
+
+## Round-based modes: the team that is wiped loses the round.  Winning enough
+## rounds wins the match; otherwise the next round is prepared (players respawned
+## with the mode loadout, credits paid out, buy phase restarted if the mode has
+## one) and play continues.
+func _check_round_end() -> void:
+	if phase != Phase.ACTIVE and phase != Phase.SHRINK:
+		return
+	var teams := teams_present()
+	if teams.size() < 2:
+		return
+	var winning_team := 0
+	for team: int in teams:
+		if alive_team_count(team) == 0:
+			winning_team = _other_team(team)
+			break
+	if winning_team == 0:
+		return
+	score["rounds_%d" % winning_team] = int(score.get("rounds_%d" % winning_team, 0)) + 1
+	notice.emit("Round %d to team %d" % [round_number, winning_team],
+		GameConfig.team_color(winning_team))
+	var target := int(mode_data.get("rounds_to_win", 4))
+	var max_rounds := int(mode_data.get("max_rounds", 0))
+	if int(score.get("rounds_%d" % winning_team, 0)) >= target \
+			or (max_rounds > 0 and round_number >= max_rounds):
+		_end_match("team_%d" % winning_team)
+		return
+	round_number += 1
+	_start_round()
+
+## Resets the field for the next round (players, health, ammo, credits, phase).
+func _start_round() -> void:
+	_transition_lock = false
+	for player: PlayerController in players:
+		var credits := 0
+		if player.inventory != null:
+			credits = int(player.inventory.credits) + int(mode_data.get("credits_per_round", 0))
+		player.respawn_enabled = true
+		player.spawn_at(_next_spawn(player.team))
+		player.inventory.clear()
+		player.inventory.credits = credits
+		player.resupply(ContentDB.section("weapons").get("default_loadout", {}))
+		player.weapons.equip_from_loadout(_starting_loadout(player))
+		player.alive = true
+		player.animator.set_downed(false)
+	if float(mode_data.get("buy_time_s", 0.0)) > 0.0:
+		_enter_buy_phase()
+	else:
+		phase = Phase.ACTIVE
+		phase_timer = 0.0
+		phase_changed.emit("round", {"round": round_number})
+	notice.emit("Round %d" % round_number, UiKit.ACCENT)
 
 # ------------------------------------------------------------------- rounds
-func _end_round(outcome: String) -> void:
+func _end_match(outcome: String) -> void:
 	if phase == Phase.ENDED:
 		return
 	phase = Phase.ENDED
