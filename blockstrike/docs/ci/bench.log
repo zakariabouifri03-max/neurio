@@ -17,10 +17,26 @@ ERROR: Condition "status < 0" is true. Returning: ERR_CANT_OPEN
 WARNING: All audio drivers failed, falling back to the dummy driver.
      at: initialize (servers/audio/audio_server.cpp:258)
 
+[perf] br q=Low fps=62.0 draws=66 tris=28305 static_mem=72MB video_mem=53MB actors=32 loot=161
+[perf] br q=Low fps=44.4 draws=76 tris=57899 static_mem=72MB video_mem=53MB actors=32 loot=161
+[perf] br q=Low fps=43.3 draws=79 tris=40511 static_mem=72MB video_mem=53MB actors=32 loot=150
+[perf] br q=Low fps=62.5 draws=46 tris=3175 static_mem=72MB video_mem=53MB actors=32 loot=140
+[perf] br q=Low fps=38.7 draws=291 tris=78230 static_mem=73MB video_mem=54MB actors=32 loot=138
+[perf] br q=Low fps=32.8 draws=151 tris=10952 static_mem=73MB video_mem=54MB actors=32 loot=128
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/bench_low.png
-[autoplay] BENCH | Low | 40.5 | 28.3 | 60.8 | 70 | 20120 | 79 | 53 |
+[autoplay] BENCH | Low | 35.5 | 19.6 | 65.4 | 158 | 47666 | 80 | 54 |
+[perf] br q=Medium fps=39.8 draws=40 tris=2887 static_mem=73MB video_mem=56MB actors=32 loot=161
+[perf] br q=Medium fps=55.2 draws=44 tris=4935 static_mem=73MB video_mem=56MB actors=32 loot=161
+[perf] br q=Medium fps=33.4 draws=215 tris=105991 static_mem=73MB video_mem=56MB actors=32 loot=152
+[perf] br q=Medium fps=16.9 draws=248 tris=190875 static_mem=73MB video_mem=56MB actors=32 loot=142
+[perf] br q=Medium fps=12.9 draws=314 tris=137780 static_mem=73MB video_mem=56MB actors=32 loot=133
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/bench_medium.png
-[autoplay] BENCH | Medium | 26.9 | 15.5 | 43.5 | 90 | 48758 | 79 | 55 |
+[autoplay] BENCH | Medium | 19.5 | 11.1 | 35.3 | 241 | 110962 | 80 | 56 |
+[perf] br q=High fps=11.2 draws=102 tris=61231 static_mem=73MB video_mem=65MB actors=32 loot=161
+[perf] br q=High fps=12.4 draws=135 tris=72759 static_mem=73MB video_mem=65MB actors=32 loot=161
+[perf] br q=High fps=17.2 draws=83 tris=22641 static_mem=73MB video_mem=65MB actors=32 loot=155
+[perf] br q=High fps=28.6 draws=50 tris=4443 static_mem=73MB video_mem=65MB actors=32 loot=138
+[perf] br q=High fps=12.0 draws=361 tris=204482 static_mem=73MB video_mem=65MB actors=32 loot=130
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/bench_high.png
-[autoplay] BENCH | High | 6.9 | 4.9 | 15.2 | 197 | 154128 | 80 | 72 |
+[autoplay] BENCH | High | 8.3 | 5.1 | 10.6 | 228 | 130290 | 80 | 65 |
 [autoplay] bench complete
