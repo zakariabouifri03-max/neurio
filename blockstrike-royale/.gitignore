@@ -1,0 +1,10 @@
+# Godot 4 generated files
+.godot/
+*.import
+export_credentials.cfg
+*.apk
+*.aab
+build/
+tools/build_out/
+# Local exports and generated engine caches
+.import/
