@@ -159,7 +159,7 @@ func _process(delta: float) -> void:
 	outside_warning_timer -= delta
 	if is_instance_valid(safe_zone):
 		world.update_zone(safe_zone.radius)
-		var zone_damage := safe_zone.tick_damage(delta)
+		var zone_damage: bool = safe_zone.tick_damage(delta)
 		if safe_zone.is_outside(player.global_position):
 			if outside_warning_timer <= 0.0:
 				show_toast("RETURN TO THE SAFE ZONE", false)

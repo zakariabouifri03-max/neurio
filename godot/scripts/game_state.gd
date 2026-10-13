@@ -102,7 +102,7 @@ func get_mode(id: String) -> Dictionary:
 
 func add_xp(amount: int) -> void:
 	profile.xp += amount
-	var needed := profile.level * 500
+	var needed: int = int(profile.level) * 500
 	while profile.xp >= needed:
 		profile.xp -= needed
 		profile.level += 1
