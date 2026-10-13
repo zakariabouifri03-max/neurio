@@ -1,0 +1,26 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+checked 39 scripts
+SUITE parse: PASS
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[unit] voxel world / actor
+[unit] codecs
+[sim] arena_2v2 seed 4242
+   ended=true winner=1 after 135 s game time (428 ms wall, 0.11 ms/tick avg, 0.3 ms worst)  kills=8 pickups=0 blocks=19 score=[0, 3]
+[sim] clash_squad seed 4242
+   ended=true winner=0 after 187 s game time (1414 ms wall, 0.25 ms/tick avg, 1.1 ms worst)  kills=23 pickups=0 blocks=0 score=[4, 1]
+[sim] br_solo seed 4242
+   t=100s: alive 10, armed with a gun 6
+   ended=true winner=28 after 340 s game time (3420 ms wall, 0.34 ms/tick avg, 3.0 ms worst)  kills=31 pickups=106 blocks=11 score=[0, 0]
+[sim] br_squad seed 4242
+   t=100s: alive 13, armed with a gun 8
+   ended=true winner=5 after 281 s game time (3677 ms wall, 0.44 ms/tick avg, 2.4 ms worst)  kills=28 pickups=104 blocks=18 score=[0, 0]
+[sim] clash_squad seed 7
+   ended=true winner=0 after 146 s game time (1124 ms wall, 0.26 ms/tick avg, 1.2 ms worst)  kills=17 pickups=0 blocks=0 score=[4, 0]
+[sim] clash_squad seed 99
+   ended=true winner=1 after 198 s game time (1513 ms wall, 0.26 ms/tick avg, 1.0 ms worst)  kills=22 pickups=0 blocks=0 score=[1, 4]
+[sim] training
+   training damage dealt by bots in 20 s: 298
+failures: 0
+SUITE sim: PASS
