@@ -555,7 +555,7 @@ func _select_mode(mode_id: String) -> void:
 func _update_mode_buttons() -> void:
 	for mode_id in mode_buttons:
 		var button: Button = mode_buttons[mode_id]
-			var selected: bool = mode_id == selected_mode
+		var selected: bool = mode_id == selected_mode
 		button.add_theme_stylebox_override("normal", _panel_style(Color("#1b796d") if selected else Color("#122b39"), Color("#62e5cf") if selected else Color("#285260"), 10, 2 if selected else 1))
 		button.add_theme_color_override("font_color", Color("#e9fff8") if selected else Color("#96b7ba"))
 
