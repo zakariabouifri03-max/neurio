@@ -15,7 +15,8 @@ jobs:
     env:
       GODOT_VERSION: 4.7.2
       GODOT_TAG: 4.7.2-stable
-      APK_PATH: godot/build/BlockStrikeRoyale-debug.apk
+      APK_PATH: build/BlockStrikeRoyale-debug.apk
+      APK_FILE: godot/build/BlockStrikeRoyale-debug.apk
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -90,11 +91,11 @@ jobs:
           editor_status=${PIPESTATUS[0]}
           "$GODOT_BIN" --headless --path godot --export-debug "Android" "$APK_PATH" 2>&1 | tee godot-export.log
           export_status=${PIPESTATUS[0]}
-          if [ "$editor_status" -ne 0 ] || [ "$export_status" -ne 0 ] || [ ! -s "$APK_PATH" ]; then
+          if [ "$editor_status" -ne 0 ] || [ "$export_status" -ne 0 ] || [ ! -s "$APK_FILE" ]; then
             echo "Godot export failed: editor=$editor_status export=$export_status"
             exit 1
           fi
-          find "$ANDROID_HOME/build-tools" -name apksigner -type f -print -quit | xargs -r -I{} {} verify --verbose "$APK_PATH"
+          find "$ANDROID_HOME/build-tools" -name apksigner -type f -print -quit | xargs -r -I{} {} verify --verbose "$APK_FILE"
 
       - name: Upload Godot build logs
         if: always()
@@ -134,7 +135,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: BlockStrikeRoyale-debug-apk
-          path: ${{ env.APK_PATH }}
+          path: ${{ env.APK_FILE }}
           if-no-files-found: error
 
       - name: Publish direct GitHub release APK
@@ -145,7 +146,7 @@ jobs:
           prerelease: true
           generate_release_notes: false
           overwrite_files: true
-          files: ${{ env.APK_PATH }}
+          files: ${{ env.APK_FILE }}
           body: |
             Playable offline prototype build for BlockStrike Royale.
 
