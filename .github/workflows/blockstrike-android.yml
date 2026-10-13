@@ -106,6 +106,25 @@ jobs:
             godot-export.log
           if-no-files-found: warn
 
+      - name: Publish Godot diagnostics for failed export
+        if: always() && steps.export_apk.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          {
+            echo "BlockStrike Royale Godot export diagnostics for run ${GITHUB_RUN_ID}"
+            echo
+            echo '--- editor log ---'
+            cat godot-editor.log 2>/dev/null || true
+            echo
+            echo '--- export log ---'
+            cat godot-export.log 2>/dev/null || true
+          } > godot-diagnostics.md
+          gh release create "blockstrike-diagnostics-${GITHUB_RUN_ID}" \
+            --title "BlockStrike build diagnostics ${GITHUB_RUN_ID}" \
+            --prerelease --notes-file godot-diagnostics.md
+
       - name: Fail if APK export failed
         if: steps.export_apk.outcome != 'success'
         shell: bash
