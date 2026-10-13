@@ -23,7 +23,7 @@ python3 -m http.server 8000
 | Weather | Rain with streaks, grey sky, darker clouds, wet road reflections |
 | Traffic | 26 cars on lanes with right-hand traffic, traffic-light obedience, following distance |
 | Player | Grip/slip driving model (bicycle model with lateral slip), handbrake drift, spinning and steering wheels, brake lights, headlights at night |
-| People | 42 walking pedestrians with swinging limbs |
+| People | 42 walking pedestrians with swinging limbs; get out of your car and walk around (on foot, run with Shift) |
 | Audio | Synthesized engine (speed-driven) and rain, via Web Audio |
 | HUD | Clock, weather, speed/gear, minimap, controls panel |
 
@@ -36,6 +36,8 @@ python3 -m http.server 8000
 | `A` `D` / `←` `→` | Steer |
 | `Space` | Handbrake (drift) |
 | `C` | Chase / hood camera |
+| `F` | Get out of the car (when stopped) / get back in (when near it) |
+| `Shift` | Run on foot |
 | `R` | Respawn on the nearest road |
 | `Q` | Toggle the day cycle (10 real minutes per day) |
 | `T` | Skip +1 hour |
@@ -50,6 +52,7 @@ Desktop keyboard is the primary input. Sound starts on the first key press (brow
 
 - `world.js` — city layout, batched geometry, facade textures, trees, lamps, signals, pedestrians
 - `vehicles.js` — car model, player driving model, traffic AI
+- `person.js` — on-foot character model and gait
 - `sky.js` — sky shader, day/night state, key/fill light colours
 - `main.js` — renderer, input, camera, audio, rain, minimap, HUD loop
 - `index.html`, `style.css` — page and HUD

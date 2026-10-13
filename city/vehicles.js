@@ -289,9 +289,9 @@ export class Traffic {
         const rx = o.x - c.x, rz = o.z - c.z;
         const f = rx * c.fx + rz * c.fz;
         const lat = Math.abs(rx * c.fz - rz * c.fx);
-        if (f > 0 && f < 10 && lat < 2.2) {
-          want = Math.min(want, o.v * 0.9);
-          if (f < 6.5) want = 0;
+        if (f > 0 && f < 14 && lat < 2.2) {
+          // gap-keeping: target speed scales with the free gap to the car ahead
+          want = Math.min(want, Math.max(0, o.v * 0.9 + (f - 7) * 0.7));
         }
       }
       if (c.v < want) c.v += Math.min(want - c.v, 3.2 * dt);

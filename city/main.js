@@ -2,7 +2,8 @@
 // Renderer, lighting, input, chase/hood camera, engine audio, rain, minimap, HUD.
 import * as THREE from 'three';
 import { BloomFX } from '../src/post.js';
-import { buildWorld, lineCoord } from './world.js';
+import { buildWorld, lineCoord, CURB } from './world.js';
+import { buildHuman } from './person.js';
 import { PlayerCar, Traffic } from './vehicles.js';
 import { createSky, dayState, applyLights } from './sky.js';
 import { mulberry32, clamp, lerp } from '../src/util.js';
@@ -42,6 +43,64 @@ const world = buildWorld(scene, renderer);
 const SPAWN = { x: lineCoord(4) + 3.5, z: lineCoord(4) + 30 };   // heading −z on the east lane
 const traffic = new Traffic(scene, mulberry32(99), 26, world, { x: SPAWN.x, z: SPAWN.z, r: 45 });
 const player = new PlayerCar(scene, SPAWN.x, SPAWN.z, 0);
+
+// ── on foot ──
+let mode = 'car';                                  // 'car' | 'foot'
+const hm = buildHuman();
+scene.add(hm.group);
+hm.group.visible = false;
+const human = { x: 0, z: 0, h: 0, s: 0 };
+const IDLE = { throttle: 0, brake: 0, steer: 0, handbrake: false };
+const nearCarDist = () => Math.hypot(human.x - player.x, human.z - player.z);
+function toggleVehicle() {
+  if (mode === 'car') {
+    if (player.speedKmh > 3) return;               // only when stopped
+    const rx = Math.cos(player.h), rz = -Math.sin(player.h);
+    human.x = player.x - rx * 2.0; human.z = player.z - rz * 2.0;   // driver's side
+    human.h = player.h; human.s = 0;
+    mode = 'foot'; hm.group.visible = true;
+    player.s = 0; player.lat = 0;
+  } else if (nearCarDist() < 3.6) {
+    mode = 'car'; hm.group.visible = false; player.s = 0;
+  }
+}
+function pushOutCircle(x, z, r) {
+  const dx = human.x - x, dz = human.z - z, min = r + 0.4, d2 = dx * dx + dz * dz;
+  if (d2 >= min * min || d2 < 1e-8) return;
+  const d = Math.sqrt(d2), p = min - d;
+  human.x += (dx / d) * p; human.z += (dz / d) * p;
+}
+function pushOutBox(b) {
+  const R = 0.4;
+  const cx = clamp(human.x, b.x0, b.x1), cz = clamp(human.z, b.z0, b.z1);
+  const dx = human.x - cx, dz = human.z - cz, d2 = dx * dx + dz * dz;
+  if (d2 >= R * R) return;
+  if (d2 > 1e-8) { const d = Math.sqrt(d2), p = R - d; human.x += (dx / d) * p; human.z += (dz / d) * p; return; }
+  const opts = [[human.x - b.x0, -1, 0], [b.x1 - human.x, 1, 0], [human.z - b.z0, 0, -1], [b.z1 - human.z, 0, 1]];
+  opts.sort((p, q) => p[0] - q[0]);
+  const [dd, nx, nz] = opts[0];
+  human.x += nx * (dd + R); human.z += nz * (dd + R);
+}
+function updateHuman(dt) {
+  human.h += inp.steer * 2.4 * dt;
+  const running = keys.has('ShiftLeft') || keys.has('ShiftRight');
+  let target = 0;
+  if (inp.throttle) target = running ? 7.5 : 4.2;
+  else if (inp.brake) target = -1.6;
+  human.s += (target - human.s) * Math.min(1, dt * 8);
+  human.x += -Math.sin(human.h) * human.s * dt;
+  human.z += -Math.cos(human.h) * human.s * dt;
+  for (const b of world.colliders.boxes) pushOutBox(b);
+  for (const o of world.colliders.circles) pushOutCircle(o.x, o.z, o.r);
+  pushOutCircle(player.x, player.z, 1.5);
+  for (const t of traffic.cars) pushOutCircle(t.x, t.z, 1.6);
+  const r = Math.hypot(human.x, human.z), lim = 1200;
+  if (r > lim) { human.x *= lim / r; human.z *= lim / r; }
+  const onWalk = world.blocks.some((b) => human.x >= b.x0 && human.x <= b.x1 && human.z >= b.z0 && human.z <= b.z1);
+  hm.group.position.set(human.x, onWalk ? CURB : 0, human.z);
+  hm.group.rotation.y = human.h;
+  hm.update(dt, Math.abs(human.s));
+}
 
 // ── image-based reflections from the same sky shader ──
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -92,6 +151,7 @@ const bindings = {
   KeyN: () => { rainTarget = rainTarget > 0.5 ? 0 : 1; },
   KeyM: () => { muted = !muted; if (master) master.gain.value = muted ? 0 : 0.7; $('hMute').textContent = muted ? 'off' : 'on'; },
   KeyP: () => { mapOn = !mapOn; $('minimap').classList.toggle('hide', !mapOn); },
+  KeyF: () => toggleVehicle(),
 };
 addEventListener('keydown', (e) => {
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
@@ -161,21 +221,28 @@ function updateAudio(dt, rain) {
 const camPos = new THREE.Vector3();
 let camInit = false, fovNow = 62;
 function updateCamera(dt) {
-  const [fx, fz] = player.forward();
-  const sp = Math.abs(player.s);
+  const foot = mode === 'foot';
+  const px = foot ? human.x : player.x, pz = foot ? human.z : player.z;
+  const ph = foot ? human.h : player.h;
+  const fx = -Math.sin(ph), fz = -Math.cos(ph);
+  const sp = foot ? 0 : Math.abs(player.s);
   let desired, look, fovT;
-  if (camMode === 'chase') {
+  if (foot) {
+    desired = new THREE.Vector3(px - fx * 4.2, 2.4, pz - fz * 4.2);
+    look = new THREE.Vector3(px + fx * 2, 1.3, pz + fz * 2);
+    fovT = 62;
+  } else if (camMode === 'chase') {
     const dist = 7.6 + sp * 0.05, hgt = 2.9 + sp * 0.01;
-    desired = new THREE.Vector3(player.x - fx * dist, hgt, player.z - fz * dist);
-    look = new THREE.Vector3(player.x + fx * 5, 1.25, player.z + fz * 5);
+    desired = new THREE.Vector3(px - fx * dist, hgt, pz - fz * dist);
+    look = new THREE.Vector3(px + fx * 5, 1.25, pz + fz * 5);
     fovT = 62 + Math.min(16, sp * 0.22);
   } else {
-    desired = new THREE.Vector3(player.x + fx * 0.45, 1.28, player.z + fz * 0.45);
-    look = new THREE.Vector3(player.x + fx * 40, 1.0, player.z + fz * 40);
+    desired = new THREE.Vector3(px + fx * 0.45, 1.28, pz + fz * 0.45);
+    look = new THREE.Vector3(px + fx * 40, 1.0, pz + fz * 40);
     fovT = 74;
   }
   if (!camInit) { camPos.copy(desired); camInit = true; }
-  else camPos.lerp(desired, 1 - Math.exp(-dt * (camMode === 'chase' ? 9 : 60)));
+  else camPos.lerp(desired, 1 - Math.exp(-dt * (camMode === 'chase' || foot ? 9 : 60)));
   camera.position.copy(camPos);
   camera.lookAt(look);
   fovNow = lerp(fovNow, fovT, 1 - Math.exp(-dt * 4));
@@ -214,7 +281,7 @@ function drawMinimap() {
 }
 
 // ── HUD ──
-const hud = { clock: '', weather: '', speed: '', gear: '' };
+const hud = { clock: '', weather: '', speed: '', gear: '', prompt: '' };
 function setText(key, id, val) { if (hud[key] !== val) { hud[key] = val; $(id).textContent = val; } }
 function clockStr(t) {
   const h = Math.floor(t), m = Math.floor((t - h) * 60);
@@ -243,7 +310,8 @@ function frame(now) {
   rain += (rainTarget - rain) * Math.min(1, dt * 0.45);
 
   readInput();
-  player.update(dt, inp, world.colliders, traffic);
+  if (mode === 'car') player.update(dt, inp, world.colliders, traffic);
+  else { player.update(dt, IDLE, world.colliders, traffic); updateHuman(dt); }
   traffic.update(dt, clock);
 
   const ds = dayState(clockT);
@@ -292,8 +360,14 @@ function frame(now) {
   const gear = player.s < -0.4 ? 'R' : 'D';
   setText('clock', 'hClock', clockStr(clockT));
   setText('weather', 'hWeather', rain > 0.5 ? 'Rain' : rain > 0.05 ? 'Light rain' : 'Clear');
-  setText('speed', 'hSpeed', String(Math.round(player.speedKmh)));
-  setText('gear', 'hGear', gear);
+  const foot = mode === 'foot';
+  setText('speed', 'hSpeed', String(Math.round(foot ? Math.abs(human.s) * 3.6 : player.speedKmh)));
+  setText('gear', 'hGear', foot ? 'FOOT' : gear);
+  $('hGear').classList.toggle('small', foot);
+  let prompt = '';
+  if (foot && nearCarDist() < 3.6) prompt = 'F · get in';
+  else if (!foot && player.speedKmh < 3) prompt = 'F · get out';
+  setText('prompt', 'hPrompt', prompt);
   if (mapOn && (frames & 1) === 0) drawMinimap();
   frames++;
   if (frames === 2) $('loading').classList.add('gone');
@@ -303,4 +377,4 @@ function frame(now) {
 requestAnimationFrame(frame);
 
 // expose a tiny hook for automated checks
-window.__city = { player, traffic, world, setTime: (t) => { clockT = t; autoTime = false; }, setRain: (r) => { rainTarget = r ? 1 : 0; rain = r ? 1 : 0; }, setCam: (m) => { camMode = m; }, get rain() { return rain; } };
+window.__city = { player, traffic, world, renderer, human, get mode() { return mode; }, toggleVehicle, setTime: (t) => { clockT = t; autoTime = false; }, setRain: (r) => { rainTarget = r ? 1 : 0; rain = r ? 1 : 0; }, setCam: (m) => { camMode = m; }, get rain() { return rain; } };
