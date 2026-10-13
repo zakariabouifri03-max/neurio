@@ -17,25 +17,27 @@ ERROR: Condition "status < 0" is true. Returning: ERR_CANT_OPEN
 WARNING: All audio drivers failed, falling back to the dummy driver.
      at: initialize (servers/audio/audio_server.cpp:258)
 
-[perf] br q=Low fps=51.5 draws=39 tris=2607 static_mem=72MB video_mem=53MB actors=32 loot=161
-[perf] br q=Low fps=54.8 draws=51 tris=8807 static_mem=72MB video_mem=53MB actors=32 loot=161
-[perf] br q=Low fps=36.6 draws=121 tris=72205 static_mem=72MB video_mem=53MB actors=32 loot=152
-[perf] br q=Low fps=26.0 draws=126 tris=75767 static_mem=72MB video_mem=53MB actors=32 loot=143
-[perf] br q=Low fps=32.2 draws=176 tris=17350 static_mem=73MB video_mem=54MB actors=32 loot=137
+[perf] br q=Low fps=59.6 draws=59 tris=23255 static_mem=72MB video_mem=53MB actors=32 loot=161
+[perf] br q=Low fps=45.9 draws=75 tris=53631 static_mem=72MB video_mem=53MB actors=32 loot=161
+[perf] br q=Low fps=38.6 draws=85 tris=50587 static_mem=72MB video_mem=53MB actors=32 loot=152
+[perf] br q=Low fps=41.9 draws=163 tris=86150 static_mem=73MB video_mem=53MB actors=32 loot=146
+[perf] br q=Low fps=34.0 draws=226 tris=57512 static_mem=73MB video_mem=54MB actors=32 loot=144
+[perf] br q=Low fps=27.9 draws=243 tris=67554 static_mem=73MB video_mem=54MB actors=32 loot=141
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/bench_low.png
-[autoplay] BENCH | Low | 28.5 | 20.3 | 45.8 | 138 | 37298 | 80 | 54 |
-[perf] br q=Medium fps=23.6 draws=53 tris=9471 static_mem=73MB video_mem=56MB actors=32 loot=161
-[perf] br q=Medium fps=29.7 draws=83 tris=26705 static_mem=73MB video_mem=56MB actors=32 loot=161
-[perf] br q=Medium fps=24.4 draws=110 tris=38335 static_mem=73MB video_mem=56MB actors=32 loot=151
-[perf] br q=Medium fps=22.3 draws=123 tris=59509 static_mem=73MB video_mem=56MB actors=32 loot=139
-[perf] br q=Medium fps=11.1 draws=392 tris=207556 static_mem=73MB video_mem=56MB actors=32 loot=128
+[autoplay] BENCH | Low | 31.0 | 24.3 | 61.5 | 210 | 58177 | 80 | 54 |
+[perf] br q=Medium fps=30.3 draws=41 tris=2895 static_mem=73MB video_mem=56MB actors=32 loot=161
+[perf] br q=Medium fps=39.7 draws=57 tris=11087 static_mem=73MB video_mem=56MB actors=32 loot=161
+[perf] br q=Medium fps=29.3 draws=156 tris=74341 static_mem=73MB video_mem=56MB actors=32 loot=155
+[perf] br q=Medium fps=15.9 draws=294 tris=180694 static_mem=73MB video_mem=56MB actors=32 loot=144
+[perf] br q=Medium fps=12.7 draws=375 tris=213248 static_mem=74MB video_mem=56MB actors=32 loot=137
+[perf] br q=Medium fps=14.5 draws=297 tris=137864 static_mem=73MB video_mem=56MB actors=32 loot=133
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/bench_medium.png
-[autoplay] BENCH | Medium | 11.0 | 9.0 | 17.7 | 291 | 167529 | 80 | 56 |
-[perf] br q=High fps=7.6 draws=133 tris=93251 static_mem=73MB video_mem=65MB actors=32 loot=161
-[perf] br q=High fps=7.5 draws=161 tris=95875 static_mem=73MB video_mem=65MB actors=32 loot=161
-[perf] br q=High fps=10.4 draws=70 tris=13751 static_mem=73MB video_mem=65MB actors=32 loot=155
-[perf] br q=High fps=16.3 draws=49 tris=3451 static_mem=73MB video_mem=65MB actors=32 loot=145
-[perf] br q=High fps=9.5 draws=319 tris=160240 static_mem=73MB video_mem=65MB actors=32 loot=138
+[autoplay] BENCH | Medium | 13.6 | 10.7 | 27.1 | 344 | 189663 | 80 | 56 |
+[perf] br q=High fps=10.8 draws=111 tris=67005 static_mem=73MB video_mem=65MB actors=32 loot=161
+[perf] br q=High fps=11.1 draws=139 tris=75205 static_mem=73MB video_mem=65MB actors=32 loot=161
+[perf] br q=High fps=14.2 draws=81 tris=22417 static_mem=73MB video_mem=65MB actors=32 loot=155
+[perf] br q=High fps=17.3 draws=116 tris=45918 static_mem=73MB video_mem=65MB actors=32 loot=148
+[perf] br q=High fps=7.8 draws=349 tris=193918 static_mem=73MB video_mem=65MB actors=32 loot=131
 [autoplay] screenshot /home/runner/work/neurio/neurio/blockstrike/docs/screenshots/bench_high.png
-[autoplay] BENCH | High | 7.4 | 4.7 | 7.3 | 169 | 81851 | 81 | 65 |
+[autoplay] BENCH | High | 6.0 | 4.7 | 10.4 | 293 | 158013 | 80 | 65 |
 [autoplay] bench complete
