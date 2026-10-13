@@ -155,7 +155,8 @@ jobs:
           [ -f verify.log ] && cp verify.log blockstrike/docs/ci/verify.log
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f blockstrike/docs/ci blockstrike/docs/screenshots 2>/dev/null || true
+          for d in blockstrike/docs/ci blockstrike/docs/screenshots; do [ -e "$d" ] && git add -f "$d"; done
+          git status --short | head -20
           git commit -m "CI: build logs, screenshots and benchmark [skip ci]" || exit 0
           git pull --rebase origin "${GITHUB_REF_NAME}" || true
           git push origin "HEAD:${GITHUB_REF_NAME}" || true

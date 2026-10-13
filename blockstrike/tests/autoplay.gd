@@ -204,8 +204,7 @@ func _bench() -> void:
 	m.local_action({"t": "jump"})
 	var a := m.local_actor()
 	var t0 := Time.get_ticks_msec()
-	var sky := _sample(8.0, true)
-	var sky_res: Dictionary = await sky
+	var sky_res: Dictionary = await _sample(8.0, true)
 	while a.state != Actor.St.ALIVE and Time.get_ticks_msec() - t0 < 40000:
 		await _wait(0.3)
 	var ground_res: Dictionary = await _sample(20.0, true)

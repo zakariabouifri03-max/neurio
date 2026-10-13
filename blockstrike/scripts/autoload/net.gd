@@ -123,7 +123,7 @@ func start_dedicated(port: int) -> void:
 	print("[server] BlockStrike Royale dedicated server v%s listening on UDP %d" % [DB.VERSION, port])
 
 func leave() -> void:
-	if role == "client" and connected:
+	if role == "client" and connected and peer and peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
 		c_leave_room.rpc_id(1)
 	if peer:
 		peer.close()
@@ -155,6 +155,7 @@ func _on_failed() -> void:
 	leave()
 
 func _on_server_lost() -> void:
+	connected = false
 	disconnected.emit("Connection to the host was lost.")
 	var was_in_match := Game.current_match != null
 	leave()
