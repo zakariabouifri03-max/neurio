@@ -1,39 +1,39 @@
 Applications Memory Usage (in Kilobytes):
-Uptime: 237980 Realtime: 237980
+Uptime: 268300 Realtime: 268300
 
-** MEMINFO in pid 2373 [com.blockstrike.royale] **
+** MEMINFO in pid 2320 [com.blockstrike.royale] **
                    Pss  Private  Private     Swap      Rss     Heap     Heap     Heap
                  Total    Dirty    Clean    Dirty    Total     Size    Alloc     Free
                 ------   ------   ------   ------   ------   ------   ------   ------
-  Native Heap   259450   259372        0        0   262200   307556   269763    32379
-  Dalvik Heap     1337     1200        0        0     5608     4311     2156     2155
- Dalvik Other     1052     1012        0        0     1872                           
-        Stack      496      496        0        0      508                           
+  Native Heap   150373   150296        0        0   152948   198800   162413    31141
+  Dalvik Heap     8857     8720        0        0    13120     4494     2247     2247
+ Dalvik Other     1045     1004        0        0     1908                           
+        Stack      492      492        0        0      504                           
        Ashmem        8        0        0        0       20                           
-    Other dev       20        0       20        0      228                           
-     .so mmap    50586     1764    46752        0    78000                           
-    .jar mmap      224        0       32        0     3584                           
-    .apk mmap       42        0        0        0      336                           
-    .dex mmap     3760        4     3756        0     3772                           
-    .oat mmap      838        0        4        0    12416                           
-    .art mmap     1386      764        0        0    19960                           
-   Other mmap       47       36        0        0      892                           
-      Unknown     2399     2384        0        0     2808                           
-        TOTAL   321645   267032    50564        0   321645   311867   271919    34534
+    Other dev       16        0       16        0      224                           
+     .so mmap    54886     1764    50984        0    85108                           
+    .jar mmap     1018        0       16        0    11920                           
+    .apk mmap      733        0        4        0    23424                           
+    .dex mmap     3764        4     3756        0     3780                           
+    .oat mmap      989        0        4        0    13516                           
+    .art mmap     1378      756        0        0    19928                           
+   Other mmap       44       36        0        0      784                           
+      Unknown     2391     2376        0        0     2808                           
+        TOTAL   225994   165448    54780        0   225994   203294   164660    33388
  
  App Summary
                        Pss(KB)                        Rss(KB)
                         ------                         ------
-           Java Heap:     1964                          25568
-         Native Heap:   259372                         262200
-                Code:    52312                          98220
-               Stack:      496                            508
+           Java Heap:     9476                          33048
+         Native Heap:   150296                         152948
+                Code:    56536                         137872
+               Stack:      492                            504
             Graphics:        0                              0
-       Private Other:     3452
-              System:     4049
-             Unknown:                                    5708
+       Private Other:     3428
+              System:     5766
+             Unknown:                                    5620
  
-           TOTAL PSS:   321645            TOTAL RSS:   392204      TOTAL SWAP (KB):        0
+           TOTAL PSS:   225994            TOTAL RSS:   329992      TOTAL SWAP (KB):        0
  
  Objects
                Views:        8         ViewRootImpl:        1
