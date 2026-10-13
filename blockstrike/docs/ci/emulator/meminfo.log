@@ -1,0 +1,40 @@
+Applications Memory Usage (in Kilobytes):
+Uptime: 157255 Realtime: 157255
+
+** MEMINFO in pid 4051 [com.blockstrike.royale] **
+                   Pss  Private  Private  SwapPss      Rss     Heap     Heap     Heap
+                 Total    Dirty    Clean    Dirty    Total     Size    Alloc     Free
+                ------   ------   ------   ------   ------   ------   ------   ------
+  Native Heap   147412   147360       16       29   148712   196540   159419    31109
+  Dalvik Heap     8676     8636        8       95     9660     4499     2266     2233
+ Dalvik Other     1046     1000       12        4     1644                           
+        Stack      492      492        0        0      500                           
+       Ashmem        8        0        0        0       20                           
+    Other dev        8        0        8        0      220                           
+     .so mmap    28864     1768    26276       18    39880                           
+    .jar mmap      307        0        4        0     5628                           
+    .apk mmap       18        0        0        0      132                           
+    .dex mmap      123        4      116        0      160                           
+    .oat mmap      766        0       40        0     8336                           
+    .art mmap     1307      764       88      129    15460                           
+   Other mmap       40       36        0        0      612                           
+      Unknown     2386     2380        0        4     2624                           
+        TOTAL   191732   162440    26568      279   191732   201039   161685    33342
+ 
+ App Summary
+                       Pss(KB)                        Rss(KB)
+                        ------                         ------
+           Java Heap:     9488                          25120
+         Native Heap:   147360                         148712
+                Code:    28212                          54252
+               Stack:      492                            500
+            Graphics:        0                              0
+       Private Other:     3456
+              System:     2724
+             Unknown:                                    5004
+ 
+           TOTAL PSS:   191732            TOTAL RSS:   233588       TOTAL SWAP PSS:      279
+ 
+ Objects
+               Views:        8         ViewRootImpl:        1
+         AppContexts:        5           Activities:        1
