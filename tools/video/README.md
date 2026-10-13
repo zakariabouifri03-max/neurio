@@ -83,3 +83,35 @@ Text is drawn with `DejaVuSans-Bold` (it carries Arabic glyphs); Arabic strings 
 shaped with `arabic-reshaper` + `python-bidi` through the `ar()` helper.
 
 > Note: keep the video out of the game's service-worker cache list — it is not needed offline.
+
+---
+
+## 🥊 Stick Rivals — 60 s stickman fight
+
+A second short film: a **landscape** (1920×1080, 24 fps) cinematic stickman
+fight, [`../../video/stickman-fight-60s.mp4`](../../video/stickman-fight-60s.mp4),
+built with the same Pillow → numpy → libx264 pipeline.
+
+```bash
+python3 tools/video/stickfight_audio.py --out /tmp/fight.wav        # score + SFX
+python3 tools/video/stickfight.py --encode video/stickman-fight-60s.mp4 \
+        --audio /tmp/fight.wav --workers 2
+python3 tools/video/stickfight.py --preview 2,18,28,40.45,55         # peek at frames
+```
+
+`stickfight.py` holds a small skeletal rig (forward-kinematics stickmen), a
+per-fighter action scheduler, a moving camera, and comic-book FX.
+`stickfight_audio.py` synthesises the tense fight score and times every
+impact/whoosh to the same `HITS` list the renderer uses, so picture and sound
+land on the same frame.
+
+| Want to change | Look at |
+|---|---|
+| Choreography — who attacks when | `RONIN_ACTIONS` / `BLAZE_ACTIONS` |
+| Landed hits, comic words, damage | `HITS` (shared with the audio for sync) |
+| Whiffing strikes · anime impact-beats | `WHOOSHES` · `FREEZES` |
+| Poses (jab / hook / kick / KO / victory…) | `pose_action()` + guard base `base_guard()` |
+| Fighter look & colours | `FIGHTERS`, `draw_fighter()`, `draw_head()` |
+| Camera moves per act · hit shake/zoom | `scene_bounds()` / `camera()` / `hit_pulse()` |
+| Backdrop (sky, city, crowd, embers) | `MOODS`, `draw_sun/ridge/city/floor/crowd/embers` |
+| Fight music & SFX | `stickfight_audio.py` (`intensity()`, `clang()`, …) |

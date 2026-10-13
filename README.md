@@ -32,6 +32,34 @@ See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline 
 
 ---
 
+## 🥊 Stick Rivals — أنيميشن عراك ستيكمان (60 ثانية)
+
+A **1-minute cinematic stickman fight** (1920×1080, 24 fps) with a fully
+synthesised soundtrack is also included:
+**[`video/stickman-fight-60s.mp4`](video/stickman-fight-60s.mp4)** (~11 MB) ·
+watch page **[`video/stickman-fight.html`](video/stickman-fight.html)**.
+
+`RONIN` 🟦 vs `BLAZE` 🟥 trade blows through a scripted choreography:
+**VS card** → circle & feints → jab/hook/kick exchanges (`POW!` `WHAM!`) →
+a sweep **takedown** (`THUD!`) → a combo climax with a slow-motion `K.O.?` beat →
+the spinning-kick **`FINISH!`** → `RONIN WINS!` / رونين يفوز.
+
+Everything is generated from code — skeletal stickmen with procedural poses, a
+moving camera with hit-driven shake & zoom-punch, comic-book impact bursts,
+motion-trail ghosts, health-bar HUD, letterbox + vignette, and a numpy-synthesised
+fight score whose impacts/whooshes are timed to the exact hits on screen:
+
+```bash
+python3 tools/video/stickfight_audio.py --out /tmp/fight.wav       # fight score + SFX
+python3 tools/video/stickfight.py --encode video/stickman-fight-60s.mp4 \
+        --audio /tmp/fight.wav --workers 2                         # render + mux
+```
+
+> Built with the same Pillow → numpy → libx264 pipeline as the racing trailer
+> (`tools/video/`). A full pass is 1440 frames (~5 min on 2 vCPU).
+
+---
+
 ## 📱 Install on your phone — كأنها APK!
 
 The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
