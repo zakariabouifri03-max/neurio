@@ -1,0 +1,71 @@
+; Engine configuration file.
+; BlockStrike Royale - Godot 4.7 project (GL Compatibility renderer for wide Android support).
+
+config_version=5
+
+[application]
+
+config/name="BlockStrike Royale"
+config/description="Voxel battle royale shooter: Battle Royale, Clash Squad, 2v2 Arena, Training, LAN and online play."
+config/version="0.3.0"
+run/main_scene="res://scenes/boot.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+boot_splash/bg_color=Color(0.054902, 0.0627451, 0.105882, 1)
+boot_splash/show_image=false
+config/icon="res://icon.png"
+
+[autoload]
+
+DB="*res://scripts/autoload/db.gd"
+Settings="*res://scripts/autoload/settings.gd"
+Profile="*res://scripts/autoload/profile.gd"
+Audio="*res://scripts/autoload/audio.gd"
+Net="*res://scripts/autoload/net.gd"
+Game="*res://scripts/autoload/game.gd"
+
+[debug]
+
+gdscript/warnings/unused_parameter=0
+gdscript/warnings/unused_variable=0
+gdscript/warnings/shadowed_variable=0
+gdscript/warnings/shadowed_variable_base_class=0
+gdscript/warnings/integer_division=0
+gdscript/warnings/narrowing_conversion=0
+gdscript/warnings/unused_signal=0
+gdscript/warnings/return_value_discarded=0
+gdscript/warnings/confusable_local_declaration=0
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=4
+window/energy_saving/keep_screen_on=true
+window/vsync/vsync_mode=1
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=false
+pointing/emulate_mouse_from_touch=true
+
+[physics]
+
+common/physics_ticks_per_second=30
+common/max_physics_steps_per_frame=4
+3d/physics_engine="GodotPhysics3D"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+textures/canvas_textures/default_texture_filter=1
+lights_and_shadows/directional_shadow/size=2048
+lights_and_shadows/directional_shadow/size.mobile=1024
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=1
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality.mobile=0
+lights_and_shadows/positional_shadow/atlas_size=0
+anti_aliasing/quality/msaa_3d=0
+environment/defaults/default_clear_color=Color(0.47, 0.68, 0.92, 1)

@@ -1,0 +1,11 @@
+# Godot
+.godot/
+*.translation
+export_credentials.cfg
+# builds
+build/
+*.apk
+*.aab
+*.idsig
+# CI scratch
+/tests/out/

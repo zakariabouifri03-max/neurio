@@ -1,0 +1,227 @@
+name: BlockStrike Royale - Android APK
+
+on:
+  push:
+    paths:
+      - "blockstrike/**"
+      - ".github/workflows/blockstrike-android.yml"
+  workflow_dispatch:
+    inputs:
+      emulator:
+        description: "Run the Android emulator install/launch test"
+        type: boolean
+        default: true
+
+concurrency:
+  group: blockstrike-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  GODOT_VERSION: "4.7.2"
+  GODOT_RELEASE: "4.7.2-stable"
+  APK: blockstrike/build/BlockStrikeRoyale.apk
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Cache Godot editor + Android templates
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/godot
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_RELEASE }}-android-v1
+
+      - name: Download Godot ${{ env.GODOT_RELEASE }}
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -e
+          mkdir -p ~/godot ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          cd ~/godot
+          curl -fsSL --retry 3 -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip"
+          unzip -q godot.zip && rm godot.zip
+          mv "Godot_v${GODOT_RELEASE}_linux.x86_64" godot && chmod +x godot
+          curl -fsSL --retry 3 -o tpl.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz"
+          unzip -q tpl.tpz 'templates/android_*' 'templates/version.txt' -d tplx
+          mv tplx/templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+          rm -rf tpl.tpz tplx
+          ls -la ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+
+      - name: Editor settings (Android SDK + JDK)
+        run: |
+          mkdir -p ~/.config/godot
+          echo "ANDROID_HOME=$ANDROID_HOME  JAVA_HOME=$JAVA_HOME"
+          ls $ANDROID_HOME/build-tools
+          printf '[gd_resource type="EditorSettings" format=3]\n\n[resource]\nexport/android/android_sdk_path = "%s"\nexport/android/java_sdk_path = "%s"\n' "$ANDROID_HOME" "$JAVA_HOME" > ~/.config/godot/editor_settings-4.7.tres
+          cat ~/.config/godot/editor_settings-4.7.tres
+
+      - name: Generate original audio + icons
+        working-directory: blockstrike
+        run: |
+          pip install --quiet numpy soundfile pillow
+          python3 tools/gen_audio.py | tail -3
+          python3 tools/gen_icon.py
+
+      - name: Import project
+        working-directory: blockstrike
+        run: |
+          ~/godot/godot --headless --path . --import > ../import.log 2>&1 || true
+          tail -25 ../import.log
+
+      - name: Headless tests (parse + full bot matches)
+        working-directory: blockstrike
+        run: |
+          set -o pipefail
+          : > ../tests.log
+          for s in parse sim; do
+            timeout 1200 ~/godot/godot --headless --path . res://tests/test_runner.tscn -- --suite=$s 2>&1 | tee -a ../tests.log
+          done
+          grep -q "SUITE parse: PASS" ../tests.log
+          grep -q "SUITE sim: PASS" ../tests.log
+
+      - name: Export signed release APK (arm64-v8a, armeabi-v7a, x86_64)
+        working-directory: blockstrike
+        env:
+          GODOT_ANDROID_KEYSTORE_RELEASE_PATH: ${{ github.workspace }}/blockstrike/android/release.keystore
+          GODOT_ANDROID_KEYSTORE_RELEASE_USER: blockstrike
+          GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: blockstrike
+        run: |
+          mkdir -p build
+          ~/godot/godot --headless --path . --export-release "Android" build/BlockStrikeRoyale.apk > ../export.log 2>&1 || true
+          tail -40 ../export.log
+          ls -la build
+          test -s build/BlockStrikeRoyale.apk
+
+      - name: Verify APK signature + manifest
+        id: ver
+        run: |
+          BT=$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)
+          $ANDROID_HOME/build-tools/$BT/apksigner verify --verbose --print-certs "$APK" | tee verify.log
+          $ANDROID_HOME/build-tools/$BT/aapt dump badging "$APK" | grep -E "package:|sdkVersion|targetSdk|native-code|uses-permission|application-label|launchable" | tee -a verify.log
+          unzip -l "$APK" | tail -3 | tee -a verify.log
+          ls -la "$APK" | tee -a verify.log
+          echo "version=0.3.0-b${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BlockStrikeRoyale-apk
+          path: ${{ env.APK }}
+          retention-days: 30
+
+      - name: Rendered screenshot tour + benchmark (xvfb, Mesa llvmpipe)
+        continue-on-error: true
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libgl1-mesa-dri libglx-mesa0 > /dev/null
+          cd blockstrike
+          export LIBGL_ALWAYS_SOFTWARE=1
+          timeout 900 xvfb-run -a -s "-screen 0 1280x720x24" ~/godot/godot --path . --rendering-driver opengl3 --resolution 1280x720 -- --autoplay=tour > ../tour.log 2>&1 || true
+          tail -30 ../tour.log
+          timeout 900 xvfb-run -a -s "-screen 0 1280x720x24" ~/godot/godot --path . --rendering-driver opengl3 --resolution 1280x720 -- --autoplay=bench > ../bench.log 2>&1 || true
+          grep -E "BENCH|bench complete|ERROR" ../bench.log | tail -20
+          ls -la docs/screenshots docs/ci || true
+
+      - name: Publish release with the APK
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="blockstrike-v${{ steps.ver.outputs.version }}"
+          cp "$APK" "BlockStrikeRoyale-${{ steps.ver.outputs.version }}.apk"
+          gh release create "$TAG" "BlockStrikeRoyale-${{ steps.ver.outputs.version }}.apk" --target "$GITHUB_SHA" \
+            --title "BlockStrike Royale ${{ steps.ver.outputs.version }}" \
+            --notes "Signed Android APK (arm64-v8a, armeabi-v7a, x86_64) built by CI from ${GITHUB_SHA}. Install: enable 'Install unknown apps' and open the APK. See blockstrike/README.md." \
+            --prerelease || gh release upload "$TAG" "BlockStrikeRoyale-${{ steps.ver.outputs.version }}.apk" --clobber
+
+      - name: Commit screenshots, benchmark and logs back
+        if: always()
+        run: |
+          mkdir -p blockstrike/docs/ci
+          for f in import tests export tour bench; do [ -f $f.log ] && tail -c 60000 $f.log > blockstrike/docs/ci/$f.log; done
+          [ -f verify.log ] && cp verify.log blockstrike/docs/ci/verify.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f blockstrike/docs/ci blockstrike/docs/screenshots 2>/dev/null || true
+          git commit -m "CI: build logs, screenshots and benchmark [skip ci]" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" || true
+
+      - name: Post log summary as commit comment
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "### BlockStrike CI build ${{ job.status }}"
+            echo '```'
+            for f in tests export verify; do [ -f $f.log ] && { echo "== $f"; tail -c 9000 $f.log; }; done
+            [ -f bench.log ] && { echo "== bench"; grep -E "BENCH" bench.log | tail -5; }
+            echo '```'
+          } > /tmp/comment.md
+          gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments" -F body=@/tmp/comment.md > /dev/null || true
+
+  emulator:
+    needs: build
+    if: github.event_name == 'push' || inputs.emulator
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: BlockStrikeRoyale-apk
+          path: apk
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install + launch on Android emulator (API 30, x86_64)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            mkdir -p emu
+            adb install -r apk/BlockStrikeRoyale.apk | tee emu/install.log
+            adb shell monkey -p com.blockstrike.royale -c android.intent.category.LAUNCHER 1
+            sleep 45
+            adb shell pidof com.blockstrike.royale | tee emu/pid.log
+            adb exec-out screencap -p > emu/emulator_menu.png
+            adb shell wm size | tee emu/screen.log
+            adb shell input tap 1560 990 || true
+            sleep 50
+            adb exec-out screencap -p > emu/emulator_after_start.png
+            adb shell pidof com.blockstrike.royale | tee -a emu/pid.log
+            adb logcat -d -s godot:* | tail -200 > emu/logcat_godot.log
+            adb logcat -d | grep -iE "fatal|crash|AndroidRuntime" | tail -60 > emu/logcat_errors.log || true
+            adb shell dumpsys meminfo com.blockstrike.royale | head -40 > emu/meminfo.log || true
+      - name: Commit emulator evidence
+        if: always()
+        run: |
+          mkdir -p blockstrike/docs/ci/emulator
+          cp -r emu/* blockstrike/docs/ci/emulator/ 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f blockstrike/docs/ci/emulator || true
+          git commit -m "CI: emulator install/launch evidence [skip ci]" || exit 0
+          for i in 1 2 3; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
