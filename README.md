@@ -1,5 +1,7 @@
 # 🏁 Bash Baqi Racing
 
+> 🏙️ **New:** [`city/`](city/) — a realistic 3D open city you can drive through in the browser (PBR materials, shadows, day/night cycle, rain, traffic lights, pedestrians). Serve the repo and open `/city/`.
+
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
 A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
 

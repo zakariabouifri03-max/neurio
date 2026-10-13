@@ -1,0 +1,43 @@
+/* Neurio City — HUD + loading screen */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #05070c; overflow: hidden; font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif; color: #f4f6fb; user-select: none; }
+#app { position: fixed; inset: 0; }
+#app canvas { display: block; width: 100%; height: 100%; }
+
+#loading { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(circle at 50% 40%, #1c2a44, #05070c 70%); z-index: 10; transition: opacity .8s ease; }
+#loading.gone { opacity: 0; pointer-events: none; }
+.loadBox { text-align: center; }
+.loadTitle { font-size: clamp(34px, 6vw, 64px); font-weight: 800; letter-spacing: .14em; }
+.loadTitle span { color: #7dd3fc; }
+.loadTip { margin-top: 14px; opacity: .6; letter-spacing: .05em; }
+
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+.panel { background: rgba(8, 12, 22, .55); border: 1px solid rgba(255, 255, 255, .08); border-radius: 14px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
+
+.tl { position: absolute; top: 16px; left: 16px; padding: 12px 16px; min-width: 210px; }
+.brand { font-weight: 800; letter-spacing: .12em; font-size: 15px; }
+.brand span { color: #7dd3fc; }
+.row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-top: 6px; }
+.clock { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.wx { font-size: 13px; opacity: .8; }
+
+#minimap { position: absolute; top: 16px; right: 16px; width: 200px; height: 200px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .18); box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
+#minimap.hide { display: none; }
+
+.speedo { position: absolute; right: 22px; bottom: 22px; padding: 12px 18px; display: flex; align-items: center; gap: 16px; }
+.gear { width: 40px; height: 40px; border-radius: 10px; background: rgba(125, 211, 252, .15); color: #7dd3fc; display: grid; place-items: center; font-weight: 800; font-size: 20px; }
+.kmh { text-align: right; }
+.kmh b { display: block; font-size: 44px; line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; }
+.kmh span { font-size: 12px; letter-spacing: .12em; opacity: .7; text-transform: uppercase; }
+
+.hint { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); padding: 10px 16px; border-radius: 999px; background: rgba(8, 12, 22, .6); font-size: 14px; transition: opacity .6s; }
+.hint.gone { opacity: 0; }
+
+.help { position: absolute; left: 16px; bottom: 16px; padding: 14px 18px; font-size: 13px; pointer-events: auto; }
+.help.hide { display: none; }
+.helpTitle { font-weight: 700; letter-spacing: .08em; margin-bottom: 8px; }
+.help table { border-collapse: collapse; }
+.help td { padding: 3px 10px 3px 0; opacity: .92; }
+.help td:first-child { white-space: nowrap; }
+.help b { color: #7dd3fc; font-weight: 600; }
+kbd { display: inline-block; min-width: 22px; padding: 2px 6px; border-radius: 6px; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .18); border-bottom-width: 2px; font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace; text-align: center; }

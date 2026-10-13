@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neurio City — realistic 3D open city</title>
+<meta name="theme-color" content="#0b1220">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../vendor/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="loading">
+  <div class="loadBox">
+    <div class="loadTitle">NEURIO <span>CITY</span></div>
+    <div class="loadTip">building the skyline…</div>
+  </div>
+</div>
+
+<div id="hud">
+  <div class="panel tl">
+    <div class="brand">NEURIO <span>CITY</span></div>
+    <div class="row"><span id="hClock" class="clock">16:30</span><span id="hWeather" class="wx">Clear</span></div>
+  </div>
+
+  <canvas id="minimap" width="200" height="200"></canvas>
+
+  <div class="panel speedo">
+    <div class="gear" id="hGear">D</div>
+    <div class="kmh"><b id="hSpeed">0</b><span>km/h</span></div>
+  </div>
+
+  <div id="hint" class="hint">Press <kbd>W</kbd> to drive · <kbd>H</kbd> for controls</div>
+
+  <div id="help" class="panel help">
+    <div class="helpTitle">Controls</div>
+    <table>
+      <tr><td><kbd>W</kbd> <kbd>↑</kbd></td><td>Accelerate</td></tr>
+      <tr><td><kbd>S</kbd> <kbd>↓</kbd></td><td>Brake / reverse</td></tr>
+      <tr><td><kbd>A</kbd> <kbd>D</kbd></td><td>Steer</td></tr>
+      <tr><td><kbd>Space</kbd></td><td>Handbrake (drift)</td></tr>
+      <tr><td><kbd>C</kbd></td><td>Camera: <b id="hCam">chase</b></td></tr>
+      <tr><td><kbd>R</kbd></td><td>Respawn on road</td></tr>
+      <tr><td><kbd>Q</kbd></td><td>Day cycle: <b id="hAuto">on</b></td></tr>
+      <tr><td><kbd>T</kbd></td><td>Skip +1 hour</td></tr>
+      <tr><td><kbd>N</kbd></td><td>Rain on / off</td></tr>
+      <tr><td><kbd>M</kbd></td><td>Sound: <b id="hMute">on</b></td></tr>
+      <tr><td><kbd>P</kbd></td><td>Minimap on / off</td></tr>
+      <tr><td><kbd>H</kbd></td><td>Hide this panel</td></tr>
+    </table>
+  </div>
+</div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
