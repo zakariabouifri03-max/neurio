@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "weapons": [
+    {
+      "id": "pulse_carbine",
+      "name": "Pulse Carbine",
+      "category": "assault_rifle",
+      "rarity": "uncommon",
+      "shop_available": false,
+      "projectile": "hitscan",
+      "damage": 24,
+      "headshot_multiplier": 2.0,
+      "fire_rate_rpm": 600,
+      "magazine": 30,
+      "reserve_ammo": 120,
+      "reload_time": 1.9,
+      "effective_range": 45.0,
+      "max_range": 120.0,
+      "min_damage_factor_at_max_range": 0.55,
+      "recoil_pitch_deg": 1.6,
+      "recoil_yaw_deg": 0.5,
+      "spread_deg": 1.1,
+      "moving_spread_penalty_deg": 1.2,
+      "aim_spread_multiplier": 0.45,
+      "movement_speed_multiplier": 0.96,
+      "body_color": "#2c3440",
+      "accent_color": "#33e0ff"
+    }
+  ]
+}

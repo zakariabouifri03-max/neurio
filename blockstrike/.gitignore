@@ -1,0 +1,17 @@
+# Godot 4 generated folders and caches
+.godot/
+.import/
+*.tmp
+*.import
+
+# Android build outputs and signing material (never commit)
+*.apk
+*.aab
+*.keystore
+*.jks
+export_credentials.cfg
+android/build/
+build/
+
+# Local test output
+tests/output/

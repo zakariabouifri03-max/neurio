@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "blocks": [
+    {"id": 0,  "key": "air",      "name": "Air",      "color": "#00000000", "solid": false},
+    {"id": 1,  "key": "grass",    "name": "Grass",    "color": "#5fb83a", "solid": true},
+    {"id": 2,  "key": "dirt",     "name": "Dirt",     "color": "#8a5a34", "solid": true},
+    {"id": 3,  "key": "stone",    "name": "Stone",    "color": "#8b8f96", "solid": true},
+    {"id": 4,  "key": "sand",     "name": "Sand",     "color": "#e8d28a", "solid": true},
+    {"id": 5,  "key": "gravel",   "name": "Gravel",   "color": "#9a9288", "solid": true},
+    {"id": 6,  "key": "wood",     "name": "Log",      "color": "#7a5330", "solid": true},
+    {"id": 7,  "key": "leaves",   "name": "Leaves",   "color": "#2f9e44", "solid": true},
+    {"id": 8,  "key": "planks",   "name": "Planks",   "color": "#c08a4c", "solid": true},
+    {"id": 9,  "key": "concrete", "name": "Concrete", "color": "#b9bec6", "solid": true},
+    {"id": 10, "key": "metal",    "name": "Metal",    "color": "#5b6470", "solid": true},
+    {"id": 11, "key": "brick",    "name": "Brick",    "color": "#b8553a", "solid": true},
+    {"id": 12, "key": "water",    "name": "Water",    "color": "#2a8fd6b3", "solid": false},
+    {"id": 13, "key": "snow",     "name": "Snow",     "color": "#f2f7fb", "solid": true}
+  ]
+}

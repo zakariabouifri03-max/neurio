@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "difficulties": {
+    "beginner": {
+      "reaction_time": 1.1,
+      "accuracy": 0.35,
+      "vision_range": 40.0,
+      "aim_speed_deg": 110.0,
+      "fire_cooldown_jitter": 0.35,
+      "strafe_chance": 0.25,
+      "max_health": 100
+    },
+    "normal": {
+      "reaction_time": 0.6,
+      "accuracy": 0.6,
+      "vision_range": 60.0,
+      "aim_speed_deg": 170.0,
+      "fire_cooldown_jitter": 0.2,
+      "strafe_chance": 0.45,
+      "max_health": 100
+    },
+    "advanced": {
+      "reaction_time": 0.3,
+      "accuracy": 0.82,
+      "vision_range": 80.0,
+      "aim_speed_deg": 240.0,
+      "fire_cooldown_jitter": 0.1,
+      "strafe_chance": 0.6,
+      "max_health": 100
+    }
+  }
+}
