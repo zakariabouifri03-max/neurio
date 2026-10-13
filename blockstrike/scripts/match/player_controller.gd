@@ -25,6 +25,7 @@ var _last_shot_rt := 0.0
 var _cam_pos := Vector3.ZERO
 var _initialized := false
 var ui_blocking := false
+var underwater := false
 
 const BASE_FOV := 72.0
 
@@ -347,6 +348,10 @@ func _process(dt: float) -> void:
 		shake_amt = move_toward(shake_amt, 0.0, dt * 1.8)
 	cam.global_position = desired
 	cam.global_transform.basis = basis
+	var uw := m.world.get_b(floori(desired.x), floori(desired.y), floori(desired.z)) == Blocks.WATER
+	if uw != underwater:
+		underwater = uw
+		m.set_underwater(uw)
 	_update_ghost(a)
 
 func _update_ghost(a: Actor) -> void:

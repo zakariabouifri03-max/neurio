@@ -9,6 +9,31 @@ const PARENT := [-1, 0, 1, 2, 2, 2, 1, 1]
 const GLOBAL_REST := [Vector3(0, 0, 0), Vector3(0, 12, 0), Vector3(0, 12, 0), Vector3(0, 24, 0), Vector3(6, 22, 0),
 	Vector3(-6, 22, 0), Vector3(2, 12, 0), Vector3(-2, 12, 0)]
 const PALETTE_Y := 32
+const SHADER_LIT := """
+shader_type spatial;
+render_mode diffuse_lambert, specular_disabled;
+uniform sampler2D skin : filter_nearest;
+uniform vec4 tint = vec4(1.0);
+vec3 to_linear(vec3 c) { return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)); }
+void fragment() {
+	vec4 t = texture(skin, UV);
+	ALBEDO = to_linear(t.rgb) * tint.rgb;
+	ROUGHNESS = 0.9;
+}
+"""
+const SHADER_UNLIT := """
+shader_type spatial;
+render_mode unshaded;
+uniform sampler2D skin : filter_nearest;
+uniform vec4 tint = vec4(1.0);
+vec3 to_linear(vec3 c) { return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)); }
+void fragment() {
+	vec4 t = texture(skin, UV);
+	ALBEDO = to_linear(t.rgb) * COLOR.rgb * tint.rgb;
+}
+"""
+static var _sh_lit: Shader
+static var _sh_unlit: Shader
 
 # ------------------------------------------------------------------ public
 ## Returns {"root": Node3D, "skel": Skeleton3D, "mi": MeshInstance3D, "hand": BoneAttachment3D, "mat": Material}
@@ -28,13 +53,14 @@ static func build(cos: Dictionary, vest := 0, helm := 0, unshaded := false) -> D
 	skel.reset_bone_poses()
 	var img := paint_skin(cos)
 	var tex := ImageTexture.create_from_image(img)
-	var mat := StandardMaterial3D.new()
-	mat.albedo_texture = tex
-	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	mat.roughness = 0.92
-	mat.vertex_color_use_as_albedo = unshaded
-	if unshaded:
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	if _sh_lit == null:
+		_sh_lit = Shader.new()
+		_sh_lit.code = SHADER_LIT
+		_sh_unlit = Shader.new()
+		_sh_unlit.code = SHADER_UNLIT
+	var mat := ShaderMaterial.new()
+	mat.shader = _sh_unlit if unshaded else _sh_lit
+	mat.set_shader_parameter("skin", tex)
 	var mi := MeshInstance3D.new()
 	mi.name = "Body"
 	mi.mesh = build_mesh(cos, vest, helm)

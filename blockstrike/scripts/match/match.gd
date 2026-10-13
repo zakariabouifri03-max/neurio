@@ -144,6 +144,8 @@ func _setup_view() -> void:
 	effects = Effects.new()
 	effects.particle_scale = [0.4, 0.75, 1.0][Settings.quality()]
 	add_child(effects)
+	if world.water_level > 0:
+		_add_ocean()
 	if kind == "br":
 		plane_node = MeshInstance3D.new()
 		(plane_node as MeshInstance3D).mesh = Models.plane_mesh()
@@ -151,11 +153,59 @@ func _setup_view() -> void:
 		plane_node.visible = false
 		add_child(plane_node)
 
+## Big flat sea around the map (outside the voxel area only, so rivers keep their voxel water).
+func _add_ocean() -> void:
+	var y := float(world.water_level) - 0.06
+	var S := float(world.sx)
+	var Z := float(world.sz)
+	var e := 900.0
+	var quads := [[Vector2(-e, -e), Vector2(S + e, 0)], [Vector2(-e, Z), Vector2(S + e, Z + e)], [Vector2(-e, 0), Vector2(0, Z)], [Vector2(S, 0), Vector2(S + e, Z)]]
+	var v := PackedVector3Array()
+	var n := PackedVector3Array()
+	for q in quads:
+		var a: Vector2 = q[0]
+		var b: Vector2 = q[1]
+		for p in [Vector2(a.x, a.y), Vector2(b.x, a.y), Vector2(b.x, b.y), Vector2(a.x, a.y), Vector2(b.x, b.y), Vector2(a.x, b.y)]:
+			v.append(Vector3(p.x, y, p.y))
+			n.append(Vector3.UP)
+	var arr := []
+	arr.resize(Mesh.ARRAY_MAX)
+	arr[Mesh.ARRAY_VERTEX] = v
+	arr[Mesh.ARRAY_NORMAL] = n
+	var mesh := ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.16, 0.38, 0.68)
+	mat.roughness = 0.3
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	if Settings.is_unlit():
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	var mi := MeshInstance3D.new()
+	mi.mesh = mesh
+	mi.material_override = mat
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(mi)
+
 func _on_terrain_ready() -> void:
 	loading = false
 	hud_event.emit("loaded", {})
 	if net_role == "client":
 		Net.send_loaded()
+
+func set_underwater(on: bool) -> void:
+	if not has_view:
+		return
+	var e := env.environment
+	if on:
+		e.fog_light_color = Color(0.08, 0.3, 0.55)
+		e.fog_depth_begin = 0.0
+		e.fog_depth_end = 16.0
+	else:
+		e.fog_light_color = Color(0.7, 0.82, 0.94)
+		var dist := Settings.view_distance()
+		e.fog_depth_begin = dist * 0.55
+		e.fog_depth_end = dist
+		_air_view = false
 
 func apply_quality() -> void:
 	if not has_view:

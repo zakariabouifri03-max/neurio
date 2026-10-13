@@ -209,11 +209,13 @@ jobs:
             adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS > /dev/null || true
             adb shell pidof com.blockstrike.royale | tee emu/pid.log
             adb shell wm size | tee emu/screen.log
-            adb exec-out screencap -p > emu/emulator_menu.png
+            adb emu screenrecord screenshot "$PWD/emu/emulator_menu.png" || adb exec-out screencap -p > emu/emulator_menu.png
             adb shell input tap 1560 990 || true
             sleep 120
             adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS > /dev/null || true
-            adb exec-out screencap -p > emu/emulator_match.png
+            adb emu screenrecord screenshot "$PWD/emu/emulator_match.png" || adb exec-out screencap -p > emu/emulator_match.png
+            sleep 20
+            adb emu screenrecord screenshot "$PWD/emu/emulator_match2.png" || true
             adb shell pidof com.blockstrike.royale | tee -a emu/pid.log
             adb logcat -d -s godot:* | tail -300 > emu/logcat_godot.log
             grep "\[perf\]" emu/logcat_godot.log | tail -10 > emu/perf.log || true

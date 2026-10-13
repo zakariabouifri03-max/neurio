@@ -151,7 +151,7 @@ func _process(dt: float) -> void:
 		CharacterBuilder.rebuild_mesh(parts, a.cosmetics, vest, helm)
 	if hurt_flash > 0.0:
 		hurt_flash -= dt
-		(parts["mat"] as StandardMaterial3D).albedo_color = Color(1.0, 0.45, 0.45) if hurt_flash > 0.0 else Color.WHITE
+		(parts["mat"] as ShaderMaterial).set_shader_parameter("tint", Color(1.0, 0.45, 0.45) if hurt_flash > 0.0 else Color.WHITE)
 	_animate(dt, now)
 
 func _rot(b: int, e: Vector3) -> void:

@@ -696,7 +696,7 @@ func _update_controls(a: Actor, ph: String) -> void:
 	var plane := a.state == Actor.St.PLANE
 	for id in ["fire_r", "fire_l", "aim", "reload", "crouch", "heal", "build", "throw"]:
 		touch.set_visible_btn(id, alive)
-	touch.set_visible_btn("jump", alive or plane or a.state == Actor.St.KNOCKED)
+	touch.set_visible_btn("jump", alive or plane)
 	touch.set_label("jump", "JUMP!" if plane else "")
 	touch.set_visible_btn("build", alive and m.rules.building_allowed())
 	touch.set_badge("heal", str(int(a.meds["med_bandage"]) + int(a.meds["med_kit"]) + int(a.meds["med_drink"])))
@@ -758,6 +758,9 @@ func _draw_overlay() -> void:
 		overlay.draw_polygon(PackedVector2Array([Vector2(W, 0), Vector2(W, H), Vector2(W - e, H - e), Vector2(W - e, e)]), cols)
 		overlay.draw_polygon(PackedVector2Array([Vector2(W, H), Vector2(0, H), Vector2(e, H - e), Vector2(W - e, H - e)]), cols)
 		overlay.draw_polygon(PackedVector2Array([Vector2(0, H), Vector2(0, 0), Vector2(e, e), Vector2(e, H - e)]), cols)
+	# under water
+	if pc.underwater:
+		overlay.draw_rect(Rect2(Vector2.ZERO, sz), Color(0.05, 0.25, 0.55, 0.38))
 	# outside the zone
 	var z := m.zone_view_dict()
 	if not z.is_empty() and bool(z.get("on", false)) and a.is_alive() and not a.in_air_phase():

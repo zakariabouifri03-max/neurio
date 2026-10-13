@@ -134,8 +134,32 @@ func _tour_br() -> void:
 	var t0 := Time.get_ticks_msec()
 	while a.state != Actor.St.ALIVE and Time.get_ticks_msec() - t0 < 30000:
 		await _wait(0.5)
-	await _wait(1.5)
+	await _wait(1.0)
+	if m.world.in_water(a.pos):
+		# landed in the sea: walk out to the nearest point of interest for a nicer capture
+		var poi: Dictionary = m.world.pois[0]
+		var bd0 := 1e9
+		for p in m.world.pois:
+			var d0 := Vector2(a.pos.x, a.pos.z).distance_to(p["pos"])
+			if d0 < bd0:
+				bd0 = d0
+				poi = p
+		var pp: Vector2 = poi["pos"]
+		a.pos = Vector3(pp.x + 3.5, m.world.column_top_solid(int(pp.x + 3.5), int(pp.y)), pp.y)
+		(m.views[a.id] as ActorView).snap_to(a.pos)
+		await _wait(1.0)
 	await _shot("33_br_landed")
+	# wait until some bots are on the ground
+	var tw := 0.0
+	while tw < 30.0:
+		var grounded := 0
+		for id in m.actors:
+			if (m.actors[id] as Actor).state == Actor.St.ALIVE and id != a.id:
+				grounded += 1
+		if grounded >= 4:
+			break
+		await _wait(1.0)
+		tw += 1.0
 	# give a weapon and walk towards the nearest bot to capture combat
 	a.give("ar_strike", 1)
 	a.give("vest_2", 1)

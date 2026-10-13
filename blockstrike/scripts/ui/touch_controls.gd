@@ -14,12 +14,12 @@ const DEFAULTS := {
 	"jump": {"p": Vector2(0.955, 0.8), "r": 42.0, "icon": "jump", "kind": "tap"},
 	"crouch": {"p": Vector2(0.775, 0.88), "r": 38.0, "icon": "crouch", "kind": "toggle"},
 	"reload": {"p": Vector2(0.765, 0.43), "r": 34.0, "icon": "reload", "kind": "tap"},
-	"heal": {"p": Vector2(0.655, 0.88), "r": 34.0, "icon": "heal", "kind": "tap"},
+	"heal": {"p": Vector2(0.725, 0.79), "r": 34.0, "icon": "heal", "kind": "tap"},
 	"build": {"p": Vector2(0.69, 0.66), "r": 32.0, "icon": "build", "kind": "toggle"},
 	"throw": {"p": Vector2(0.86, 0.29), "r": 32.0, "icon": "throw", "kind": "tap"},
 	"interact": {"p": Vector2(0.6, 0.62), "r": 40.0, "icon": "interact", "kind": "tap"},
 	"emote": {"p": Vector2(0.255, 0.075), "r": 26.0, "icon": "emote", "kind": "tap"},
-	"bag": {"p": Vector2(0.3, 0.92), "r": 30.0, "icon": "bag", "kind": "tap"},
+	"bag": {"p": Vector2(0.235, 0.925), "r": 30.0, "icon": "bag", "kind": "tap"},
 	"pause": {"p": Vector2(0.972, 0.055), "r": 24.0, "icon": "pause", "kind": "tap"},
 }
 

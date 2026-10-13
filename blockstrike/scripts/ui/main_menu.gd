@@ -39,9 +39,11 @@ var net_buttons := {}
 var ranked_check: CheckButton
 var missions_btn: Button
 var queue_box: Control
+var play_card: Control
 var _orbit := 0.0
 var panel_right := false     # shop/locker open: show the character on the right
 var _look_shift := 0.55
+var _cam_dist := 3.5
 
 func _ready() -> void:
 	get_tree().root.theme = UI.build_theme()
@@ -200,8 +202,9 @@ func preview_cosmetic(id: String) -> void:
 func _process(dt: float) -> void:
 	_orbit += dt * 0.35
 	var chest := Vector3(0.6, 1.0, 0.0)
-	_look_shift = lerpf(_look_shift, -1.05 if panel_right else 0.55, minf(1.0, dt * 6.0))
-	cam.global_position = chest + Vector3(sin(_orbit) * 0.45, 0.25, 3.5)
+	_look_shift = lerpf(_look_shift, -1.45 if panel_right else 0.55, minf(1.0, dt * 6.0))
+	_cam_dist = lerpf(_cam_dist, 4.6 if panel_right else 3.5, minf(1.0, dt * 6.0))
+	cam.global_position = chest + Vector3(sin(_orbit) * 0.45, 0.25, _cam_dist)
 	cam.look_at(chest + Vector3(_look_shift, 0.05, 0), Vector3.UP)
 
 # ------------------------------------------------------------------ layout
@@ -288,6 +291,7 @@ func _build_play_card() -> void:
 	v.add_child(start_btn)
 	p.add_child(v)
 	ui.add_child(p)
+	play_card = p
 	queue_box = UI.panel(Color(0.05, 0.07, 0.12, 0.92), 14)
 	queue_box.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	queue_box.position = Vector2(-260, 90)
@@ -376,6 +380,7 @@ func open_panel(key: String) -> void:
 	overlay.add_child(dim)
 	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	panel_right = key in ["shop", "locker"]
+	play_card.visible = false
 	if panel_right:
 		dim.color = Color(0, 0, 0, 0.12)
 	var p := UI.panel()
@@ -408,6 +413,8 @@ func open_panel(key: String) -> void:
 
 func close_panel() -> void:
 	panel_right = false
+	if play_card:
+		play_card.visible = true
 	for c in overlay.get_children():
 		c.queue_free()
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
