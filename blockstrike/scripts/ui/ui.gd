@@ -20,12 +20,9 @@ static var theme: Theme
 static func build_theme() -> Theme:
 	if theme:
 		return theme
-	var ff := FontFile.new()
-	var err := ff.load_dynamic_font("res://assets/fonts/LilitaOne-Regular.woff2")
-	if err == OK:
-		font = ff
-	else:
-		font = ThemeDB.fallback_font
+	# load() uses the imported font resource (exported builds do not contain the raw .woff2 file)
+	var f = load("res://assets/fonts/LilitaOne-Regular.woff2") if ResourceLoader.exists("res://assets/fonts/LilitaOne-Regular.woff2") else null
+	font = f if f is Font else ThemeDB.fallback_font
 	theme = Theme.new()
 	theme.default_font = font
 	theme.default_font_size = 22

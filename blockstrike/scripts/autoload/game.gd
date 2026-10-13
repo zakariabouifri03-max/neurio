@@ -22,6 +22,35 @@ func _ready() -> void:
 			server_port = int(a.substr(7))
 		elif a.begins_with("--autoplay="):
 			autoplay = a.substr(11)
+	_setup_device_capture()
+
+## Opt-in screenshot capture for device/emulator testing: only active when the marker file
+## <external files>/Pictures/bsr_capture exists (created by the CI emulator test via adb).
+var _cap_dir := ""
+var _cap_n := 0
+func _setup_device_capture() -> void:
+	if OS.get_name() != "Android":
+		return
+	var dir := OS.get_system_dir(OS.SYSTEM_DIR_PICTURES, false)
+	if dir != "" and FileAccess.file_exists(dir.path_join("bsr_capture")):
+		_cap_dir = dir
+		var t := Timer.new()
+		t.wait_time = 15.0
+		t.autostart = true
+		t.timeout.connect(_device_capture)
+		add_child(t)
+		print("[capture] enabled -> ", dir)
+
+func _device_capture() -> void:
+	if _cap_n >= 12:
+		return
+	await RenderingServer.frame_post_draw
+	var img := get_viewport().get_texture().get_image()
+	img.resize(img.get_width() / 2, img.get_height() / 2, Image.INTERPOLATE_BILINEAR)
+	var path := _cap_dir.path_join("bsr_%02d.png" % _cap_n)
+	img.save_png(path)
+	print("[capture] ", path)
+	_cap_n += 1
 
 func start_match(cfg: Dictionary) -> void:
 	match_cfg = cfg

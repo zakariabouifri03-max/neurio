@@ -187,8 +187,8 @@ func _tick_br(t: float, dt: float) -> void:
 			if a.state == Actor.St.PLANE:
 				a.pos = pp
 				any = true
-				if k >= 0.97:
-					jump(a)
+				if k >= 0.84:
+					jump(a)  # force everyone out before the plane leaves the island
 		if not any and t > plane_t0 + 2.0:
 			phase = "play"
 		if t > phase_end + 1.0:
