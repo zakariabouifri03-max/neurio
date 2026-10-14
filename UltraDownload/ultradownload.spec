@@ -8,7 +8,7 @@ if sys.platform != 'win32':
 root = Path(SPECPATH)
 a = Analysis([str(root / 'main.py')], pathex=[str(root)],
     binaries=[], datas=[(str(root / 'assets' / 'app_icon.ico'), 'assets')],
-    hiddenimports=collect_submodules('keyring.backends') + collect_submodules('win32ctypes'),
+    hiddenimports=collect_submodules('keyring.backends') + collect_submodules('win32ctypes', filter=lambda name: '.tests' not in name),
     hookspath=[], hooksconfig={}, runtime_hooks=[],
     excludes=['pytest', 'tkinter', 'PySide6.QtWebEngineCore', 'PySide6.QtWebEngineWidgets'],
     noarchive=False)

@@ -218,7 +218,8 @@ class DownloadEngine:
                     self.emit()
                     return
                 except (httpx.TransportError, TransferError) as error:
-                    retries += 1
+                    if attempt < self.settings.retries and (not isinstance(error, TransferError) or error.retryable):
+                        retries += 1
                     self.save_partial(index, tmp, retries, "retrying")
                     self.backoff(error, attempt)
         except Interrupted:

@@ -31,7 +31,9 @@ jobs:
         run: |
           cmd /c build.bat 2>&1 | Tee-Object -FilePath build-log.txt
           $code = $LASTEXITCODE
-          $tail = (Get-Content build-log.txt -Tail 65) -join "`n"
+          $tests = (Select-String -Path build-log.txt -Pattern '\d+ passed' | Select-Object -Last 1).Line
+          if ($tests) { Write-Output "::notice title=Windows test result::$tests" }
+          $tail = (Get-Content build-log.txt -Tail 18) -join "`n"
           $escaped = $tail.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
           if ($code -ne 0) { Write-Output "::error title=Windows build diagnostics::$escaped"; exit $code }
           Write-Output "::notice title=Windows build verified::$escaped"

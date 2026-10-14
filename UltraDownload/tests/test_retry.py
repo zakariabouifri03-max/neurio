@@ -23,6 +23,7 @@ def test_permanent_errors_not_retried(server, setup_download, code):
     DownloadEngine(db, d, settings).run()
     assert d.status == 'failed'
     assert len(server.failures[0]) == 9
+    assert db.chunks(d.id, 0, 1)[0]['retries'] == 0
     assert not Path(d.destination).exists()
 
 
