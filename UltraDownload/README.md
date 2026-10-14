@@ -11,7 +11,7 @@ Fixed **1 MiB (1,048,576-byte) chunks**, at most **10 concurrent chunk requests 
 ## Build status — read first
 
 - The source application and real HTTP-transfer tests have been run on **Linux, Python 3.11**. Qt was exercised using its offscreen platform, including a GUI-driven download.
-- **No Windows EXE has been built or tested in this development session.** Linux PyInstaller cannot create a Windows EXE. Windows 10/11 interactive verification and code signing remain release tasks.
+- Windows EXEs are built by GitHub Actions, not by cross-compiling on Linux. The workflow publishes a direct-download prerelease only after source tests and packaged-EXE checks pass. Windows 10/11 interactive verification and code signing remain release tasks.
 - `build.bat` and the GitHub Actions workflow build a **standalone Windows x64 EXE**, run the tests **before** packaging, then launch and exercise the **packaged EXE**. Users of a successfully built EXE do **not** need Python installed.
 - See [TESTING.md](TESTING.md) for actual validation, coverage, and the remaining Windows release checklist. This is implemented source, not a UI mockup or a claim of a certified production release.
 
@@ -44,7 +44,7 @@ The build uses PyInstaller's **one-file, windowed** mode, with a multi-resolutio
 
 ### GitHub Actions
 
-`.github/workflows/ultradownload-windows.yml` runs on Windows Server 2022 with Python 3.12 x64 when these source files are pushed or a relevant PR is opened. It can also be run manually. After a **successful run**, download the **UltraDownload-Windows-x64** artifact from the run's artifact list. This workflow has been supplied but **not executed from this session**. Windows Server testing is not a substitute for interactive Windows 10 and 11 testing.
+`.github/workflows/ultradownload-windows.yml` runs on Windows Server 2022 with Python 3.12 x64 when these source files are pushed or a relevant PR is opened. It can also be run manually. After a **successful run**, download the **UltraDownload-Windows-x64** artifact from the run's artifact list. Successful runs from this development branch also publish the EXE as a GitHub release asset. Windows Server testing is not a substitute for interactive Windows 10 and 11 testing.
 
 ### Linux source development
 

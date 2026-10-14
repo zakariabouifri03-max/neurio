@@ -10,7 +10,7 @@ on:
       - 'UltraDownload/**'
       - '.github/workflows/ultradownload-windows.yml'
 permissions:
-  contents: read
+  contents: write
 jobs:
   windows-exe:
     runs-on: windows-2022
@@ -55,3 +55,12 @@ jobs:
         with:
           name: UltraDownload-test-results
           path: UltraDownload/test-results.xml
+      - name: Publish verified direct-download EXE
+        if: github.event_name == 'push' && github.ref == 'refs/heads/arena/8a5ce8bb-neurio'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "ultradownload-win-${{ github.run_id }}"
+          gh release create $tag dist/UltraDownload.exe dist/UltraDownload.exe.sha256 dist/exe-self-test.json --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "UltraDownload 1.0.0 — Windows x64" --prerelease --latest=false --notes "Standalone Windows x64 EXE. Source tests, packaged Qt launch (offscreen), and a real ten-worker exact-byte download self-test passed on Windows Server 2022. No Python installation required. Unsigned prerelease; interactive Windows 10/11 validation is still pending. Build: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub release publication failed.' }
