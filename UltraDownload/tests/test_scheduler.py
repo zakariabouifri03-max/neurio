@@ -33,3 +33,12 @@ def test_limit_wait_is_interruptible():
 def test_scheduler_rejects_more_than_ten():
     with pytest.raises(ValueError):
         schedule(range(20), lambda i: None, threading.Event(), 11)
+
+
+def test_rate_pacing_measures_real_elapsed_time():
+    limiter = RateLimiter(100000)
+    stop = threading.Event()
+    began = time.monotonic()
+    for _ in range(5):
+        limiter.consume(10000, stop)
+    assert time.monotonic()-began >= .39

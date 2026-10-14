@@ -207,7 +207,7 @@ class DownloadEngine:
                 if self.stop.is_set():
                     raise Interrupted()
                 try:
-                    self.transfer(index, tmp)
+                    self.transfer(index, tmp, retries)
                     digest = sha256_file(tmp, self.stop)
                     os.replace(tmp, part)
                     size = part.stat().st_size
@@ -237,7 +237,7 @@ class DownloadEngine:
         with self.lock:
             self.progress[index] = size
 
-    def transfer(self, index, tmp):
+    def transfer(self, index, tmp, retries=0):
         if tmp.is_symlink():
             raise OSError("Unsafe chunk path")
         start, end, offset = None, None, 0
@@ -255,43 +255,41 @@ class DownloadEngine:
         with self.lock:
             self.progress[index] = offset
         self.acquire_slot()
+        with self.lock:
+            self.active += 1
         try:
             with self.client.stream(self.remote.url, self.remote, start, end) as response:
                 self.client.validate_response(response, self.remote, start, end)
-                with self.lock:
-                    self.active += 1
-                try:
-                    self.db.chunk(self.d.id, index, "active", offset)
-                    with tmp.open("ab" if offset else "wb") as stream:
-                        for block in response.iter_raw(64*1024):
-                            if self.stop.is_set():
-                                raise Interrupted()
-                            if expected is not None and offset+len(block) > expected:
-                                raise ProtocolError("Response body exceeds expected size")
-                            self.global_limiter.consume(len(block), self.stop)
-                            self.limiter.consume(len(block), self.stop)
-                            stream.write(block)
-                            offset += len(block)
-                            with self.lock:
-                                self.progress[index] = offset
-                                self.transferred += len(block)
-                            self.emit()
-                        stream.flush()
-                        os.fsync(stream.fileno())
-                    if expected is not None and offset != expected:
-                        raise TransferError("Truncated response body", retryable=True)
-                    if self.d.size is None:
-                        self.d.size = offset
-                        import json
-                        manifest = self.root / "manifest.json"
-                        value = json.loads(manifest.read_text())
-                        value["size"] = offset
-                        staging = manifest.with_suffix(".tmp")
-                        staging.write_text(json.dumps(value))
-                        os.replace(staging, manifest)
-                        self.db.save(self.d)
-                finally:
-                    with self.lock:
-                        self.active -= 1
+                self.db.chunk(self.d.id, index, "active", offset, retries)
+                with tmp.open("ab" if offset else "wb") as stream:
+                    for block in response.iter_raw(64*1024):
+                        if self.stop.is_set():
+                            raise Interrupted()
+                        if expected is not None and offset+len(block) > expected:
+                            raise ProtocolError("Response body exceeds expected size")
+                        self.global_limiter.consume(len(block), self.stop)
+                        self.limiter.consume(len(block), self.stop)
+                        stream.write(block)
+                        offset += len(block)
+                        with self.lock:
+                            self.progress[index] = offset
+                            self.transferred += len(block)
+                        self.emit()
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                if expected is not None and offset != expected:
+                    raise TransferError("Truncated response body", retryable=True)
+                if self.d.size is None:
+                    self.d.size = offset
+                    import json
+                    manifest = self.root / "manifest.json"
+                    value = json.loads(manifest.read_text())
+                    value["size"] = offset
+                    staging = manifest.with_suffix(".tmp")
+                    staging.write_text(json.dumps(value))
+                    os.replace(staging, manifest)
+                    self.db.save(self.d)
         finally:
+            with self.lock:
+                self.active -= 1
             self.global_slots.release()

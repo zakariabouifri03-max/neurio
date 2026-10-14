@@ -68,3 +68,16 @@ def test_crash_after_atomic_publication(server, setup_download):
     DownloadEngine(db, recovered, settings).run()
     assert recovered.status == 'completed'
     assert not server.events
+
+
+def test_new_validator_does_not_validate_old_unversioned_chunks(server, setup_download):
+    server.etag = server.modified = ''
+    db, d, settings = setup_download(server)
+    DownloadEngine(db, d, settings).run()
+    assert d.status == 'completed'
+    Path(d.destination).unlink()
+    server.etag = '"new-validator"'
+    server.events.clear()
+    DownloadEngine(db, d, settings).run()
+    assert d.status == 'completed', d.error
+    assert len([event for event, *_ in server.events if event == 'start']) == d.count

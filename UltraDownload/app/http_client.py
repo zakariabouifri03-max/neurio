@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from email.message import Message
-from urllib.parse import urlsplit, unquote
+from urllib.parse import urlsplit, unquote, urljoin
 import re
 import threading
 import time
@@ -69,12 +69,18 @@ class RateLimiter:
     def consume(self, size, stop):
         if not self.rate:
             return
-        with self.lock:
-            now = time.monotonic()
-            self.next = max(self.next, now) + size / self.rate
-            delay = self.next - now
-        if stop.wait(delay):
-            raise Interrupted()
+        # No long-lived reservations survive a pause; at most one buffer is burstable.
+        while True:
+            if stop.is_set():
+                raise Interrupted()
+            with self.lock:
+                now = time.monotonic()
+                delay = self.next - now
+                if delay <= 0:
+                    self.next = now + size / self.rate
+                    return
+            if stop.wait(min(delay, .1)):
+                raise Interrupted()
 
 
 class HTTPClient:
@@ -83,7 +89,17 @@ class HTTPClient:
             follow_redirects=True, max_redirects=10, trust_env=False,
             timeout=httpx.Timeout(settings.read_timeout, connect=settings.connect_timeout),
             limits=httpx.Limits(max_connections=10, max_keepalive_connections=10),
-            headers={"Accept-Encoding": "identity", "User-Agent": "UltraDownload/1.0"})
+            headers={"Accept-Encoding": "identity", "User-Agent": "UltraDownload/1.0"},
+            event_hooks={"response": [self.redirect_guard]})
+
+    @staticmethod
+    def redirect_guard(response):
+        location = response.headers.get("location")
+        if response.is_redirect and location:
+            target = urljoin(str(response.url), location)
+            validate_url(target)
+            if response.url.scheme == "https" and urlsplit(target).scheme != "https":
+                raise ProtocolError("Refusing HTTPS to HTTP redirect")
 
     def close(self):
         self.client.close()

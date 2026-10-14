@@ -4,10 +4,17 @@ from app.download_engine import DownloadEngine
 
 def test_ten_real_connections_and_immediate_replacement(server, setup_download):
     server.delay = .15
-    server.slow_first = .7
+    server.slow_first = 1.5
     db, d, settings = setup_download(server)
     updates = []
     engine = DownloadEngine(db, d, settings, callback=updates.append)
+    import time
+    completions = []
+    worker = engine.worker
+    def measured_worker(index):
+        worker(index)
+        completions.append(time.monotonic())
+    engine.worker = measured_worker
     engine.run()
     assert d.status == "completed", d.error
     assert Path(d.destination).read_bytes() == server.data
@@ -15,7 +22,7 @@ def test_ten_real_connections_and_immediate_replacement(server, setup_download):
     starts = {index: t for event, index, t, _ in server.events if event == "start"}
     ends = {index: t for event, index, t, _ in server.events if event == "end"}
     assert starts[10] < ends[0], "Scheduler must not wait for an entire batch"
-    assert starts[10]-min(ends.values()) < .3
+    assert starts[10]-min(completions) < .5, "Measure replacement after worker verification, not server send"
     assert len(starts) == d.count
     assert max(s["percent"] for s in updates) <= 100
     assert updates[-1]["downloaded"] == len(server.data)

@@ -21,6 +21,7 @@ class RangeServer(ThreadingHTTPServer):
         self.block_delay = self.slow_first = 0
         self.ignore_ranges = self.head_unsupported = self.unknown_length = self.bad_range = False
         self.etag = '"version-1"'
+        self.modified = 'Wed, 01 Jan 2025 00:00:00 GMT'
         self.failures = {}
         self.truncate = set()
         self.limit = 100
@@ -34,8 +35,10 @@ class Handler(BaseHTTPRequestHandler):
     def headers_for(self, code, start=None, end=None, size=None):
         s = self.server
         self.send_response(code)
-        self.send_header("ETag", s.etag)
-        self.send_header("Last-Modified", "Wed, 01 Jan 2025 00:00:00 GMT")
+        if s.etag:
+            self.send_header("ETag", s.etag)
+        if s.modified:
+            self.send_header("Last-Modified", s.modified)
         self.send_header("Accept-Ranges", "bytes")
         self.send_header("Content-Disposition", 'attachment; filename="test.bin"')
         if size is not None and not s.unknown_length:

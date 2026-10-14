@@ -52,3 +52,11 @@ def test_full_response_not_accepted_as_chunk(server, setup_download):
 def test_url_validation(url):
     with pytest.raises(ValueError):
         validate_url(url)
+
+
+def test_no_https_downgrade_or_redirect_credentials():
+    import httpx
+    for location in ['http://insecure.test/file', 'https://user:password@host/file']:
+        response = httpx.Response(302, headers={'Location': location}, request=httpx.Request('GET', 'https://secure.test/file'))
+        with pytest.raises((ProtocolError, ValueError)):
+            HTTPClient.redirect_guard(response)
