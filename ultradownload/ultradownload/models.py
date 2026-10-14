@@ -108,6 +108,7 @@ class DownloadTask:
     range_support: RangeSupport = RangeSupport.UNKNOWN
     final_url: str = ""             # after redirects
     requires_auth: bool = False
+    allow_overwrite: bool = False
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
     # Sensitive request headers live in memory only; they are never written
@@ -150,6 +151,7 @@ class DownloadTask:
             "range_support": self.range_support.value,
             "final_url": self.final_url,
             "requires_auth": self.requires_auth,
+            "allow_overwrite": self.allow_overwrite,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "downloaded": self.downloaded_bytes,

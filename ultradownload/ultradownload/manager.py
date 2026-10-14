@@ -230,6 +230,7 @@ class DownloadManager(QObject):
             final_url=probe.final_url or probe.url,
             requires_auth=bool(headers and any(
                 k.lower() in ("authorization", "cookie") for k in headers)),
+            allow_overwrite=allow_overwrite,
             headers=dict(headers or {}))
 
         # --- destination conflict policy -----------------------------------
@@ -322,6 +323,7 @@ class DownloadManager(QObject):
             speed_limit=task.speed_limit,
             user_agent=self.settings.get("user_agent", DEFAULT_SETTINGS["user_agent"]),
             extra_headers={},
+            allow_overwrite=task.allow_overwrite,
             global_limiter=self.global_limiter)
         engine = DownloadEngine(task=task, config=cfg,
                                 event_sink=self._make_sink(task.id),

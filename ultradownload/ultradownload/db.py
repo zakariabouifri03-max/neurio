@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS downloads (
     content_type    TEXT NOT NULL DEFAULT '',
     range_support   TEXT NOT NULL DEFAULT 'unknown',
     requires_auth   INTEGER NOT NULL DEFAULT 0,
+    allow_overwrite INTEGER NOT NULL DEFAULT 0,
     downloaded      INTEGER NOT NULL DEFAULT 0,
     retries         INTEGER NOT NULL DEFAULT 0,
     created_at      REAL NOT NULL,
@@ -78,7 +79,8 @@ _TASK_COLUMNS = (
     "url", "final_url", "filename", "dest_dir", "total_size", "part_count",
     "status", "priority", "speed_limit", "checksum_algo", "checksum_value",
     "error", "etag", "last_modified", "content_type", "range_support",
-    "requires_auth", "downloaded", "created_at", "updated_at",
+    "requires_auth", "allow_overwrite", "downloaded", "created_at",
+    "updated_at",
 )
 
 
@@ -99,10 +101,19 @@ class Database:
             self._conn.execute("PRAGMA synchronous=NORMAL")
             self._conn.execute("PRAGMA foreign_keys=ON")
             self._conn.executescript(_SCHEMA)
+            self._migrate()
             self._conn.execute(
                 "INSERT OR REPLACE INTO meta(key, value) VALUES('schema', ?)",
                 (str(SCHEMA_VERSION),))
             self._conn.commit()
+
+    def _migrate(self) -> None:
+        """Add columns that may be missing in older databases."""
+        cols = {row[1] for row in
+                self._conn.execute("PRAGMA table_info(downloads)")}
+        if "allow_overwrite" not in cols:
+            self._conn.execute("ALTER TABLE downloads ADD COLUMN "
+                               "allow_overwrite INTEGER NOT NULL DEFAULT 0")
 
     # ------------------------------------------------------------------ tasks
 
@@ -116,6 +127,7 @@ class Database:
                 task.checksum_algo, task.checksum_value, task.error,
                 task.etag, task.last_modified, task.content_type,
                 task.range_support.value, int(task.requires_auth),
+                int(task.allow_overwrite),
                 task.downloaded_bytes, task.created_at, task.updated_at,
             ]
             if task.id is None:
@@ -200,6 +212,7 @@ class Database:
                 range_support=RangeSupport(r["range_support"]),
                 final_url=r["final_url"],
                 requires_auth=bool(r["requires_auth"]),
+                allow_overwrite=bool(r["allow_overwrite"]),
                 created_at=r["created_at"], updated_at=r["updated_at"])
             task.parts = parts_by_task.get(task.id, [])
             tasks.append(task)
