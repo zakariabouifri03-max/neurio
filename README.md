@@ -1,3 +1,5 @@
+> **UltraDownload desktop project:** The Python/PySide6 download manager, tests, documentation, and Windows EXE build pipeline are in [`UltraDownload/`](UltraDownload/README.md). The original browser game below is preserved.
+
 # 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!

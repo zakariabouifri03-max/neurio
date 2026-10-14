@@ -3,3 +3,14 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# UltraDownload local environments and generated artifacts
+.venv/
+.arena/
+.pytest_cache/
+UltraDownload/build/
+UltraDownload/dist/
+UltraDownload/*.egg-info/
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal

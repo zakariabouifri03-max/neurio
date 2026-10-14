@@ -1,0 +1,57 @@
+name: UltraDownload Windows EXE
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'UltraDownload/**'
+      - '.github/workflows/ultradownload-windows.yml'
+  pull_request:
+    paths:
+      - 'UltraDownload/**'
+      - '.github/workflows/ultradownload-windows.yml'
+permissions:
+  contents: read
+jobs:
+  windows-exe:
+    runs-on: windows-2022
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: UltraDownload
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: 'x64'
+          cache: 'pip'
+          cache-dependency-path: UltraDownload/requirements.txt
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Full test suite
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q --junitxml=test-results.xml
+      - name: Generate application icon
+        run: python tools/make_icon.py
+      - name: Package standalone Windows executable
+        run: python -m PyInstaller --clean --noconfirm ultradownload.spec
+      - name: Launch and exercise the actual EXE
+        run: python tools/verify_windows.py
+      - name: Artifact digest
+        shell: pwsh
+        run: (Get-FileHash dist/UltraDownload.exe -Algorithm SHA256).Hash | Set-Content -Encoding ascii dist/UltraDownload.exe.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UltraDownload-Windows-x64
+          path: |
+            UltraDownload/dist/UltraDownload.exe
+            UltraDownload/dist/UltraDownload.exe.sha256
+            UltraDownload/dist/exe-self-test.json
+            UltraDownload/README.md
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: UltraDownload-test-results
+          path: UltraDownload/test-results.xml
