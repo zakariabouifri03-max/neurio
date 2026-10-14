@@ -1,0 +1,15 @@
+{
+  "name": "neurio-tools",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Dev tooling for the neurio games (headless verification of the Giant Worlds page)",
+  "type": "module",
+  "scripts": {
+    "preview": "node tools/preview.mjs",
+    "verify:worlds": "node tools/verify-worlds.mjs"
+  },
+  "devDependencies": {
+    "@sparticuz/chromium": "^153.0.0",
+    "puppeteer": "^25.13.0"
+  }
+}

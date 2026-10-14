@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🪐 Giant Worlds — 100 planets of enormous plants</title>
+<meta name="theme-color" content="#0b1a2a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" href="../icons/icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../vendor/three.module.js",
+    "three/addons/": "../vendor/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="stage"></div>
+<div id="errLog"></div>
+
+<!-- ══════════ boot ══════════ -->
+<div id="boot">
+  <div class="bootBox">
+    <div class="bootOrb"></div>
+    <div class="bootTitle">GIANT WORLDS</div>
+    <div class="bootSub">100 planets · real-scale flora · walk among them</div>
+    <div class="bootBar"><div></div></div>
+    <div class="bootTip">growing the forest… <span id="bootMs"></span></div>
+  </div>
+</div>
+
+<!-- ══════════ HUD ══════════ -->
+<div id="hud">
+  <div class="hudTop">
+    <div class="planetPlate">
+      <div class="ppIdx" id="hudPlanet">001 / 100 · …</div>
+      <div class="ppEpi" id="hudEpithet">…</div>
+      <div class="ppRow">
+        <span class="chip" id="hudBiome">—</span>
+        <span class="chip">⬇ <b id="hudGrav">1.0 g</b></span>
+        <span class="chip">🌡 <b id="hudTemp">20 °C</b></span>
+        <span class="chip" id="hudWater">🌊 water</span>
+        <span class="chip" id="hudMode">WALK</span>
+      </div>
+    </div>
+    <div class="topBtns">
+      <button id="btnMapTop" class="iconBtn" title="Star map (M)">🪐</button>
+      <button id="btnHelp" class="iconBtn" title="Controls (H)">❓</button>
+    </div>
+  </div>
+
+  <!-- scale: you vs the nearest giant -->
+  <div id="scalePanel">
+    <div class="scaleHead">SCALE</div>
+    <div class="scaleRow">
+      <div class="scaleBar"><div id="scaleYou"></div></div>
+      <div class="scaleTxt">
+        <div class="sName" id="nearName">—</div>
+        <div class="sH" id="nearH">—</div>
+        <div class="sD" id="nearD">—</div>
+        <div class="sYou">you · 1.7 m</div>
+        <div class="sRatio" id="scaleRatio">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="compass">
+    <div class="cTrack" id="compassTrack"><div id="compassNeedle"></div></div>
+    <div id="compassCard">N 0°</div>
+  </div>
+
+  <div id="hudBottom">
+    <div class="chip"><span class="lbl">X</span><b id="hudX">0</b></div>
+    <div class="chip"><span class="lbl">Z</span><b id="hudZ">0</b></div>
+    <div class="chip"><span class="lbl">ALT</span><b id="hudAlt">0.0</b> m</div>
+    <div class="chip"><span class="lbl">SPD</span><b id="hudSpeed">0.0</b> km/h</div>
+    <div class="chip"><span class="lbl">FROM PAD</span><b id="hudDist">0</b></div>
+    <div class="chip dim"><span class="lbl">GIANTS</span><b id="hudGiants">0</b></div>
+    <div class="chip dim"><span class="lbl">TALLEST</span><b id="hudTallest">0 m</b></div>
+    <div class="chip dim"><span class="lbl">TRIS</span><b id="hudTris">0</b></div>
+    <div class="chip dim"><span class="lbl">FPS</span><b id="hudFps">60</b></div>
+  </div>
+
+  <div id="crosshair">+</div>
+
+  <!-- touch controls -->
+  <div id="lookArea"></div>
+  <div id="touch">
+    <div id="stick"><div id="knob"></div></div>
+    <div class="tBtns">
+      <button id="btnJump" class="tbtn">⤒</button>
+      <button id="btnFly" class="tbtn">🕊</button>
+      <button id="btnMap" class="tbtn">🪐</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ star map ══════════ -->
+<div id="mapOverlay">
+  <div class="mapBox">
+    <div class="mapHead">
+      <h2>🪐 STAR MAP</h2>
+      <div class="mapSub"><span id="mapCount">0 / 100 explored</span> — tap a world to travel</div>
+      <div class="mapActs">
+        <button id="btnNext" class="mbtn">▶ Next world</button>
+        <button id="btnRandom" class="mbtn alt">🎲 Random</button>
+        <button id="mapClose" class="mbtn close">✖</button>
+      </div>
+    </div>
+    <div id="mapGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════ warp ══════════ -->
+<div id="warp">
+  <div class="warpLines"></div>
+  <div class="warpTxt">
+    <div class="wTitle">TRAVELLING</div>
+    <div class="wName" id="warpName">—</div>
+    <div class="wBiome" id="warpBiome">—</div>
+  </div>
+</div>
+
+<!-- ══════════ help ══════════ -->
+<div id="helpModal">
+  <div class="helpBox">
+    <h2>🌿 GIANT WORLDS</h2>
+    <p class="lede">You are <b>1.7 metres</b> tall. The plants here grow to <b>70 metres</b>.
+      Everything is built to real-world scale — walk up to a trunk and look up.</p>
+    <div class="keys">
+      <div><kbd>W A S D</kbd> walk</div>
+      <div><kbd>Shift</kbd> sprint / fly faster</div>
+      <div><kbd>Space</kbd> jump · rise in flight</div>
+      <div><kbd>F</kbd> flight suit (fly over the canopy)</div>
+      <div><kbd>Ctrl</kbd> descend in flight</div>
+      <div><kbd>M</kbd> star map — 100 worlds</div>
+      <div><kbd>R</kbd> back to the landing site</div>
+      <div><kbd>1 2 3</kbd> detail low / med / high</div>
+      <div><kbd>Mouse</kbd> look (click the world first)</div>
+      <div><kbd>Touch</kbd> left stick walks · drag right to look</div>
+    </div>
+    <div class="tip">💡 Hold <kbd>Shift</kbd> + <kbd>F</kbd> and rise: at 60 m the whole forest is below you.</div>
+    <button id="btnHelpClose" class="mbtn big">EXPLORE</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

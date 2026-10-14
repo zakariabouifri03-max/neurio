@@ -14,6 +14,23 @@ No build step, no external CDN — everything is procedural and vendored (Three.
 
 ---
 
+## 🪐 Also here: Giant Worlds — 100 planets of enormous plants
+
+A second, separate experience lives in **[`worlds/`](worlds/)**: a first-person sandbox where
+**you are 1.7 m tall** and the flora grows to **70+ metres**. 100 seeded planets across 10 biomes,
+a star map to travel between them, walking/sprinting/jumping under each planet's own gravity and a
+flight suit to rise above the canopy. Same rule as the racing game: no build step, no CDN,
+everything procedural on the vendored Three.js.
+
+```bash
+node tools/preview.mjs        # → http://localhost:8001/   (opens straight in the forest)
+```
+
+See [`worlds/README.md`](worlds/README.md) for controls, and `node tools/verify-worlds.mjs`
+for the 26-assertion headless-browser test that walks, jumps, flies and visits all 100 worlds.
+
+---
+
 ## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
 
 A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised

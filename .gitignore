@@ -3,3 +3,7 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# tooling / scratch
+node_modules/
+.arena/
