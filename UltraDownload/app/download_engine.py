@@ -179,7 +179,7 @@ class DownloadEngine:
             expected = bounds[1]-bounds[0]+1
             complete = self.root / "chunks" / f"{index:06d}.part"
             partial = complete.with_suffix(".tmp")
-            valid = bool(self.remote.validator)
+            valid = bool(self.remote.validator and ((self.d.etag and not self.d.etag.startswith("W/")) or self.d.modified))
             if (valid and row["status"] == "complete" and complete.is_file() and not complete.is_symlink()
                     and complete.stat().st_size == expected and sha256_file(complete, self.stop) == row["digest"]):
                 self.completed.add(index)

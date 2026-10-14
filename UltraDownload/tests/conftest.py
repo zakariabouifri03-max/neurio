@@ -1,4 +1,5 @@
 import hashlib
+import random
 import uuid
 import pytest
 from app.database import Database
@@ -20,7 +21,7 @@ class MemoryVault:
 
 @pytest.fixture
 def payload():
-    return (bytes(range(256))*((12*CHUNK_SIZE+137)//256+1))[:12*CHUNK_SIZE+137]
+    return random.Random(731).randbytes(12*CHUNK_SIZE+137)
 
 
 @pytest.fixture
