@@ -19,7 +19,7 @@ if errorlevel 1 exit /b 1
 if errorlevel 1 exit /b 1
 .venv\Scripts\python.exe -m PyInstaller --clean --noconfirm ultradownload.spec
 if errorlevel 1 exit /b 1
-powershell -NoProfile -Command "$p = Start-Process -FilePath '.\dist\UltraDownload.exe' -ArgumentList '--smoke-test' -PassThru; if (-not $p.WaitForExit(60000)) { $p.Kill(); exit 1 }; if ($p.ExitCode -ne 0) { exit 1 }; Get-FileHash '.\dist\UltraDownload.exe' -Algorithm SHA256 | Format-List"
+.venv\Scripts\python.exe tools\smoke_exe.py dist\UltraDownload.exe
 if errorlevel 1 exit /b 1
 echo.
 echo Build and smoke test succeeded: dist\UltraDownload.exe

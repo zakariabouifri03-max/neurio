@@ -41,7 +41,6 @@ jobs:
         shell: pwsh
         run: |
           .venv\Scripts\python.exe -m pip freeze | Out-File dist\build-requirements.txt -Encoding utf8
-          (Get-FileHash dist\UltraDownload.exe -Algorithm SHA256).Hash | Out-File dist\UltraDownload.exe.sha256 -Encoding ascii
       - uses: actions/upload-artifact@v4
         with:
           name: UltraDownload-Windows-x64
