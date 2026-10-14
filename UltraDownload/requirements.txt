@@ -3,5 +3,5 @@ httpx==0.28.1
 pytest==8.3.5
 pyinstaller==6.12.0
 # Compatible packaging support versions (avoid unbounded build-tool upgrades).
-setuptools==75.8.2
+setuptools==70.3.0
 pyinstaller-hooks-contrib==2025.2
