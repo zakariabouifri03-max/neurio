@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⛰️ Peak Climb — 3D mountain climbing</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app"></div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div class="tl">
+    <div class="chip">HEIGHT <b id="hgt">0</b> m</div>
+    <div class="chip">TIME <b id="time">0:00</b></div>
+    <div class="chip dim">BEST <b id="best">–</b></div>
+  </div>
+
+  <div class="bars">
+    <div class="bar"><span>STAMINA</span><div class="track"><i id="stam"></i></div></div>
+    <div class="bar hp"><span>HP</span><div class="track"><i id="hp"></i></div></div>
+  </div>
+
+  <div class="hands">
+    <div id="hL" class="hand">LMB · LEFT HAND</div>
+    <div id="hR" class="hand">RMB · RIGHT HAND</div>
+  </div>
+
+  <div id="altitude"><div id="altFill"></div><div id="altMarker"></div></div>
+
+  <div id="cross"></div>
+  <div id="toast"></div>
+  <div id="fade"></div>
+  <div id="help">WASD move · Shift run · Space jump / lunge off a grip · LMB/RMB grab &amp; release · R respawn at campfire · Esc menu</div>
+</div>
+
+<!-- START -->
+<div id="start" class="overlay">
+  <div class="card">
+    <div class="emoji">⛰️</div>
+    <h1>PEAK CLIMB</h1>
+    <p>Climb the mountain with your hands. Every grip costs stamina — rest on ledges, light campfires as you go, and reach the summit flag.</p>
+    <button id="btnStart" class="btn">Start climbing</button>
+    <p class="small">Desktop browser · mouse + keyboard</p>
+  </div>
+</div>
+
+<!-- PAUSE -->
+<div id="pause" class="overlay hidden">
+  <div class="card">
+    <h1>PAUSED</h1>
+    <button id="btnResume" class="btn">Resume</button>
+    <button id="btnNew" class="btn ghost">New mountain</button>
+    <p class="small">Seed <span id="seedTxt"></span></p>
+  </div>
+</div>
+
+<!-- WIN -->
+<div id="win" class="overlay hidden">
+  <div class="card">
+    <div class="emoji">🏆</div>
+    <h1>SUMMIT!</h1>
+    <p>Time <b id="winTime">0:00</b> · Max height <b id="winH">0</b> m</p>
+    <button id="btnAgain" class="btn">Climb again</button>
+    <button id="btnNew2" class="btn ghost">New mountain</button>
+  </div>
+</div>
+
+<script type="module" src="game.js"></script>
+</body>
+</html>

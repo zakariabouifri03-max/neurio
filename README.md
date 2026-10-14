@@ -1,5 +1,7 @@
 # 🏁 Bash Baqi Racing
 
+> 🧗 **New:** also in this repo — **[Peak Climb](peak/README.md)**, a procedural 3D mountain-climbing game (open `/peak/` on the same static server).
+
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
 A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
 
