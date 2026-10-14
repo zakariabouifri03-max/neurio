@@ -1,115 +1,242 @@
-# 🏁 Bash Baqi Racing
+# UltraDownload — Professional Windows Download Manager
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+UltraDownload is a real, functional desktop download manager for **Windows 10/11**
+built with **Python 3.12+** and **PySide6**. It is designed for very large files —
+PC games of 40 GB, 80 GB or more.
 
-**▶ Play:** serve the folder with any static server and open it:
+**The core feature is genuine parallel downloading:** when you paste a direct
+download URL, UltraDownload inspects the file and splits it into up to **40
+logical byte ranges** (1, 4, 8, 16, 24, 32 or 40). All parts start **at the
+same time** and download simultaneously over separate HTTP connections
+whenever the server supports HTTP Range Requests (RFC 9110).
 
-```bash
-python3 -m http.server 8000
-# → http://localhost:8000
+```
+ ┌────────────────────────────────────────────────────────────┐
+ │  Part 1   ████████████░░░░░░░░   12.4 MB/s                 │
+ │  Part 2   ██████████████░░░░░   13.1 MB/s                  │
+ │  …        (all 40 workers run concurrently)                │
+ │  Part 40  ██████████░░░░░░░░░   11.8 MB/s                  │
+ └────────────────────────────────────────────────────────────┘
 ```
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+---
+
+## Features
+
+### Parallel download engine
+- Splits files into 1–40 byte-range parts; **every part starts concurrently**
+  (thread pool sized to the part count — proven by an automated overlap test).
+- Streams each chunk straight to disk — **never loads the file into RAM**
+  (bounded 64 KiB buffers, so 80 GB games work on modest memory).
+- Validates every `206` response's `Content-Range` before appending a byte.
+- Confirms received byte counts match the expected range length.
+- Detects servers that **ignore Range headers** and safely falls back to a
+  single-stream download, clearly reporting that the requested number of
+  connections could not be maintained.
+- Configurable exponential-backoff retries for transient failures
+  (timeouts, HTTP 408/429/5xx, dropped connections, truncated responses).
+- 64-bit-safe offsets — files larger than 4 GiB are fully supported (covered
+  by automated tests).
+
+### Full download control
+- **Pause** — stops transfers safely, keeps all partial data, persists state.
+- **Resume** — continues from saved byte positions after re-validating that
+  the remote file (size/ETag) is unchanged; requests only the remaining range.
+- **Cancel** — stops workers and lets you keep or delete temporary data.
+- **Retry** — retries only failed parts; completed parts are never re-fetched.
+
+### Queue & multiple files
+- Multiple downloads in a persistent queue with configurable simultaneous
+  downloads, per-download part counts, per-download speed limits and a global
+  bandwidth limit (token bucket).
+- Priority ordering (▲/▼), pause-all / resume-all.
+- Queue and progress survive application restarts and crashes.
+
+### Safety & integrity
+- Optional checksum verification (MD5/SHA-1/SHA-256/SHA-512) during assembly.
+- Atomic finalization: parts are assembled into a temp file, verified
+  (size + checksum), then atomically renamed with `os.replace`.
+- If assembly fails, **valid temporary parts are preserved** — no re-download.
+- Never overwrites existing files without explicit permission.
+- Filenames from servers are sanitized (path traversal, Windows reserved
+  names like `CON`, invalid characters).
+- Downloaded files are **never executed automatically**.
+- Auth headers/cookies you provide are kept **in memory only** and never
+  written to the database or logs.
+- Supports only content you are authorized to download; it does not bypass
+  DRM, paywalls or access controls.
+
+### Professional dark UI
+- Dark charcoal theme with blue or purple accents (switchable), rounded
+  panels, animated progress bars, live per-part status grid.
+- **Dashboard** — total speed, total downloaded, active/completed counts,
+  free disk space, active download cards, queue with priorities.
+- **Add Download** — URL validation, folder picker, custom filename,
+  part-count selector (1–40, default 40), optional checksum, optional
+  auth headers, live URL inspection (size, MIME, range support).
+- **Download Details** — progress %, downloaded/remaining, speed, ETA, active
+  connections, Pause/Resume/Cancel/Retry, and a grid of **all parts** each with
+  its own progress bar, status, byte counts and live speed.
+- **History** — completed/cancelled/failed downloads with Open Folder and
+  Restart actions.
+- **Settings** — default folder, simultaneous downloads, default parts,
+  timeouts, retries, speed limit, start minimized, theme/accent, temporary
+  file cleanup with confirmation.
 
 ---
 
-## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
+## Project layout
 
-A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
-soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
+```
+ultradownload/
+├── __main__.py            # python -m ultradownload
+├── app.py                 # QApplication bootstrap
+├── config.py              # settings model (persisted in SQLite)
+├── manager.py             # download queue, scheduling, crash recovery
+├── utils.py               # filename sanitization, formatting, redaction
+├── engine/                # Qt-free download engine (fully unit-tested)
+│   ├── ranges.py          # byte-range math (exact coverage, no overlap)
+│   ├── inspector.py       # HEAD/probe-GET URL inspection
+│   ├── task.py            # parallel workers, pause/resume/cancel/retry
+│   ├── merger.py          # assembly, checksums, atomic rename
+│   ├── bandwidth.py       # token-bucket speed limits
+│   ├── speed.py           # sliding-window speed metering
+│   └── errors.py          # typed transient/permanent errors
+├── storage/
+│   └── database.py        # SQLite: downloads, parts, settings, recovery
+└── gui/                   # PySide6 interface (dark theme)
+    ├── main_window.py
+    ├── theme.py           # QSS stylesheets
+    ├── widgets.py
+    └── pages/             # dashboard, add, details, history, settings
 
-title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
-
-Everything is generated from code (no stock footage/music):
-
-```bash
-python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
-python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
+tests/                     # automated tests + local Range HTTP test server
+assets/                    # application icon (.png / .ico)
+requirements.txt           # runtime dependencies
+requirements-dev.txt       # + pytest, pyinstaller, pillow
+build.bat                  # one-command Windows build
+UltraDownload.spec         # PyInstaller configuration
+file_version_info.txt      # Windows version resource
 ```
 
-See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
+---
+
+## Running from source
+
+```bash
+python -m venv .venv
+# Windows:  .venv\Scripts\activate
+# Linux/macOS:
+source .venv/bin/activate
+
+pip install -r requirements.txt
+python -m ultradownload
+```
+
+Python **3.12+** is recommended (3.10+ works).
 
 ---
 
-## 📱 Install on your phone — كأنها APK!
+## Building UltraDownload.exe (Windows)
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
+> **The Windows executable must be built and tested on Windows.**
+> PyInstaller produces binaries for the OS it runs on; this repository
+> includes everything needed, but run the build on a Windows 10/11 machine
+> with 64-bit Python 3.12+ installed.
 
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
+```bat
+build.bat
+```
 
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
+This will:
 
-**Offline play** is built-in: a service worker caches all game files on first visit.
+1. create a virtual environment,
+2. install `requirements.txt` + PyInstaller,
+3. run the full automated test suite (build aborts if tests fail),
+4. invoke PyInstaller with `UltraDownload.spec`,
+5. produce **`dist\UltraDownload.exe`** — a single, windowed executable with
+   the application icon and version resource embedded. Users do **not** need
+   Python installed.
+
+Manual build:
+
+```bat
+pip install -r requirements.txt pyinstaller pillow
+pyinstaller --clean --noconfirm UltraDownload.spec
+```
+
+Test the resulting executable on both Windows 10 and Windows 11 before
+distributing it.
 
 ---
 
-## 🎮 The Game
+## Automated tests
 
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
+The test suite includes a **local HTTP test server with full Range support**
+plus fault-injection modes (Range ignored, wrong `Content-Range`, truncated
+responses, HTTP 500/429, auth, slow drip feeds). No external websites are
+used. Run:
 
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests -q
+```
 
-## 🕹️ Controls
+Covered scenarios include:
 
-| Action | Keys |
+| Area | Tests |
 |---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
+| Range math | exact coverage, no overlap, remainder handling, >4 GiB offsets, part count > file size |
+| Concurrency | a barrier-locked server proves **all parts are in flight at once**; request windows overlap in time |
+| Progress | real byte counts, aggregated multi-part progress, speed/ETA |
+| Pause/Resume | partial data preserved, resume requests only remaining ranges, remote-change detection |
+| Cancel | keep or delete temporary data |
+| Retry | transient 500s/429s retried with backoff, `Retry-After` honored, bounded retries, failed-part-only retry |
+| Server quirks | Range ignored → safe single-stream fallback, invalid `Content-Range` rejected, truncated responses recovered or failed cleanly |
+| Files | zero-byte files, unknown size (chunked), >4 GiB (opt-in `UD_RUN_LARGE=1`), checksum verification, atomic assembly |
+| Recovery | crash simulation → queue/part state restored from SQLite |
+| Security | filename sanitization, path traversal, credential redaction, no secrets in DB |
+| Disk/permissions | insufficient space rejected, permission errors surfaced |
+| GUI | offscreen smoke tests for every page, live updates, theming |
 
-Touch buttons appear automatically on phones/tablets.
+Large-file test (writes ~4 GiB through loopback — needs disk space):
 
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
+```bash
+UD_RUN_LARGE=1 python -m pytest tests/test_large_files.py -q
 ```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
-```
-
-Made with ❤️ and Three.js
 
 ---
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+## Using UltraDownload
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+1. **Add Download** — paste a direct URL (e.g. a game ISO or installer),
+   pick the folder, optionally set a filename, part count and checksum,
+   then click **Check URL** (to inspect) or **Start Download**.
+2. Open **Details** to watch every part download live.
+3. Use **Pause / Resume / Cancel / Retry** as needed — progress is saved.
+4. Find finished downloads under **History** (Open Folder / Restart).
+5. Tune limits and appearance in **Settings**.
 
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
+Tips:
+- 40 parts is the default for large files, but some servers/CDNs perform
+  better with fewer connections — adjust per download if needed.
+- If the server ignores Range requests, UltraDownload automatically uses a
+  single stream and tells you so.
+- Keep at least as much free disk space as the file size during the final
+  assembly step (parts are deleted after successful assembly).
 
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+---
+
+## Data storage
+
+- Database: `%LOCALAPPDATA%\UltraDownload\ultradownload.sqlite3` (Windows),
+  `~/.local/share/UltraDownload/` on Linux.
+- Log file: next to the database (`ultradownload.log`) — credentials are
+  redacted in all log output.
+- Temporary parts: `<destination>\.ultradownload\<id>\part_*.part` — removed
+  automatically after successful assembly (configurable).
+
+## License
+
+Provided as-is for authorized downloads only. You are responsible for
+complying with the terms of service of any content you download.
