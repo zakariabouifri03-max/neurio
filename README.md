@@ -1,4 +1,26 @@
-# 🏁 Bash Baqi Racing
+# 🏁 Bash Baqi Racing + 🔫 WARFRONT
+
+This repo now ships **two** self-contained browser games:
+
+| Game | Open | What it is |
+|---|---|---|
+| 🔫 **WARFRONT — Operation Blackout** | `warfront.html` | 3D first-person shooter: gunplay with recoil & bloom, AI soldiers that flank / take cover / throw nades, scorestreaks (UAV, airstrike, care package), medals, killfeed, waves, ranks, unlocks, camos |
+| 🏁 **Bash Baqi Racing** | `index.html` | 3D kart racer on the beach: shop, championship, random tracks |
+
+Both follow the same house rules: **zero external assets** — every texture, model and sound
+is generated in code with Three.js + Canvas/WebAudio.
+
+```bash
+node tools/serve.mjs 8000     # → http://localhost:8000/          opens WARFRONT
+                              # → http://localhost:8000/index.html opens the racing game
+```
+
+WARFRONT docs: **[`src/fps/README.md`](src/fps/README.md)** · single-file build:
+`node tools/build-warfront-singlefile.mjs` → `warfront-singlefile.html`.
+
+---
+
+## 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
 A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!

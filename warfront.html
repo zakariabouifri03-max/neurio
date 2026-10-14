@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>WARFRONT — Operation Blackout</title>
+<meta name="theme-color" content="#0b0f0d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="stylesheet" href="src/fps/fps.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="view"></canvas>
+
+<!-- dev error overlay -->
+<div id="errLog"></div>
+
+<!-- ══════════ BOOT / LOADING ══════════ -->
+<div id="boot">
+  <div class="bootInner">
+    <div class="bootSpin"></div>
+    <div class="bootTitle">WARFRONT</div>
+    <div class="bootSub" id="bootMsg">spinning up the engine…</div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN MENU ══════════ -->
+<div id="menu">
+  <div class="menuVignette"></div>
+  <div class="menuGrid">
+    <header class="menuHead">
+      <div class="logo">
+        <span class="logoW">WAR</span><span class="logoF">FRONT</span>
+        <em>OPERATION BLACKOUT</em>
+      </div>
+      <div class="rankPlate">
+        <div class="rankBadge" id="rankBadge">PVT</div>
+        <div class="rankInfo">
+          <b id="rankName">Private</b>
+          <div class="xpBar"><i id="xpFill"></i></div>
+          <span id="xpText">0 / 500 XP</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="menuCol left">
+      <h3>LOADOUT</h3>
+      <div class="slotRow">
+        <span class="slotLbl">PRIMARY</span>
+        <button class="cyc" id="cycPrimary"><b id="primaryName">M4 CARBINE</b><i>◀ ▶</i></button>
+      </div>
+      <canvas class="gunCanvas" id="prevPrimary" width="420" height="150"></canvas>
+      <div class="slotRow">
+        <span class="slotLbl">SECONDARY</span>
+        <button class="cyc" id="cycSecondary"><b id="secondaryName">M1911</b><i>◀ ▶</i></button>
+      </div>
+      <div class="slotRow">
+        <span class="slotLbl">PERK</span>
+        <button class="cyc" id="cycPerk"><b id="perkName">NONE</b><i>◀ ▶</i></button>
+      </div>
+      <div class="perkNote" id="perkNote">No perk equipped.</div>
+    </section>
+
+    <section class="menuCol right">
+      <h3>OPERATIONS</h3>
+      <div class="opCard active" data-diff="recruit">
+        <b>RECRUIT</b><span>6 waves · forgiving AI · standard loot</span>
+      </div>
+      <div class="opCard" data-diff="operator">
+        <b>OPERATOR</b><span>8 waves · smarter AI · double XP</span>
+      </div>
+      <div class="opCard" data-diff="veteran">
+        <b>VETERAN</b><span>10 waves · lethal AI · no regen · triple XP</span>
+      </div>
+      <h3>INTEL</h3>
+      <div class="statRow" id="menuStats"></div>
+    </section>
+
+    <div class="menuCta">
+      <button class="deployBtn" id="btnDeploy">▶ DEPLOY</button>
+      <button class="ghostBtn" id="btnSettings">⚙ SETTINGS</button>
+      <button class="ghostBtn" id="btnHelp">? CONTROLS</button>
+      <div class="hint" id="menuHint">Mouse is captured on deploy — press <kbd>ESC</kbd> to pause.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SETTINGS / HELP MODAL ══════════ -->
+<div id="modal">
+  <div class="modalBox">
+    <div class="modalHead"><h2 id="modalTitle">SETTINGS</h2><button class="xBtn" id="modalClose">✕</button></div>
+    <div class="modalBody" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ══════════ HUD ══════════ -->
+<div id="hud" class="hide">
+
+  <!-- damage / state overlays -->
+  <div id="vignette"></div>
+  <div id="dmgArrows"></div>
+  <div id="dmgFlash"></div>
+  <div id="lowHp"></div>
+  <div id="combatTint"></div>
+  <div id="scope" class="hide"><div class="scopeIn"><div class="scopeCross"></div><div class="scopeNum"></div></div></div>
+
+  <!-- crosshair -->
+  <div id="xhair">
+    <i class="ch t"></i><i class="ch b"></i><i class="ch l"></i><i class="ch r"></i>
+    <span class="chDot"></span>
+  </div>
+  <div id="hitmark"></div>
+  <div id="vmx"></div>
+
+  <!-- top-left: objective -->
+  <div class="hudTL">
+    <div id="objBox">
+      <div class="objTag" id="objTag">OBJECTIVE</div>
+      <div class="objTxt" id="objTxt">Eliminate all hostiles</div>
+      <div class="objSub"><span id="objCount">0 / 8</span><span class="objWave" id="objWave">WAVE 1/8</span></div>
+      <div class="objBar" id="objBar"><i></i></div>
+      <div class="scoreRow"><span>SCORE <b id="hudScore">0</b></span><i id="hudStreak">STREAK 0</i><em id="hudClock">--:--</em><em id="hudXp">+0 XP</em></div>
+    </div>
+  </div>
+
+  <!-- top-right: killfeed -->
+  <div id="killfeed"></div>
+
+  <!-- streak / medals -->
+  <div id="medals"></div>
+  <div id="banner"><b id="bannerT"></b><span id="bannerS"></span></div>
+
+  <!-- streak abilities -->
+  <div id="streaks">
+    <button class="stk" id="stkUav" disabled><kbd>4</kbd><span>UAV</span><i>0</i></button>
+    <button class="stk" id="stkAirstrike" disabled><kbd>5</kbd><span>AIRSTRIKE</span><i>0</i></button>
+    <button class="stk" id="stkCare" disabled><kbd>6</kbd><span>CARE PACKAGE</span><i>0</i></button>
+  </div>
+
+  <!-- bottom-left: vitals -->
+  <div class="hudBL">
+    <div id="armorRow"></div>
+    <div class="hpRow">
+      <div class="hpNum"><b id="hpNum">100</b><span>HP</span></div>
+      <div class="hpBar"><i id="hpFill"></i></div>
+      <div class="stBar"><i id="stFill"></i></div>
+    </div>
+    <div class="plateNote" id="plateNote"></div>
+  </div>
+
+  <!-- bottom-right: weapon -->
+  <div class="hudBR">
+    <div class="wName" id="wName">M4 CARBINE</div>
+    <div class="ammoRow"><b id="ammoMag">30</b><span id="ammoReserve">/ 120</span></div>
+    <div class="nadeRow"><span class="nadeIco">◉</span><b id="nadeCount">2</b><span class="wSwap">Q swap · R reload · G grenade</span></div>
+  </div>
+
+  <!-- minimap -->
+  <div id="mapWrap">
+    <canvas id="minimap" width="176" height="176"></canvas>
+    <div class="mapRing"></div>
+    <div class="mapN">N</div>
+  </div>
+
+  <!-- compass + subtitles -->
+  <div id="compass"><i id="compassNeedle"></i></div>
+  <div id="say"></div>
+  <div id="prompt"></div>
+
+  <button id="btnPauseTop" class="roundBtn">▮▮</button>
+</div>
+
+<!-- ══════════ PAUSE ══════════ -->
+<div id="pause" class="hide">
+  <div class="pauseBox">
+    <div class="pTitle">PAUSED</div>
+    <div class="pStats" id="pStats"></div>
+    <button class="bigBtn" id="btnResume">▶ RESUME</button>
+    <button class="bigBtn alt" id="btnRestart">⟲ RESTART OPERATION</button>
+    <button class="bigBtn alt" id="btnQuit">⏻ ABORT TO MENU</button>
+  </div>
+</div>
+
+<!-- ══════════ DEATH / RESULTS ══════════ -->
+<div id="results" class="hide">
+  <div class="resBox">
+    <div class="resTitle" id="resTitle">K.I.A.</div>
+    <div class="resSub" id="resSub">You were killed in action</div>
+    <div class="resGrid" id="resGrid"></div>
+    <div class="resRank" id="resRank"></div>
+    <button class="bigBtn" id="btnRespawn">▶ RESPAWN <span id="respawnCd"></span></button>
+    <button class="bigBtn alt" id="btnQuitRes">⏻ ABORT TO MENU</button>
+  </div>
+</div>
+
+<!-- touch controls (coarse pointers only) -->
+<div id="touchPad" class="hide">
+  <div class="stick" id="stickMove"><i></i></div>
+  <div class="tBtns">
+    <button id="tFire" class="tbtn big">🔥</button>
+    <div class="tRow">
+      <button id="tReload" class="tbtn">R</button>
+      <button id="tJump" class="tbtn">⤒</button>
+      <button id="tAds" class="tbtn">◎</button>
+      <button id="tSprint" class="tbtn">»</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="src/fps/main.js"></script>
+<script>
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  // reuse the app's offline worker without hijacking the racing game cache keys
+}
+</script>
+</body>
+</html>
