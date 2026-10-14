@@ -1,3 +1,5 @@
+> **New desktop project:** [UltraDownload — Windows download manager](UltraDownload/README.md) (source, tests, and EXE build pipeline). The browser game below is preserved.
+
 # 🏁 Bash Baqi Racing
 
 لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!

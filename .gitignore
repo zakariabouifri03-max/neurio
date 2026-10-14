@@ -3,3 +3,12 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# UltraDownload local state and packaging artifacts
+.venv/
+.pytest_cache/
+UltraDownload/build/
+UltraDownload/dist/
+UltraDownload/*.egg-info/
+*.sqlite3*
+.ultradownload/
