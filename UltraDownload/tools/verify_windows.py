@@ -1,5 +1,7 @@
 """Launch the actual packaged EXE and fail on timeout, bad exit, or bad report."""
 import json
+import os
+import traceback
 import subprocess
 import tempfile
 from pathlib import Path
@@ -12,6 +14,10 @@ def main():
         raise FileNotFoundError(exe)
     report = root / 'dist' / 'exe-self-test.json'
     report.unlink(missing_ok=True)
+    diagnostics = root / 'dist' / 'exe-diagnostics.txt'
+    diagnostics.unlink(missing_ok=True)
+    os.environ['ULTRADOWNLOAD_DIAGNOSTIC_FILE'] = str(diagnostics)
+    os.environ['QT_QPA_PLATFORM'] = 'offscreen'
     with tempfile.TemporaryDirectory(prefix='UltraDownload-smoke-') as profile:
         subprocess.run([str(exe), '--smoke-test', '--data-dir', profile], check=True, timeout=60)
     subprocess.run([str(exe), '--self-test', str(report)], check=True, timeout=120)
@@ -23,4 +29,11 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as exc:
+        path = Path(__file__).resolve().parents[1] / 'dist' / 'exe-diagnostics.txt'
+        details = path.read_text(encoding='utf-8')[-6000:] if path.exists() else 'No executable diagnostics were written.'
+        message = (str(exc) + '\n' + details).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+        print('::error title=Packaged executable diagnostic::' + message, flush=True)
+        raise

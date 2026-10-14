@@ -5,7 +5,7 @@ a = Analysis(
     [str(root / 'main.py')], pathex=[str(root)],
     binaries=[], datas=[(str(root / 'assets' / 'app_icon.ico'), 'assets')],
     hiddenimports=['app.self_test'],
-    hookspath=[], hooksconfig={}, runtime_hooks=[],
+    hookspath=[], hooksconfig={}, runtime_hooks=[str(root / 'tools' / 'diagnostic_hook.py')],
     excludes=['pytest', 'tkinter', 'PySide6.QtWebEngineCore', 'PySide6.QtWebEngineWidgets',
               'PySide6.QtQml', 'PySide6.QtQuick', 'PySide6.QtMultimedia'],
     noarchive=False,
