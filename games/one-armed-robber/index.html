@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One-Armed Robber — 3D Heist</title>
+<meta name="theme-color" content="#0b1020">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": { "three": "../../vendor/three.module.js" } }
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div id="hurt"></div>
+
+<!-- ═════════ HUD ═════════ -->
+<div id="hud" class="hidden">
+  <div id="tl">
+    <div class="chip gold"><span>LOOT</span><b id="bagVal">$0</b></div>
+    <div class="chip"><span>LOAD</span><b id="bagW">0%</b></div>
+    <div class="chip"><span>TIME</span><b id="time">0:00</b></div>
+  </div>
+
+  <div id="tr">
+    <canvas id="minimap" width="220" height="200"></canvas>
+  </div>
+
+  <div id="heatWrap">
+    <span>HEAT</span>
+    <div class="bar heat"><div id="heatFill"></div></div>
+  </div>
+
+  <div id="police" class="hidden">🚨 POLICE IN <b id="policeT">60</b>s</div>
+  <div id="objective"></div>
+  <div id="crosshair"></div>
+
+  <div id="prompt" class="hidden">
+    <span id="promptText"></span>
+    <div class="bar"><div id="promptFill"></div></div>
+  </div>
+
+  <div id="bl">
+    <span>HP</span>
+    <div class="bar hp"><div id="hpFill"></div></div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<!-- ═════════ MENU ═════════ -->
+<div id="menu" class="overlay">
+  <div class="card">
+    <div class="emoji">🦾🚫</div>
+    <h1>ONE-ARMED<br><span>ROBBER</span></h1>
+    <p class="lead">You have one good arm, a bag, and a bad plan. Rob the bank, avoid the cameras, and reach the getaway van before the police arrive.</p>
+    <ul class="howto">
+      <li><kbd>W A S D</kbd> move &nbsp;·&nbsp; <kbd>SHIFT</kbd> sprint &nbsp;·&nbsp; <kbd>C</kbd> / <kbd>CTRL</kbd> crouch (harder to spot)</li>
+      <li><kbd>MOUSE</kbd> look &nbsp;·&nbsp; <kbd>LMB</kbd> punch (knocks out guards, smashes cameras)</li>
+      <li><kbd>E</kbd> <b>hold</b> to grab loot / pick the back door · <kbd>E</kbd> tap at the vault keypad</li>
+      <li>Watch the <b>HEAT</b> meter. Full heat = alarm, guards hunt you and the police clock starts.</li>
+    </ul>
+    <button id="btnStart" class="big">▶ START HEIST</button>
+    <div class="small">Best haul: <span id="bestMenu">$0</span></div>
+  </div>
+</div>
+
+<!-- ═════════ PAUSE ═════════ -->
+<div id="pause" class="overlay hidden">
+  <div class="card small-card">
+    <h2>⏸ PAUSED</h2>
+    <button id="btnResume" class="big">▶ RESUME</button>
+    <button id="btnRestart" class="big ghost">↺ RESTART HEIST</button>
+  </div>
+</div>
+
+<!-- ═════════ VAULT KEYPAD ═════════ -->
+<div id="hack" class="overlay hidden">
+  <div class="card small-card keypad">
+    <h2>🔐 VAULT KEYPAD</h2>
+    <p id="hackMsg">Watch the sequence…</p>
+    <div id="pads">
+      <button class="pad red" data-i="0">1</button>
+      <button class="pad green" data-i="1">2</button>
+      <button class="pad blue" data-i="2">3</button>
+      <button class="pad yellow" data-i="3">4</button>
+    </div>
+    <p class="small">Keys 1–4 or click · ESC to back off (no penalty)</p>
+    <button id="btnHackCancel" class="ghost">Back off</button>
+  </div>
+</div>
+
+<!-- ═════════ RESULTS ═════════ -->
+<div id="over" class="overlay hidden">
+  <div class="card">
+    <h2 id="overTitle">BUSTED</h2>
+    <div id="overBody"></div>
+    <div class="small">Best haul: <span id="best">$0</span></div>
+    <button id="btnAgain" class="big">↺ HEIST AGAIN</button>
+  </div>
+</div>
+
+<script type="module" src="game.js"></script>
+</body>
+</html>

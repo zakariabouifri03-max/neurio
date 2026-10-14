@@ -1,0 +1,148 @@
+/* One-Armed Robber — UI */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&display=swap');
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: #070b16; color: #e5e7eb;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  user-select: none; -webkit-user-select: none; touch-action: none;
+}
+#app, #app canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+.hidden { display: none !important; }
+
+/* damage flash + vignette */
+#hurt {
+  position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity .25s;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(220,20,30,.75) 100%);
+}
+
+/* ── HUD ── */
+#hud { position: fixed; inset: 0; pointer-events: none; }
+#tl { position: absolute; top: 14px; left: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  background: rgba(10,14,28,.7); border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+  padding: 6px 12px; display: flex; flex-direction: column; min-width: 84px;
+  backdrop-filter: blur(4px);
+}
+.chip span { font-size: 10px; letter-spacing: 2px; color: #94a3b8; }
+.chip b { font-family: 'Bebas Neue', Impact, sans-serif; font-size: 26px; font-weight: 400; line-height: 1; }
+.chip.gold b { color: #fcd34d; }
+
+#tr { position: absolute; top: 14px; right: 14px; }
+#minimap { width: 220px; height: 200px; border-radius: 12px; border: 1px solid rgba(255,255,255,.15); background: rgba(8,12,24,.7); }
+
+#heatWrap {
+  position: absolute; top: 230px; right: 14px; width: 220px;
+  display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 2px; color: #cbd5e1;
+}
+#heatWrap span { min-width: 42px; }
+.bar {
+  flex: 1; height: 12px; background: rgba(255,255,255,.12); border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+}
+.bar > div { height: 100%; width: 0%; background: linear-gradient(90deg, #22c55e, #facc15, #ef4444); transition: width .08s linear; }
+.bar.hp { flex: 1; }
+.bar.hp > div { background: linear-gradient(90deg, #ef4444, #f97316); }
+#hpFill { background: linear-gradient(90deg, #ef4444, #f97316) !important; }
+
+#police {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  background: rgba(220,38,38,.9); color: #fff; padding: 8px 18px; border-radius: 999px;
+  font-family: 'Bebas Neue', Impact, sans-serif; font-size: 26px; letter-spacing: 1px;
+  animation: pulse .6s infinite alternate; box-shadow: 0 0 24px rgba(239,68,68,.6);
+}
+@keyframes pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.06); } }
+
+#objective {
+  position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: rgba(10,14,28,.7); padding: 8px 16px; border-radius: 10px; font-size: 14px;
+  border: 1px solid rgba(255,255,255,.1); white-space: nowrap; max-width: 92vw; overflow: hidden; text-overflow: ellipsis;
+}
+#crosshair {
+  position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px;
+  border-radius: 50%; background: rgba(255,255,255,.85); box-shadow: 0 0 0 2px rgba(0,0,0,.35);
+}
+
+#prompt {
+  position: absolute; top: 58%; left: 50%; transform: translate(-50%, 0);
+  background: rgba(10,14,28,.8); padding: 10px 16px; border-radius: 12px; min-width: 240px;
+  display: flex; flex-direction: column; gap: 6px; text-align: center; font-weight: 600;
+  border: 1px solid rgba(252,211,77,.4);
+}
+#prompt .bar { height: 8px; }
+#prompt .bar > div { background: #fcd34d; }
+
+#bl {
+  position: absolute; bottom: 24px; left: 14px; width: 240px; display: flex; align-items: center; gap: 8px;
+  font-size: 11px; letter-spacing: 2px; color: #fca5a5;
+}
+
+#toast {
+  position: absolute; top: 22%; left: 50%; transform: translateX(-50%);
+  font-family: 'Bebas Neue', Impact, sans-serif; font-size: 30px; letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0,0,0,.8); opacity: 0; transition: opacity .25s; text-align: center; white-space: nowrap;
+}
+#toast.show { opacity: 1; }
+
+/* ── overlays ── */
+.overlay {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(7,11,22,.55), rgba(7,11,22,.92));
+  z-index: 10; padding: 16px;
+}
+.card {
+  background: linear-gradient(160deg, rgba(20,26,48,.95), rgba(10,14,28,.95));
+  border: 1px solid rgba(255,255,255,.12); border-radius: 22px; padding: 26px 28px;
+  max-width: 560px; width: 100%; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.5);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.small-card { max-width: 380px; }
+.emoji { font-size: 44px; letter-spacing: 6px; }
+h1 {
+  font-family: 'Bebas Neue', Impact, sans-serif; font-weight: 400; font-size: 64px; line-height: .9; margin: 0;
+  letter-spacing: 2px;
+}
+h1 span { color: #fcd34d; text-shadow: 0 0 22px rgba(252,211,77,.4); }
+h2 { font-family: 'Bebas Neue', Impact, sans-serif; font-weight: 400; font-size: 40px; margin: 0; letter-spacing: 1px; }
+.lead { margin: 0; color: #cbd5e1; line-height: 1.5; font-size: 15px; }
+.howto { text-align: left; color: #cbd5e1; font-size: 14px; line-height: 1.8; padding-left: 18px; margin: 0; }
+kbd {
+  background: #1e293b; border: 1px solid #334155; border-bottom-width: 3px; border-radius: 6px;
+  padding: 1px 6px; font-size: 12px; color: #f8fafc; font-family: inherit;
+}
+.small { font-size: 12px; color: #94a3b8; }
+button {
+  font-family: inherit; cursor: pointer; border: 0; border-radius: 14px; padding: 12px 22px;
+  font-size: 16px; font-weight: 800; color: #111827; background: #fcd34d; letter-spacing: .5px;
+  transition: transform .1s, filter .15s; min-width: 220px;
+  box-shadow: 0 6px 0 #b45309;
+}
+button:hover { filter: brightness(1.08); }
+button:active { transform: translateY(3px); box-shadow: 0 3px 0 #b45309; }
+button.big { font-size: 20px; padding: 14px 28px; }
+button.ghost { background: #1e293b; color: #e2e8f0; box-shadow: 0 6px 0 #0b1222; }
+button.ghost:active { box-shadow: 0 3px 0 #0b1222; }
+
+/* ── keypad ── */
+#pads { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 240px; }
+.pad {
+  height: 96px; min-width: 0; border-radius: 18px; font-size: 34px; color: #fff; box-shadow: none;
+  font-family: 'Bebas Neue', Impact, sans-serif; border: 3px solid rgba(0,0,0,.3); opacity: .55; transition: opacity .08s, transform .08s;
+}
+.pad:active { transform: scale(.97); }
+.pad.lit, .pad:hover { opacity: 1; }
+.pad.red { background: #dc2626; }
+.pad.green { background: #16a34a; }
+.pad.blue { background: #2563eb; }
+.pad.yellow { background: #ca8a04; }
+.pad.lit { box-shadow: 0 0 28px currentColor, inset 0 0 18px rgba(255,255,255,.6); }
+#hackMsg { margin: 0; min-height: 22px; color: #fde68a; font-weight: 600; }
+.keypad button.ghost { min-width: 160px; padding: 8px 16px; font-size: 14px; }
+
+@media (max-width: 600px) {
+  h1 { font-size: 46px; }
+  .howto { font-size: 12px; }
+  #tr, #minimap { transform: scale(.7); transform-origin: top right; }
+  #heatWrap { top: 165px; width: 170px; }
+}
