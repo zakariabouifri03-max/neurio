@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🪖 Block Front 1944 — Voxel War</title>
+<meta name="theme-color" content="#3b4a2c">
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;user-select:none;-webkit-user-select:none}
+  #app{position:fixed;inset:0}
+  canvas{display:block;width:100%;height:100%}
+  .ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,14,8,.62);color:#fff;z-index:20;text-align:center}
+  .ov.hide{display:none}
+  .panel{background:rgba(24,30,20,.92);border:3px solid #c9a44a;border-radius:14px;padding:26px 30px;max-width:520px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+  .panel h1{margin:0 0 6px;font-size:34px;letter-spacing:2px;color:#f2d27a;text-shadow:0 3px 0 #000}
+  .panel h2{margin:0 0 14px;font-size:18px;color:#cfd8b8;font-weight:normal}
+  .panel p{margin:8px 0;color:#dfe6cf;font-size:15px;line-height:1.5}
+  .keys{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;text-align:left;margin:14px 0;font-size:14px;color:#e8efd6}
+  .keys kbd{background:#0007;border:1px solid #c9a44a;border-bottom-width:3px;border-radius:5px;padding:1px 7px;font-family:inherit;color:#fff}
+  .btn{margin-top:12px;font:700 20px "Trebuchet MS",sans-serif;background:linear-gradient(#e0b04b,#a86f1c);color:#1b1206;border:0;border-bottom:5px solid #6d4610;border-radius:10px;padding:12px 28px;cursor:pointer}
+  .btn:active{transform:translateY(2px)}
+  .stat{font-size:17px;color:#f2d27a;margin:4px 0}
+  #hud{position:fixed;inset:0;pointer-events:none;z-index:10;display:none}
+  .chip{position:absolute;background:rgba(20,24,16,.7);border:2px solid #6f7d52;border-radius:10px;padding:6px 12px;color:#fff;font-weight:700;font-size:15px}
+  .chip span{display:block;font-size:11px;color:#b8c39a;letter-spacing:1px;font-weight:normal}
+  #hp{left:16px;top:16px;width:230px}
+  .bar{height:12px;background:#0006;border-radius:6px;overflow:hidden;margin-top:4px}
+  .bar div{height:100%;width:100%;background:linear-gradient(#7dff7d,#1fa33a);transition:width .15s}
+  #wave{left:50%;top:14px;transform:translateX(-50%);text-align:center;min-width:280px}
+  #wave b{font-size:20px;color:#f2d27a}
+  #ammo{right:16px;bottom:96px;text-align:right;font-size:26px}
+  #ammo small{font-size:12px;color:#b8c39a;display:block;letter-spacing:1px}
+  #nades{right:16px;bottom:170px;font-size:16px}
+  #hotbar{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;pointer-events:none}
+  .slot{width:58px;height:58px;border:3px solid #6f7d52;border-radius:8px;background:rgba(20,24,16,.7);position:relative;display:flex;align-items:center;justify-content:center}
+  .slot.on{border-color:#f2d27a;box-shadow:0 0 12px #f2d27a88;transform:translateY(-4px)}
+  .slot .sw{width:60%;height:60%;border-radius:4px;border:2px solid #0008}
+  .slot .k{position:absolute;left:4px;top:2px;font-size:11px;color:#fff;font-weight:700}
+  .slot .n{position:absolute;bottom:-17px;left:0;right:0;text-align:center;font-size:10px;color:#e8efd6;white-space:nowrap}
+  #cross{position:fixed;left:50%;top:50%;width:26px;height:26px;transform:translate(-50%,-50%);z-index:10;pointer-events:none}
+  #cross::before,#cross::after{content:"";position:absolute;background:#fff;box-shadow:0 0 3px #000}
+  #cross::before{left:12px;top:0;width:2px;height:26px}
+  #cross::after{top:12px;left:0;height:2px;width:26px}
+  #cross i{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px;border:2px solid #f33;border-radius:50%;opacity:0;transition:opacity .15s}
+  #cross.hit i{opacity:1}
+  #flash{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(200,0,0,.85));opacity:0;pointer-events:none;z-index:9}
+  #msg{position:fixed;left:50%;top:30%;transform:translate(-50%,-50%);font-size:30px;font-weight:700;color:#fff;text-shadow:0 3px 0 #000,0 0 14px #000;z-index:11;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
+  #touchHint{position:fixed;left:0;right:0;bottom:118px;text-align:center;font-size:12px;color:#fff8;z-index:9;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="flash"></div>
+<div id="cross"><i></i></div>
+<div id="msg"></div>
+
+<div id="hud">
+  <div id="hp" class="chip"><span>HEALTH</span><b id="hpTxt">100</b><div class="bar"><div id="hpFill"></div></div></div>
+  <div id="wave" class="chip"><b id="waveTxt">WAVE 0</b><br><span id="infoTxt">score 0 · kills 0 · enemies 0</span></div>
+  <div id="ammo" class="chip"><span>RIFLE</span><b id="ammoTxt">30 / 120</b></div>
+  <div id="nades" class="chip"><span>GRENADES [Q]</span><b id="nadeTxt">x3</b></div>
+  <div id="hotbar"></div>
+  <div id="touchHint">Mouse: aim & fire · Right-click: place block · F: dig · Q: grenade · 1-6: materials</div>
+</div>
+
+<div id="start" class="ov">
+  <div class="panel">
+    <h1>BLOCK FRONT 1944</h1>
+    <h2>A voxel war in the trenches — hold the line against Axis waves.</h2>
+    <p>Blocky soldiers and tanks advance from the north through the trenches.
+       Build sandbag walls, dig through terrain, blow up bunkers and survive as long as you can.</p>
+    <div class="keys">
+      <kbd>W A S D</kbd><span>move</span>
+      <kbd>Mouse</kbd><span>aim</span>
+      <kbd>Left click</kbd><span>fire rifle (hold for auto)</span>
+      <kbd>R</kbd><span>reload</span>
+      <kbd>Q</kbd><span>throw grenade (blows up walls!)</span>
+      <kbd>Right click</kbd><span>place block</span>
+      <kbd>F</kbd><span>dig block you aim at</span>
+      <kbd>1-6 / wheel</kbd><span>choose block material</span>
+      <kbd>Shift</kbd><span>sprint · <kbd>Space</kbd> jump</span>
+      <kbd>Esc</kbd><span>pause</span>
+    </div>
+    <button id="btnStart" class="btn">▶ DEPLOY</button>
+  </div>
+</div>
+
+<div id="pause" class="ov hide">
+  <div class="panel">
+    <h1>PAUSED</h1>
+    <p>Click anywhere to return to the front.</p>
+    <button id="btnResume" class="btn">▶ RESUME</button>
+  </div>
+</div>
+
+<div id="over" class="ov hide">
+  <div class="panel">
+    <h1>OVERRUN</h1>
+    <h2>Your position has fallen.</h2>
+    <div class="stat">Wave reached: <b id="oWave">0</b></div>
+    <div class="stat">Kills: <b id="oKills">0</b></div>
+    <div class="stat">Score: <b id="oScore">0</b></div>
+    <button id="btnRedeploy" class="btn">↻ REDEPLOY</button>
+  </div>
+</div>
+
+<script type="module" src="game.js"></script>
+</body>
+</html>
