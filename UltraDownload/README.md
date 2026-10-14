@@ -4,6 +4,8 @@ A real Python/PySide6 desktop download manager for Windows, with bounded paralle
 
 **Version:** 1.0.0 · **Python:** 3.12 recommended (3.11 compatible) · **Platform target:** Windows 10/11 x64
 
+**[Download the verified Windows EXE (ZIP)](https://github.com/zakariabouifri03-max/neurio/actions/runs/38536392228/artifacts/11880705546)** — 67 Windows tests passed; packaged EXE launch passed. See [validation, checksum, and release limitations](VALIDATION.md). GitHub sign-in may be required; artifact retention is 30 days.
+
 ## Run from source
 
 ```bat
