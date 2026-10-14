@@ -1,0 +1,5 @@
+# UltraDownload runtime dependencies (Python 3.10+, recommended 3.12)
+# PySide6-Essentials provides QtCore/QtGui/QtWidgets (the Addons modules are
+# not used, which keeps installs and the packaged EXE smaller).
+PySide6-Essentials>=6.5,<7
+requests>=2.31,<3

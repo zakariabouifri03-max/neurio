@@ -1,0 +1,16 @@
+# build / packaging artifacts
+.build-venv/
+.run-venv/
+build/
+dist/
+*.spec.bak
+
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+# local app data
+*.log
+*.udpart

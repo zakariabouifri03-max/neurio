@@ -1,0 +1,6 @@
+# Development / testing / packaging dependencies
+-r requirements.txt
+pytest>=7.4
+pyinstaller>=6.3
+# only needed to regenerate assets/icon.png + assets/icon.ico:
+pillow>=10.0
