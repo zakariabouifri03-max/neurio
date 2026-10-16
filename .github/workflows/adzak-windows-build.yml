@@ -1,0 +1,74 @@
+name: Build ADZAK Lite Browser (Windows x64)
+
+# Builds the real Windows x64 Release binaries on a Windows runner,
+# smoke-tests the single-file EXE headlessly, and uploads artifacts.
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/9fb76cdb-neurio]
+    paths:
+      - 'adzak-lite-browser/**'
+      - '.github/workflows/adzak-windows-build.yml'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore adzak-lite-browser/src/ADZAKLiteBrowser/ADZAKLiteBrowser.csproj
+
+      - name: Publish single-file EXE (self-contained, win-x64)
+        run: >
+          dotnet publish adzak-lite-browser/src/ADZAKLiteBrowser/ADZAKLiteBrowser.csproj
+          -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:DebugType=none -p:DebugSymbols=false
+          -o publish/single
+
+      - name: Publish folder build (self-contained, win-x64)
+        run: >
+          dotnet publish adzak-lite-browser/src/ADZAKLiteBrowser/ADZAKLiteBrowser.csproj
+          -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=false
+          -p:DebugType=none -p:DebugSymbols=false
+          -o publish/folder
+
+      - name: Ensure WebView2 Runtime (for smoke test)
+        shell: pwsh
+        run: |
+          try {
+            Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile "$env:TEMP\WebView2Setup.exe" -UseBasicParsing
+            Start-Process "$env:TEMP\WebView2Setup.exe" -ArgumentList '/silent','/install' -Wait -NoNewWindow
+          } catch { Write-Host "Runtime setup step warning: $_" }
+
+      - name: Smoke test the single-file EXE (headless, no network)
+        shell: pwsh
+        run: |
+          $p = Start-Process 'publish/single/ADZAKLiteBrowser.exe' -ArgumentList '--smoke-test' -Wait -PassThru
+          Write-Host "Smoke test exit code: $($p.ExitCode)"
+          $result = Join-Path $env:TEMP 'adzak-smoke-result.json'
+          if (Test-Path $result) { Get-Content $result }
+          if ($p.ExitCode -ne 0) { throw "Smoke test failed" }
+
+      - name: Package artifacts
+        shell: pwsh
+        run: |
+          Copy-Item adzak-lite-browser/README.md publish/ -ErrorAction SilentlyContinue
+          Compress-Archive -Path publish/folder/* -DestinationPath publish/ADZAK-Lite-Browser-win-x64-folder.zip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ADZAK-Lite-Browser-win-x64
+          path: |
+            publish/single/ADZAKLiteBrowser.exe
+            publish/ADZAK-Lite-Browser-win-x64-folder.zip
+            publish/README.md
+          if-no-files-found: error
