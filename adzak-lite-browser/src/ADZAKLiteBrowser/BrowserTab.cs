@@ -153,9 +153,8 @@ public sealed class BrowserTab : IDisposable
         {
             try { Core.MemoryUsageTargetLevel = CoreWebView2MemoryUsageTargetLevel.Low; }
             catch { /* older runtimes: suspension alone still helps */ }
-            await Core.SuspendAsync();
-            IsSuspended = true;
-            _host.RefreshTabText(this);
+            IsSuspended = await Core.TrySuspendAsync();
+            if (IsSuspended) _host.RefreshTabText(this);
         }
         catch
         {

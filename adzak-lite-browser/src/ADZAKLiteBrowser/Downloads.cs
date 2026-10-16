@@ -18,17 +18,25 @@ public sealed class DownloadEntry
 
     public string FileName => Path.GetFileName(TargetPath);
 
+    // WebView2 reports these as 64-bit values whose exact CLR types vary by
+    // SDK vintage; Convert.*(object) keeps this robust either way.
+    private long ReceivedBytes
+    {
+        get { try { return Convert.ToInt64(Operation.BytesReceived); } catch { return 0; } }
+    }
+
+    private long TotalBytes
+    {
+        get { try { return Convert.ToInt64(Operation.TotalBytesToReceive); } catch { return 0; } }
+    }
+
     public int Percent
     {
         get
         {
-            try
-            {
-                var total = Operation.TotalBytesToReceive;
-                if (total <= 0) return 0;
-                return (int)Math.Min(100, Operation.BytesReceived * 100 / total);
-            }
-            catch { return 0; }
+            var total = TotalBytes;
+            if (total <= 0) return 0;
+            return (int)Math.Min(100, ReceivedBytes * 100 / total);
         }
     }
 
@@ -36,14 +44,10 @@ public sealed class DownloadEntry
     {
         get
         {
-            try
-            {
-                var total = Operation.TotalBytesToReceive;
-                return total > 0
-                    ? $"{FormatBytes(Operation.BytesReceived)} / {FormatBytes(total)}"
-                    : FormatBytes(Operation.BytesReceived);
-            }
-            catch { return ""; }
+            var total = TotalBytes;
+            return total > 0
+                ? $"{FormatBytes(ReceivedBytes)} / {FormatBytes(total)}"
+                : FormatBytes(ReceivedBytes);
         }
     }
 

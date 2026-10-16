@@ -463,9 +463,7 @@ public sealed class MainForm : Form
             {
                 case CoreWebView2PermissionKind.Camera:
                 case CoreWebView2PermissionKind.Microphone:
-                case CoreWebView2PermissionKind.CameraAndMicrophone:
-                    var what = e.PermissionKind == CoreWebView2PermissionKind.Camera ? "camera"
-                             : e.PermissionKind == CoreWebView2PermissionKind.Microphone ? "microphone" : "camera and microphone";
+                    var what = e.PermissionKind == CoreWebView2PermissionKind.Camera ? "camera" : "microphone";
                     var answer = MessageBox.Show(this,
                         $"{HostOf(e.Uri)} wants to use your {what}. Allow?",
                         "ADZAK Lite Browser — permission", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
