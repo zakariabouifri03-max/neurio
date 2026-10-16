@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101311" />
+    <meta
+      name="description"
+      content="A private, on-device audio player with adjustable boost and a look-ahead limiter."
+    />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Safi — a little louder. a lot clearer.</title>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <a class="brand" href="./" aria-label="Safi home"
+          ><span class="brand-icon">≋</span>safi<span class="brand-dot"
+            >.</span
+          ></a
+        >
+        <div class="side-label">YOUR SOUND, REFINED</div>
+        <nav>
+          <a class="nav-active" href="#player"
+            ><span>◉</span> Sound studio <span class="nav-dot"></span></a
+          ><a href="#library"><span>♫</span> My library</a
+          ><button id="install-side" hidden><span>↧</span> Install app</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <span class="privacy-orb">⌁</span
+          ><strong>Only on your device.</strong>
+          <p>Your audio stays yours.<br />No uploads. No accounts.</p>
+          <span class="version">SAFI PLAYER / V1.0</span>
+        </div>
+      </aside>
+      <main>
+        <header>
+          <span class="breadcrumb"
+            >Your personal listening space <span>/</span> <b>Studio</b></span
+          ><button id="install" class="pill" hidden>↧ Install app</button
+          ><span class="local-badge"><i></i> LOCAL & PRIVATE</span>
+        </header>
+        <section class="intro">
+          <div class="eyebrow"><span></span> LESS NOISE. MORE FEELING.</div>
+          <h1>A little louder.<br /><span>A lot clearer.</span></h1>
+          <p>
+            Give quiet tracks a lift. Keep the peaks in check.<br />Your own
+            little sound studio, right in your pocket.
+          </p>
+        </section>
+        <div class="studio-grid">
+          <section class="player card" id="player" aria-label="Audio player">
+            <div class="card-top">
+              <span>NOW PLAYING</span
+              ><span class="mini-tag" id="source-type">LOCAL AUDIO</span>
+            </div>
+            <div class="track-heading">
+              <div class="artwork" aria-hidden="true">
+                <div class="disc"><span>≋</span></div>
+              </div>
+              <div class="track-copy">
+                <h2 id="track-name">Make room for your music.</h2>
+                <p id="track-detail">Open a track to get started</p>
+              </div>
+            </div>
+            <div class="visualizer">
+              <canvas
+                id="visualizer"
+                aria-label="Live output level visualization"
+              ></canvas
+              ><span id="viz-empty">YOUR NEXT FAVORITE MOMENT STARTS HERE</span>
+            </div>
+            <div class="time-row">
+              <span id="elapsed">0:00</span><span id="duration">0:00</span>
+            </div>
+            <input
+              type="range"
+              id="seek"
+              aria-label="Playback position"
+              min="0"
+              max="100"
+              value="0"
+              step="0.1"
+              disabled
+            />
+            <div class="transport">
+              <button
+                class="icon-button"
+                id="previous"
+                aria-label="Previous track"
+                disabled
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M5 5h2v14H5zM19 5v14L8 12z" />
+                </svg></button
+              ><button class="play-button" id="play" aria-label="Play" disabled>
+                ▶</button
+              ><button
+                class="icon-button"
+                id="next"
+                aria-label="Next track"
+                disabled
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M17 5h2v14h-2zM5 5l11 7-11 7z" />
+                </svg>
+              </button>
+            </div>
+            <div class="volume-row">
+              <span aria-hidden="true">◖))</span
+              ><input
+                id="volume"
+                type="range"
+                aria-label="Output volume"
+                min="0"
+                max="100"
+                value="70"
+              /><output id="volume-value" for="volume">70%</output>
+            </div>
+            <div class="player-footer">
+              <span
+                ><i></i>
+                <span id="engine-status">Ready when you are</span></span
+              ><span>WEB AUDIO ENGINE</span>
+            </div>
+          </section>
+          <section class="controls card" aria-label="Sound controls">
+            <div class="card-top">
+              <span>FIND YOUR SWEET SPOT</span><span aria-hidden="true">⌘</span>
+            </div>
+            <div class="boost-title">
+              <div>
+                <h2>Sound boost</h2>
+                <p>A gentle lift, not a loudness contest.</p>
+              </div>
+              <span class="boost-number"
+                ><output id="boost-value" for="boost">+0</output
+                ><small>dB</small></span
+              >
+            </div>
+            <input
+              type="range"
+              id="boost"
+              aria-label="Sound boost in decibels"
+              min="-6"
+              max="12"
+              step="1"
+              value="0"
+            />
+            <div class="range-labels">
+              <span>−6 dB</span><span>ORIGINAL</span><span>+12 dB</span>
+            </div>
+            <div class="section-label">MAKE IT YOURS</div>
+            <div class="presets" role="group" aria-label="Equalizer presets">
+              <button
+                data-preset="balanced"
+                class="selected"
+                aria-pressed="true"
+              >
+                <span>≋</span> Balanced</button
+              ><button data-preset="voice" aria-pressed="false">
+                <span>♩</span> Clear voice</button
+              ><button data-preset="warm" aria-pressed="false">
+                <span>◔</span> Warm
+              </button>
+            </div>
+            <div class="protection">
+              <span class="shield" aria-hidden="true">◇</span>
+              <div>
+                <strong id="protection-label">Peak protection</strong>
+                <p id="protection-copy">
+                  Look-ahead limiter • starts with playback
+                </p>
+              </div>
+              <span class="protection-state" id="protection-state">READY</span>
+            </div>
+            <div class="meter-title">
+              <span>OUTPUT LEVEL</span><span id="meter-value">— dBFS</span>
+            </div>
+            <div class="meter"><div id="meter-fill"></div></div>
+            <div class="range-labels">
+              <span>−60</span><span>−30</span><span>−1 dBFS</span>
+            </div>
+            <div class="safety-note">
+              <span class="info-icon" aria-hidden="true">i</span>
+              <p>
+                Start low, especially with headphones. Boost cannot exceed your
+                speaker’s physical limits or remove existing distortion.
+              </p>
+            </div>
+            <button class="reset-button" id="reset">
+              ↺ Reset sound settings
+            </button>
+          </section>
+        </div>
+        <section class="library card" id="library">
+          <div class="library-heading">
+            <div>
+              <div class="section-label">YOUR LISTENING LIST</div>
+              <h2>Good sound starts here.</h2>
+            </div>
+            <button class="add-button" id="add-files">+ Add audio</button>
+          </div>
+          <input
+            type="file"
+            id="files"
+            accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac,.aac"
+            multiple
+            hidden
+          />
+          <div
+            id="drop-zone"
+            class="drop-zone"
+            tabindex="0"
+            role="button"
+            aria-label="Choose audio files"
+          >
+            <span class="upload-icon">↥</span>
+            <div>
+              <strong>Bring your own soundtrack.</strong>
+              <p>
+                Choose audio files <span>or drop them here</span> · MP3, WAV,
+                M4A & more*
+              </p>
+            </div>
+            <span class="drop-arrow">↗</span>
+          </div>
+          <ol id="track-list"></ol>
+          <p class="format-note">
+            *Format support depends on your browser. Files stay on this device
+            and are not saved by the app.
+          </p>
+        </section>
+        <div id="status" role="status" aria-live="polite"></div>
+        <footer>
+          <span class="footer-brand">safi.</span
+          ><span>Made for your music. Not your data.</span
+          ><button id="about">What this app can do ↗</button>
+        </footer>
+      </main>
+    </div>
+    <dialog id="about-dialog">
+      <button id="close-about" class="dialog-close" aria-label="Close">
+        ×
+      </button>
+      <div class="eyebrow">HONEST SOUND</div>
+      <h2>A player, not a system hack.</h2>
+      <p>
+        Safi boosts only the local audio files you open here. It cannot increase
+        YouTube, calls, other apps, or your phone’s hardware maximum.
+      </p>
+      <p>
+        The limiter reduces digital clipping from added gain. It cannot
+        guarantee distortion-free speakers, repair a damaged recording, or
+        protect hearing at every listening level. Strong boosts can reduce
+        dynamics.
+      </p>
+      <p>
+        <b>B darija:</b> Kayzid sot ghir dyal l’audio li kat7ell hna. Ma
+        kayzidch sot dyal telephone kamel. Bda b sot na9es, surtout b les
+        ecouteurs.
+      </p>
+      <p>
+        Install from your browser menu → Add to Home screen. Open once online to
+        prepare offline use. Select your tracks again after reopening.
+      </p>
+    </dialog>
+    <audio id="audio" preload="metadata"></audio>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

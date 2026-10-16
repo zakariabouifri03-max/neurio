@@ -1,0 +1,25 @@
+{
+  "id": "./",
+  "name": "Safi — Local Sound Studio",
+  "short_name": "Safi",
+  "description": "A private local audio player with boost and peak limiting. Not a system-wide booster.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#101311",
+  "theme_color": "#101311",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
