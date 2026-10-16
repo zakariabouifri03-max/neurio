@@ -34,10 +34,14 @@ See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline 
 
 ## 📱 Install on your phone — APK ولا PWA
 
-**Real APK (≈250 KB, offline, no permissions):** download
-**[`BashBaqiRacing.apk`](https://github.com/zakariabouifri03-max/neurio/releases/latest)**
-from the releases page onto the phone, tap it, allow *"install unknown apps"* once, and
-play. Nothing else is needed — no internet, no Play Store.
+**Real APK (≈250 KB, offline, zero permissions):** download
+**[`dist/BashBaqiRacing.apk`](dist/BashBaqiRacing.apk)** (tap the ⬇ *Download* button on
+GitHub) onto the phone, tap the file, allow *"install unknown apps"* once — done. Nothing
+else is needed: no internet, no Play Store, no account.
+
+> 📲 **Share it on WhatsApp:** the direct link is
+> `https://github.com/zakariabouifri03-max/neurio/raw/hooome/dist/BashBaqiRacing.apk`
+> — send that to a friend and the whole game lands in their phone.
 
 **Or the PWA:** the game is also a full **Progressive Web App** — installable, fullscreen,
 **works offline**, its own icon.
