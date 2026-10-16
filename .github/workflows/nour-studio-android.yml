@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-apk:
@@ -53,10 +53,40 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 4
 
+      - name: Prepare the release asset
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/NourStudio-Android-v1.0.0.apk
+
+      - name: Publish direct-download GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          APK="dist/NourStudio-Android-v1.0.0.apk"
+          TAG="nour-studio-v1.0.0"
+          TITLE="Nour Studio 1.0.0 — Android APK"
+          NOTES=$(cat <<'EOF'
+          ## Nour Studio for Android
+
+          Install the attached APK directly on Android. The first time you start the camera, allow camera access when prompted.
+
+          **Honest limitations:** this app applies local exposure, contrast, and colour adjustments; it does not include a neural AI model, cannot speed up a weak connection, and does not upload camera video. Android does not let a regular app replace WhatsApp's camera feed. The OBS Virtual Camera bridge is for WhatsApp on a computer only.
+
+          For installation and build notes, see [NOUR-ANDROID.md](https://github.com/zakariabouifri03-max/neurio/blob/arena/b6cb5ea3-neurio/NOUR-ANDROID.md).
+          EOF
+          )
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TITLE" --notes "$NOTES"
+          else
+            gh release create "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$TITLE" --notes "$NOTES"
+          fi
+
       - name: Upload APK to the workflow run
         uses: actions/upload-artifact@v7
         with:
           name: NourStudio-Android-v1.0.0
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: dist/NourStudio-Android-v1.0.0.apk
           if-no-files-found: error
           retention-days: 30

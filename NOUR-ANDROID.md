@@ -24,4 +24,4 @@ cd android
 gradle --no-daemon :app:assembleDebug
 ```
 
-The repeatable GitHub Actions workflow is `.github/workflows/nour-studio-android.yml`. It verifies the APK signature and publishes a 30-day workflow artifact; the tagged GitHub Release is the permanent direct-download location.
+The repeatable GitHub Actions workflow is `.github/workflows/nour-studio-android.yml`. It verifies the APK signature, attaches it to the tagged GitHub Release for permanent direct download, and also stores a 30-day workflow artifact.
