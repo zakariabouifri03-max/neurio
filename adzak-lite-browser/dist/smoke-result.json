@@ -1,0 +1,14 @@
+{
+  "startedUtc": "2026-10-16T16:03:36.7731607Z",
+  "runtimeVersion": "155.0.4283.60",
+  "blocklistBlocksDoubleclick": true,
+  "blocklistAllowsExample": true,
+  "normalizeSearch": "how to boil eggs",
+  "normalizeHost": "https://example.com/docs",
+  "settingsLoadOk": true,
+  "navigationCompleted": true,
+  "documentTitle": "ADZAK Smoke OK",
+  "domText": "hello",
+  "webglRenderer": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "ok": true
+}
