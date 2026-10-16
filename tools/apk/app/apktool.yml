@@ -1,0 +1,17 @@
+version: 2.4.1
+apkFileName: bashbaqi-unsigned.apk
+isFrameworkApk: false
+usesFramework:
+  ids:
+  - 1
+sdkInfo:
+  minSdkVersion: '24'
+  targetSdkVersion: '34'
+versionInfo:
+  versionCode: '1'
+  versionName: '1.0'
+resourcesAreCompressed: false
+sharedLibrary: false
+doNotCompress:
+- png
+- webp

@@ -20,6 +20,7 @@ addEventListener('error', (e) => {
 const game = {
   state: 'boot',
   paused: false,
+  background: false,   // true while the Android shell is in the background
   save: loadSave(),
   persist: () => persist(game.save),
   highQ: !(matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700),
@@ -34,6 +35,68 @@ const game = {
   _fpsT: 0, _fpsN: 0, _fpsLow: 0,
 };
 window.GAME = game;
+
+// ── ⚡ performance mode ─────────────────────────────────────────────────────
+// 'fast' = 1× pixels, no bloom, no shadows  ·  'auto' = full quality, degrades by itself
+const APK_SHELL = /BashBaqiAPK/.test(navigator.userAgent || '');
+game.quality = game.save.quality || (APK_SHELL ? 'fast' : 'auto');
+game.isFast = () => game.quality === 'fast';
+
+// remember every light/mesh shadow flag so leaving fast mode restores the scene exactly
+function shadowUsers() {
+  const out = [];
+  for (const sc of [game.race && game.race.scene, game.garage && game.garage.scene]) {
+    if (!sc) continue;
+    sc.traverse((o) => {
+      if (o.isLight || o.isMesh) {
+        if (!o.userData._sh) o.userData._sh = { cast: o.castShadow, recv: o.receiveShadow };
+        out.push(o);
+      }
+    });
+  }
+  return out;
+}
+
+game.applyQuality = (announce = false) => {
+  const r = game.renderer;
+  if (!r) return;
+  const fast = game.isFast();
+  game.highQ = !fast && !(matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700);
+  r.setPixelRatio(Math.min(devicePixelRatio || 1, fast ? 1 : 2));
+  r.setSize(innerWidth, innerHeight);
+  if (game.fx) { game.fx.enabled = !fast; game.fx.setSize(innerWidth, innerHeight); }
+  r.shadowMap.enabled = !fast;
+  for (const o of shadowUsers()) {
+    o.castShadow = fast ? false : o.userData._sh.cast;
+    o.receiveShadow = fast ? false : o.userData._sh.recv;
+  }
+  if (announce) game.toast(fast
+    ? '⚡ <b>Fast mode</b> — fewer pixels, no bloom, no shadows'
+    : '🎨 <b>Auto quality</b> — bloom and shadows back on');
+};
+
+// the auto ladder: bloom → fewer pixels → whole fast mode (never runs while 'fast')
+game.autoQuality = (fps) => {
+  const r = game.renderer;
+  if (!r || game.quality === 'fast') return;
+  if (fps > 26) { game._fpsLow = Math.max(0, game._fpsLow - 1); return; }
+  if (++game._fpsLow < 2) return;      // ~6 s of slowness before touching anything
+  game._fpsLow = 0;
+  if (game.fx && game.fx.enabled) { game.fx.enabled = false; return; }
+  const pr = r.getPixelRatio();
+  if (pr > 1) {
+    r.setPixelRatio(Math.max(1, pr - 0.5));
+    r.setSize(innerWidth, innerHeight);
+    if (game.fx) game.fx.setSize(innerWidth, innerHeight);
+    return;
+  }
+  game.quality = 'fast';
+  game.save.quality = 'fast';
+  game.persist();
+  game.applyQuality(false);
+  game.toast('⚡ Slow device — switched to <b>Fast mode</b> (tap ⚡ to change)');
+};
+
 
 // ── economy / stats ─────────────────────────────────────────────────────────
 game.spend = ({ coins = 0, gems = 0 }) => {
@@ -120,6 +183,7 @@ game.startRace = () => {
   $('pauseModal').classList.remove('open');
   const map = MAPS[(Math.random() * MAPS.length) | 0];
   game.race = new Race(game, map, onRaceFinish);
+  if (game.isFast()) game.applyQuality();      // ⚡ apply the fast settings to the fresh scene
   game.state = 'race';
   $('hud').classList.add('on');
   $('garageUI').classList.remove('on');
@@ -154,6 +218,7 @@ game.showGarage = () => {
   $('garageUI').classList.add('on');
   if (!game.garage) game.garage = new Garage(game);
   else game.garage.refresh();
+  if (game.isFast()) game.applyQuality();      // ⚡ apply the fast settings to the fresh scene
   game.refreshTopbar();
 };
 
@@ -188,7 +253,8 @@ function onRaceFinish(res) {
 
 // ── renderer / loop ──────────────────────────────────────────────────────────
 function boot() {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+  const fastBoot = game.isFast();
+  const renderer = new THREE.WebGLRenderer({ antialias: !fastBoot, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   renderer.setSize(innerWidth, innerHeight);
   renderer.shadowMap.enabled = true;
@@ -198,15 +264,16 @@ function boot() {
   $('app').appendChild(renderer.domElement);
   game.renderer = renderer;
   game.fx = new BloomFX(renderer);
+  game.applyQuality();
 
   const clock = new THREE.Clock();
   renderer.setAnimationLoop(() => {
     const dt = Math.min(clock.getDelta(), 0.08);
-    // auto quality: drop bloom if consistently slow
+    if (game.background) return;             // Android shell sent the app to the background
+    // auto quality ladder (bloom → pixels → fast mode)
     game._fpsT += dt; game._fpsN++;
     if (game._fpsT > 3) {
-      const fps = game._fpsN / game._fpsT;
-      if (fps < 28 && game.fx.enabled) { game.fx.enabled = false; }
+      game.autoQuality(game._fpsN / game._fpsT);
       game._fpsT = 0; game._fpsN = 0;
     }
 
@@ -230,6 +297,24 @@ function boot() {
 
   wireUI();
 
+  // ── Android shell bridge (BashBaqiAPK WebView calls these) ──
+  window.__pauseGame = () => {
+    game.background = true;
+    if (audio.master) audio.master.gain.value = 0;      // silence the island while backgrounded
+    if (game.state === 'race' && !game.paused) game.togglePause();
+  };
+  window.__resumeGame = () => {
+    game.background = false;
+    if (audio.master) audio.master.gain.value = 0.8;
+  };
+  window.__setQuality = (q) => {
+    if (q !== 'fast' && q !== 'auto') return;
+    game.quality = q;
+    game.save.quality = q;
+    game.persist();
+    game.applyQuality();
+  };
+
   // go! loading screen already visible; start the first race immediately
   setTimeout(() => {
     $('loading').classList.add('hide');
@@ -241,6 +326,25 @@ function boot() {
 // ── UI wiring ────────────────────────────────────────────────────────────────
 function wireUI() {
   game.refreshTopbar();
+
+  // ⚡ performance mode toggle
+  const perfBtn = $('btnPerf');
+  if (perfBtn) {
+    const syncPerfBtn = () => {
+      perfBtn.textContent = game.isFast() ? '⚡' : '🔋';
+      perfBtn.classList.toggle('boost', game.isFast());
+      perfBtn.title = game.isFast() ? 'Fast mode ON — tap for auto quality' : 'Auto quality — tap for fast mode';
+    };
+    perfBtn.onclick = () => {
+      audio.click();
+      game.quality = game.isFast() ? 'auto' : 'fast';
+      game.save.quality = game.quality;
+      game.persist();
+      game.applyQuality(true);
+      syncPerfBtn();
+    };
+    syncPerfBtn();
+  }
 
   $('btnRace').onclick = () => { audio.click(); game.startRace(); };
   $('btnShop').onclick = () => openShop(game);

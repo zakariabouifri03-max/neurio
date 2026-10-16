@@ -25,6 +25,7 @@ export function defaultSave() {
     races: 0,
     music: true,
     sfx: true,
+    quality: null,         // null = auto · 'fast' = ⚡ performance mode
   };
 }
 
