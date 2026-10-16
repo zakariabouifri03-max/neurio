@@ -51,10 +51,11 @@ jobs:
       - name: Generate signing key (sideload builds)
         run: |
           keytool -genkeypair -v \
-            -keystore keystore.jks -alias sawt \
-            -keyalg RSA -keysize 2048 -validity 10000 \
+            -keystore android/keystore.jks -alias sawt \
+            -keyalg RSA -keysize 2048 -validity 10000 -noprompt \
             -storepass sawt-release -keypass sawt-release \
-            -dname "CN=SAWT+, O=SAWT+, C=MA"
+            -dname "CN=SAWT Plus, O=SAWT, C=MA"
+          ls -la android/keystore.jks
 
       - name: Build release APK
         working-directory: android
