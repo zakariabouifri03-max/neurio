@@ -1,150 +1,140 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ar-MA" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏁 Bash Baqi Racing</title>
-<meta name="theme-color" content="#0ea5e9">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bash Baqi">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/style.css">
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
-</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f5f1">
+  <meta name="description" content="نور ستوديو: حسّن ضوّ وصورة الكاميرا محلياً قبل مقابلة الفيديو. ما كاين حتى رفع للفيديو للخوادم.">
+  <title>نور ستوديو — كاميرا المقابلة</title>
+  <link rel="icon" href="icons/nour.svg" type="image/svg+xml">
+  <link rel="manifest" href="clearcall.webmanifest">
+  <link rel="stylesheet" href="src/clearcall/style.css">
 </head>
 <body>
-<div id="app"></div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="./" aria-label="نور ستوديو، الصفحة الرئيسية">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 2.8 19.3 12l9.1 4-9.1 4-3.3 9.2L12.7 20 3.6 16l9.1-4L16 2.8Z"/><circle cx="25.2" cy="6.8" r="2.1"/></svg></span>
+        <span class="brand-name">nour<span>studio</span></span>
+      </a>
+      <div class="sidebar-label">مساحة الخدمة</div>
+      <nav class="side-nav" aria-label="التنقل الرئيسي">
+        <a class="nav-item active" href="#studio" aria-current="page"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3V9Z"/></svg><span>الاستوديو</span><span class="nav-dot"></span></a>
+        <button class="nav-item" id="nav-guide" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.3 1.8c-1.1 1.1-1.9 1.4-1.9 3"/><path d="M12 17.2v.1"/></svg><span>الربط مع واتساب</span><svg class="nav-arrow" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      </nav>
+      <div class="side-spacer"></div>
+      <div class="privacy-card">
+        <div class="privacy-icon"><svg viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 4.7-2.8 8.2-7 10-4.2-1.8-7-5.3-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <b>الخصوصية أولاً</b>
+        <p>الصورة كتتعالج فمتصفحك فقط. ما كنخزّنوها وما كنرسلوها حتى لشي سيرفر.</p>
+        <span class="privacy-live"><i></i> المعالجة محلية</span>
+      </div>
+      <div class="sidebar-footer">
+        <a class="play-link" href="blockyard.html"><span class="play-link-icon"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></svg></span><span><b>بغيتي تلعب؟</b><small>زور عالم Blockyard</small></span><svg class="play-arrow" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a>
+        <span class="version-label">NOUR STUDIO <i>·</i> BETA</span>
+      </div>
+    </aside>
 
-<!-- error overlay -->
-<div id="errLog"></div>
+    <main class="main-panel" id="studio">
+      <header class="topbar">
+        <div class="topbar-start">
+          <button id="menu-toggle" class="mobile-menu" type="button" aria-label="فتح القائمة" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+          <div class="breadcrumb"><span class="crumb-muted">نور ستوديو</span><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><b>كاميرا المقابلة</b></div>
+        </div>
+        <div class="topbar-end">
+          <span class="device-safe"><i></i><span>فيديوك ما كيخرجش من جهازك</span></span>
+          <button class="help-button" id="top-guide" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.3 1.8c-1.1 1.1-1.9 1.4-1.9 3"/><path d="M12 17.2v.1"/></svg><span>كيفاش نربطها بواتساب؟</span></button>
+        </div>
+      </header>
 
-<!-- loading -->
-<div id="loading">
-  <div class="loadBox">
-    <div class="loadFlag">🏁</div>
-    <div class="loadTitle">BASH BAQI<br>RACING</div>
-    <div class="loadBar"><div></div></div>
-    <div class="loadTip">warming up the buggies…</div>
+      <div class="page-content">
+        <section class="page-heading">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-line"></span>استوديو مقابلات الفيديو</div>
+            <h1>بان مزيان، <span>بضوّ أحسن.</span></h1>
+            <p class="heading-copy">حسّن الإضاءة وخفّف دقّة الصورة إلا كان النت ضعيف. كلشي كيتدار عندك فالجهاز.</p>
+          </div>
+          <div class="privacy-summary"><span class="summary-mark"><svg viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 4.7-2.8 8.2-7 10-4.2-1.8-7-5.3-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg></span><span><b>بلا رفع للفيديو</b><small>المعالجة محلية وآمنة</small></span><i class="summary-check">✓</i></div>
+        </section>
+
+        <div class="studio-grid">
+          <section class="preview-column" aria-labelledby="preview-title">
+            <div class="section-heading preview-heading">
+              <div><span class="section-kicker">المعاينة</span><h2 id="preview-title">شوف الصورة قبل المكالمة</h2></div>
+              <div class="camera-state" id="camera-state"><i></i><span id="camera-state-text">الكاميرا مطفّية</span></div>
+            </div>
+            <div class="preview-shell" id="preview-shell">
+              <video id="camera-source" class="source-video" muted autoplay playsinline aria-hidden="true"></video>
+              <canvas id="processed-canvas" class="processed-canvas" width="640" height="360" aria-label="معاينة صورة الكاميرا بعد التحسين"></canvas>
+              <div class="preview-placeholder" id="preview-placeholder">
+                <div class="placeholder-orbit orbit-one"></div><div class="placeholder-orbit orbit-two"></div>
+                <div class="placeholder-center"><span class="camera-illustration"><svg viewBox="0 0 32 32"><rect x="3" y="8" width="19" height="16" rx="4"/><path d="m22 13 7-4v14l-7-4V13Z"/><path d="M9 13h7"/></svg></span><span class="placeholder-spark spark-one">✦</span><span class="placeholder-spark spark-two">✧</span></div>
+                <b id="placeholder-title">الكاميرا واجدة</b><p id="placeholder-copy">كليكي على «شغّل الكاميرا» باش تشوف المعاينة.</p>
+                <button id="placeholder-start" class="placeholder-start" type="button"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></svg>شغّل الكاميرا</button>
+              </div>
+              <div class="preview-topline"><span class="feed-label"><i></i> <span id="feed-label">معاينة محلية</span></span><span class="resolution-pill" id="resolution-pill">480p · 24 fps</span></div>
+              <div class="preview-bottomline"><span class="preview-caption"><svg viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 4.7-2.8 8.2-7 10-4.2-1.8-7-5.3-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg>الصورة كتبقى فهاد الجهاز</span><span class="preview-resolution" id="camera-resolution" dir="ltr">بانتظار الكاميرا</span></div>
+            </div>
+            <div class="camera-toolbar">
+              <label class="camera-picker"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.2"/><path d="M8 6l1.3-2h5.4L16 6"/></svg><select id="camera-select" aria-label="اختار الكاميرا"><option value="">الكاميرا الافتراضية</option></select><svg class="select-chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></svg></label>
+              <div class="toolbar-actions"><button id="start-camera-button" class="start-camera-button" type="button"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></svg><span>شغّل الكاميرا</span></button><button id="mirror-button" class="tool-button" type="button" aria-pressed="true" title="قلب المعاينة ديالك"><svg viewBox="0 0 24 24"><path d="M12 3v18M8 7 4 12l4 5M16 7l4 5-4 5"/></svg><span>قلب المعاينة</span></button><button id="clean-output-button" class="tool-button output-button" type="button" disabled><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/><path d="m9 12 2 2 4-4"/></svg><span>عرض الكاميرا فقط</span></button></div>
+            </div>
+
+            <section class="connection-card" aria-labelledby="connection-title">
+              <div class="connection-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5a14 14 0 0 1 18 0M6.5 13a8.5 8.5 0 0 1 11 0M10 16.5a3.2 3.2 0 0 1 4 0"/><path d="M12 20h.01"/></svg></div>
+              <div class="connection-copy"><div class="connection-title-row"><h3 id="connection-title">اختار الوضع على حساب النت</h3><span class="network-note">تقليل الدقّة ما كيزيدش سرعة الإنترنت</span></div><p>واتساب كيتحكّم فضغط المكالمة؛ هاد الاختيار غير كيخفّف المصدر اللي كيوصل ليه.</p></div>
+              <div class="quality-options" role="group" aria-label="اختار جودة مصدر الفيديو">
+                <button type="button" class="quality-option active" data-profile="low" aria-pressed="true"><span class="quality-radio"></span><span><b>نت ضعيف</b><small>480p · 24 fps</small></span></button>
+                <button type="button" class="quality-option" data-profile="balanced" aria-pressed="false"><span class="quality-radio"></span><span><b>متوازن</b><small>حتى 720p · 30 fps</small></span></button>
+                <button type="button" class="quality-option" data-profile="high" aria-pressed="false"><span class="quality-radio"></span><span><b>جودة عالية</b><small>حتى 1080p · 30 fps</small></span></button>
+              </div>
+            </section>
+          </section>
+
+          <aside class="adjust-panel" aria-labelledby="adjust-title">
+            <div class="section-heading adjust-heading"><div><span class="section-kicker">ضبط الصورة</span><h2 id="adjust-title">إضاءة طبيعية</h2></div><span class="adjust-icon"><svg viewBox="0 0 24 24"><path d="M12 3v2m0 14v2M3 12h2m14 0h2m-2.6-6.4-1.4 1.4M7 17l-1.4 1.4m12.8 0L17 17M7 7 5.6 5.6"/><circle cx="12" cy="12" r="4"/></svg></span></div>
+            <div class="auto-row"><span class="auto-icon"><svg viewBox="0 0 24 24"><path d="M12 3v2m0 14v2M3 12h2m14 0h2m-2.6-6.4-1.4 1.4M7 17l-1.4 1.4m12.8 0L17 17M7 7 5.6 5.6"/><circle cx="12" cy="12" r="4"/></svg></span><span class="auto-copy"><b>تصحيح الضوّ تلقائياً</b><small>كيوازن السطوع حسب الإضاءة</small></span><button id="auto-light-toggle" class="switch on" type="button" role="switch" aria-checked="true" aria-label="تشغيل تصحيح الإضاءة التلقائي"><span></span></button></div>
+            <div class="slider-list">
+              <label class="slider-row" for="exposure-range"><span class="slider-label"><span>السطوع</span><output id="exposure-value" for="exposure-range">0</output></span><input id="exposure-range" type="range" min="-20" max="30" value="0"><span class="range-ends"><small>ناقص</small><small>زايد</small></span></label>
+              <label class="slider-row" for="contrast-range"><span class="slider-label"><span>التباين</span><output id="contrast-value" for="contrast-range">+8</output></span><input id="contrast-range" type="range" min="-20" max="30" value="8"><span class="range-ends"><small>ناعم</small><small>واضح</small></span></label>
+              <label class="slider-row" for="warmth-range"><span class="slider-label"><span>دفء الألوان</span><output id="warmth-value" for="warmth-range">+5</output></span><input id="warmth-range" type="range" min="-15" max="20" value="5"><span class="range-ends"><small>بارد</small><small>دافئ</small></span></label>
+            </div>
+            <div class="adjust-note"><span class="note-icon"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="8"/></svg></span><p><b>تحسين خفيف وطبيعي</b><br>ما كنبدّلوش ملامحك وما كنولّدو حتى صورة جديدة. غير ضوّ وألوان.</p></div>
+            <button id="reset-adjustments" class="reset-button" type="button"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5"/></svg>رجّع الإعدادات العادية</button>
+          </aside>
+        </div>
+
+        <section class="bottom-cards">
+          <article class="interview-card">
+            <div class="bottom-card-icon lamp-icon"><svg viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4m-2-20a7 7 0 0 0-4.4 12.5c.8.6 1.4 1.4 1.4 2.5h6c0-1.1.6-1.9 1.4-2.5A7 7 0 0 0 12 1Z"/><path d="M12 5v4m-2-2h4"/></svg></div>
+            <div><span class="bottom-eyebrow">قبل ما تبدا</span><h3>ضوّ النهار كيعطي أحسن نتيجة</h3><p>خلي مصدر الضوّ قدّامك، طلّع الكاميرا لمستوى العين، وقرب للراوتر إلا كان الويفي ضعيف.</p></div>
+            <span class="tip-number">01</span>
+          </article>
+          <article class="whatsapp-card"><div class="whatsapp-mark"><svg viewBox="0 0 24 24"><path d="M20.5 11.6a8.4 8.4 0 0 1-12.4 7.3L4 20l1.1-4a8.4 8.4 0 1 1 15.4-4.4Z"/><path d="M9 8.5c.2 2.5 2.1 4.6 4.6 5.1l1.2-1.1 2 .8c.2.1.3.3.2.5-.3 1.1-1.4 1.7-2.5 1.5-3.6-.6-6.6-3.6-7-7.2-.1-1 .5-1.9 1.4-2.2.3-.1.5 0 .6.2l.8 1.9L9 8.5Z"/></svg></div><div class="whatsapp-copy"><span class="bottom-eyebrow">ربطها مع المكالمة</span><h3>واتساب ما كياخدش هاد الصورة مباشرة</h3><p>استعمل OBS Virtual Camera كجسر، واختارها من إعدادات كاميرا واتساب فالكمبيوتر.</p></div><button id="bottom-guide" class="guide-arrow" type="button" aria-label="شرح الربط مع واتساب"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button></article>
+        </section>
+        <footer class="page-footer"><span>نور ستوديو · المعالجة كتوقع محلياً فالمتصفح</span><span>ما نقدروش نسرّعو النت ولا نرجّعو التفاصيل اللي ما وصلاتش للكاميرا.</span></footer>
+      </div>
+    </main>
   </div>
-</div>
 
-<!-- speed lines overlay -->
-<div id="speedLines"></div>
-<div id="coinPops"></div>
-
-<!-- ══════════ RACE HUD ══════════ -->
-<div id="hud">
-  <div class="hudTL">
-    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
-    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
-    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
-    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
-  </div>
-
-  <div id="progbar">
-    <span class="flagL">🏁</span>
-    <div class="track"><div id="progMarkers"></div></div>
-    <span class="flagR">🏆</span>
-  </div>
-
-  <button id="btnPauseTop" class="roundBtn">⏸</button>
-
-  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
-
-  <div id="powerSlot" class="powerSlot">
-    <span id="hudPower"></span>
-    <span class="keyHint">SPACE</span>
-  </div>
-
-  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
-
-  <div id="banner"></div>
-
-  <!-- touch controls -->
-  <div id="touchWrap">
-    <div class="tcol left">
-      <button id="tLeft" class="tbtn">◀</button>
-      <button id="tRight" class="tbtn">▶</button>
-    </div>
-    <div class="tcol right">
-      <button id="tBrake" class="tbtn brake">▼</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ GARAGE UI ══════════ -->
-<div id="garageUI">
-  <div id="topbar">
-    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
-    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
-    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
-    <div class="spacer"></div>
-    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
-    <button id="btnMusic" class="miniBtn">🎵</button>
-    <button id="btnSfx" class="miniBtn">🔊</button>
-    <button id="btnFull" class="miniBtn">⛶</button>
-  </div>
-
-  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
-  <div id="carNamePlate"></div>
-
-  <div id="menuBar">
-    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
-    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
-    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
-    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
-    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
-    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
-  </div>
-</div>
-
-<!-- ══════════ Shop / panels ══════════ -->
-<div id="panel">
-  <div class="panelBox">
-    <div class="panelHead">
-      <h2 id="panelTitle">SHOP</h2>
-      <div id="panelTabs"></div>
-      <button id="panelClose" class="roundBtn">✖</button>
-    </div>
-    <div id="panelBody"></div>
-  </div>
-</div>
-
-<!-- results -->
-<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
-<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
-
-<!-- pause -->
-<div id="pauseModal">
-  <div class="modalBox">
-    <div class="rtitle">⏸ PAUSED</div>
-    <div class="rbtns">
-      <button id="btnResume" class="big race">▶ RESUME</button>
-      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
-<div id="confetti"></div>
-
-<script type="module" src="src/main.js"></script>
-<script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-</script>
+  <div class="sidebar-scrim" id="sidebar-scrim"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="guide-dialog" class="guide-dialog" aria-labelledby="guide-title">
+    <button id="close-guide" class="dialog-close" type="button" aria-label="سدّ الشرح"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    <div class="dialog-badge"><svg viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 4.7-2.8 8.2-7 10-4.2-1.8-7-5.3-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+    <span class="dialog-kicker">واتساب على الكمبيوتر</span>
+    <h2 id="guide-title">كيفاش توصل الصورة المحسّنة؟</h2>
+    <p class="dialog-intro">المتصفح ما يقدرش يبدّل كاميرا واتساب بوحدو. استعمل <b>OBS Virtual Camera</b> كجسر مجاني بين نور ستوديو وواتساب.</p>
+    <ol class="setup-steps">
+      <li><span class="step-num">1</span><span><b>شغّل الكاميرا هنا</b><small>سمح للمتصفح يستعمل الكاميرا، وضبط الضوّ والوضع اللي مناسب للنت.</small></span></li>
+      <li><span class="step-num">2</span><span><b>فتح عرض الكاميرا فقط</b><small>كليكي «عرض الكاميرا فقط» باش تبقى غير الصورة باينة. زر Esc كيرجعك للاستوديو.</small></span></li>
+      <li><span class="step-num">3</span><span><b>فـ OBS زِد Window Capture</b><small>اختار نافذة المتصفح اللي فيها نور ستوديو، ومن بعد كليكي Start Virtual Camera.</small></span></li>
+      <li><span class="step-num">4</span><span><b>اختارها فواتساب</b><small>WhatsApp Desktop → Settings → Video → Camera → OBS Virtual Camera.</small></span></li>
+    </ol>
+    <div class="important-note"><svg viewBox="0 0 24 24"><path d="M12 3 22 21H2L12 3Z"/><path d="M12 9v5m0 3v.1"/></svg><p><b>مهم:</b> نور ستوديو كيحسّن الضوّ وكيخفّف دقّة المصدر، ولكن ما كيزيدش سرعة الإنترنت. واتساب هو اللي كيتحكّم فالجودة النهائية حسب الشبكة. هاد الربط خاصّو كمبيوتر وOBS؛ الهاتف ما كيدعمش هاد الطريقة.</p></div>
+    <div class="dialog-actions"><a class="obs-link" href="https://obsproject.com/download" target="_blank" rel="noreferrer">تحميل OBS من الموقع الرسمي <svg viewBox="0 0 24 24"><path d="M14 4h6v6m-11 3 11-9M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/></svg></a><button id="done-guide" class="done-button" type="button">مفهوم</button></div>
+  </dialog>
+  <noscript><main class="noscript-message"><h1>نور ستوديو محتاج JavaScript</h1><p>فعّل JavaScript باش تخدم معاينة الكاميرا محلياً.</p></main></noscript>
+  <script type="module" src="src/clearcall/app.js"></script>
 </body>
 </html>

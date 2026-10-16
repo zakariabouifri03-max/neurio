@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#eff3e8">
+  <meta name="description" content="Small blocks. Big adventures. Jump, explore, and collect in Blockyard, an original playable 3D obstacle course.">
+  <title>Blockyard — Small blocks. Big adventures.</title>
+  <link rel="icon" href="icons/blockyard.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preload" href="assets/fonts/outfit-800.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/dm-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="src/blockyard/style.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
+</head>
+<body>
+  <main id="game" aria-label="Blockyard 3D parkour game"></main>
+  <div class="world-shade" aria-hidden="true"></div>
+  <div id="loading" class="loading"><div class="loading-cube" data-icon="cube" data-size="40"></div><h1>blockyard<span>.</span></h1><p>A little world is coming together.</p><div class="loading-track"><span></span></div></div>
+  <section id="recovery" class="recovery" hidden><div data-icon="cube" data-size="48"></div><h1>Let’s get you back in.</h1><p id="error-message">This world needs WebGL 2. Enable hardware acceleration or try a modern browser.</p><button class="primary" onclick="location.reload()">Try again <span data-icon="reset"></span></button><a href="drift.html">Visit Drift instead</a></section>
+
+  <div id="hud" class="hud">
+    <header class="topbar">
+      <a class="brand" href="blockyard.html" aria-label="Blockyard home"><span class="brand-mark" data-icon="cube" data-size="30"></span><span>blockyard<span class="brand-dot">.</span></span></a>
+      <nav class="main-nav" aria-label="Game navigation"><button id="play-tab" class="nav-button active"><span data-icon="play" data-size="14"></span>Play</button><button data-panel="avatar" class="nav-button"><span data-icon="shirt" data-size="17"></span>Your avatar</button><a href="drift.html" class="nav-button drift-link">Drift <span data-icon="diagonal" data-size="14"></span></a></nav>
+      <div class="top-actions">
+        <div class="counter coins-counter" title="Sky coins collected"><span class="coin-symbol" data-icon="coin" data-size="22"></span><b id="coins-value">0</b><span class="counter-total">/ 24</span></div>
+        <div class="counter timer-counter" title="Current run time"><span data-icon="clock" data-size="17"></span><b id="time-value">00:00</b></div>
+        <span class="top-divider"></span>
+        <button id="sound-button" class="icon-button" aria-label="Enable game sound" title="Game sound"><span data-icon="mute"></span></button>
+        <button data-panel="help" class="icon-button help-button" aria-label="How to play" title="How to play (H)"><span data-icon="help"></span></button>
+        <button data-panel="pause" class="icon-button pause-button" aria-label="Pause game" title="Pause (Esc)"><span data-icon="pause"></span></button>
+      </div>
+    </header>
+
+    <div class="left-stack">
+    <aside class="adventure-card">
+      <div class="world-eyebrow"><span class="world-dot"></span>WORLD 01 <span class="solo-label">SOLO ADVENTURE</span></div>
+      <h1>Cloud Hop<span>.</span></h1>
+      <p class="world-description">Small blocks.<br> Big adventures.</p>
+      <div class="card-divider"></div>
+      <div class="stage-heading"><span class="eyebrow">YOUR NEXT STEP</span><span class="stage-count"><b id="stage-value">01</b> / 06</span></div>
+      <h2 id="stage-name">Sunny Square</h2>
+      <p id="stage-hint" class="stage-hint">Follow the coins. Space twice gives you a double jump.</p>
+      <div id="stage-dots" class="stage-dots" aria-label="Course progress"></div>
+      <button data-panel="route" class="route-button">Explore the route <span data-icon="arrow" data-size="17"></span></button>
+    </aside>
+
+    <aside class="quest-card"><span class="quest-icon" data-icon="coin" data-size="21"></span><div><span class="eyebrow">A LITTLE SIDE QUEST</span><b>Pocketful of sunshine</b><div class="quest-progress"><span><i id="coin-progress"></i></span><small id="quest-count">0 / 24</small></div></div></aside>
+
+    </div>
+    <div class="world-tag"><span class="tag-icon" data-icon="cloud" data-size="19"></span><span>GOOD VIBES.<br><b>HIGH ALTITUDES.</b></span><span class="tag-star" data-icon="spark" data-size="16"></span></div>
+
+    <div class="bottom-left"><button class="avatar-shortcut" data-panel="avatar"><span class="mini-avatar"><i class="mini-head">ᴗ</i><i id="mini-shirt" class="mini-shirt"></i><i class="mini-legs"></i></span><span><small>A WHOLE LOT OF YOU</small><b>Meet your avatar <span data-icon="arrow" data-size="15"></span></b></span></button><div class="save-line"><i></i><span id="save-status">Your progress is saved right here.</span></div></div>
+
+    <div class="play-hints"><div class="jump-hint"><span data-icon="bolt" data-size="14"></span><span id="jump-description">A second jump goes a long way.</span><span class="jump-pips"><i id="jump-pip-1"></i><i id="jump-pip-2"></i></span></div><div class="control-strip"><span class="key-group"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><b>Move</b></span><i class="hint-divider"></i><span><kbd class="wide-key">SPACE</kbd><b>Double jump</b></span><i class="hint-divider"></i><span><span data-icon="mouse" data-size="16"></span><b>Drag to look</b></span><i class="hint-divider"></i><span class="respawn-key"><kbd>R</kbd><b>Respawn</b></span></div></div>
+
+    <div class="bottom-right"><button data-panel="models" class="model-button"><span class="model-symbol" data-icon="cube" data-size="25"></span><span><small>MAKE IT YOURS</small><b>Get the 3D model</b></span><span data-icon="download" data-size="18"></span></button><span class="world-note">AN ORIGINAL BLOCKY PLAYGROUND</span></div>
+    <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+  </div>
+
+  <div id="touch-controls" class="touch-controls"><div id="joystick" class="joystick" role="group" aria-label="Movement joystick"><div id="joystick-knob"></div><span class="joystick-mark up"></span><span class="joystick-mark right"></span></div><button id="jump-button" class="jump-button" aria-label="Jump or double jump"><span data-icon="jump" data-size="25"></span><span>JUMP</span></button><button id="respawn-button" class="touch-respawn" aria-label="Respawn at checkpoint"><span data-icon="reset" data-size="18"></span></button></div>
+
+  <div id="modal-overlay" class="modal-overlay" hidden><section id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"><button id="close-modal" class="icon-button modal-close" aria-label="Close dialog"><span data-icon="close" data-size="21"></span></button><div id="modal-content"></div></section></div>
+  <noscript><div class="recovery"><h1>This world needs JavaScript.</h1><p>Enable JavaScript to start your adventure.</p></div></noscript>
+  <script type="module" src="src/blockyard/game.js"></script>
+</body>
+</html>

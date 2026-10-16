@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "نور ستوديو — كاميرا المقابلة",
+  "short_name": "Nour Studio",
+  "description": "تحسين محلي لإضاءة وصورة الكاميرا قبل مكالمات الفيديو.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f6f3",
+  "theme_color": "#f5f6f3",
+  "lang": "ar-MA",
+  "dir": "rtl",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    { "src": "icons/nour.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

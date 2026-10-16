@@ -1,115 +1,147 @@
-# 🏁 Bash Baqi Racing
+# Nour Studio, Blockyard, and Drift
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+The root app is **Nour Studio**, a local browser companion for clearer video-call camera framing and lighting. It offers adaptive exposure, manual light/contrast/warmth, and 480p/720p/1080p source profiles. Camera video is processed on-device and is never uploaded by the app. It **cannot speed up an internet connection** or restore details missing from the camera feed. A browser cannot replace WhatsApp's camera directly; on a computer, use the optional OBS Virtual Camera bridge described in the app. This is local image processing, not a generative-AI face replacement or an installed AI model.
 
-**▶ Play:** serve the folder with any static server and open it:
+**Android APK:** [download Nour Studio directly from GitHub](https://github.com/zakariabouifri03-max/neurio/releases/download/nour-studio-v1.0.0/NourStudio-Android-v1.0.0.apk). See [`NOUR-ANDROID.md`](NOUR-ANDROID.md) for installation and the WhatsApp/Android limitations.
 
-```bash
-python3 -m http.server 8000
-# → http://localhost:8000
+The original playable 3D platformer, **Blockyard — Cloud Hop**, is at [`blockyard.html`](blockyard.html). The **Drift** raft-survival game is at [`drift.html`](drift.html), and the original racing demo is at [`racing.html`](racing.html).
+
+## Run the apps
+
+```sh
+npm run dev
+# Nour Studio: http://localhost:3000/
+# Blockyard:   http://localhost:3000/blockyard.html
+# Drift:       http://localhost:3000/drift.html
+# Racing:      http://localhost:3000/racing.html
 ```
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+Node 18+ is enough to serve the apps. **No npm install, account, or external CDN is needed to run Nour Studio or play the games.** The server listens on `0.0.0.0:3000`, accepts preview hosts, and uses relative asset URLs. Set `PORT` to change the port. For webcam access, use HTTPS or `localhost` and grant the browser camera permission.
 
----
+Nour Studio's video pipeline runs locally in the browser. The low-data profile limits the source to 640×480/24 fps; the balanced and high profiles cap it at 1280×720/30 fps and 1920×1080/30 fps. A cap can lower the amount of source video, but WhatsApp controls final compression and upload bitrate. These controls do not increase network speed.
 
-## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
+## Blockyard — Cloud Hop
 
-A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
-soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
+**Small blocks. Big adventures.**
 
-title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
+An original, playable 3D obstacle-course game with a customizable blocky character, floating islands, collectible coins, and forgiving checkpoints. Inspired by the playful style of blocky games like Roblox; **not an official Roblox game**, and no Roblox assets, accounts, Robux, or multiplayer are involved.
 
-Everything is generated from code (no stock footage/music):
+The previous **Drift** raft-survival game remains fully available at [`drift.html`](drift.html), with its own saved voyage. See [`DRIFT.md`](DRIFT.md). The original racing demo is preserved at [`racing.html`](racing.html).
 
-```bash
-python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
-python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
+## Play Blockyard
+
+```sh
+# After npm run dev:
+# Open http://localhost:3000/blockyard.html
+# Drift is at http://localhost:3000/drift.html
 ```
 
-See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
+Use a current browser with WebGL 2 and hardware acceleration. **Pause → Graphics → Light** lowers rendering resolution and disables shadows. Recovery screens handle unavailable WebGL or a lost graphics context.
 
----
+## Your adventure
 
-## 📱 Install on your phone — كأنها APK!
+Follow the coins across six checkpoint islands:
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
+1. **Sunny Square** — meet your character and find your feet.
+2. **First steps** — hop between the floating blocks.
+3. **Hotfoot** — jump over the coral-red lava strips.
+4. **Cloud movers** — ride the blue moving platforms.
+5. **Bounce garden** — use the yellow spring to reach the high blocks.
+6. **Sky summit** — clear the rotating pink bar and reach the gold arch.
 
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
+The 24 sky coins are an optional side quest. Checkpoints must be reached in order; touching each island saves your progress. Falling or touching a hazard returns you to your latest checkpoint. Passing through the final arch completes the run and records your local personal best.
 
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
+### Controls
 
-**Offline play** is built-in: a service worker caches all game files on first visit.
-
----
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
+| Action | Desktop |
 |---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
+| Move | `W A S D` or arrow keys, relative to the camera |
+| Jump | `Space` |
+| Double jump | Press `Space` again while airborne |
+| Sprint | Hold `Shift` |
+| Orbit / look | Drag the game with either mouse button |
+| Zoom | Mouse wheel |
+| Respawn at checkpoint | `R` |
+| Help | `H` |
+| Pause / close a menu | `Esc` |
 
-Touch buttons appear automatically on phones/tablets.
+**Phones and tablets:** use the joystick and **JUMP** button; tap jump a second time in the air. Drag the world to look around and pinch to zoom. The circular reset button returns to your checkpoint. Portrait and landscape layouts are supported.
 
-## 🧱 Tech — 100% procedural
+Jump buffering, brief coyote time, air steering, swept landing checks, solid block sides, and moving-platform carry make the course responsive without making it an automatic runner.
 
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
+## Make it yours
 
+Open **Your avatar** or the bottom-left character button. Choose from four free outfits: **Citrus club**, **Ocean explorer**, **Berry nice**, and **Electric blue**. Changes appear in the actual game and in a rotating 3D preview, and save automatically. They are cosmetic, not upgrades or purchases.
+
+Sound is optional and starts muted. All jump sounds, coin chimes, and checkpoint celebrations are synthesized locally with Web Audio.
+
+## Download the 3D models
+
+- **[`models/blockyard-avatar.glb`](models/blockyard-avatar.glb)** — original blocky adventurer in the Citrus outfit; approximately 137 KB, including the painted face texture.
+- **[`models/blockyard-cloud-hop.glb`](models/blockyard-cloud-hop.glb)** — complete floating course, islands, obstacles, foliage, benches, coins, flags, and signs; approximately 2.7 MB.
+
+Click **Get the 3D model** in the bottom-right corner to export either model locally. Exporting your character uses your selected outfit. The avatar dialog also has a direct download button.
+
+These are self-contained **glTF 2.0 binaries** for Blender and compatible 3D apps. They are static geometry/materials, **not** rigged avatars, Roblox Studio projects, or scripts. The game supplies movement, collision, animation, particles, and sound separately. See [`models/README.md`](models/README.md).
+
+Both models have been checked using the Khronos glTF validator. Existing Drift raft and island models remain in `models/` as well.
+
+## Saves and offline play
+
+Blockyard uses its own `localStorage` key, `blockyard-cloud-hop-v1`; it does not overwrite Drift saves. Checkpoints, coins, elapsed time, outfit, sound/quality preferences, and your personal best persist. Reloading places you at your latest checkpoint, rather than in midair.
+
+Menus pause the timer and obstacles. Hiding the browser tab pauses the game, and blur clears held movement input. Restarting requires confirmation, resets the current course, and preserves your outfit and personal best. If storage is blocked or full, the game remains playable and reports that saves are unavailable.
+
+After one successful online visit and service-worker installation, **Nour Studio, Blockyard, and Drift can reload offline**. All scripts, fonts, textures, icons, and sounds are local or procedurally generated. Nour Studio still needs a camera permission; model export also works offline. There is no video upload or server-side save.
+
+## Optional portable HTML
+
+```sh
+npm install
+npm run bundle                 # dist/blockyard.html
+npm run bundle -- --drift       # dist/drift.html
+npm run bundle -- --racing      # dist/bash-baqi-racing.html
 ```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
+
+The single-file game embeds scripts, CSS, fonts, and icons, includes third-party licenses, and can be opened directly from disk. It needs no server or service worker. Generated bundles are ignored by Git; the normal hosted game needs no build.
+
+## Checks
+
+```sh
+npm test        # 50 dependency-free processing, rules, physics, save, and wave tests
+npm run check  # Parse all app modules and validate the three manifests
 ```
 
-Made with ❤️ and Three.js
+The platformer tests include a continuous, hazard-free traversal of every intended jump using the same physics as the game.
 
----
+For browser integration tests, install dependencies and run the server in another terminal:
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+```sh
+npm install
+BROWSER_EXECUTABLE_PATH=/path/to/chromium npm run test:browser
+# Preserved raft-game suites:
+BROWSER_EXECUTABLE_PATH=/path/to/chromium npm run test:drift
+```
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+The new suite covers movement, coin collection, double jumps, landing, camera controls, pause/audio/quality, real 3D customization, both GLB exports, checkpoints, falls, lava, moving platforms, springs, finish conditions, persistence, offline reload, restart confirmation, and touch/portrait/landscape input. Screenshots and test downloads stay in ignored `.arena/`.
 
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
+`TEST_BASE_URL` overrides the page URL. `BROWSER_SINGLE_PROCESS=1` supports constrained Chromium environments; desktop and touch tests use separate browser launches.
 
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+## Structure
+
+```text
+index.html                 Blockyard interface and local import map
+src/blockyard/
+  game.js                  Fixed-step loop, input, camera, particles, audio, export
+  rules.js                 Pure physics, course data, progression, save validation
+  models.js                Original blocky avatar, scenery, textures, model helpers
+  world.js                 Floating islands, obstacles, clouds, lighting, collectibles
+  ui.js                    HUD, customization, menus, model downloads, route map
+  icons.js                 Local SVG interface icons
+  style.css                Responsive desktop/touch design
+src/raft/                  Preserved Drift game and shared GLB writer
+models/                    Downloadable original 3D models
+assets/fonts/              Locally bundled fonts and OFL licenses
+vendor/                    Three.js r170 and geometry utility, with license
+sw.js                      Network-first offline cache for both games
+```

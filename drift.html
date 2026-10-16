@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#193e3d">
+  <meta name="description" content="A little raft. An endless ocean. Build a home on the tide in Drift, an original 3D survival game.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Drift">
+  <title>Drift — A little raft. An endless ocean.</title>
+  <link rel="manifest" href="drift.webmanifest">
+  <link rel="icon" href="icons/drift.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/drift-192.png">
+  <link rel="preload" href="assets/fonts/dm-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/outfit-800.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="src/raft/style.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
+</head>
+<body>
+  <main id="ocean" aria-label="Drift 3D ocean survival game"></main>
+  <div class="scene-vignette" aria-hidden="true"></div>
+  <div class="scene-grain" aria-hidden="true"></div>
+
+  <div id="loading" class="loading-screen">
+    <div class="loading-mark"><span data-icon="sail" data-size="44"></span></div>
+    <h1>drift<span>.</span></h1>
+    <p>Your little world is taking shape.</p>
+    <div class="loading-line"><span></span></div>
+  </div>
+  <section id="error-screen" class="error-screen" hidden>
+    <span data-icon="waves" data-size="38"></span>
+    <h1>A moment of rough water.</h1>
+    <p id="error-message">Your browser couldn’t start the 3D ocean. Enable hardware acceleration or try another browser.</p>
+    <button class="primary-button" onclick="location.reload()">Try again</button>
+  </section>
+
+  <div id="interface" class="interface">
+    <header class="topbar">
+      <a class="brand" href="drift.html" aria-label="Drift home">
+        <span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 38 42" fill="none"><path d="M19 3 4 29h15V3Z" fill="currentColor"/><path d="m23 12 12 17H23V12Z" fill="currentColor" opacity=".65"/><path d="M3 34c6-5 8 5 15 0s10 5 17 0" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+        <span class="brand-name">drift<span>.</span></span>
+        <span class="brand-caption">A LITTLE RAFT.<br>AN ENDLESS OCEAN.</span>
+      </a>
+      <div class="compass" aria-label="Camera compass">
+        <div class="compass-directions"><span>W</span><span>NW</span><b id="compass-heading">N</b><span>NE</span><span>E</span></div>
+        <div class="compass-ticks"></div>
+        <span class="compass-pointer"></span>
+        <span class="compass-bearing" id="compass-bearing">024°</span>
+      </div>
+      <div class="top-actions">
+        <div class="day-card"><span class="sun-icon" data-icon="sun" data-size="24"></span><div><span class="eyebrow" id="day-label">DAY 01</span><span class="day-time" id="day-time">08:42 <small>AM</small></span></div></div>
+        <div class="top-divider"></div>
+        <button id="sound-button" class="icon-button" aria-label="Enable ocean sound" title="Ocean sound"><span data-icon="muted"></span></button>
+        <button id="help-button" class="icon-button" aria-label="How to play" title="How to play (H)"><span data-icon="help"></span></button>
+        <button id="pause-button" class="icon-button pause-button" aria-label="Pause game" title="Pause (Esc)"><span data-icon="pause"></span></button>
+      </div>
+    </header>
+
+    <aside class="left-rail">
+      <section class="vitals glass" aria-label="Survival status">
+        <div class="vital-row health"><span class="vital-icon" data-icon="heart" data-size="19"></span><div class="vital-body"><div class="vital-label"><span>Health</span><b id="health-value">100 <small>/ 100</small></b></div><div class="vital-track"><span id="health-bar" style="width:100%"></span></div></div></div>
+        <div class="vital-row thirst"><span class="vital-icon" data-icon="drop" data-size="19"></span><div class="vital-body"><div class="vital-label"><span>Thirst</span><b id="thirst-value">86 <small>/ 100</small></b></div><div class="vital-track"><span id="thirst-bar" style="width:86%"></span></div></div></div>
+        <div class="vital-row hunger"><span class="vital-icon" data-icon="food" data-size="18"></span><div class="vital-body"><div class="vital-label"><span>Hunger</span><b id="hunger-value">78 <small>/ 100</small></b></div><div class="vital-track"><span id="hunger-bar" style="width:78%"></span></div></div></div>
+      </section>
+      <section class="chapter-card" aria-label="Current objectives">
+        <div class="chapter-eyebrow"><span data-icon="flag" data-size="14"></span><span>YOUR NEXT CHAPTER</span><span id="chapter-number">01</span></div>
+        <h2 id="chapter-title">A little more room</h2>
+        <p id="chapter-description">Every great escape starts small.</p>
+        <div id="chapter-tasks" class="chapter-tasks"></div>
+        <button id="craft-guide" class="text-button">Let’s build something <span data-icon="chevron" data-size="14"></span></button>
+      </section>
+    </aside>
+
+    <aside class="right-rail">
+      <div class="minimap-shell" aria-label="Ocean map"><span class="map-north">N</span><canvas id="minimap" width="260" height="260" aria-label="Nearby islands, supplies, and your raft"></canvas><span class="map-south">S</span><span class="map-east">E</span><span class="map-west">W</span></div>
+      <div class="location-caption"><span class="eyebrow">THE ENDLESS BLUE</span><span id="coordinates">26° 14′ N &nbsp; 142° 08′ W</span></div>
+      <div class="wind-caption"><span data-icon="wind" data-size="17"></span><span id="sea-description">A steady sea breeze</span><b>NE</b><span data-icon="arrow" data-size="12"></span></div>
+      <section class="cove-card">
+        <span class="cove-eyebrow">LAND ON THE HORIZON</span>
+        <h3>Palmwood Cove<span>.</span></h3>
+        <p>A shelter. A little possibility.</p>
+        <button id="island-course" aria-label="Set course for Palmwood Cove"><span data-icon="sail" data-size="16"></span><span id="course-label">Set course</span><span id="island-distance">38 m</span></button>
+      </section>
+    </aside>
+
+    <div id="world-label" class="world-label" hidden><span class="world-label-dot"></span><div class="world-label-box"><span id="world-label-icon"></span><div><b id="world-label-title">Driftwood</b><span id="world-label-action">CLICK TO REEL IN</span></div><kbd>E</kbd></div></div>
+    <div id="reticle" class="reticle" aria-hidden="true"></div>
+    <div id="build-banner" class="build-banner glass" hidden><span data-icon="craft" data-size="20"></span><div><b id="build-name">Build a foundation</b><span id="build-cost">4 driftwood · 2 plastic</span></div><button id="cancel-build" class="icon-button" title="Cancel building (Esc)" aria-label="Cancel building"><span data-icon="close" data-size="18"></span></button></div>
+    <div id="shark-warning" class="shark-warning" role="alert" hidden><span data-icon="warning" data-size="20"></span><span>Something’s circling… <b>Equip your spear [4]</b></span></div>
+
+    <div class="bottom-ui">
+      <div class="voyage-caption"><div class="voyage-heading"><span data-icon="waves" data-size="20"></span><span>GO WHERE THE TIDE TAKES YOU.</span></div><div class="save-status"><span class="status-dot"></span><span id="save-status">A new day. A new horizon.</span></div></div>
+      <section class="toolbelt" aria-label="Tools and quick items">
+        <div id="first-hint" class="first-hint"><span class="hint-sparkle">✧</span><span>The ocean provides. <b>Click floating supplies to collect.</b></span><button id="dismiss-hint" aria-label="Dismiss tip">×</button></div>
+        <div id="selected-tool" class="selected-tool">SCRAP HOOK</div>
+        <div id="hotbar" class="hotbar" role="toolbar" aria-label="Select a tool"></div>
+        <div id="control-hints" class="control-hints"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</span><i></i><span><span data-icon="mouse" data-size="14"></span> Drag to look</span><i></i><span id="view-hint">Scroll to zoom</span></div>
+      </section>
+      <div class="bottom-actions"><button id="build-button" class="utility-button"><span data-icon="craft" data-size="18"></span><span>Build</span><kbd>B</kbd></button><button id="view-button" class="utility-button" aria-label="Switch to first-person deck view" title="Switch viewpoint (V)"><span data-icon="camera" data-size="18"></span><span id="view-button-label">Step aboard</span><kbd>V</kbd></button><button id="inventory-button" class="utility-button"><span data-icon="backpack" data-size="18"></span><span>Backpack</span><kbd>TAB</kbd></button></div>
+    </div>
+    <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+  </div>
+
+  <aside id="backpack-panel" class="backpack-panel" aria-labelledby="panel-title" hidden>
+    <div class="panel-heading"><div><span class="eyebrow">MAKE YOURSELF AT HOME</span><h2 id="panel-title">Your backpack<span>.</span></h2></div><button id="close-panel" class="icon-button" aria-label="Close backpack"><span data-icon="close"></span></button></div>
+    <div class="panel-tabs" role="tablist"><button id="inventory-tab" role="tab" aria-selected="true" class="active">Supplies <span id="supply-count">27</span></button><button id="crafting-tab" role="tab" aria-selected="false">Crafting <span>6</span></button></div>
+    <div id="inventory-view" class="panel-view"><div class="panel-note"><span data-icon="anchor" data-size="15"></span>A few good things, rescued from the sea.</div><div id="inventory-grid" class="inventory-grid"></div><div class="inventory-footnote"><span data-icon="mouse" data-size="16"></span>Select food or water to use it.</div><div class="raft-summary"><span class="eyebrow">YOUR FLOATING HOME</span><div><span>Foundations</span><b id="raft-size">9 tiles</b></div><div><span>Raft condition</span><b id="raft-condition">100%</b></div><div><span>Time at sea</span><b id="time-at-sea">0m</b></div></div></div>
+    <div id="crafting-view" class="panel-view" hidden><div class="panel-note"><span data-icon="craft" data-size="15"></span>Small improvements. Endless possibilities.</div><div id="recipe-list" class="recipe-list"></div></div>
+    <div class="panel-footer"><span class="status-dot"></span>Your progress is saved on this device.</div>
+  </aside>
+
+  <div id="modal-overlay" class="modal-overlay" hidden>
+    <section id="modal" class="modal glass" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"><div id="modal-content"></div></section>
+  </div>
+  <button id="exit-photo" class="photo-exit utility-button" hidden><span data-icon="camera" data-size="18"></span>Return to the game <kbd>Esc</kbd></button>
+
+  <div id="touch-controls" class="touch-controls">
+    <div id="joystick" class="joystick" aria-label="Movement joystick"><div id="joystick-knob"></div></div>
+    <button id="touch-action" aria-label="Use selected tool"><span data-icon="plus" data-size="26"></span></button>
+  </div>
+  <noscript><div class="noscript">Drift needs JavaScript to bring your ocean to life. Please enable it and reload.</div></noscript>
+  <script type="module" src="src/raft/game.js"></script>
+</body>
+</html>

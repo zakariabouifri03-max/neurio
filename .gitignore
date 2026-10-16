@@ -3,3 +3,13 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+node_modules/
+.arena/
+coverage/
+test-results/
+playwright-report/
+dist/
+.gradle/
+android/.gradle/
+android/app/build/
+android/app/src/main/assets/www/

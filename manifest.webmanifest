@@ -1,18 +1,14 @@
 {
-  "name": "Bash Baqi Racing",
-  "short_name": "Bash Baqi",
-  "description": "3D kart racing: 50 cars, 16 drivers, 50 random tracks. Win races, earn coins, buy everything!",
+  "id": "./blockyard",
+  "name": "Blockyard — Cloud Hop",
+  "short_name": "Blockyard",
+  "description": "Small blocks. Big adventures. An original, playable 3D parkour playground.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "fullscreen",
-  "orientation": "landscape",
-  "background_color": "#2f9be8",
-  "theme_color": "#0ea5e9",
+  "background_color": "#eef4e6",
+  "theme_color": "#eff3e8",
   "lang": "en",
-  "categories": ["games", "racing"],
-  "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+  "categories": ["games", "entertainment"],
+  "icons": [{ "src": "icons/blockyard.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
 }

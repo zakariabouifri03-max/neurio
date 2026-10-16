@@ -1,0 +1,22 @@
+{
+  "name": "blockyard-playground",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Original blocky 3D platformer, customizable avatar, and downloadable models. Drift and the racing demo are preserved.",
+  "scripts": {
+    "dev": "node tools/serve.mjs",
+    "start": "node tools/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node tools/check.mjs",
+    "test:browser": "node tests/blockyard-browser.mjs",
+    "bundle": "node tools/build-singlefile.mjs",
+    "test:ocean": "node tests/ocean-browser.mjs",
+    "test:drift": "node tests/browser.mjs && node tests/ocean-browser.mjs",
+    "test:blockyard": "node tests/blockyard-browser.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12",
+    "playwright-core": "^1.64.1"
+  }
+}
