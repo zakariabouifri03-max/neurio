@@ -1014,3 +1014,56 @@ dialog p {
   display: block;
   margin: auto;
 }
+
+.strong-mode {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 13px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.strong-mode strong {
+  font-size: 11px;
+  font-weight: 500;
+}
+.strong-mode p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+.strong-mode button {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: var(--soft);
+  border: 1px solid #647952;
+  color: var(--green);
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 10px;
+}
+.strong-mode button.selected {
+  background: var(--green);
+  color: #18210f;
+}
+#compression-readout {
+  margin-top: 12px;
+}
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.dialog-actions button {
+  flex: 1;
+  border: 1px solid var(--line);
+  padding: 12px 8px;
+  border-radius: 8px;
+  background: var(--soft);
+  font-size: 12px;
+}
+#strong-confirm {
+  background: var(--green);
+  color: #18210f;
+}

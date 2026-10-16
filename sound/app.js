@@ -7,9 +7,11 @@ let current = -1,
   boostNode,
   volumeNode,
   analyser,
+  compressor,
   filters;
 let enginePromise,
   limiterReady = false,
+  strongMode = false,
   playingRequest = 0,
   installPrompt;
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -43,11 +45,16 @@ async function initializeAudio() {
         channelCountMode: "explicit",
       });
       limiterReady = true;
+      $("strong-mode").disabled = false;
+      $("mode-hint").textContent = "Up to +24 dB with dynamic compression.";
       $("protection-state").textContent = "ACTIVE";
       $("protection-copy").textContent =
         "5 ms look-ahead • −1 dBFS sample ceiling";
     } catch {
       // No pretend protection: prevent extra gain when the limiter is unavailable.
+      $("strong-mode").disabled = true;
+      $("mode-hint").textContent = "Strong lift needs a working limiter.";
+      $("boost-max-label").textContent = "0 dB";
       $("boost").max = "0";
       $("boost").value = "0";
       updateBoost();
@@ -83,7 +90,14 @@ async function initializeAudio() {
       last.connect(filter);
       last = filter;
     }
-    last.connect(boostNode);
+    compressor = ctx.createDynamicsCompressor();
+    compressor.threshold.value = 0;
+    compressor.knee.value = 0;
+    compressor.ratio.value = 1;
+    compressor.attack.value = 0.012;
+    compressor.release.value = 0.18;
+    last.connect(compressor);
+    compressor.connect(boostNode);
     if (limiter) {
       boostNode.connect(limiter);
       limiter.connect(volumeNode);
@@ -103,6 +117,47 @@ async function initializeAudio() {
   // Keep a failed context from being duplicated; surface the actionable error.
   return enginePromise;
 }
+
+function setStrongMode(enabled) {
+  if (enabled && !limiterReady) return;
+  strongMode = enabled;
+  // Reset gain BEFORE changing processing mode; never silently retain a high gain.
+  $("boost").value = "0";
+  $("boost").max =
+    limiterReady || !enginePromise ? (enabled ? "24" : "12") : "0";
+  if (enabled)
+    $("volume").value = String(Math.min(Number($("volume").value), 40));
+  updateBoost();
+  updateVolume();
+  $("boost-max-label").textContent = `+${$("boost").max} dB`;
+  $("strong-mode").setAttribute("aria-pressed", String(enabled));
+  $("strong-mode").classList.toggle("selected", enabled);
+  $("strong-mode").textContent = enabled ? "Strong lift: ON" : "Strong lift";
+  $("boost-description").textContent = enabled
+    ? "Quiet passages lifted. Peaks kept in check."
+    : "A gentle lift for everyday listening.";
+  $("compression-readout").hidden = !enabled;
+  if (compressor) {
+    const now = ctx.currentTime;
+    compressor.threshold.setTargetAtTime(enabled ? -24 : 0, now, 0.04);
+    compressor.knee.setTargetAtTime(enabled ? 12 : 0, now, 0.04);
+    compressor.ratio.setTargetAtTime(enabled ? 3.5 : 1, now, 0.04);
+  }
+  status(
+    enabled
+      ? "Strong lift enabled at 0 dB. Output lowered to 40% or less. Raise gradually; compression changes dynamics."
+      : "Gentle mode restored at 0 dB. Strong compression is off.",
+  );
+}
+$("strong-mode").addEventListener("click", () => {
+  if (strongMode) setStrongMode(false);
+  else $("strong-dialog").showModal();
+});
+$("strong-cancel").addEventListener("click", () => $("strong-dialog").close());
+$("strong-confirm").addEventListener("click", () => {
+  $("strong-dialog").close();
+  setStrongMode(true);
+});
 
 function updateBoost() {
   const value = Number($("boost").value);
@@ -139,6 +194,7 @@ document
     button.addEventListener("click", () => selectPreset(button.dataset.preset)),
   );
 $("reset").addEventListener("click", () => {
+  setStrongMode(false);
   $("boost").value = "0";
   $("volume").value = "70";
   updateBoost();
@@ -382,6 +438,9 @@ function draw(now) {
   painter.setTransform(ratio, 0, 0, ratio, 0, 0);
   painter.clearRect(0, 0, width, height);
   const active = analyser && !audio.paused;
+  if (strongMode && compressor)
+    $("reduction-value").textContent =
+      `${(active ? Math.abs(compressor.reduction) : 0).toFixed(1)} dB reduction`;
   let peak = 0;
   if (active) {
     analyser.getByteFrequencyData(frequency);

@@ -1,7 +1,8 @@
 # Safi — Local Sound Studio
 
 An installable, mobile-first **web app (PWA), not an APK**. Plays local audio
-with -6 to +12 dB gain, three tone presets, output volume, a live analyzer,
+with -6 to +12 dB gentle gain, an optional **Strong lift** mode up to +24 dB,
+three tone presets, output volume, a live analyzer,
 playlist controls, seeking, and a stereo-linked look-ahead sample-peak limiter.
 
 ## Use
@@ -35,15 +36,24 @@ repository, open /sound/ under the site's base path.
 
 ## Audio path
 
-Local HTMLAudioElement -> low shelf -> peaking EQ -> high shelf -> gain ->
+Local HTMLAudioElement -> low shelf -> peaking EQ -> high shelf -> dynamics compressor -> gain ->
 AudioWorklet limiter -> output volume -> analyser -> destination.
 The limiter adds 5 ms look-ahead, uses a monotonic peak queue, links stereo
 channels, and applies immediate gain reduction / 120 ms gain recovery.
-Its ceiling is **-1 dBFS sample peak**, not a true-peak reconstruction limiter.
+Strong lift uses a -24 dB threshold, 3.5:1 ratio, 12 dB knee, 12 ms attack and
+180 ms release before added gain. Gentle mode uses 1:1 compression. Strong mode
+is disabled until the limiter loads; it requires explicit confirmation, starts
+at 0 dB gain, and lowers player volume to 40% or less. Disabling it resets gain
+to 0 dB. Reset returns to gentle/0 dB/70%; no strong settings are persisted.
+The live reduction readout reports the actual Web Audio compressor reduction.
+Compression can pump or reduce dynamics: this is not "distortion-free" processing.
+
+The limiter ceiling is **-1 dBFS sample peak**, not a true-peak reconstruction limiter.
 Input/output buffer state remains stable across render blocks. It does not
 make guarantees for downstream hardware, intersample peaks or hearing safety.
 If the worklet cannot load, positive gain and tone presets are disabled and
-basic playback remains available; the UI explicitly shows missing protection.
+Strong lift is also disabled, and basic playback remains available; the UI
+explicitly shows missing protection.
 Gain and volume initialize at 0 dB / 70% every fresh session, never a saved
 high boost. Output device volume is separate from this player's gain.
 
@@ -68,5 +78,20 @@ DSP tests cover quiet-signal transparency with delay, boosted peak ceilings at
 8/44.1/48/96 kHz, stereo gain linking, isolated peaks, and non-finite input.
 Headless Chromium smoke tests were also run for actual AudioWorklet playback,
 file selection/removal, gain/preset/reset controls, pause, mobile layout,
-dialogs, offline reload and the unavailable-worklet fallback. Tested mobile
+dialogs, offline reload and the unavailable-worklet fallback. Strong-mode
+checks cover consent/cancel, +24 dB range, actual compressor reduction, volume
+reduction on entry, disable/reset behavior and disabled mode without a limiter. Tested mobile
 viewport: 390 x 844. These are not a physical-phone or speaker distortion test.
+
+For the browser regression suite, install `playwright-core` in a temporary
+folder or locally (not needed to run the app). Start the static server above,
+then run with a local Chromium executable:
+
+```sh
+SAFI_CHROMIUM_PATH=/path/to/chromium node sound/tests/browser-smoke.cjs
+```
+
+`SAFI_TEST_URL` can override the default `http://127.0.0.1:8000/`. The test
+creates/removes a small WAV fixture in the OS temporary directory. Playwright
+must be available on Node's module path. No test audio or browser binary is
+shipped in the APK.

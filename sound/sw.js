@@ -1,4 +1,4 @@
-const CACHE = "safi-audio-v1";
+const CACHE = "safi-audio-v2";
 const FILES = [
   "./",
   "./index.html",

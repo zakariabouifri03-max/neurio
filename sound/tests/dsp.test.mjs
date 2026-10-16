@@ -26,7 +26,7 @@ test("strong peaks stay at or below -1 dBFS at several sample rates", () => {
   for (const sampleRate of [8000, 44100, 48000, 96000]) {
     const limiter = new LookaheadLimiter(sampleRate);
     const left = Float32Array.from({ length: 25000 }, (_, i) =>
-      i % 199 === 0 ? 12 : Math.sin(i * 0.037) * 4,
+      i % 199 === 0 ? 32 : Math.sin(i * 0.037) * 4,
     );
     const right = Float32Array.from(
       { length: left.length },

@@ -1,4 +1,4 @@
-# Safi Sound — Android APK
+# Safi Sound 1.1 — Android APK
 
 An Android-installable, offline WebView container for the Safi local audio
 player in `sound/`. It bundles all HTML/JS/CSS and the AudioWorklet. There is
@@ -15,7 +15,9 @@ This is **not** a system-wide volume booster and does not control other apps.
   ask you to allow installation from the particular browser/file manager you
   used. Do not disable Play Protect; if it reports a specific threat, stop
   and investigate. Turn off that source's install permission afterwards.
-- Choose **Add audio**, select your own file, Play, then increase gain gently.
+- Choose **Add audio**, select your own file, Play, then increase gain gently. For more lift, play a track first, tap
+  **Strong lift**, read the warning and confirm. It enables compression and
+  up to +24 dB gain, but starts at 0 dB and lowers player output to 40% or less.
 
 The app has no INTERNET, microphone, or broad storage permission. Android's
 system document picker grants access to files you explicitly choose. The UI

@@ -35,7 +35,7 @@
           <span class="privacy-orb">⌁</span
           ><strong>Only on your device.</strong>
           <p>Your audio stays yours.<br />No uploads. No accounts.</p>
-          <span class="version">SAFI PLAYER / V1.0</span>
+          <span class="version">SAFI PLAYER / V1.1</span>
         </div>
       </aside>
       <main>
@@ -148,7 +148,9 @@
             <div class="boost-title">
               <div>
                 <h2>Sound boost</h2>
-                <p>A gentle lift, not a loudness contest.</p>
+                <p id="boost-description">
+                  A gentle lift for everyday listening.
+                </p>
               </div>
               <span class="boost-number"
                 ><output id="boost-value" for="boost">+0</output
@@ -165,7 +167,26 @@
               value="0"
             />
             <div class="range-labels">
-              <span>−6 dB</span><span>ORIGINAL</span><span>+12 dB</span>
+              <span>−6 dB</span><span>ORIGINAL</span
+              ><span id="boost-max-label">+12 dB</span>
+            </div>
+            <div class="strong-mode">
+              <div>
+                <strong>Need more lift?</strong>
+                <p id="mode-hint">Play a track to unlock Strong lift.</p>
+              </div>
+              <button
+                id="strong-mode"
+                type="button"
+                aria-pressed="false"
+                disabled
+              >
+                Strong lift
+              </button>
+            </div>
+            <div id="compression-readout" class="meter-title" hidden>
+              <span>DYNAMIC COMPRESSION</span
+              ><output id="reduction-value">0.0 dB reduction</output>
             </div>
             <div class="section-label">MAKE IT YOURS</div>
             <div class="presets" role="group" aria-label="Equalizer presets">
@@ -281,6 +302,28 @@
         Install from your browser menu → Add to Home screen. Open once online to
         prepare offline use. Select your tracks again after reopening.
       </p>
+    </dialog>
+    <dialog id="strong-dialog" aria-labelledby="strong-title">
+      <div class="eyebrow">MORE LIFT, LESS DYNAMIC RANGE</div>
+      <h2 id="strong-title">Enable Strong lift?</h2>
+      <p>
+        This mode adds dynamic compression and unlocks up to +24 dB of input
+        gain. Quiet passages can become much louder. Peaks still pass through
+        the −1 dBFS sample limiter.
+      </p>
+      <p>
+        <b>Turn down your phone first.</b> Limiting is not hearing protection.
+        Strong boosts can cause speaker distortion, listening fatigue, and
+        reduced dynamics. No distortion-free or hardware-volume guarantee.
+      </p>
+      <p>
+        We will reset boost to 0 dB and lower this player’s output to 40% or
+        less. Increase gradually; do not start at maximum.
+      </p>
+      <div class="dialog-actions">
+        <button id="strong-cancel" autofocus>Keep gentle mode</button
+        ><button id="strong-confirm">Enable Strong lift</button>
+      </div>
     </dialog>
     <audio id="audio" preload="metadata"></audio>
     <script type="module" src="./app.js"></script>
