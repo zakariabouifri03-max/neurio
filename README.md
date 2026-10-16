@@ -32,17 +32,37 @@ See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline 
 
 ---
 
-## 📱 Install on your phone — كأنها APK!
+## 📱 Install on your phone — APK ولا PWA
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
+**Real APK (≈250 KB, offline, zero permissions):** download
+**[`dist/BashBaqiRacing.apk`](dist/BashBaqiRacing.apk)** (tap the ⬇ *Download* button on
+GitHub) onto the phone, tap the file, allow *"install unknown apps"* once — done. Nothing
+else is needed: no internet, no Play Store, no account.
+
+> 📲 **Share it on WhatsApp:** the direct link is
+> `https://github.com/zakariabouifri03-max/neurio/raw/hooome/dist/BashBaqiRacing.apk`
+> — send that to a friend and the whole game lands in their phone.
+
+**Or the PWA:** the game is also a full **Progressive Web App** — installable, fullscreen,
+**works offline**, its own icon.
 
 1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
 2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
 3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
 
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
 **Offline play** is built-in: a service worker caches all game files on first visit.
+
+### ⚡ Fast mode (for older / slower phones)
+
+Tap the **⚡** button in the garage to toggle performance mode:
+
+| | pixels | bloom | shadows |
+| --- | --- | --- | --- |
+| **Auto** (default in the browser) | up to 2× | on | on |
+| **Fast** (default in the APK) | 1× | off | off |
+
+Auto mode also degrades by itself: if it keeps measuring under ~26 fps it drops bloom,
+then the resolution, then switches to full fast mode. The choice is saved.
 
 ---
 
@@ -58,6 +78,7 @@ You are dropped **straight into a race** the moment the game loads. Finish, earn
 - 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
 - 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
 - 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
+- ⚡ **Fast mode button**: 1× pixels / no bloom / no shadows for older phones (auto-degrades too)
 - 💾 Progress auto-saves in the browser
 
 ## 🕹️ Controls
@@ -94,6 +115,7 @@ neurio/
 │   ├── post.js           # bloom post-processing
 │   ├── save.js           # localStorage persistence
 │   └── util.js           # seeded RNG + helpers
+├── tools/apk/            # offline APK pipeline: hand-written smali + apktool + v2 signing
 └── vendor/               # three.js r170 (no internet needed)
 ```
 
@@ -101,15 +123,23 @@ Made with ❤️ and Three.js
 
 ---
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+## 📦 The APK — how it is built
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+The APK is **generated from this repo**, offline, with no Gradle and no Android SDK:
 
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
+```bash
+node tools/apk/build.mjs        # → dist/BashBaqiRacing.apk  (~250 KB)
+```
 
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+esbuild bundles the game into one HTML file → `tools/make-icons.mjs` draws the launcher
+icons → **apktool** assembles the hand-written `MainActivity.smali` into `classes.dex` and
+packages everything → **APK Signature Scheme v2** signing in pure JS → `tools/apk/verify.py`
+re-checks the digest, RSA signature, zip and dex from scratch and must print `PASS`.
+
+- Package `com.neurio.bashbaqi` · **minSdk 24 (Android 7.0+)** · targetSdk 34 · signed **v2**
+- **Zero permissions** — the HTML, JS, audio and icons all live inside the APK
+- Starts in **⚡ fast mode** (it spots the `BashBaqiAPK` user agent) and keeps the screen
+  awake; leaving the app pauses the race and silences the island music
+
+See **[`tools/apk/README.md`](tools/apk/README.md)** for the one-time tool setup and the
+signing-key notes (keep `tools/apk/keystore/` — future updates must use the same key).

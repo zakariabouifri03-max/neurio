@@ -182,6 +182,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   box-shadow: 0 4px 0 #9db4c8, 0 6px 10px rgba(0,0,0,0.25);
 }
 .miniBtn.off { opacity: 0.55; filter: grayscale(1); }
+.miniBtn.boost {
+  background: linear-gradient(180deg, #ffe95e, #f7b731); color: #4a2c00;
+  box-shadow: 0 4px 0 #c98d16, 0 6px 10px rgba(0,0,0,0.25);
+}
 .miniBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #9db4c8; }
 
 #logo {
