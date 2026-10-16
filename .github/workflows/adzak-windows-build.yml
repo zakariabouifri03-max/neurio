@@ -101,10 +101,9 @@ jobs:
             publish/README.md
           if-no-files-found: error
 
-      # Only on manual dispatch: publish a permanent GitHub Release with
+      # Every successful build refreshes the permanent GitHub Release with
       # direct-download EXE assets (artifact downloads expire; releases don't).
       - name: Publish GitHub Release (direct EXE downloads)
-        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
