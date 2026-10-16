@@ -10,6 +10,9 @@ on:
       - 'adzak-lite-browser/**'
       - '.github/workflows/adzak-windows-build.yml'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -40,6 +43,14 @@ jobs:
           -p:DebugType=none -p:DebugSymbols=false
           -o publish/folder
 
+      - name: Publish portable EXE (framework-dependent, win-x64)
+        run: >
+          dotnet publish adzak-lite-browser/src/ADZAKLiteBrowser/ADZAKLiteBrowser.csproj
+          -c Release -r win-x64 --self-contained false
+          -p:PublishSingleFile=true
+          -p:DebugType=none -p:DebugSymbols=false
+          -o publish/portable
+
       - name: Ensure WebView2 Runtime (for smoke test)
         shell: pwsh
         run: |
@@ -56,6 +67,23 @@ jobs:
           $result = Join-Path $env:TEMP 'adzak-smoke-result.json'
           if (Test-Path $result) { Get-Content $result }
           if ($p.ExitCode -ne 0) { throw "Smoke test failed" }
+          if (Test-Path $result) { Copy-Item $result publish/smoke-result.json }
+
+      - name: Commit portable EXE + smoke result to this branch
+        shell: bash
+        run: |
+          mkdir -p adzak-lite-browser/dist
+          cp publish/portable/ADZAKLiteBrowser.exe adzak-lite-browser/dist/ADZAKLiteBrowser-portable.exe
+          cp publish/smoke-result.json adzak-lite-browser/dist/smoke-result.json || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add adzak-lite-browser/dist
+          if git diff --cached --quiet; then
+            echo "No dist changes to commit."
+          else
+            git commit -m "Add built portable EXE and smoke-test results [skip ci]"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
 
       - name: Package artifacts
         shell: pwsh
