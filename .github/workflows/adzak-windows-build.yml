@@ -100,3 +100,36 @@ jobs:
             publish/ADZAK-Lite-Browser-win-x64-folder.zip
             publish/README.md
           if-no-files-found: error
+
+      # Only on manual dispatch: publish a permanent GitHub Release with
+      # direct-download EXE assets (artifact downloads expire; releases don't).
+      - name: Publish GitHub Release (direct EXE downloads)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          cp publish/single/ADZAKLiteBrowser.exe publish/ADZAKLiteBrowser.exe
+          cp publish/portable/ADZAKLiteBrowser.exe publish/ADZAKLiteBrowser-portable.exe
+          cat > publish/release-notes.md <<'NOTES'
+          Lightweight C#/.NET 8 + WebView2 (Chromium) browser for Windows 10/11 x64 and 8 GB RAM PCs.
+
+          **Which file?**
+          - `ADZAKLiteBrowser.exe` — self-contained (recommended): includes the .NET runtime. Only needs the free WebView2 Runtime below.
+          - `ADZAKLiteBrowser-portable.exe` (1.0 MB) — needs the free .NET 8 Desktop Runtime (https://dotnet.microsoft.com/download/dotnet/8.0) + WebView2 Runtime.
+          - `ADZAK-Lite-Browser-win-x64-folder.zip` — folder layout of the self-contained build.
+
+          WebView2 Runtime (built into Windows 11 and most Windows 10 PCs): https://developer.microsoft.com/microsoft-edge/webview2/
+
+          The EXE is not code-signed, so Windows SmartScreen warns on first launch (More info -> Run anyway).
+          Honest test status: CI builds + a headless smoke test of the shipped EXE passed; see adzak-lite-browser/BUILD-RESULTS.md in the repo.
+          NOTES
+          gh release create adzak-lite-v1.0 \
+            --title "ADZAK Lite Browser v1.0 (Windows x64)" \
+            --notes-file publish/release-notes.md \
+            --target "$GITHUB_REF_NAME" || echo "Release already exists; uploading assets."
+          gh release upload adzak-lite-v1.0 \
+            publish/ADZAKLiteBrowser.exe \
+            publish/ADZAKLiteBrowser-portable.exe \
+            publish/ADZAK-Lite-Browser-win-x64-folder.zip \
+            --clobber
