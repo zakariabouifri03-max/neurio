@@ -28,7 +28,7 @@ public sealed class MainForm : Form
     private readonly TabControl _tabs = new();
     private readonly ImageList _tabImages = new() { ImageSize = new Size(16, 16), ColorDepth = ColorDepth.Depth32Bit };
     private readonly ToolStrip _toolbar = new();
-    private readonly ToolStripSpringTextBox _address = new();
+    private readonly ToolStripTextBox _address = new();
     private readonly ToolStripButton _backBtn, _fwdBtn, _reloadBtn, _starBtn, _shieldBtn, _downloadsBtn;
     private readonly ToolStrip _bookmarksBar = new();
     private readonly Panel _findPanel = new();
@@ -126,11 +126,21 @@ public sealed class MainForm : Form
 
         _statusTimer.Tick += StatusTimer_Tick;
         _suspendTimer.Tick += SuspendTimer_Tick;
+        SizeChanged += (_, _) => FitAddressBar();
+        FitAddressBar();
 
         RebuildBookmarksBar();
         Shown += MainForm_Shown;
         FormClosing += MainForm_FormClosing;
         KeyDown += MainForm_KeyDown;
+    }
+
+    /// <summary>Stretch the address bar across the free toolbar width
+    /// (spring-textbox effect, sized manually on window resize).</summary>
+    private void FitAddressBar()
+    {
+        try { _address.Size = new Size(Math.Max(200, _toolbar.Width - 400), 24); }
+        catch { }
     }
 
     // ============================================================ lifecycle
