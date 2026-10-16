@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1214">
+  <meta name="description" content="GHOSTLINE. An original 3D urban hacking playground. Explore South Bank, breach the surveillance grid, and leave no trace.">
+  <title>GHOSTLINE — The city is your backdoor.</title>
+  <link rel="icon" type="image/svg+xml" href="icons/ghostline.svg">
+  <link rel="manifest" href="ghostline.webmanifest">
+  <link rel="preload" href="assets/fonts/space-grotesk-500.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="src/ghostline/style.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
+</head>
+<body>
+  <svg class="svg-defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+    <symbol id="i-logo" viewBox="0 0 32 32"><path d="M4 10V4h24v6M4 22v6h24v-6M9 10h14v12H9zM16 10v12M9 16h14"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M8 4v6m8 4v6"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM17 8q5 4 0 8m2-11q8 7 0 14"/></symbol>
+    <symbol id="i-muted" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM17 9l5 6m0-6-5 6"/></symbol>
+    <symbol id="i-scan" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5M2 12h20"/><circle cx="12" cy="12" r="4"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="m13 2-8 12h6l-1 8 9-13h-7z"/></symbol>
+    <symbol id="i-relay" viewBox="0 0 24 24"><path d="M5 5h14v14H5zM9 9h6v6H9zM9 2v3m6-3v3M9 19v3m6-3v3M2 9h3m-3 6h3m14-6h3m-3 6h3"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zm6-3v15m6-12v15"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 15v6h16v-6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="m3 4 16 4-2 8L1 12zm12 12v5h6M6 14l-2 4"/></symbol>
+    <symbol id="i-rain" viewBox="0 0 24 24"><path d="M6 14a4 4 0 1 1 0-8 6 6 0 0 1 11 1 3.5 3.5 0 1 1 1 7M7 17l-1 3m6-3-1 3m6-3-1 3"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+  </defs></svg>
+
+  <div id="viewport" aria-label="Interactive 3D city. Use WASD to move and drag to look around."></div>
+  <div class="scene-grade" aria-hidden="true"></div>
+  <div id="scan-overlay" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="ghostline.html" aria-label="Ghostline home"><svg><use href="#i-logo"/></svg><span>GHOSTLINE<span class="brand-cursor">_</span></span><span class="alpha-badge">ALPHA</span></a>
+    <nav aria-label="Main navigation">
+      <button class="nav-tab active" id="nav-play"><span>01</span> PLAY</button>
+      <button class="nav-tab" data-open="operative"><span>02</span> OPERATIVE</button>
+      <button class="nav-tab" data-open="intel"><span>03</span> INTEL</button>
+    </nav>
+    <div class="header-actions">
+      <span class="network-status"><i></i> LOCAL NETWORK <b>ONLINE</b></span>
+      <button class="icon-button" id="sound-toggle" aria-label="Enable sound" title="Toggle sound"><svg><use href="#i-muted"/></svg></button>
+      <button class="icon-button" data-open="settings" aria-label="Settings" title="Settings"><svg><use href="#i-settings"/></svg></button>
+      <button class="icon-button fullscreen-button" id="fullscreen-toggle" aria-label="Enter fullscreen" title="Fullscreen"><svg><use href="#i-expand"/></svg></button>
+    </div>
+  </header>
+
+  <main id="hud">
+    <div class="world-topline"><div class="session-label"><span class="live-dot"></span> LIVE WORLD <span class="divider">/</span> <span id="session-state">AWAITING OPERATIVE</span></div><div class="compass" aria-hidden="true"><span>NW</span><i></i><i></i><i></i><b id="heading">N</b><i></i><i></i><i></i><span>NE</span></div><span class="world-coordinates">51°30′ N &nbsp; 0°07′ W</span></div>
+
+    <section class="welcome" id="welcome">
+      <div class="eyebrow"><span></span> OPEN-WORLD HACKING</div>
+      <h1>The city is<br>your <em>backdoor.</em></h1>
+      <p>Every connection is an opportunity.<br>Get inside. Take control. Leave no trace.</p>
+      <button class="primary-button" id="deploy-button">ENTER THE CITY <svg><use href="#i-arrow"/></svg></button>
+      <div class="welcome-meta"><span class="tiny-dot"></span> SINGLE PLAYER <span>·</span> FREE ROAM</div>
+    </section>
+
+    <aside class="operation-card" id="operation-card" aria-label="Current operation">
+      <div class="card-eyebrow"><span class="operation-mark">//</span> MAIN OPERATION <span class="mission-number">01</span></div>
+      <h2>Ghost in the grid</h2>
+      <p id="objective-description">Breach the relays. Break the surveillance.<br>Give the city back its shadows.</p>
+      <div class="objective-list" id="objective-list"></div>
+      <div class="operation-progress"><div><span>NETWORK ACCESS</span><b id="relay-count">0 / 3</b></div><div class="progress-segments"><i></i><i></i><i></i></div></div>
+      <button class="text-button" data-open="map">VIEW DISTRICT MAP <svg><use href="#i-arrow"/></svg><kbd>M</kbd></button>
+    </aside>
+
+    <div id="world-markers" aria-hidden="true"></div>
+    <div class="crosshair" id="crosshair" aria-hidden="true"><i></i><i></i></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"><svg><use href="#i-check"/></svg><div><b id="toast-title"></b><span id="toast-message"></span></div></div>
+
+    <section class="minimap-panel" aria-label="District minimap">
+      <button class="minimap-heading" data-open="map"><span><svg><use href="#i-pin"/></svg> SOUTH BANK</span><svg><use href="#i-expand"/></svg></button>
+      <div class="minimap-frame"><canvas id="minimap" width="420" height="300" aria-label="Live minimap showing your position and relays"></canvas><span class="map-north">N</span><div class="map-scale">20 m <span></span></div></div>
+      <div class="minimap-footer"><span><i class="you-dot"></i> YOU</span><span><i class="relay-dot"></i> RELAY</span><span id="district-status">RESTRICTED NETWORK</span></div>
+    </section>
+
+    <div class="interaction-prompt" id="interaction-prompt" hidden>
+      <div class="target-icon"><svg><use href="#i-relay"/></svg></div><div class="target-info"><span id="target-type">NEXUS CITY RELAY</span><b id="target-name">Relay 01</b><small id="target-state">UNSECURED CONNECTION</small></div>
+      <button id="hack-button" aria-label="Hack selected device"><kbd>E</kbd><span id="hack-label">HACK</span></button><div class="hack-progress"><i id="hack-progress"></i></div>
+    </div>
+
+    <div class="controls-hint" id="controls-hint"><span class="mouse-icon"></span> DRAG TO LOOK <span class="hint-separator"></span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> MOVE</span><span><kbd>SHIFT</kbd> SPRINT</span><span><kbd>ESC</kbd> PAUSE</span></div>
+
+    <section class="operative-hud" aria-label="Operative tools">
+      <div class="operative-status"><div class="operative-emblem"><svg><use href="#i-logo"/></svg></div><div><span>OPERATIVE_07</span><b>ECHO <i>CONNECTED</i></b></div><button class="trace-info" data-open="intel" aria-label="Learn about network trace"><svg><use href="#i-eye"/></svg><b id="trace-value">0%</b></button></div>
+      <div class="trace-track"><i id="trace-bar"></i></div>
+      <div class="ability-buttons"><button id="scan-button"><svg><use href="#i-scan"/></svg><span>NETSCAN</span><kbd>Q</kbd></button><button id="blackout-button"><svg><use href="#i-bolt"/></svg><span id="blackout-label">BLACKOUT</span><kbd>B</kbd></button></div>
+      <div class="operative-meta"><span id="xp-value">0000 XP</span><span><i></i> ENCRYPTION ACTIVE</span></div>
+    </section>
+
+    <div class="touch-controls" id="touch-controls"><div class="dpad"><button data-move="forward" aria-label="Move forward">↑</button><button data-move="left" aria-label="Move left">←</button><button data-move="back" aria-label="Move backward">↓</button><button data-move="right" aria-label="Move right">→</button></div><button class="touch-sprint" data-move="sprint" aria-label="Sprint">RUN</button><button class="touch-jump" id="touch-jump" aria-label="Jump">JUMP</button></div>
+  </main>
+
+  <footer class="bottom-bar"><span><span class="location-dot"></span> LONDON <span class="divider">/</span> SOUTH BANK DISTRICT</span><span class="weather"><svg><use href="#i-rain"/></svg><span id="weather-label">LIGHT RAIN</span><span class="divider">/</span><time id="city-clock">21:47</time></span><span class="build-label">PROCEDURAL WORLD <span class="divider">/</span> BUILD 0.1.0 <i></i></span></footer>
+
+  <dialog id="map-dialog" class="panel-dialog map-dialog" aria-labelledby="map-title">
+    <div class="dialog-top"><div><div class="eyebrow">NEXUS / NETWORK TOPOLOGY</div><h2 id="map-title">South Bank district<span>_</span></h2></div><button class="icon-button close-dialog" aria-label="Close map"><svg><use href="#i-close"/></svg></button></div>
+    <div class="map-layout"><div class="big-map-wrap"><canvas id="district-map" width="1000" height="1000" aria-label="District map. Click to set a waypoint."></canvas><div class="map-instruction">CLICK TO SET A WAYPOINT <span>ESC TO CLOSE</span></div></div><aside><div class="eyebrow">OPERATION BLACKOUT</div><h3>Follow the signal.</h3><p>Three relays. One surveillance grid.<br>Plan your route, then disappear.</p><div id="map-relays"></div><button class="secondary-button" id="clear-waypoint">CLEAR WAYPOINT</button><div class="map-legend"><span><i class="you-dot"></i> Operative</span><span><i class="relay-dot"></i> City relay</span><span><i class="patrol-dot"></i> Patrol drone</span><span><i class="exit-dot"></i> Safehouse</span></div></aside></div>
+  </dialog>
+
+  <dialog id="operative-dialog" class="panel-dialog operative-dialog" aria-labelledby="operative-title">
+    <div class="dialog-top"><div><div class="eyebrow">IDENTITY / UNLISTED</div><h2 id="operative-title">Meet your ghost<span>_</span></h2></div><button class="icon-button close-dialog" aria-label="Close operative viewer"><svg><use href="#i-close"/></svg></button></div>
+    <div class="model-layout"><div id="model-stage"><span class="model-label">ECHO_07 <small>PROCEDURAL 3D MODEL</small></span><span class="model-drag">↔ DRAG TO ROTATE</span></div><div class="model-details"><div class="eyebrow">OPERATIVE 07 / INDEPENDENT</div><h3>ECHO</h3><p>No records. No affiliations. Just a talent for finding the doors a city forgets to lock.</p><div class="model-specs"><div><span>CLASS</span><b>Network infiltrator</b></div><div><span>LOADOUT</span><b>Profiler + blackout rig</b></div><div><span>STATUS</span><b class="accent">Off the grid</b></div></div><label class="eyebrow">FIELD JACKET</label><div class="swatches"><button data-palette="carbon" class="selected" style="--swatch:#3a464a" aria-label="Carbon jacket" aria-pressed="true"></button><button data-palette="sand" style="--swatch:#a09279" aria-label="Sandstone jacket" aria-pressed="false"></button><button data-palette="spectre" style="--swatch:#c9cdd1" aria-label="Spectre jacket" aria-pressed="false"></button><span id="palette-name">CARBON</span></div><button class="primary-button" id="export-model">DOWNLOAD 3D MODEL <svg><use href="#i-download"/></svg></button><small class="export-note">.GLB FORMAT · ORIGINAL MESH · BLENDER READY<br>Articulated parts · static pose export</small><p id="export-status" role="status"></p></div></div>
+  </dialog>
+
+  <dialog id="intel-dialog" class="panel-dialog intel-dialog" aria-labelledby="intel-title">
+    <div class="dialog-top"><div><div class="eyebrow">DECRYPTED / EYES ONLY</div><h2 id="intel-title">Knowledge is access<span>_</span></h2></div><button class="icon-button close-dialog" aria-label="Close intel"><svg><use href="#i-close"/></svg></button></div>
+    <div class="intel-layout"><section><div class="eyebrow">YOUR MISSION</div><h3>Give the city<br>back its shadows.</h3><p>NEXUS watches every corner of South Bank. Its three street-level relays are the weak link. Get within 13 meters, breach each relay, then return to the green safehouse beacon.</p><div class="intel-tip"><svg><use href="#i-eye"/></svg><div><b>Stay one step ahead.</b><p>Patrol drones raise your trace when they get close. At 100%, you are routed back to the safehouse. Breached relays stay yours.</p></div></div><div class="intel-tip"><svg><use href="#i-bolt"/></svg><div><b>Darkness is an advantage.</b><p>Blackout disables detection and dims the district for 8 seconds. It takes 25 seconds to recharge.</p></div></div><p class="original-note">An original, small-scale playable prototype inspired by urban hacking games. Not affiliated with Ubisoft or Watch Dogs.</p></section><section class="controls-table"><div class="eyebrow">FIELD MANUAL / CONTROLS</div><div><span>Move</span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / ARROWS</span></div><div><span>Look around</span><span>CLICK + DRAG</span></div><div><span>Sprint</span><kbd>SHIFT</kbd></div><div><span>Jump</span><kbd>SPACE</kbd></div><div><span>Breach nearby device</span><kbd>E</kbd></div><div><span>Toggle network scan</span><kbd>Q</kbd></div><div><span>District blackout</span><kbd>B</kbd></div><div><span>District map</span><kbd>M</kbd></div><div><span>Pause / close panel</span><kbd>ESC</kbd></div><p>Touchscreen? Use the directional pad to move, drag the world to look around, and tap your tools to hack.</p></section></div>
+  </dialog>
+
+  <dialog id="settings-dialog" class="panel-dialog small-dialog" aria-labelledby="settings-title"><div class="dialog-top"><div><div class="eyebrow">SYSTEM / PREFERENCES</div><h2 id="settings-title">Your setup<span>_</span></h2></div><button class="icon-button close-dialog" aria-label="Close settings"><svg><use href="#i-close"/></svg></button></div><div class="settings-body"><label class="setting-row"><span>Visual quality<small>Lower settings improve frame rate.</small></span><select id="quality-setting"><option value="auto">Adaptive</option><option value="high">High</option><option value="low">Low</option></select></label><label class="setting-row"><span>City soundscape<small>Synthesized ambience & interface audio.</small></span><input type="checkbox" id="sound-setting" role="switch"></label><label class="setting-row"><span>Rain effects<small>Ambient rain in the 3D world.</small></span><input type="checkbox" id="rain-setting" role="switch" checked></label><label class="setting-row"><span>Camera sensitivity</span><input id="sensitivity-setting" type="range" min="0.4" max="2" step="0.1" value="1"></label><button class="secondary-button danger-button" id="reset-button">RESTART OPERATION</button><p class="settings-note">Relay progress and your preferences are saved on this device. Restarting only clears this operation.</p><a class="archive-link" href="racing.html">Looking for the original racing game? <span>↗</span></a></div></dialog>
+
+  <dialog id="pause-dialog" class="panel-dialog small-dialog" aria-labelledby="pause-title"><div class="pause-content"><div class="pause-symbol"><svg><use href="#i-pause"/></svg></div><div class="eyebrow">CONNECTION ON HOLD</div><h2 id="pause-title">Stay in the shadows.</h2><p>The city can wait.</p><button class="primary-button close-dialog">RESUME OPERATION <svg><use href="#i-arrow"/></svg></button><button class="secondary-button" id="pause-intel">FIELD MANUAL</button></div></dialog>
+
+  <dialog id="complete-dialog" class="panel-dialog small-dialog" aria-labelledby="complete-title"><div class="pause-content"><div class="complete-symbol"><svg><use href="#i-check"/></svg></div><div class="eyebrow">OPERATION COMPLETE</div><h2 id="complete-title">You are the ghost.</h2><p>The surveillance grid is blind.<br>South Bank belongs to its people again.</p><div class="result-stats"><div><b>03</b><span>RELAYS BREACHED</span></div><div><b id="result-time">00:00</b><span>TIME IN FIELD</span></div><div><b>+750</b><span>XP EARNED</span></div></div><button class="primary-button close-dialog">KEEP EXPLORING <svg><use href="#i-arrow"/></svg></button><button class="secondary-button" id="replay-button">REPLAY OPERATION</button></div></dialog>
+
+  <div id="boot-screen"><div class="boot-logo"><svg><use href="#i-logo"/></svg>GHOSTLINE<span>_</span></div><div class="boot-progress"><i></i></div><span id="boot-message">ESTABLISHING A SECURE CONNECTION...</span></div>
+  <noscript><div class="no-script">GHOSTLINE needs JavaScript and WebGL to render the city. Enable JavaScript to play.</div></noscript>
+  <script type="module" src="src/ghostline/main.js"></script>
+</body>
+</html>

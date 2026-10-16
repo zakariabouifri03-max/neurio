@@ -1,0 +1,23 @@
+{
+  "name": "GHOSTLINE \u2014 Urban Hacking Playground",
+  "short_name": "GHOSTLINE",
+  "description": "Explore an original 3D city. Breach the surveillance grid and leave no trace.",
+  "start_url": "./ghostline.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "background_color": "#101b20",
+  "theme_color": "#0d1214",
+  "lang": "en",
+  "categories": [
+    "games",
+    "entertainment"
+  ],
+  "icons": [
+    {
+      "src": "icons/ghostline.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+name: SAWT+ Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "android/**"
+      - "src/sawt/**"
+      - "index.html"
+      - "tools/build-android-assets.mjs"
+      - "tools/sawt-png.mjs"
+      - "tools/make-sawt-icons.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/sawt-apk.yml"
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install build tooling
+        run: npm ci
+
+      - name: Bundle web assets for the WebView
+        run: node tools/build-android-assets.mjs
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      - name: Ensure Android SDK pieces
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Generate signing key (sideload builds)
+        run: |
+          keytool -genkeypair -v \
+            -keystore keystore.jks -alias sawt \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass sawt-release -keypass sawt-release \
+            -dname "CN=SAWT+, O=SAWT+, C=MA"
+
+      - name: Build release APK
+        working-directory: android
+        env:
+          SAWT_KEYSTORE: keystore.jks
+          SAWT_STORE_PASS: sawt-release
+          SAWT_KEY_PASS: sawt-release
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Collect APK
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk sawt-plus.apk
+          ls -la sawt-plus.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sawt-plus-apk
+          path: sawt-plus.apk
+
+      - name: Publish download asset on GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create sawt-latest \
+            --title "SAWT+ APK (latest)" \
+            --notes "Auto-built SAWT+ volume booster Android APK. Download sawt-plus.apk and allow install from unknown sources. Sideload build signed with a CI-generated key — updates replace this asset." \
+            --prerelease ./sawt-plus.apk || true
+          gh release upload sawt-latest ./sawt-plus.apk --clobber

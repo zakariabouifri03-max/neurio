@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>HOLLOWPINE — Make it to morning.</title>
+    <meta
+      name="description"
+      content="An original 3D wilderness survival game. Gather, craft, build a shelter, and make it to morning. Includes downloadable forest and survivor models."
+    />
+    <meta name="theme-color" content="#15211b" />
+    <link rel="icon" href="icons/hollowpine.svg" type="image/svg+xml" />
+    <link rel="manifest" href="hollowpine.webmanifest" />
+    <link
+      rel="preload"
+      href="assets/fonts/instrument-serif-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="src/hollowpine/style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three.module.js",
+          "three/addons/": "./vendor/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <svg class="svg-defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <symbol id="pine" viewBox="0 0 32 36">
+          <path d="m16 2-7 10h4L5 23h6l-7 8h24l-7-8h6l-8-11h4zM16 31v4" />
+        </symbol>
+        <symbol id="arrow" viewBox="0 0 24 24">
+          <path d="M4 12h16m-6-6 6 6-6 6" />
+        </symbol>
+        <symbol id="close" viewBox="0 0 24 24">
+          <path d="m6 6 12 12M6 18 18 6" />
+        </symbol>
+        <symbol id="sound" viewBox="0 0 24 24">
+          <path d="M3 9v6h4l5 4V5L7 9zM16 8q5 4 0 8m3-11q8 7 0 14" />
+        </symbol>
+        <symbol id="mute" viewBox="0 0 24 24">
+          <path d="M3 9v6h4l5 4V5L7 9zM17 9l5 6m0-6-5 6" />
+        </symbol>
+        <symbol id="settings" viewBox="0 0 24 24">
+          <path d="M3 7h18M3 17h18M8 3v8m8 2v8" />
+        </symbol>
+        <symbol id="expand" viewBox="0 0 24 24">
+          <path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5" />
+        </symbol>
+        <symbol id="sun" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="4" />
+          <path
+            d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"
+          />
+        </symbol>
+        <symbol id="moon" viewBox="0 0 24 24">
+          <path d="M20 15a9 9 0 0 1-11-11 9 9 0 1 0 11 11z" />
+        </symbol>
+        <symbol id="heart" viewBox="0 0 24 24">
+          <path
+            d="M12 20S2 14 2 7a5 5 0 0 1 10-1A5 5 0 0 1 22 7c0 7-10 13-10 13z"
+          />
+        </symbol>
+        <symbol id="stamina" viewBox="0 0 24 24">
+          <path d="m14 2-9 12h6l-1 8 9-13h-7z" />
+        </symbol>
+        <symbol id="food" viewBox="0 0 24 24">
+          <path
+            d="M5 3v7m3-7v7m3-7v7M5 7h6m-3 3v11M18 3c-3 2-3 7 0 9h2V3zm2 9v9"
+          />
+        </symbol>
+        <symbol id="water" viewBox="0 0 24 24">
+          <path
+            d="M12 2S4 11 4 15a8 8 0 0 0 16 0c0-4-8-13-8-13zM7 15q0 4 4 4"
+          />
+        </symbol>
+        <symbol id="warmth" viewBox="0 0 24 24">
+          <path
+            d="M9 14V5a3 3 0 1 1 6 0v9a5 5 0 1 1-6 0zM12 8v9m6-11h3m-3 5h3"
+          />
+        </symbol>
+        <symbol id="wood" viewBox="0 0 24 24">
+          <path
+            d="m4 7 12-3 5 12-12 4zM4 7l5 13M16 4 21 16M8 6l5 12M5 10l12-4m-9 9 11-4"
+          />
+          <ellipse
+            cx="7"
+            cy="14"
+            rx="2.5"
+            ry="6"
+            transform="rotate(-22 7 14)"
+          />
+        </symbol>
+        <symbol id="stone" viewBox="0 0 24 24">
+          <path
+            d="m3 15 3-9 10-3 6 9-5 9H6zm3-9 7 7 3-10M3 15l10-2 4 8m-4-8 9-1"
+          />
+        </symbol>
+        <symbol id="fiber" viewBox="0 0 24 24">
+          <path
+            d="M12 22V7M12 13C1 14 2 3 2 3s11 0 10 10zm0 4C23 18 22 7 22 7s-11 0-10 10zM12 8c-5-5 0-7 0-7s5 2 0 7"
+          />
+        </symbol>
+        <symbol id="axe" viewBox="0 0 32 32">
+          <path d="m8 29 9-23 3 1-9 23zM15 7l7 2 5-4 3 11-6 3-9-5zM24 5l3 13" />
+        </symbol>
+        <symbol id="torch" viewBox="0 0 32 32">
+          <path
+            d="m13 16 6 1-4 13-4-1zM11 15l10 3-1 4-10-3zM17 3c2 4 7 5 6 10-1 3-4 5-7 3-8-2-6-8-3-12 0 4 3 5 4-1z"
+          />
+        </symbol>
+        <symbol id="berries" viewBox="0 0 32 32">
+          <circle cx="11" cy="15" r="5" />
+          <circle cx="22" cy="16" r="5" />
+          <circle cx="17" cy="24" r="5" />
+          <path
+            d="M16 17V8m0 3C9 9 9 3 9 3s8 1 7 8zm0-2c2-6 10-6 10-6s-2 7-10 6"
+          />
+        </symbol>
+        <symbol id="bottle" viewBox="0 0 32 32">
+          <path
+            d="M12 3h8v5l5 5v13a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3V13l5-5zm-1 14h10M12 6h8M10 22h4"
+          />
+        </symbol>
+        <symbol id="craft" viewBox="0 0 32 32">
+          <path
+            d="M5 4h22v24H5zM9 9h14M9 13h6m-2 10 9-9m-11 1 12 8m-3-12 5 5M9 23l4 2"
+          />
+        </symbol>
+        <symbol id="fire" viewBox="0 0 32 32">
+          <path
+            d="M18 3c1 7 9 7 7 14-1 6-7 8-12 5-9-4-7-11-2-15-1 5 4 6 7-4zM6 26l21 4M6 30l21-4"
+          />
+        </symbol>
+        <symbol id="tent" viewBox="0 0 32 32">
+          <path
+            d="m16 3 14 25H2zm0 9-7 16m7-16 7 16M2 28l5 2m23-2-5 2M16 3V1"
+          />
+        </symbol>
+        <symbol id="map" viewBox="0 0 24 24">
+          <path d="m3 5 6-2 6 3 6-3v16l-6 2-6-3-6 3zm6-2v15m6-12v15" />
+        </symbol>
+        <symbol id="pin" viewBox="0 0 24 24">
+          <path d="M19 9c0 5-7 13-7 13S5 14 5 9a7 7 0 1 1 14 0z" />
+          <circle cx="12" cy="9" r="2" />
+        </symbol>
+        <symbol id="book" viewBox="0 0 24 24">
+          <path
+            d="M12 5c-3-2-7-2-10-1v15c3-1 7-1 10 1 3-2 7-2 10-1V4c-3-1-7-1-10 1zm0 0v15"
+          />
+        </symbol>
+        <symbol id="cube" viewBox="0 0 24 24">
+          <path d="m12 2 10 5v10l-10 5-10-5V7zm0 10L2 7m10 5 10-5m-10 5v10" />
+        </symbol>
+        <symbol id="download" viewBox="0 0 24 24">
+          <path d="M12 2v14m-5-5 5 5 5-5M4 16v5h16v-5" />
+        </symbol>
+        <symbol id="check" viewBox="0 0 24 24">
+          <path d="m5 12 4 4L19 6" />
+        </symbol>
+        <symbol id="compass" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" />
+          <path d="m16 8-3 5-5 3 3-5z" />
+        </symbol>
+        <symbol id="mouse" viewBox="0 0 24 24">
+          <rect x="6" y="2" width="12" height="20" rx="6" />
+          <path d="M12 2v6" />
+        </symbol>
+        <symbol id="pause" viewBox="0 0 24 24">
+          <path d="M8 5v14M16 5v14" />
+        </symbol>
+      </defs>
+    </svg>
+    <div
+      id="world"
+      aria-label="Interactive 3D forest. Move with WASD. Drag to look. E to gather."
+    ></div>
+    <div class="world-vignette" aria-hidden="true"></div>
+    <div id="damage-overlay" aria-hidden="true"></div>
+    <header class="header">
+      <a class="wordmark" href="./hollowpine.html" aria-label="Hollowpine home"
+        ><svg><use href="#pine" /></svg
+        ><span>HOLLOWPINE<span class="wordmark-dot">.</span></span></a
+      >
+      <nav aria-label="Main navigation">
+        <button class="nav-link active" id="nav-survival">SURVIVAL</button
+        ><button class="nav-link" data-open="guide">FIELD GUIDE</button
+        ><button class="nav-link" data-open="models">
+          3D MODELS <span>↗</span>
+        </button>
+      </nav>
+      <div class="header-tools">
+        <span class="prototype-label"><i></i> PLAYABLE PROTOTYPE</span
+        ><button
+          class="icon-button"
+          id="sound-toggle"
+          aria-label="Enable forest sounds"
+          title="Forest sounds"
+        >
+          <svg><use href="#mute" /></svg></button
+        ><button class="icon-button" data-open="settings" aria-label="Settings">
+          <svg><use href="#settings" /></svg></button
+        ><button
+          class="icon-button"
+          id="fullscreen-button"
+          aria-label="Fullscreen"
+        >
+          <svg><use href="#expand" /></svg>
+        </button>
+      </div>
+    </header>
+    <main id="hud">
+      <div class="world-topline">
+        <div>
+          <span class="season-dot"></span> BLACKWATER WOODS
+          <span class="line-divider"></span
+          ><span class="topline-muted">NORTHERN WILDERNESS</span>
+        </div>
+        <div class="heading-compass" aria-hidden="true">
+          <span>NW</span><i></i><i></i><i></i><b id="heading">N</b><i></i><i></i
+          ><i></i><span>NE</span>
+        </div>
+        <div class="day-time">
+          <svg id="day-icon"><use href="#sun" /></svg
+          ><b id="day-label">DAY 01</b><span class="line-divider"></span
+          ><time id="clock">17:12</time><span class="temperature">14°C</span>
+        </div>
+      </div>
+      <section id="welcome" class="welcome">
+        <div class="eyebrow">
+          <span></span> A WILDERNESS SURVIVAL EXPERIENCE
+        </div>
+        <h1>The wild<br />has <em>no mercy.</em></h1>
+        <p>
+          A forest. A hatchet. A fighting chance.<br />Build your shelter before
+          the light is gone.
+        </p>
+        <button class="primary-button" id="begin-button">
+          BEGIN YOUR STORY <svg><use href="#arrow" /></svg></button
+        ><button class="welcome-model-link" data-open="models">
+          Explore the original 3D models <span>↗</span>
+        </button>
+        <div class="welcome-meta">
+          <i></i> SINGLE PLAYER <span>·</span> YOUR PROGRESS SAVES AUTOMATICALLY
+        </div>
+      </section>
+      <aside class="journal" aria-label="Survival objectives">
+        <div class="journal-eyebrow">
+          <svg><use href="#book" /></svg> SURVIVAL JOURNAL <span>01</span>
+        </div>
+        <h2>Make it to morning.</h2>
+        <p id="journal-description">
+          The sun is setting. A warm fire and a roof over your head could make
+          all the difference.
+        </p>
+        <div id="objectives" class="objectives"></div>
+        <div class="journal-bottom">
+          <span id="journal-progress">0 OF 4 COMPLETED</span
+          ><button data-open="guide" aria-label="Open field guide">
+            FIELD GUIDE <svg><use href="#arrow" /></svg>
+          </button>
+        </div>
+      </aside>
+      <div id="world-labels" aria-hidden="true"></div>
+      <div class="crosshair" aria-hidden="true"></div>
+      <div id="toast" class="toast" role="status" aria-live="polite">
+        <span class="toast-icon"
+          ><svg><use href="#check" /></svg
+        ></span>
+        <div>
+          <b id="toast-title"></b>
+          <p id="toast-message"></p>
+        </div>
+      </div>
+      <div class="survivor-vitals">
+        <div class="survivor-name">
+          <span class="survivor-mark"
+            ><svg><use href="#pine" /></svg></span
+          ><span
+            >THE SURVIVOR<small id="survivor-status"
+              >A LONG WAY FROM HOME</small
+            ></span
+          ><span class="vitals-rule"></span>
+        </div>
+        <div id="vitals" class="vitals"></div>
+        <div class="vitals-legend">
+          HEALTH <span>·</span> STAMINA <span>·</span> FOOD <span>·</span> WATER
+          <span>·</span> WARMTH
+        </div>
+      </div>
+      <div class="interaction" id="interaction" hidden>
+        <span class="interaction-key">E</span
+        ><span
+          ><small id="interaction-kind">GATHER RESOURCE</small
+          ><b id="interaction-title">Fallen branch</b
+          ><span id="interaction-detail">+2 wood</span></span
+        ><button id="interact-button" aria-label="Interact with nearby object">
+          <svg><use href="#arrow" /></svg>
+        </button>
+      </div>
+      <section class="loadout" aria-label="Equipment and inventory">
+        <div class="resource-strip">
+          <span
+            ><svg><use href="#wood" /></svg>WOOD <b id="wood-count">00</b></span
+          ><i></i
+          ><span
+            ><svg><use href="#stone" /></svg>STONE
+            <b id="stone-count">00</b></span
+          ><i></i
+          ><span
+            ><svg><use href="#fiber" /></svg>FIBER
+            <b id="fiber-count">00</b></span
+          ><button data-open="craft" aria-label="Open crafting inventory">
+            <span>+</span>
+          </button>
+        </div>
+        <div class="hotbar">
+          <button
+            class="hotbar-slot selected"
+            id="axe-button"
+            title="Hatchet (1)"
+          >
+            <kbd>1</kbd><svg><use href="#axe" /></svg><span>HATCHET</span
+            ><i></i></button
+          ><button class="hotbar-slot" id="torch-button" title="Torch (2)">
+            <kbd>2</kbd><svg><use href="#torch" /></svg><span>TORCH</span
+            ><i></i></button
+          ><button class="hotbar-slot" id="eat-button" title="Eat berries (3)">
+            <kbd>3</kbd><svg><use href="#berries" /></svg><span>RATIONS</span
+            ><b id="berry-count">2</b></button
+          ><button
+            class="hotbar-slot"
+            id="drink-button"
+            title="Drink from flask (4)"
+          >
+            <kbd>4</kbd><svg><use href="#bottle" /></svg><span>FLASK</span
+            ><b id="bottle-count">2</b></button
+          ><button
+            class="hotbar-slot craft-slot"
+            data-open="craft"
+            title="Crafting (C)"
+          >
+            <kbd>C</kbd><svg><use href="#craft" /></svg><span>CRAFT</span>
+          </button>
+        </div>
+        <div class="movement-hint">
+          <span><kbd>W A S D</kbd> MOVE</span
+          ><span><kbd>SHIFT</kbd> SPRINT</span
+          ><span
+            ><svg><use href="#mouse" /></svg> DRAG TO LOOK</span
+          >
+        </div>
+      </section>
+      <section class="minimap-panel" aria-label="Forest minimap">
+        <button class="minimap-heading" data-open="map">
+          <span
+            ><svg><use href="#compass" /></svg> YOUR SURROUNDINGS</span
+          ><svg><use href="#expand" /></svg>
+        </button>
+        <div class="minimap-area">
+          <canvas
+            id="minimap"
+            width="400"
+            height="300"
+            aria-label="Map of the forest, camp, resources, and your position"
+          ></canvas
+          ><span class="north">N ↑</span>
+        </div>
+        <div class="minimap-footer">
+          <span><i></i> CAMP CLEARING</span
+          ><button data-open="map">MAP <kbd>M</kbd></button>
+        </div>
+      </section>
+      <div id="touch-controls" class="touch-controls">
+        <div class="dpad">
+          <button data-move="forward" aria-label="Move forward">↑</button
+          ><button data-move="left" aria-label="Move left">←</button
+          ><button data-move="back" aria-label="Move backward">↓</button
+          ><button data-move="right" aria-label="Move right">→</button>
+        </div>
+        <button class="touch-run" data-move="sprint" aria-label="Sprint">
+          RUN</button
+        ><button
+          class="touch-action"
+          id="touch-action"
+          aria-label="Gather or use hatchet"
+        >
+          <svg><use href="#axe" /></svg>
+        </button>
+      </div>
+    </main>
+    <footer class="footer">
+      <span><i></i> THE FOREST DOESN’T CARE IF YOU’RE READY.</span
+      ><span class="footer-center"
+        ><svg><use href="#pine" /></svg> EXPLORE. ADAPT. ENDURE.</span
+      ><span class="footer-build"
+        >ORIGINAL 3D WORLD <span> / </span> ALPHA 0.2</span
+      >
+    </footer>
+
+    <dialog
+      id="craft-dialog"
+      class="dialog craft-dialog"
+      aria-labelledby="craft-title"
+    >
+      <div class="dialog-header">
+        <div>
+          <div class="eyebrow">THE THINGS THAT KEEP YOU ALIVE</div>
+          <h2 id="craft-title">Make something of it.</h2>
+        </div>
+        <button class="icon-button close-dialog" aria-label="Close crafting">
+          <svg><use href="#close" /></svg>
+        </button>
+      </div>
+      <div class="craft-inventory" id="craft-inventory"></div>
+      <div id="recipe-cards" class="recipe-cards"></div>
+      <div class="craft-note">
+        <svg><use href="#pin" /></svg
+        ><span id="craft-note-text"
+          >Structures are built at the marked camp clearing.</span
+        >
+      </div>
+      <p id="craft-feedback" role="status"></p>
+    </dialog>
+
+    <dialog
+      id="models-dialog"
+      class="dialog model-dialog"
+      aria-labelledby="models-title"
+    >
+      <div class="dialog-header">
+        <div>
+          <div class="eyebrow">BUILT FROM SCRATCH. YOURS TO EXPLORE.</div>
+          <h2 id="models-title">A world, in the making.</h2>
+        </div>
+        <button
+          class="icon-button close-dialog"
+          aria-label="Close model viewer"
+        >
+          <svg><use href="#close" /></svg>
+        </button>
+      </div>
+      <div class="model-tabs" role="tablist" aria-label="Model selection">
+        <button
+          data-model="camp"
+          class="selected"
+          role="tab"
+          aria-selected="true"
+        >
+          <svg><use href="#pine" /></svg> FOREST CAMPSITE</button
+        ><button data-model="survivor" role="tab" aria-selected="false">
+          <svg><use href="#compass" /></svg> THE SURVIVOR</button
+        ><button data-model="hatchet" role="tab" aria-selected="false">
+          <svg><use href="#axe" /></svg> FIELD HATCHET
+        </button>
+      </div>
+      <div class="model-layout">
+        <div id="model-stage">
+          <div class="model-stage-label">
+            <span id="model-code">ENV_001</span><span>LIVE 3D PREVIEW</span>
+          </div>
+          <span class="model-drag">DRAG TO ROTATE <i>·</i> SCROLL TO ZOOM</span>
+        </div>
+        <div class="model-details">
+          <div class="eyebrow" id="model-category">
+            ENVIRONMENT / ORIGINAL ASSET
+          </div>
+          <h3 id="model-name">A place to<br />call home.</h3>
+          <p id="model-description">
+            A slice of Blackwater Woods. Needle-covered pines, a branch-built
+            shelter, and the small comfort of a fire.
+          </p>
+          <dl class="model-specs">
+            <div>
+              <dt>FORMAT</dt>
+              <dd>glTF 2.0 binary</dd>
+            </div>
+            <div>
+              <dt>GEOMETRY</dt>
+              <dd id="model-triangles">Procedural mesh</dd>
+            </div>
+            <div>
+              <dt>MATERIALS</dt>
+              <dd>PBR · self-contained</dd>
+            </div>
+            <div>
+              <dt>READY FOR</dt>
+              <dd>Blender / game engines</dd>
+            </div>
+          </dl>
+          <button class="primary-button" id="download-model">
+            DOWNLOAD .GLB <svg><use href="#download" /></svg>
+          </button>
+          <p class="model-footnote" id="model-footnote">
+            Original environment geometry. Static scene export.<br />No assets
+            taken from another game.
+          </p>
+          <p id="export-status" role="status"></p>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog
+      id="map-dialog"
+      class="dialog map-dialog"
+      aria-labelledby="map-title"
+    >
+      <div class="dialog-header">
+        <div>
+          <div class="eyebrow">BLACKWATER WOODS / A ROUGH SURVEY</div>
+          <h2 id="map-title">Find your bearings.</h2>
+        </div>
+        <button class="icon-button close-dialog" aria-label="Close map">
+          <svg><use href="#close" /></svg>
+        </button>
+      </div>
+      <div class="map-layout">
+        <div class="big-map">
+          <canvas
+            id="forest-map"
+            width="1000"
+            height="1000"
+            aria-label="Forest map. Click land to set a waypoint."
+          ></canvas
+          ><span class="map-instruction" id="map-instruction"
+            >CLICK THE LAND TO SET A WAYPOINT</span
+          >
+        </div>
+        <aside>
+          <div class="eyebrow">KNOW THE TERRAIN</div>
+          <h3>Don't lose<br />your way.</h3>
+          <p>
+            The trail leads through the camp clearing. Water is to the east. The
+            trees hide the rest.
+          </p>
+          <button class="map-location" data-waypoint="camp">
+            <svg><use href="#tent" /></svg
+            ><span>Camp clearing<small>BUILD · REST · RECOVER</small></span
+            ><span>↗</span></button
+          ><button class="map-location" data-waypoint="water">
+            <svg><use href="#water" /></svg
+            ><span>Lakeside spring<small>DRINK · REFILL FLASK</small></span
+            ><span>↗</span></button
+          ><button class="secondary-button" id="clear-waypoint">
+            CLEAR WAYPOINT
+          </button>
+          <div class="map-legend">
+            <span><i class="map-dot you"></i> You</span
+            ><span><i class="map-dot camp"></i> Camp</span
+            ><span><i class="map-dot resource"></i> Resources</span
+            ><span><i class="map-dot water"></i> Water</span>
+          </div>
+          <small class="map-warning"
+            >A waypoint is a direction, not a safe route.</small
+          >
+        </aside>
+      </div>
+    </dialog>
+
+    <dialog
+      id="guide-dialog"
+      class="dialog guide-dialog"
+      aria-labelledby="guide-title"
+    >
+      <div class="dialog-header">
+        <div>
+          <div class="eyebrow">A FEW THINGS WORTH REMEMBERING</div>
+          <h2 id="guide-title">Read the wild.</h2>
+        </div>
+        <button class="icon-button close-dialog" aria-label="Close field guide">
+          <svg><use href="#close" /></svg>
+        </button>
+      </div>
+      <div class="guide-layout">
+        <section>
+          <div class="eyebrow">YOUR FIRST NIGHT</div>
+          <h3>Start small.<br />Stay breathing.</h3>
+          <p>
+            Gather fallen branches, loose stones, and wild flax with
+            <kbd>E</kbd>. You can also chop marked pine trees: four hatchet
+            swings yield five wood.
+          </p>
+          <div class="guide-tip">
+            <svg><use href="#fire" /></svg>
+            <div>
+              <h4>Build a little warmth.</h4>
+              <p>
+                Collect 4 wood + 4 stone, then open Crafting near camp. A
+                campfire restores warmth, lights your torch, and repels wolves.
+                Add wood with E to keep it burning.
+              </p>
+            </div>
+          </div>
+          <div class="guide-tip">
+            <svg><use href="#tent" /></svg>
+            <div>
+              <h4>Make it to morning.</h4>
+              <p>
+                A shelter needs 8 wood + 4 fiber. Build it, keep your fire lit,
+                and press E by the shelter to rest until dawn. Eat and drink
+                before you turn in.
+              </p>
+            </div>
+          </div>
+          <div class="guide-tip">
+            <svg><use href="#moon" /></svg>
+            <div>
+              <h4>Respect the dark.</h4>
+              <p>
+                Time moves faster here. Nights are cold, and wolves get curious.
+                Stay near a fire or carry your lit torch. Hunger, thirst, and
+                cold can cost you health.
+              </p>
+            </div>
+          </div>
+          <p class="original-note">
+            An original, stylized survival prototype inspired by the
+            forest-survival genre. Not affiliated with Endnight Games or The
+            Forest. No multiplayer, cave system, or borrowed game assets.
+          </p>
+        </section>
+        <section class="control-table">
+          <div class="eyebrow">YOUR HANDS KNOW WHAT TO DO</div>
+          <div><span>Move</span><kbd>W A S D / ARROWS</kbd></div>
+          <div><span>Look around</span><span>CLICK + DRAG</span></div>
+          <div><span>Sprint</span><kbd>SHIFT</kbd></div>
+          <div><span>Jump</span><kbd>SPACE</kbd></div>
+          <div><span>Gather / chop / interact</span><kbd>E</kbd></div>
+          <div>
+            <span>Swing the hatchet</span><span>CLICK / <kbd>F</kbd></span>
+          </div>
+          <div><span>Hatchet / torch</span><kbd>1 / 2</kbd></div>
+          <div><span>Eat / drink</span><kbd>3 / 4</kbd></div>
+          <div><span>Craft / map / pause</span><kbd>C / M / ESC</kbd></div>
+          <p>
+            Touchscreen? Use the directional pad, drag the world to look, and
+            tap the axe or interaction button. Menus pause the world.
+          </p>
+          <a class="archive-link" href="./"
+            >Get SAWT+, the phone volume booster <span>↗</span></a
+          ><a class="archive-link" href="ghostline.html"
+            >Play GHOSTLINE, the previous hacking game <span>↗</span></a
+          ><a class="archive-link" href="racing.html"
+            >Play the original racing game <span>↗</span></a
+          >
+        </section>
+      </div>
+    </dialog>
+
+    <dialog
+      id="settings-dialog"
+      class="dialog small-dialog"
+      aria-labelledby="settings-title"
+    >
+      <div class="dialog-header">
+        <div>
+          <div class="eyebrow">A FEW CREATURE COMFORTS</div>
+          <h2 id="settings-title">Your wilderness.</h2>
+        </div>
+        <button class="icon-button close-dialog" aria-label="Close settings">
+          <svg><use href="#close" /></svg>
+        </button>
+      </div>
+      <div class="settings-body">
+        <label class="setting-row"
+          ><span
+            >Graphics quality<small
+              >Adaptive adjusts to your device.</small
+            ></span
+          ><select id="quality-setting">
+            <option value="auto">Adaptive</option>
+            <option value="high">High</option>
+            <option value="low">Low</option>
+          </select></label
+        ><label class="setting-row"
+          ><span
+            >Forest soundscape<small
+              >Wind, birds, fire, and field sounds.</small
+            ></span
+          ><input id="sound-setting" type="checkbox" role="switch" /></label
+        ><label class="setting-row"
+          ><span
+            >Night wildlife threats<small
+              >Wolves can approach and damage you.</small
+            ></span
+          ><input
+            id="threat-setting"
+            type="checkbox"
+            role="switch"
+            checked /></label
+        ><label class="setting-row"
+          ><span>Camera sensitivity</span
+          ><input
+            id="sensitivity-setting"
+            type="range"
+            min="0.4"
+            max="2"
+            step="0.1"
+            value="1" /></label
+        ><button id="restart-button" class="secondary-button danger-button">
+          START A NEW SURVIVAL
+        </button>
+        <p class="settings-note">
+          Your camp, resources, position, and vital signs save on this device.
+          Starting over clears only HOLLOWPINE progress.
+        </p>
+        <a href="./" class="archive-link"
+          >New: SAWT+ volume booster app <span>↗</span></a
+        ><a href="ghostline.html" class="archive-link"
+          >Previous game: GHOSTLINE <span>↗</span></a
+        >
+      </div>
+    </dialog>
+
+    <dialog
+      id="pause-dialog"
+      class="dialog small-dialog centered-dialog"
+      aria-labelledby="pause-title"
+    >
+      <div class="centered-content">
+        <svg class="large-icon"><use href="#pine" /></svg>
+        <div class="eyebrow">TAKE A BREATH</div>
+        <h2 id="pause-title">Even the wild<br />can wait.</h2>
+        <p>Your story isn't over.</p>
+        <button class="primary-button close-dialog">
+          BACK TO THE WOODS <svg><use href="#arrow" /></svg></button
+        ><button class="secondary-button" id="pause-guide">
+          OPEN FIELD GUIDE
+        </button>
+      </div>
+    </dialog>
+    <dialog
+      id="dawn-dialog"
+      class="dialog small-dialog centered-dialog"
+      aria-labelledby="dawn-title"
+    >
+      <div class="centered-content">
+        <svg class="large-icon"><use href="#sun" /></svg>
+        <div class="eyebrow">YOUR FIRST NIGHT / SURVIVED</div>
+        <h2 id="dawn-title">Morning looks<br />good on you.</h2>
+        <p>
+          A fire. A shelter. Another sunrise.<br />You made a home in the
+          wilderness.
+        </p>
+        <div class="result-stats">
+          <div><b id="result-day">02</b><span>DAY REACHED</span></div>
+          <div><b id="result-time">0m 00s</b><span>TIME IN THE WILD</span></div>
+          <div><b>02</b><span>STRUCTURES BUILT</span></div>
+        </div>
+        <button class="primary-button close-dialog">
+          KEEP EXPLORING <svg><use href="#arrow" /></svg></button
+        ><button class="secondary-button" id="dawn-restart">
+          START A NEW STORY
+        </button>
+      </div>
+    </dialog>
+    <dialog
+      id="death-dialog"
+      class="dialog small-dialog centered-dialog"
+      aria-labelledby="death-title"
+    >
+      <div class="centered-content">
+        <svg class="large-icon"><use href="#moon" /></svg>
+        <div class="eyebrow">THE WILDERNESS TOOK ITS TOLL</div>
+        <h2 id="death-title">Not your<br />last sunrise.</h2>
+        <p>
+          Wake at camp with your structures and gathered resources intact. The
+          forest gives you another chance.
+        </p>
+        <button class="primary-button" id="recover-button">
+          RETURN TO CAMP <svg><use href="#arrow" /></svg></button
+        ><button class="secondary-button" id="death-restart">START OVER</button>
+      </div>
+    </dialog>
+    <div id="loading">
+      <div class="loading-brand">
+        <svg><use href="#pine" /></svg>HOLLOWPINE<span>.</span>
+      </div>
+      <div class="loading-line"><i></i></div>
+      <span id="loading-message">FINDING A WAY INTO THE WOODS...</span>
+    </div>
+    <noscript
+      ><div class="no-script">
+        The forest needs JavaScript and WebGL to come alive. Enable JavaScript
+        to play.
+      </div></noscript
+    >
+    <script type="module" src="src/hollowpine/main.js"></script>
+  </body>
+</html>

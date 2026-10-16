@@ -1,115 +1,166 @@
-# 🏁 Bash Baqi Racing
+# SAWT+ — Volume Booster & Speaker
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+**Sound beyond the gauge. Bla tachawch. Bhal baffle.**
 
-**▶ Play:** serve the folder with any static server and open it:
+A phone-first **volume booster and sound amplifier** web app: push audio past the normal level, shape bass and treble, and keep it clean with a limiter + soft-clip stage. Installable as a PWA, works offline, no ads, no server.
 
-```bash
-python3 -m http.server 8000
-# → http://localhost:8000
+Three sources run through the same clean boost chain:
+
+- **MIC** — live microphone amplifier for quiet rooms, TV, and conversations (headphones recommended to avoid feedback).
+- **FILE** — boost your own MP3 / WAV / OGG / M4A files, entirely on-device.
+- **SOUNDS** — mixable synthesized ambience and noise colors: rain, ocean, wind, fire, fan, white, pink, and brown noise.
+
+Plus: boost dial ×0.5–×8 (+/− dB readout), live level meter with CLIP light, bass / treble, five presets (CLEAN / SPEECH / MUSIC / BASS / NIGHT), output level, mute, and a **NO DISTORTION** limiter.
+
+## Run
+
+With **Node.js 22+**:
+
+```sh
+npm run dev
+# Open http://localhost:3000
 ```
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+The included server needs **no installed npm packages**, binds to `0.0.0.0`, and accepts live-preview hosts. Use `PORT=8080 npm run dev` to change the port. Any static HTTP server works (`python3 -m http.server 8000 --bind 0.0.0.0`). Do not open the HTML files over `file://`; ES modules need an HTTP origin.
+
+### Install on a phone
+
+Open the site in the phone browser over HTTPS or localhost, then tap **INSTALL** (Android / Chrome) or **Share → Add to Home Screen** (iPhone). The app runs full-screen and offline after installation: modules, fonts, icons, and the app shell are precached by `sw.js`.
+
+### Android APK (GitHub Releases)
+
+A native Android wrapper around the same app is built automatically by GitHub Actions (`.github/workflows/sawt-apk.yml`) and published on the repository's Releases page:
+
+- **Direct download:** `https://github.com/zakariabouifri03-max/neurio/releases/download/sawt-latest/sawt-plus.apk`
+- The `sawt-latest` rolling tag always carries the newest build; each build replaces the asset.
+- On the phone, open the link (or download `sawt-plus.apk` and tap it) and allow **install from unknown sources** when prompted.
+
+The APK is a thin WebView shell (`android/`) that loads a self-contained bundle of this web app from its own assets — no server, works offline, same interface. It requests only the microphone permission (for MIC amplifier mode). Builds are signed with a CI-generated sideload key, not a Play Store key. To rebuild locally: `node tools/build-android-assets.mjs`, then `gradle assembleRelease` in `android/` (Android SDK 34 + JDK 17 required).
+
+### Honest limits
+
+A web app can only boost audio that plays **through it** (its files, its sounds, and the live mic pass-through). It cannot raise the system volume of other apps — the OS owns that. It cannot override phone audio hardware. Long loud sessions can damage hearing; the output-level control and mute are there for a reason. Everything stays in the browser: no accounts, no analytics, no network calls.
+
+## Previous games
+
+The same site keeps the earlier prototypes:
+
+- [HOLLOWPINE](hollowpine.html) — 3D woodland-survival game with downloadable GLB models; [models documentation](models/README.md).
+- [GHOSTLINE](ghostline.html) — urban hacking prototype; [documentation](GHOSTLINE.md).
+- [Bash Baqi Racing](racing.html) — kart racing; [documentation](RACING.md).
+
+They are linked from SAWT+ (footer / About) and from HOLLOWPINE's Settings panel. Saved-game keys, source, and models stay separate.
 
 ---
 
-## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
+# HOLLOWPINE
 
-A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
-soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
+**The wild has no mercy. Make it to morning.** — playable at [hollowpine.html](hollowpine.html).
 
-title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
+An original, playable **3D woodland-survival prototype** with downloadable environment, character, and equipment models. Inspired by the forest-survival genre, including *The Forest*; a stylized prototype, **not a recreation or an Endnight Games product**. All geometry is original procedural work.
 
-Everything is generated from code (no stock footage/music):
+## Play
 
-```bash
-python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
-python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
+Click **Begin your story**. You start with a hatchet, an unlit torch, two portions of berries, and two flask charges.
+
+1. **Gather essentials.** Pick up branches, stones, wild flax, and berries. Only marked pines can be chopped; four hatchet strikes fell one for five wood.
+2. **Light a campfire.** Bring **4 wood + 4 stone** to camp and open Crafting with `C`.
+3. **Build a lean-to.** Gather **8 wood + 4 fiber** and build the shelter at camp.
+4. **Rest until dawn.** Approach the shelter and press `E` with the fire lit and food / water ≥ 20. Reach morning to complete the objective.
+
+### Controls
+
+| Action | Keyboard / mouse |
+| --- | --- |
+| Move | `W A S D` or arrow keys |
+| Sprint / Jump | `Shift` / `Space` |
+| Look around | Drag the 3D world |
+| Gather / chop / build / tend / refill / rest | `E`, near the relevant object |
+| Swing hatchet | `F`, or click the world with the hatchet equipped |
+| Equip hatchet / torch | `1` / `2` |
+| Eat berries / drink water | `3` / `4` |
+| Crafting / forest map | `C` / `M` |
+| Pause / close a panel | `Esc` |
+
+Touch devices have directional, Run, and contextual-action controls plus tappable equipment / crafting buttons.
+
+### Survival systems
+
+Vitals (health, stamina, hunger, thirst, warmth), camp crafting with fuel, flask refill at the lakeside spring, day/night cycle, wandering deer and wolves (optional threats), live minimap with waypoints, collapse-and-recover flow, and local saves. Menus pause the simulation. Settings offers automatic / high / low graphics quality, soundscape, night threats, camera sensitivity, and a confirmed reset.
+
+This is a compact **single-player survival slice**: finite resource nodes, two crafting recipes, one first-night objective. No caves, swimming, multiplayer, free-form construction, or copied game assets.
+
+## Original 3D models
+
+Open **3D Models** for a live, draggable / zoomable preview. **Download .GLB** exports locally. Ready-made files are included:
+
+| File | Contents |
+| --- | --- |
+| [Forest campsite](models/hollowpine-forest-campsite.glb) | Standalone conifer-forest diorama, rocky ground, ferns, lean-to, and campfire |
+| [Survivor](models/hollowpine-survivor.glb) | Original backpacked hiker, beanie, boots, clothing, and field hatchet |
+| [Field hatchet](models/hollowpine-field-hatchet.glb) | Standalone steel-headed, wood-handled prop |
+| [ECHO operative](models/echo-operative-carbon.glb) | Preserved GHOSTLINE character |
+
+All are **self-contained glTF 2.0 binary files**, PBR materials, meters, Y-up. Import in Blender via **File → Import → glTF 2.0 (.glb/.gltf)**.
+
+**These are static mesh / scene exports.** The character has named parent-transform articulation, but is **not a skinned production rig and contains no embedded animation clips**. The campsite is a compact diorama, not the entire playable map. See [model notes](models/README.md).
+
+## Implementation
+
+- Local **Three.js r170**, GLTFExporter, BufferGeometryUtils; no runtime npm dependencies.
+- Seeded procedural geometry, generated textures, instanced foliage, articulated hiker / animals, moving water, day/night lighting, adaptive quality.
+- Web Audio synthesized soundscape (opt-in) and SAWT+ synthesized ambience; no external recordings or CDNs.
+- Local Instrument Serif / Space Grotesk / IBM Plex Mono fonts; responsive HTML/CSS; keyboard and touch input; reduced-motion support.
+
+```text
+index.html                 SAWT+ volume booster app (the current app)
+src/sawt/
+  app.js                   Boost UI, presets, meter, persistence
+  audio.js                 Boost chain: EQ → gain → limiter → soft-clip
+  style.css                Phone-first pro-audio interface
+icons/sawt.*               App icon (SVG + PNG), generated by tools/make-sawt-icons.mjs
+
+hollowpine.html            HOLLOWPINE survival game
+src/hollowpine/            Its runtime, rules, models, world, map, viewer, sound
+models/                    Ready-to-import GLBs and model notes
+assets/fonts/              Local fonts and licenses
+vendor/                    Local Three.js, addons, and MIT license
+sw.js                      Offline cache with network-first updates
+tools/serve.mjs            Dependency-free static server
+
+ghostline.html             Preserved urban hacking game + src/ghostline/
+racing.html                Preserved kart racing game + src/*.js
 ```
 
-See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
+## Verify
 
----
+```sh
+npm ci
+npm test
 
-## 📱 Install on your phone — كأنها APK!
+# Keep npm run dev running in another terminal:
+npm run test:browser          # SAWT+ + HOLLOWPINE browser suites
+npm run test:browser:sawt     # SAWT+ only
+npm run test:browser:hollowpine
+npm run test:browser:ghostline
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
-
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
-
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
-
-**Offline play** is built-in: a service worker caches all game files on first visit.
-
----
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
-|---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
-
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
+# Optional: rebuild the archived racing game's single-file bundle
+npm run build:racing
 ```
 
-Made with ❤️ and Three.js
+The unit suite covers survival / mission transitions, archived GHOSTLINE rules, and Khronos glTF validation of all four GLBs (self-contained buffers / images, static-export contract, zero errors / warnings).
 
----
+The **SAWT+ browser suite** exercises the real app: boost math and limiter, ambient tiles through the meter, presets and saved settings, microphone amplification (fake media stream) and denial feedback, WAV file boosting and loop, phone-viewport layout with touch, mute, and offline boot + offline audio.
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+The **HOLLOWPINE browser suite** exercises the WebGL game: movement / pause, gathering / felling, crafting, night threats and torch protection, dawn completion, map waypoints, model viewing and all three exports, recovery, settings, saved and offline reloads, reset, mobile touch, portrait / landscape layouts, and default-quality startup. It refreshes the three forest GLBs through the real download controls. Screenshots are diagnostic files in ignored `.cache/`.
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+The browser helper uses Playwright with an npm-provided Linux Chromium. It supports:
 
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
+- `BASE_URL=http://...` — test an already running server (include `/hollowpine.html` or `/ghostline.html` for the game suites).
+- `CHROMIUM_PATH=/path/to/chromium` — use an existing compatible Chromium executable.
 
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+The racing bundle `bash-baqi-racing.html`, dependencies, browser binaries, and diagnostic screenshots are intentionally not versioned.
+
+## Third-party licenses
+
+Three.js / GLTFExporter / BufferGeometryUtils: MIT; see [`vendor/LICENSE`](vendor/LICENSE). Font licenses are included under `assets/fonts/`. Khronos glTF Validator is a development-only dependency. All app, woodland, survivor, equipment, and archived city / operative work was authored for these prototypes.

@@ -1,0 +1,43 @@
+plugins {
+  id "com.android.application"
+}
+
+def keystorePath = System.getenv("SAWT_KEYSTORE")
+
+android {
+  namespace "app.sawt.plus"
+  compileSdk 34
+
+  defaultConfig {
+    applicationId "app.sawt.plus"
+    minSdk 24
+    targetSdk 34
+    versionCode 1
+    versionName "0.3"
+  }
+
+  signingConfigs {
+    release {
+      if (keystorePath != null) {
+        storeFile rootProject.file(keystorePath)
+        storePassword System.getenv("SAWT_STORE_PASS")
+        keyAlias "sawt"
+        keyPassword System.getenv("SAWT_KEY_PASS")
+      }
+    }
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      if (keystorePath != null) {
+        signingConfig signingConfigs.release
+      }
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+}

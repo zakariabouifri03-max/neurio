@@ -1,6 +1,6 @@
 // Builds bash-baqi-racing.html — the whole game in ONE file (works from file://)
 import { readFileSync, writeFileSync } from 'node:fs';
-import { build } from '/tmp/gb/node_modules/esbuild/lib/main.js';
+import { build } from 'esbuild';
 
 const root = new URL('..', import.meta.url).pathname;
 
@@ -21,7 +21,7 @@ const js = res.outputFiles[0].text;
 const css = readFileSync(root + 'src/style.css', 'utf8');
 const iconB64 = readFileSync(root + 'icons/icon-192.png').toString('base64');
 
-let html = readFileSync(root + 'index.html', 'utf8');
+let html = readFileSync(root + 'racing.html', 'utf8');
 
 // inline CSS
 html = html.replace('<link rel="stylesheet" href="src/style.css">', () => `<style>\n${css}\n</style>`);

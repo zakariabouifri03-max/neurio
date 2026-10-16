@@ -1,0 +1,20 @@
+{
+  "name": "HOLLOWPINE — Wilderness Survival",
+  "short_name": "HOLLOWPINE",
+  "description": "An original 3D forest survival game. Gather, craft, build, and make it to morning.",
+  "start_url": "./hollowpine.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "background_color": "#18221f",
+  "theme_color": "#121c18",
+  "lang": "en",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "icons/hollowpine.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
