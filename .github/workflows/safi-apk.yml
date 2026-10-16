@@ -4,7 +4,7 @@ on:
     branches: ['arena/64c17fc7-neurio']
     paths: ['android-safi/**', 'sound/**', '.github/workflows/safi-apk.yml']
 permissions:
-  contents: read
+  contents: write
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -30,3 +30,13 @@ jobs:
             deliverables/Safi-Sound.apk
             deliverables/Safi-Sound.apk.sha256
           if-no-files-found: error
+      - name: Publish APK to the session branch for direct download
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deliverables/Safi-Sound.apk deliverables/Safi-Sound.apk.sha256
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish verified Safi Sound APK"
+            git pull --rebase origin arena/64c17fc7-neurio
+            git push origin HEAD:arena/64c17fc7-neurio
+          fi
