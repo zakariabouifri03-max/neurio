@@ -1,0 +1,32 @@
+name: Safi Sound APK
+on:
+  push:
+    branches: ['arena/64c17fc7-neurio']
+    paths: ['android-safi/**', 'sound/**', '.github/workflows/safi-apk.yml']
+permissions:
+  contents: read
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android build components
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+      - name: Test audio limiter
+        run: node --test sound/tests/dsp.test.mjs
+      - name: Build and verify signed test APK
+        run: bash android-safi/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Safi-Sound-APK
+          path: |
+            deliverables/Safi-Sound.apk
+            deliverables/Safi-Sound.apk.sha256
+          if-no-files-found: error
