@@ -11,10 +11,15 @@ hardware acceleration enabled by default.
 
 ## Download / files
 
-- `ADZAKLiteBrowser.exe` — single-file, self-contained Windows x64 Release build
-  (includes the .NET runtime; rename it freely, e.g. `ADZAK Lite Browser.exe`).
-- `ADZAK-Lite-Browser-win-x64-folder.zip` — the same build as a classic folder
-  (EXE + DLLs), if you prefer that layout.
+- **Recommended:** the self-contained single-file `ADZAKLiteBrowser.exe` from the
+  GitHub Actions run (artifact “ADZAK-Lite-Browser-win-x64”):
+  <https://github.com/zakariabouifri03-max/neurio/actions/runs/38928622187>
+  It includes the .NET runtime — nothing else to install except WebView2 below.
+  Rename it freely, e.g. `ADZAK Lite Browser.exe`.
+- `ADZAK-Lite-Browser-win-x64-folder.zip` — same build, classic folder layout.
+- `dist/ADZAKLiteBrowser-portable.exe` in this repo (~1 MB) — same app, but
+  framework-dependent: requires the free **.NET 8 Desktop Runtime**
+  (<https://dotnet.microsoft.com/download/dotnet/8.0>) already installed.
 - Source: `src/ADZAKLiteBrowser/` (WinForms + WebView2, .NET 8).
 
 ## Runtime instructions
