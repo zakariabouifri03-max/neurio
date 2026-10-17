@@ -3,3 +3,9 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+node_modules/
+playwright-report/
+test-results/
+
+.cache/

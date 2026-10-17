@@ -1,115 +1,132 @@
-# 🏁 Bash Baqi Racing
+# RABONA — Wobbly Football
 
-لعبة سباق كارت ثلاثية الأبعاد كاملة بالمتصفح — سيارات باغي على الشاطئ، متجر، بطولة، وخرائط عشوائية!
-A full 3D kart-racing game in the browser — beach buggies, a huge shop, a championship, and random tracks!
+An original, playable 3D wobbly-physics football game inspired by the Rabona screenshots you shared. Built for the browser with Three.js — no build step, no external runtime APIs.
 
-**▶ Play:** serve the folder with any static server and open it:
+**What you see in the reference images:**
+- Capsule stickmen with white joints, colorful boots, wobbly tackles
+- Desert stadium with cube seats, RABONA billboards, floodlights, cactus
+- Big yellow/black ball, sliding saves, rabona (cross-leg) kicks
+- “PLAY WITH FRIENDS” vibe — this version is SOLO VS AI, local 3v3
+
+This is an original interpretation, not a copy of any commercial game.
+
+## Features
+
+**Stadium**
+- 70×44m pitch with striped grass, white lines, center circle, penalty areas
+- Two full goals with posts, crossbar, and net
+- Desert outside: sand, rocks, cactus, 4 floodlights with point lights
+- Cube stands like in screenshots (red/white/blue cubes with star patterns)
+- RABONA billboards around pitch and big scoreboard
+- Bright desert sky with clouds, environment map for reflections
+
+**Players — Wobbly Physics**
+- Procedural capsule characters: torso, head with hair, arms with elbow joints, legs with knee joints, feet with colorful boots
+- White joint spheres exactly like reference
+- Teams: BLUE vs RED, plus GOLD goalkeepers who dive
+- Animations: idle sway, run cycle with opposite arm/leg swing, kick, **rabona** (leg crosses behind), slide tackle, fall & get up, celebrate
+- Shadow blobs that scale with height
+- Wobble springs on torso when hit
+
+**Ball**
+- Yellow base with black pentagons + blue lines (like reference), canvas texture
+- Physics: gravity, drag, rolling friction, bounce, spin, Magnus curve on rabona
+- Possession: ball sticks slightly in front when you are close
+- Kicks: normal (E) and rabona (Q) with curve and extra height
+
+**Gameplay — 3v3**
+- You control BLUE team (auto-switches to closest to ball, press R to force switch)
+- 2 field players + 1 goalkeeper per team (6 total)
+- AI: chase ball, support positioning, shoot when in range, goalkeeper tracks ball laterally and dives
+- Tackling: slide (Space) into carrier → carrier falls, you steal
+- Goals: ball must cross line inside 7.32m width and below 2.44m height
+- 90-second quick match, scoreboard, commentary, goal celebration with camera orbit
+- After goal, positions reset
+
+**Controls**
+- **WASD / Arrows**: Move
+- **Shift**: Sprint (1.45×)
+- **E**: Kick / Shoot (towards goal or facing)
+- **Q**: Rabona kick (curled, fancy)
+- **Space**: Slide tackle
+- **R**: Switch player (closest to ball)
+- **C**: Camera (follow player vs ball/wide)
+- **Esc**: Pause
+
+**Touch / Mobile**
+- Left cluster: move
+- Right cluster: KICK (big), R (rabona), S (slide), ⚡ sprint
+- Responsive layout, no horizontal overflow
+
+**Lobby**
+- Live 3D showcase: wobbly player doing run/rabona cycle with ball bobbing
+- Drag to orbit
+- PLAY (quick match), PRACTICE (same but you can lab rabona), TEAMS (info), HOW TO PLAY
+- Settings: difficulty (easy/normal/hard affects AI speed), quality (performance/balanced/high), camera default, volume, mute
+- Local storage: `rabona-settings-v1` and `rabona-record-v1`
+
+**Audio**
+- Synthesized kicks, slide, bump, goal fanfare, whistle via WebAudio
+
+## How to Run
+
+No build step or runtime package installation required. Start the included dependency-free static server (Node 18+):
 
 ```bash
-python3 -m http.server 8000
-# → http://localhost:8000
+npm start
 ```
 
-No build step, no external CDN — everything is procedural and vendored (Three.js r170 included in `vendor/`).
+Binds to `0.0.0.0:8000`, accepts preview proxy hosts, blocks hidden files and dependency folders. Use `PORT=8080 npm start` for different port.
 
----
-
-## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
-
-A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
-soundtrack is included: **[`video/bash-baqi-racing-60s.mp4`](video/bash-baqi-racing-60s.mp4)**
-
-title card → beach cruise → dune ramp backflip → `TURBO!` duel overtake → `FINISH` + trophy → sunset logo card.
-
-Everything is generated from code (no stock footage/music):
+Alternatively:
 
 ```bash
-python3 tools/video/audio.py  --out /tmp/track.wav      # music + SFX synth
-python3 tools/video/cartoon.py --encode video/bash-baqi-racing-60s.mp4 --audio /tmp/track.wav
+python3 -m http.server 8000 --bind 0.0.0.0
 ```
 
-See **[`tools/video/README.md`](tools/video/README.md)** for the scene timeline and all the knobs.
+Open http://localhost:8000
 
----
+Add `?test=1` to skip service worker (used by tests).
 
-## 📱 Install on your phone — كأنها APK!
+## Architecture
 
-The game is a full **PWA** (Progressive Web App): installable, fullscreen, **works offline**, its own icon — no APK file needed.
+- `index.html`: markup, icons, HUD, touch controls, modals
+- `src/rabona/style.css`: local fonts, responsive UI, HUD, touch, modals
+- `src/rabona/rules.js`: constants, pitch dimensions, ball/player physics helpers (`stepBall`, `kickBall`, `stepPlayer`), seeded RNG, time formatting
+- `src/rabona/models.js`: `createWobblyPlayer` (capsule hierarchy, materials, shadow, update function), `createBall` (textured icosa + shadow), `createPitch` (striped canvas texture + white lines), `createGoal` (posts + net lines), `createStadium` (desert, rocks, cactus, cube stands, floodlights, billboards, scoreboard texture)
+- `src/rabona/world.js`: environment sky canvas → PMREM, fog, hemi + directional light with 2048 shadow, `followShadow`, `updateScoreTexture`
+- `src/rabona/game.js`: `RabonaGame` class — teams, ball, possession, AI (field + GK), input, kick/rabona/slide, goal detection, camera (follow vs ball with lerp, shake), HUD, commentary
+- `src/rabona/audio.js`: WebAudio synthesized effects
+- `src/rabona/main.js`: boot, renderer, quality, lobby orbit, UI bindings, settings/record persistence, main loop (dt capped 0.05), showcase animation
+- `vendor/three.module.js`: Three r170 local, `vendor/utils/BufferGeometryUtils.js`
+- `assets/fonts/`: Barlow Condensed, DM Sans, IBM Plex Mono WOFF2
+- `assets/rabona.svg`: logo
+- `tools/serve.mjs`: safe static server (blocks dotfiles, node_modules, outside root, uses realpath)
+- `sw.js`: `rabona-v1`, caches local assets, network-first, offline reload to lobby
+- `manifest.webmanifest`: PWA metadata
 
-1. Open the game link on your phone (Chrome on Android / Safari on iPhone)
-2. Tap **📱 Install** button inside the game's garage, **or** browser menu `⋮` → **"Add to Home screen" / "تثبيت التطبيق"**
-3. Done — the 🏁 buggy icon sits on your home screen and launches **fullscreen like a real app**
+Preserved but not loaded: `src/` old racing source, `src/royale/` previous OUTRUN game.
 
-> **Want a real `.apk` file?** Host this repo anywhere public (e.g. enable **Settings → Pages → Deploy from branch** in GitHub — one tap), then go to **pwabuilder.com** on your phone, paste the link, and it gives you a signed APK to download. No PC needed.
+## Tests
 
-**Offline play** is built-in: a service worker caches all game files on first visit.
-
----
-
-## 🎮 The Game
-
-You are dropped **straight into a race** the moment the game loads. Finish, earn, upgrade, repeat!
-
-- 🏎️ **50 cars to buy** — micros, beach buggies, muscle cars, monster trucks, hotrods, super sports (3 ultra-rare 💎 gem cars)
-- 🧑‍🤝‍🧑 **16 drivers** — from Zaid 😎 to Nova the alien 👽
-- 🗺️ **50 random tracks** across 10 worlds: Beach, Jungle, Desert, cobblestone Town at sunset, Snow, Volcano, Swamp, Canyon, Farm, and Stardust Night 🌙
-- 🥇🥈🥉 **Place 1st–3rd** for big rewards — every place pays coins, top 3 pays gems, 1st wins a 🏆
-- 🪙 Coins also sit **on the track** — grab them mid-race
-- 🏆 **Championship season**: points (10/8/6/4/2/1) every race vs 5 rivals; champion after 10 races wins a jackpot
-- 📦 **? item boxes**: 🔥 turbo boost · 🚀 homing rocket · 🛡️ bubble shield
-- 🔧 **Garage**: upgrades (top speed / acceleration / handling), paint shop, wheels, horns
-- 💾 Progress auto-saves in the browser
-
-## 🕹️ Controls
-
-| Action | Keys |
-|---|---|
-| Drive | `W A S D` / arrows (auto-gas on mobile) |
-| Power-up | `SPACE` |
-| Reset on track | `R` |
-| Horn | `H` |
-| Pause | `ESC` |
-
-Touch buttons appear automatically on phones/tablets.
-
-## 🧱 Tech — 100% procedural
-
-- **Three.js r170** (vendored, zero runtime dependencies) with a hand-written **bloom pass** (threshold + separable blur + filmic composite + vignette)
-- Every track is generated from a seeded closed Catmull-Rom spline: road ribbon mesh, terrain sculpted *away from the spline*, themed decor merged into single draw calls, start-line arch, item boxes, coins, hot-air balloons 🎈
-- Cars & chibi drivers are built from primitives (8 car archetypes, 16 hat styles, emoji faces)
-- All SFX + the island music loop are synthesized live with the Web Audio API — zero audio files
-- Arcade kart physics: grip/drift model, off-road slowdown, rubber-banding AI, homing rockets, spin-outs, dust particles
-
-```
-neurio/
-├── index.html            # UI layers (HUD, menus, shop, results)
-├── src/
-│   ├── main.js           # state machine + renderer + economy
-│   ├── race.js           # race engine: physics, AI, powerups, HUD
-│   ├── menu.js           # garage scene + shop/drivers/customize/upgrades/series
-│   ├── builders.js       # 3D builders: cars, drivers, track worlds
-│   ├── data.js           # 50 cars · 16 drivers · 50 maps · 10 themes · economy
-│   ├── tex.js            # canvas textures (roads, skies, faces…)
-│   ├── audio.js          # synth engine/sfx/music
-│   ├── post.js           # bloom post-processing
-│   ├── save.js           # localStorage persistence
-│   └── util.js           # seeded RNG + helpers
-└── vendor/               # three.js r170 (no internet needed)
+```bash
+npm test              # 12 unit tests: RNG, pitch, ball physics, kick, player movement, sprint, facing, timers, format
+npm run test:browser  # full real-WebGL integration: lobby, garage, guide, settings persistence, kickoff, movement, kick, rabona, slide, simulation, goal, pause, touch, exit, finish, mobile layout, reload persistence
 ```
 
-Made with ❤️ and Three.js
+Browser tests use bundled Chromium via `@sparticuz/chromium` and require `LD_LIBRARY_PATH` with extracted libs (handled in test file). They run with `?test=1` to skip SW.
 
----
+## Limitations & Honest Notes
 
-## 📦 `BashBaqiRacing.apk` — ملف جاهز!
+- Single player vs AI, not real online multiplayer (labeled SOLO VS AI)
+- 3v3 not 11v11 — keeps it playable and performant in browser
+- Wobble is procedural animation + springs, not full rigid-body ragdoll (would need Ammo/Cannon and be heavier)
+- No throw-ins/corners/offside — ball bounces off invisible walls except goal mouth, keeps action flowing
+- AI is simple steering + random shots, not a full football tactics engine
+- All assets procedural/local, no external models or textures
 
-A **ready-to-install Android APK** is included in this repo (built offline with aapt2 + ecj + d8 + apksigner, no Gradle — see `tools/`).
-It's a fullscreen WebView shell that runs the bundled single-file game 100% offline.
+## Credits
 
-**Install on a phone:**
-1. Download `BashBaqiRacing.apk` onto your phone.
-2. Tap it → allow **"Install from unknown sources"** (once).
-3. Play — icon 🏁 sits on your home screen, works offline.
+Original game code, models, textures, and audio synthesis. Fonts: Barlow Condensed, DM Sans, IBM Plex Mono (OFL). Three.js r170 MIT.
 
-- Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
-- Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+Inspired by Rabona's wobbly football vibe — an original interpretation built for this prompt.
