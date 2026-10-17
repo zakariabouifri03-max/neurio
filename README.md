@@ -113,3 +113,16 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+
+---
+
+## 🖤 `store/` — ATLAS INK digital tee-design shop
+
+A second, standalone storefront lives in **[`store/`](store/README.md)**: 12 original print-ready
+t-shirt designs sold as instant digital downloads, with a bilingual EN/AR UI, cart, demo checkout
+and real SVG / 300 DPI PNG / ZIP exports generated in the browser.
+
+```bash
+cd store && python3 -m http.server 8000   # → http://localhost:8000
+```

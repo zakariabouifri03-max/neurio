@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATLAS INK — Digital T-Shirt Designs, Print-Ready</title>
+  <meta name="description" content="Original print-ready t-shirt designs. Instant download — SVG, PNG, DTF and EPS. Commercial license included.">
+  <meta name="theme-color" content="#F3F0E8">
+  <meta property="og:title" content="ATLAS INK — Digital T-Shirt Designs">
+  <meta property="og:description" content="Original print-ready tee graphics. Download instantly, print anywhere, sell with a commercial license.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+  <script>
+    try {
+      const saved = JSON.parse(localStorage.getItem('atlasink.store.v1') || '{}');
+      const list = navigator.languages || [navigator.language || 'en'];
+      const lang = saved.lang || (list.some(function (l) { return String(l).toLowerCase().indexOf('ar') === 0; }) ? 'ar' : 'en');
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main" data-i18n="a11y.skip">Skip to the shop</a>
+
+<svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="i-asterisk" viewBox="0 0 24 24"><path d="M12 2v20M3.34 7l17.32 10M3.34 17L20.66 7"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="7.2"/><path d="m20.5 20.5-4.3-4.3"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5.5 8.5h13l-1 11.5h-11l-1-11.5Z"/><path d="M9 8.5V6.7a3 3 0 0 1 6 0v1.8"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.2S3.4 14.7 3.4 8.9A4.35 4.35 0 0 1 12 6.2a4.35 4.35 0 0 1 8.6 2.7c0 5.8-8.6 11.3-8.6 11.3Z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15.5M13.5 6l6 6-6 6"/></symbol>
+  <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 20V4.5M6 10.5l6-6 6 6"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.6l2.85 6.2 6.75.8-5 4.6 1.3 6.8-5.9-3.3-5.9 3.3 1.3-6.8-5-4.6 6.75-.8L12 2.6Z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.6l5 5L20 6.8"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12.5M7 10.5l5 5 5-5M4 20.5h16"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="10.5" rx="2"/><path d="M8 10V7.3a4 4 0 0 1 8 0V10"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3.5 7h17M3.5 12h17M3.5 17h17"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15.5 15.5 0 0 1 0 18M12 3a15.5 15.5 0 0 0 0 18"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3Z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 8V3.5h10V8M7 17H4.5v-7h15v7H17"/><rect x="7" y="14" width="10" height="6.5"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 2.5h8l4.5 4.5v14.5H6V2.5Z"/><path d="M14 2.5V7h4.5"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2Z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M4 12h16"/></symbol>
+</svg>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track">
+    <span>INSTANT DOWNLOAD</span><span class="ticker__star">✳</span>
+    <span>COMMERCIAL LICENSE INCLUDED</span><span class="ticker__star">✳</span>
+    <span>SVG · PNG · DTF · EPS</span><span class="ticker__star">✳</span>
+    <span>PRINT-READY 300 DPI</span><span class="ticker__star">✳</span>
+    <span>DEMO STOREFRONT — NO REAL PAYMENTS</span><span class="ticker__star">✳</span>
+    <span>INSTANT DOWNLOAD</span><span class="ticker__star">✳</span>
+    <span>COMMERCIAL LICENSE INCLUDED</span><span class="ticker__star">✳</span>
+    <span>SVG · PNG · DTF · EPS</span><span class="ticker__star">✳</span>
+    <span>PRINT-READY 300 DPI</span><span class="ticker__star">✳</span>
+    <span>DEMO STOREFRONT — NO REAL PAYMENTS</span><span class="ticker__star">✳</span>
+  </div>
+</div>
+<p class="sr-only" data-i18n="announce">Instant download · commercial license included · SVG, PNG, DTF and EPS files.</p>
+
+<header class="site-head" id="top">
+  <div class="wrap head__inner">
+    <a class="brand" href="#top" aria-label="Atlas Ink — home">
+      <svg class="ic brand__mark" aria-hidden="true"><use href="#i-asterisk"/></svg>
+      <span class="brand__name">ATLAS INK<sup>®</sup></span>
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="#shop" data-i18n="nav.shop">Shop</a>
+      <a href="#vault" data-i18n="nav.vault">The vault</a>
+      <a href="#how" data-i18n="nav.how">How it works</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+    </nav>
+
+    <div class="head__actions">
+      <button class="icon-btn icon-btn--lang" id="btnLang" type="button" aria-label="Switch language" data-i18n-aria="a11y.lang">
+        <svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg>
+        <span id="langLabel">عربية</span>
+      </button>
+      <button class="icon-btn wish-toggle" id="btnWish" type="button" aria-label="Saved designs" data-i18n-aria="a11y.wishlist">
+        <svg class="ic" aria-hidden="true"><use href="#i-heart"/></svg>
+        <span class="count-dot" id="wishCount" hidden>0</span>
+      </button>
+      <button class="icon-btn nav-search-btn" id="btnSearch" type="button" aria-label="Search designs" data-i18n-aria="a11y.search">
+        <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+      </button>
+      <button class="cart-btn" id="btnCart" type="button">
+        <svg class="ic" aria-hidden="true"><use href="#i-bag"/></svg>
+        <span data-i18n="nav.cart">Cart</span>
+        <span class="cart-btn__count">(<span id="cartCount">0</span>)</span>
+      </button>
+      <button class="burger" id="btnMenu" type="button" aria-label="Open menu" aria-expanded="false" data-i18n-aria="a11y.menu">
+        <svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" hidden>
+  <div class="mobile-menu__top">
+    <span class="brand"><svg class="ic brand__mark"><use href="#i-asterisk"/></svg><span class="brand__name">ATLAS INK<sup>®</sup></span></span>
+    <button class="icon-btn" id="mobileClose" type="button" aria-label="Close menu" data-i18n-aria="a11y.closeMenu">
+      <svg class="ic"><use href="#i-close"/></svg>
+    </button>
+  </div>
+  <nav class="mobile-menu__nav" aria-label="Mobile">
+    <a href="#shop" data-i18n="nav.shop">Shop</a>
+    <a href="#vault" data-i18n="nav.vault">The vault</a>
+    <a href="#how" data-i18n="nav.how">How it works</a>
+    <a href="#license" data-i18n="nav.license">License</a>
+    <a href="#faq" data-i18n="nav.faq">FAQ</a>
+  </nav>
+  <div class="mobile-menu__bottom">
+    <button class="btn btn--ghost" id="btnLangMobile" type="button">
+      <svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg>
+      <span data-i18n="nav.lang">العربية / English</span>
+    </button>
+    <p class="micro" data-i18n="mobile.note">Digital downloads only. Files arrive the second you check out.</p>
+  </div>
+</div>
+
+<main>
+  <!-- ── HERO ─────────────────────────────────────────────────── -->
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow"><span class="eyebrow__dot"></span><span data-i18n="hero.eyebrow">Digital tee design studio — Casablanca</span></p>
+        <h1 class="display hero__title" id="heroTitle" data-i18n-html="hero.title">PRINT<br>SOMETHING<br><em>worth wearing.</em></h1>
+        <p class="hero__lead" data-i18n="hero.lead">Original tee graphics, made to be printed and sold — not admired in a folder. Download instantly, print anywhere, keep the commercial license.</p>
+        <div class="hero__cta">
+          <a class="btn btn--solid" href="#shop">
+            <span data-i18n="hero.cta1">Shop the drop</span>
+            <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+          <a class="btn btn--ghost" href="#free" data-i18n="hero.cta2">Get a free design</a>
+        </div>
+        <ul class="hero__stats">
+          <li><b>12</b><span data-i18n="hero.stat1">original designs</span></li>
+          <li><b>4.9 <svg class="ic ic--fill stat-star" aria-hidden="true"><use href="#i-star"/></svg></b><span data-i18n="hero.stat2">from 212 buyers</span></li>
+          <li><b>0<span class="stat-unit">min</span></b><span data-i18n="hero.stat3">delivery time</span></li>
+        </ul>
+      </div>
+
+      <div class="hero__art">
+        <div class="hero__canvas">
+          <span class="hero__ghost" aria-hidden="true">001</span>
+          <span class="hero__vertical" aria-hidden="true">DROP 001 — FW26</span>
+          <span class="hero__stamp" aria-hidden="true">
+            <svg class="ic" aria-hidden="true"><use href="#i-asterisk"/></svg>
+            <span data-i18n-html="hero.stamp">INSTANT<br>DOWNLOAD</span>
+          </span>
+          <span class="hero__filetag" aria-hidden="true">SVG · PNG · DTF · EPS</span>
+
+          <div class="float-card float-card--back" aria-hidden="true">
+            <div class="float-card__mock" id="heroBackMock"></div>
+            <div class="float-card__foot"><span>Atlas</span><span class="mono">$16</span></div>
+          </div>
+
+          <button class="float-card float-card--front" type="button" data-open="sahara" aria-label="Quick view Sahara Club">
+            <span class="float-card__mock" id="heroFrontMock"></span>
+            <span class="float-card__foot">
+              <span class="float-card__name">Sahara Club</span>
+              <span class="float-card__price">$14</span>
+            </span>
+            <span class="float-card__hint"><span data-i18n="hero.quickview">Quick view</span> <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="trust">
+      <div class="wrap trust__inner">
+        <span class="trust__label" data-i18n="trust.label">Printed by studios in 40+ countries</span>
+        <div class="trust__logos" aria-hidden="true">
+          <span class="trust__logo trust__logo--anton">SOUK</span>
+          <span class="trust__logo trust__logo--mono">PRINTLAB</span>
+          <span class="trust__logo trust__logo--serif">Atelier 34</span>
+          <span class="trust__logo trust__logo--anton">BLANK CO.</span>
+          <span class="trust__logo trust__logo--mono">VELVET&amp;CO</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SHOP ─────────────────────────────────────────────────── -->
+  <section class="shop wrap" id="shop" aria-labelledby="shopTitle">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow"><span class="eyebrow__dot"></span><span data-i18n="shop.eyebrow">The shop</span></p>
+        <h2 class="display section-title" id="shopTitle">
+          <span data-i18n="shop.title">THE CURRENT DROP</span>
+          <sup class="title-count" id="shopCount">12</sup>
+        </h2>
+      </div>
+      <p class="section-dek" data-i18n="shop.sub">Twelve original graphics. One clean commercial license. Files that open without drama.</p>
+    </div>
+
+    <div class="shop-toolbar">
+      <div class="chips" id="filterChips" role="group" aria-label="Filter designs"></div>
+      <div class="toolbar-end">
+        <label class="searchbox">
+          <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+          <input type="search" id="searchInput" data-i18n-ph="shop.search" placeholder="Search designs…" autocomplete="off">
+          <button class="searchbox__clear" id="searchClear" type="button" aria-label="Clear search" data-i18n-aria="a11y.clearSearch" hidden>
+            <svg class="ic" aria-hidden="true"><use href="#i-close"/></svg>
+          </button>
+        </label>
+        <label class="selectbox">
+          <span class="sr-only" data-i18n="shop.sortLabel">Sort designs</span>
+          <select id="sortSelect">
+            <option value="featured" data-i18n="sort.featured">Featured</option>
+            <option value="price-asc" data-i18n="sort.priceAsc">Price: low to high</option>
+            <option value="price-desc" data-i18n="sort.priceDesc">Price: high to low</option>
+            <option value="rating" data-i18n="sort.rating">Top rated</option>
+            <option value="newest" data-i18n="sort.newest">Newest</option>
+          </select>
+          <svg class="ic selectbox__chevron" aria-hidden="true"><use href="#i-arrow-up"/></svg>
+        </label>
+      </div>
+    </div>
+
+    <div class="results-line">
+      <span id="resultsLabel">12 designs</span>
+      <button class="link-btn" id="resetFilters" type="button" hidden data-i18n="shop.reset">Reset filters</button>
+    </div>
+
+    <div class="product-grid" id="productGrid"></div>
+
+    <div class="empty-state" id="emptyState" hidden>
+      <svg class="ic empty-state__icon" aria-hidden="true"><use href="#i-search"/></svg>
+      <h3 data-i18n="shop.emptyTitle">Nothing matches that.</h3>
+      <p data-i18n="shop.emptySub">Try another search, or clear the filters and start again.</p>
+      <button class="btn btn--solid" id="emptyReset" type="button" data-i18n="shop.reset">Reset filters</button>
+    </div>
+  </section>
+
+  <!-- ── VAULT ────────────────────────────────────────────────── -->
+  <section class="vault" id="vault" aria-labelledby="vaultTitle">
+    <div class="wrap vault__grid">
+      <div class="vault__copy">
+        <p class="eyebrow eyebrow--light"><span class="eyebrow__dot"></span><span data-i18n="vault.eyebrow">The whole arsenal</span></p>
+        <h2 class="display vault__title" id="vaultTitle" data-i18n-html="vault.title">THE <span class="outline">FULL</span><br>VAULT</h2>
+        <p class="vault__desc" data-i18n="vault.desc">Every design in the current drop, one download. Twelve graphics across six moods — enough to build a whole season of tees.</p>
+        <ul class="checklist checklist--light">
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="vault.inc1">All 12 designs, all four formats</span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="vault.inc2">Commercial license for every design</span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="vault.inc3">Lifetime access and free file updates</span></li>
+        </ul>
+        <div class="vault__pricing">
+          <b>$69</b><s>$171</s>
+          <span class="save-tag" data-i18n="vault.save">SAVE 60%</span>
+        </div>
+        <button class="btn btn--lime btn--wide" id="vaultCta" type="button" data-add="vault">
+          <span data-i18n="vault.cta">Add the vault</span>
+          <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg>
+        </button>
+        <p class="vault__micro" data-i18n="vault.micro">One-time payment · instant download · no subscription</p>
+      </div>
+      <div class="vault__visual" aria-hidden="true">
+        <div class="vault__stack" id="vaultStack"></div>
+        <span class="vault__seal"><b>12</b><span data-i18n="vault.designs">DESIGNS</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FREEBIE ──────────────────────────────────────────────── -->
+  <section class="freebie wrap" id="free" aria-labelledby="freeTitle">
+    <div class="freebie__card">
+      <div class="freebie__copy">
+        <p class="eyebrow"><span class="eyebrow__dot"></span><span data-i18n="free.eyebrow">Try before you print</span></p>
+        <h2 class="display freebie__title" id="freeTitle" data-i18n-html="free.title">A FREE<br>DESIGN,<br><em>on the house.</em></h2>
+        <p data-i18n="free.desc">See exactly how our files open, scale and print. The Welcome Card is yours — no email gate, no catch, just a good file.</p>
+        <div class="freebie__actions">
+          <button class="btn btn--solid" id="btnFreeSvg" type="button">
+            <svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>
+            <span data-i18n="free.svg">Download the SVG</span>
+          </button>
+          <button class="btn btn--ghost" id="btnFreePng" type="button" data-i18n="free.png">PNG, 300 DPI</button>
+        </div>
+        <p class="micro" data-i18n="free.micro">Free for personal and small-batch commercial use.</p>
+      </div>
+      <div class="freebie__visual">
+        <div class="freebie__mock" id="freebieMock"></div>
+        <span class="freebie__sticker" aria-hidden="true" data-i18n="free.sticker">FREE</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW ──────────────────────────────────────────────────── -->
+  <section class="how wrap section" id="how" aria-labelledby="howTitle">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow"><span class="eyebrow__dot"></span><span data-i18n="how.eyebrow">How it works</span></p>
+        <h2 class="display section-title" id="howTitle" data-i18n-html="how.title">FILE TO FABRIC<br><em>in three steps.</em></h2>
+      </div>
+      <p class="section-dek" data-i18n="how.sub">No shipping. No minimums. No waiting for a supplier to wake up.</p>
+    </div>
+    <div class="steps">
+      <article class="step">
+        <span class="step__no">01</span>
+        <svg class="ic step__icon" aria-hidden="true"><use href="#i-search"/></svg>
+        <h3 data-i18n="how.step1t">Pick your design</h3>
+        <p data-i18n="how.step1d">Preview every graphic on four tee colours, zoom the flat file, and check the details. No surprises.</p>
+      </article>
+      <article class="step">
+        <span class="step__no">02</span>
+        <svg class="ic step__icon" aria-hidden="true"><use href="#i-download"/></svg>
+        <h3 data-i18n="how.step2t">Checkout &amp; download</h3>
+        <p data-i18n="how.step2d">Pay once and grab your files instantly — SVG, 300 DPI PNG, DTF and EPS, packed and ready.</p>
+      </article>
+      <article class="step">
+        <span class="step__no">03</span>
+        <svg class="ic step__icon" aria-hidden="true"><use href="#i-print"/></svg>
+        <h3 data-i18n="how.step3t">Print &amp; sell</h3>
+        <p data-i18n="how.step3d">Send them to your printer or POD partner. Sell up to 500 pieces per design with the license included.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── LICENSE ──────────────────────────────────────────────── -->
+  <section class="license" id="license" aria-labelledby="licenseTitle">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow"><span class="eyebrow__dot"></span><span data-i18n="license.eyebrow">The fine print, made simple</span></p>
+          <h2 class="display section-title" id="licenseTitle" data-i18n-html="license.title">YOU MAKE THE TEES.<br><em>we handle the files.</em></h2>
+        </div>
+        <p class="section-dek" data-i18n="license.sub">Every purchase includes a commercial license. Need more volume? Upgrade when you need it.</p>
+      </div>
+      <div class="license__grid">
+        <article class="license__card">
+          <span class="tag tag--lime" data-i18n="license.tag1">Included free</span>
+          <h3 data-i18n="license.c1t">Standard license</h3>
+          <p class="license__price">+$0</p>
+          <ul class="checklist">
+            <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="license.c1b1">Sell up to 500 printed pieces per design</span></li>
+            <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="license.c1b2">Tees, hoodies, totes and stickers</span></li>
+            <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="license.c1b3">Edit colours, crop and scale freely</span></li>
+            <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="license.c1b4">No credit required</span></li>
+          </ul>
+          <p class="license__fine" data-i18n="license.c1fine">Attached automatically to every order.</p>
+        </article>
+        <article class="license__card license__card--ink">
+          <span class="tag tag--orange" data-i18n="license.tag2">Upgrade</span>
+          <h3 data-i18n="license.c2t">Extended license</h3>
+          <p class="license__price">+$39 <span data-i18n="license.perDesign">/ design</span></p>
+          <ul class="checklist checklist--light">
+            <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="license.c2b1">Unlimited print units</span></li>
+            <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="license.c2b2">Sales across marketplaces and ads</span></li>
+            <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="license.c2b3">Use in a full clothing collection</span></li>
+            <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="license.c2b4">Priority file support</span></li>
+          </ul>
+          <a class="btn btn--lime" href="mailto:hello@atlasink.studio?subject=Extended%20license">
+            <span data-i18n="license.ask">Ask for extended</span>
+            <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </article>
+      </div>
+      <p class="license__note" data-i18n="license.note">Not allowed: reselling or redistributing the files, uploading them to POD libraries, or claiming the artwork as your own. Printed products? Go wild.</p>
+    </div>
+  </section>
+
+  <!-- ── REVIEWS ──────────────────────────────────────────────── -->
+  <section class="reviews wrap section" id="reviews" aria-labelledby="reviewsTitle">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow"><span class="eyebrow__dot"></span><span data-i18n="reviews.eyebrow">Word on the street</span></p>
+        <h2 class="display section-title" id="reviewsTitle" data-i18n-html="reviews.title">BUYERS WHO<br><em>actually print.</em></h2>
+      </div>
+      <div class="reviews__score">
+        <b>4.9</b>
+        <span class="stars" aria-hidden="true">★★★★★</span>
+        <span class="mono" data-i18n="reviews.count">212 verified reviews</span>
+      </div>
+    </div>
+    <div class="reviews__grid">
+      <figure class="review">
+        <div class="stars" aria-hidden="true">★★★★★</div>
+        <blockquote data-i18n="reviews.q1">“The files are spotless. My DTF printer didn't need a single fix — we sold out the Sahara tee in nine days.”</blockquote>
+        <figcaption>
+          <span class="avatar">YB</span>
+          <span><b>Yassine B.</b><small data-i18n="reviews.a1">Print shop owner · Casablanca</small></span>
+        </figcaption>
+      </figure>
+      <figure class="review">
+        <div class="stars" aria-hidden="true">★★★★★</div>
+        <blockquote data-i18n="reviews.q2">“I've bought a lot of design packs. This is the first one where the SVGs actually open clean in Illustrator.”</blockquote>
+        <figcaption>
+          <span class="avatar">MK</span>
+          <span><b>Mara K.</b><small data-i18n="reviews.a2">Streetwear label · Berlin</small></span>
+        </figcaption>
+      </figure>
+      <figure class="review">
+        <div class="stars" aria-hidden="true">★★★★★</div>
+        <blockquote data-i18n="reviews.q3">“Downloaded at 2am and had mockups live by morning. The license is simple enough to explain to my lawyer.”</blockquote>
+        <figcaption>
+          <span class="avatar">SR</span>
+          <span><b>Sofia R.</b><small data-i18n="reviews.a3">Etsy seller · Madrid</small></span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ── FAQ ──────────────────────────────────────────────────── -->
+  <section class="faq wrap section" id="faq" aria-labelledby="faqTitle">
+    <div class="faq__grid">
+      <div class="faq__head">
+        <p class="eyebrow"><span class="eyebrow__dot"></span><span data-i18n="faq.eyebrow">Good questions</span></p>
+        <h2 class="display section-title" id="faqTitle" data-i18n-html="faq.title">EVERYTHING<br><em>else.</em></h2>
+        <p class="section-dek" data-i18n-html="faq.sub">Still unsure? Write to <a href="mailto:hello@atlasink.studio">hello@atlasink.studio</a> — a human answers.</p>
+      </div>
+      <div class="faq__list">
+        <details class="faq__item">
+          <summary><span data-i18n="faq.q1">What exactly do I get?</span><span class="faq__plus" aria-hidden="true"></span></summary>
+          <div class="faq__a"><p data-i18n="faq.a1">A ZIP with four files per design: an editable SVG, a high-resolution transparent PNG at 300 DPI, a DTF-ready PNG with a white underbase, and an EPS for older vector software. A license PDF is included too.</p></div>
+        </details>
+        <details class="faq__item">
+          <summary><span data-i18n="faq.q2">Can I sell shirts with these designs?</span><span class="faq__plus" aria-hidden="true"></span></summary>
+          <div class="faq__a"><p data-i18n="faq.a2">Yes. Every purchase includes a commercial license for up to 500 printed pieces per design. Need unlimited units? The extended license is +$39 per design.</p></div>
+        </details>
+        <details class="faq__item">
+          <summary><span data-i18n="faq.q3">Do you print or ship physical shirts?</span><span class="faq__plus" aria-hidden="true"></span></summary>
+          <div class="faq__a"><p data-i18n="faq.a3">No — this is a digital-only studio. You get the print files, not the garment. That's why delivery is instant and prices stay low.</p></div>
+        </details>
+        <details class="faq__item">
+          <summary><span data-i18n="faq.q4">What software do I need?</span><span class="faq__plus" aria-hidden="true"></span></summary>
+          <div class="faq__a"><p data-i18n="faq.a4">Any vector editor will do: Illustrator, CorelDRAW, Affinity Designer or Inkscape. If your printer only accepts images, the 300 DPI PNG and DTF files are ready to go.</p></div>
+        </details>
+        <details class="faq__item">
+          <summary><span data-i18n="faq.q5">Can I get a refund?</span><span class="faq__plus" aria-hidden="true"></span></summary>
+          <div class="faq__a"><p data-i18n="faq.a5">Digital files can't be returned, so all sales are final. If a file is broken or won't open, email us and we'll fix it or replace it the same day. Try the free design first to be sure.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── NEWSLETTER ───────────────────────────────────────────── -->
+  <section class="newsletter" id="newsletter" aria-labelledby="newsTitle">
+    <div class="wrap newsletter__inner">
+      <p class="eyebrow eyebrow--light"><span class="eyebrow__dot"></span><span data-i18n="news.eyebrow">The list</span></p>
+      <h2 class="display newsletter__title" id="newsTitle" data-i18n-html="news.title">FREE DESIGN.<br><em>no catch.</em></h2>
+      <p class="newsletter__desc" data-i18n="news.desc">Join for one free tee graphic, first access to drops and zero spam. Unsubscribe whenever — we won't take it personally.</p>
+      <form class="newsletter__form" id="newsForm" novalidate>
+        <label class="sr-only" for="newsEmail" data-i18n="news.emailLabel">Email address</label>
+        <input type="email" id="newsEmail" name="email" data-i18n-ph="news.placeholder" placeholder="you@studio.com" autocomplete="email" required>
+        <button class="btn btn--orange" type="submit">
+          <span data-i18n="news.cta">Send it</span>
+          <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg>
+        </button>
+      </form>
+      <p class="newsletter__err" id="newsErr" hidden data-i18n="news.err">That email doesn't look right. Try again?</p>
+      <div class="newsletter__success" id="newsSuccess" hidden>
+        <svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>
+        <div>
+          <strong data-i18n="news.ok">You're in.</strong>
+          <p data-i18n="news.okSub">Your free design is ready. (Demo: no email is actually sent.)</p>
+          <button class="btn btn--ghost btn--small" id="newsDownload" type="button">
+            <svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>
+            <span data-i18n="news.download">Download the free SVG</span>
+          </button>
+        </div>
+      </div>
+      <p class="newsletter__micro" data-i18n="news.micro">By joining you agree to our terms and privacy policy. No spam, ever.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a class="brand brand--light" href="#top" aria-label="Atlas Ink — home">
+          <svg class="ic brand__mark" aria-hidden="true"><use href="#i-asterisk"/></svg>
+          <span class="brand__name">ATLAS INK<sup>®</sup></span>
+        </a>
+        <p data-i18n="footer.tagline">Original graphics for people who print. Made in Casablanca, downloaded everywhere.</p>
+        <p class="footer__demo" data-i18n="footer.demo">Demo storefront — payments are simulated and no card is ever charged.</p>
+        <div class="footer__social">
+          <a href="#newsletter" aria-label="Instagram">IG</a>
+          <a href="#newsletter" aria-label="Pinterest">PIN</a>
+          <a href="#newsletter" aria-label="TikTok">TT</a>
+        </div>
+      </div>
+      <div class="footer__cols">
+        <div>
+          <h4 data-i18n="footer.shop">Shop</h4>
+          <a href="#shop" data-i18n="footer.current">Current drop</a>
+          <a href="#vault" data-i18n="footer.vault">The full vault</a>
+          <a href="#free" data-i18n="footer.free">Free sample</a>
+          <button class="footer__link" id="linkDownloads" type="button" hidden data-i18n="footer.downloads">My downloads</button>
+        </div>
+        <div>
+          <h4 data-i18n="footer.help">Help</h4>
+          <a href="#faq" data-i18n="footer.faq">FAQ</a>
+          <a href="#license" data-i18n="footer.license">License</a>
+          <a href="mailto:hello@atlasink.studio" data-i18n="footer.contact">Contact</a>
+        </div>
+        <div>
+          <h4 data-i18n="footer.studio">Studio</h4>
+          <a href="#how" data-i18n="footer.how">How it works</a>
+          <a href="#reviews" data-i18n="footer.reviews">Reviews</a>
+          <a href="mailto:hello@atlasink.studio?subject=Wholesale" data-i18n="footer.wholesale">Wholesale</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__wordmark" aria-hidden="true">
+      <span>ATLAS</span>
+      <svg class="ic"><use href="#i-asterisk"/></svg>
+      <span>INK</span>
+    </div>
+
+    <div class="footer__bottom">
+      <span>© 2026 Atlas Ink Studio</span>
+      <div class="payments" aria-label="Payment methods">
+        <span>VISA</span><span>Mastercard</span><span>PayPal</span><span>Apple Pay</span>
+      </div>
+      <button class="footer__link" id="btnLangFooter" type="button">العربية / EN</button>
+      <button class="footer__top-btn" id="btnTop" type="button">
+        <span data-i18n="footer.top">Back to top</span>
+        <svg class="ic" aria-hidden="true"><use href="#i-arrow-up"/></svg>
+      </button>
+    </div>
+  </div>
+</footer>
+
+<!-- ── OVERLAYS ─────────────────────────────────────────────────── -->
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle" hidden>
+  <div class="drawer__head">
+    <h2 class="drawer__title" id="cartTitle">
+      <span data-i18n="cart.title">Your cart</span>
+      <span class="drawer__count" id="cartDrawerCount">0</span>
+    </h2>
+    <button class="icon-btn" data-close-cart type="button" aria-label="Close cart" data-i18n-aria="a11y.closeCart">
+      <svg class="ic" aria-hidden="true"><use href="#i-close"/></svg>
+    </button>
+  </div>
+  <div class="drawer__note">
+    <svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>
+    <span data-i18n="cart.digital">Digital download · no shipping, no waiting</span>
+  </div>
+  <div class="drawer__body" id="cartBody">
+    <div class="cart-lines" id="cartLines"></div>
+    <div class="cart-empty" id="cartEmpty" hidden>
+      <svg class="ic cart-empty__star" aria-hidden="true"><use href="#i-asterisk"/></svg>
+      <h3 data-i18n="cart.emptyTitle">Nothing in here yet.</h3>
+      <p data-i18n="cart.emptySub">The drop is waiting. Pick something worth printing.</p>
+      <button class="btn btn--solid" type="button" data-close-cart data-i18n="cart.browse">Browse the drop</button>
+    </div>
+  </div>
+  <div class="drawer__foot" id="cartFoot">
+    <div id="promoArea"></div>
+    <div class="totals">
+      <div class="totals__row"><span data-i18n="cart.subtotal">Subtotal</span><b id="cartSubtotal">$0</b></div>
+      <div class="totals__row" id="discountRow" hidden><span data-i18n="cart.discount">Discount</span><b id="cartDiscount">−$0</b></div>
+      <div class="totals__row totals__row--grand"><span data-i18n="cart.total">Total</span><b id="cartTotal">$0</b></div>
+    </div>
+    <button class="btn btn--solid btn--wide" id="btnCheckout" type="button">
+      <span data-i18n="cart.checkout">Checkout</span>
+      <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg>
+    </button>
+    <p class="micro micro--center">
+      <svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>
+      <span data-i18n="cart.secure">Secure demo checkout — no real card is charged.</span>
+    </p>
+    <div class="drawer__save">
+      <button class="link-btn link-btn--center" type="button" data-close-cart data-i18n="cart.continue">Continue shopping</button>
+      <button class="link-btn link-btn--center" type="button" id="btnSaveCart" data-i18n="cart.save">Save cart as text</button>
+    </div>
+  </div>
+</aside>
+
+<div class="modal" id="productModal" hidden>
+  <div class="modal__panel modal__panel--product" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+    <button class="modal__close" type="button" data-close-modal aria-label="Close product" data-i18n-aria="a11y.closeProduct">
+      <svg class="ic" aria-hidden="true"><use href="#i-close"/></svg>
+    </button>
+    <div id="pmPanel"></div>
+  </div>
+</div>
+
+<div class="modal" id="checkoutModal" hidden>
+  <div class="modal__panel modal__panel--checkout" role="dialog" aria-modal="true" aria-labelledby="coTitle">
+    <button class="modal__close modal__close--light" type="button" data-close-checkout aria-label="Close checkout" data-i18n-aria="a11y.closeCheckout">
+      <svg class="ic" aria-hidden="true"><use href="#i-close"/></svg>
+    </button>
+    <div id="coPanel"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
