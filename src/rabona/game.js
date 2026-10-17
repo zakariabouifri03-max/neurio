@@ -34,6 +34,104 @@ export class RabonaGame {
     const m = createBall();
     this.ballModel = m;
     this.scene.add(m.root);
+    this.setupParticles();
+  }
+
+  setupParticles() {
+    // ultra dust
+    this.dustParticles = [];
+    for(let i=0;i<96;i++) this.dustParticles.push({ x:0, y:-10, z:0, vx:0, vy:0, vz:0, life:0 });
+    this.dustPos = new Float32Array(96*3);
+    this.dustPos.fill(-100);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(this.dustPos, 3));
+    const canvas = document.createElement('canvas');
+    canvas.width=canvas.height=64;
+    const ctx=canvas.getContext('2d');
+    const grad=ctx.createRadialGradient(32,32,0,32,32,32);
+    grad.addColorStop(0,'rgba(235,220,190,0.9)');
+    grad.addColorStop(0.35,'rgba(210,200,170,0.4)');
+    grad.addColorStop(1,'rgba(200,190,160,0)');
+    ctx.fillStyle=grad; ctx.fillRect(0,0,64,64);
+    const tex=new THREE.CanvasTexture(canvas);
+    this.dustMat = new THREE.PointsMaterial({ map:tex, size:0.55, transparent:true, opacity:0.62, depthWrite:false, sizeAttenuation:true, color:0xe0d0a8 });
+    this.dustPoints = new THREE.Points(geo, this.dustMat);
+    this.dustPoints.frustumCulled=false;
+    this.dustPoints.visible=false;
+    this.scene.add(this.dustPoints);
+    this.dustIndex=0;
+
+    // ball trail ultra
+    this.trailPos = [];
+    for(let i=0;i<18;i++) this.trailPos.push(new THREE.Vector3(0,-10,0));
+    const trailGeo = new THREE.BufferGeometry();
+    const trailPositions = new Float32Array(18*3);
+    trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+    const trailCanvas=document.createElement('canvas');
+    trailCanvas.width=trailCanvas.height=32;
+    const tctx=trailCanvas.getContext('2d');
+    const tgrad=tctx.createRadialGradient(16,16,0,16,16,16);
+    tgrad.addColorStop(0,'rgba(255,240,180,0.9)');
+    tgrad.addColorStop(1,'rgba(255,220,100,0)');
+    tctx.fillStyle=tgrad; tctx.fillRect(0,0,32,32);
+    const trailTex=new THREE.CanvasTexture(trailCanvas);
+    this.trailMat = new THREE.PointsMaterial({ map:trailTex, size:0.38, transparent:true, opacity:0.0, depthWrite:false, blending:THREE.AdditiveBlending });
+    this.trailPoints = new THREE.Points(trailGeo, this.trailMat);
+    this.trailPoints.frustumCulled=false;
+    this.scene.add(this.trailPoints);
+  }
+
+  spawnDust(x,z,count=3, power=1.2) {
+    for(let i=0;i<count;i++){
+      const p=this.dustParticles[this.dustIndex++ % this.dustParticles.length];
+      p.x = x + (Math.random()-0.5)*0.6;
+      p.z = z + (Math.random()-0.5)*0.6;
+      p.y = 0.08 + Math.random()*0.15;
+      p.vx = (Math.random()-0.5)*power;
+      p.vz = (Math.random()-0.5)*power;
+      p.vy = Math.random()*power*0.6 + 0.2;
+      p.life = 0.6 + Math.random()*0.6;
+    }
+    this.dustPoints.visible=true;
+  }
+
+  updateDust(dt) {
+    let alive=0;
+    for(let i=0;i<this.dustParticles.length;i++){
+      const p=this.dustParticles[i];
+      if(p.life>0){
+        p.life-=dt;
+        p.x+=p.vx*dt;
+        p.z+=p.vz*dt;
+        p.y+=p.vy*dt;
+        p.vy-=1.4*dt;
+        p.vx*= (1 - dt*0.6);
+        p.vz*= (1 - dt*0.6);
+        this.dustPos[i*3]=p.x;
+        this.dustPos[i*3+1]=p.y;
+        this.dustPos[i*3+2]=p.z;
+        alive++;
+      } else {
+        this.dustPos[i*3+1]=-100;
+      }
+    }
+    this.dustPoints.geometry.attributes.position.needsUpdate=true;
+    this.dustPoints.visible = alive>0;
+  }
+
+  updateTrail(dt) {
+    // push current ball pos to trail
+    this.trailPos.pop();
+    this.trailPos.unshift(new THREE.Vector3(this.ball.x, this.ball.y, this.ball.z));
+    const posAttr = this.trailPoints.geometry.attributes.position;
+    const speed = Math.hypot(this.ball.vx, this.ball.vz, this.ball.vy);
+    const showTrail = speed > 8 && this.ball.y > 0.5;
+    this.trailMat.opacity = showTrail ? Math.min(0.55, speed*0.03) : 0;
+    for(let i=0;i<this.trailPos.length;i++){
+      const p=this.trailPos[i];
+      posAttr.setXYZ(i, p.x, p.y, p.z);
+    }
+    posAttr.needsUpdate=true;
   }
 
   bindInput() {
@@ -394,12 +492,12 @@ export class RabonaGame {
 
     if (this.state==='goal') {
       this.goalTimer -= dt;
-      this.time += 0; // pause time during celebration? Let time continue slightly?
-      // animate players
+      this.time += 0;
       this.players.forEach(p=>{
         stepPlayer(p, {mx:0,mz:0}, dt, this.ball);
         p.model.update(p, dt, this.time);
       });
+      this.updateDust(dt);
       this.updateCamera(dt);
       if (this.goalTimer<=0) {
         this.resetPositions();
@@ -475,7 +573,18 @@ export class RabonaGame {
       }
 
       // ball physics
+      const prevBallY = this.ball.y;
       stepBall(this.ball, dt);
+      if (prevBallY > 0.6 && this.ball.y <= BALL_RADIUS+0.05 && Math.hypot(this.ball.vx, this.ball.vz) > 2) {
+        this.spawnDust(this.ball.x, this.ball.z, 4, 1.0);
+      }
+
+      // ultra dust from sprint/slide
+      if (this.activePlayer) {
+        const ap = this.activePlayer;
+        if (ap.state==='slide' && Math.random()<0.35) this.spawnDust(ap.x, ap.z, 5, 1.6);
+        if (ap.state==='run' && Math.hypot(ap.vx, ap.vz)>5.5 && Math.random()<0.18) this.spawnDust(ap.x, ap.z, 2, 0.7);
+      }
 
       // collisions player vs ball (if not possessed, push)
       for(const p of this.players) {
@@ -546,6 +655,8 @@ export class RabonaGame {
       this.kickCooldown = Math.max(0, this.kickCooldown - dt);
       this.cameraShake = Math.max(0, (this.cameraShake||0) - dt*2);
 
+      this.updateDust(dt);
+      this.updateTrail(dt);
       this.updateCamera(dt);
       this.updateHUD();
 

@@ -5,7 +5,7 @@ import { RabonaGame } from './game.js';
 import { RabonaAudio } from './audio.js';
 
 const $ = id => document.getElementById(id);
-const defaults = { difficulty:'normal', quality:'balanced', sound:true, volume:0.65, camera:'follow' };
+const defaults = { difficulty:'normal', quality:'ultra', sound:true, volume:0.65, camera:'follow' };
 
 function load(key, fallback) {
   try { return { ...fallback, ...JSON.parse(localStorage.getItem(key)||'{}') }; } catch { return { ...fallback }; }
@@ -81,8 +81,8 @@ function settingsModal() {
     <div class="setting-row"><div><label>Difficulty</label><small>AI speed & awareness.</small></div>
       <select id="difficulty"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option></select>
     </div>
-    <div class="setting-row"><div><label>Graphics quality</label><small>Shadows & resolution.</small></div>
-      <select id="quality"><option value="performance">Performance</option><option value="balanced">Balanced</option><option value="high">High</option></select>
+    <div class="setting-row"><div><label>Graphics quality</label><small>Shadows & resolution. Ultra = 4K shadows + PBR.</small></div>
+      <select id="quality"><option value="performance">Performance</option><option value="balanced">Balanced</option><option value="high">High</option><option value="ultra">Ultra — Realistic</option></select>
     </div>
     <div class="setting-row"><div><label>Camera</label><small>Follow or wide broadcast.</small></div>
       <select id="camera-setting"><option value="follow">Follow player</option><option value="ball">Ball cam</option></select>
@@ -177,16 +177,23 @@ function resultsModal(result) {
 function applyQuality() {
   if (!renderer) return;
   const ratio = devicePixelRatio || 1;
-  renderer.setPixelRatio(Math.min(ratio, config.quality==='performance'?1: config.quality==='high'?2:1.5));
-  renderer.shadowMap.enabled = config.quality!=='performance';
-  const size = config.quality==='high'?2048:1024;
+  const isUltra = config.quality==='ultra';
+  const isHigh = config.quality==='high' || isUltra;
+  const isPerf = config.quality==='performance';
+  renderer.setPixelRatio(Math.min(ratio, isUltra? Math.min(2.5, ratio*1.2) : isHigh?2: isPerf?1:1.5));
+  renderer.shadowMap.enabled = !isPerf;
+  renderer.shadowMap.type = isUltra ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
+  const size = isUltra ? 4096 : isHigh ? 2048 : 1024;
   if (world && world.sun.shadow.mapSize.x!==size) {
     world.sun.shadow.map?.dispose();
     world.sun.shadow.map=null;
     world.sun.shadow.mapSize.set(size,size);
+    world.sun.shadow.radius = isUltra ? 4 : 2;
+    world.sun.shadow.blurSamples = isUltra ? 16 : 8;
   }
   if (world) world.sun.shadow.needsUpdate=true;
   renderer.setSize(innerWidth, innerHeight);
+  renderer.toneMappingExposure = isUltra ? 1.18 : 1.05;
 }
 
 if ('serviceWorker' in navigator && !new URLSearchParams(location.search).has('test')) {
@@ -208,7 +215,8 @@ async function boot() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.18;
+  renderer.physicallyCorrectLights = true;
   renderer.domElement.setAttribute('aria-label','Rabona wobbly football. WASD to move, E to kick, Q for rabona, Space to slide.');
   $('scene').appendChild(renderer.domElement);
 
