@@ -1,132 +1,103 @@
-# RABONA — Wobbly Football
+# MONKEY CO. — Ultra Professional T-Shirt Store
 
-An original, playable 3D wobbly-physics football game inspired by the Rabona screenshots you shared. Built for the browser with Three.js — no build step, no external runtime APIs.
+An ultra-professional, fun & colorful e-commerce store for monkey t-shirts — built for the browser with Three.js, no build step, no external APIs. Inspired by your Rabona wobbly style but now as a premium streetwear brand.
 
-**What you see in the reference images:**
-- Capsule stickmen with white joints, colorful boots, wobbly tackles
-- Desert stadium with cube seats, RABONA billboards, floodlights, cactus
-- Big yellow/black ball, sliding saves, rabona (cross-leg) kicks
-- “PLAY WITH FRIENDS” vibe — this version is SOLO VS AI, local 3v3
+**Live Preview:** Port 8000 → `RABONA ULTRA — Wobbly Football` (now Monkey Co.)
 
-This is an original interpretation, not a copy of any commercial game.
+## Features — Ultra Professional
 
-## Features
+**Brand & Design**
+- Fun & colorful monkey cartoon style like Rabona, but premium
+- 8 unique monkey characters: Banana Bandit 🍌, Skate 🛹, DJ 🎧, Astro 🚀, Ninja 🥷, Chef 👨‍🍳, Gamer 🎮, Surf 🏄
+- Each monkey hand-drawn on canvas (eyes with iris/pupil highlight, accessories)
+- Glassmorphism header (sticky blur), dark theme (#0f0f0f), accent yellow #ffe066 + pink + blue
+- Barlow Condensed + DM Sans + Plex Mono fonts, all local
 
-**Stadium**
-- 70×44m pitch with striped grass, white lines, center circle, penalty areas
-- Two full goals with posts, crossbar, and net
-- Desert outside: sand, rocks, cactus, 4 floodlights with point lights
-- Cube stands like in screenshots (red/white/blue cubes with star patterns)
-- RABONA billboards around pitch and big scoreboard
-- Bright desert sky with clouds, environment map for reflections
+**Hero — 3D**
+- Live 3D t-shirt rotating (Three.js, PBR, ACESFilmic, shadows)
+- Drag to rotate, auto spin, fabric texture + monkey canvas combined
+- Badges: LIVE 3D, NEW DROP, stats (8 designs, 4.8★, 50k sold)
 
-**Players — Wobbly Physics**
-- Procedural capsule characters: torso, head with hair, arms with elbow joints, legs with knee joints, feet with colorful boots
-- White joint spheres exactly like reference
-- Teams: BLUE vs RED, plus GOLD goalkeepers who dive
-- Animations: idle sway, run cycle with opposite arm/leg swing, kick, **rabona** (leg crosses behind), slide tackle, fall & get up, celebrate
-- Shadow blobs that scale with height
-- Wobble springs on torso when hit
+**Shop — E-commerce**
+- Product grid (8 tees), each with:
+  - 2D t-shirt preview canvas (generated)
+  - Badges: NEW, BESTSELLER, SALE % off
+  - Price + original + rating + reviews
+  - Hover actions: quick view + add to cart
+- Filters: ALL, NEW, BESTSELLER, BANANA, SKATE, DJ + search
+- Product modal:
+  - 3D t-shirt viewer (drag to rotate, same PBR as hero)
+  - Color selector (8 base colors, visual dots, active outline)
+  - Size selector (XS-XXL, disabled if not available)
+  - Quantity with +/- 
+  - Stock + free shipping note
+  - Add to cart
 
-**Ball**
-- Yellow base with black pentagons + blue lines (like reference), canvas texture
-- Physics: gravity, drag, rolling friction, bounce, spin, Magnus curve on rabona
-- Possession: ball sticks slightly in front when you are close
-- Kicks: normal (E) and rabona (Q) with curve and extra height
+**Cart & Checkout — Everything**
+- Cart sidebar (slide-in animation, backdrop blur)
+- Items with 2D preview, color/size, qty +/- , remove, subtotal
+- Subtotal + free shipping over $50 + 30-day returns
+- Checkout modal:
+  - Email, name, address, city, ZIP, card (demo)
+  - Order summary with subtotal, shipping $8, total
+  - Fake payment, but ultra professional UI
+- Success modal with order ID (MNK-...), total, ETA 2-3 days, continue shopping
 
-**Gameplay — 3v3**
-- You control BLUE team (auto-switches to closest to ball, press R to force switch)
-- 2 field players + 1 goalkeeper per team (6 total)
-- AI: chase ball, support positioning, shoot when in range, goalkeeper tracks ball laterally and dives
-- Tackling: slide (Space) into carrier → carrier falls, you steal
-- Goals: ball must cross line inside 7.32m width and below 2.44m height
-- 90-second quick match, scoreboard, commentary, goal celebration with camera orbit
-- After goal, positions reset
+**Ultra Professional Details**
+- Canvas-generated textures: fabric noise, monkey faces, t-shirt shape, badges
+- PBR materials: roughness, metalness, clearcoat, sheen
+- Shadows: PCFSoft, 1024 map, contact shadows
+- Particles? No, clean e-commerce
+- Animations: hover lift, slide-in cart, toast, loading track
+- Responsive: 1280 → 390 mobile, no horizontal overflow, touch friendly
+- Persistence: `monkey-store-cart-v1` + `monkey-store-orders-v1` in localStorage
+- Toast notifications
+- PWA: `monkey-v1` caches 14 assets, network-first, offline reload works
 
-**Controls**
-- **WASD / Arrows**: Move
-- **Shift**: Sprint (1.45×)
-- **E**: Kick / Shoot (towards goal or facing)
-- **Q**: Rabona kick (curled, fancy)
-- **Space**: Slide tackle
-- **R**: Switch player (closest to ball)
-- **C**: Camera (follow player vs ball/wide)
-- **Esc**: Pause
-
-**Touch / Mobile**
-- Left cluster: move
-- Right cluster: KICK (big), R (rabona), S (slide), ⚡ sprint
-- Responsive layout, no horizontal overflow
-
-**Lobby**
-- Live 3D showcase: wobbly player doing run/rabona cycle with ball bobbing
-- Drag to orbit
-- PLAY (quick match), PRACTICE (same but you can lab rabona), TEAMS (info), HOW TO PLAY
-- Settings: difficulty (easy/normal/hard affects AI speed), quality (performance/balanced/high), camera default, volume, mute
-- Local storage: `rabona-settings-v1` and `rabona-record-v1`
-
-**Audio**
-- Synthesized kicks, slide, bump, goal fanfare, whistle via WebAudio
+**Previous Games Preserved**
+- `src/rabona/` — Rabona wobbly football ultra (high-poly players, 4096 shadows, dust, trail)
+- `src/royale/` — Outrun battle royale
+- Not loaded, but in repo history
 
 ## How to Run
 
-No build step or runtime package installation required. Start the included dependency-free static server (Node 18+):
-
 ```bash
 npm start
+# 0.0.0.0:8000, safe static server (blocks dotfiles, node_modules)
+# Open http://localhost:8000
+# ?test=1 skips SW
 ```
-
-Binds to `0.0.0.0:8000`, accepts preview proxy hosts, blocks hidden files and dependency folders. Use `PORT=8080 npm start` for different port.
-
-Alternatively:
-
-```bash
-python3 -m http.server 8000 --bind 0.0.0.0
-```
-
-Open http://localhost:8000
-
-Add `?test=1` to skip service worker (used by tests).
 
 ## Architecture
 
-- `index.html`: markup, icons, HUD, touch controls, modals
-- `src/rabona/style.css`: local fonts, responsive UI, HUD, touch, modals
-- `src/rabona/rules.js`: constants, pitch dimensions, ball/player physics helpers (`stepBall`, `kickBall`, `stepPlayer`), seeded RNG, time formatting
-- `src/rabona/models.js`: `createWobblyPlayer` (capsule hierarchy, materials, shadow, update function), `createBall` (textured icosa + shadow), `createPitch` (striped canvas texture + white lines), `createGoal` (posts + net lines), `createStadium` (desert, rocks, cactus, cube stands, floodlights, billboards, scoreboard texture)
-- `src/rabona/world.js`: environment sky canvas → PMREM, fog, hemi + directional light with 2048 shadow, `followShadow`, `updateScoreTexture`
-- `src/rabona/game.js`: `RabonaGame` class — teams, ball, possession, AI (field + GK), input, kick/rabona/slide, goal detection, camera (follow vs ball with lerp, shake), HUD, commentary
-- `src/rabona/audio.js`: WebAudio synthesized effects
-- `src/rabona/main.js`: boot, renderer, quality, lobby orbit, UI bindings, settings/record persistence, main loop (dt capped 0.05), showcase animation
-- `vendor/three.module.js`: Three r170 local, `vendor/utils/BufferGeometryUtils.js`
-- `assets/fonts/`: Barlow Condensed, DM Sans, IBM Plex Mono WOFF2
-- `assets/rabona.svg`: logo
-- `tools/serve.mjs`: safe static server (blocks dotfiles, node_modules, outside root, uses realpath)
-- `sw.js`: `rabona-v1`, caches local assets, network-first, offline reload to lobby
-- `manifest.webmanifest`: PWA metadata
-
-Preserved but not loaded: `src/` old racing source, `src/royale/` previous OUTRUN game.
+- `index.html`: header, hero with canvas, product grid, modals (product, cart, checkout, success), footer
+- `src/monkey-store/style.css`: ultra professional e-commerce styling, responsive, animations
+- `src/monkey-store/rules.js`: MONKEY_TYPES (8), BASE_COLORS (8), SIZES (6), PRODUCTS (8), createMonkeyCanvas (512px cartoon monkey with accessories), seeded RNG, formatPrice
+- `src/monkey-store/models.js`: createTShirtModel (extruded shape + sleeves + neck + shadow, PBR), applyMonkeyTexture (combines base color + monkey canvas + fabric noise + tag)
+- `src/monkey-store/store.js`: MonkeyStore class — cart CRUD, total/count, detailed items, checkout with order ID, localStorage
+- `src/monkey-store/main.js`: Three.js hero + modal scenes (ambient + directional + fill lights, ACESFilmic, shadows, drag rotate), renderProducts, modals, cart, checkout, search, filters, toast, boot
+- `vendor/three.module.js`: Three r170
+- `assets/fonts/`: local WOFF2
+- `tools/serve.mjs`: safe static server
+- `sw.js`: monkey-v1, 14 assets
+- `manifest.webmanifest`: PWA
 
 ## Tests
 
 ```bash
-npm test              # 12 unit tests: RNG, pitch, ball physics, kick, player movement, sprint, facing, timers, format
-npm run test:browser  # full real-WebGL integration: lobby, garage, guide, settings persistence, kickoff, movement, kick, rabona, slide, simulation, goal, pause, touch, exit, finish, mobile layout, reload persistence
+npm test              # 7 unit tests: product validity, colors/sizes, formatPrice, RNG, canvas fn, cart ops, checkout
+npm run test:browser  # real WebGL: lobby, product grid, modal open, 3D canvas, color/size select, add to cart, qty, checkout, order success, cart cleared, mobile layout, offline reload, zero errors
 ```
 
-Browser tests use bundled Chromium via `@sparticuz/chromium` and require `LD_LIBRARY_PATH` with extracted libs (handled in test file). They run with `?test=1` to skip SW.
+Browser tests use bundled Chromium via @sparticuz/chromium.
 
-## Limitations & Honest Notes
+## Limitations
 
-- Single player vs AI, not real online multiplayer (labeled SOLO VS AI)
-- 3v3 not 11v11 — keeps it playable and performant in browser
-- Wobble is procedural animation + springs, not full rigid-body ragdoll (would need Ammo/Cannon and be heavier)
-- No throw-ins/corners/offside — ball bounces off invisible walls except goal mouth, keeps action flowing
-- AI is simple steering + random shots, not a full football tactics engine
-- All assets procedural/local, no external models or textures
+- Demo store, no real payment backend — UI is ultra professional but checkout is fake
+- No real backend, no user accounts
+- 3D t-shirt is procedural, not Marvelous Designer quality, but PBR and high-poly
+- Images are canvas-generated, not photoshoots — keeps it 100% local and offline
 
 ## Credits
 
-Original game code, models, textures, and audio synthesis. Fonts: Barlow Condensed, DM Sans, IBM Plex Mono (OFL). Three.js r170 MIT.
-
-Inspired by Rabona's wobbly football vibe — an original interpretation built for this prompt.
+Original code, textures, 3D models, store logic. Fonts OFL. Three.js MIT. Inspired by Rabona fun style, now as Monkey Co. streetwear.

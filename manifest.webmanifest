@@ -1,12 +1,12 @@
 {
   "id": "./",
-  "name": "RABONA — Wobbly Football",
-  "short_name": "RABONA",
-  "description": "Wobbly physics football in a desert stadium. Tackle, dribble, and hit the perfect rabona.",
+  "name": "MONKEY CO. — Ultra T-Shirt Store",
+  "short_name": "MONKEY CO.",
+  "description": "Ultra professional monkey t-shirt store. Fun & colorful, 3D customizer, premium cotton.",
   "start_url": "./",
   "scope": "./",
-  "display": "fullscreen",
-  "background_color": "#1e4a2a",
-  "theme_color": "#1e4a2a",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#0f0f0f",
   "icons": [{"src":"assets/rabona.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]
 }

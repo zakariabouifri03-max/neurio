@@ -1,7 +1,7 @@
 {
-  "name": "rabona-wobbly-football",
-  "version": "0.2.0",
-  "description": "RABONA — wobbly physics football in a desert stadium. Tackle, dribble, and hit the perfect rabona.",
+  "name": "monkey-co-tshirt-store",
+  "version": "0.3.0",
+  "description": "MONKEY CO. — ultra professional monkey t-shirt store. Fun & colorful, 3D customizer, e-commerce.",
   "scripts": {
     "start": "node tools/serve.mjs",
     "test": "node --test tests/mechanics.test.js",

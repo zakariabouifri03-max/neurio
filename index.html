@@ -2,125 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#3a8a4a"><meta name="description" content="RABONA — wobbly physics football. Tackle, dribble, and hit the perfect rabona in a desert stadium.">
-<title>RABONA — Wobbly Football</title>
+<meta name="theme-color" content="#0f0f0f"><meta name="description" content="MONKEY CO. — ultra professional t-shirt store. Wobbly monkeys, premium cotton, streetwear.">
+<title>MONKEY CO. — Ultra Professional T-Shirt Store</title>
 <link rel="icon" href="assets/rabona.svg" type="image/svg+xml"><link rel="manifest" href="manifest.webmanifest">
 <link rel="preload" href="assets/fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="src/rabona/style.css">
+<link rel="stylesheet" href="src/monkey-store/style.css">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
 </head>
 <body>
-<svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
-<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
-<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13-8L7 4z"/></symbol>
-<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M2 21v-3a7 7 0 0 1 14 0v3m0-17a3 3 0 0 1 0 6m3 3a6 6 0 0 1 3 5v3"/></symbol>
-<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Zm0 2H3v3a5 5 0 0 0 5 5m9-8h4v3a5 5 0 0 1-5 5m-4 1v6m-4 1h8"/></symbol>
-<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
-<symbol id="i-settings" viewBox="0 0 24 24"><path d="M3 7h18M3 17h18M8 3v8m8 2v8"/></symbol>
-<symbol id="i-volume" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
-<symbol id="i-muted" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5V4Zm5 5 6 6m0-6-6 6"/></symbol>
-<symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14m8-14v14"/></symbol>
-<symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
-<symbol id="i-football" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 0 1 0 18M3 12a15 15 0 0 1 18 0M5.5 5.5l13 13M18.5 5.5l-13 13"/></symbol>
-<symbol id="i-zap" viewBox="0 0 24 24"><path d="m13 2-9 12h7l-1 8 10-13h-7V2Z"/></symbol>
-</defs></svg>
+<div id="loading" style="position:fixed;inset:0;z-index:100;background:#0f0f0f;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;transition:opacity .4s"><div style="font:800 28px Barlow,Arial;letter-spacing:1px">MONKEY CO.<span style="color:#ffe066">®</span></div><div style="width:120px;height:2px;background:#ffffff18;overflow:hidden"><i style="display:block;height:100%;width:40%;background:#ffe066;animation:loading 1s ease infinite"></i></div><style>@keyframes loading{from{transform:translateX(-110%)}to{transform:translateX(350%)}}</style><span class="mono">LOADING ULTRA STORE…</span></div>
 
-<div id="scene" aria-label="Wobbly football stadium"></div>
-<div id="scene-shade"></div>
-<div class="grain"></div>
-
-<div id="loading"><div class="loading-brand"><img src="assets/rabona.svg" alt="" width="120">RABONA</div><div class="loading-track"><i></i></div><span class="mono">WARMING UP THE WOBBLY LEGS…</span></div>
-<div id="graphics-error" hidden><span class="eyebrow">ONE QUICK RED CARD</span><h1>LET'S GET<br>YOU BACK.</h1><p>RABONA needs WebGL 2. Try a recent Chrome, Firefox, or Safari with hardware acceleration.</p><button onclick="location.reload()" class="primary">TRY AGAIN <svg><use href="#i-arrow"/></svg></button></div>
-
-<div id="lobby">
 <header class="topbar">
-<a href="#play" class="brand" aria-label="Rabona home"><img src="assets/rabona.svg" alt="" width="90"><span>RABONA<sup>®</sup></span><span class="brand-divider"></span><span class="brand-caption">WOBBLY<br>FOOTBALL</span></a>
-<nav aria-label="Main navigation"><button class="nav-link active" data-view="play" aria-current="page">PLAY</button><button class="nav-link" data-view="garage">TEAMS</button><button class="nav-link" data-view="guide">HOW TO PLAY <span>↗</span></button></nav>
-<div class="header-actions"><span class="local-session"><i class="status-dot"></i> SOLO VS AI • LOCAL FRIENDS</span><button id="sound-btn" class="icon-button" aria-label="Mute audio"><svg><use href="#i-volume"/></svg></button><button id="settings-btn" class="icon-button" aria-label="Settings"><svg><use href="#i-settings"/></svg></button></div>
+<a href="#" class="brand">MONKEY <span>CO.</span> <small>ULTRA • EST. 2026</small></a>
+<nav class="nav"><a href="#" class="active">SHOP</a><a href="#products">COLLECTION</a><a href="#">LOOKBOOK</a><a href="#">ABOUT</a></nav>
+<div class="actions">
+<div style="position:relative"><input id="search-input" placeholder="Search monkey..." style="height:40px;width:200px;padding:0 14px 0 36px;background:#1e1e1e;border:1px solid #ffffff12;border-radius:20px;color:white;font:13px DM"><span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5">🔍</span></div>
+<button class="icon-btn">♡</button>
+<button class="icon-btn">👤</button>
+<button id="cart-btn" class="cart-btn">CART <b id="cart-count">0</b></button>
+</div>
 </header>
 
-<main id="play-view" class="lobby-view">
-<section class="hero-copy">
-<div class="eyebrow"><span class="live-dash"></span> DESERT CUP • 3V3 • WOBBLY PHYSICS</div>
-<h1>RABONA<br><span>FOOTBALL.</span></h1>
-<p class="hero-description">Tackle, tumble, and bend it like you mean it.<br>Wobbly legs, big goals, and the perfect rabona.</p>
-
-<div class="mode-cards">
-<div class="mode-card featured"><div class="mode-icon"><svg><use href="#i-trophy"/></svg></div><div><strong>QUICK MATCH</strong><small>3v3 • 90 seconds • First to win</small></div><span class="badge">SOLO VS AI</span></div>
-<div class="mode-card"><div class="mode-icon"><svg><use href="#i-football"/></svg></div><div><strong>FREE KICK</strong><small>Practice your rabona</small></div></div>
+<section class="hero">
+<div class="hero-bg"></div>
+<div class="hero-copy">
+<div class="eyebrow"><i></i> NEW DROP • DESERT COLLECTION • 8 DESIGNS</div>
+<h1>MONKEY<br><span>BUSINESS.</span></h1>
+<p>Ultra-soft organic cotton, wobbly monkey approved. Designed in the desert, worn everywhere. Each tee is a story — banana bandits, skate legends, DJ gorillas.</p>
+<div class="hero-ctas"><button id="hero-shop" class="primary">SHOP COLLECTION →</button><button id="hero-custom" class="secondary">3D CUSTOMIZER</button></div>
+<div class="hero-stats"><div><b>8</b><small>MONKEY DESIGNS</small></div><div><b>4.8★</b><small>2.4K REVIEWS</small></div><div><b>50K+</b><small>TEES SOLD</small></div></div>
 </div>
-
-<div class="team-preview"><span class="team blue"><i></i> BLUE</span><span class="vs">VS</span><span class="team red"><i></i> RED</span><span class="team gk"><i></i> + GK</span></div>
-
-<button class="primary deploy-button" id="play-btn"><span>KICK-OFF!</span><span class="button-key">↵</span><svg><use href="#i-play"/></svg></button>
-<button class="secondary-button" id="practice-btn" style="margin-top:10px;">PRACTICE RABONA</button>
-
-<div class="match-meta"><span><svg><use href="#i-users"/></svg><b>6 PLAYERS</b></span><i></i><span><svg><use href="#i-clock"/></svg><b>90 SEC</b></span><i></i><span>RABONA READY</span></div>
+<div class="hero-visual"><div class="hero-badge"><i></i> LIVE 3D • DRAG TO ROTATE</div><canvas id="hero-canvas" width="600" height="520"></canvas></div>
 </section>
 
-<div class="scene-meta"><span class="mono"><i class="status-dot"></i> IN-ENGINE / LIVE 3D</span><span class="weather">☀️ 32° • DESERT STADIUM</span><span class="scene-japanese">RABONA / 01</span></div>
-
-<div class="orbit-hint"><svg><use href="#i-football"/></svg> DRAG TO LOOK AROUND <span>360°</span></div>
-</main>
-
-<main id="garage-view" class="lobby-view secondary-view" hidden>
-<section class="garage-copy">
-<div class="eyebrow"><span class="live-dash"></span> PICK YOUR COLORS. OWN THE PITCH.</div>
-<h1>YOUR<br><span>SQUAD.</span></h1>
-<p class="hero-description">Blue vs Red, plus golden goalkeepers who actually dive.</p>
-<div class="team-cards">
-<div class="team-card blue"><div class="team-dot"></div><strong>BLUE STRIKERS</strong><small>Balanced • Good at rabona</small><div class="kit"><i style="background:#4a7bff"></i><i style="background:#ffffff"></i><i style="background:#ff6b8a"></i></div></div>
-<div class="team-card red"><div class="team-dot red"></div><strong>RED ROCKETS</strong><small>Fast • Aggressive tackles</small><div class="kit"><i style="background:#ff4a4a"></i><i style="background:#ffffff"></i><i style="background:#6be0ff"></i></div></div>
-<div class="team-card gk"><div class="team-dot gk"></div><strong>GOLDEN KEEPERS</strong><small>They dive, they save, they wobble</small><div class="kit"><i style="background:#e8c24a"></i><i style="background:#ffffff"></i></div></div>
-</div>
-<div class="section-label"><span>STADIUM</span><span>DESERT CUP</span></div>
-<p class="car-description">Cube stands, cactus on the sideline, and billboards that scream RABONA. The same vibe as your reference screenshots.</p>
-<button id="garage-save" class="primary"><span>LET'S PLAY</span><svg><use href="#i-arrow"/></svg></button>
-</section>
-</main>
-
-<main id="guide-view" class="lobby-view secondary-view" hidden>
-<section class="guide-copy">
-<div class="eyebrow"><span class="live-dash"></span> LEARN THE WOBBLE. THEN OWN IT.</div>
-<h1>NO SKILL GAP.<br><span>JUST WOBBLE.</span></h1>
-<div class="guide-steps">
-<div><span>01</span><svg><use href="#i-football"/></svg><p><strong>DRIBBLE & SPRINT.</strong> Move close to the ball to possess it. Hold Shift to sprint past defenders. Ball sticks slightly in front.</p></div>
-<div><span>02</span><svg><use href="#i-zap"/></svg><p><strong>RABONA!</strong> Press Q (or touch Rabona) to cross your leg behind and curl the ball. Perfect for beating the keeper.</p></div>
-<div><span>03</span><svg><use href="#i-users"/></svg><p><strong>TACKLE & SLIDE.</strong> Space to slide tackle. Hit the ball carrier to make them tumble and steal possession.</p></div>
-</div>
-<div class="controls-grid"><div><kbd>W A S D</kbd><span>Move / arrows</span></div><div><kbd>SHIFT</kbd><span>Sprint</span></div><div><kbd>E</kbd><span>Kick</span></div><div><kbd>Q</kbd><span>Rabona (curl)</span></div><div><kbd>SPACE</kbd><span>Slide tackle</span></div><div><kbd>R</kbd><span>Switch player</span></div><div><kbd>C</kbd><span>Camera</span></div><div><kbd>ESC</kbd><span>Pause</span></div></div>
-<button id="guide-ready" class="primary"><span>GOT IT. KICK-OFF!</span><svg><use href="#i-arrow"/></svg></button>
-</section>
-</main>
-
-<footer class="lobby-footer">
-<div class="principles"><div><span class="principle-number">01</span><svg><use href="#i-football"/></svg><p>WOBBLY PHYSICS.<small>Capsule limbs, white joints, big tumbles.</small></p></div><div><span class="principle-number">02</span><svg><use href="#i-zap"/></svg><p>RABONA KICK.<small>Cross behind, curl, score.</small></p></div><div><span class="principle-number">03</span><svg><use href="#i-trophy"/></svg><p>DESERT STADIUM.<small>Cube stands, cactus, RABONA boards.</small></p></div><div class="footer-stamp"><span>3V3</span> WOBBLY.<br><strong>PLAY WITH FRIENDS.</strong></div></div>
-<div class="statusbar"><span><i class="status-dot"></i> THE PITCH IS READY.</span><span class="status-center">AN ORIGINAL BROWSER FOOTBALL EXPERIENCE</span><div><span>V.0.2 / WEBGL</span></div></div>
-</footer>
-</div>
-
-<section id="hud" hidden aria-label="Match HUD">
-<div class="hud-top">
-<div class="scoreboard"><div class="team-score blue"><span>BLUE</span><strong id="score-blue">0</strong></div><div class="score-divider"><span id="hud-score">0 - 0</span><small id="hud-time">01:30</small></div><div class="team-score red"><span>RED</span><strong id="score-red">0</strong></div></div>
-<button id="pause-btn" class="icon-button" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
-</div>
-
-<div class="hud-bottom">
-<div class="possession-indicator"><span id="possession">LOOSE BALL</span><small id="active-player">BLUE 1</small></div>
-<div class="hud-controls"><span><kbd>WASD</kbd> MOVE</span><span><kbd>E</kbd> KICK</span><span><kbd>Q</kbd> RABONA</span><span><kbd>SPACE</kbd> SLIDE</span><span><kbd>R</kbd> SWITCH</span></div>
-</div>
-
-<div id="commentary" class="commentary"></div>
-
-<div id="touch-controls">
-<div class="touch-steer"><button id="touch-left">‹</button><button id="touch-right">›</button><button id="touch-up">‹</button><button id="touch-down">›</button></div>
-<div class="touch-actions"><button id="touch-rabona" title="Rabona">R</button><button id="touch-slide" title="Slide">S</button><button id="touch-sprint" title="Sprint">⚡</button><button id="touch-kick" title="Kick">KICK</button></div>
-</div>
+<section id="products" class="section">
+<div class="section-head"><div><div class="eyebrow"><i></i> ULTRA PROFESSIONAL • FUN & COLORFUL</div><h2>CHOOSE YOUR<br><span>MONKEY.</span></h2></div><div class="filters"><button class="filter active" data-filter="all">ALL</button><button class="filter" data-filter="new">NEW</button><button class="filter" data-filter="bestseller">BESTSELLER</button><button class="filter" data-filter="banana">BANANA</button><button class="filter" data-filter="skate">SKATE</button><button class="filter" data-filter="dj">DJ</button></div></div>
+<div id="product-grid" class="grid"></div>
 </section>
 
-<div id="modal-backdrop" hidden><section id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"><button id="modal-close" class="icon-button modal-close" aria-label="Close"><svg><use href="#i-close"/></svg></button><div id="modal-content"></div></section></div>
-<div id="toast" role="status" aria-live="polite" hidden></div>
+<footer class="footer"><div><b>MONKEY CO.®</b>Ultra professional t-shirt store<br>Built with Three.js • No external APIs</div><div><b>CONTACT</b>hello@monkeyco.com<br>+1 (555) BAN-ANA</div><div><b>SHIPPING</b>Worldwide • Free over $50<br>30-day returns</div><div><b>FOLLOW</b>Instagram • TikTok • Twitter<br>Join 50k monkeys</div></footer>
 
-<script type="module" src="src/rabona/main.js"></script>
+<!-- Product Modal -->
+<div id="product-modal" class="modal-backdrop" hidden><div class="modal" style="position:relative"><button id="modal-close" class="modal-close">✕</button><div class="modal-media"><canvas id="modal-canvas" width="520" height="520"></canvas></div><div class="modal-body"><div class="mono" id="modal-badge">NEW • BESTSELLER</div><h2 id="modal-name" class="modal-title">Banana Bandit Tee</h2><div id="modal-rating" class="mono">★ 4.8 (234 reviews)</div><p id="modal-desc" class="modal-desc">Sneaky monkey stealing bananas. Ultra-soft organic cotton.</p><div style="display:flex;align-items:baseline;gap:12px;margin:8px 0"><b id="modal-price" style="font:800 28px Barlow">$29.00</b><s id="modal-original" style="font:12px Plex;color:#6a6a6a">$45.00</s><span class="badge sale">-35%</span></div><div class="option-group"><div class="option-label"><span>COLOR</span><span id="modal-color-name" class="mono"></span></div><div id="modal-colors" class="colors"></div></div><div class="option-group"><div class="option-label"><span>SIZE</span><span class="mono">Size guide</span></div><div id="modal-sizes" class="sizes"></div></div><div class="option-group"><div class="option-label"><span>QUANTITY</span><span id="modal-stock" class="stock">● 42 in stock</span></div><div class="qty"><button id="modal-dec">−</button><span id="modal-qty">1</span><button id="modal-inc">+</button></div></div><div class="modal-actions"><button id="modal-add" class="primary">ADD TO CART — <span id="modal-add-price">$29.00</span></button></div></div></div></div>
+
+<!-- Cart -->
+<div id="cart-backdrop" class="cart-backdrop" hidden></div>
+<div id="cart" class="cart" hidden><div class="cart-head"><h3>CART (<span id="cart-count-2">0</span>)</h3><button id="cart-close" class="icon-btn">✕</button></div><div id="cart-body" class="cart-body"></div><div class="cart-foot"><div class="cart-total"><span class="mono">Subtotal</span><b id="cart-total">$0.00</b></div><button id="checkout-btn" class="primary">CHECKOUT →</button><div class="mono" style="text-align:center;margin-top:10px;opacity:.6">Free shipping over $50 • 30-day returns</div></div></div>
+
+<!-- Checkout -->
+<div id="checkout-backdrop" class="cart-backdrop" hidden></div>
+<div id="checkout-modal" class="modal-backdrop" hidden><form id="checkout-form" class="checkout"><div style="display:flex;justify-content:space-between;align-items:center"><h2>CHECKOUT</h2><button type="button" id="checkout-close" class="icon-btn">✕</button></div><div class="form-grid"><div class="field full"><label>Email</label><input id="field-email" type="email" placeholder="you@monkey.co" required></div><div class="field full"><label>Full Name</label><input id="field-name" type="text" placeholder="John Banana" required></div><div class="field full"><label>Address</label><input id="field-address" type="text" placeholder="123 Jungle St" required></div><div class="field"><label>City</label><input id="field-city" type="text" placeholder="Banana City" required></div><div class="field"><label>ZIP</label><input id="field-zip" type="text" placeholder="90210" required></div><div class="field full"><label>Card Number (demo)</label><input id="field-card" type="text" placeholder="4242 4242 4242 4242" required></div></div><div class="order-summary"><h4>ORDER SUMMARY</h4><div id="order-summary-items"></div><div class="summary-row"><span>Subtotal</span><b id="summary-subtotal">$0.00</b></div><div class="summary-row"><span>Shipping</span><b>$8.00</b></div><div class="summary-row total"><span>Total</span><b id="summary-total">$0.00</b></div></div><button type="submit" class="primary" style="width:100%;justify-content:center">PAY NOW →</button><div class="mono" style="text-align:center;margin-top:12px">Demo store — no real payment. Ultra professional UI only.</div></form></div>
+
+<!-- Success -->
+<div id="success-backdrop" class="cart-backdrop" hidden></div>
+<div id="success-modal" class="modal-backdrop" hidden><div class="checkout" style="text-align:center"><div style="width:64px;height:64px;background:#ffe066;border-radius:50%;display:grid;place-items:center;margin:0 auto 18px;font-size:32px">✓</div><h2>ORDER CONFIRMED!</h2><p style="color:#a0a0a0;font-size:14px">Your monkeys are being packed. Ultra professional shipping activated.</p><div class="order-summary" style="text-align:left"><div class="summary-row"><span>Order ID</span><b id="order-id">MNK-XXXX</b></div><div class="summary-row"><span>Total Paid</span><b id="order-total">$0.00</b></div><div class="summary-row"><span>ETA</span><b>2-3 days • Free tracking</b></div></div><button id="success-close" class="primary" style="width:100%;justify-content:center">CONTINUE SHOPPING</button><button id="continue-shopping" class="secondary" style="width:100%;margin-top:10px">VIEW COLLECTION</button></div></div>
+
+<script type="module" src="src/monkey-store/main.js"></script>
 </body>
 </html>

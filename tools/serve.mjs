@@ -26,4 +26,4 @@ const server = createServer(async (request, response) => {
     response.end(error.code === 'ENOENT' || error.code === 'ENOTDIR' ? 'Not found' : 'Bad request');
   }
 });
-server.listen(port, '0.0.0.0', () => console.log(`RABONA is ready on 0.0.0.0:${port}`));
+server.listen(port, '0.0.0.0', () => console.log(`MONKEY CO. is ready on 0.0.0.0:${port}`));
