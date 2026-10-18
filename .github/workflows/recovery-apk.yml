@@ -1,0 +1,28 @@
+name: Build recovery APK
+on:
+  push:
+    branches: [arena/6186214b-neurio]
+    paths: ['android-recovery/**', '.github/workflows/recovery-apk.yml']
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Build debug APK
+        working-directory: android-recovery
+        run: gradle --no-daemon assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neurio-restore-apk
+          path: android-recovery/app/build/outputs/apk/debug/app-debug.apk
