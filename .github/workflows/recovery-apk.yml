@@ -4,6 +4,8 @@ on:
     branches: [arena/6186214b-neurio]
     paths: ['android-recovery/**', '.github/workflows/recovery-apk.yml']
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,3 +29,10 @@ jobs:
         with:
           name: neurio-restore-apk
           path: android-recovery/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publish direct APK download
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create neurio-restore-v1.0 android-recovery/app/build/outputs/apk/debug/app-debug.apk#neurio-restore.apk \
+            --target "$GITHUB_SHA" --title 'Neurio Restore v1.0 (Android)' \
+            --notes 'Scans accessible photos and videos and Android trash; cannot recover permanently erased internal storage.'
