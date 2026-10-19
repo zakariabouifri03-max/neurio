@@ -1,19 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏁 Bash Baqi Racing</title>
-<meta name="theme-color" content="#0ea5e9">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bash Baqi">
+<title>📦 Carton Craft — بني بالكرطون</title>
+<meta name="theme-color" content="#c19a6b">
+<meta name="description" content="لعبة بناء 3D واقعية بالكرتون - بني دار، برج، قلعة من الكرطون المقوى!">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="src/style.css">
 <script type="importmap">
 {
@@ -26,125 +21,137 @@
 </head>
 <body>
 <div id="app"></div>
-
-<!-- error overlay -->
 <div id="errLog"></div>
 
-<!-- loading -->
+<!-- Loading -->
 <div id="loading">
   <div class="loadBox">
-    <div class="loadFlag">🏁</div>
-    <div class="loadTitle">BASH BAQI<br>RACING</div>
+    <div class="loadIcon">📦</div>
+    <div class="loadTitle">CARTON CRAFT</div>
+    <div class="loadSub">بني عالمك بالكرطون المقوى</div>
     <div class="loadBar"><div></div></div>
-    <div class="loadTip">warming up the buggies…</div>
+    <div class="loadTip">كنوجدو الكرطون... ✂️</div>
   </div>
 </div>
 
-<!-- speed lines overlay -->
-<div id="speedLines"></div>
-<div id="coinPops"></div>
-
-<!-- ══════════ RACE HUD ══════════ -->
-<div id="hud">
-  <div class="hudTL">
-    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
-    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
-    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
-    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
-  </div>
-
-  <div id="progbar">
-    <span class="flagL">🏁</span>
-    <div class="track"><div id="progMarkers"></div></div>
-    <span class="flagR">🏆</span>
-  </div>
-
-  <button id="btnPauseTop" class="roundBtn">⏸</button>
-
-  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
-
-  <div id="powerSlot" class="powerSlot">
-    <span id="hudPower"></span>
-    <span class="keyHint">SPACE</span>
-  </div>
-
-  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
-
-  <div id="banner"></div>
-
-  <!-- touch controls -->
-  <div id="touchWrap">
-    <div class="tcol left">
-      <button id="tLeft" class="tbtn">◀</button>
-      <button id="tRight" class="tbtn">▶</button>
-    </div>
-    <div class="tcol right">
-      <button id="tBrake" class="tbtn brake">▼</button>
+<!-- Top Bar -->
+<div id="topbar">
+  <div class="brand">
+    <span class="logo">📦</span>
+    <div class="brandText">
+      <b>CARTON CRAFT</b>
+      <span>بني بالكرطون</span>
     </div>
   </div>
-</div>
-
-<!-- ══════════ GARAGE UI ══════════ -->
-<div id="garageUI">
-  <div id="topbar">
-    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
-    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
-    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
-    <div class="spacer"></div>
-    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
-    <button id="btnMusic" class="miniBtn">🎵</button>
-    <button id="btnSfx" class="miniBtn">🔊</button>
-    <button id="btnFull" class="miniBtn">⛶</button>
+  <div class="stats">
+    <div class="stat"><span>🧱</span><b id="statPieces">0</b><i>قطعة</i></div>
+    <div class="stat"><span>📏</span><b id="statHeight">0.0m</b><i>العلو</i></div>
+    <div class="stat gold"><span>⭐</span><b id="statScore">0</b></div>
   </div>
-
-  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
-  <div id="carNamePlate"></div>
-
-  <div id="menuBar">
-    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
-    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
-    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
-    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
-    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
-    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
+  <div class="topActions">
+    <button id="btnPhysics" class="pillBtn physics">🌬️ فيزياء: OFF</button>
+    <button id="btnClear" class="iconBtn" title="مسح الكل">🗑️</button>
+    <button id="btnSave" class="iconBtn" title="حفظ">💾</button>
+    <button id="btnHelp" class="iconBtn">❓</button>
   </div>
 </div>
 
-<!-- ══════════ Shop / panels ══════════ -->
-<div id="panel">
-  <div class="panelBox">
-    <div class="panelHead">
-      <h2 id="panelTitle">SHOP</h2>
-      <div id="panelTabs"></div>
-      <button id="panelClose" class="roundBtn">✖</button>
-    </div>
-    <div id="panelBody"></div>
+<!-- Left: Inventory -->
+<div id="inventory">
+  <div class="invHead">
+    <h3>📦 الكرطون</h3>
+    <span class="hint">ختار و حط</span>
   </div>
-</div>
+  <div id="invGrid" class="invGrid"></div>
+  
+  <div class="controlsBox">
+    <h4>🎮 التحكم</h4>
+    <div class="ctrlRow"><kbd>Click</kbd> حط قطعة</div>
+    <div class="ctrlRow"><kbd>Right Click</kbd> مسح</div>
+    <div class="ctrlRow"><kbd>R</kbd> <kbd>Q</kbd> <kbd>E</kbd> دوران</div>
+    <div class="ctrlRow"><kbd>Scroll</kbd> قرب / بعد</div>
+    <div class="ctrlRow"><kbd>Drag</kbd> دور الكاميرا</div>
+    <div class="ctrlRow"><kbd>Shift+Drag</kbd> حرك</div>
+  </div>
 
-<!-- results -->
-<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
-<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
-
-<!-- pause -->
-<div id="pauseModal">
-  <div class="modalBox">
-    <div class="rtitle">⏸ PAUSED</div>
-    <div class="rbtns">
-      <button id="btnResume" class="big race">▶ RESUME</button>
-      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
+  <div class="actionBox">
+    <button id="btnCannon" class="bigBtn cannon">💥 سيفط كرة الحديد</button>
+    <button id="btnShake" class="bigBtn shake">🌪️ زلزال</button>
+    <div class="row2">
+      <button id="btnUndo" class="miniBtn">↩️ تراجع</button>
+      <button id="btnSnap" class="miniBtn on">🧲 سناب</button>
     </div>
   </div>
 </div>
 
+<!-- Right: Properties -->
+<div id="props">
+  <div class="propCard">
+    <h4>🎨 القطعة الحالية</h4>
+    <div id="currentPiecePreview"></div>
+    <div id="currentPieceName">ورقة كرطون كبيرة</div>
+    <div class="propSliders">
+      <label>الدوران Y <span id="rotVal">0°</span>
+        <input type="range" id="rotSlider" min="0" max="360" value="0">
+      </label>
+      <label>العلو Y
+        <input type="range" id="heightSlider" min="0" max="40" value="0" step="1">
+      </label>
+    </div>
+  </div>
+  <div class="propCard challenges">
+    <h4>🏆 التحديات</h4>
+    <div id="challengesList"></div>
+  </div>
+</div>
+
+<!-- Bottom: Mode Bar -->
+<div id="bottomBar">
+  <div class="modeTabs">
+    <button class="modeBtn on" data-mode="build">🔨 بناء</button>
+    <button class="modeBtn" data-mode="destroy">💣 تدمير</button>
+    <button class="modeBtn" data-mode="inspect">👁️ معاينة</button>
+  </div>
+  <div class="bottomHint" id="bottomHint">حرك الماوس فوق الأرض و كليكي باش تحط الكرطون — استعمل الدرع باش تبني دار!</div>
+</div>
+
+<!-- Crosshair for inspect -->
+<div id="crosshair">+</div>
+
+<!-- Toast -->
 <div id="toast"></div>
 <div id="confetti"></div>
 
+<!-- Help Modal -->
+<div id="helpModal">
+  <div class="modalBox">
+    <button id="helpClose" class="roundBtn">✖</button>
+    <h2>📦 كيفاش تلعب؟</h2>
+    <div class="helpGrid">
+      <div class="helpCard"><span>1️⃣</span><b>ختار قطعة</b><p>من القائمة على اليسار: ورقة، صندوق، أنبوب...</p></div>
+      <div class="helpCard"><span>2️⃣</span><b>حطها في المكان</b><p>حرك الماوس، الشبح غيبان، كليكي باش تثبت. R/Q/E للدوران.</p></div>
+      <div class="helpCard"><span>3️⃣</span><b>بني شي حاجة كبيرة</b><p>دار، برج، قلعة، جسر — الكرطون كيبغي الخيال!</p></div>
+      <div class="helpCard"><span>4️⃣</span><b>جرب الفيزياء</b><p>شعل “فيزياء ON” وشوف واش البناء غيطيح ولا لا، وسيفط كرة حديد 💥</p></div>
+    </div>
+    <div class="helpTip">
+      💡 <b>نصيحة:</b> الكرطون الحقيقي فيه تموجات (corrugated) لداخل — شعل الضوء وشوف التفاصيل! كل قطعة فيها خشب و ورق واقعي.
+    </div>
+    <button id="helpStart" class="big race">فهمت — نبدا البناء! 🔨</button>
+  </div>
+</div>
+
+<!-- Delete confirm -->
+<div id="clearModal">
+  <div class="modalBox small">
+    <h3>واش بغيتي تمسح كلشي؟</h3>
+    <p>غتمسح <b id="clearCount">0</b> قطعة</p>
+    <div class="rbtns">
+      <button id="btnClearYes" class="big race">🗑️ مسح</button>
+      <button id="btnClearNo" class="big ghost">لا</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="src/main.js"></script>
-<script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-</script>
 </body>
 </html>

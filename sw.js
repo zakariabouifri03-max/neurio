@@ -1,22 +1,12 @@
-// Bash Baqi Racing — service worker: full offline support
-const VERSION = 'bbr-v1';
+// Carton Craft — service worker: offline support
+const VERSION = 'carton-v1';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
   './src/main.js',
-  './src/race.js',
-  './src/menu.js',
-  './src/builders.js',
-  './src/data.js',
-  './src/tex.js',
-  './src/audio.js',
-  './src/util.js',
-  './src/save.js',
-  './src/post.js',
   './src/style.css',
   './vendor/three.module.js',
-  './vendor/utils/BufferGeometryUtils.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
 ];
