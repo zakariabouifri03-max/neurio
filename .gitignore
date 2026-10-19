@@ -3,3 +3,12 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+.venv/
+/build/
+/dist/
+/.pytest_cache/
+/.mypy_cache/
+/.ruff_cache/
+/.coverage
+*.spec
+*.autosave.novacut

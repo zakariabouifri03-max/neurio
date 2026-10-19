@@ -1,0 +1,7 @@
+# Optional dependencies only. Install these explicitly for local image segmentation
+# and Demucs audio separation; model weights are managed separately by the app.
+Pillow>=10.0
+rembg>=2.0
+onnxruntime>=1.17
+# Demucs pulls PyTorch and is large; install only on a machine with the required RAM/disk.
+demucs>=4.0
