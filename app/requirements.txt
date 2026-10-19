@@ -1,0 +1,22 @@
+# Neurio — Hayed Background + Zid Quality
+# Install: pip install -r requirements.txt
+
+# Core GUI
+PySide6>=6.5
+
+# Image processing
+Pillow>=10.0
+numpy>=1.24
+opencv-python-headless>=4.8
+
+# Background removal (U2Net / ISNet)
+rembg>=2.0
+onnxruntime>=1.15
+
+# Optional — for building exe
+pyinstaller>=6.0
+pyinstaller-hooks-contrib
+
+# Optional quality boosters (not required):
+# realesrgan
+# gfpgan
