@@ -27,7 +27,33 @@ jobs:
 
       - name: Build, test, and smoke-test the Windows app
         shell: pwsh
-        run: .\build_windows.ps1
+        run: |
+          $Log = Join-Path $env:RUNNER_TEMP "novacut-build.log"
+          $ExitCode = 0
+          try {
+            & .\build_windows.ps1 *>&1 | Tee-Object -FilePath $Log
+            if ($LASTEXITCODE -ne 0) { $ExitCode = $LASTEXITCODE }
+          } catch {
+            $_ | Out-String | Add-Content -Path $Log
+            $ExitCode = 1
+          }
+          if ($ExitCode -ne 0) {
+            $Tail = (Get-Content $Log | Select-Object -Last 30) -join " | "
+            $Tail = $Tail -replace '[\r\n]+', ' '
+            if ($Tail.Length -gt 3000) { $Tail = $Tail.Substring($Tail.Length - 3000) }
+            Write-Output "::error title=NovaCut Windows build failed::$Tail"
+            Get-Content $Log | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+            exit $ExitCode
+          }
+
+      - name: Preserve Windows build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NovaCut-Windows-build-log
+          path: ${{ runner.temp }}/novacut-build.log
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Create portable download archive and checksum
         shell: pwsh
