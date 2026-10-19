@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Build artifacts
+build/
+dist/
+*.spec.bak
+installer/bin/
+installer/Output/
+installer/ffmpeg/
+installer/ffmpeg.zip
+*.app/
+
+# Test / runtime artifacts
+.pytest_cache/
+*.novacut.tmp
+test-output/
+
+# OS
+.DS_Store
+Thumbs.db

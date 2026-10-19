@@ -1,0 +1,12 @@
+# NovaCut AI Studio - runtime dependencies
+# All open source. See THIRD_PARTY_NOTICES.md for licenses.
+PySide6>=6.6,<6.9
+numpy>=1.24
+opencv-python-headless>=4.8
+imageio-ffmpeg>=0.4.9
+# Optional local-AI backends (the app works without them; features show an
+# honest "unavailable" state and offer a managed one-click download):
+#   faster-whisper        -> automatic subtitles
+#   rembg                 -> background removal (+ onnxruntime)
+#   demucs                -> vocal / accompaniment separation
+#   ollama (external app) -> local AI assistant
