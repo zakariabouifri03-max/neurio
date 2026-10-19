@@ -8,6 +8,10 @@ from typing import Callable
 from PySide6.QtCore import QObject, QRunnable, Signal, Slot
 
 
+_ACTIVE_WORKERS: set["Worker"] = set()
+_ACTIVE_WORKERS_LOCK = threading.Lock()
+
+
 class WorkerSignals(QObject):
     result = Signal(object)
     error = Signal(str)
@@ -25,6 +29,11 @@ class Worker(QRunnable):
         self.signals = WorkerSignals()
         self.cancel_event = threading.Event()
         self.setAutoDelete(False)
+        # Keep the QRunnable and its signal emitter alive if the window closes
+        # while work is still completing. Signal connections to deleted widgets
+        # are disconnected by Qt; the worker releases itself from this set on exit.
+        with _ACTIVE_WORKERS_LOCK:
+            _ACTIVE_WORKERS.add(self)
 
     def cancel(self) -> None:
         self.cancel_event.set()
@@ -36,6 +45,17 @@ class Worker(QRunnable):
             if not self.cancel_event.is_set():
                 self.signals.result.emit(result)
         except Exception as exc:
-            self.signals.error.emit(f"{exc}\n\n{traceback.format_exc(limit=6)}")
+            if not self.cancel_event.is_set():
+                try:
+                    self.signals.error.emit(f"{exc}\n\n{traceback.format_exc(limit=6)}")
+                except RuntimeError:
+                    # A receiver may have been destroyed during application shutdown.
+                    pass
         finally:
-            self.signals.finished.emit()
+            try:
+                self.signals.finished.emit()
+            except RuntimeError:
+                pass
+            finally:
+                with _ACTIVE_WORKERS_LOCK:
+                    _ACTIVE_WORKERS.discard(self)
