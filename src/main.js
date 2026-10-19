@@ -416,20 +416,18 @@ function spawnCop(){
 
 // Wanted / HUD
 function updateWanted(){
-  const stars=$('wantedStars'); stars.innerHTML='';
-  for(let i=0;i<5;i++){ const s=document.createElement('span'); s.textContent='★'; s.className= i<Math.floor(wanted) ? 'on':'off'; stars.appendChild(s); }
-  $('wantedLevelMenu').textContent=Math.floor(wanted);
+  const stars=$('wantedStars'); if(stars){ stars.innerHTML=''; for(let i=0;i<5;i++){ const s=document.createElement('span'); s.textContent='★'; s.className= i<Math.floor(wanted) ? 'on':'off'; stars.appendChild(s); } }
+  const wl=$('wantedLevelMenu'); if(wl) wl.textContent=Math.floor(wanted);
   maxWanted=Math.max(maxWanted, wanted);
-  $('statMaxWanted').textContent=Math.floor(maxWanted);
-  $('wantedFlash').classList.toggle('on', wanted>=3);
-  if(wanted>0) wanted= Math.max(0, wanted - 0.008); // decay slowly but cops keep it
+  const sm=$('statMaxWanted'); if(sm) sm.textContent=Math.floor(maxWanted);
+  const wf=$('wantedFlash'); if(wf) wf.classList.toggle('on', wanted>=3);
+  if(wanted>0) wanted= Math.max(0, wanted - 0.008);
 }
 function updateHUD(){
-  $('hudMoney').textContent=money.toLocaleString();
-  $('statCashMenu').textContent='$'+money.toLocaleString();
-  $('statDelivs').textContent=deliveries;
-  $('money').textContent=money; // keep
-  $('hudMoney').textContent=money;
+  const elMoney=$('hudMoney'); if(elMoney) elMoney.textContent=money.toLocaleString();
+  const elCash=$('statCashMenu'); if(elCash) elCash.textContent='$'+money.toLocaleString();
+  const elDel=$('statDelivs'); if(elDel) elDel.textContent=deliveries;
+  // safely handle hudMoney second call
   const mph=Math.abs(Math.round(carSpeed*2.2)); $('speedoNum').textContent=inCar?mph: Math.round(Math.hypot(charVel.x,charVel.z)*2.2);
   $('hudGear').textContent= carSpeed>0?'D': carSpeed<0?'R':'N';
 }
