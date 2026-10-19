@@ -1,0 +1,69 @@
+name: Release Neurio EXE
+
+on:
+  push:
+    tags:
+      - "neurio-v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release (e.g. neurio-v1.1)"
+        required: false
+        default: "neurio-v1.0-exe"
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r app/requirements.txt
+
+      - name: Build EXE
+        run: python app/build.py
+
+      - name: List dist
+        shell: bash
+        run: ls -lh dist/
+
+      - name: Create Release and upload EXE
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: "✨ Neurio v1.0 — Hayed Background + Zid Quality (EXE)"
+          body: |
+            ## ✨ Neurio v1.0 — Hayed Background + Zid Quality
+            
+            **EXE dyal PC — ta3tih taswira → yhayed background → yzid quality HD 2x/4x**
+            
+            ### 📥 Direct EXE (no ZIP needed)
+            - **Neurio.exe** hna lta7t — double-click, no install, no Python
+            - Size ~150MB (includes Python + Qt + rembg)
+            
+            ### 🚀 Kifach
+            1. Telechargi Neurio.exe
+            2. Double-click
+            3. Khtar taswira → Hayed Background ✂️ → Zid Quality ✨ → Hfed 💾
+            
+            ### 🖥️ Alternative
+            ```bash
+            pip install -r app/requirements.txt
+            python app/main.py  # desktop
+            python app/web_app.py  # web
+            ```
+            
+            Branch: arena/3b760e91-neurio
+          files: dist/Neurio.exe
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
