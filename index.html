@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Cartoon Drift — طوموبيلات كارتون</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<script>
+/* Kill any old service worker / cache from the previous game so nobody ever
+   sees a stale build again. Safe on browsers without support. */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function (rs) {
+    rs.forEach(function (r) { r.unregister().catch(function(){}); });
+  }).catch(function(){});
+}
+if (window.caches && caches.keys) {
+  caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }).catch(function(){});
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -138,7 +152,7 @@ button{font-family:inherit}
 
 <!-- MENU -->
 <div id="menu">
-  <div class="logo">CARTOON<span> DRIFT</span> <i>🏁 طوموبيلات كارتون • 60 FPS</i></div>
+  <div class="logo">CARTOON<span> DRIFT</span> <i>🏁 طوموبيلات كارتون • v2.0 • 60 FPS</i></div>
   <div class="card">
     <h3>🏎️ ختار طوموبيلتك</h3>
     <div class="cars" id="carGrid"></div>
@@ -427,7 +441,8 @@ function bindTouch(id, key){
   el.addEventListener('pointerdown', ensureAudio, {once:true});
 }
 bindTouch('tLeft','left'); bindTouch('tRight','right'); bindTouch('tGas','gas'); bindTouch('tBrake','brake'); bindTouch('tNitro','nitro');
-function isMobile(){ return matchMedia('(pointer:coarse)').matches || innerWidth<700; }
+const COARSE = (window.matchMedia && matchMedia('(pointer:coarse)').matches) || innerWidth < 700;
+function isMobile(){ return COARSE || innerWidth < 700; }
 function updateTouchVis(){
   $('touch').classList.toggle('on', state==='race' || state==='count');
 }

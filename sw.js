@@ -1,52 +1,32 @@
-// Bash Baqi Racing — service worker: full offline support
-const VERSION = 'bbr-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './src/main.js',
-  './src/race.js',
-  './src/menu.js',
-  './src/builders.js',
-  './src/data.js',
-  './src/tex.js',
-  './src/audio.js',
-  './src/util.js',
-  './src/save.js',
-  './src/post.js',
-  './src/style.css',
-  './vendor/three.module.js',
-  './vendor/utils/BufferGeometryUtils.js',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-];
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())
-  );
+/*
+ * Cartoon Drift — service-worker kill switch
+ * ------------------------------------------
+ * This file intentionally replaces the old "Bash Baqi Racing" service worker
+ * that used to cache the whole app. Any browser that still has the old worker
+ * installed will fetch this file on its next update check, activate it, wipe
+ * every cache, unregister itself and reload the page so the new game shows up.
+ */
+self.addEventListener('install', () => {
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
+    } catch (err) { /* ignore */ }
+
+    try { await self.registration.unregister(); } catch (err) { /* ignore */ }
+
+    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clients) {
+      try {
+        if ('navigate' in client) await client.navigate(client.url);
+        else client.postMessage({ type: 'sw-killed' });
+      } catch (err) { /* ignore */ }
+    }
+  })());
 });
 
-self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then((hit) => {
-      if (hit) return hit;
-      return fetch(e.request).then((res) => {
-        if (res.ok && new URL(e.request.url).origin === location.origin) {
-          const copy = res.clone();
-          caches.open(VERSION).then((c) => c.put(e.request, copy));
-        }
-        return res;
-      }).catch(() => caches.match('./index.html'));
-    })
-  );
-});
+// No fetch handler on purpose: everything goes straight to the network.
