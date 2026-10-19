@@ -1,156 +1,158 @@
 <!DOCTYPE html>
-<html lang="ar" dir="ltr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>📦 Carton Craft — بني بالكرطون</title>
-<meta name="theme-color" content="#c19a6b">
-<meta name="description" content="لعبة بناء 3D واقعية بالكرتون - بني دار، برج، قلعة من الكرطون المقوى!">
+<title>📦 VICE CARTON — GTA 6 Style Carton Anime</title>
+<meta name="theme-color" content="#ff2e90">
+<meta name="description" content="GTA 6 style open world but everything is made of cardboard — Vice Carton anime! Drive, deliver, build.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Bebas+Neue&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="src/style.css">
 <script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/" } }
 </script>
 </head>
 <body>
 <div id="app"></div>
 <div id="errLog"></div>
 
-<!-- Loading -->
+<!-- LOADING — GTA 6 trailer parody -->
 <div id="loading">
-  <div class="loadBox">
-    <div class="loadIcon">📦</div>
-    <div class="loadTitle">CARTON CRAFT</div>
-    <div class="loadSub">بني عالمك بالكرطون المقوى</div>
+  <div class="loadBg"></div>
+  <div class="loadVignette"></div>
+  <div class="loadContent">
+    <div class="gtaLogo">
+      <span class="gtaSmall">VICE</span>
+      <span class="gtaBig">CARTON</span>
+      <span class="gtaSub">GTA 6 STYLE × CARTON ANIME</span>
+    </div>
+    <div class="loadCard">📦</div>
     <div class="loadBar"><div></div></div>
-    <div class="loadTip">كنوجدو الكرطون... ✂️</div>
+    <div class="loadTip">LOADING VICE CARTON... 🌴</div>
+    <div class="loadQuote">“Everything is made of cardboard — even the dreams are corrugated.”</div>
   </div>
+  <div class="scanlines"></div>
 </div>
 
-<!-- Top Bar -->
-<div id="topbar">
-  <div class="brand">
-    <span class="logo">📦</span>
-    <div class="brandText">
-      <b>CARTON CRAFT</b>
-      <span>بني بالكرطون</span>
+<!-- GTA HUD -->
+<div id="hud">
+  <!-- top right: money / wanted -->
+  <div class="hudTop">
+    <div class="wanted">
+      <span id="wantedStars"></span>
+    </div>
+    <div class="money">
+      <span class="dollar">$</span><b id="hudMoney">0</b>
     </div>
   </div>
-  <div class="stats">
-    <div class="stat"><span>🧱</span><b id="statPieces">0</b><i>قطعة</i></div>
-    <div class="stat"><span>📏</span><b id="statHeight">0.0m</b><i>العلو</i></div>
-    <div class="stat gold"><span>⭐</span><b id="statScore">0</b></div>
+  <!-- top left: health + armor -->
+  <div class="hudHealth">
+    <div class="hBar"><div id="hFill" style="width:85%"></div><span>❤️</span></div>
+    <div class="aBar"><div id="aFill" style="width:40%"></div><span>🛡️</span></div>
+    <div class="hudWeapon" id="hudWeapon">📦 FISTS</div>
   </div>
-  <div class="topActions">
-    <button id="btnPhysics" class="pillBtn physics">🌬️ فيزياء: OFF</button>
-    <button id="btnClear" class="iconBtn" title="مسح الكل">🗑️</button>
-    <button id="btnSave" class="iconBtn" title="حفظ">💾</button>
-    <button id="btnHelp" class="iconBtn">❓</button>
+  <!-- minimap -->
+  <div class="mapWrap">
+    <canvas id="minimap" width="160" height="160"></canvas>
+    <div class="mapNeedle">N</div>
   </div>
+  <!-- center mission -->
+  <div id="missionCard">
+    <b id="missionTitle">WELCOME TO VICE CARTON</b>
+    <p id="missionDesc">Steal a car and deliver the 📦 package before the cops notice!</p>
+    <div class="missionProg"><div id="missionProgFill"></div></div>
+  </div>
+  <!-- bottom right: speedo -->
+  <div id="speedo">
+    <b id="speedoNum">0</b><span>MPH</span>
+    <div class="gear" id="hudGear">D</div>
+  </div>
+  <!-- bottom left: radio -->
+  <div id="radio">
+    <span id="radioIcon">📻</span>
+    <div><b id="radioName">VICE CARTON FM</b><br><i id="radioTrack">Cardboard Dreams — Synthwave Mix</i></div>
+    <button id="btnRadio">⏭</button>
+  </div>
+  <!-- controls hint -->
+  <div id="controlsHint">
+    <span><kbd>WASD</kbd> Drive/Walk</span>
+    <span><kbd>E</kbd> Enter/Exit</span>
+    <span><kbd>SPACE</kbd> Brake / Jump</span>
+    <span><kbd>SHIFT</kbd> Turbo</span>
+  </div>
+  <!-- wanted flash -->
+  <div id="wantedFlash"></div>
+  <div id="banner"></div>
 </div>
 
-<!-- Left: Inventory -->
-<div id="inventory">
-  <div class="invHead">
-    <h3>📦 الكرطون</h3>
-    <span class="hint">ختار و حط</span>
-  </div>
-  <div id="invGrid" class="invGrid"></div>
-  
-  <div class="controlsBox">
-    <h4>🎮 التحكم</h4>
-    <div class="ctrlRow"><kbd>Click</kbd> حط قطعة</div>
-    <div class="ctrlRow"><kbd>Right Click</kbd> مسح</div>
-    <div class="ctrlRow"><kbd>R</kbd> <kbd>Q</kbd> <kbd>E</kbd> دوران</div>
-    <div class="ctrlRow"><kbd>Scroll</kbd> قرب / بعد</div>
-    <div class="ctrlRow"><kbd>Drag</kbd> دور الكاميرا</div>
-    <div class="ctrlRow"><kbd>Shift+Drag</kbd> حرك</div>
-  </div>
-
-  <div class="actionBox">
-    <button id="btnCannon" class="bigBtn cannon">💥 سيفط كرة الحديد</button>
-    <button id="btnShake" class="bigBtn shake">🌪️ زلزال</button>
-    <div class="row2">
-      <button id="btnUndo" class="miniBtn">↩️ تراجع</button>
-      <button id="btnSnap" class="miniBtn on">🧲 سناب</button>
+<!-- Pause / Menu -->
+<div id="menu">
+  <div class="menuBox">
+    <h1>VICE <span>CARTON</span></h1>
+    <p class="menuSub">GTA VI — CARDBOARD ANIME EDITION</p>
+    <div class="menuGrid">
+      <button class="mBtn primary" id="btnResume">▶ CONTINUE</button>
+      <button class="mBtn" id="btnNewJob">📦 NEW JOB</button>
+      <button class="mBtn" id="btnSpawnCar">🚗 SPAWN CAR</button>
+      <button class="mBtn" id="btnBuildMode">🔨 BUILD MODE</button>
+      <button class="mBtn" id="btnWanted">⭐ WANTED: <b id="wantedLevelMenu">0</b></button>
+      <button class="mBtn" id="btnHelp">❓ HOW TO PLAY</button>
+    </div>
+    <div class="statsRow">
+      <div><span>💰</span><b id="statCashMenu">0</b><i>CASH</i></div>
+      <div><span>📦</span><b id="statDelivs">0</b><i>DELIVERIES</i></div>
+      <div><span>⭐</span><b id="statMaxWanted">0</b><i>MAX WANTED</i></div>
     </div>
   </div>
 </div>
 
-<!-- Right: Properties -->
-<div id="props">
-  <div class="propCard">
-    <h4>🎨 القطعة الحالية</h4>
-    <div id="currentPiecePreview"></div>
-    <div id="currentPieceName">ورقة كرطون كبيرة</div>
-    <div class="propSliders">
-      <label>الدوران Y <span id="rotVal">0°</span>
-        <input type="range" id="rotSlider" min="0" max="360" value="0">
-      </label>
-      <label>العلو Y
-        <input type="range" id="heightSlider" min="0" max="40" value="0" step="1">
-      </label>
+<!-- Build Mode Overlay (carton builder inside GTA) -->
+<div id="buildUI">
+  <div class="buildTop">
+    <b>🔨 BUILD MODE — Vice Carton Architect</b>
+    <button id="btnExitBuild">✖ EXIT BUILD</button>
+  </div>
+  <div class="buildLeft">
+    <h4>📦 CARTON PIECES</h4>
+    <div id="invGrid"></div>
+    <div class="buildHint">
+      <span><kbd>Click</kbd> Place</span>
+      <span><kbd>Right Click</kbd> Delete</span>
+      <span><kbd>R</kbd> Rotate</span>
     </div>
   </div>
-  <div class="propCard challenges">
-    <h4>🏆 التحديات</h4>
-    <div id="challengesList"></div>
+  <div class="buildRight">
+    <div class="buildCard">
+      <div id="buildPreview">📦</div>
+      <p id="buildName">Large Sheet</p>
+      <input type="range" id="buildRot" min="0" max="360" value="0">
+    </div>
+    <button id="btnBuildSave" class="big race">💾 SAVE</button>
+    <button id="btnBuildClear" class="big ghost">🗑️ CLEAR</button>
   </div>
 </div>
-
-<!-- Bottom: Mode Bar -->
-<div id="bottomBar">
-  <div class="modeTabs">
-    <button class="modeBtn on" data-mode="build">🔨 بناء</button>
-    <button class="modeBtn" data-mode="destroy">💣 تدمير</button>
-    <button class="modeBtn" data-mode="inspect">👁️ معاينة</button>
-  </div>
-  <div class="bottomHint" id="bottomHint">حرك الماوس فوق الأرض و كليكي باش تحط الكرطون — استعمل الدرع باش تبني دار!</div>
-</div>
-
-<!-- Crosshair for inspect -->
-<div id="crosshair">+</div>
-
-<!-- Toast -->
-<div id="toast"></div>
-<div id="confetti"></div>
 
 <!-- Help Modal -->
 <div id="helpModal">
   <div class="modalBox">
     <button id="helpClose" class="roundBtn">✖</button>
-    <h2>📦 كيفاش تلعب؟</h2>
+    <h2>🌴 HOW TO PLAY — VICE CARTON</h2>
     <div class="helpGrid">
-      <div class="helpCard"><span>1️⃣</span><b>ختار قطعة</b><p>من القائمة على اليسار: ورقة، صندوق، أنبوب...</p></div>
-      <div class="helpCard"><span>2️⃣</span><b>حطها في المكان</b><p>حرك الماوس، الشبح غيبان، كليكي باش تثبت. R/Q/E للدوران.</p></div>
-      <div class="helpCard"><span>3️⃣</span><b>بني شي حاجة كبيرة</b><p>دار، برج، قلعة، جسر — الكرطون كيبغي الخيال!</p></div>
-      <div class="helpCard"><span>4️⃣</span><b>جرب الفيزياء</b><p>شعل “فيزياء ON” وشوف واش البناء غيطيح ولا لا، وسيفط كرة حديد 💥</p></div>
+      <div class="hCard"><b>🚗 DRIVE LIKE GTA</b><p>WASD to drive, SPACE brake, SHIFT turbo. Smash through cardboard buildings and palm trees!</p></div>
+      <div class="hCard"><b>📦 DELIVER PACKAGES</b><p>Follow the <span style="color:#ff2e90">pink blip</span> on minimap — deliver cardboard boxes for cash.</p></div>
+      <div class="hCard"><b>👟 WALK & EXPLORE</b><p>Press <kbd>E</kbd> near a car to enter/exit. Walk with WASD, sprint SHIFT, jump SPACE.</p></div>
+      <div class="hCard"><b>🔨 BUILD YOUR EMPIRE</b><p>Press build mode and create your own cardboard mansion in Vice Carton — everything is buildable!</p></div>
     </div>
-    <div class="helpTip">
-      💡 <b>نصيحة:</b> الكرطون الحقيقي فيه تموجات (corrugated) لداخل — شعل الضوء وشوف التفاصيل! كل قطعة فيها خشب و ورق واقعي.
-    </div>
-    <button id="helpStart" class="big race">فهمت — نبدا البناء! 🔨</button>
+    <div class="helpTip">💡 <b>Anime + Carton:</b> Realistic corrugated cardboard textures + cel-shaded anime characters = GTA 6 if it was made of boxes!</div>
+    <button id="helpStart" class="big race">LET'S GO! 🌴📦</button>
   </div>
 </div>
 
-<!-- Delete confirm -->
-<div id="clearModal">
-  <div class="modalBox small">
-    <h3>واش بغيتي تمسح كلشي؟</h3>
-    <p>غتمسح <b id="clearCount">0</b> قطعة</p>
-    <div class="rbtns">
-      <button id="btnClearYes" class="big race">🗑️ مسح</button>
-      <button id="btnClearNo" class="big ghost">لا</button>
-    </div>
-  </div>
-</div>
+<div id="toast"></div>
+<div id="confetti"></div>
+<div id="crosshair">+</div>
 
 <script type="module" src="src/main.js"></script>
 </body>
