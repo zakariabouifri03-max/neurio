@@ -2,12 +2,17 @@
 // GTA 6 open world but everything is cardboard + anime cel-shading
 import * as THREE from 'three';
 
+// safe DOM helper — never throws if element missing (fixes stale SW cache)
+const $ = (id)=>{
+  const el=document.getElementById(id);
+  if(el) return el;
+  // dummy no-op element to prevent crash
+  return { textContent:'', innerHTML:'', style:{}, classList:{ toggle:()=>{}, add:()=>{}, remove:()=>{} }, appendChild:()=>{}, remove:()=>{} };
+};
 addEventListener('error', e=>{
   const el=document.getElementById('errLog');
-  el.style.display='block';
-  el.textContent='⚠️ '+e.message+` ${e.filename?.split('/').pop()}:${e.lineno}`;
+  if(el){ el.style.display='block'; el.textContent='⚠️ '+e.message+` ${e.filename?.split('/').pop()}:${e.lineno}`; }
 });
-const $=id=>document.getElementById(id);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
 
