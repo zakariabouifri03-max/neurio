@@ -75,7 +75,16 @@ if (-not $Smoke.WaitForExit(30000)) {
     Stop-Process -Id $Smoke.Id -Force
     throw "The packaged application did not finish its startup smoke test within 30 seconds."
 }
-if ($Smoke.ExitCode -ne 0) { throw "The packaged application startup smoke test failed with exit code $($Smoke.ExitCode)." }
+if ($Smoke.ExitCode -ne 0) {
+    $RuntimeLog = Join-Path $env:LOCALAPPDATA "NovaCut AI Studio\Logs\novacut.log"
+    if (Test-Path $RuntimeLog) {
+        Write-Host "Application log tail after startup failure:"
+        Get-Content $RuntimeLog | Select-Object -Last 50 | ForEach-Object { Write-Host $_ }
+    } else {
+        Write-Host "The application exited before creating its log file."
+    }
+    throw "The packaged application startup smoke test failed with exit code $($Smoke.ExitCode)."
+}
 Write-Host "Packaged application startup smoke test passed."
 
 if ($env:FFMPEG_DIR) {

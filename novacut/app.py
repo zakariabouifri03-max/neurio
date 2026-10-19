@@ -545,12 +545,17 @@ class NovaCutMainWindow(QMainWindow):
         self.ffmpeg_path = str(self.settings.value("ffmpeg/path", ""))
         self.whisper_cli = str(self.settings.value("whisper/cli", ""))
         self._log_path = configure_logging()
+        LOG.info("Constructing main window (smoke_test=%s)", smoke_test)
         self._build_actions()
+        LOG.info("Main window actions created")
         self._build_ui()
+        LOG.info("Main window widgets created")
         self._build_menus()
+        LOG.info("Main window menus created")
         self._wire_shortcuts()
         self._restore_window_state()
         self._refresh_all()
+        LOG.info("Main window project state refreshed")
         self._update_ai_statuses()
         self._start_assistant_model_check()
         self.autosave_timer = QTimer(self)
@@ -615,7 +620,9 @@ class NovaCutMainWindow(QMainWindow):
         self.preview_frame.setObjectName("previewFrame")
         stack = QStackedLayout(self.preview_frame)
         self.preview_stack = stack
+        LOG.info("Creating Qt Multimedia preview widget")
         self.video_widget = QVideoWidget()
+        LOG.info("Qt Multimedia preview widget created")
         self.video_widget.setMinimumSize(360, 210)
         self.video_widget.setSizePolicy(self.video_widget.sizePolicy().horizontalPolicy(), self.video_widget.sizePolicy().verticalPolicy())
         self.image_preview = QLabel()
@@ -755,9 +762,11 @@ class NovaCutMainWindow(QMainWindow):
         self.ai_page.addMarkersRequested.connect(self._apply_scene_markers)
         self.ai_page.splitScenesRequested.connect(self._split_at_scenes)
 
+        LOG.info("Creating Qt Multimedia player")
         self.audio_output = QAudioOutput(self)
         self.audio_output.setVolume(0.8)
         self.player = QMediaPlayer(self)
+        LOG.info("Qt Multimedia player created")
         self.player.setAudioOutput(self.audio_output)
         self.player.setVideoOutput(self.video_widget)
         self.player.positionChanged.connect(self._player_position_changed)
@@ -2166,7 +2175,9 @@ def main(argv: list[str] | None = None) -> int:
     smoke = "--smoke" in argv
     argv = [value for value in argv if value != "--smoke"]
     project_path = argv[0] if argv else ""
+    LOG.info("Starting QApplication (smoke=%s)", smoke)
     app = QApplication.instance() or QApplication([sys.argv[0], *argv])
+    LOG.info("QApplication constructed")
     app.setApplicationName(APP_NAME)
     app.setOrganizationName("NovaCut")
     app.setStyle("Fusion")
@@ -2180,6 +2191,8 @@ def main(argv: list[str] | None = None) -> int:
         except Exception:
             pass
     sys.excepthook = excepthook
+    LOG.info("Constructing NovaCut main window")
     window = NovaCutMainWindow(project_path, smoke_test=smoke)
     window.show()
+    LOG.info("NovaCut main window shown")
     return app.exec()
