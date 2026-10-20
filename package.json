@@ -1,0 +1,28 @@
+{
+  "name": "sunday-supply-co-store",
+  "version": "1.0.0",
+  "description": "Storefront and print-ready Weekend Club digital T-shirt designs",
+  "main": "sw.js",
+  "scripts": {
+    "test": "node --check tools/build-shirt-pack.mjs && node --check tools/build-singlefile.mjs",
+    "build:game": "node tools/build-singlefile.mjs",
+    "build:shirt-pack": "node tools/build-shirt-pack.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zakariabouifri03-max/neurio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zakariabouifri03-max/neurio/issues"
+  },
+  "homepage": "https://github.com/zakariabouifri03-max/neurio#readme",
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "esbuild": "^0.28.2",
+    "fflate": "^0.8.3"
+  },
+  "private": true
+}

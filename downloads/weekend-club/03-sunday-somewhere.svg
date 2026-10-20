@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="3600" viewBox="0 0 3000 3600">
+ <path d="M935 1250a565 565 0 0 1 1130 0v620H935Z" fill="#df765b"/>
+ <path d="M935 1270h1130v135H935z" fill="#f3c56a"/>
+ <path d="M935 1530h1130v110H935z" fill="#f3c56a"/>
+ <path d="M935 1765h1130v105H935z" fill="#f3c56a"/>
+ <circle cx="1500" cy="1020" r="180" fill="#f3c56a"/>
+ <path d="M1000 1870c260-280 420-225 610-455 170 210 265 300 480 390v65H1000Z" fill="#27564a"/>
+ <path d="M1050 1870c150-100 260-100 405-35 135-88 315-55 500 35" fill="none" stroke="#f7ead0" stroke-width="22" stroke-linecap="round"/>
+ <text x="1500" y="2260" text-anchor="middle" fill="#27564a" font-family="Arial Black,DejaVu Sans,sans-serif" font-size="250" font-weight="900" letter-spacing="8">SUNDAY,</text>
+ <text x="1500" y="2580" text-anchor="middle" fill="#df765b" font-family="Arial Black,DejaVu Sans,sans-serif" font-size="300" font-weight="900" letter-spacing="3">SOMEWHERE</text>
+ <text x="1500" y="2780" text-anchor="middle" fill="#27564a" font-family="Arial,sans-serif" font-size="80" font-weight="700" letter-spacing="28">NO PLANS. JUST SUN.</text>
+</svg>

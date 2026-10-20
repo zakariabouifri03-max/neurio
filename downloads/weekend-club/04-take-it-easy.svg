@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="3600" viewBox="0 0 3000 3600">
+ <circle cx="1500" cy="1450" r="485" fill="#edab55"/>
+ <g fill="none" stroke="#27564a" stroke-width="28" stroke-linecap="round">
+  <path d="M1500 790V660M1205 890l-85-110M1795 890l85-110M1010 1160l-135-45M1990 1160l135-45"/>
+  <path d="M1100 1485c120-90 230-90 350 0 120-90 230-90 350 0"/>
+  <path d="M1210 1660c90 70 160 70 250 0 90 70 160 70 250 0"/>
+ </g>
+ <ellipse cx="1300" cy="1325" rx="34" ry="46" fill="#27564a"/><ellipse cx="1700" cy="1325" rx="34" ry="46" fill="#27564a"/>
+ <path d="M1310 1555q190 210 380 0" fill="none" stroke="#27564a" stroke-width="28" stroke-linecap="round"/>
+ <text x="1500" y="2220" text-anchor="middle" fill="#27564a" font-family="Arial Black,DejaVu Sans,sans-serif" font-size="340" font-weight="900" letter-spacing="6">TAKE IT</text>
+ <text x="1500" y="2580" text-anchor="middle" fill="#df765b" font-family="Arial Black,DejaVu Sans,sans-serif" font-size="370" font-weight="900" letter-spacing="3">EASY</text>
+ <text x="1500" y="2780" text-anchor="middle" fill="#27564a" font-family="Arial,sans-serif" font-size="72" font-weight="700" letter-spacing="27">A LITTLE SLOWER LOOKS GOOD</text>
+</svg>

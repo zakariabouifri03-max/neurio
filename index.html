@@ -1,150 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en-US">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🏁 Bash Baqi Racing</title>
-<meta name="theme-color" content="#0ea5e9">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bash Baqi">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/style.css">
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
-</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f1e8">
+  <meta name="description" content="Four original, print-ready T-shirt graphics in one instant digital download. Transparent PNGs, editable SVGs, and a small-business print license.">
+  <title>The Weekend Club — Sunday Supply Co.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/store.css">
 </head>
-<body>
-<div id="app"></div>
+<body class="store-page">
+  <div class="announcement"><span class="announcement-star">✳</span> THE WEEKEND CLUB IS HERE <span class="announcement-divider">/</span> 4 ORIGINAL DESIGNS · INSTANT DIGITAL DOWNLOAD</div>
+  <header class="site-header">
+    <a class="wordmark" href="#top" aria-label="Sunday Supply Co. home"><span class="logo-sun">✳</span><span>SUNDAY <i>SUPPLY CO.</i></span></a>
+    <nav class="main-nav" aria-label="Main navigation"><a href="#designs">The designs</a><a href="#details">What's included</a><a href="#faq">FAQ</a></nav>
+    <a class="header-cta" href="https://www.paypal.com/ncp/payment/ETCSHU9TFAYEE">GET THE PACK <span>↗</span></a>
+  </header>
 
-<!-- error overlay -->
-<div id="errLog"></div>
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="kicker"><span class="kicker-line"></span> YOUR NEXT FAVORITE TEE STARTS HERE</div>
+        <h1>Good art.<br><em>Good days.</em><br>Great tees.</h1>
+        <p class="hero-description">Meet The Weekend Club: four feel-good, original T-shirt graphics ready for your next print project. Download once, make something you love, wear it out.</p>
+        <div class="hero-buttons"><a class="button button-dark" href="https://www.paypal.com/ncp/payment/ETCSHU9TFAYEE">SHOP THE 4-DESIGN PACK <span>↗</span></a><a href="#designs" class="text-link">TAKE A LOOK <span>↓</span></a></div>
+        <div class="hero-proof"><span class="proof-mark">✓</span><span>Instant digital download</span><b></b><span>No physical shirt ships</span><b></b><span>Made for makers</span></div>
+      </div>
+      <div class="hero-visual">
+        <div class="visual-sun"></div><div class="visual-caption caption-top">PRINT. PRESS. REPEAT.</div>
+        <div class="tee-stage hero-tee"><div class="tee-shirt tee-sage"></div><img class="tee-art hero-art-print" src="downloads/weekend-club/01-good-days-ahead.png" alt="Good Days Ahead artwork printed on a sage green T-shirt"></div>
+        <div class="swatch swatch-one"></div><div class="swatch swatch-two"></div><div class="swatch swatch-three"></div>
+        <div class="visual-sticker"><span>4</span><small>ORIGINAL<br>DESIGNS</small></div>
+        <div class="visual-caption caption-bottom">THE WEEKEND CLUB <span>✳</span> VOL. 01</div>
+      </div>
+      <div class="hero-footnote"><span>01 — 04</span><span class="footnote-rule"></span><span>MADE FOR YOUR NEXT GOOD IDEA</span></div>
+    </section>
 
-<!-- loading -->
-<div id="loading">
-  <div class="loadBox">
-    <div class="loadFlag">🏁</div>
-    <div class="loadTitle">BASH BAQI<br>RACING</div>
-    <div class="loadBar"><div></div></div>
-    <div class="loadTip">warming up the buggies…</div>
-  </div>
-</div>
+    <div class="marquee" aria-label="Four original print-ready designs"><div class="marquee-inner"><span>GOOD DAYS AHEAD</span><b>✳</b><span>WILDFLOWER SOCIAL CLUB</span><b>✳</b><span>SUNDAY, SOMEWHERE</span><b>✳</b><span>TAKE IT EASY</span><b>✳</b><span>GOOD DAYS AHEAD</span><b>✳</b><span>WILDFLOWER SOCIAL CLUB</span><b>✳</b><span>SUNDAY, SOMEWHERE</span><b>✳</b><span>TAKE IT EASY</span><b>✳</b></div></div>
 
-<!-- speed lines overlay -->
-<div id="speedLines"></div>
-<div id="coinPops"></div>
+    <section class="design-section section-pad" id="designs">
+      <div class="section-title-row"><div><div class="eyebrow">THE WEEKEND CLUB — VOL. 01</div><h2>Four designs.<br><em>One very good pack.</em></h2></div><p>Easygoing colors, a little vintage sunshine, and the kind of words you want to wear on repeat.</p></div>
+      <div class="design-grid">
+        <article class="design-card card-sage"><div class="card-topline"><span>01 / GOOD DAYS</span><span>☼</span></div><div class="tee-preview"><div class="tee-shirt shirt-cream"></div><img src="downloads/weekend-club/01-good-days-ahead.png" alt="Good Days Ahead design preview" loading="lazy"></div><div class="design-meta"><h3>Good Days Ahead</h3><span>01</span><p>A little sunshine goes a long way.</p></div></article>
+        <article class="design-card card-rose"><div class="card-topline"><span>02 / WILDFLOWER</span><span>✿</span></div><div class="tee-preview"><div class="tee-shirt shirt-sand"></div><img src="downloads/weekend-club/02-wildflower-social-club.png" alt="Wildflower Social Club design preview" loading="lazy"></div><div class="design-meta"><h3>Wildflower Social Club</h3><span>02</span><p>For growing at your own pace.</p></div></article>
+        <article class="design-card card-blue"><div class="card-topline"><span>03 / SUNDAY</span><span>◒</span></div><div class="tee-preview"><div class="tee-shirt shirt-blue"></div><img src="downloads/weekend-club/03-sunday-somewhere.png" alt="Sunday, Somewhere design preview" loading="lazy"></div><div class="design-meta"><h3>Sunday, Somewhere</h3><span>03</span><p>No plans. Just sun.</p></div></article>
+        <article class="design-card card-yellow"><div class="card-topline"><span>04 / TAKE IT EASY</span><span>〰</span></div><div class="tee-preview"><div class="tee-shirt shirt-yellow"></div><img src="downloads/weekend-club/04-take-it-easy.png" alt="Take It Easy design preview" loading="lazy"></div><div class="design-meta"><h3>Take It Easy</h3><span>04</span><p>A little slower looks good.</p></div></article>
+      </div>
+      <div class="collection-note"><span class="note-star">✳</span><p><strong>Four moods, one easy download.</strong><br>Every design is included in The Weekend Club pack. Pick your favorite—or print all four.</p><a href="#shop">GET THE COLLECTION <span>↗</span></a></div>
+    </section>
 
-<!-- ══════════ RACE HUD ══════════ -->
-<div id="hud">
-  <div class="hudTL">
-    <div class="hudChip place"><span class="lbl">PLACE</span><b id="hudPlace">6/6</b></div>
-    <div class="hudChip"><span class="lbl">LAP</span><b id="hudLap">1/2</b></div>
-    <div class="hudChip slim"><span class="lbl">⏱</span><b id="hudTime">0:00</b></div>
-    <div class="hudChip slim gold"><span class="lbl">🪙</span><b id="hudCoins">+0</b></div>
-  </div>
+    <section class="details-band" id="details"><div class="details-inner"><div class="details-intro"><div class="eyebrow light-eyebrow">A LITTLE FILE. A LOT OF POSSIBILITIES.</div><h2>Everything you need<br>to make it <em>yours.</em></h2><p>Made for your personal projects, your creative side hustle, or the tee you can't find anywhere else.</p></div><div class="included-grid"><article><span class="included-number">01</span><div class="included-icon">PNG</div><h3>Print-ready PNGs</h3><p>High-resolution, 3000 × 3600 px files with transparent backgrounds, ready for your printer or print-on-demand workflow.</p></article><article><span class="included-number">02</span><div class="included-icon included-svg">SVG</div><h3>Scalable vector files</h3><p>Four editable SVGs stay crisp at any size. Ideal when your print shop asks for vector artwork.</p></article><article><span class="included-number">03</span><div class="included-icon included-license">✓</div><h3>Small-business license</h3><p>Use the art on physical products you make and sell—up to 500 finished products per design.</p></article><article><span class="included-number">04</span><div class="included-icon included-download">↓</div><h3>Instant access</h3><p>One ZIP download, no shipping, no waiting. Your files are ready as soon as checkout is complete.</p></article></div></div></section>
 
-  <div id="progbar">
-    <span class="flagL">🏁</span>
-    <div class="track"><div id="progMarkers"></div></div>
-    <span class="flagR">🏆</span>
-  </div>
+    <section class="shop-section section-pad" id="shop"><div class="shop-wrap"><div class="shop-copy"><div class="eyebrow">YOUR NEXT PROJECT, SORTED</div><h2>Make room for<br><em>more good days.</em></h2><p>Get all four Weekend Club designs in one convenient digital pack. Download, print, and bring your own version to life.</p><div class="shop-includes"><div><span>✓</span> 4 transparent PNG files</div><div><span>✓</span> 4 editable SVG files</div><div><span>✓</span> Small-business print license included</div><div><span>✓</span> Instant ZIP download after checkout</div></div><a class="button button-dark shop-button" href="https://www.paypal.com/ncp/payment/ETCSHU9TFAYEE">BUY THE WEEKEND CLUB PACK <span>↗</span></a><div class="secure-note"><span>▣</span> Secure checkout hosted by PayPal. The final price is shown before you pay.</div></div><div class="shop-art"><div class="shop-stamp">ORIGINAL<br>ARTWORK<br><span>VOL. 01</span></div><div class="shop-art-shape"></div><img src="downloads/weekend-club/02-wildflower-social-club.png" alt="Wildflower Social Club print artwork" loading="lazy"><div class="shop-art-caption">WILDFLOWER<br><span>SOCIAL CLUB</span></div></div></div><p class="digital-disclaimer">DIGITAL DOWNLOAD ONLY — no physical T-shirt is included or shipped.</p></section>
 
-  <button id="btnPauseTop" class="roundBtn">⏸</button>
-
-  <div class="mapWrap"><canvas id="minimap" width="108" height="108"></canvas></div>
-
-  <div id="powerSlot" class="powerSlot">
-    <span id="hudPower"></span>
-    <span class="keyHint">SPACE</span>
-  </div>
-
-  <div id="speedo"><b id="kmh">0</b><span>km/h</span></div>
-
-  <div id="banner"></div>
-
-  <!-- touch controls -->
-  <div id="touchWrap">
-    <div class="tcol left">
-      <button id="tLeft" class="tbtn">◀</button>
-      <button id="tRight" class="tbtn">▶</button>
-    </div>
-    <div class="tcol right">
-      <button id="tBrake" class="tbtn brake">▼</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ GARAGE UI ══════════ -->
-<div id="garageUI">
-  <div id="topbar">
-    <div class="stat"><span>🏆</span><b id="statTrophies">0</b></div>
-    <div class="stat coin"><span>🪙</span><b id="statCoins">0</b></div>
-    <div class="stat gem"><span>💎</span><b id="statGems">0</b></div>
-    <div class="spacer"></div>
-    <button id="btnInstall" class="miniBtn" hidden title="Install app">📱</button>
-    <button id="btnMusic" class="miniBtn">🎵</button>
-    <button id="btnSfx" class="miniBtn">🔊</button>
-    <button id="btnFull" class="miniBtn">⛶</button>
-  </div>
-
-  <div id="logo">🏁 BASH BAQI <span>RACING</span></div>
-  <div id="carNamePlate"></div>
-
-  <div id="menuBar">
-    <button id="btnUpg" class="mbtn small">🔧<span>Upgrades</span></button>
-    <button id="btnCustom" class="mbtn small">🎨<span>Customize</span></button>
-    <button id="btnShop" class="mbtn small">🛒<span>Cars</span></button>
-    <button id="btnSeries" class="mbtn small">🏆<span>Series</span></button>
-    <button id="btnHelp" class="mbtn small">❓<span>Help</span></button>
-    <button id="btnRace" class="mbtn race">🏁<span>RACE!</span></button>
-  </div>
-</div>
-
-<!-- ══════════ Shop / panels ══════════ -->
-<div id="panel">
-  <div class="panelBox">
-    <div class="panelHead">
-      <h2 id="panelTitle">SHOP</h2>
-      <div id="panelTabs"></div>
-      <button id="panelClose" class="roundBtn">✖</button>
-    </div>
-    <div id="panelBody"></div>
-  </div>
-</div>
-
-<!-- results -->
-<div id="results"><div class="modalBox"><div id="resultsBody"></div></div></div>
-<div id="seasonModal"><div class="modalBox"><div id="seasonBody"></div></div></div>
-
-<!-- pause -->
-<div id="pauseModal">
-  <div class="modalBox">
-    <div class="rtitle">⏸ PAUSED</div>
-    <div class="rbtns">
-      <button id="btnResume" class="big race">▶ RESUME</button>
-      <button id="btnQuitRace" class="big ghost">🏠 QUIT TO GARAGE</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
-<div id="confetti"></div>
-
-<script type="module" src="src/main.js"></script>
-<script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-</script>
+    <section class="faq-section section-pad" id="faq"><div class="faq-heading"><div class="eyebrow">GOOD QUESTION</div><h2>Before you <em>make.</em></h2></div><div class="faq-list"><details><summary>What exactly am I buying? <span>＋</span></summary><p>The Weekend Club is a digital pack of four original T-shirt graphics. It includes four high-resolution transparent PNGs, four matching SVG vector files, and a small-business license. No physical shirt is included.</p></details><details><summary>How do I get my files after checkout? <span>＋</span></summary><p>PayPal should return you to the download page after a successful payment. On that page, select “Download the full pack.” You can also return to your order page if your browser closes.</p></details><details><summary>Can I use these designs on products I sell? <span>＋</span></summary><p>Yes. The included license allows up to 500 physical end products per design. You may not resell or redistribute the digital source files. Please read the full license inside the ZIP.</p></details><details><summary>What if my print shop needs another file type? <span>＋</span></summary><p>The pack includes both transparent PNG and scalable SVG files. Contact your print provider to confirm its preferred format and dimensions before ordering.</p></details><details><summary>Will a T-shirt be mailed to me? <span>＋</span></summary><p>No—this is a digital download only. No garment or physical item will be shipped.</p></details></div><div class="setup-note"><strong>Seller setup:</strong> Set your PayPal payment link's post-payment return URL to <code>https://your-domain.com/success.html</code> (replace with your live domain). This static storefront cannot independently verify a payment; see the README for secure fulfillment options.</div></section>
+  </main>
+  <footer class="site-footer"><a class="wordmark" href="#top"><span class="logo-sun">✳</span><span>SUNDAY <i>SUPPLY CO.</i></span></a><span>Made for the good days. <b>✳</b></span><a href="#top">BACK TO TOP ↑</a><small>© <span id="year"></span> Sunday Supply Co. Digital download only.</small></footer>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

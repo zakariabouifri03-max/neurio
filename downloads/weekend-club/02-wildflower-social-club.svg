@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="3600" viewBox="0 0 3000 3600">
+ <g fill="none" stroke="#27564a" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M1500 1300c-80 330-45 550 0 720M1490 1640c-170-55-255-180-275-320 190 20 290 130 275 320ZM1510 1800c185-65 280-190 290-350-195 30-295 150-290 350Z"/>
+  <path d="M1500 1220c-100-130-85-270 0-360 90 100 95 235 0 360ZM1495 1215c-165-20-240-135-220-255 140 5 235 95 220 255ZM1505 1215c160-30 240-140 215-255-140 10-230 110-215 255ZM1497 1210c-175 85-300 20-330-90 125-65 260-25 330 90ZM1503 1210c165 90 290 40 335-70-120-75-265-45-335 70Z" fill="#edab55" stroke="#27564a"/>
+  <path d="M1050 1290c-110 230-100 475 10 690M1950 1290c110 230 100 475-10 690" stroke="#df765b"/>
+  <path d="M1130 1500c-100-75-195-70-255-10 75 80 175 85 255 10ZM1860 1660c110-65 205-45 250 25-85 65-180 50-250-25" fill="#b6c987"/>
+ </g>
+ <text x="1500" y="2370" text-anchor="middle" fill="#27564a" font-family="Georgia,serif" font-size="205" font-weight="700" letter-spacing="15">WILDFLOWER</text>
+ <text x="1500" y="2615" text-anchor="middle" fill="#df765b" font-family="Arial,sans-serif" font-size="98" font-weight="700" letter-spacing="31">SOCIAL CLUB</text>
+ <path d="M1010 2700h980" stroke="#edab55" stroke-width="15"/>
+ <text x="1500" y="2845" text-anchor="middle" fill="#27564a" font-family="Arial,sans-serif" font-size="65" letter-spacing="18">GROW AT YOUR OWN PACE</text>
+</svg>

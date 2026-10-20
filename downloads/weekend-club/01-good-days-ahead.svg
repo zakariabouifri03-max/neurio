@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="3600" viewBox="0 0 3000 3600">
+ <g fill="none" stroke="#df704e" stroke-linecap="round" stroke-width="32">
+  <path d="M1500 760V590M1180 820 1060 690M1820 820l120-130M955 1050l-180-65M2045 1050l180-65"/>
+  <path d="M1110 1200c130-305 650-305 780 0" stroke="#efad53" stroke-width="22"/>
+ </g>
+ <path d="M1150 1190a350 350 0 0 1 700 0z" fill="#efad53"/>
+ <path d="M1185 1095c130-42 170 48 300 12s180-56 330-10" fill="none" stroke="#fbedd6" stroke-width="25" stroke-linecap="round"/>
+ <text x="1500" y="1545" text-anchor="middle" fill="#244c43" font-family="Arial Black, DejaVu Sans, sans-serif" font-size="280" font-weight="900" letter-spacing="10">GOOD DAYS</text>
+ <text x="1500" y="1895" text-anchor="middle" fill="#244c43" font-family="Arial Black, DejaVu Sans, sans-serif" font-size="390" font-weight="900" letter-spacing="5">AHEAD</text>
+ <path d="M890 2040h1220" stroke="#df704e" stroke-width="18" stroke-linecap="round"/>
+ <text x="1500" y="2220" text-anchor="middle" fill="#df704e" font-family="Arial, sans-serif" font-size="88" font-weight="700" letter-spacing="24">TAKE THE LONG WAY</text>
+</svg>

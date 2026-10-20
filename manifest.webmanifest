@@ -2,7 +2,7 @@
   "name": "Bash Baqi Racing",
   "short_name": "Bash Baqi",
   "description": "3D kart racing: 50 cars, 16 drivers, 50 random tracks. Win races, earn coins, buy everything!",
-  "start_url": "./index.html",
+  "start_url": "./game.html",
   "scope": "./",
   "display": "fullscreen",
   "orientation": "landscape",
