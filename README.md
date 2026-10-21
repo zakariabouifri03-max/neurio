@@ -113,3 +113,20 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 🛍️ adzakART — digital design storefront
+
+A complete English storefront for the **adzakART** Etsy shop: all **139 designs**, every one **$2**, delivered as a single transparent PNG.
+
+- Editorial home page, searchable shop with 10 collections, product pages, saved designs, FAQ, license and About.
+- Real checkout: each buy button opens the matching Etsy listing (payment + instant delivery stay on Etsy).
+- No build step. Open [`adzakart/index.html`](adzakart/index.html) or serve the folder:
+
+```bash
+cd adzakart && python3 -m http.server 8080
+```
+
+Catalog, price, copy and images are all editable — see [`adzakart/README.md`](adzakart/README.md).
+
