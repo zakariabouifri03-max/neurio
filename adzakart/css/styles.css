@@ -691,6 +691,11 @@ main, .site-head, .site-foot, .announce, .overlay, .drawer, .drawer-scrim, .toas
 .buy-actions { display: grid; gap: 10px; margin: 22px 0 14px; }
 .buy-note { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 7px; }
 .buy-note svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.buy-note-warn { color: var(--accent); }
+/* a download that is not ready yet still reads as a live, pressable control */
+.is-pending { opacity: .62; cursor: not-allowed; }
+.btn.is-pending:hover { transform: none; }
+.btn.is-pending:hover span[aria-hidden] { transform: none; }
 .secondary-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .ghost-pill {
   display: inline-flex; align-items: center; gap: 8px;

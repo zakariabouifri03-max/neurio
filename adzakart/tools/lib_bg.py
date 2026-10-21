@@ -13,7 +13,7 @@ from __future__ import annotations
 import os
 from collections import Counter
 
-from PIL import Image, ImageChops, ImageDraw, ImageFilter
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageEnhance
 
 SUPPORTED = (".png", ".jpg", ".jpeg", ".webp", ".tif", ".tiff", ".bmp")
 CHECKER_A = (232, 226, 214)
@@ -180,6 +180,32 @@ def bg_lum(bg) -> float:
     return 0.299 * bg[0] + 0.587 * bg[1] + 0.114 * bg[2]
 
 
+def upscale(result: Image.Image, min_long_edge: int = 3000, sharpen: bool = True) -> Image.Image:
+    """Bring a cut-out up to print resolution.
+
+    Uses high-quality Lanczos resampling, then a light unsharp mask so edges
+    stay crisp instead of going soft. Never shrinks an image that is already
+    big enough.
+    """
+    w, h = result.size
+    longest = max(w, h)
+    if longest >= min_long_edge:
+        return result
+    factor = min_long_edge / float(longest)
+    size = (max(1, round(w * factor)), max(1, round(h * factor)))
+    big = result.resize(size, Image.LANCZOS)
+    if sharpen:
+        # mask keys off alpha so the transparent area cannot pick up ringing
+        big = big.filter(ImageFilter.UnsharpMask(radius=1.6, percent=90, threshold=2))
+    return big
+
+
+def save_png(result: Image.Image, path: str, dpi: int = 300) -> None:
+    """Write a real RGBA PNG with print metadata."""
+    out = result.convert("RGBA")
+    out.save(path, "PNG", optimize=True, dpi=(dpi, dpi))
+
+
 def trim(result: Image.Image, pad: int = 6) -> Image.Image:
     """Crop to the visible artwork, keeping a little breathing room."""
     bbox = result.getchannel("A").getbbox()
@@ -294,5 +320,5 @@ def white_halo_score(img: Image.Image, bg=(255, 255, 255)) -> float:
 __all__ = [
     "SUPPORTED", "list_images", "flatten", "estimate_backdrop", "cut_backdrop",
     "trim", "summarise", "verdict", "checkerboard", "preview_on_checker",
-    "white_halo_score", "bg_lum", "human_bytes", "ImageChops",
+    "white_halo_score", "bg_lum", "human_bytes", "upscale", "save_png", "ImageChops",
 ]

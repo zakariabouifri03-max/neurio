@@ -31,7 +31,7 @@ from PIL import Image  # noqa: E402
 
 from lib_bg import (  # noqa: E402
     human_bytes, list_images, cut_backdrop, trim, summarise, verdict,
-    preview_on_checker, white_halo_score, bg_lum,
+    preview_on_checker, white_halo_score, bg_lum, upscale, save_png,
 )
 
 
@@ -47,6 +47,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--no-despill", action="store_true", help="skip backdrop un-multiply")
     p.add_argument("--keep-size", action="store_true", help="do not trim the canvas")
     p.add_argument("--preview", action="store_true", help="also write a checkerboard JPG preview")
+    p.add_argument("--target", type=int, default=3000,
+                   help="upscale so the long edge is at least this many px (default 3000 = print ready, 0 = off)")
+    p.add_argument("--dpi", type=int, default=300, help="DPI written into the PNG (default 300)")
     p.add_argument("--force", action="store_true", help="re-clean files that already have alpha")
     p.add_argument("--report", default="", help="write deliverables.csv (listing id, file, Etsy URL) here")
     return p.parse_args()
@@ -109,7 +112,12 @@ def main() -> int:
                     note = "cleaned"
                     if not args.keep_size:
                         out = trim(out, pad=args.pad)
-                out.save(target, "PNG", optimize=True)
+                if note == "cleaned" and args.target:
+                    before = out.size
+                    out = upscale(out, min_long_edge=args.target)
+                    if out.size != before:
+                        note = "cleaned + upscaled"
+                save_png(out, target, dpi=args.dpi)
 
             stats = summarise(out)
             ok, problems = verdict(stats)

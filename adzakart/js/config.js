@@ -8,15 +8,13 @@ window.ADZAK_CONFIG = {
     owner: "Mohammed Bouifri",
     place: "Sefrou, Morocco",
     since: 2026,
-    messageUrl:
-      "https://www.etsy.com/messages/new?with_id=1130303999&referring_id=61867927&referring_type=shop&recipient_id=1130303999",
-    shopUrl: "https://www.etsy.com/shop/adzakART",
+    // Where "get in touch" points. Add your Instagram or an email link here.
+    contactUrl: "#/faq",
     instagram: "", // add a URL to show the link in the footer
   },
 
-  // The single price for every design, in USD.
-  // IMPORTANT: checkout happens on Etsy, so set every Etsy listing to this
-  // price too — otherwise Etsy charges its own listing price.
+  // The single price for every design, in USD. Displayed everywhere on the
+  // site from this one value.
   price: 2,
   currency: "USD",
 
@@ -26,7 +24,7 @@ window.ADZAK_CONFIG = {
     { label: "Format", value: "1 × PNG" },
     { label: "Background", value: "Transparent" },
     { label: "Resolution", value: "High-res, 300 DPI" },
-    { label: "Delivery", value: "Instant download" },
+    { label: "Delivery", value: "Direct download" },
   ],
 
   license: {
@@ -110,7 +108,7 @@ window.ADZAK_CONFIG = {
       quote: "Quick responses and very helpful! Love my custom design!",
     },
     {
-      name: "Etsy buyer",
+      name: "Verified buyer",
       date: "August 2026",
       stars: 5,
       quote: "Cute little autumn dachshunds. Thank you!",
@@ -127,7 +125,7 @@ window.ADZAK_CONFIG = {
   faq: [
     {
       q: "What exactly do I get?",
-      a: "Your design as a high-resolution PNG with a clean transparent background — or the full set of PNGs if you choose a bundle. Nothing is shipped: this is a digital download, available the moment your order is confirmed.",
+      a: "Your design as a high-resolution PNG with a clean transparent background — or the full set of PNGs if you choose a bundle. Nothing is shipped and there is no account to create: the file downloads straight to your device.",
     },
     {
       q: "Is the background really transparent?",
@@ -139,7 +137,7 @@ window.ADZAK_CONFIG = {
     },
     {
       q: "How does delivery work?",
-      a: "Checkout is completed securely on Etsy. As soon as your payment clears, the PNG lands in your Etsy purchases and in your email — no waiting for a human, no shipping fees.",
+      a: "Click “Get this design” and the PNG downloads immediately to your device — no account, no waiting for a human, no shipping fees. Save it somewhere safe and keep a backup; the same file can be downloaded again from the design’s page.",
     },
     {
       q: "Will the colours match my screen?",
@@ -147,11 +145,11 @@ window.ADZAK_CONFIG = {
     },
     {
       q: "Can I request a custom design?",
-      a: "Absolutely. Message the studio with your idea, wording and vibe. Custom work is quoted individually and usually turned around within a few days.",
+      a: "Absolutely. Send the studio your idea, wording and vibe. Custom work is quoted individually and usually turned around within a few days.",
     },
     {
       q: "What is your refund policy?",
-      a: "Because files are delivered instantly, digital purchases are final. If something is wrong with your download, message the studio and we will make it right — a replacement file or a fix, quickly.",
+      a: "Because files are delivered instantly, digital purchases are final. If something is wrong with your download — a corrupted file, a missing detail — get in touch and the studio will make it right with a replacement or a fix, quickly.",
     },
   ],
 };

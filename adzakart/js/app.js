@@ -1,6 +1,6 @@
 /* ==========================================================================
    adzakART storefront
-   Vanilla JS. Hash routing, live search, saved designs, Etsy checkout links.
+   Vanilla JS. Hash routing, live search, saved designs, direct downloads.
    ========================================================================== */
 (function () {
   "use strict";
@@ -94,8 +94,9 @@
   function image(design, options) {
     options = options || {};
     var fallback = options.large ? design.imageLarge : design.imageCard;
-    // If a background-removed file exists, show the real deliverable.
-    var src = design.clean || fallback;
+    // The product page shows the actual hand-over file. Cards keep the light
+    // web preview so a grid of 24 designs does not pull 24 full-size prints.
+    var src = (options.large && design.clean) ? design.clean : fallback;
     var alt = options.alt === undefined ? "" : options.alt;
     return (
       '<img src="' + esc(src) + '"' +
@@ -104,6 +105,42 @@
       ' decoding="async" referrerpolicy="no-referrer" data-img' +
       ' data-fallback="' + esc(fallback) + '">'
     );
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* delivery — every design is handed over as its own file              */
+  /* ------------------------------------------------------------------ */
+  // The deliverable lives at assets/designs/clean/<id>.png and is produced
+  // by tools/prepare-store.py (background removed, print resolution).
+  function fileFor(design) {
+    return design.clean || "";
+  }
+
+  function downloadName(design) {
+    return "adzakART-" + design.slug + ".png";
+  }
+
+  // Same-origin anchor + download attribute = a real file on the buyer's
+  // device, no third party, no new tab. When the file has not been produced
+  // yet we still render a live control so the click is never a dead end.
+  function downloadButton(design, cls, label) {
+    if (fileFor(design)) {
+      return (
+        '<a class="' + cls + '" href="' + esc(fileFor(design)) + '" download="' + esc(downloadName(design)) + '"' +
+        ' data-buy="' + design.id + '">' + label + ' <span aria-hidden="true">&#8595;</span></a>'
+      );
+    }
+    return (
+      '<button class="' + cls + ' is-pending" type="button" data-awaiting="' + design.id + '">' +
+      label + ' <span aria-hidden="true">&#8595;</span></button>'
+    );
+  }
+
+  function pendingNote(design) {
+    if (fileFor(design)) {
+      return '<p class="buy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 11l5 5 5-5"/><path d="M4 20h16"/></svg> Instant download \u00b7 high-resolution PNG \u00b7 nothing behind the artwork</p>';
+    }
+    return '<p class="buy-note buy-note-warn"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg> The print file for this design is still being prepared</p>';
   }
 
   function starString(n) {
@@ -117,7 +154,7 @@
     var saved = state.saved.has(design.id);
     return (
       '<article class="card reveal" style="transition-delay:' + Math.min(index || 0, 8) * 32 + 'ms">' +
-        '<a class="card-media' + (design.clean ? " is-clean" : "") + '" href="#/design/' + design.id + '" aria-label="View ' + esc(design.short) + '">' +
+        '<a class="card-media" href="#/design/' + design.id + '" aria-label="View ' + esc(design.short) + '">' +
           image(design) +
           '<span class="price-pill">' + PRICE + "</span>" +
         "</a>" +
@@ -248,7 +285,7 @@
     return (
       '<section class="section-tight"><div class="wrap"><div class="stats reveal">' +
         '<div class="stat"><b>' + TOTAL + "</b><span>Original designs</span></div>" +
-        '<div class="stat"><b>' + CATALOG.shop.sales + "</b><span>Sales on Etsy</span></div>" +
+        '<div class="stat"><b>' + CATALOG.shop.sales + "</b><span>Happy makers</span></div>" +
         '<div class="stat"><b>' + CATALOG.shop.rating + "★</b><span>Average rating</span></div>" +
         '<div class="stat"><b>' + PRICE + "</b><span>Every single design</span></div>" +
       "</div></div></section>"
@@ -262,8 +299,8 @@
           sectionHead("How it works", "From screen to <em>shirt</em>", '<a class="link-arrow" href="#/faq">More questions →</a>') +
           '<div class="steps">' +
             '<div class="step reveal"><span class="step-num">01</span><h3>Pick your design</h3><p>Browse all ' + TOTAL + " originals. Every one is " + PRICE + ", with the full artwork and the transparent background included.</p></div>" +
-            '<div class="step reveal"><span class="step-num">02</span><h3>Check out securely</h3><p>Pay by card, PayPal, Apple Pay or Klarna through Etsy checkout. No account needed on this site.</p></div>' +
-            '<div class="step reveal"><span class="step-num">03</span><h3>Download &amp; make</h3><p>Your PNG is ready immediately — in your Etsy purchases and your inbox. Drop it into Canva, Cricut or Photoshop and go.</p></div>' +
+            '<div class="step reveal"><span class="step-num">02</span><h3>Tap get</h3><p>One click starts the download straight away. No account, no checkout screen, nothing to install.</p></div>' +
+            '<div class="step reveal"><span class="step-num">03</span><h3>Make something</h3><p>The PNG lands in your downloads folder, already cut out. Drop it into Canva, Cricut or Photoshop and go.</p></div>' +
           "</div>" +
         "</div>" +
       "</section>"
@@ -294,12 +331,12 @@
           sectionHead(
             "Kind words",
             "Loved by <em>makers</em>",
-            '<a class="link-arrow" href="https://www.etsy.com/shop/adzakART#reviews" target="_blank" rel="noopener">Read all reviews ↗</a>'
+            '<a class="link-arrow" href="#/about">About the studio →</a>'
           ) +
           '<div class="reviews-grid">' + reviewCards(CFG.reviews.slice(0, 3)) + "</div>" +
           '<div class="reviews-foot">' +
             '<div class="rating-line"><b>' + CATALOG.shop.rating + "</b><span>average from " + CATALOG.shop.reviewCount + " reviews<br>" + CATALOG.shop.sales + " sales and counting</span></div>" +
-            '<a class="link-arrow" href="https://www.etsy.com/shop/adzakART" target="_blank" rel="noopener">Visit the Etsy shop ↗</a>' +
+            '<a class="link-arrow" href="#/shop">Shop all designs →</a>' +
           "</div>" +
         "</div>" +
       "</section>"
@@ -342,7 +379,7 @@
         "<p>No subscription. No shipping. No fuss.</p></div>" +
         '<div class="cta-actions">' +
           '<a class="btn btn-light btn-large" href="#/shop">Shop the collection <span aria-hidden="true">→</span></a>' +
-          '<a class="btn btn-ghost btn-large" style="border-color:rgba(255,243,234,.4);color:#fff3ea" href="' + esc(CFG.studio.messageUrl) + '" target="_blank" rel="noopener">Ask for a custom design ↗</a>' +
+          '<a class="btn btn-ghost btn-large" style="border-color:rgba(255,243,234,.4);color:#fff3ea" href="' + esc(CFG.studio.contactUrl) + '">Ask for a custom design →</a>' +
         "</div>" +
       "</div></div></section>"
     );
@@ -369,7 +406,7 @@
             "</div>" +
             '<div class="hero-proof">' +
               '<span class="stars" aria-hidden="true">★ ' + CATALOG.shop.rating + "</span><span>from " + CATALOG.shop.reviewCount + " reviews</span><i></i>" +
-              "<span>" + CATALOG.shop.sales + " sales on Etsy</span><i></i><span>Instant download</span>" +
+              "<span>" + CATALOG.shop.sales + " happy makers</span><i></i><span>Instant download</span>" +
             "</div>" +
           "</div>" +
           heroArt() +
@@ -560,8 +597,8 @@
             '<p class="product-full-title">' + esc(d.title) + "</p>" +
             '<div class="price-row"><span class="price">' + PRICE + " <small>USD</small></span><span class=\"price-note\">One flat price<br>no subscription</span></div>" +
             '<div class="buy-actions">' +
-              '<a class="btn btn-ink btn-large btn-full" href="' + esc(d.etsy) + '" target="_blank" rel="noopener" data-buy="' + d.id + '">Get this design — ' + PRICE + ' <span aria-hidden="true">↗</span></a>' +
-              '<p class="buy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Secure checkout &amp; instant download on Etsy</p>' +
+              downloadButton(d, "btn btn-ink btn-large btn-full", "Get this design — " + PRICE) +
+              pendingNote(d) +
             "</div>" +
             '<div class="secondary-actions">' +
               '<button class="ghost-pill' + (saved ? " saved" : "") + '" type="button" data-save="' + d.id + '" aria-pressed="' + saved + '">' +
@@ -571,7 +608,7 @@
               '<button class="ghost-pill" type="button" data-share="' + d.id + '">' +
                 '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg> Share' +
               "</button>" +
-              '<a class="ghost-pill" href="' + esc(d.etsy) + '" target="_blank" rel="noopener">Etsy listing ↗</a>' +
+              downloadButton(d, "ghost-pill", "Download PNG") +
             "</div>" +
             '<dl class="spec-grid">' +
               specs.map(function (s) {
@@ -583,7 +620,7 @@
                 (isBundle
                   ? "<p>Every design in this bundle, delivered as high-resolution PNGs with clean transparent backgrounds. No watermark, no white box, no mockups to crop.</p>"
                   : "<p>One high-resolution PNG of this exact design, cut out with a clean transparent background. No watermark, no white box, no extra files to dig through.</p>") +
-                "<ul><li>" + (isBundle ? "PNG bundle" : "PNG") + " with alpha transparency</li><li>High-resolution files, 300 DPI</li><li>Ready for sublimation, DTF and print-on-demand</li><li>Instant download after checkout</li></ul>" +
+                "<ul><li>" + (isBundle ? "PNG bundle" : "PNG") + " with alpha transparency</li><li>High-resolution files, 300 DPI</li><li>Ready for sublimation, DTF and print-on-demand</li><li>Instant download — no account needed</li></ul>" +
               "</div></details>" +
               '<details class="faq-item"><summary>How to use it</summary><div class="faq-a">' +
                 "<p>Open the PNG in Canva, Cricut Design Space, Silhouette Studio, Photoshop, Procreate or your printing software. Scale it up or down without losing the clean edges, then print, press or cut.</p>" +
@@ -592,7 +629,7 @@
                 "<p>" + esc(CFG.license.summary) + ". Print it on physical products you make and sell. You may not resell or share the file itself. <a href=\"#/license\">Read the full license</a>.</p>" +
               "</div></details>" +
               '<details class="faq-item"><summary>Delivery &amp; refunds</summary><div class="faq-a">' +
-                "<p>Your files are delivered instantly by Etsy after payment — no shipping, no waiting. Because digital downloads cannot be returned, all sales are final; if anything is wrong with your file, <a href=\"" + esc(CFG.studio.messageUrl) + "\" target=\"_blank\" rel=\"noopener\">message the studio</a> and we will fix it quickly.</p>" +
+                "<p>The file downloads the moment you click Get this design — no shipping, no waiting, no account. Because the download is instant, all sales are final; if anything is wrong with your file, <a href=\"" + esc(CFG.studio.contactUrl) + "\">get in touch</a> and the studio will fix it quickly.</p>" +
               "</div></details>" +
             "</div>" +
             '<div class="product-share"><span>Design #' + (d.index + 1) + " of " + TOTAL + "</span><span>Made in " + esc(CFG.studio.place) + "</span></div>" +
@@ -606,7 +643,7 @@
       '<div class="buybar" id="buybar">' +
         '<span class="buybar-thumb">' + image(d) + "</span>" +
         '<span class="buybar-info"><b>' + esc(d.short) + "</b><span>" + PRICE + " · transparent PNG</span></span>" +
-        '<a class="btn btn-ink" href="' + esc(d.etsy) + '" target="_blank" rel="noopener">Buy ' + PRICE + "</a>" +
+        downloadButton(d, "btn btn-ink", "Get " + PRICE) +
       "</div>"
     );
   }
@@ -640,7 +677,7 @@
         "</div>" +
       "</div></section>" +
       '<section class="section"><div class="wrap">' +
-        sectionHead("Kind words", "What buyers <em>say</em>", '<a class="link-arrow" href="https://www.etsy.com/shop/adzakART#reviews" target="_blank" rel="noopener">All reviews on Etsy ↗</a>') +
+        sectionHead("Kind words", "What buyers <em>say</em>", '<a class="link-arrow" href="#/about">About the studio →</a>') +
         '<div class="reviews-grid">' + reviewCards(CFG.reviews) + "</div>" +
       "</div></section>" +
       ctaBand()
@@ -659,7 +696,7 @@
       "</div>" +
       '<div class="section-tight"><div class="wrap"><div class="cta-band">' +
         "<div><h2>Still <em>curious?</em></h2><p>Custom work, sizing questions, or a design you cannot find — just ask.</p></div>" +
-        '<div class="cta-actions"><a class="btn btn-light btn-large" href="' + esc(CFG.studio.messageUrl) + '" target="_blank" rel="noopener">Message the studio ↗</a></div>' +
+        '<div class="cta-actions"><a class="btn btn-light btn-large" href="' + esc(CFG.studio.contactUrl) + '">Get in touch →</a></div>' +
       "</div></div></div>"
     );
   }
@@ -679,7 +716,7 @@
           CFG.license.notAllowed.map(function (item) { return "<li>" + esc(item) + "</li>"; }).join("") +
         "</ul></section>" +
       "</div>" +
-      '<p class="license-note">This license applies to purchases made through the adzakART Etsy shop and this storefront. It is granted to the buyer and is not transferable. If you need an extended or wholesale license, <a href="' + esc(CFG.studio.messageUrl) + '" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">get in touch</a>. adzakART retains copyright of all artwork.</p>' +
+      '<p class="license-note">This license applies to every purchase made from adzakART. It is granted to the buyer and is not transferable. If you need an extended or wholesale license, <a href="' + esc(CFG.studio.contactUrl) + '" style="color:var(--accent);text-decoration:underline">get in touch</a>. adzakART retains copyright of all artwork.</p>' +
       "</div>" +
       ctaBand()
     );
@@ -913,7 +950,7 @@
       brand: { "@type": "Brand", name: "adzakART" },
       offers: {
         "@type": "Offer",
-        url: design.etsy,
+        url: location.origin + location.pathname + "#/design/" + design.id,
         priceCurrency: "USD",
         price: CFG.price.toFixed(2),
         availability: "https://schema.org/InStock",
@@ -1041,6 +1078,18 @@
   }
 
   function onClick(event) {
+    // A design whose file has not been produced yet: never a silent dead click.
+    var awaiting = event.target.closest("[data-awaiting]");
+    if (awaiting) {
+      event.preventDefault();
+      var waitDesign = BY_ID.get(awaiting.getAttribute("data-awaiting"));
+      showToast(
+        (waitDesign ? waitDesign.short + " — " : "") +
+        "the print file is still being prepared. Try another design in the meantime."
+      );
+      return;
+    }
+
     if (event.target.closest("[data-clear-search]")) {
       clearSearchInput();
       return;

@@ -6,7 +6,7 @@ Reads:   data/catalog.tsv + data/catalog-part2.tsv
 Writes:  data/catalog.json, js/catalog.js
 
 Add a new design by appending a row to the TSV:
-    id <TAB> slug <TAB> title <TAB> image-path <TAB> etsy-price
+    id <TAB> slug <TAB> title <TAB> image-path <TAB> source-price
 then run:  python3 tools/build_catalog.py
 """
 from __future__ import annotations
@@ -25,7 +25,6 @@ LOCAL_MAP = DATA / "local-images.json"
 USE_LOCAL = "--local" in sys.argv
 
 IMAGE_BASE = "https://i.etsystatic.com/61867927"
-SHOP_URL = "https://www.etsy.com/shop/adzakART"
 SHOP_NAME = "adzakART"
 OWNER = "Mohammed Bouifri"
 LOCATION = "Sefrou, Morocco"
@@ -229,7 +228,7 @@ def read_rows() -> list[dict]:
                     "slug": slug or slugify(title),
                     "title": title,
                     "imagePath": image,
-                    "etsyPrice": float(price) if price else None,
+                    "sourcePrice": float(price) if price else None,
                 }
             )
     seen: set[str] = set()
@@ -280,8 +279,6 @@ def main() -> None:
                 "imageLarge": image if local else image.replace("il_340x270", "il_794xN"),
                 "imageCard": image if local else image.replace("il_340x270", "il_680x540"),
                 "clean": clean,
-                "etsyPrice": row["etsyPrice"],
-                "etsy": f"https://www.etsy.com/listing/{row['id']}/{row['slug']}",
                 "index": index,
             }
         )
@@ -302,7 +299,6 @@ def main() -> None:
             "name": SHOP_NAME,
             "owner": OWNER,
             "location": LOCATION,
-            "url": SHOP_URL,
             "sales": 118,
             "rating": 4.5,
             "reviewCount": 6,

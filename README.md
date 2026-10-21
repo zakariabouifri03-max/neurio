@@ -118,26 +118,34 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 ## 🛍️ adzakART — digital design storefront
 
-A complete English storefront for the **adzakART** Etsy shop: all **139 designs**, every one **$2**, delivered as a single transparent PNG.
+A complete English storefront for **adzakART**: all **139 designs**, every one **$2**, delivered as a single transparent PNG.
 
 - Editorial home page, searchable shop with 10 collections, product pages, saved designs, FAQ, license and About.
-- Real checkout: each buy button opens the matching Etsy listing (payment + instant delivery stay on Etsy).
+- **Direct delivery**: “Get this design” downloads `assets/designs/clean/<id>.png` straight to the buyer's device — no marketplace, no redirect, no account.
 - No build step. Open [`adzakart/index.html`](adzakart/index.html) or serve the folder:
 
 ```bash
-cd adzakart && python3 -m http.server 8080
+cd adzakart && python3 -m http.server 8080 --bind 0.0.0.0
 ```
 
-**Transparent delivery is enforced, not just promised.** Two offline tools turn finished artwork into sell-ready cut-outs and refuse to pass a file that still has a background:
+### Putting your artwork into the store
+
+The store can only hand over files that live inside it, so the artwork is dropped in once, as a batch:
 
 ```bash
 pip install Pillow
-python3 adzakart/tools/clean-background.py --in raw/ --out adzakart/assets/designs/clean --preview
-python3 adzakart/tools/check-transparency.py --in adzakart/assets/designs/clean
-python3 adzakart/tools/build_catalog.py
+# name each file with its design id, e.g. raw/4523481819-funny-whiskey.jpg
+python3 adzakart/tools/prepare-store.py
 ```
 
-Any design with a cleaned file gets a checkerboard preview on the site (the buyer sees the actual deliverable) and an entry in `deliverables.csv` telling you which Etsy listing to update.
+That removes the background, upscales to 3000 px / 300 DPI, refuses anything that still has a backdrop, writes the download file, writes a light web preview, and rebuilds the catalog. It ends with `Store status: N/139 designs can be downloaded right now.`
+
+Individual tools are usable alone:
+
+```bash
+python3 adzakart/tools/clean-background.py --in raw --out adzakart/assets/designs/clean --preview
+python3 adzakart/tools/check-transparency.py --in adzakart/assets/designs/clean
+python3 adzakart/tools/build_catalog.py --local
+```
 
 Catalog, price, copy and images are all editable — see [`adzakart/README.md`](adzakart/README.md).
-
