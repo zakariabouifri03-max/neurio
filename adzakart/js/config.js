@@ -131,7 +131,7 @@ window.ADZAK_CONFIG = {
     },
     {
       q: "Is the background really transparent?",
-      a: "Yes. The design arrives on its own — no white box, no page background, no watermark. That means you can drop it straight onto a t-shirt, tumbler, tote or sticker in Canva, Cricut Design Space, Photoshop or Procreate. If a design deliberately includes a printed shape (a badge, a frame, a poster), that shape is part of the artwork.",
+      a: "Yes. The artwork is cut out cleanly — no white box, no paper background, no watermark, and no pale fringe around the edges. Every file is checked for that before it goes on sale. That means you can drop it straight onto a t-shirt, tumbler, tote or sticker in Canva, Cricut Design Space, Photoshop or Procreate. If a design deliberately includes a printed shape (a badge, a frame, a poster), that shape is part of the artwork.",
     },
     {
       q: "Can I sell products made with the design?",

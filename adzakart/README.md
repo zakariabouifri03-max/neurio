@@ -16,9 +16,14 @@ adzakart/
 │   ├── catalog.tsv            # 72 designs
 │   ├── catalog-part2.tsv      # 67 designs
 │   └── catalog.json           # generated
-├── assets/favicon.svg
+├── assets/
+│   ├── favicon.svg
+│   └── designs/clean/          # transparent PNGs you deliver (created by the tool)
 └── tools/
     ├── build_catalog.py       # TSV → catalog.json + catalog.js
+    ├── clean-background.py    # backdrop remover → sell-ready transparent PNG
+    ├── check-transparency.py  # quality gate: proves the background is gone
+    ├── lib_bg.py              # shared cut-out + verification maths
     └── fetch-images.mjs       # optional: mirror Etsy images locally
 ```
 
@@ -88,6 +93,98 @@ python3 tools/build_catalog.py --local
 ```
 
 That writes `data/local-images.json` and points the catalog at local files. Re-run both commands whenever you add designs. Commit the `assets/designs/` folder if you want the host to serve them.
+
+## Make the download genuinely transparent ⭐
+
+The promise on every product page is a design **with no background**. That is a
+two-part job: the file the buyer receives must be a real cut-out, and the site
+should show that same file.
+
+### 1. Cut the background out of your artwork
+
+Put your finished files in a folder, named after the Etsy listing id:
+
+```
+raw/
+├── 4523481819-funny-whiskey.jpg
+├── 4558369974-highland-cow.jpg
+└── ...
+```
+
+The first 8–12 digits are all that matters. Then:
+
+```bash
+pip install Pillow                     # once
+python3 tools/clean-background.py --in raw --out assets/designs/clean --preview
+```
+
+For each file it reads the real backdrop colour from the border, flood-fills
+**only the border-connected area** (so white eyes, highlights and letter
+counters survive), feathers the cut edge, un-multiplies the backdrop out of
+semi-transparent pixels, trims to the artwork and writes `assets/designs/clean/<id>.png`.
+
+It prints a PASS/FAIL table and writes `deliverables.csv`:
+
+| listing_id | design | file | etsy_url | status |
+|---|---|---|---|---|
+| 4523481819 | Funny Whiskey Cigar | clean/4523481819.png | etsy.com/listing/4523481819/… | PASS |
+
+Useful flags: `--tolerance 18` for noisy JPEGs, `--choke 1` if a faint halo
+survives, `--pad 6` for transparent breathing room, `--keep-size` to keep the
+original canvas, `--preview` for checkerboard JPGs you can eyeball.
+
+### 2. Prove it before you upload
+
+```bash
+python3 tools/check-transparency.py --in assets/designs/clean
+```
+
+This is the gate. It fails a file when it has no alpha channel, has opaque
+corners (a boxed/JPEG backdrop), is mostly opaque, has almost no transparent
+area, or carries a white fringe on the cut edge — the exact "white cast around
+the image" problem buyers complained about. Exit code is `0` only when every
+file is sell-ready, so you can run it in CI or before a bulk upload.
+
+```bash
+python3 tools/check-transparency.py --in assets/designs/clean --preview preview-check/
+```
+
+### 3. Point the site at the real files
+
+```bash
+python3 tools/build_catalog.py
+```
+
+Any design that has `assets/designs/clean/<id>.png` now gets:
+
+- `"clean": "assets/designs/clean/<id>.png"` in the catalog (plus `shop.cleanDesigns`),
+- a checkerboard preview on its product page and card — the buyer sees the
+  actual deliverable, not a flat JPEG,
+- the caption *"This is the exact file you get — transparent background,
+  nothing behind it"* instead of *"Flat preview"*.
+
+Designs without a cleaned file keep using the Etsy image and the old caption,
+so you can migrate a few at a time.
+
+### 4. Put the cleaned PNG on Etsy
+
+A checkout from this site opens the matching Etsy listing, so the **Etsy file**
+is what the buyer downloads. For each row in `deliverables.csv`:
+
+1. Open `etsy_url`.
+2. *Edit listing → Digital files* → delete the old file → upload
+   `assets/designs/clean/<id>.png`.
+3. Save. Repeat for the next row.
+
+Until that is done, the page promise and the delivered file disagree. The
+`cleanDesigns` count in `data/catalog.json` tells you how many listings are
+done.
+
+> **White-on-white warning:** if a design contains white or near-white details
+> and was flattened onto a white canvas, those details are already gone in the
+> JPEG — no tool can recover them. `clean-background.py` names the files that
+> came from a near-white canvas so you can check the preview. If something is
+> missing, re-export that design on a mid-tone or dark backdrop and run it again.
 
 ## Customising
 

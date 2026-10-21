@@ -240,6 +240,20 @@ def read_rows() -> list[dict]:
     return rows
 
 
+CLEAN_DIR = ROOT / "assets" / "designs" / "clean"
+
+
+def clean_asset(design_id: str) -> str | None:
+    """Return the web path of a background-removed PNG for this design, if one
+    has been produced by tools/clean-background.py. This is the file the buyer
+    should receive, and it is what the product page previews."""
+    for ext in (".png", ".webp"):
+        path = CLEAN_DIR / f"{design_id}{ext}"
+        if path.exists():
+            return f"assets/designs/clean/{design_id}{ext}"
+    return None
+
+
 def main() -> None:
     rows = read_rows()
     local_map = {}
@@ -251,6 +265,7 @@ def main() -> None:
         label = CATEGORY_BY_ID[category][0]
         local = local_map.get(row["id"])
         image = local if local else IMAGE_BASE + row["imagePath"]
+        clean = clean_asset(row["id"])
         designs.append(
             {
                 "id": row["id"],
@@ -264,12 +279,14 @@ def main() -> None:
                 "image": image,
                 "imageLarge": image if local else image.replace("il_340x270", "il_794xN"),
                 "imageCard": image if local else image.replace("il_340x270", "il_680x540"),
+                "clean": clean,
                 "etsyPrice": row["etsyPrice"],
                 "etsy": f"https://www.etsy.com/listing/{row['id']}/{row['slug']}",
                 "index": index,
             }
         )
 
+    clean_total = sum(1 for d in designs if d["clean"])
     counts: dict[str, int] = {slug: 0 for slug, *_ in CATEGORIES}
     for design in designs:
         for tag in design["tags"]:
@@ -290,6 +307,7 @@ def main() -> None:
             "rating": 4.5,
             "reviewCount": 6,
             "totalDesigns": len(designs),
+            "cleanDesigns": clean_total,
         },
         "categories": categories,
         "designs": designs,

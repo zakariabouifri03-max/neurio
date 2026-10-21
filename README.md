@@ -128,5 +128,16 @@ A complete English storefront for the **adzakART** Etsy shop: all **139 designs*
 cd adzakart && python3 -m http.server 8080
 ```
 
+**Transparent delivery is enforced, not just promised.** Two offline tools turn finished artwork into sell-ready cut-outs and refuse to pass a file that still has a background:
+
+```bash
+pip install Pillow
+python3 adzakart/tools/clean-background.py --in raw/ --out adzakart/assets/designs/clean --preview
+python3 adzakart/tools/check-transparency.py --in adzakart/assets/designs/clean
+python3 adzakart/tools/build_catalog.py
+```
+
+Any design with a cleaned file gets a checkerboard preview on the site (the buyer sees the actual deliverable) and an entry in `deliverables.csv` telling you which Etsy listing to update.
+
 Catalog, price, copy and images are all editable — see [`adzakart/README.md`](adzakart/README.md).
 

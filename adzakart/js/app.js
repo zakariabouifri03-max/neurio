@@ -93,14 +93,16 @@
 
   function image(design, options) {
     options = options || {};
-    var src = options.large ? design.imageLarge : design.imageCard;
+    var fallback = options.large ? design.imageLarge : design.imageCard;
+    // If a background-removed file exists, show the real deliverable.
+    var src = design.clean || fallback;
     var alt = options.alt === undefined ? "" : options.alt;
     return (
       '<img src="' + esc(src) + '"' +
       (alt ? ' alt="' + esc(alt) + '"' : ' alt=""') +
       (options.eager ? "" : ' loading="lazy"') +
       ' decoding="async" referrerpolicy="no-referrer" data-img' +
-      ' data-fallback="' + esc(design.image) + '">'
+      ' data-fallback="' + esc(fallback) + '">'
     );
   }
 
@@ -115,7 +117,7 @@
     var saved = state.saved.has(design.id);
     return (
       '<article class="card reveal" style="transition-delay:' + Math.min(index || 0, 8) * 32 + 'ms">' +
-        '<a class="card-media" href="#/design/' + design.id + '" aria-label="View ' + esc(design.short) + '">' +
+        '<a class="card-media' + (design.clean ? " is-clean" : "") + '" href="#/design/' + design.id + '" aria-label="View ' + esc(design.short) + '">' +
           image(design) +
           '<span class="price-pill">' + PRICE + "</span>" +
         "</a>" +
@@ -543,12 +545,14 @@
         "</nav>" +
         '<div class="product-grid">' +
           '<div class="product-media-col">' +
-            '<div class="product-media">' +
+            '<div class="product-media' + (d.clean ? " is-clean" : "") + '">' +
               image(d, { large: true, eager: true, alt: d.short + " — transparent PNG design by adzakART" }) +
               '<span class="media-tag">Transparent PNG</span>' +
               '<span class="media-index">' + PRICE + " · instant download</span>" +
             "</div>" +
-            '<p class="media-caption">Flat preview · your download arrives with a transparent background</p>' +
+            '<p class="media-caption">' + (d.clean
+              ? "This is the exact file you get — transparent background, nothing behind it"
+              : "Flat preview · your download arrives with a transparent background") + "</p>" +
           "</div>" +
           '<div class="product-copy">' +
             '<p class="card-cat"><a href="#/shop/' + d.category + '">' + esc(d.categoryLabel) + "</a></p>" +
