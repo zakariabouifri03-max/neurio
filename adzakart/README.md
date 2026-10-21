@@ -39,9 +39,14 @@ No build step, no dependencies, no server code:
 
 ```bash
 cd adzakart
-python3 -m http.server 8080 --bind 0.0.0.0
-# open http://localhost:8080
+python3 tools/serve.py            # http://localhost:8080
 ```
+
+`tools/serve.py` is a tiny static server that sends `Cache-Control: no-store`
+for HTML, JS and CSS. Without it, a browser can keep an old copy of `app.js` in
+cache and keep showing an older version of the store after you change
+something. (Plain `python3 -m http.server 8080` also works — just hard-refresh
+with **Ctrl/Cmd + Shift + R** if a change does not appear.)
 
 Deploy by uploading the folder to any static host. On **GitHub Pages** it works
 from a subfolder (e.g. `https://user.github.io/neurio/adzakart/`) because every
@@ -75,16 +80,30 @@ be placed in the project once. That is one command.
 pip install Pillow            # once
 ```
 
-1. Drop your files into `raw/`, named with the design id first:
+1. Put your files in `raw/` — **or pass a `.zip`**:
 
-   ```
-   raw/
-   ├── 4523481819-funny-whiskey.jpg
-   ├── 4558369974-highland-cow.png
-   └── 4523705786-mexico.jpg
+   ```bash
+   python3 tools/prepare-store.py --in designs.zip
    ```
 
-   The id is the number in the design's page address: `#/design/4523481819`.
+   Filenames can be anything. If the name starts with the design id it is used
+   directly:
+
+   ```
+   raw/4523481819-funny-whiskey.jpg
+   raw/4558369974-highland-cow.png
+   ```
+
+   If there is no id, the name is matched against the design titles in the
+   catalog, so this works too:
+
+   ```
+   raw/I'll Be In The Backyard.png      -> 4523481819
+   raw/Highland Cow Halloween.png       -> 4558369974
+   ```
+
+   It prints every guess so you can check it, and skips anything it cannot
+   place with confidence.
 
 2. Run:
 
@@ -96,6 +115,7 @@ For every file it:
 
 | step | result |
 |---|---|
+| reads the file | if it already has real transparency it is used as-is |
 | removes the backdrop | a real transparent PNG (no white box left behind) |
 | trims to the artwork | no dead space around the design |
 | upscales | 3000 px long edge, 300 DPI, sharpened |
@@ -135,6 +155,17 @@ semi-transparent pixels, then writes a print-ready PNG.
 channel, opaque corners (a boxed or JPEG backdrop), is mostly opaque, has almost
 no transparent area, or carries a white fringe on the cut edge. Exit code is `0`
 only when every file is sell-ready.
+
+### Use the real artwork, not the product photos
+
+The images that appear on a shop's listing cards are usually **mockups**: the
+design printed on a shirt, photographed on a table, with a logo stamp on top.
+Removing the background from a mockup gives you a white sweatshirt with a stamp
+on it — not a design.
+
+`prepare-store.py` needs the actual artwork file for each design (the PNG you
+deliver to a buyer). If you only have mockups, save the transparent master from
+the design app you work in, then run the tool again.
 
 ### White-on-white warning
 

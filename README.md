@@ -134,9 +134,12 @@ The store can only hand over files that live inside it, so the artwork is droppe
 
 ```bash
 pip install Pillow
-# name each file with its design id, e.g. raw/4523481819-funny-whiskey.jpg
-python3 adzakart/tools/prepare-store.py
+python3 adzakart/tools/prepare-store.py --in designs.zip   # or --in raw/
 ```
+
+Filenames don't need ids — `I'll Be In The Backyard.png` is matched to the right design automatically, and every guess is printed for you to check.
+
+Serve the result with `python3 adzakart/tools/serve.py` (sends `no-store`, so the browser can never show you an old build).
 
 That removes the background, upscales to 3000 px / 300 DPI, refuses anything that still has a backdrop, writes the download file, writes a light web preview, and rebuilds the catalog. It ends with `Store status: N/139 designs can be downloaded right now.`
 

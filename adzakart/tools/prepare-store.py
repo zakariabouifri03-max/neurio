@@ -23,10 +23,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
+import zipfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, ".."))
@@ -35,7 +39,7 @@ sys.path.insert(0, HERE)
 from PIL import Image  # noqa: E402
 
 from lib_bg import (  # noqa: E402
-    human_bytes, list_images, cut_backdrop, trim, summarise, verdict,
+    SUPPORTED, human_bytes, cut_backdrop, trim, summarise, verdict,
     white_halo_score, upscale, save_png, preview_on_checker,
 )
 
@@ -49,6 +53,62 @@ def design_id(name: str) -> str:
     """4523481819-funny-whiskey.jpg -> 4523481819"""
     match = re.match(r"^\s*(\d{8,12})", name)
     return match.group(1) if match else ""
+
+
+# --------------------------------------------------------------------------
+# matching a file to a design when the filename has no id
+# --------------------------------------------------------------------------
+STOP = {
+    "png", "jpg", "jpeg", "webp", "design", "designs", "digital", "download",
+    "sublimation", "clipart", "file", "the", "and", "for", "with", "a", "an",
+    "of", "to", "in", "on", "my", "copy", "final", "transparent", "background",
+}
+
+
+def words(text: str) -> set[str]:
+    text = re.sub(r"[^a-z0-9]+", " ", text.lower())
+    return {w for w in text.split() if len(w) > 2 and w not in STOP}
+
+
+def build_index(catalog: list[dict]) -> dict:
+    """Inverted index: word -> designs that contain it, with rarity weights.
+
+    A word that appears in one design only ("backyard") is worth far more than
+    one that appears in fifty ("halloween").
+    """
+    doc_words: dict[str, set[str]] = {}
+    for design in catalog:
+        doc_words[design["id"]] = words(design.get("short", "") + " " + design.get("title", ""))
+    df: dict[str, int] = {}
+    for bag in doc_words.values():
+        for w in bag:
+            df[w] = df.get(w, 0) + 1
+    total = max(1, len(doc_words))
+    idf = {w: math.log(1 + total / c) for w, c in df.items()}
+    return {"doc_words": doc_words, "df": df, "idf": idf}
+
+
+def match_design(filename: str, index: dict) -> tuple[str, float, float]:
+    """Best-effort match for filenames without an id, e.g.
+    "I'll Be In The Backyard.png" -> 4523481819.
+
+    Returns (design_id, rarity score, share of filename words matched).
+    """
+    name_words = words(filename)
+    if not name_words or not index.get("idf"):
+        return "", 0.0, 0.0
+    scores: dict[str, float] = {}
+    hits: dict[str, int] = {}
+    for w in name_words:
+        for did, bag in index["doc_words"].items():
+            if w in bag:
+                scores[did] = scores.get(did, 0.0) + index["idf"][w]
+                hits[did] = hits.get(did, 0) + 1
+    if not scores:
+        return "", 0.0, 0.0
+    best = max(scores, key=scores.get)
+    share = hits[best] / len(name_words)
+    return best, scores[best], share
 
 
 def web_preview(img: Image.Image, path: str, max_side: int = 1100) -> None:
@@ -84,14 +144,30 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    if not os.path.isdir(args.src):
-        print(f"\n  No folder at {args.src}")
-        print("  Create it and drop your design files in, named after the design id:")
-        print("     raw/4523481819-funny-whiskey.jpg")
-        print("  Then run this command again.\n")
+    is_zip = os.path.isfile(args.src) and args.src.lower().endswith(".zip")
+    if not os.path.isdir(args.src) and not is_zip:
+        print(f"\n  Nothing at {args.src}")
+        print("  Point me at a folder of designs, or a .zip of them:")
+        print("     python3 tools/prepare-store.py --in raw")
+        print("     python3 tools/prepare-store.py --in designs.zip\n")
         return 2
 
-    files = list_images(args.src)
+    # a .zip of artwork is unpacked on the fly — that is how most people have it
+    workdir = None
+    src = args.src
+    if os.path.isfile(src) and src.lower().endswith(".zip"):
+        workdir = tempfile.mkdtemp(prefix="adzakart-")
+        with zipfile.ZipFile(src) as zf:
+            zf.extractall(workdir)
+        src = workdir
+        print(f"  unpacked {os.path.basename(args.src)} -> {len(os.listdir(workdir))} item(s)")
+
+    files = []
+    for root, _dirs, names in os.walk(src):
+        for name in sorted(names):
+            if name.lower().endswith(SUPPORTED):
+                files.append(os.path.join(root, name))
+    files.sort()
     if not files:
         print(f"\n  {args.src} has no images yet.")
         print("  Add files named  <design-id>-anything.jpg  and run this again.\n")
@@ -106,24 +182,37 @@ def main() -> int:
         except Exception:
             local_map = {}
 
-    known = set()
+    known, index, titles = set(), {}, {}
     if os.path.exists(CATALOG):
         try:
             with open(CATALOG, encoding="utf-8") as fh:
-                known = {d["id"] for d in json.load(fh)["designs"]}
+                catalog_designs = json.load(fh)["designs"]
+            known = {d["id"] for d in catalog_designs}
+            titles = {d["id"]: d.get("short", d["id"]) for d in catalog_designs}
+            index = build_index(catalog_designs)
         except Exception:
-            known = set()
+            known, titles, index = set(), {}, {}
 
-    rows, skipped, shipped = [], [], 0
+    rows, skipped, shipped, guessed = [], [], 0, []
+    used: set[str] = set()
     for path in files:
         base = os.path.splitext(os.path.basename(path))[0]
         did = design_id(base)
         if not did:
-            skipped.append((base, "no design id in the filename"))
-            continue
+            # no id in the name: match the filename against the design titles
+            did, score, share = match_design(base, index)
+            if not did or share < 0.5:
+                skipped.append((base, "could not tell which design this is — prefix it with the design id"))
+                continue
+            guessed.append((base, did, titles.get(did, did), share))
+
         if did not in known:
             skipped.append((base, f"design {did} is not in the catalog"))
             continue
+        if did in used:
+            skipped.append((base, f"design {did} was already provided by another file"))
+            continue
+        used.add(did)
 
         try:
             with Image.open(path) as im:
@@ -178,6 +267,11 @@ def main() -> int:
         for r in rows:
             print(f"  {r[0].ljust(14)}{r[1].rjust(12)}{r[2].rjust(8)}{r[3].rjust(9)}{r[4].rjust(11)}")
 
+    if guessed:
+        print("\n  Matched by name (no id in the filename):")
+        for base, did, title, score in guessed:
+            print(f"   {base[:40]:42} -> {did}  {title[:34]}  ({score*100:.0f}%)")
+
     print(f"\n  {shipped} design(s) ready to download  ·  {len(skipped)} skipped")
     if skipped:
         print("\n  Skipped:")
@@ -205,6 +299,9 @@ def main() -> int:
         print("  Reload the storefront — “Get this design” now hands over the file directly.\n")
     elif shipped:
         print("\n  Files written. Run: python3 tools/build_catalog.py --local\n")
+
+    if workdir:
+        shutil.rmtree(workdir, ignore_errors=True)
 
     return 0 if shipped or not skipped else 1
 
