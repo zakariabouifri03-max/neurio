@@ -462,9 +462,9 @@ static HICON iconFromPng(const std::string& png, int size) {
     return CreateIconFromResourceEx(reinterpret_cast<PBYTE>(const_cast<char*>(png.data())), DWORD(png.size()), TRUE,
                                     0x00030000, size, size, LR_DEFAULTCOLOR);
 }
-static void setWindowIcons(HICON big, HICON small) {
-    SendMessageW(g.hwnd, WM_SETICON, ICON_BIG, LPARAM(big ? big : g.appIconBig));
-    SendMessageW(g.hwnd, WM_SETICON, ICON_SMALL, LPARAM(small ? small : g.appIconSmall));
+static void setWindowIcons(HICON bigIcon, HICON smallIcon) {
+    SendMessageW(g.hwnd, WM_SETICON, ICON_BIG, LPARAM(bigIcon ? bigIcon : g.appIconBig));
+    SendMessageW(g.hwnd, WM_SETICON, ICON_SMALL, LPARAM(smallIcon ? smallIcon : g.appIconSmall));
 }
 
 // ============================================================ launching an APK (worker thread)
