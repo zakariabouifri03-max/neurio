@@ -121,7 +121,9 @@ if ($g) {
     Write-Output "  errors: $(@($g.errors) -join ' || ')"
     Write-Output "  text: $($g.text)"
 }
+Check 'smoke: Bash Baqi runs without JavaScript errors' ($g -and @($g.errors).Count -eq 0) "errors=$(@($g.errors) -join ' || ')"
 Check 'smoke: Bash Baqi starts in keyboard mode' ($g -and $g.maxTouchPoints -le 1) "maxTouchPoints=$($g.maxTouchPoints)"
+Check 'smoke: app user-agent token (fast mode)' ($g -and $g.ua -match 'BashBaqiAPK/1\.0') "ua='$($g.ua)'"
 Check 'smoke: screenshots (game, library, native dialog)' ((Test-Path "$($s.out)\game.png") -and (Test-Path "$($s.out)\home.png") -and (Test-Path "$($s.out)\native.png")) ''
 
 $s = Smoke $Exe 'cordova' @($CordovaApk)

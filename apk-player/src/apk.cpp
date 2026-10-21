@@ -146,7 +146,7 @@ struct StringPool {
         if (n < 28) return false;
         uint16_t type = rd16(p), hsize = rd16(p + 2);
         uint32_t size = rd32(p + 4);
-        if (type != RES_STRING_POOL_TYPE || size > n || size < 28 || hsize < 28) return false;
+        if (type != RES_STRING_POOL_TYPE || size > n || size < 28 || hsize < 28 || hsize > size) return false;
         uint32_t count = rd32(p + 8), flags = rd32(p + 16), strStart = rd32(p + 20);
         bool utf8 = (flags & (1u << 8)) != 0;
         if (count > (size - hsize) / 4 || strStart > size) return false;
@@ -155,8 +155,8 @@ struct StringPool {
         const uint8_t* end = p + size;
         for (uint32_t i = 0; i < count; i++) {
             uint32_t off = rd32(offs + 4 * i);
-            const uint8_t* s = p + strStart + off;
             if (strStart + uint64_t(off) >= size) continue;
+            const uint8_t* s = p + strStart + off;
             std::string& out = strings[i];
             if (utf8) {
                 // utf16 length (1 or 2 bytes), then utf8 byte length (1 or 2 bytes)
@@ -497,6 +497,46 @@ void scanForPrefix(const std::string& buf, const std::string& prefix, std::vecto
     }
 }
 
+// User-agent tokens a WebView shell appends with setUserAgentString(getUserAgentString() + " X/1.0"):
+// dex string constants of the form " Product/1.2" (leading space, one token). "" if none.
+std::string findUaSuffix(const std::string& d) {
+    if (d.find("setUserAgentString") == std::string::npos) return std::string();
+    static const char* const kBrowserTokens[] = {"mozilla", "applewebkit", "chrome", "chromium", "safari", "mobile",
+                                                 "version", "gecko", "firefox", "edg", "edge", "opr", "opera",
+                                                 "samsungbrowser", "crios", "fxios", "khtml", "trident", "wv",
+                                                 "headlesschrome", "android", "linux", nullptr};
+    std::vector<std::string> found;
+    // dex string_data_item: uleb128 utf16 length, MUTF-8 bytes, NUL. Look for short ASCII strings " Name/1.2".
+    for (size_t pos = d.find(' ', 1); pos != std::string::npos && found.size() < 4; pos = d.find(' ', pos + 1)) {
+        size_t len = (unsigned char)d[pos - 1];
+        if (len < 4 || len > 64 || pos + len >= d.size() || d[pos + len] != '\0') continue;
+        std::string t = d.substr(pos + 1, len - 1);  // without the leading space
+        size_t slash = t.find('/');
+        if (slash == std::string::npos || slash == 0 || slash + 1 >= t.size() || t.find('/', slash + 1) != std::string::npos)
+            continue;
+        bool ok = std::isalpha((unsigned char)t[0]) != 0 && std::isdigit((unsigned char)t[slash + 1]) != 0;
+        for (size_t k = 1; ok && k < slash; k++) {
+            unsigned char c = (unsigned char)t[k];
+            ok = std::isalnum(c) || c == '_' || c == '-' || c == '.';
+        }
+        for (size_t k = slash + 1; ok && k < t.size(); k++) {
+            unsigned char c = (unsigned char)t[k];
+            ok = std::isdigit(c) || c == '.';
+        }
+        if (!ok) continue;
+        std::string product = lower(t.substr(0, slash));
+        bool browser = false;
+        for (int k = 0; kBrowserTokens[k]; k++)
+            if (product == kBrowserTokens[k]) browser = true;
+        if (browser) continue;
+        if (std::find(found.begin(), found.end(), t) == found.end()) found.push_back(t);
+    }
+    if (found.empty() || found.size() > 3) return std::string();
+    std::string r;
+    for (const auto& t : found) r += " " + t;
+    return r;
+}
+
 const char* const kNotTheApp[] = {"licen", "privacy", "policy", "terms", "eula", "credits", "notice", "about",
                                   "help", "faq", "changelog", "open_source", "opensource", "oss", "third_party",
                                   "thirdparty", "copyright", "agreement", "consent", "tos.", "gdpr", "readme",
@@ -703,7 +743,7 @@ bool parseAxml(const std::string& buf, std::vector<XmlElem>& out) {
         if (size < 8 || off + size > n) break;
         if (type == RES_STRING_POOL_TYPE) {
             sp.parse(c, size);
-        } else if (type == RES_XML_RESOURCE_MAP_TYPE) {
+        } else if (type == RES_XML_RESOURCE_MAP_TYPE && hsize >= 8 && hsize <= size) {
             size_t cnt = (size - hsize) / 4;
             resMap.resize(cnt);
             for (size_t i = 0; i < cnt; i++) resMap[i] = rd32(c + hsize + 4 * i);
@@ -990,6 +1030,7 @@ bool inspect(const Archive& a, Info& info, std::string* error) {
             scanForPrefix(d, "file:///android_asset/", dexAssetRefs);
             scanForPrefix(d, "https://appassets.androidplatform.net/assets/", dexLoaderRefs);
             if (!usesWebView && d.find("Landroid/webkit/WebView;") != std::string::npos) usesWebView = true;
+            if (info.uaSuffix.empty()) info.uaSuffix = findUaSuffix(d);
         }
     }
 
@@ -1226,6 +1267,7 @@ std::string toJson(const Info& i) {
     o += std::string(",\"guessed\":") + (i.guessed ? "true" : "false");
     o += std::string(",\"cordova\":") + (i.cordova ? "true" : "false");
     o += std::string(",\"keyboard\":") + (i.keyboard ? "true" : "false");
+    o += ",\"uaSuffix\":" + q(i.uaSuffix);
     o += ",\"abis\":" + arr(i.abis);
     o += ",\"engines\":" + arr(i.engines);
     o += ",\"webBytes\":" + std::to_string(i.webBytes);

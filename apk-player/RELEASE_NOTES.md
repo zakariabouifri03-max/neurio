@@ -7,4 +7,6 @@
 * Game saves are kept. Desktop shortcuts are supported. `.xapk` / `.apks` bundles are supported.
 * Native Android games (Unity, Unreal, Godot, Flutter, Java) are detected and explained. They need a real Android system.
 
+**`BashBaqiRacing-1.0.1.apk`** is a fixed build of *Bash Baqi Racing*. Version 1.0 crashed when the first race started (`Cannot read properties of null (reading 'morphAttributes')`). It is signed with the same key, so it also installs over 1.0 on phones.
+
 Uses the Microsoft Edge WebView2 runtime that ships with Windows 10/11. Because the exe is unsigned, SmartScreen may warn the first time: click *More info → Run anyway*.

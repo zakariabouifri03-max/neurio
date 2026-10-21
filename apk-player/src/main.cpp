@@ -236,6 +236,8 @@ static struct App {
     Mode mode = Mode::Starting;
     std::wstring dataDir, uiDir, iconsDir, appsDir, logPath;
     std::wstring defaultUA;
+    bool minimized = false;
+    std::wstring uaSuffix;  // what the running app appends to its WebView user agent (e.g. " GameAPK/1.0")
     std::wstring appHost;       // currently mapped app host
     std::wstring pendingLaunch; // from the command line
     std::vector<std::string> pendingHome;  // messages for the launcher page, sent once it is ready
@@ -657,6 +659,7 @@ static void goHome() {
     SetWindowTextW(g.hwnd, APP_TITLE);
     setWindowIcons(nullptr, nullptr);
     if (ComPtr<ICoreWebView2_8> w8; SUCCEEDED(g.wv.As(&w8))) w8->put_IsMuted(FALSE);
+    g.uaSuffix.clear();
     applyInputMode(false, [] {
         if (g.wv) g.wv->Navigate(L"https://player.example/home.html");
     });
@@ -678,9 +681,10 @@ static void applyInputMode(bool touch, std::function<void()> done) {
             }
             std::wstring ua = L"Mozilla/5.0 (Linux; Android 14; Pixel 8 Build/AP2A.240905.003; wv) AppleWebKit/537.36 (KHTML, like "
                               L"Gecko) Version/4.0 Chrome/" + chrome + L" Mobile Safari/537.36";
+            ua += g.uaSuffix;
             s2->put_UserAgent(ua.c_str());
         } else {
-            s2->put_UserAgent(g.defaultUA.c_str());
+            s2->put_UserAgent((g.defaultUA + g.uaSuffix).c_str());
         }
     }
     std::wstring t = touch ? L"true" : L"false";
@@ -747,7 +751,8 @@ static void startApp(std::unique_ptr<LaunchResult> r) {
     }
     setWindowIcons(g.gameIconBig, g.gameIconSmall);
     sizeForOrientation(r->info.orientation);
-    plog("navigate %s (touch=%d, %.2fs)", U(url).c_str(), int(touch), r->seconds);
+    g.uaSuffix = W(r->info.uaSuffix);
+    plog("navigate %s (touch=%d, %.2fs, ua+'%s')", U(url).c_str(), int(touch), r->seconds, r->info.uaSuffix.c_str());
     g.current = std::move(r);
     applyInputMode(touch, [url] {
         if (!g.wv || g.mode != Mode::Game) return;
@@ -1341,9 +1346,16 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             if (g.ctrl) {
                 if (wp == SIZE_MINIMIZED) {
                     g.ctrl->put_IsVisible(FALSE);  // pauses rendering + fires visibilitychange (games pause)
+                    // like Android's onPause(): some WebView shells expose hooks for it (e.g. Bash Baqi mutes)
+                    if (g.wv && g.mode == Mode::Game && !g.minimized)
+                        g.wv->ExecuteScript(L"try{window.__pauseGame&&window.__pauseGame()}catch(e){}", nullptr);
+                    g.minimized = true;
                 } else {
                     g.ctrl->put_IsVisible(TRUE);
                     resizeWebView();
+                    if (g.minimized && g.wv && g.mode == Mode::Game)
+                        g.wv->ExecuteScript(L"try{window.__resumeGame&&window.__resumeGame()}catch(e){}", nullptr);
+                    g.minimized = false;
                 }
             }
             return 0;

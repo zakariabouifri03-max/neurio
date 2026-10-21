@@ -68,6 +68,7 @@ struct Info {
     bool guessed = false;   // entry/url found heuristically (not from an explicit reference)
     bool cordova = false;
     bool keyboard = false;  // the web content listens to keyboard events
+    std::string uaSuffix;   // token(s) the app appends to its WebView user agent, e.g. " MyGameAPK/1.0"
     std::vector<std::string> abis;
     std::vector<std::string> engines;  // native engines / runtimes found in lib/ or assets/
     uint64_t webBytes = 0;             // total size of files under webRoot

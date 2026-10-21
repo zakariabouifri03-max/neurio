@@ -57,14 +57,6 @@ jobs:
             }
           }
 
-      - name: Get the Bash Baqi Racing APK (test input)
-        shell: bash
-        run: |
-          git fetch --depth 1 origin arena/340501d9-neurio
-          mkdir -p smoke-input
-          git show FETCH_HEAD:dist/BashBaqiRacing.apk > smoke-input/BashBaqiRacing.apk
-          ls -la smoke-input
-
       - name: Make sure the WebView2 runtime is installed
         shell: pwsh
         run: |
@@ -81,7 +73,7 @@ jobs:
         id: smoke
         shell: pwsh
         run: |
-          & apk-player\tests\ci-smoke.ps1 -BashBaqiApk smoke-input\BashBaqiRacing.apk
+          & apk-player\tests\ci-smoke.ps1 -BashBaqiApk apk-player\bin\BashBaqiRacing-1.0.1.apk
           exit $LASTEXITCODE
 
       - name: Show the player log on failure
@@ -104,7 +96,7 @@ jobs:
         run: |
           $pkg = Join-Path $env:RUNNER_TEMP 'NeurioApkPlayer'
           New-Item -ItemType Directory -Force $pkg | Out-Null
-          Copy-Item apk-player\bin\NeurioApkPlayer.exe, apk-player\bin\NeurioApkPlayer-32bit.exe $pkg
+          Copy-Item apk-player\bin\NeurioApkPlayer.exe, apk-player\bin\NeurioApkPlayer-32bit.exe, apk-player\bin\BashBaqiRacing-1.0.1.apk $pkg
           Copy-Item apk-player\README-WINDOWS.txt (Join-Path $pkg 'README.txt')
           Compress-Archive -Force -Path "$pkg\*" -DestinationPath apk-player\bin\NeurioApkPlayer-windows.zip
           Get-ChildItem apk-player\bin | Format-Table Name, Length
@@ -131,8 +123,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG=apk-player-v1.0.0
-          gh release view "$TAG" >/dev/null 2>&1 || \
-            gh release create "$TAG" --target "$GITHUB_REF_NAME" --title "Neurio APK Player 1.0.0 (Windows)" \
-              --notes-file apk-player/RELEASE_NOTES.md
-          gh release upload "$TAG" apk-player/bin/NeurioApkPlayer.exe apk-player/bin/NeurioApkPlayer-32bit.exe \
-            apk-player/bin/NeurioApkPlayer-windows.zip --clobber
+          # re-create the release on the commit that holds these binaries (same download URLs)
+          gh release delete "$TAG" --cleanup-tag -y >/dev/null 2>&1 || true
+          sleep 3
+          gh release create "$TAG" --target "$(git rev-parse HEAD)" --title "Neurio APK Player 1.0.0 (Windows)" \
+            --notes-file apk-player/RELEASE_NOTES.md \
+            apk-player/bin/NeurioApkPlayer.exe apk-player/bin/NeurioApkPlayer-32bit.exe \
+            apk-player/bin/NeurioApkPlayer-windows.zip apk-player/bin/BashBaqiRacing-1.0.1.apk

@@ -2,6 +2,7 @@ NEURIO APK PLAYER 1.0 - play Android HTML5 games on Windows, without an emulator
 ================================================================================
 
 HOW TO USE
+  (BashBaqiRacing-1.0.1.apk in this zip is a game you can try right away.)
   1. Double-click NeurioApkPlayer.exe
      (on an old 32-bit Windows use NeurioApkPlayer-32bit.exe).
   2. Click "Open APK" and pick your .apk  -- or drag the .apk onto the window,

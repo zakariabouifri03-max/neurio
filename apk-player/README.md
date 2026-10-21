@@ -12,6 +12,7 @@ Neurio APK Player is a small Windows program, about 1 MB. It opens an **Android 
 It is **not an emulator**. It unpacks the game's web files and runs them in the Microsoft Edge **WebView2** engine, which already ships with Windows 10/11. That keeps it light enough for weak PCs.
 
 **Download:** see the [`apk-player-v1.0.0` release](../../../releases/tag/apk-player-v1.0.0), or take [`bin/NeurioApkPlayer.exe`](bin/NeurioApkPlayer.exe) from this branch.
+[`bin/BashBaqiRacing-1.0.1.apk`](bin/BashBaqiRacing-1.0.1.apk) is a fixed build of the game: 1.0 crashed at the first race because of a `mergeGeometries` bug, now fixed in `src/builders.js`. Use it to try the player.
 
 | | |
 |---|---|

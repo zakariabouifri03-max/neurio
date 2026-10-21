@@ -113,3 +113,11 @@ It's a fullscreen WebView shell that runs the bundled single-file game 100% offl
 
 - Package: `com.bashbaqi.racing` · minSdk 21 (Android 5.0+) · signed v1+v2
 - Rebuildable: `node tools/build-singlefile.mjs` regenerates the bundled game (`bash-baqi-racing.html`); the APK pipeline lives in the repo history.
+
+---
+
+## 🖥️ Play APKs on a Windows PC, without an emulator
+
+`apk-player/` contains **Neurio APK Player**, a small `NeurioApkPlayer.exe` of about 600 KB. It opens HTML5/WebView APKs (like this game) in a native window, using the WebView2 engine built into Windows 10/11. That is far lighter than an Android emulator.
+
+Get it from the `apk-player-v1.0.0` release or from `apk-player/bin/`. Then drag the APK onto the exe and press **F11** for fullscreen. `apk-player/bin/BashBaqiRacing-1.0.1.apk` is the fixed game build: 1.0 crashed when the first race started. Details: [apk-player/README.md](apk-player/README.md).

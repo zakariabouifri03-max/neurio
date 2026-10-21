@@ -35,6 +35,14 @@ function tube(p1, p2, r, mat, seg = 6) {
 
 const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
 
+// mergeGeometries() refuses to mix indexed geometries (Box, Cone, Cylinder...) with
+// non-indexed ones (Icosahedron, Octahedron...): it returns null and `new Mesh(null)`
+// then throws "Cannot read properties of null (reading 'morphAttributes')", which killed
+// the first race on most tracks. Make everything non-indexed before merging.
+function mergeAll(geos) {
+  return mergeGeometries(geos.map((g) => (g.index ? g.toNonIndexed() : g)), false);
+}
+
 // ═══════════════════════════ CARS ═══════════════════════════════════════════
 
 export function buildCar(car, opts = {}) {
@@ -910,7 +918,7 @@ export function buildTrackWorld(map) {
         geos.push(xform(tint(new THREE.ConeGeometry(ww * 0.35, hh * 0.35, 7), 0xffffff), Math.cos(a) * rr, hh * 0.83 - 12, Math.sin(a) * rr));
       }
     }
-    const merged = mergeGeometries(geos, false);
+    const merged = mergeAll(geos);
     const mesh = new THREE.Mesh(merged, new THREE.MeshLambertMaterial({ vertexColors: true }));
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -1074,7 +1082,7 @@ export function buildGarageWorld() {
   for (const gg of PROPS.lantern(rng)) { gg.translate(5, 0, -7); palmGeos.push(gg); }
   for (const gg of PROPS.lantern(rng)) { gg.translate(-5, 0, 7); palmGeos.push(gg); }
   for (const gg of PROPS.palm(rng)) { gg.translate(12, 0, -14); palmGeos.push(gg); }
-  const decor = new THREE.Mesh(mergeGeometries(palmGeos, false), new THREE.MeshLambertMaterial({ vertexColors: true }));
+  const decor = new THREE.Mesh(mergeAll(palmGeos), new THREE.MeshLambertMaterial({ vertexColors: true }));
   decor.castShadow = true;
   decor.receiveShadow = true;
   g.add(decor);
