@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>⛏️ neurio Craft — Minecraft 3D Realistic</title>
+<meta name="description" content="Lo3ba Minecraft 3D wa9i3iya f l-moutasaffih: 3alam kbiiiir, bni w kesser, nhar w lil, hayawanat w TNT!">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛏️</text></svg>">
+<link rel="stylesheet" href="src/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../vendor/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div id="err"></div>
+
+<!-- ══════════════ HUD ══════════════ -->
+<div id="hud">
+  <div id="crosshair">+</div>
+  <div id="hudTop">
+    <div id="info">📍 …</div>
+    <div class="hudBtns">
+      <span id="timeIcon" title="L-wa9t">☀️</span>
+      <button id="btnTime" title="Beddel l-wa9t (T)">🕐</button>
+      <button id="btnFly" title="Fly mode (F)">🕊️</button>
+      <button id="btnInv" title="L-makhzon (E)">🎒</button>
+      <button id="btnMenuTop" title="Pause (Esc)">⏸</button>
+    </div>
+  </div>
+  <div id="blockName"></div>
+  <div id="hotbar"></div>
+</div>
+
+<!-- touch controls -->
+<div id="touch">
+  <div id="joy"><div id="joyKnob"></div></div>
+  <div class="touchBtns">
+    <button id="btnBreak" class="tbtn">⛏️</button>
+    <button id="btnPlace" class="tbtn">🧱</button>
+    <button id="btnJump" class="tbtn">⬆️</button>
+    <button id="btnFlyT" class="tbtn small">🕊️</button>
+  </div>
+</div>
+
+<!-- ══════════════ TITLE SCREEN ══════════════ -->
+<div id="menu">
+  <div class="menuCard">
+    <div class="logo">⛏️ NEURIO <span>CRAFT</span></div>
+    <div class="tagline">Minecraft 3D <b>Realistic</b> f l-moutasaffih — عالم مكعبات واقعي 🌍</div>
+
+    <button id="btnPlay">▶ &nbsp;EL3EB — العب دابا!</button>
+    <div id="loadTip">⏳ Kan-3ammer l-3alam…</div>
+
+    <div class="menuRow">
+      <label>🌱 Seed dyal l-3alam
+        <input id="seedInput" type="text" maxlength="24" spellcheck="false">
+      </label>
+      <label>🎨 Graphics
+        <select id="qualitySel">
+          <option value="low">⚡ Sari3 (mobile)</option>
+          <option value="med">✨ Zwina (balanced)</option>
+          <option value="high">💎 Ultra realistic</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="controls">
+      <span><b>WASD</b> تحرك</span><span>🖱️ <b>Souris</b> شوف</span>
+      <span><b>Clic gauche</b> كسّر ⛏️</span><span><b>Clic droit</b> بني 🧱</span>
+      <span><b>Space</b> نقّز</span><span><b>Shift</b> جري 🏃</span>
+      <span><b>F</b> طير 🕊️</span><span><b>E</b> المخزون 🎒</span>
+      <span><b>1–9</b> / 🖱️ wheel بدّل البلوك</span><span><b>T</b> نهار/غروب/ليل 🌗</span>
+      <span class="wide">💣 <b>Astuce:</b> كسّر TNT باش يتفرقع! · 📱 F tilifoun: joystick + boutons</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ INVENTORY ══════════════ -->
+<div id="inventory">
+  <div class="panel">
+    <div class="panelHead"><h2>🎒 L-Makhzon — المخزون الإبداعي</h2><button id="btnInvClose">✖</button></div>
+    <p class="hint">Klik 3la ay block bash y-t7at f slot li mkhtar f l-hotbar 👇</p>
+    <div id="invGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════════ PAUSE ══════════════ -->
+<div id="pause">
+  <div class="panel small">
+    <h2>⏸ Pause — توقف</h2>
+    <p class="hint">🌱 Seed: <b id="pauseSeed"></b> · L-3alam dyalek kayt-7fed automatiquement 💾</p>
+    <div class="pauseBtns">
+      <button id="btnResume" class="big">▶ Kemmel l-la3b</button>
+      <button id="btnFly2" class="big ghost">🕊️ Fly mode on/off</button>
+      <button id="btnNewWorld" class="big ghost">🎲 3alam jdid (seed 3achwa2i)</button>
+      <button id="btnResetWorld" class="big danger">🗑️ Mse7 l-bina2 dyali w bda men jdid</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module" src="src/game.js"></script>
+<script>
+addEventListener('error', (e) => {
+  const el = document.getElementById('err');
+  el.style.display = 'block';
+  el.textContent = '⚠️ ' + (e.message || e.error || 'error') + ' — refrechi la page';
+});
+</script>
+</body>
+</html>

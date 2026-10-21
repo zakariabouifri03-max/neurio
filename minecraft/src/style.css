@@ -1,0 +1,108 @@
+/* neurio Craft — UI */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #0b1026; }
+body { font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; color: #fff; user-select: none; }
+#app, #app canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+button { font-family: inherit; cursor: pointer; }
+#err { display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 99;
+  background: #b91c1c; color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 13px; max-width: 92vw; }
+
+/* ── HUD ─────────────────────────────────────────────────────────────────── */
+#hud { display: none; position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+#hud.show { display: block; }
+#crosshair { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -54%);
+  font-size: 26px; font-weight: 700; color: #fff; mix-blend-mode: difference; opacity: .9; }
+#hudTop { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: flex-start; }
+#info { background: rgba(10,14,24,.55); padding: 6px 12px; border-radius: 10px; font-size: 13px; backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,.14); }
+.hudBtns { display: flex; gap: 6px; align-items: center; pointer-events: auto; }
+.hudBtns button, #timeIcon { width: 40px; height: 40px; border-radius: 11px; border: 1px solid rgba(255,255,255,.18);
+  background: rgba(10,14,24,.55); color: #fff; font-size: 18px; display: grid; place-items: center; backdrop-filter: blur(4px); }
+.hudBtns button.on { background: #16a34a; border-color: #4ade80; }
+#blockName { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%);
+  font-size: 17px; font-weight: 700; text-shadow: 0 2px 6px #000; opacity: 0; transition: opacity .35s; white-space: nowrap; }
+#hotbar { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 5px;
+  pointer-events: auto; background: rgba(10,14,24,.5); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,.16);
+  backdrop-filter: blur(4px); }
+.slot { width: 52px; height: 52px; border-radius: 8px; border: 2px solid rgba(255,255,255,.28); position: relative;
+  background: rgba(0,0,0,.35); overflow: hidden; }
+.slot img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+.slot span { position: absolute; top: 1px; left: 4px; font-size: 11px; font-weight: 700; text-shadow: 0 1px 3px #000; }
+.slot.sel { border-color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,.35), 0 0 14px rgba(255,255,255,.4); transform: scale(1.08); }
+
+/* ── Touch ───────────────────────────────────────────────────────────────── */
+#touch { display: none; position: fixed; inset: 0; pointer-events: none; z-index: 11; }
+#touch.show { display: block; }
+#joy { position: absolute; left: 26px; bottom: 96px; width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(255,255,255,.09); border: 2px solid rgba(255,255,255,.25); display: grid; place-items: center; }
+#joyKnob { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.35); border: 2px solid rgba(255,255,255,.5); }
+.touchBtns { position: absolute; right: 18px; bottom: 96px; display: grid; grid-template-columns: repeat(2, 62px); gap: 10px; pointer-events: auto; }
+.tbtn { width: 62px; height: 62px; border-radius: 50%; border: 2px solid rgba(255,255,255,.3);
+  background: rgba(10,14,24,.5); font-size: 26px; color: #fff; }
+.tbtn:active { background: rgba(255,255,255,.35); }
+.tbtn.small { font-size: 20px; height: 48px; border-radius: 16px; }
+
+/* ── Title screen ────────────────────────────────────────────────────────── */
+#menu { position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center;
+  background: linear-gradient(180deg, rgba(4,8,18,.06) 0%, rgba(4,8,18,.32) 55%, rgba(4,8,18,.78) 100%); }
+#menu.hidden { display: none; }
+.menuCard { width: min(680px, 94vw); margin-bottom: 4vh; text-align: center; padding: 22px 22px 18px;
+  background: rgba(8,12,22,.72); border: 1px solid rgba(255,255,255,.16); border-radius: 22px; backdrop-filter: blur(10px);
+  box-shadow: 0 24px 70px rgba(0,0,0,.55); max-height: 92vh; overflow-y: auto; }
+.logo { font-size: clamp(34px, 7vw, 54px); font-weight: 900; letter-spacing: 2px;
+  background: linear-gradient(180deg, #a3e635, #4d9e26 55%, #8a5f3c 56%, #6e4a2d);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 3px 0 rgba(0,0,0,.6)); }
+.logo span { letter-spacing: 5px; }
+.tagline { margin: 4px 0 16px; font-size: clamp(14px, 2.6vw, 18px); color: #e7eefc; }
+#btnPlay { font-size: clamp(19px, 3.4vw, 25px); font-weight: 900; color: #fff; padding: 15px 46px; border-radius: 16px;
+  border: 2px solid #86efac; border-bottom-width: 6px;
+  background: linear-gradient(180deg, #3fae2a, #2c7d1e); box-shadow: 0 12px 30px rgba(46,160,40,.45);
+  transition: transform .1s, box-shadow .1s; }
+#btnPlay:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 16px 36px rgba(46,160,40,.6); }
+#btnPlay:active { transform: translateY(2px); }
+#loadTip { margin: 9px 0 4px; font-size: 13px; color: #bcd3ff; min-height: 18px; }
+.menuRow { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 12px 0 4px; }
+.menuRow label { font-size: 13px; color: #cbd5e1; display: flex; flex-direction: column; gap: 5px; text-align: left; }
+.menuRow input, .menuRow select { background: rgba(0,0,0,.45); color: #fff; border: 1px solid rgba(255,255,255,.25);
+  border-radius: 9px; padding: 8px 10px; font-size: 14px; min-width: 180px; outline: none; }
+.controls { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: center; font-size: 12.5px; color: #aebdd6; }
+.controls b { color: #fff; }
+.controls .wide { flex-basis: 100%; color: #fcd34d; }
+
+/* ── Panels (inventory / pause) ──────────────────────────────────────────── */
+#inventory, #pause { display: none; position: fixed; inset: 0; z-index: 30; background: rgba(3,6,14,.62);
+  align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+#inventory.show, #pause.show { display: flex; }
+.panel { width: min(700px, 94vw); max-height: 88vh; overflow-y: auto; background: rgba(10,15,26,.94);
+  border: 1px solid rgba(255,255,255,.2); border-radius: 18px; padding: 18px; }
+.panel.small { width: min(440px, 94vw); text-align: center; }
+.panelHead { display: flex; justify-content: space-between; align-items: center; }
+.panelHead h2, .panel h2 { font-size: 20px; }
+#btnInvClose { width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.08); color: #fff; font-size: 15px; }
+.hint { color: #9fb0cc; font-size: 13px; margin: 6px 0 12px; }
+#invGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.invItem { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14); border-radius: 12px;
+  color: #fff; padding: 9px 5px 7px; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.invItem:hover { background: rgba(255,255,255,.14); border-color: #86efac; }
+.invItem img { width: 44px; height: 44px; image-rendering: pixelated; border-radius: 6px; }
+.invItem span { font-size: 12px; font-weight: 700; }
+.invItem small { font-size: 11px; color: #9fb0cc; }
+.pauseBtns { display: flex; flex-direction: column; gap: 9px; margin-top: 8px; }
+.big { padding: 13px; border-radius: 13px; font-size: 16px; font-weight: 800; color: #fff;
+  border: 2px solid #86efac; background: linear-gradient(180deg, #3fae2a, #2c7d1e); }
+.big.ghost { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.25); }
+.big.danger { background: rgba(185,28,28,.25); border-color: rgba(248,113,113,.5); }
+
+#toast { position: fixed; left: 50%; top: 64px; transform: translate(-50%, -12px); z-index: 40; opacity: 0;
+  background: rgba(8,12,22,.88); border: 1px solid rgba(255,255,255,.2); padding: 9px 16px; border-radius: 12px;
+  font-size: 14px; font-weight: 600; transition: all .3s; pointer-events: none; max-width: 92vw; text-align: center; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 640px) {
+  .slot { width: 42px; height: 42px; }
+  #hotbar { bottom: 10px; gap: 3px; max-width: 98vw; }
+  #blockName { bottom: 70px; font-size: 14px; }
+  #info { font-size: 11px; }
+}

@@ -14,6 +14,15 @@ No build step, no external CDN — everything is procedural and vendored (Three.
 
 ---
 
+## ⛏️ NEW — neurio Craft: Minecraft 3D Realistic
+
+A second game lives in **[`minecraft/`](minecraft/)**: a realistic 3D Minecraft-style voxel
+sandbox — infinite seeded terrain with mountains, lakes, caves and biomes, break & build with
+26 blocks, day/night cycle with shadows, animals, swimming, fly mode and exploding TNT 💣.
+Open **`http://localhost:8000/minecraft/`** — see [`minecraft/README.md`](minecraft/README.md).
+
+---
+
 ## 🎬 فيديو ترويجي — 60 ثانية أنيميشن
 
 A **1-minute vertical cartoon trailer** (1080×1920, 24 fps) with a fully synthesised
