@@ -43,6 +43,12 @@ from lib_bg import (  # noqa: E402
     white_halo_score, upscale, save_png, preview_on_checker,
 )
 
+import importlib.util  # noqa: E402
+
+_spec = importlib.util.spec_from_file_location("extract_from_mockup", os.path.join(HERE, "extract-from-mockup.py"))
+extract_mod = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(extract_mod)
+
 CLEAN_DIR = os.path.join(ROOT, "assets", "designs", "clean")
 PREVIEW_DIR = os.path.join(ROOT, "assets", "designs")
 LOCAL_MAP = os.path.join(ROOT, "data", "local-images.json")
@@ -139,6 +145,13 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--force", action="store_true", help="re-clean files that already have alpha")
     p.add_argument("--no-verify", action="store_true", help="skip the quality gate (not recommended)")
     p.add_argument("--no-build", action="store_true", help="write files but do not rebuild the catalog")
+    p.add_argument("--mockup", action="store_true",
+                   help="the inputs are product mockups: find the print inside the garment, "
+                        "cut it out and upscale it")
+    p.add_argument("--erase", action="append", default=[],
+                   help="with --mockup: delete a stamp/watermark area x,y,w,h (repeatable)")
+    p.add_argument("--threshold", type=int, default=14,
+                   help="with --mockup: edge sensitivity (lower keeps fainter ink)")
     return p.parse_args()
 
 
@@ -217,14 +230,46 @@ def main() -> int:
         try:
             with Image.open(path) as im:
                 im.load()
-                already = im.mode in ("RGBA", "LA") and summarise(im.convert("RGBA"))["transparent"] > 0.02
-                if already and not args.force:
-                    art = trim(im.convert("RGBA"), pad=6)
-                else:
-                    art, bg, _ = cut_backdrop(
-                        im, tolerance=args.tolerance, feather=args.feather, choke=args.choke
+                if args.mockup:
+                    # the file is a product photo: pull the printed design out
+                    # of the garment first
+                    source = im.convert("RGB")
+                    garment, printed, fab = extract_mod.garment_and_print(source, args.threshold)
+                    box = (
+                        printed[0], printed[1],
+                        printed[2] - printed[0], printed[3] - printed[1],
                     )
-                    art = trim(art, pad=6)
+                    g = max(3, int(max(box[2], box[3]) * 0.012))
+                    crop_box = (
+                        max(0, box[0] - g), max(0, box[1] - g),
+                        min(source.width, box[0] + box[2] + g), min(source.height, box[1] + box[3] + g),
+                    )
+                    crop = source.crop(crop_box)
+                    # delete stamped areas (they are not part of the design)
+                    scrape = []
+                    for raw_box in args.erase:
+                        parts = [float(v) for v in re.split(r"[,\s]+", raw_box.strip()) if v]
+                        if len(parts) != 4:
+                            continue
+                        ex, ey, ew, eh = [int(v) for v in parts]
+                        lx, ly = ex - crop_box[0], ey - crop_box[1]
+                        lx2, ly2 = min(crop.width, lx + ew), min(crop.height, ly + eh)
+                        lx, ly = max(0, lx), max(0, ly)
+                        if lx2 - lx > 2 and ly2 - ly > 2:
+                            scrape.append((lx, ly, lx2 - lx, ly2 - ly))
+                    art = extract_mod.model_cut(crop, fab, lo=args.threshold, hi=args.threshold * 3)
+                    if scrape:
+                        art = extract_mod.force_transparent(art, scrape, feather=3)
+                    art = trim(art, pad=3)
+                else:
+                    already = im.mode in ("RGBA", "LA") and summarise(im.convert("RGBA"))["transparent"] > 0.02
+                    if already and not args.force:
+                        art = trim(im.convert("RGBA"), pad=6)
+                    else:
+                        art, bg, _ = cut_backdrop(
+                            im, tolerance=args.tolerance, feather=args.feather, choke=args.choke
+                        )
+                        art = trim(art, pad=6)
 
             if args.target:
                 art = upscale(art, min_long_edge=args.target)

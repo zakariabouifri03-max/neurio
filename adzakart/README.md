@@ -27,6 +27,7 @@ adzakart/
 │       └── clean/<id>.png     # the files buyers download (generated)
 └── tools/
     ├── prepare-store.py       # one command: art in, working store out
+    ├── extract-from-mockup.py # pull the print out of a product photo
     ├── build_catalog.py       # TSV → catalog.json + catalog.js
     ├── clean-background.py    # backdrop remover (advanced / batch use)
     ├── check-transparency.py  # quality gate: proves the background is gone
@@ -156,16 +157,55 @@ channel, opaque corners (a boxed or JPEG backdrop), is mostly opaque, has almost
 no transparent area, or carries a white fringe on the cut edge. Exit code is `0`
 only when every file is sell-ready.
 
-### Use the real artwork, not the product photos
+## When all you have is a mockup
 
-The images that appear on a shop's listing cards are usually **mockups**: the
-design printed on a shirt, photographed on a table, with a logo stamp on top.
-Removing the background from a mockup gives you a white sweatshirt with a stamp
-on it — not a design.
+If the only file you have for a design is the product photo (the design printed
+on a shirt, on a table), you can pull the design out of it:
 
-`prepare-store.py` needs the actual artwork file for each design (the PNG you
-deliver to a buyer). If you only have mockups, save the transparent master from
-the design app you work in, then run the tool again.
+```bash
+python3 tools/prepare-store.py --in mockups --mockup
+```
+
+That finds the garment, finds the printed area inside it, cuts the print out,
+upscales it to 3000 px and rebuilds the catalog. A single file works too, and
+the filename is matched to a design automatically.
+
+### What it can and cannot do
+
+| Situation | Result |
+|---|---|
+| Solid-colour garment (white / cream / grey tee) | clean cut-out |
+| Garment with soft shading or folds | clean cut-out (a per-pixel fabric model follows the shading) |
+| Design that is light-coloured on a light garment | **not recoverable** — those pixels are the same colour as the fabric |
+| Design printed across a seam, a pocket or a fold | partially recovered; the fold's shadow survives as a smudge |
+| A watermark or shop stamp | removed only if you tell it where: `--erase x,y,w,h` |
+| A stamped area that covers part of the design | that part is lost when the stamp is deleted — use a cleaner source |
+
+### Deleting a stamp or watermark
+
+```bash
+python3 tools/prepare-store.py --in mockups --mockup --erase 290,860,160,160
+```
+
+`x,y,w,h` are pixels in the **original mockup image**, measured from the top-left.
+Repeat `--erase` for several stamps. The area is made fully transparent — it is
+deleted, not painted over, because inventing pixels is how you end up shipping a
+blurry patch where the watermark used to be.
+
+To find the coordinates, open the mockup in any editor and read the selection
+box, or run the extractor on its own with `--debug-boxes`:
+
+```bash
+python3 tools/extract-from-mockup.py --in mockups --out /tmp/check --debug-boxes
+# writes <name>-boxes.jpg: blue = garment found, orange = print found
+```
+
+### The honest recommendation
+
+An extraction from a mockup is a **recovery**, not a master. The file your design
+app can export (transparent PNG, full resolution) is sharper, has true edges and
+no fabric texture. Use the mockup route when it is all you have — and keep the
+original export when you can.
 
 ### White-on-white warning
 
