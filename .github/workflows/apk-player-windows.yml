@@ -1,0 +1,138 @@
+name: APK Player for Windows (build + smoke test)
+
+on:
+  push:
+    branches: ["arena/815d6790-neurio"]
+    paths:
+      - "apk-player/**"
+      - ".github/workflows/apk-player-windows.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-player-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build x64
+        id: build64
+        shell: cmd
+        run: |
+          call apk-player\build.bat x64 > build-x64.log 2>&1
+          set RC=%ERRORLEVEL%
+          type build-x64.log
+          exit /b %RC%
+
+      - name: Build x86 (32-bit)
+        id: build86
+        shell: cmd
+        run: |
+          call apk-player\build.bat x86 > build-x86.log 2>&1
+          set RC=%ERRORLEVEL%
+          type build-x86.log
+          exit /b %RC%
+
+      - name: Report compiler errors
+        if: failure()
+        shell: pwsh
+        run: |
+          foreach ($f in 'build-x64.log', 'build-x86.log') {
+            if (-not (Test-Path $f)) { continue }
+            $lines = Get-Content $f | Where-Object { $_ -match ' error |error C|error LNK|fatal error|unresolved|warning C4(244|267|996)|FAILED' } | Select-Object -First 30
+            if ($lines) {
+              $i = 0
+              foreach ($l in $lines) { $i++; if ($i -le 9) { Write-Output "::error title=$f::$l" } }
+              Write-Output ("::error title=$f (all)::" + (($lines | ForEach-Object { $_ -replace '%', '%25' }) -join '%0A'))
+            } else {
+              $tail = (Get-Content $f -Tail 25 | ForEach-Object { $_ -replace '%', '%25' }) -join '%0A'
+              Write-Output "::error title=$f (tail)::$tail"
+            }
+          }
+
+      - name: Get the Bash Baqi Racing APK (test input)
+        shell: bash
+        run: |
+          git fetch --depth 1 origin arena/340501d9-neurio
+          mkdir -p smoke-input
+          git show FETCH_HEAD:dist/BashBaqiRacing.apk > smoke-input/BashBaqiRacing.apk
+          ls -la smoke-input
+
+      - name: Make sure the WebView2 runtime is installed
+        shell: pwsh
+        run: |
+          $key = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+          $pv = (Get-ItemProperty -ErrorAction SilentlyContinue $key).pv
+          if ($pv -and $pv -ne '0.0.0.0') { Write-Output "WebView2 runtime $pv already installed"; exit 0 }
+          Write-Output 'Installing the WebView2 runtime...'
+          $setup = Join-Path $env:RUNNER_TEMP 'MicrosoftEdgeWebview2Setup.exe'
+          Invoke-WebRequest -UseBasicParsing 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile $setup
+          Start-Process -FilePath $setup -ArgumentList '/silent /install' -Wait
+          Write-Output "WebView2 runtime now: $((Get-ItemProperty -ErrorAction SilentlyContinue $key).pv)"
+
+      - name: Smoke tests
+        id: smoke
+        shell: pwsh
+        run: |
+          & apk-player\tests\ci-smoke.ps1 -BashBaqiApk smoke-input\BashBaqiRacing.apk
+          exit $LASTEXITCODE
+
+      - name: Show the player log on failure
+        if: failure() && steps.smoke.outcome == 'failure'
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse apk-player\bin\ci -Filter player.log | ForEach-Object {
+            Write-Output "===== $($_.FullName)"
+            Get-Content $_.FullName -Tail 60
+            $tail = (Get-Content $_.FullName -Tail 18 | ForEach-Object { $_ -replace '%', '%25' }) -join '%0A'
+            Write-Output "::error title=$($_.Directory.Name) player.log::$tail"
+          }
+          Get-ChildItem -Recurse apk-player\bin\ci -Filter error.txt | ForEach-Object {
+            Write-Output "::error title=$($_.Directory.Name) error.txt::$(Get-Content -Raw $_.FullName)"
+          }
+
+      - name: Package
+        if: always() && steps.build64.outcome == 'success' && steps.build86.outcome == 'success'
+        shell: pwsh
+        run: |
+          $pkg = Join-Path $env:RUNNER_TEMP 'NeurioApkPlayer'
+          New-Item -ItemType Directory -Force $pkg | Out-Null
+          Copy-Item apk-player\bin\NeurioApkPlayer.exe, apk-player\bin\NeurioApkPlayer-32bit.exe $pkg
+          Copy-Item apk-player\README-WINDOWS.txt (Join-Path $pkg 'README.txt')
+          Compress-Archive -Force -Path "$pkg\*" -DestinationPath apk-player\bin\NeurioApkPlayer-windows.zip
+          Get-ChildItem apk-player\bin | Format-Table Name, Length
+
+      - name: Commit the binaries and test results to the branch
+        if: always() && steps.build64.outcome == 'success' && steps.build86.outcome == 'success'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A apk-player/bin
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "apk-player: Windows build + smoke results (${{ steps.smoke.outcome }}) [skip ci]"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            sleep 7
+          done
+          exit 1
+
+      - name: Publish the GitHub release
+        if: success()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=apk-player-v1.0.0
+          gh release view "$TAG" >/dev/null 2>&1 || \
+            gh release create "$TAG" --target "$GITHUB_REF_NAME" --title "Neurio APK Player 1.0.0 (Windows)" \
+              --notes-file apk-player/RELEASE_NOTES.md
+          gh release upload "$TAG" apk-player/bin/NeurioApkPlayer.exe apk-player/bin/NeurioApkPlayer-32bit.exe \
+            apk-player/bin/NeurioApkPlayer-windows.zip --clobber

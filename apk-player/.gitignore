@@ -1,0 +1,7 @@
+# local build output (bin/ holds the published binaries and CI results)
+build/
+*.o
+*.obj
+*.pdb
+*.ilk
+*.res

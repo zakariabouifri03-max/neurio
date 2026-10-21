@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neurio APK Player</title>
+<style>
+  :root {
+    --bg: #0b1020; --panel: rgba(255,255,255,.055); --panel2: rgba(255,255,255,.09);
+    --line: rgba(255,255,255,.12); --text: #eef2ff; --muted: #9aa6c7;
+    --accent: #22c55e; --accent2: #0ea5e9; --warn: #f59e0b; --danger: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font: 14px/1.45 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    color: var(--text); background: var(--bg); overflow: hidden; user-select: none;
+  }
+  body::before {
+    content: ""; position: fixed; inset: -20%; z-index: -1;
+    background:
+      radial-gradient(40% 35% at 15% 10%, rgba(34,197,94,.20), transparent 70%),
+      radial-gradient(45% 40% at 90% 15%, rgba(14,165,233,.22), transparent 70%),
+      radial-gradient(50% 45% at 60% 110%, rgba(168,85,247,.18), transparent 70%);
+  }
+  .wrap { height: 100%; display: flex; flex-direction: column; padding: 22px 28px 14px; gap: 18px; }
+  header { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    width: 46px; height: 46px; border-radius: 14px; flex: none; position: relative;
+    background: linear-gradient(135deg, #22c55e, #0ea5e9); box-shadow: 0 8px 24px rgba(14,165,233,.35);
+  }
+  .logo::after {
+    content: ""; position: absolute; left: 18px; top: 13px; border-style: solid;
+    border-width: 10px 0 10px 16px; border-color: transparent transparent transparent #fff;
+  }
+  h1 { font-size: 21px; margin: 0; letter-spacing: .2px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .grow { flex: 1; }
+  button {
+    font: inherit; color: inherit; border: 0; cursor: pointer; border-radius: 12px;
+    transition: transform .08s, background .15s, box-shadow .15s;
+  }
+  button:active { transform: scale(.97); }
+  .btn { padding: 10px 18px; font-weight: 600; background: var(--panel2); border: 1px solid var(--line); }
+  .btn:hover { background: rgba(255,255,255,.14); }
+  .primary {
+    background: linear-gradient(135deg, #22c55e, #16a34a); border: 0;
+    box-shadow: 0 6px 18px rgba(34,197,94,.35); color: #fff;
+  }
+  .primary:hover { box-shadow: 0 8px 24px rgba(34,197,94,.5); background: linear-gradient(135deg, #2bd469, #16a34a); }
+
+  .drop {
+    border: 2px dashed rgba(255,255,255,.18); border-radius: 18px; padding: 22px;
+    display: flex; align-items: center; gap: 20px; background: var(--panel); cursor: pointer;
+    transition: border-color .15s, background .15s, transform .15s;
+  }
+  .drop:hover { border-color: rgba(34,197,94,.6); background: rgba(34,197,94,.06); }
+  body.drag .drop { border-color: var(--accent); background: rgba(34,197,94,.12); transform: scale(1.01); }
+  .drop .big { font-size: 40px; width: 64px; text-align: center; }
+  .drop b { font-size: 17px; }
+  .drop .d { color: var(--muted); margin-top: 2px; }
+  .chips { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .chip { font-size: 11.5px; padding: 3px 9px; border-radius: 99px; background: rgba(255,255,255,.08); color: #cbd5f5; border: 1px solid var(--line); }
+
+  .section { display: flex; align-items: baseline; gap: 10px; }
+  .section h2 { margin: 0; font-size: 15px; }
+  .section span { color: var(--muted); font-size: 12.5px; }
+
+  .lib { flex: 1; overflow: auto; padding: 2px 4px 8px 2px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 12px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px;
+    display: flex; gap: 12px; align-items: center; position: relative; transition: background .15s, transform .15s;
+  }
+  .card:hover { background: var(--panel2); transform: translateY(-1px); }
+  .card.missing { opacity: .55; }
+  .icon {
+    width: 58px; height: 58px; border-radius: 15px; overflow: hidden; flex: none; position: relative;
+    background: rgba(255,255,255,.1) center/cover no-repeat; display: grid; place-items: center; font-size: 30px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  }
+  .icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .icon img.fg { position: absolute; width: 150%; height: 150%; left: -25%; top: -25%; max-width: none; }
+  .meta { min-width: 0; flex: 1; }
+  .name { font-weight: 700; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .small { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+  .ok { background: rgba(34,197,94,.16); color: #86efac; }
+  .no { background: rgba(245,158,11,.16); color: #fcd34d; }
+  .gone { background: rgba(148,163,184,.16); color: #cbd5e1; }
+  .mode { background: rgba(14,165,233,.16); color: #7dd3fc; cursor: pointer; }
+  .mode:hover { background: rgba(14,165,233,.3); }
+  .actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .play { padding: 8px 14px; font-weight: 700; }
+  .tools { display: flex; gap: 2px; opacity: 0; transition: opacity .15s; }
+  .card:hover .tools { opacity: 1; }
+  .tool { width: 28px; height: 26px; border-radius: 8px; background: transparent; font-size: 13px; color: var(--muted); }
+  .tool:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+  .empty { color: var(--muted); text-align: center; padding: 34px 10px; border: 1px dashed var(--line); border-radius: 16px; }
+  .empty b { color: var(--text); }
+
+  footer { display: flex; gap: 14px; flex-wrap: wrap; color: var(--muted); font-size: 12px; align-items: center; }
+  kbd { font: 600 11px/1 "Segoe UI", sans-serif; padding: 3px 6px; border-radius: 6px; background: rgba(255,255,255,.1); border: 1px solid var(--line); color: #e2e8f0; }
+
+  .overlay { position: fixed; inset: 0; background: rgba(5,8,18,.72); display: none; place-items: center; z-index: 10; backdrop-filter: blur(4px); }
+  .overlay.show { display: grid; }
+  .spinner { width: 46px; height: 46px; border-radius: 50%; border: 4px solid rgba(255,255,255,.15); border-top-color: var(--accent); animation: spin .8s linear infinite; margin: 0 auto 14px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .busyText { font-weight: 600; font-size: 15px; text-align: center; }
+  .modal {
+    width: min(560px, 92vw); max-height: 88vh; overflow: auto; background: #111833; border: 1px solid var(--line);
+    border-radius: 20px; padding: 22px; box-shadow: 0 30px 80px rgba(0,0,0,.6);
+  }
+  .modal .head { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+  .modal h3 { margin: 0; font-size: 18px; }
+  .modal p { margin: 8px 0; color: #cdd6f4; }
+  .modal .dz { color: #a5b4fc; }
+  .modal ul { margin: 8px 0 4px; padding-left: 20px; color: #cdd6f4; }
+  .modal li { margin: 4px 0; }
+  .modal .row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .alert { display: inline-block; padding: 3px 10px; border-radius: 99px; font-weight: 700; font-size: 12px; background: rgba(245,158,11,.18); color: #fcd34d; }
+  .alert.err { background: rgba(239,68,68,.18); color: #fca5a5; }
+  a { color: #7dd3fc; cursor: pointer; text-decoration: underline; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); opacity: 0;
+    background: rgba(15,23,42,.95); border: 1px solid var(--line); padding: 10px 18px; border-radius: 12px;
+    font-weight: 600; transition: all .25s; z-index: 20; pointer-events: none; max-width: 86vw; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  ::-webkit-scrollbar { width: 10px; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.14); border-radius: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"></div>
+    <div>
+      <h1>Neurio APK Player</h1>
+      <div class="sub">Play Android web games on your PC — no emulator, light and fast.</div>
+    </div>
+    <div class="grow"></div>
+    <button class="btn primary" id="openBtn">📂 Open APK</button>
+  </header>
+
+  <div class="drop" id="drop">
+    <div class="big">📦</div>
+    <div>
+      <b>Drop an APK here</b> <span class="sub">— or click to choose a file</span>
+      <div class="d">Jarr l-APK o 7etto hna, wla clicki bach tkhtar fichier. Kaykhdem bla émulateur.</div>
+      <div class="chips"><span class="chip">.apk</span><span class="chip">.xapk</span><span class="chip">.apks</span>
+        <span class="chip">HTML5 · Cordova · Capacitor · Construct · Phaser · Three.js · WebView</span></div>
+    </div>
+  </div>
+
+  <div class="section"><h2>🎮 Your games</h2><span id="count"></span></div>
+  <div class="lib"><div class="grid" id="grid"></div></div>
+
+  <footer>
+    <span><kbd>F11</kbd> Fullscreen</span>
+    <span><kbd>F2</kbd> Touch / keyboard mode</span>
+    <span><kbd>F1</kbd> Back to library</span>
+    <span><kbd>F5</kbd> Restart game</span>
+    <span><kbd>Ctrl</kbd>+<kbd>M</kbd> Mute</span>
+    <span class="grow"></span>
+    <span id="ver"></span>
+  </footer>
+</div>
+
+<div class="overlay" id="busy"><div><div class="spinner"></div><div class="busyText" id="busyText">Opening…</div></div></div>
+<div class="overlay" id="dlg"><div class="modal" id="dlgBody"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  var wv = window.chrome && window.chrome.webview;
+  function send(cmd, arg) { if (wv) wv.postMessage(arg === undefined ? cmd : cmd + '\t' + arg); }
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  var toastT;
+  function toast(t) {
+    var d = $('toast'); d.textContent = t; d.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(function () { d.classList.remove('show'); }, 2800);
+  }
+  function busy(text) { $('busyText').textContent = text || 'Opening…'; $('busy').classList.add('show'); }
+  function unbusy() { $('busy').classList.remove('show'); }
+
+  function iconEl(it, size) {
+    var box = el('div', 'icon');
+    if (size) { box.style.width = box.style.height = size + 'px'; box.style.borderRadius = Math.round(size * .26) + 'px'; }
+    function fallback() { box.textContent = '🤖'; box.style.background = 'rgba(255,255,255,.1)'; }
+    if (it.icon) {
+      var img = new Image(); img.alt = ''; img.onerror = fallback; img.src = it.icon; box.appendChild(img);
+    } else if (it.iconFg) {
+      if (it.iconBg) box.style.backgroundImage = 'url("' + it.iconBg + '")';
+      else box.style.background = it.iconBgColor || '#ffffff';
+      var fg = new Image(); fg.alt = ''; fg.className = 'fg'; fg.onerror = fallback; fg.src = it.iconFg; box.appendChild(fg);
+    } else {
+      fallback();
+    }
+    return box;
+  }
+
+  var modeNames = { '-1': 'Auto', '0': '⌨️ Keyboard', '1': '👆 Touch' };
+  function modeLabel(it) {
+    if (it.touch === 1) return '👆 Touch';
+    if (it.touch === 0) return '⌨️ Keyboard';
+    return (it.keyboard ? '⌨️' : '👆') + ' Auto';
+  }
+
+  function render(m) {
+    var grid = $('grid'); grid.textContent = '';
+    $('ver').textContent = 'v' + m.version;
+    var items = m.items || [];
+    $('count').textContent = items.length ? items.length + (items.length === 1 ? ' app' : ' apps') : '';
+    if (!items.length) {
+      var e = el('div', 'empty');
+      e.appendChild(el('b', '', 'No games yet.'));
+      e.appendChild(el('div', '', 'Open an APK to start — it will appear here next time.'));
+      e.appendChild(el('div', '', 'Mazal ma 7elliti 7ta APK. 7el wa7ed o ghadi yban hna.'));
+      grid.appendChild(e);
+    }
+    items.forEach(function (it) {
+      var c = el('div', 'card' + (it.exists ? '' : ' missing'));
+      c.appendChild(iconEl(it));
+      var meta = el('div', 'meta');
+      meta.appendChild(el('div', 'name', it.name || it.file));
+      var sub = [it.framework, it.version ? 'v' + it.version : '', it.file].filter(Boolean).join(' · ');
+      var s = el('div', 'small', sub); s.title = it.path; meta.appendChild(s);
+      var b = el('div', 'badges');
+      if (!it.exists) b.appendChild(el('span', 'badge gone', 'File moved / deleted'));
+      else if (it.kind === 'web' || it.kind === 'remote') b.appendChild(el('span', 'badge ok', it.kind === 'remote' ? '🌐 Plays here (online)' : '✅ Plays here'));
+      else b.appendChild(el('span', 'badge no', '⚠️ Needs Android'));
+      if (it.kind === 'web' || it.kind === 'remote') {
+        var md = el('span', 'badge mode', modeLabel(it));
+        md.title = 'Input mode — click to change (Auto → Touch → Keyboard). In game: F2';
+        md.onclick = function (ev) {
+          ev.stopPropagation();
+          var next = it.touch === -1 ? 1 : it.touch === 1 ? 0 : -1;
+          send('touch', it.path + '\t' + next);
+          toast('Input mode: ' + modeNames[String(next)]);
+        };
+        b.appendChild(md);
+      }
+      meta.appendChild(b);
+      c.appendChild(meta);
+
+      var act = el('div', 'actions');
+      var play = el('button', 'btn primary play', it.kind === 'native' || it.kind === 'unknown' ? 'Info' : '▶ Play');
+      play.onclick = function (ev) { ev.stopPropagation(); if (!it.exists) { toast('The file is missing: ' + it.path); return; } send('launch', it.path); };
+      act.appendChild(play);
+      var tools = el('div', 'tools');
+      function tool(txt, title, fn) { var t = el('button', 'tool', txt); t.title = title; t.onclick = function (ev) { ev.stopPropagation(); fn(); }; tools.appendChild(t); }
+      tool('📌', 'Create a desktop shortcut', function () { send('shortcut', it.path); });
+      tool('📁', 'Show the APK file in Explorer', function () { send('folder', it.path); });
+      tool('✕', 'Remove from the list (the file is kept)', function () { send('remove', it.path); });
+      act.appendChild(tools);
+      c.appendChild(act);
+      c.ondblclick = function () { if (it.exists) send('launch', it.path); };
+      grid.appendChild(c);
+    });
+    if (m.busy) busy('Opening…'); else unbusy();
+  }
+
+  function closeDlg() { $('dlg').classList.remove('show'); }
+  function link(text, url) { var a = el('a', '', text); a.onclick = function () { send('link', url); }; return a; }
+
+  function showNative(m) {
+    var it = m.item, info = m.info, body = $('dlgBody'); body.textContent = '';
+    var head = el('div', 'head');
+    head.appendChild(iconEl(it, 56));
+    var t = el('div');
+    t.appendChild(el('h3', '', it.name));
+    t.appendChild(el('span', 'alert', 'Native Android app' + (info.framework ? ' · ' + info.framework : '')));
+    head.appendChild(t);
+    body.appendChild(head);
+    var what = info.framework && info.framework !== 'Java/Kotlin' ? 'made with ' + info.framework : 'written in Java/Kotlin';
+    body.appendChild(el('p', '', 'This APK is a native Android app (' + what + (info.abis && info.abis.length ? ', ' + info.abis.join(' / ') : '') +
+      '). Its code needs a real Android system, so it cannot run in this light player — only HTML5 / web games can.'));
+    body.appendChild(el('p', 'dz', 'Had l-APK native: khasso Android 7a9i9i bach ykhdem. Had l-programme kaykhdem ghir l-jeux dyal HTML5 / web (bla émulateur).'));
+    body.appendChild(el('p', '', 'Best options for a weak PC:'));
+    var ul = el('ul');
+    var li1 = el('li'); li1.appendChild(document.createTextNode('A light emulator in "low" settings (2 CPU cores, 2 GB RAM): '));
+    li1.appendChild(link('LDPlayer', 'https://www.ldplayer.net/')); li1.appendChild(document.createTextNode(' or '));
+    li1.appendChild(link('MuMu Player', 'https://www.mumuplayer.com/')); ul.appendChild(li1);
+    var li2 = el('li'); li2.appendChild(document.createTextNode('Fastest on old PCs: boot Android directly from a USB stick with '));
+    li2.appendChild(link('Bliss OS', 'https://blissos.org/')); li2.appendChild(document.createTextNode(' (no Windows overhead).')); ul.appendChild(li2);
+    var li3 = el('li'); li3.appendChild(document.createTextNode('If the game also exists as a web game, open its web version here instead.')); ul.appendChild(li3);
+    body.appendChild(ul);
+    var row = el('div', 'row');
+    var ok = el('button', 'btn primary', 'OK'); ok.onclick = closeDlg; row.appendChild(ok);
+    body.appendChild(row);
+    $('dlg').classList.add('show');
+  }
+
+  function showError(text) {
+    var body = $('dlgBody'); body.textContent = '';
+    var head = el('div', 'head');
+    var t = el('div'); t.appendChild(el('h3', '', 'Could not open this file')); t.appendChild(el('span', 'alert err', 'Error'));
+    head.appendChild(el('div', 'icon', '⚠️')); head.appendChild(t);
+    body.appendChild(head);
+    body.appendChild(el('p', '', text));
+    body.appendChild(el('p', 'dz', 'Ta2akked bli l-fichier APK sali7 (machi naqess) o 3awed jarreb.'));
+    var row = el('div', 'row'); var ok = el('button', 'btn primary', 'OK'); ok.onclick = closeDlg; row.appendChild(ok); body.appendChild(row);
+    $('dlg').classList.add('show');
+  }
+
+  if (wv) {
+    wv.addEventListener('message', function (e) {
+      var m = e.data || {};
+      if (m.type === 'library') render(m);
+      else if (m.type === 'status') { closeDlg(); busy(m.text); }
+      else if (m.type === 'native') { unbusy(); showNative(m); }
+      else if (m.type === 'error') { unbusy(); showError(m.text); }
+      else if (m.type === 'toast') toast(m.text);
+    });
+  }
+
+  $('openBtn').onclick = function () { send('open'); };
+  $('drop').onclick = function () { send('open'); };
+  $('dlg').onclick = function (e) { if (e.target === $('dlg')) closeDlg(); };
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDlg(); });
+  document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  // drag & drop: the file object is handed to the player, which reads its path
+  var dragDepth = 0;
+  window.addEventListener('dragenter', function (e) { e.preventDefault(); dragDepth++; document.body.classList.add('drag'); });
+  window.addEventListener('dragleave', function () { if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove('drag'); } });
+  window.addEventListener('dragover', function (e) { e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'; });
+  window.addEventListener('drop', function (e) {
+    e.preventDefault(); dragDepth = 0; document.body.classList.remove('drag');
+    var files = e.dataTransfer && e.dataTransfer.files ? Array.prototype.slice.call(e.dataTransfer.files) : [];
+    if (!files.length) return;
+    if (wv && wv.postMessageWithAdditionalObjects) wv.postMessageWithAdditionalObjects('drop', files);
+    else toast('Drag & drop needs a newer WebView2 — use “Open APK”.');
+  });
+
+  send('ready');
+})();
+</script>
+</body>
+</html>
