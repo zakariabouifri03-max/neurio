@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>🪂 Nar Survivor 3D — Battle Royale khfif</title>
+<meta name="description" content="Lo3ba 3D battle royale khfifa bzaf, khdama 3la telephone d3if. 12 bots, zone, loot w guns.">
+<meta name="theme-color" content="#141a12">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nar Survivor">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="./icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<style>
+/* ══════════════════════════════════════════════════════════════
+   NAR SURVIVOR 3D — styles
+   (system fonts only: zero download, zero layout shift)
+   ══════════════════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#0b0f0a;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Arabic",sans-serif;
+  color:#eaf3e6;user-select:none;-webkit-user-select:none;touch-action:none;overscroll-behavior:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+
+/* ── generic overlays ───────────────────────────────────────── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;z-index:40;padding:18px;text-align:center;
+  background:radial-gradient(120% 90% at 50% 0%,#26401f 0%,#131c11 45%,#080b07 100%)}
+.screen.hide{display:none}
+.title{font-size:clamp(30px,8.5vw,64px);font-weight:900;letter-spacing:1px;line-height:.95;
+  background:linear-gradient(180deg,#fff3c4,#ffb020 55%,#e2571a);-webkit-background-clip:text;
+  background-clip:text;color:transparent;text-shadow:0 6px 26px rgba(255,140,20,.28);filter:drop-shadow(0 3px 0 rgba(0,0,0,.35))}
+.sub{font-size:clamp(12px,3.4vw,16px);color:#a9c39f;font-weight:600;max-width:560px;line-height:1.55}
+.badge{display:inline-block;background:#0000005c;border:1px solid #ffffff22;border-radius:999px;
+  padding:6px 14px;font-size:12px;font-weight:800;letter-spacing:.4px;color:#ffd479}
+.btn{border:0;border-radius:16px;padding:15px 30px;font-size:clamp(15px,4.4vw,19px);font-weight:900;
+  color:#1b1206;background:linear-gradient(180deg,#ffd45e,#f59300);box-shadow:0 5px 0 #a35c00,0 12px 26px #00000059;
+  cursor:pointer;letter-spacing:.4px;transition:transform .07s ease}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #a35c00,0 6px 14px #00000059}
+.btn.ghost{background:linear-gradient(180deg,#2c3a29,#1b2419);color:#d7e8cf;box-shadow:0 5px 0 #0d130c,0 10px 20px #0000004d}
+.btn.small{padding:10px 18px;font-size:14px;border-radius:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+.panel{background:#0e1410e0;border:1px solid #ffffff1c;border-radius:18px;padding:14px;
+  max-width:640px;width:100%;backdrop-filter:blur(3px)}
+.panel h3{font-size:13px;letter-spacing:1.6px;color:#9fb894;text-transform:uppercase;margin-bottom:9px}
+.opt{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.opt button{border:1px solid #ffffff26;background:#182016;color:#cfe0c6;border-radius:12px;
+  padding:10px 14px;font-size:13px;font-weight:800;cursor:pointer;min-width:76px}
+.opt button.on{background:linear-gradient(180deg,#ffd45e,#f59300);color:#1b1206;border-color:#ffd45e;
+  box-shadow:0 3px 0 #a35c00}
+.stat{display:flex;justify-content:space-between;gap:10px;padding:6px 2px;border-bottom:1px dashed #ffffff14;
+  font-size:13px;color:#bcd0b2}
+.stat b{color:#ffe9a8;font-weight:900}
+.hint{font-size:11.5px;color:#8aa281;line-height:1.6}
+#errLog{position:fixed;left:8px;right:8px;bottom:8px;z-index:99;background:#3a0d0df0;border:1px solid #ff6b6b;
+  border-radius:12px;padding:10px;font-size:12px;color:#ffd7d7;display:none;max-height:34vh;overflow:auto;white-space:pre-wrap}
+
+/* ── HUD ────────────────────────────────────────────────────── */
+#hud{position:fixed;inset:0;z-index:20;pointer-events:none;display:none}
+#hud.on{display:block}
+.chip{background:#0b10099c;border:1px solid #ffffff1f;border-radius:12px;padding:5px 10px;
+  font-weight:900;font-size:12px;letter-spacing:.4px;color:#e7f2e0;box-shadow:0 2px 8px #00000040}
+.chip .lbl{color:#93ab89;font-size:9.5px;letter-spacing:1.4px;display:block;font-weight:800}
+#topbar{position:absolute;top:max(8px,env(safe-area-inset-top));left:8px;right:8px;
+  display:flex;gap:7px;align-items:flex-start;justify-content:space-between}
+#topL{display:flex;gap:7px;align-items:flex-start;flex-wrap:wrap}
+#alive{color:#ffd479}
+#zoneChip.warn{border-color:#ff6b6b;color:#ffc9c9;animation:pulse .7s infinite}
+@keyframes pulse{50%{background:#4a1414c9}}
+#btnPause{pointer-events:auto;background:#0b10099c;border:1px solid #ffffff1f;color:#eaf3e6;
+  border-radius:12px;width:40px;height:40px;font-size:17px;font-weight:900;cursor:pointer}
+#minimapWrap{position:absolute;top:calc(max(8px,env(safe-area-inset-top)) + 52px);right:8px;
+  background:#0b1009b0;border:1px solid #ffffff1f;border-radius:14px;padding:4px;box-shadow:0 4px 14px #00000059}
+#minimap{display:block;border-radius:10px;width:112px;height:112px}
+#killfeed{position:absolute;top:calc(max(8px,env(safe-area-inset-top)) + 52px);left:8px;
+  display:flex;flex-direction:column;gap:5px;max-width:46vw}
+.kf{background:#0b10099c;border-left:3px solid #ff8a3d;border-radius:8px;padding:4px 9px;font-size:11.5px;
+  font-weight:800;color:#f0e6d6;animation:kfin .18s ease}
+@keyframes kfin{from{opacity:0;transform:translateX(-12px)}}
+#bars{position:absolute;left:8px;bottom:calc(8px + env(safe-area-inset-bottom));width:min(46vw,250px);display:flex;flex-direction:column;gap:5px}
+.bar{height:15px;background:#0b10099c;border:1px solid #ffffff1f;border-radius:9px;overflow:hidden;position:relative}
+.bar i{position:absolute;inset:0;width:100%;transform-origin:left;display:block;transition:transform .16s ease}
+#hpFill{background:linear-gradient(90deg,#4ade80,#16a34a)}
+#arFill{background:linear-gradient(90deg,#7dd3fc,#2563eb)}
+.bar span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:900;letter-spacing:.6px;color:#06120a;text-shadow:0 1px 0 #ffffff55}
+#wpn{position:absolute;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));text-align:right;display:flex;
+  flex-direction:column;gap:5px;align-items:flex-end}
+#wpnName{font-size:12px;font-weight:900;color:#ffe9a8;letter-spacing:.6px}
+#ammo{font-size:clamp(20px,6vw,30px);font-weight:900;color:#fff;text-shadow:0 2px 8px #000a;line-height:1}
+#ammo small{font-size:12px;color:#9fb894;font-weight:800}
+#reloadWrap{width:104px;height:7px;background:#0b10099c;border:1px solid #ffffff1f;border-radius:5px;overflow:hidden;display:none}
+#reloadWrap.on{display:block}
+#reloadFill{height:100%;width:0%;background:linear-gradient(90deg,#ffd45e,#f59300)}
+#items{display:flex;gap:6px}
+.item{pointer-events:auto;background:#0b10099c;border:1px solid #ffffff22;border-radius:12px;padding:6px 9px;
+  font-size:11px;font-weight:900;color:#e7f2e0;cursor:pointer}
+.item b{color:#ffd479}
+.item.off{opacity:.4}
+#cross{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;opacity:.9}
+#cross:before,#cross:after{content:"";position:absolute;background:#ffffffd9;box-shadow:0 0 3px #000}
+#cross:before{left:50%;top:0;width:2px;height:100%;margin-left:-1px}
+#cross:after{top:50%;left:0;height:2px;width:100%;margin-top:-1px}
+#hitmark{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;opacity:0;
+  transition:opacity .12s ease}
+#hitmark:before,#hitmark:after{content:"";position:absolute;background:#ff5252;width:3px;height:15px;left:20px;top:14px;
+  box-shadow:0 0 5px #000}
+#hitmark:before{transform:rotate(45deg)}#hitmark:after{transform:rotate(-45deg)}
+#hitmark.on{opacity:1}
+#banner{position:absolute;left:0;right:0;top:26%;text-align:center;font-size:clamp(22px,7vw,44px);
+  font-weight:900;letter-spacing:1px;color:#fff;text-shadow:0 4px 18px #000c,0 0 30px #ff8a3d88;opacity:0}
+#banner.on{animation:bnr 1.5s ease forwards}
+@keyframes bnr{0%{opacity:0;transform:scale(.7)}18%{opacity:1;transform:scale(1.06)}75%{opacity:1}100%{opacity:0;transform:scale(1)}}
+#prompt{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);background:#0b1009c9;
+  border:1px solid #ffd45e66;border-radius:12px;padding:8px 14px;font-size:13px;font-weight:800;
+  color:#ffe9a8;display:none;white-space:nowrap;box-shadow:0 4px 14px #00000059}
+#prompt.on{display:block}
+#dmgLayer{position:fixed;inset:0;z-index:21;pointer-events:none;overflow:hidden}
+.dnum{position:absolute;font-size:15px;font-weight:900;color:#fff2c0;text-shadow:0 2px 5px #000;
+  will-change:transform,opacity}
+.dnum.crit{color:#ff8a5e;font-size:19px}
+#vig{position:fixed;inset:0;z-index:19;pointer-events:none;opacity:0;transition:opacity .25s ease;
+  background:radial-gradient(120% 100% at 50% 50%,transparent 45%,#7a0d0dcc 100%)}
+#vig.on{opacity:1}
+
+/* ── touch controls ─────────────────────────────────────────── */
+#touch{position:fixed;inset:0;z-index:22;display:none;pointer-events:none}
+#touch.on{display:block}
+.stick{position:absolute;bottom:calc(16px + env(safe-area-inset-bottom));width:118px;height:118px;
+  border-radius:50%;background:#0b10094d;border:2px solid #ffffff26;pointer-events:auto}
+#stickL{left:16px}#stickR{right:16px}
+.stick i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#ffffffcc,#9fb89488 60%,#4a5a45cc);
+  border:1px solid #ffffff44;box-shadow:0 4px 12px #00000059}
+#stickR i{background:radial-gradient(circle at 35% 30%,#ffe6a3cc,#f5930099 60%,#7a4a00cc)}
+#actBtns{position:absolute;right:calc(16px + 132px);bottom:calc(28px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:none}
+.abtn{pointer-events:auto;width:56px;height:56px;border-radius:50%;border:1px solid #ffffff2e;
+  background:#0b1009a8;color:#eaf3e6;font-size:12px;font-weight:900;cursor:pointer;
+  box-shadow:0 4px 12px #0000004d;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.abtn:active{background:#2b3a26}
+.abtn.on{background:#3d5a30;border-color:#ffe9a8;box-shadow:0 0 0 2px #ffd45e66,0 4px 12px #0000004d}
+.abtn.fire{width:74px;height:74px;font-size:22px;background:radial-gradient(circle at 40% 35%,#ffd45e,#e2571a);color:#20120a;border-color:#ffe9a8}
+.abtn small{font-size:8.5px;letter-spacing:.6px;opacity:.85}
+#kbHint{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font-size:10.5px;color:#8aa28180;
+  font-weight:700;letter-spacing:.4px;pointer-events:none}
+
+/* ── loading ────────────────────────────────────────────────── */
+#loading{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;background:#0b0f0a}
+#loading.hide{display:none;opacity:0;transition:opacity .4s ease}
+.ldbar{width:min(74vw,320px);height:9px;background:#ffffff14;border-radius:6px;overflow:hidden}
+.ldbar i{display:block;height:100%;width:8%;background:linear-gradient(90deg,#ffd45e,#f59300);transition:width .2s ease}
+.ldtxt{font-size:12px;color:#9fb894;font-weight:800;letter-spacing:.8px}
+
+/* portrait: shrink the sticks so they don't cover the screen */
+@media (orientation:portrait){
+  .stick{width:104px;height:104px}
+  #actBtns{right:calc(12px + 116px)}
+  .abtn{width:50px;height:50px}.abtn.fire{width:66px;height:66px}
+  #minimap{width:92px;height:92px}
+  #bars{width:min(52vw,220px)}
+}
+@media (max-height:430px){
+  .title{font-size:clamp(24px,7vw,40px)}
+  .panel{padding:10px}
+  .btn{padding:12px 22px}
+}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="vig"></div>
+
+<!-- ══════════ HUD ══════════ -->
+<div id="hud">
+  <div id="topbar">
+    <div id="topL">
+      <div class="chip"><span class="lbl">ALIVE</span><b id="alive">13</b></div>
+      <div class="chip"><span class="lbl">KILLS</span><b id="kills">0</b></div>
+      <div class="chip" id="zoneChip"><span class="lbl">ZONE</span><b id="zoneT">0:30</b></div>
+    </div>
+    <button id="btnPause">⏸</button>
+  </div>
+
+  <div id="killfeed"></div>
+  <div id="minimapWrap"><canvas id="minimap" width="132" height="132"></canvas></div>
+
+  <div id="bars">
+    <div class="bar"><i id="hpFill"></i><span id="hpTxt">100 HP</span></div>
+    <div class="bar"><i id="arFill"></i><span id="arTxt">0 ARMOR</span></div>
+  </div>
+
+  <div id="wpn">
+    <div id="wpnName">— IDDA —</div>
+    <div id="ammo">∞</div>
+    <div id="reloadWrap"><i id="reloadFill"></i></div>
+    <div id="items">
+      <button class="item off" id="itMed">🩹 <b>0</b></button>
+      <button class="item off" id="itNar">💥 <b>0</b></button>
+    </div>
+  </div>
+
+  <div id="cross"></div>
+  <div id="hitmark"></div>
+  <div id="banner"></div>
+  <div id="prompt"></div>
+</div>
+<div id="dmgLayer"></div>
+
+<!-- ══════════ TOUCH CONTROLS ══════════ -->
+<div id="touch">
+  <div class="stick" id="stickL"><i></i></div>
+  <div class="stick" id="stickR"><i></i></div>
+  <div id="actBtns">
+    <button class="abtn fire" id="bFire">🔥</button>
+    <button class="abtn" id="bJump">⤴<small>JUMP</small></button>
+    <button class="abtn" id="bProne">↕<small>SCOPE</small></button>
+    <button class="abtn" id="bPick">🎒<small>PICK</small></button>
+  </div>
+  <div id="kbHint">WASD move · mouse aim · click fire · R reload · F pick · Q med · E grenade · SPACE jump · P pause</div>
+</div>
+
+<!-- ══════════ MENU ══════════ -->
+<div class="screen" id="menu">
+  <div class="badge">🪂 12 BOTS · ZONE · LOOT · 3D</div>
+  <div class="title">NAR<br>SURVIVOR 3D</div>
+  <div class="sub">Battle royale 3D <b>mkhaffef</b>: kolchi procedural, bla textures dyal l-barra,
+    w kayn <b>3 niveaux dyal qualité</b> bach ykhdem 3la telephone d3if.</div>
+
+  <div class="panel">
+    <h3>⚙ Qualité / Performance</h3>
+    <div class="opt" id="qOpt">
+      <button data-q="0" class="on">⚡ KHFIF</button>
+      <button data-q="1">🌤 NORMAL</button>
+      <button data-q="2">✨ ZWIN</button>
+    </div>
+    <div class="hint" id="qHint" style="margin-top:8px"></div>
+  </div>
+
+  <div class="panel">
+    <h3>🎯 Sensibilité dyal l-aim</h3>
+    <div class="opt" id="sOpt">
+      <button data-s="0.7">Low</button>
+      <button data-s="1" class="on">Medium</button>
+      <button data-s="1.45">High</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>📊 Statistiques dyalek</h3>
+    <div id="stats"></div>
+  </div>
+
+  <div class="row">
+    <button class="btn" id="btnPlay">▶ L3AB DABA</button>
+    <button class="btn ghost small" id="btnHow">❓ Kifach تل3ab</button>
+  </div>
+  <div class="hint">Ma3ndhach aya 3ala9a b Free Fire / Garena — hadi lo3ba مستقلة dyalna.</div>
+</div>
+
+<!-- ══════════ HOW TO ══════════ -->
+<div class="screen hide" id="how">
+  <div class="title" style="font-size:clamp(22px,6vw,38px)">KIFACH تل3ab</div>
+  <div class="panel" style="text-align:right;direction:rtl">
+    <div class="stat"><span>🕹 Stick liser</span><b>تحرك</b></div>
+    <div class="stat"><span>🕹 Stick limen</span><b>صوّب (الرامي يخدم وحدو)</b></div>
+    <div class="stat"><span>🔥 / ⤴ / 🎒</span><b>طلق · نطّ · خد الشيء</b></div>
+    <div class="stat"><span>↕ SCOPE</span><b>دقة أكثر + زوم</b></div>
+    <div class="stat"><span>🩹 Q</span><b>داوي روحك (ثانية ونص)</b></div>
+    <div class="stat"><span>💥 E</span><b>قنبلة — ضرر ف 5 أمتار</b></div>
+    <div class="stat"><span>🗺 الميني-ماب</span><b>الدائرة الزرقا = الزون الآمنة</b></div>
+    <div class="stat"><span>☠ برا الزون</span><b>كتخسر صحة كل ثانية — دخل!</b></div>
+  </div>
+  <div class="panel" style="text-align:left">
+    <h3>💡 نصائح للربح</h3>
+    <div class="hint">
+      1. هبط حدا الديورات — فيهم السلاح والذخيرة.<br>
+      2. خوذ <b>AR</b> ولا <b>SMG</b> قبل ما تقلب على قتال.<br>
+      3. الدرع (armor) كيمتص 60% من الضرر — لبسو بكري.<br>
+      4. ف آخر الزون، بقا حدا الحد ولا داخل شوية — ما تمشيش ف الوسط.<br>
+      5. ف KHFIF الجودة كتهبط أوتوماتيك إلا بان اللّاج.
+    </div>
+  </div>
+  <button class="btn ghost" id="btnHowBack">⬅ رجع</button>
+</div>
+
+<!-- ══════════ PAUSE ══════════ -->
+<div class="screen hide" id="pause">
+  <div class="title" style="font-size:clamp(24px,7vw,42px)">⏸ وقفة</div>
+  <div class="panel">
+    <h3>⚙ Réglages</h3>
+    <div class="opt" id="qOpt2">
+      <button data-q="0">⚡ KHFIF</button>
+      <button data-q="1">🌤 NORMAL</button>
+      <button data-q="2">✨ ZWIN</button>
+    </div>
+    <div class="hint" id="perfNote" style="margin-top:8px"></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="btnResume">▶ كمل</button>
+    <button class="btn ghost" id="btnQuit">🚪 خرج للـmenu</button>
+  </div>
+</div>
+
+<!-- ══════════ RESULTS ══════════ -->
+<div class="screen hide" id="result">
+  <div class="badge" id="rBadge">MATCH</div>
+  <div class="title" id="rTitle">#1</div>
+  <div class="sub" id="rSub"></div>
+  <div class="panel">
+    <div class="stat"><span>☠ Kills</span><b id="rKills">0</b></div>
+    <div class="stat"><span>💥 Damage</span><b id="rDmg">0</b></div>
+    <div class="stat"><span>⏱ Survival</span><b id="rTime">0:00</b></div>
+    <div class="stat"><span>🪙 Coins rb7ti</span><b id="rCoins">+0</b></div>
+    <div class="stat" style="border:0"><span>🏆 Best place</span><b id="rBest">#1</b></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="btnAgain">🔁 مرة أخرى</button>
+    <button class="btn ghost" id="btnMenu">🏠 Menu</button>
+  </div>
+</div>
+
+<!-- ══════════ LOADING ══════════ -->
+<div id="loading">
+  <div class="title" style="font-size:clamp(20px,6vw,34px)">🪂 NAR SURVIVOR 3D</div>
+  <div class="ldbar"><i id="ldFill"></i></div>
+  <div class="ldtxt" id="ldTxt">generating the island…</div>
+</div>
+
+<div id="errLog"></div>
+
+<script>
+  // surface fatal errors on-screen (phones have no console)
+  window.addEventListener('error', (e) => {
+    const d = document.getElementById('errLog');
+    if (!d) return;
+    d.style.display = 'block';
+    d.textContent += (e.message || e.error || 'error') + '\n';
+  });
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  }
+</script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/"
+  }
+}
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
