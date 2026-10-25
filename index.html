@@ -10,17 +10,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
     <!-- =====================================================================
-       ⚙️ إعدادات ربط روابط الدفع PAYPAL (تقدر تعدل الروابط هنا مباشرة بأول الملف)
+       ⚙️ إعدادات ربط الدفع PAYPAL الرسمية (مربوطة بالكود ديالك جاهزة 100%!)
        ===================================================================== -->
   <script>
     window.ADZAK_PAYPAL_CONFIG = {
-      // 1) رابط الدفع لتصميم واحد ($3.99)
-      singleDesignUrl: "https://www.paypal.com/ncp/payment/SCAX7VMZWXSDG",
+      // الجزء 1: معرف PayPal Client ID (من كود HTML في حسابك PayPal)
+      sdkClientId: "BAAcGe9lR0lGxAMuQ0ZpOVcmwiKxH46aVSQdEkgLBi-sVOzXJ80k3r2FGKiWo-7POW3Z3aZIcaYWIS7qNw",
 
-      // 2) رابط الدفع للباقة الكاملة 6 تصاميم ($15.99)
-      bundleUrl: "https://www.paypal.com/ncp/payment/SCAX7VMZWXSDG",
+      // الجزء 2: معرف الزر المدمج Hosted Button ID (من كود HTML في حسابك PayPal)
+      hostedButtonId: "WSDWVJ58CV5VN",
 
-      // 3) اختياري: رابط PayPal خاص لكل تصميم بوحدو (خليه "" باش يستعمل singleDesignUrl)
+      // اختياري: معرف زر مخصص للباقة الكاملة 6 تصاميم ($15.99) إيلا أنشأتيه من بعد
+      bundleHostedButtonId: "",
+
+      // رابط الدفع المباشر الاحتياطي (يشتغل حتى عند فتح الملف محلياً file://)
+      singleDesignUrl: "https://www.paypal.com/ncp/payment/WSDWVJ58CV5VN",
+      bundleUrl: "https://www.paypal.com/ncp/payment/WSDWVJ58CV5VN",
+
       productLinks: {
         "howdy-halloween": "",
         "shes-spooky": "",
@@ -31,6 +37,12 @@
       }
     };
   </script>
+  <!-- الجزء 1 من كود PayPal الرسمي (PayPal Hosted Buttons SDK) -->
+  <script
+    src="https://www.paypal.com/sdk/js?client-id=BAAcGe9lR0lGxAMuQ0ZpOVcmwiKxH46aVSQdEkgLBi-sVOzXJ80k3r2FGKiWo-7POW3Z3aZIcaYWIS7qNw&components=hosted-buttons&disable-funding=venmo&currency=USD"
+    async
+    onload="window.__onPaypalSdkReady && window.__onPaypalSdkReady()"
+  ></script>
   <style>
 :root {
   --bg-base: #fff8fb;
@@ -2942,6 +2954,14 @@ a {
   100% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
 }
 
+.paypal-hosted-widget-wrap {
+  margin: 6px 0 10px;
+  min-height: 10px;
+}
+.paypal-hosted-widget-wrap:empty {
+  margin: 0;
+  min-height: 0;
+}
 .btn-paypal-official {
   display: flex;
   align-items: center;
@@ -3862,26 +3882,30 @@ a {
           <div class="promo-feedback" id="couponFeedback" hidden></div>
         </div>
 
-        <!-- Step 1: Direct Official PayPal Checkout Button -->
+        <!-- Step 1: Official Embedded PayPal Hosted Button (الجزء 2 من كود PayPal) + Direct Link Fallback -->
         <div class="paypal-gate-step1">
           <div class="paypal-gate-status-row">
             <span class="paypal-lock-pill">&#128274; PNG LOCKED UNTIL PAID</span>
             <span class="paypal-radar-pill" id="paypalLiveRadar">
-              <span class="radar-dot"></span> Official PayPal Receipt Gate Active
+              <span class="radar-dot"></span> Official PayPal Secure Checkout
             </span>
           </div>
+
+          <!-- الجزء 2: حاوية زر PayPal الرسمي المدمج -->
+          <div id="paypal-container-WSDWVJ58CV5VN" class="paypal-hosted-widget-wrap"></div>
+
           <a
-            href="https://www.paypal.com/ncp/payment/SCAX7VMZWXSDG"
+            href="https://www.paypal.com/ncp/payment/WSDWVJ58CV5VN"
             target="_blank"
             rel="noopener noreferrer"
             class="btn-paypal-official"
             id="directPaypalPayBtn"
           >
-            <span>&#128179; Pay Now on Official PayPal</span>
+            <span>&#128179; Open PayPal Checkout Page</span>
             <strong id="ppAmountText">$3.99 USD &nearr;</strong>
           </a>
-          <small class="paypal-step1-hint">
-            PayPal checkout opened in a new tab (supports PayPal Balance &amp; Debit/Credit Cards). If your browser blocked the tab, click the golden button above.
+          <small class="paypal-step1-hint" id="paypalStep1Hint">
+            Pay directly using the official PayPal / Card buttons above (or click the button to open PayPal in a new tab), then enter your receipt Transaction ID in Step 2 below to unlock your PNG.
           </small>
         </div>
 
@@ -4808,14 +4832,56 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"Ew0cB/WBREEcEBARewZ5DUZULTIg
   }
 
   // Direct PayPal Checkout + Strict Payment Verification Gate
+  let renderedHostedBtnId = null;
+
+  function mountPaypalHostedButton() {
+    const activeBtnId =
+      (state.isBundleCheckout && PP_CFG.bundleHostedButtonId)
+        ? PP_CFG.bundleHostedButtonId
+        : (PP_CFG.hostedButtonId || 'WSDWVJ58CV5VN');
+
+    const container = document.getElementById('paypal-container-WSDWVJ58CV5VN');
+    if (!container || !window.paypal || typeof window.paypal.HostedButtons !== 'function') {
+      return false;
+    }
+    if (renderedHostedBtnId === activeBtnId && container.children.length > 0) {
+      return true;
+    }
+    try {
+      container.innerHTML = '';
+      window.paypal
+        .HostedButtons({ hostedButtonId: activeBtnId })
+        .render('#paypal-container-WSDWVJ58CV5VN');
+      renderedHostedBtnId = activeBtnId;
+      // Style fallback link subtly when embedded button is live
+      const fallbackBtn = document.getElementById('directPaypalPayBtn');
+      if (fallbackBtn) {
+        fallbackBtn.style.marginTop = '8px';
+        fallbackBtn.style.padding = '9px 14px';
+        fallbackBtn.style.fontSize = '13px';
+      }
+      return true;
+    } catch (err) {
+      console.warn('PayPal HostedButtons render fallback:', err);
+      return false;
+    }
+  }
+
+  window.__onPaypalSdkReady = function () {
+    mountPaypalHostedButton();
+  };
+
   function openSingleCheckout(productId, tierId) {
     state.checkoutMode = 'single';
     state.isBundleCheckout = false;
     state.directCheckoutItems = [{ productId, tierId: tierId || 'standard' }];
     savePendingSelection();
-    window.open(getActivePaypalUrl(), '_blank', 'noopener,noreferrer');
     renderCheckoutModal();
     $('#checkoutModal').hidden = false;
+    const mounted = mountPaypalHostedButton();
+    if (!mounted && window.location.protocol === 'file:') {
+      window.open(getActivePaypalUrl(), '_blank', 'noopener,noreferrer');
+    }
   }
 
   function openBundleCheckout() {
@@ -4826,9 +4892,12 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"Ew0cB/WBREEcEBARewZ5DUZULTIg
       tierId: 'standard'
     }));
     savePendingSelection();
-    window.open(getActivePaypalUrl(), '_blank', 'noopener,noreferrer');
     renderCheckoutModal();
     $('#checkoutModal').hidden = false;
+    const mounted = mountPaypalHostedButton();
+    if (!mounted && window.location.protocol === 'file:') {
+      window.open(getActivePaypalUrl(), '_blank', 'noopener,noreferrer');
+    }
   }
 
   function openCartCheckout() {
@@ -5453,6 +5522,7 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"Ew0cB/WBREEcEBARewZ5DUZULTIg
   renderStudioInspector();
   refreshUnlockedUI();
   updateCartBadge();
+  mountPaypalHostedButton();
   checkPaypalReturnParams();
 })();
 
