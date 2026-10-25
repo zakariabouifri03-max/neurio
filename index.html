@@ -10,20 +10,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
     <!-- =====================================================================
-       ⚙️ إعدادات ربط الدفع PAYPAL الرسمية (مربوطة بالكود ديالك جاهزة 100%!)
+       ⚙️ إعدادات ربط الدفع PAYPAL الرسمية (تدعم الفتح الفوري بدون مغادرة الصفحة + العودة التلقائية!)
        ===================================================================== -->
   <script>
     window.ADZAK_PAYPAL_CONFIG = {
-      // الجزء 1: معرف PayPal Client ID (من كود HTML في حسابك PayPal)
+      // خيار أ (الأفضل — يفتح الـ PNG فوراً بنفس الصفحة بدون انتظار تحويل PayPal!):
+      // اختياري: ضع هنا Live Client ID من https://developer.paypal.com/dashboard/applications/live
+      liveClientId: "",
+
+      // خيار ب (الكود الحالي ديالك J2PB3BSV3DCC8 + رابط العودة التلقائية في PayPal):
       sdkClientId: "BAAcGe9lR0lGxAMuQ0ZpOVcmwiKxH46aVSQdEkgLBi-sVOzXJ80k3r2FGKiWo-7POW3Z3aZIcaYWIS7qNw",
-
-      // الجزء 2: معرف الزر المدمج Hosted Button ID (من كود HTML في حسابك PayPal)
       hostedButtonId: "J2PB3BSV3DCC8",
-
-      // اختياري: معرف زر مخصص للباقة الكاملة 6 تصاميم ($15.99) إيلا أنشأتيه من بعد
       bundleHostedButtonId: "",
 
-      // رابط الدفع المباشر الاحتياطي (يشتغل حتى عند فتح الملف محلياً file://)
+      // رابط الدفع المباشر الاحتياطي
       singleDesignUrl: "https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8",
       bundleUrl: "https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8",
 
@@ -36,13 +36,32 @@
         "1865-juneteenth": ""
       }
     };
+
+    // محمّل ذكي لسكريبت PayPal (يجرب أزرار الدفع الفورية داخل الصفحة أولاً ثم يرجع تلقائياً لـ HostedButtons)
+    (function loadPaypalSdkSmart() {
+      if (window.location.protocol === 'file:') return;
+      var cfg = window.ADZAK_PAYPAL_CONFIG || {};
+      function inject(src, onErr) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.async = true;
+        s.onload = function () { if (window.__onPaypalSdkReady) window.__onPaypalSdkReady(); };
+        if (onErr) s.onerror = onErr;
+        document.head.appendChild(s);
+      }
+      if (cfg.liveClientId && cfg.liveClientId.trim().length > 15) {
+        inject('https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(cfg.liveClientId.trim()) + '&components=buttons&disable-funding=venmo&currency=USD');
+      } else if (cfg.sdkClientId) {
+        var cid = encodeURIComponent(cfg.sdkClientId.trim());
+        inject(
+          'https://www.paypal.com/sdk/js?client-id=' + cid + '&components=buttons,hosted-buttons&disable-funding=venmo&currency=USD',
+          function () {
+            inject('https://www.paypal.com/sdk/js?client-id=' + cid + '&components=hosted-buttons&disable-funding=venmo&currency=USD');
+          }
+        );
+      }
+    })();
   </script>
-  <!-- الجزء 1 من كود PayPal الرسمي (PayPal Hosted Buttons SDK) -->
-  <script
-    src="https://www.paypal.com/sdk/js?client-id=BAAcGe9lR0lGxAMuQ0ZpOVcmwiKxH46aVSQdEkgLBi-sVOzXJ80k3r2FGKiWo-7POW3Z3aZIcaYWIS7qNw&components=hosted-buttons&disable-funding=venmo&currency=USD"
-    async
-    onload="window.__onPaypalSdkReady && window.__onPaypalSdkReady()"
-  ></script>
   <style>
 :root {
   --bg-base: #fff8fb;
@@ -3891,18 +3910,24 @@ a {
             </span>
           </div>
 
+          <div id="fileProtocolWarning" hidden style="background:#fff1f2;border:1.5px solid #fda4af;color:#9f1239;padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.55;margin-bottom:10px;">
+            <strong>&#9888;&#65039; تنبيه مهم (Local File Mode):</strong> أنت فاتح الملف من جهازك (<code>file://</code>). موقع PayPal لا يمكنه إرجاعك لملف داخل جهازك بعد الدفع! ارفع الملف على <strong>GitHub Pages</strong> (رابط <code>https://</code>) ليشتغل الإرجاع التلقائي وفتح الـ PNG فوراً.
+          </div>
+
+          <!-- In-Page Instant Capture PayPal Smart Buttons (Zero Redirect Needed!) -->
+          <div id="paypal-smart-buttons-container" class="paypal-hosted-widget-wrap"></div>
+
           <!-- Official Embedded PayPal Hosted Button (J2PB3BSV3DCC8) -->
           <div id="paypal-container-J2PB3BSV3DCC8" class="paypal-hosted-widget-wrap"></div>
 
           <a
             href="https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8"
-            target="_blank"
             rel="noopener noreferrer"
             class="btn-paypal-official"
             id="directPaypalPayBtn"
           >
             <span>&#128179; Pay Securely on Official PayPal</span>
-            <strong id="ppAmountText">$3.99 USD &nearr;</strong>
+            <strong id="ppAmountText">$3.99 USD &rarr;</strong>
           </a>
         </div>
 
@@ -4768,18 +4793,160 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
     if (collar) collar.hidden = !(matchBtn ? matchBtn.dataset.shirt === 'true' : bgClass.startsWith('bg-tee-'));
   }
 
+  async function unlockCurrentSelectionWithKey(validSecretKey, payerEmailOverride, payerNameOverride) {
+    const savedSel = safeGetStorage(STORAGE_PENDING_SEL_KEY, null);
+    const activeItems = getActiveCheckoutItems();
+    const itemsToUnlock = (activeItems && activeItems.length > 0)
+      ? activeItems
+      : ((savedSel && Array.isArray(savedSel.items) && savedSel.items.length > 0)
+          ? savedSel.items
+          : [{ productId: PRODUCTS[0].id, tierId: 'standard' }]);
+
+    const unlockedOrderItems = [];
+    for (const it of itemsToUnlock) {
+      const p = findProduct(it.productId);
+      if (!p) continue;
+      const decryptedBytes = chacha20DecryptItem(validSecretKey, p.id);
+      if (!decryptedBytes) continue;
+      await saveDecryptedBytesToIdb(p.id, decryptedBytes);
+      unlockedOrderItems.push({
+        productId: p.id,
+        sku: p.sku,
+        title: p.title,
+        dimensions: p.dimensions,
+        downloadFilename: p.downloadFilename,
+        tierId: it.tierId || 'standard',
+        tierName: it.tierId === 'unlimited' ? 'Unlimited Commercial Print Shop License' : 'Standard Print & Small Biz License'
+      });
+    }
+    if (unlockedOrderItems.length === 0) return;
+
+    const order = {
+      orderId: generateOrderId(),
+      buyerName: payerNameOverride || ($('#buyerNameInput')?.value || '').trim() || (savedSel && savedSel.buyerName) || 'PayPal Verified Buyer',
+      email: payerEmailOverride || ($('#buyerEmailInput')?.value || '').trim() || (savedSel && savedSel.email) || 'verified-paypal@adzakart.studio',
+      isBundle: Boolean(state.isBundleCheckout || (savedSel && savedSel.isBundle)),
+      items: unlockedOrderItems,
+      createdAt: new Date().toISOString()
+    };
+
+    state.unlockedOrders.unshift(order);
+    safeSetStorage(STORAGE_ORDERS_KEY, state.unlockedOrders);
+    try { localStorage.removeItem(STORAGE_PENDING_SEL_KEY); } catch (_) {}
+
+    if (state.checkoutMode === 'cart' || (savedSel && savedSel.checkoutMode === 'cart')) {
+      state.cart = [];
+      persistCart();
+    }
+
+    refreshUnlockedUI();
+    renderCatalogGrid();
+    renderStudioInspector(true);
+    $('#checkoutModal').hidden = true;
+
+    setMascotPose('dance', {
+      burst: true,
+      customSpeech: `🎉 PayPal Payment Confirmed! ${unlockedOrderItems.length} clean 300 DPI PNG(s) unlocked!`,
+      customDockSpeech: `🎉 Verified! ${unlockedOrderItems.length} PNG(s) unlocked!`
+    });
+    openVaultModal();
+
+    if (unlockedOrderItems.length === 1) {
+      await exportAndDownloadCleanPng(unlockedOrderItems[0].productId);
+    } else {
+      showToast(`🌸 PayPal payment verified! All ${unlockedOrderItems.length} clean PNGs unlocked!`);
+    }
+  }
+
   function mountPaypalHostedButton() {
+    const fileWarn = document.getElementById('fileProtocolWarning');
+    if (fileWarn) fileWarn.hidden = window.location.protocol !== 'file:';
+
+    const fallbackBtn = document.getElementById('directPaypalPayBtn');
+    if (fallbackBtn) {
+      // If inside an iframe (e.g. preview), open PayPal in new tab; on real site, open in same tab for clean return!
+      if (window.self !== window.top) fallbackBtn.setAttribute('target', '_blank');
+      else fallbackBtn.removeAttribute('target');
+    }
+
+    if (!window.paypal) return false;
+
+    // Mode A: In-Page PayPal Smart Buttons (actions.order.capture — unlocks immediately with ZERO redirect!)
+    const smartWrap = document.getElementById('paypal-smart-buttons-container');
+    if (smartWrap && typeof window.paypal.Buttons === 'function') {
+      smartWrap.innerHTML = '';
+      try {
+        const btnInstance = window.paypal.Buttons({
+          style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay' },
+          createOrder: function (data, actions) {
+            savePendingSelection();
+            const { total } = calculateCheckoutTotal();
+            const items = getActiveCheckoutItems();
+            const desc = state.isBundleCheckout
+              ? BUNDLE_OFFER.title
+              : items.map((i) => getShortTitle(findProduct(i.productId) || { title: 'PNG' })).join(', ') + ' — ADZAK ART PNG';
+            return actions.order.create({
+              purchase_units: [{
+                description: desc.slice(0, 120),
+                amount: { currency_code: 'USD', value: total.toFixed(2) }
+              }]
+            });
+          },
+          onApprove: async function (data, actions) {
+            const details = await actions.order.capture();
+            const cap = details?.purchase_units?.[0]?.payments?.captures?.[0];
+            if (details && (details.status === 'COMPLETED' || (cap && cap.status === 'COMPLETED'))) {
+              const payerEmail = details?.payer?.email_address || '';
+              const payerName = [details?.payer?.name?.given_name, details?.payer?.name?.surname].filter(Boolean).join(' ');
+              const internalKey = ['ADZAK-PP9X', '4M7K2W8Q5L', '3N6R'].join('');
+              await unlockCurrentSelectionWithKey(internalKey, payerEmail, payerName);
+            } else {
+              const errBox = $('#checkoutErrorBox');
+              if (errBox) {
+                errBox.textContent = 'PayPal reported payment was not completed yet.';
+                errBox.hidden = false;
+              }
+            }
+          },
+          onError: function () {
+            // If BAA client-id disallows dynamic createOrder at click time, fall back cleanly to HostedButtons!
+            smartWrap.innerHTML = '';
+            mountHostedFallbackOnly();
+          }
+        });
+        if (btnInstance.isEligible && !btnInstance.isEligible()) {
+          return mountHostedFallbackOnly();
+        }
+        btnInstance.render('#paypal-smart-buttons-container').then(function () {
+          if (fallbackBtn) fallbackBtn.style.display = 'none';
+          const hostedWrap = document.getElementById('paypal-container-J2PB3BSV3DCC8');
+          if (hostedWrap) hostedWrap.innerHTML = '';
+        }).catch(function () {
+          smartWrap.innerHTML = '';
+          mountHostedFallbackOnly();
+        });
+        return true;
+      } catch (_) {
+        smartWrap.innerHTML = '';
+      }
+    }
+
+    return mountHostedFallbackOnly();
+  }
+
+  function mountHostedFallbackOnly() {
     const activeBtnId = (state.isBundleCheckout && PP_CFG.bundleHostedButtonId)
       ? PP_CFG.bundleHostedButtonId
       : (PP_CFG.hostedButtonId || 'J2PB3BSV3DCC8');
     const container = document.getElementById('paypal-container-J2PB3BSV3DCC8');
+    const fallbackBtn = document.getElementById('directPaypalPayBtn');
+    if (fallbackBtn) fallbackBtn.style.display = '';
     if (!container || !window.paypal || typeof window.paypal.HostedButtons !== 'function') return false;
     if (renderedHostedBtnId === activeBtnId && container.children.length > 0) return true;
     try {
       container.innerHTML = '';
       window.paypal.HostedButtons({ hostedButtonId: activeBtnId }).render('#paypal-container-J2PB3BSV3DCC8');
       renderedHostedBtnId = activeBtnId;
-      const fallbackBtn = document.getElementById('directPaypalPayBtn');
       if (fallbackBtn) {
         fallbackBtn.style.marginTop = '8px';
         fallbackBtn.style.padding = '9px 14px';
@@ -4974,81 +5141,30 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
     const ppKey = (params.get('pp_unlock') || params.get('pp_key') || '').trim();
     if (!ppKey) return;
 
-    // Immediately scrub secret parameter from browser URL bar
     if (window.location.protocol.startsWith('http')) {
       window.history.replaceState({}, '', window.location.pathname);
     }
 
-    // 1. Verify SHA-256 cryptographic digest
     const candidateHash = bytesToHex(sha256Bytes('VERIFY:' + ppKey));
     if (candidateHash !== PAYPAL_RETURN_VERIFY_SHA256) {
       showToast('🔒 Invalid or unauthorized payment return token.');
       return;
     }
 
-    // 2. Load the buyer's selected item(s) before they clicked PayPal
-    const savedSel = safeGetStorage(STORAGE_PENDING_SEL_KEY, null);
-    const itemsToUnlock = (savedSel && Array.isArray(savedSel.items) && savedSel.items.length > 0)
-      ? savedSel.items
-      : [{ productId: PRODUCTS[0].id, tierId: 'standard' }];
+    await unlockCurrentSelectionWithKey(ppKey, '', '');
+  }
 
-    // 3. Decrypt ONLY the purchased item(s) using 256-bit ChaCha20 & store in IndexedDB
-    const unlockedOrderItems = [];
-    for (const it of itemsToUnlock) {
-      const p = findProduct(it.productId);
-      if (!p) continue;
-      const decryptedBytes = chacha20DecryptItem(ppKey, p.id);
-      if (!decryptedBytes) continue;
-      await saveDecryptedBytesToIdb(p.id, decryptedBytes);
-      unlockedOrderItems.push({
-        productId: p.id,
-        sku: p.sku,
-        title: p.title,
-        dimensions: p.dimensions,
-        downloadFilename: p.downloadFilename,
-        tierId: it.tierId || 'standard',
-        tierName: it.tierId === 'unlimited' ? 'Unlimited Commercial Print Shop License' : 'Standard Print & Small Biz License'
+  // Cross-tab sync: if PayPal completes in another tab, unlock this tab live too!
+  window.addEventListener('storage', (e) => {
+    if (e.key === STORAGE_ORDERS_KEY) {
+      loadStoredState();
+      hydrateUnlockedCacheFromIdb().then(() => {
+        refreshUnlockedUI();
+        $('#checkoutModal').hidden = true;
+        openVaultModal();
       });
     }
-
-    if (unlockedOrderItems.length === 0) return;
-
-    const order = {
-      orderId: generateOrderId(),
-      buyerName: (savedSel && savedSel.buyerName) || 'PayPal Verified Buyer',
-      email: (savedSel && savedSel.email) || 'verified-paypal@adzakart.studio',
-      isBundle: Boolean(savedSel && savedSel.isBundle),
-      items: unlockedOrderItems,
-      createdAt: new Date().toISOString()
-    };
-
-    state.unlockedOrders.unshift(order);
-    safeSetStorage(STORAGE_ORDERS_KEY, state.unlockedOrders);
-    localStorage.removeItem(STORAGE_PENDING_SEL_KEY);
-
-    if (savedSel && savedSel.checkoutMode === 'cart') {
-      state.cart = [];
-      persistCart();
-    }
-
-    refreshUnlockedUI();
-    renderCatalogGrid();
-    renderStudioInspector(true);
-    $('#checkoutModal').hidden = true;
-
-    setMascotPose('dance', {
-      burst: true,
-      customSpeech: `🎉 PayPal Payment Confirmed! ${unlockedOrderItems.length} clean 300 DPI PNG(s) decrypted & unlocked!`,
-      customDockSpeech: `🎉 Verified! ${unlockedOrderItems.length} PNG(s) unlocked!`
-    });
-    openVaultModal();
-
-    if (unlockedOrderItems.length === 1) {
-      await exportAndDownloadCleanPng(unlockedOrderItems[0].productId);
-    } else {
-      showToast(`🌸 PayPal payment verified! All ${unlockedOrderItems.length} clean PNGs unlocked!`);
-    }
-  }
+  });
 
   function handleOrderLookup(e) {
     e.preventDefault();
