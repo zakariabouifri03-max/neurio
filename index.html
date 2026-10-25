@@ -18,14 +18,14 @@
       sdkClientId: "BAAcGe9lR0lGxAMuQ0ZpOVcmwiKxH46aVSQdEkgLBi-sVOzXJ80k3r2FGKiWo-7POW3Z3aZIcaYWIS7qNw",
 
       // الجزء 2: معرف الزر المدمج Hosted Button ID (من كود HTML في حسابك PayPal)
-      hostedButtonId: "WSDWVJ58CV5VN",
+      hostedButtonId: "J2PB3BSV3DCC8",
 
       // اختياري: معرف زر مخصص للباقة الكاملة 6 تصاميم ($15.99) إيلا أنشأتيه من بعد
       bundleHostedButtonId: "",
 
       // رابط الدفع المباشر الاحتياطي (يشتغل حتى عند فتح الملف محلياً file://)
-      singleDesignUrl: "https://www.paypal.com/ncp/payment/WSDWVJ58CV5VN",
-      bundleUrl: "https://www.paypal.com/ncp/payment/WSDWVJ58CV5VN",
+      singleDesignUrl: "https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8",
+      bundleUrl: "https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8",
 
       productLinks: {
         "howdy-halloween": "",
@@ -3891,11 +3891,11 @@ a {
             </span>
           </div>
 
-          <!-- Official Embedded PayPal Hosted Button (WSDWVJ58CV5VN) -->
-          <div id="paypal-container-WSDWVJ58CV5VN" class="paypal-hosted-widget-wrap"></div>
+          <!-- Official Embedded PayPal Hosted Button (J2PB3BSV3DCC8) -->
+          <div id="paypal-container-J2PB3BSV3DCC8" class="paypal-hosted-widget-wrap"></div>
 
           <a
-            href="https://www.paypal.com/ncp/payment/WSDWVJ58CV5VN"
+            href="https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8"
             target="_blank"
             rel="noopener noreferrer"
             class="btn-paypal-official"
@@ -3987,7 +3987,7 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
   const ASSETS = window.__ADZAK_ASSETS__ || {};
   const LOCKED_VAULT = window.__ADZAK_LOCKED_VAULT__ || {};
   const PP_CFG = window.ADZAK_PAYPAL_CONFIG || {};
-  const DEFAULT_PP_URL = PP_CFG.singleDesignUrl || 'https://www.paypal.com/ncp/payment/WSDWVJ58CV5VN';
+  const DEFAULT_PP_URL = PP_CFG.singleDesignUrl || 'https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8';
 
   // Only the irreversible SHA-256 verification digest is stored here — NEVER the secret key itself!
   const PAYPAL_RETURN_VERIFY_SHA256 = 'be166452edf2d839428532099b3072e6b33a8389a43c236970b613446484c045';
@@ -4771,13 +4771,13 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
   function mountPaypalHostedButton() {
     const activeBtnId = (state.isBundleCheckout && PP_CFG.bundleHostedButtonId)
       ? PP_CFG.bundleHostedButtonId
-      : (PP_CFG.hostedButtonId || 'WSDWVJ58CV5VN');
-    const container = document.getElementById('paypal-container-WSDWVJ58CV5VN');
+      : (PP_CFG.hostedButtonId || 'J2PB3BSV3DCC8');
+    const container = document.getElementById('paypal-container-J2PB3BSV3DCC8');
     if (!container || !window.paypal || typeof window.paypal.HostedButtons !== 'function') return false;
     if (renderedHostedBtnId === activeBtnId && container.children.length > 0) return true;
     try {
       container.innerHTML = '';
-      window.paypal.HostedButtons({ hostedButtonId: activeBtnId }).render('#paypal-container-WSDWVJ58CV5VN');
+      window.paypal.HostedButtons({ hostedButtonId: activeBtnId }).render('#paypal-container-J2PB3BSV3DCC8');
       renderedHostedBtnId = activeBtnId;
       const fallbackBtn = document.getElementById('directPaypalPayBtn');
       if (fallbackBtn) {
