@@ -9,6 +9,28 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+    <!-- =====================================================================
+       ⚙️ إعدادات ربط روابط الدفع PAYPAL (تقدر تعدل الروابط هنا مباشرة بأول الملف)
+       ===================================================================== -->
+  <script>
+    window.ADZAK_PAYPAL_CONFIG = {
+      // 1) رابط الدفع لتصميم واحد ($3.99)
+      singleDesignUrl: "https://www.paypal.com/ncp/payment/SCAX7VMZWXSDG",
+
+      // 2) رابط الدفع للباقة الكاملة 6 تصاميم ($15.99)
+      bundleUrl: "https://www.paypal.com/ncp/payment/SCAX7VMZWXSDG",
+
+      // 3) اختياري: رابط PayPal خاص لكل تصميم بوحدو (خليه "" باش يستعمل singleDesignUrl)
+      productLinks: {
+        "howdy-halloween": "",
+        "shes-spooky": "",
+        "love-fall-yall": "",
+        "america-bow": "",
+        "moo-haha-cow": "",
+        "1865-juneteenth": ""
+      }
+    };
+  </script>
   <style>
 :root {
   --bg-base: #fff8fb;
@@ -3981,7 +4003,25 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"Ew0cB/WBREEcEBARewZ5DUZULTIg
 
   const ASSETS = window.__ADZAK_ASSETS__ || {};
   const LOCKED_VAULT = window.__ADZAK_LOCKED_VAULT__ || {};
-  const PAYPAL_PAYMENT_URL = 'https://www.paypal.com/ncp/payment/SCAX7VMZWXSDG';
+  const PP_CFG = window.ADZAK_PAYPAL_CONFIG || {};
+  const DEFAULT_PP_URL = PP_CFG.singleDesignUrl || 'https://www.paypal.com/ncp/payment/SCAX7VMZWXSDG';
+  function getActivePaypalUrl() {
+    if (state.isBundleCheckout) {
+      return PP_CFG.bundleUrl || DEFAULT_PP_URL;
+    }
+    const items = getActiveCheckoutItems();
+    if (items.length === 1 && PP_CFG.productLinks && PP_CFG.productLinks[items[0].productId]) {
+      return PP_CFG.productLinks[items[0].productId];
+    }
+    return PP_CFG.singleDesignUrl || DEFAULT_PP_URL;
+  }
+  function savePendingSelection() {
+    safeSetStorage('adzak_pending_selection_v6', {
+      isBundle: state.isBundleCheckout,
+      checkoutMode: state.checkoutMode,
+      items: getActiveCheckoutItems()
+    });
+  }
   const VAULT_CIPHER_KEY = 'ADZAK-SAKURA-VAULT-2026';
 
   // Hydrate all static HTML images immediately (0ms)
@@ -4772,7 +4812,8 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"Ew0cB/WBREEcEBARewZ5DUZULTIg
     state.checkoutMode = 'single';
     state.isBundleCheckout = false;
     state.directCheckoutItems = [{ productId, tierId: tierId || 'standard' }];
-    window.open(PAYPAL_PAYMENT_URL, '_blank', 'noopener,noreferrer');
+    savePendingSelection();
+    window.open(getActivePaypalUrl(), '_blank', 'noopener,noreferrer');
     renderCheckoutModal();
     $('#checkoutModal').hidden = false;
   }
@@ -4784,7 +4825,8 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"Ew0cB/WBREEcEBARewZ5DUZULTIg
       productId: p.id,
       tierId: 'standard'
     }));
-    window.open(PAYPAL_PAYMENT_URL, '_blank', 'noopener,noreferrer');
+    savePendingSelection();
+    window.open(getActivePaypalUrl(), '_blank', 'noopener,noreferrer');
     renderCheckoutModal();
     $('#checkoutModal').hidden = false;
   }
@@ -4800,6 +4842,7 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"Ew0cB/WBREEcEBARewZ5DUZULTIg
     }
     state.checkoutMode = 'cart';
     state.isBundleCheckout = false;
+    savePendingSelection();
     renderCheckoutModal();
     $('#checkoutModal').hidden = false;
   }
@@ -4889,7 +4932,7 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"Ew0cB/WBREEcEBARewZ5DUZULTIg
     const { discount, total } = calculateCheckoutTotal();
     $('#checkoutTotalAmount').textContent = formatUSD(total);
     if ($('#ppAmountText')) $('#ppAmountText').innerHTML = `${formatUSD(total)} USD &nearr;`;
-    if ($('#directPaypalPayBtn')) $('#directPaypalPayBtn').href = PAYPAL_PAYMENT_URL;
+    if ($('#directPaypalPayBtn')) $('#directPaypalPayBtn').href = getActivePaypalUrl();
 
     const discTag = $('#checkoutDiscountTag');
     if (discount > 0 && state.appliedCoupon) {
@@ -5140,7 +5183,12 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"Ew0cB/WBREEcEBARewZ5DUZULTIg
         window.history.replaceState({}, '', window.location.pathname.replace(/\/paypal-return$/, '/') || '/');
       }
 
-      if (state.directCheckoutItems.length === 0) {
+      const savedSel = safeGetStorage('adzak_pending_selection_v6', null);
+      if (savedSel && Array.isArray(savedSel.items) && savedSel.items.length > 0) {
+        state.isBundleCheckout = Boolean(savedSel.isBundle);
+        state.checkoutMode = savedSel.checkoutMode === 'bundle' ? 'bundle' : 'single';
+        state.directCheckoutItems = savedSel.items;
+      } else if (state.directCheckoutItems.length === 0) {
         state.checkoutMode = 'single';
         state.directCheckoutItems = [{ productId: PRODUCTS[0].id, tierId: 'standard' }];
       }
