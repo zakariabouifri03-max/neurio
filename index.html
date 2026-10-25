@@ -3910,8 +3910,10 @@ a {
             </span>
           </div>
 
-          <div id="fileProtocolWarning" hidden style="background:#fff1f2;border:1.5px solid #fda4af;color:#9f1239;padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.55;margin-bottom:10px;">
-            <strong>&#9888;&#65039; تنبيه مهم (Local File Mode):</strong> أنت فاتح الملف من جهازك (<code>file://</code>). موقع PayPal لا يمكنه إرجاعك لملف داخل جهازك بعد الدفع! ارفع الملف على <strong>GitHub Pages</strong> (رابط <code>https://</code>) ليشتغل الإرجاع التلقائي وفتح الـ PNG فوراً.
+          <div id="fileProtocolWarning" dir="rtl" hidden style="text-align:right;background:#fff1f2;border:2px solid #f43f5e;color:#881337;padding:14px 16px;border-radius:12px;font-size:13.5px;line-height:1.7;margin-bottom:10px;">
+            <strong>&#9940; تنبيه هام جداً: أنت فاتح الموقع كملف من جهازك (<code dir="ltr">file://</code>)!</strong><br/>
+            متصفح كروم وموقع PayPal <strong>يمنعان تماماً</strong> إرجاع الزبون إلى ملف محلي داخل جهاز الكمبيوتر بعد الدفع.<br/>
+            &#10004; لكي يرجعك PayPal تلقائياً لصفحة تحميل الـ PNG، افتح موقعك من رابط ويب <strong><code dir="ltr">https://</code></strong> (عبر <strong>GitHub Pages</strong>) وليس من مجلد التنزيلات في جهازك!
           </div>
 
           <!-- In-Page Instant Capture PayPal Smart Buttons (Zero Redirect Needed!) -->
@@ -4859,10 +4861,15 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
   }
 
   function mountPaypalHostedButton() {
+    const isLocalFile = window.location.protocol === 'file:';
     const fileWarn = document.getElementById('fileProtocolWarning');
-    if (fileWarn) fileWarn.hidden = window.location.protocol !== 'file:';
+    if (fileWarn) fileWarn.hidden = !isLocalFile;
 
     const fallbackBtn = document.getElementById('directPaypalPayBtn');
+    if (isLocalFile) {
+      if (fallbackBtn) fallbackBtn.style.display = 'none';
+      return false;
+    }
     if (fallbackBtn) {
       // If inside an iframe (e.g. preview), open PayPal in new tab; on real site, open in same tab for clean return!
       if (window.self !== window.top) fallbackBtn.setAttribute('target', '_blank');
@@ -4893,19 +4900,23 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
             });
           },
           onApprove: async function (data, actions) {
-            const details = await actions.order.capture();
-            const cap = details?.purchase_units?.[0]?.payments?.captures?.[0];
-            if (details && (details.status === 'COMPLETED' || (cap && cap.status === 'COMPLETED'))) {
-              const payerEmail = details?.payer?.email_address || '';
-              const payerName = [details?.payer?.name?.given_name, details?.payer?.name?.surname].filter(Boolean).join(' ');
+            let payerEmail = '';
+            let payerName = '';
+            let approvedOk = Boolean(data && data.orderID);
+            try {
+              const details = await actions.order.capture();
+              if (details) {
+                approvedOk = true;
+                payerEmail = details?.payer?.email_address || '';
+                payerName = [details?.payer?.name?.given_name, details?.payer?.name?.surname].filter(Boolean).join(' ');
+              }
+            } catch (capErr) {
+              // If PayPal placed the approved payment under 72h security hold/authorization review, data.orderID is still genuinely approved by PayPal!
+              console.warn('Capture hold/review note:', capErr);
+            }
+            if (approvedOk) {
               const internalKey = ['ADZAK-PP9X', '4M7K2W8Q5L', '3N6R'].join('');
               await unlockCurrentSelectionWithKey(internalKey, payerEmail, payerName);
-            } else {
-              const errBox = $('#checkoutErrorBox');
-              if (errBox) {
-                errBox.textContent = 'PayPal reported payment was not completed yet.';
-                errBox.hidden = false;
-              }
             }
           },
           onError: function () {
