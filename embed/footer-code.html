@@ -25,7 +25,33 @@
     document.head.appendChild(ps);
   }
 
-  var BUNDLE_URL = 'https://raw.githubusercontent.com/zakariabouifri03-max/neurio/arena/f2c0341b-neurio/embed/adzak-store-bundle.json';
+  var RAW_BASE = 'https://raw.githubusercontent.com/zakariabouifri03-max/neurio/arena/f2c0341b-neurio/embed';
+  var CDN_BASE = 'https://cdn.jsdelivr.net/gh/zakariabouifri03-max/neurio@a62f8b5/embed';
+
+  function loadBundleWithFallback() {
+    return fetch(RAW_BASE + '/adzak-store-bundle.json')
+      .then(function (r) {
+        if (!r.ok) throw new Error('raw ' + r.status);
+        return r.json();
+      })
+      .catch(function () {
+        return fetch(CDN_BASE + '/adzak-store-bundle.json').then(function (r2) {
+          if (!r2.ok) throw new Error('cdn ' + r2.status);
+          return r2.json().then(function (b) {
+            var swap = function (u) { return typeof u === 'string' ? u.replace(RAW_BASE, CDN_BASE) : u; };
+            if (b.assets) {
+              Object.keys(b.assets).forEach(function (k) { b.assets[k] = swap(b.assets[k]); });
+            }
+            if (b.vault) {
+              Object.keys(b.vault).forEach(function (k) {
+                b.vault[k] = Array.isArray(b.vault[k]) ? b.vault[k].map(swap) : [swap(b.vault[k])];
+              });
+            }
+            return b;
+          });
+        });
+      });
+  }
 
   function mountStore() {
     var root = document.getElementById('adzak-sakura-storefront-app');
@@ -39,11 +65,7 @@
     }
     root.innerHTML = '<div style="min-height:60vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;color:#e11d74;font-weight:700;background:#fff8fb;">&#127800; Loading ADZAK ART Store...</div>';
 
-    fetch(BUNDLE_URL)
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
+    loadBundleWithFallback()
       .then(function (bundle) {
         window.__ADZAK_ASSETS__ = bundle.assets || {};
         window.__ADZAK_LOCKED_VAULT__ = {};
