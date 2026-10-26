@@ -1,0 +1,77 @@
+<!-- ADZAK ART — كود التذييل (Footer Code) -->
+<div id="adzak-sakura-storefront-app" dir="ltr"></div>
+<script>
+(function () {
+  if (window.__ADZAK_STORE_BOOTED__) return;
+  window.__ADZAK_STORE_BOOTED__ = true;
+
+  if (!window.ADZAK_PAYPAL_CONFIG) {
+    window.ADZAK_PAYPAL_CONFIG = {
+      liveClientId: "",
+      testCentMode: false,
+      testCentAmount: 0.01,
+      sdkClientId: "BAAcGe9lR0lGxAMuQ0ZpOVcmwiKxH46aVSQdEkgLBi-sVOzXJ80k3r2FGKiWo-7POW3Z3aZIcaYWIS7qNw",
+      hostedButtonId: "J2PB3BSV3DCC8",
+      singleDesignUrl: "https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8",
+      bundleUrl: "https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8"
+    };
+  }
+  if (!window.__ADZAK_PP_LOADING__ && window.location.protocol !== 'file:') {
+    window.__ADZAK_PP_LOADING__ = true;
+    var ps = document.createElement('script');
+    ps.async = true;
+    ps.onload = function () { if (window.__onPaypalSdkReady) window.__onPaypalSdkReady(); };
+    ps.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(window.ADZAK_PAYPAL_CONFIG.sdkClientId) + '&components=hosted-buttons&disable-funding=venmo&currency=USD';
+    document.head.appendChild(ps);
+  }
+
+  var BUNDLE_URL = 'https://raw.githubusercontent.com/zakariabouifri03-max/neurio/arena/f2c0341b-neurio/embed/adzak-store-bundle.json';
+
+  function mountStore() {
+    var root = document.getElementById('adzak-sakura-storefront-app');
+    if (!root) {
+      root = document.createElement('div');
+      root.id = 'adzak-sakura-storefront-app';
+      root.setAttribute('dir', 'ltr');
+    }
+    if (document.body.firstChild !== root) {
+      document.body.insertBefore(root, document.body.firstChild);
+    }
+    root.innerHTML = '<div style="min-height:60vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;color:#e11d74;font-weight:700;background:#fff8fb;">&#127800; Loading ADZAK ART Store...</div>';
+
+    fetch(BUNDLE_URL)
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (bundle) {
+        window.__ADZAK_ASSETS__ = bundle.assets || {};
+        window.__ADZAK_LOCKED_VAULT__ = {};
+        window.__ADZAK_VAULT_URLS__ = bundle.vault || {};
+
+        if (!document.getElementById('adzak-sakura-css')) {
+          var st = document.createElement('style');
+          st.id = 'adzak-sakura-css';
+          st.textContent = bundle.css || '';
+          document.head.appendChild(st);
+        }
+
+        root.innerHTML = bundle.html || '';
+
+        var appScript = document.createElement('script');
+        appScript.textContent = bundle.js || '';
+        document.body.appendChild(appScript);
+      })
+      .catch(function (err) {
+        console.error('ADZAK Store load error:', err);
+        root.innerHTML = '<div style="padding:40px;text-align:center;font-family:sans-serif;color:#be123c;">Unable to load storefront bundle. Please refresh the page.</div>';
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountStore);
+  } else {
+    mountStore();
+  }
+})();
+</script>

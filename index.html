@@ -14,33 +14,32 @@
        ===================================================================== -->
   <script>
     window.ADZAK_PAYPAL_CONFIG = {
-      // إيميل حسابك PayPal المستقبل للأموال (يدعم الرجوع التلقائي المباشر للموقع وتحميل الـ PNG فوراً!):
-      businessEmail: "zakariabouifri03@gmail.com",
-
-      // وضع التجربة السريعة بـ $0.01 USD:
-      // بعد ما تتأكد من الشراء والرجوع التلقائي، غيّر true إلى false لترجع الأثمنة الأصلية ($3.99 و $15.99) تلقائياً!
-      testCentMode: true,
-      testCentAmount: 0.01,
-
-      // اختياري: ضع Live Client ID من developer.paypal.com إذا أردت نافذة منبثقة داخل نفس الصفحة
+      // ضع هنا Live Client ID من https://developer.paypal.com/dashboard/applications/live
+      // ليعمل الدفع بنافذة منبثقة ويفتح الـ PNG تلقائياً في ثانية واحدة بدون الخروج من موقعك!
       liveClientId: "",
 
-      // بيانات الاحتياط السابقة
+      // وضع التجربة السريعة بـ $0.01 USD (غيّر true إلى false لإرجاع الأسعار الأصلية $3.99 و $15.99):
+      testCentMode: false,
+      testCentAmount: 0.01,
+
+      // زر PayPal الاحتياطي الخاص بك (J2PB3BSV3DCC8)
       sdkClientId: "BAAcGe9lR0lGxAMuQ0ZpOVcmwiKxH46aVSQdEkgLBi-sVOzXJ80k3r2FGKiWo-7POW3Z3aZIcaYWIS7qNw",
       hostedButtonId: "J2PB3BSV3DCC8",
       singleDesignUrl: "https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8",
       bundleUrl: "https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8"
     };
 
-    // تحميل SDK فقط إذا وضع المستخدم Live Client ID حقيقي
-    (function loadPaypalSdkIfConfigured() {
+    (function loadPaypalSdk() {
       if (window.location.protocol === 'file:') return;
       var cfg = window.ADZAK_PAYPAL_CONFIG || {};
+      var s = document.createElement('script');
+      s.async = true;
+      s.onload = function () { if (window.__onPaypalSdkReady) window.__onPaypalSdkReady(); };
       if (cfg.liveClientId && cfg.liveClientId.trim().length > 15) {
-        var s = document.createElement('script');
-        s.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(cfg.liveClientId.trim()) + '&components=buttons&disable-funding=venmo&currency=USD';
-        s.async = true;
-        s.onload = function () { if (window.__onPaypalSdkReady) window.__onPaypalSdkReady(); };
+        s.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(cfg.liveClientId.trim()) + '&components=buttons&enable-funding=card&disable-funding=venmo&currency=USD';
+        document.head.appendChild(s);
+      } else if (cfg.sdkClientId) {
+        s.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(cfg.sdkClientId.trim()) + '&components=hosted-buttons&disable-funding=venmo&currency=USD';
         document.head.appendChild(s);
       }
     })();
@@ -3899,35 +3898,22 @@ a {
             &#10004; لكي يرجعك PayPal تلقائياً لصفحة تحميل الـ PNG، افتح موقعك من رابط ويب <strong><code dir="ltr">https://</code></strong> (عبر <strong>GitHub Pages</strong>) وليس من مجلد التنزيلات في جهازك!
           </div>
 
-          <!-- In-Page Instant Capture PayPal Smart Buttons (if liveClientId is set) -->
+          <!-- In-Page Instant Capture PayPal Smart Buttons (Opens Popup / Inline Card & Auto-Unlocks PNG Immediately!) -->
           <div id="paypal-smart-buttons-container" class="paypal-hosted-widget-wrap"></div>
 
-          <!-- Official PayPal Standard Direct Auto-Return Form (cgi-bin/webscr -> zakariabouifri03@gmail.com) -->
-          <form id="paypalAutoReturnForm" action="https://www.paypal.com/cgi-bin/webscr" method="post" style="margin:0;">
-            <input type="hidden" name="cmd" value="_xclick" />
-            <input type="hidden" name="business" id="ppFieldBusiness" value="zakariabouifri03@gmail.com" />
-            <input type="hidden" name="item_name" id="ppFieldItemName" value="ADZAK ART — 300 DPI Transparent PNG" />
-            <input type="hidden" name="item_number" id="ppFieldItemNumber" value="ADZAK-PNG" />
-            <input type="hidden" name="amount" id="ppFieldAmount" value="0.01" />
-            <input type="hidden" name="currency_code" value="USD" />
-            <input type="hidden" name="no_shipping" value="1" />
-            <input type="hidden" name="no_note" value="1" />
-            <input type="hidden" name="rm" value="1" />
-            <input type="hidden" name="charset" value="utf-8" />
-            <input type="hidden" name="return" id="ppFieldReturn" value="" />
-            <input type="hidden" name="cancel_return" id="ppFieldCancelReturn" value="" />
-            <input type="hidden" name="cbt" value="Return to ADZAK ART & Download Your PNG Now" />
+          <!-- Fallback Official PayPal Hosted Button (J2PB3BSV3DCC8) -->
+          <div id="paypal-container-J2PB3BSV3DCC8" class="paypal-hosted-widget-wrap"></div>
 
-            <button
-              type="submit"
-              class="btn-paypal-official"
-              id="directPaypalPayBtn"
-              style="width:100%;border:none;cursor:pointer;font-size:15.5px;"
-            >
-              <span>&#128179; Pay with PayPal / Card &amp; Auto-Return to PNG</span>
-              <strong id="ppAmountText">$0.01 USD &rarr;</strong>
-            </button>
-          </form>
+          <a
+            href="https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-paypal-official"
+            id="directPaypalPayBtn"
+          >
+            <span>&#128179; Pay Securely on Official PayPal</span>
+            <strong id="ppAmountText">$3.99 USD &rarr;</strong>
+          </a>
         </div>
 
         <div class="checkout-error" id="checkoutErrorBox" hidden></div>
@@ -4096,12 +4082,28 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
     return Array.from(b).map((x) => x.toString(16).padStart(2, '0')).join('');
   }
 
-  function chacha20DecryptItem(secretKey, itemId) {
+  async function chacha20DecryptItem(secretKey, itemId) {
+    let cipherBytes = null;
     const b64 = LOCKED_VAULT[itemId];
-    if (!b64) return null;
-    const binStr = atob(b64);
-    const cipherBytes = new Uint8Array(binStr.length);
-    for (let i = 0; i < binStr.length; i++) cipherBytes[i] = binStr.charCodeAt(i);
+    if (b64) {
+      const binStr = atob(b64);
+      cipherBytes = new Uint8Array(binStr.length);
+      for (let i = 0; i < binStr.length; i++) cipherBytes[i] = binStr.charCodeAt(i);
+    } else if (window.__ADZAK_VAULT_URLS__ && window.__ADZAK_VAULT_URLS__[itemId]) {
+      const urls = Array.isArray(window.__ADZAK_VAULT_URLS__[itemId])
+        ? window.__ADZAK_VAULT_URLS__[itemId]
+        : [window.__ADZAK_VAULT_URLS__[itemId]];
+      for (const u of urls) {
+        try {
+          const resp = await fetch(u, { cache: 'force-cache' });
+          if (resp.ok) {
+            cipherBytes = new Uint8Array(await resp.arrayBuffer());
+            break;
+          }
+        } catch (_) {}
+      }
+    }
+    if (!cipherBytes) return null;
 
     const keyBytes = sha256Bytes('VAULT-KEY:' + secretKey);
     const nonceBytes = sha256Bytes('VAULT-NONCE:' + itemId).slice(0, 12);
@@ -4807,7 +4809,7 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
     for (const it of itemsToUnlock) {
       const p = findProduct(it.productId);
       if (!p) continue;
-      const decryptedBytes = chacha20DecryptItem(validSecretKey, p.id);
+      const decryptedBytes = await chacha20DecryptItem(validSecretKey, p.id);
       if (!decryptedBytes) continue;
       await saveDecryptedBytesToIdb(p.id, decryptedBytes);
       unlockedOrderItems.push({
@@ -4859,85 +4861,18 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
     }
   }
 
-  function buildSignedPaypalReturnUrl() {
-    const cleanBase = window.location.origin + window.location.pathname;
-    const items = getActiveCheckoutItems();
-    const compactItems = (items && items.length > 0 ? items : [{ productId: PRODUCTS[0].id, tierId: 'standard' }])
-      .map((it) => ({ p: it.productId, t: it.tierId || 'standard' }));
-    const rndArr = new Uint8Array(6);
-    if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(rndArr);
-    const rndHex = Array.from(rndArr).map((b) => b.toString(16).padStart(2, '0')).join('');
-    const payloadObj = {
-      i: compactItems,
-      b: state.isBundleCheckout ? 1 : 0,
-      t: Math.floor(Date.now() / 1000),
-      r: rndHex,
-      e: ($('#buyerEmailInput')?.value || '').trim().slice(0, 80),
-      n: ($('#buyerNameInput')?.value || '').trim().slice(0, 60)
-    };
-    const jsonBytes = new TextEncoder().encode(JSON.stringify(payloadObj));
-    let bin = '';
-    for (let k = 0; k < jsonBytes.length; k++) bin += String.fromCharCode(jsonBytes[k]);
-    const claimB64 = btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    const kParts = ['ADZAK-PP9X', '4M7K2W8Q5L', '3N6R'].join('');
-    const sigHex = bytesToHex(sha256Bytes('ADZAK-SIGNED-RETURN:' + claimB64 + ':' + kParts)).slice(0, 32);
-    return {
-      returnUrl: cleanBase + '?pp_claim=' + encodeURIComponent(claimB64) + '&pp_sig=' + sigHex,
-      cancelUrl: cleanBase + '?pp_cancel=1'
-    };
-  }
-
-  function preparePaypalAutoReturnForm() {
-    const form = document.getElementById('paypalAutoReturnForm');
-    if (!form) return;
-    const isLocalFile = window.location.protocol === 'file:';
-    if (isLocalFile) return;
-
-    // Inside iframe (like preview), open PayPal in a clean top-level tab; on a direct website tab, stay in same tab!
-    if (window.self !== window.top) form.setAttribute('target', '_blank');
-    else form.setAttribute('target', '_self');
-
-    const { total } = calculateCheckoutTotal();
-    const items = getActiveCheckoutItems();
-    const itemTitle = state.isBundleCheckout
-      ? BUNDLE_OFFER.title + ' (All 6 Transparent PNGs — 300 DPI)'
-      : items.map((i) => getShortTitle(findProduct(i.productId) || { title: 'PNG' })).join(' + ') + ' — ADZAK ART 300 DPI Transparent PNG';
-    const itemSku = state.isBundleCheckout
-      ? 'ADZAK-BUNDLE-6'
-      : items.map((i) => i.productId).join(',').slice(0, 60);
-
-    const { returnUrl, cancelUrl } = buildSignedPaypalReturnUrl();
-    const fBiz = document.getElementById('ppFieldBusiness');
-    const fName = document.getElementById('ppFieldItemName');
-    const fNum = document.getElementById('ppFieldItemNumber');
-    const fAmt = document.getElementById('ppFieldAmount');
-    const fRet = document.getElementById('ppFieldReturn');
-    const fCan = document.getElementById('ppFieldCancelReturn');
-
-    if (fBiz) fBiz.value = (PP_CFG.businessEmail || 'zakariabouifri03@gmail.com').trim();
-    if (fName) fName.value = itemTitle.slice(0, 125);
-    if (fNum) fNum.value = itemSku || 'ADZAK-PNG';
-    if (fAmt) fAmt.value = total.toFixed(2);
-    if (fRet) fRet.value = returnUrl;
-    if (fCan) fCan.value = cancelUrl;
-  }
-
   function mountPaypalHostedButton() {
     const isLocalFile = window.location.protocol === 'file:';
     const fileWarn = document.getElementById('fileProtocolWarning');
     if (fileWarn) fileWarn.hidden = !isLocalFile;
+    if (isLocalFile || !window.paypal) return false;
 
-    const form = document.getElementById('paypalAutoReturnForm');
-    if (isLocalFile) {
-      if (form) form.style.display = 'none';
-      return false;
-    }
-    if (form) form.style.display = '';
-    preparePaypalAutoReturnForm();
-
-    // Optional Mode: In-Page PayPal Smart Buttons if seller configured liveClientId
     const smartWrap = document.getElementById('paypal-smart-buttons-container');
-    if (smartWrap && PP_CFG.liveClientId && window.paypal && typeof window.paypal.Buttons === 'function') {
+    const hostedWrap = document.getElementById('paypal-container-J2PB3BSV3DCC8');
+
+    // Mode 1: Live Client ID -> In-Page PayPal Popup + Inline Card (100% Automatic Instant Unlock on Same Page!)
+    if (PP_CFG.liveClientId && PP_CFG.liveClientId.trim().length > 15 && smartWrap && typeof window.paypal.Buttons === 'function') {
+      if (hostedWrap) hostedWrap.innerHTML = '';
       smartWrap.innerHTML = '';
       try {
         window.paypal.Buttons({
@@ -4945,9 +4880,14 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
           createOrder: function (data, actions) {
             savePendingSelection();
             const { total } = calculateCheckoutTotal();
+            const items = getActiveCheckoutItems();
+            const desc = state.isBundleCheckout
+              ? BUNDLE_OFFER.title
+              : items.map((i) => getShortTitle(findProduct(i.productId) || { title: 'PNG' })).join(', ') + ' — ADZAK ART PNG';
             return actions.order.create({
+              application_context: { shipping_preference: 'NO_SHIPPING' },
               purchase_units: [{
-                description: 'ADZAK ART — 300 DPI Transparent PNG',
+                description: desc.slice(0, 120),
                 amount: { currency_code: 'USD', value: total.toFixed(2) }
               }]
             });
@@ -4955,18 +4895,43 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
           onApprove: async function (data, actions) {
             let payerEmail = '';
             let payerName = '';
+            let approvedOk = Boolean(data && data.orderID);
             try {
               const details = await actions.order.capture();
-              payerEmail = details?.payer?.email_address || '';
-              payerName = [details?.payer?.name?.given_name, details?.payer?.name?.surname].filter(Boolean).join(' ');
-            } catch (_) {}
-            const internalKey = ['ADZAK-PP9X', '4M7K2W8Q5L', '3N6R'].join('');
-            await unlockCurrentSelectionWithKey(internalKey, payerEmail, payerName);
+              if (details) {
+                approvedOk = true;
+                payerEmail = details?.payer?.email_address || '';
+                payerName = [details?.payer?.name?.given_name, details?.payer?.name?.surname].filter(Boolean).join(' ');
+              }
+            } catch (capErr) {
+              console.warn('Capture hold/review note:', capErr);
+            }
+            if (approvedOk) {
+              const internalKey = ['ADZAK-PP9X', '4M7K2W8Q5L', '3N6R'].join('');
+              await unlockCurrentSelectionWithKey(internalKey, payerEmail, payerName);
+            }
           }
         }).render('#paypal-smart-buttons-container');
+        return true;
+      } catch (e) {
+        console.error('Smart Buttons error:', e);
+      }
+    }
+
+    // Mode 2: HostedButtons fallback (J2PB3BSV3DCC8)
+    if (hostedWrap && typeof window.paypal.HostedButtons === 'function') {
+      const activeBtnId = PP_CFG.hostedButtonId || 'J2PB3BSV3DCC8';
+      if (renderedHostedBtnId === activeBtnId && hostedWrap.children.length > 0) return true;
+      hostedWrap.innerHTML = '';
+      try {
+        window.paypal.HostedButtons({ hostedButtonId: activeBtnId }).render('#paypal-container-J2PB3BSV3DCC8');
+        renderedHostedBtnId = activeBtnId;
+        const fb = document.getElementById('directPaypalPayBtn');
+        if (fb) { fb.style.marginTop = '8px'; fb.style.padding = '9px 14px'; fb.style.fontSize = '13px'; }
+        return true;
       } catch (_) {}
     }
-    return true;
+    return false;
   }
 
   window.__onPaypalSdkReady = function () { mountPaypalHostedButton(); };
@@ -5075,7 +5040,6 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
     const { discount, total, isTestCent } = calculateCheckoutTotal();
     $('#checkoutTotalAmount').textContent = formatUSD(total);
     if ($('#ppAmountText')) $('#ppAmountText').innerHTML = `${formatUSD(total)} USD &rarr;`;
-    preparePaypalAutoReturnForm();
 
     const discTag = $('#checkoutDiscountTag');
     if (isTestCent) {
@@ -5253,10 +5217,7 @@ window.__ADZAK_LOCKED_VAULT__ = {"howdy-halloween":"zI06Bl9V8ihbrcmJBy4rVSDLhxpS
   function bindEvents() {
     $('#buyerEmailInput')?.addEventListener('input', savePendingSelection);
     $('#buyerNameInput')?.addEventListener('input', savePendingSelection);
-    $('#paypalAutoReturnForm')?.addEventListener('submit', () => {
-      savePendingSelection();
-      preparePaypalAutoReturnForm();
-    });
+    
 
     $('#copyPromoTop')?.addEventListener('click', () => {
       navigator.clipboard?.writeText('SAKURA20').catch(() => {});

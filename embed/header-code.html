@@ -1,0 +1,32 @@
+<!-- ADZAK ART — كود الرأس (Header Code) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background-color: #fff8fb; }
+</style>
+<script>
+  window.ADZAK_PAYPAL_CONFIG = {
+    liveClientId: "",
+    testCentMode: false,
+    testCentAmount: 0.01,
+    sdkClientId: "BAAcGe9lR0lGxAMuQ0ZpOVcmwiKxH46aVSQdEkgLBi-sVOzXJ80k3r2FGKiWo-7POW3Z3aZIcaYWIS7qNw",
+    hostedButtonId: "J2PB3BSV3DCC8",
+    singleDesignUrl: "https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8",
+    bundleUrl: "https://www.paypal.com/ncp/payment/J2PB3BSV3DCC8"
+  };
+  (function () {
+    if (window.location.protocol === 'file:' || window.__ADZAK_PP_LOADING__) return;
+    window.__ADZAK_PP_LOADING__ = true;
+    var cfg = window.ADZAK_PAYPAL_CONFIG;
+    var s = document.createElement('script');
+    s.async = true;
+    s.onload = function () { if (window.__onPaypalSdkReady) window.__onPaypalSdkReady(); };
+    if (cfg.liveClientId && cfg.liveClientId.trim().length > 15) {
+      s.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(cfg.liveClientId.trim()) + '&components=buttons&enable-funding=card&disable-funding=venmo&currency=USD';
+    } else {
+      s.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(cfg.sdkClientId) + '&components=hosted-buttons&disable-funding=venmo&currency=USD';
+    }
+    document.head.appendChild(s);
+  })();
+</script>
