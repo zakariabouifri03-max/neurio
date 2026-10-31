@@ -891,37 +891,44 @@
     }
   });
 
-  const revealer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add("is-in");
-      revealer.unobserve(entry.target);
-    });
-  }, { threshold: 0.12, rootMargin: "0px 0px -40px" });
-  $$(".reveal, .dash, .value").forEach((el) => revealer.observe(el));
+  const revealTargets = $$(".reveal, .dash, .value");
 
-  /* animated stats */
-  const statObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const el = entry.target;
-      const target = Number(el.dataset.count);
-      const suffix = el.dataset.suffix || "";
-      const start = performance.now();
-      const dur = 1400;
+  if ("IntersectionObserver" in window) {
+    const revealer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-in");
+        revealer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px" });
+    revealTargets.forEach((el) => revealer.observe(el));
 
-      const tick = (now) => {
-        const t = Math.min((now - start) / dur, 1);
-        const eased = 1 - Math.pow(1 - t, 3);
-        const value = Math.round(target * eased);
-        el.textContent = value.toLocaleString("en-US") + suffix;
-        if (t < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-      statObserver.unobserve(el);
-    });
-  }, { threshold: 0.6 });
-  $$("[data-count]").forEach((el) => statObserver.observe(el));
+    /* animated stats */
+    const statObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = Number(el.dataset.count);
+        const suffix = el.dataset.suffix || "";
+        const start = performance.now();
+        const dur = 1400;
+
+        const tick = (now) => {
+          const t = Math.min((now - start) / dur, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          const value = Math.round(target * eased);
+          el.textContent = value.toLocaleString("en-US") + suffix;
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        statObserver.unobserve(el);
+      });
+    }, { threshold: 0.6 });
+    $$("[data-count]").forEach((el) => statObserver.observe(el));
+  } else {
+    /* graceful fallback: show everything immediately */
+    revealTargets.forEach((el) => el.classList.add("is-in"));
+  }
 
   /* newsletter */
   $("#newsForm").addEventListener("submit", (e) => {

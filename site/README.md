@@ -20,6 +20,10 @@ python3 -m http.server 4173 --bind 0.0.0.0
 | `assets/app.js` | Product data, filtering/sorting/search, cart, wishlist, quick view, promo codes, demo checkout |
 | `assets/fonts/` | Inter variable woff2 (latin) — no external font requests |
 | `assets/hero-ambient-light.jpg` | Hero backdrop |
+| `snippets/fourthwall-trust-header.html` | 8.6 KB header snippet for a Fourthwall shop (light bar, 5-star badge, AggregateRating) |
+| `neurio-standalone.html` | Generated single-file build (all CSS/JS/fonts/images inlined) |
+| `tools/build-standalone.mjs` | Rebuilds the single-file version |
+| `FOURTHWALL.md` | Guide: Fourthwall setup, theme colours, limits |
 
 ## Interactions
 
@@ -35,6 +39,12 @@ python3 -m http.server 4173 --bind 0.0.0.0
 All data lives in the `PRODUCTS` array at the top of `assets/app.js`; every card, filter
 chip and quick view is generated from it. Currency, copy and colours are centralised in
 CSS custom properties at the top of `assets/styles.css`.
+
+## Deploy
+
+- **Any static host:** upload the `site/` folder.
+- **Single file:** upload `site/neurio-standalone.html` alone (Netlify Drop, Vercel, GitHub Pages, even open it from disk). Rebuild with `node site/tools/build-standalone.mjs` after edits.
+- **Fourthwall shop:** paste `snippets/fourthwall-trust-header.html` into Header code (8,639 chars, under the 30,000 limit). See `FOURTHWALL.md`.
 
 ## Accessibility & performance
 
