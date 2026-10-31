@@ -27,9 +27,16 @@ l'layout dyal shop. Donc kayn jouj ḥouloul.
 
 ---
 
-## A) Tẓid l'look dyal Neurio 3la Fourthwall (snippet)
+## A) Tẓid l'look dyal Neurio 3la Fourthwall (snippets)
 
-Fichier: **`snippets/fourthwall-trust-header.html`** — **8,639 caractères** (b3id 3la 30k).
+**Jouj fichiers** — wa7ed l Header code w wa7ed l Footer code:
+
+| Champ | Fichier | Ḥajm | Ach kayzid |
+| --- | --- | --- | --- |
+| Header code | `snippets/fourthwall-header.html` | 6,177 | Barre fateḥa 5★ (perks + promo, tsedd) + background fateḥ |
+| Footer code | `snippets/fourthwall-footer.html` | 10,184 | Band dyal reviews 5★ + badge flottant + AggregateRating |
+
+(Optionnel: `snippets/fourthwall-trust-header.html` = kolchi f wa7ed champ, 8,639 caractères.)
 
 Kayzid:
 
@@ -40,9 +47,10 @@ Kayzid:
 
 **Kifach:**
 1. Ḥell l'champ (melli support yfteḥo).
-2. Kopi l'contenu kamel dyal `fourthwall-trust-header.html`.
-3. Paste f **Edit HTML code → Header code** → Enable header code → Save.
-4. Beddel l'`CONFIG` f l'wel dyal l'script: `rating`, `reviews`, `promo`, `perks`, `badgeLink`, `schema`.
+2. Kopi `fourthwall-header.html` kamel → paste f **Header code** → ✔ **Enable header code**.
+3. Kopi `fourthwall-footer.html` kamel → paste f **Footer code** → ✔ **Enable footer code**.
+4. **Save**, mn ba3d 3mel refresh w chouf l'pages (home, produit, checkout).
+5. Beddel l'`CONFIG` f l'wel dyal kol script: `rating`, `reviews`, `promo`, `perks`, `quotes`, `badgeLink`, `schema`.
 
 > ⚠️ `schema: true` kayb3at `ratingValue` l Google. Ila l'notes machi ḥaqiqiya,
 > bedel l'reviews b l'ra9m l'ḥaqiqi wla dir `schema: false` — Google kay3aqeb
@@ -87,6 +95,8 @@ node site/tools/build-standalone.mjs
 | Fichier | Ach kaydir |
 | --- | --- |
 | `site/neurio-standalone.html` | Site kamel f fichier wa7ed (hosting) |
-| `site/snippets/fourthwall-trust-header.html` | Snippet < 30k l Fourthwall |
+| `site/snippets/fourthwall-header.html` | Header code (< 30k) |
+| `site/snippets/fourthwall-footer.html` | Footer code (< 30k) |
+| `site/snippets/fourthwall-trust-header.html` | Version all-in-one (champ wa7ed) |
 | `site/tools/build-standalone.mjs` | Build dyal l'fichier wa7ed |
 | `site/index.html` + `assets/` | L'source (dev) |

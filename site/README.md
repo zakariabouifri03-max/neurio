@@ -20,7 +20,9 @@ python3 -m http.server 4173 --bind 0.0.0.0
 | `assets/app.js` | Product data, filtering/sorting/search, cart, wishlist, quick view, promo codes, demo checkout |
 | `assets/fonts/` | Inter variable woff2 (latin) — no external font requests |
 | `assets/hero-ambient-light.jpg` | Hero backdrop |
-| `snippets/fourthwall-trust-header.html` | 8.6 KB header snippet for a Fourthwall shop (light bar, 5-star badge, AggregateRating) |
+| `snippets/fourthwall-header.html` | Header-code snippet: light 5-star trust bar |
+| `snippets/fourthwall-footer.html` | Footer-code snippet: reviews band, floating badge, AggregateRating |
+| `snippets/fourthwall-trust-header.html` | All-in-one variant (single field) |
 | `neurio-standalone.html` | Generated single-file build (all CSS/JS/fonts/images inlined) |
 | `tools/build-standalone.mjs` | Rebuilds the single-file version |
 | `FOURTHWALL.md` | Guide: Fourthwall setup, theme colours, limits |
@@ -44,7 +46,7 @@ CSS custom properties at the top of `assets/styles.css`.
 
 - **Any static host:** upload the `site/` folder.
 - **Single file:** upload `site/neurio-standalone.html` alone (Netlify Drop, Vercel, GitHub Pages, even open it from disk). Rebuild with `node site/tools/build-standalone.mjs` after edits.
-- **Fourthwall shop:** paste `snippets/fourthwall-trust-header.html` into Header code (8,639 chars, under the 30,000 limit). See `FOURTHWALL.md`.
+- **Fourthwall shop:** paste `snippets/fourthwall-header.html` into Header code and `snippets/fourthwall-footer.html` into Footer code (each well under the 30,000 character limit). See `FOURTHWALL.md`.
 
 ## Accessibility & performance
 
