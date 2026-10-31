@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Neurio — Premium digital products for people who ship</title>
+<meta name="description" content="Neurio is a curated marketplace for premium digital products: UI kits, templates, courses, e-books, presets and Notion systems. Instant download, lifetime updates, fair payouts for creators." />
+<meta name="theme-color" content="#07080c" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%237c5cff'/%3E%3Cpath d='M19 45V19l26 26V19' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E" />
+<meta property="og:title" content="Neurio — Premium digital products" />
+<meta property="og:description" content="A curated marketplace for premium digital products. Instant download, lifetime updates." />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="assets/hero-ambient.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preload" href="assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="assets/styles.css" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "OnlineStore",
+  "name": "Neurio",
+  "description": "A curated marketplace for premium digital products: UI kits, templates, courses, e-books and Notion systems.",
+  "url": "https://neurio.store",
+  "currenciesAccepted": "USD",
+  "paymentAccepted": "Credit Card, PayPal",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "3204"
+  }
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#catalog">Skip to products</a>
+
+<!-- ====== SVG SPRITE ====== -->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2.2l2.3 11.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9.5" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-9.6A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20Z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.6 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9-5.3-2.9-5.3 2.9 1.1-5.9L3.5 9.8l5.9-.8L12 3.6Z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m4.5 12.5 5 5 10-11"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 5 6.2v5.4c0 4.2 3 7.5 7 9 4-1.5 7-4.8 7-9V6.2L12 3.5Z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.7-6"/><path d="M20 4v5h-5"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5c.9 4.4 2.1 5.6 6.5 6.5-4.4.9-5.6 2.1-6.5 6.5-.9-4.4-2.1-5.6-6.5-6.5C9.9 9.1 11.1 7.9 12 3.5Z"/><path d="M18.5 15.5c.4 2 1 2.6 3 3-2 .4-2.6 1-3 3-.4-2-1-2.6-3-3 2-.4 2.6-1 3-3Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 14h5l-1 7 8-11h-5l1-7Z"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c4 4.6 4 12.4 0 17-4-4.6-4-12.4 0-17Z"/></symbol>
+  <symbol id="i-layout" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M9.5 9.5v10"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="m10.5 9 5 3-5 3V9Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2 2 0 0 1 6 4h5v16H6a2 2 0 0 0-2 1.5V5.5Z"/><path d="M20 5.5A2 2 0 0 0 18 4h-5v16h5a2 2 0 0 1 2 1.5V5.5Z"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M5 4z"/><path d="M5 20v-6M5 10V4M12 20v-9M12 7V4M19 20v-4M19 12V4"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="7" r="2"/><circle cx="19" cy="14" r="2"/></symbol>
+  <symbol id="i-shapes" viewBox="0 0 24 24"><circle cx="8" cy="8" r="4.5"/><rect x="12.5" y="12.5" width="8" height="8" rx="2"/><path d="m16 3 4 7h-8l4-7Z"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="3"/><path d="M8 8.5h8M8 12.5h8M8 16.5h4"/></symbol>
+  <symbol id="i-type" viewBox="0 0 24 24"><path d="M5 6.5h9M9.5 6.5V19"/><path d="M14 12h6M17 12v7"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m5 8 7 5 7-5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14.4c2.2.7 3.5 2.6 3.5 5.6"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2.5 6.5h10v10h-10z"/><path d="M12.5 10h4l3 3v3.5h-7z"/><circle cx="6.5" cy="18.5" r="1.8"/><circle cx="16.5" cy="18.5" r="1.8"/></symbol>
+</svg>
+
+<!-- ====== ANNOUNCEMENT ====== -->
+<div class="announce" id="announce">
+  <div class="wrap announce__inner">
+    <span class="announce__dot" aria-hidden="true"></span>
+    <p><strong>Launch week</strong> — take 30% off every bundle with code <code>LAUNCH30</code></p>
+    <a href="#catalog" class="announce__link">Shop the drop <svg class="ico"><use href="#i-arrow"/></svg></a>
+  </div>
+</div>
+
+<!-- ====== HEADER ====== -->
+<header class="header" id="header">
+  <div class="wrap header__inner">
+    <a class="brand" href="#top" aria-label="Neurio home">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64"><path d="M19 45V19l26 26V19" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="brand__name">neurio</span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="#catalog">Browse</a>
+      <a href="#categories">Categories</a>
+      <a href="#bestsellers">Bestsellers</a>
+      <a href="#sell">Sell with us</a>
+      <a href="#reviews">Reviews</a>
+    </nav>
+
+    <div class="header__actions">
+      <button class="icon-btn header__search-btn" type="button" data-focus-search aria-label="Search products">
+        <svg class="ico"><use href="#i-search"/></svg>
+      </button>
+
+      <button class="icon-btn" type="button" id="wishBtn" aria-label="Saved items" data-wish-only>
+        <svg class="ico"><use href="#i-heart"/></svg>
+        <span class="count" id="wishCount" hidden>0</span>
+      </button>
+
+      <button class="btn btn--primary btn--sm header__cta" type="button" data-open-sell>
+        Start selling
+      </button>
+
+      <button class="icon-btn cart-btn" type="button" id="openCart" aria-label="Open cart" aria-haspopup="dialog">
+        <svg class="ico"><use href="#i-cart"/></svg>
+        <span class="count" id="cartCount" hidden>0</span>
+      </button>
+
+      <button class="burger" type="button" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-nav" id="mobileNav" hidden>
+    <nav aria-label="Mobile">
+      <a href="#catalog">Browse</a>
+      <a href="#categories">Categories</a>
+      <a href="#bestsellers">Bestsellers</a>
+      <a href="#sell">Sell with us</a>
+      <a href="#reviews">Reviews</a>
+    </nav>
+    <div class="mobile-nav__foot">
+      <button class="btn btn--primary btn--block" type="button" data-open-sell>Start selling</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ====== HERO ====== -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <img src="assets/hero-ambient.jpg" alt="" />
+      <div class="hero__veil"></div>
+    </div>
+
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="pill reveal">
+          <span class="pill__dot"></span> 48 new drops this month
+        </p>
+        <h1 class="reveal">
+          Digital products that<br />
+          <span class="grad">ship your next idea.</span>
+        </h1>
+        <p class="hero__sub reveal">
+          A curated vault of UI kits, templates, courses, e-books and systems —
+          built by independent designers and makers. Instant download, lifetime
+          updates, one clean licence.
+        </p>
+
+        <form class="hero__search reveal" id="heroSearch" role="search">
+          <svg class="ico hero__search-ico" aria-hidden="true"><use href="#i-search"/></svg>
+          <label class="sr-only" for="q">Search the vault</label>
+          <input id="q" name="q" type="search" placeholder="Try “dashboard”, “Notion”, “presets”…" autocomplete="off" />
+          <button class="btn btn--primary btn--sm" type="submit">Search</button>
+        </form>
+
+        <ul class="hero__tags reveal" aria-label="Popular searches">
+          <li><button type="button" class="tag" data-tag="UI Kits">UI kits</button></li>
+          <li><button type="button" class="tag" data-tag="Notion">Notion</button></li>
+          <li><button type="button" class="tag" data-tag="Presets">Presets</button></li>
+          <li><button type="button" class="tag" data-tag="Courses">Courses</button></li>
+        </ul>
+
+        <dl class="stats reveal">
+          <div><dt>Customers</dt><dd data-count="12400" data-suffix="+">12,400+</dd></div>
+          <div><dt>Products</dt><dd data-count="486">486</dd></div>
+          <div><dt>Avg. rating</dt><dd>4.9<span class="stats__star">★</span></dd></div>
+        </dl>
+      </div>
+
+      <div class="hero__art reveal" aria-hidden="true">
+        <div class="stack">
+          <article class="mini mini--back">
+            <div class="mini__cover cover cover--cyan">
+              <svg class="cover__glyph"><use href="#i-play"/></svg>
+            </div>
+            <div class="mini__meta">
+              <span class="mini__cat">Course</span>
+              <span class="mini__price">$89</span>
+            </div>
+          </article>
+
+          <article class="mini mini--mid">
+            <div class="mini__cover cover cover--violet">
+              <svg class="cover__glyph"><use href="#i-layout"/></svg>
+            </div>
+            <div class="mini__meta">
+              <span class="mini__cat">UI Kit</span>
+              <span class="mini__price">$48</span>
+            </div>
+          </article>
+
+          <article class="mini mini--front">
+            <div class="mini__cover cover cover--lime">
+              <svg class="cover__glyph"><use href="#i-note"/></svg>
+            </div>
+            <div class="mini__meta">
+              <span class="mini__cat">Notion system</span>
+              <span class="mini__price">$29</span>
+            </div>
+            <div class="mini__foot">
+              <span class="mini__stars">★★★★★</span>
+              <span class="mini__sold">1,204 sold</span>
+            </div>
+          </article>
+
+          <div class="float-chip float-chip--a">
+            <svg class="ico"><use href="#i-bolt"/></svg>
+            <span><strong>Instant</strong> delivery</span>
+          </div>
+          <div class="float-chip float-chip--b">
+            <svg class="ico"><use href="#i-shield"/></svg>
+            <span><strong>14-day</strong> guarantee</span>
+          </div>
+          <div class="float-chip float-chip--c">
+            <div class="avatars"><i>AK</i><i>MJ</i><i>SR</i></div>
+            <span><strong>2.4k</strong> this week</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap marquee" aria-label="Trusted by teams at">
+      <p class="marquee__label">Trusted by makers at</p>
+      <ul class="marquee__list">
+        <li>Northwind</li><li>Lumen</li><li>Kite Studio</li><li>Orbital</li><li>Foundry&nbsp;52</li><li>Slate&amp;Co</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ====== CATEGORIES ====== -->
+  <section class="section categories" id="categories">
+    <div class="wrap">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">Shop by category</p>
+          <h2>Find exactly the thing<br class="br-lg" /> you didn’t know you needed.</h2>
+        </div>
+        <a class="link-arrow" href="#catalog">Browse all products <svg class="ico"><use href="#i-arrow"/></svg></a>
+      </div>
+
+      <ul class="cat-grid">
+        <li><button class="cat-card cat-card--wide" type="button" data-cat="UI Kits">
+          <span class="cat-card__icon"><svg class="ico"><use href="#i-layout"/></svg></span>
+          <span class="cat-card__name">UI Kits &amp; Design Systems</span>
+          <span class="cat-card__meta">128 products · Figma &amp; Framer</span>
+          <svg class="ico cat-card__arrow"><use href="#i-arrow"/></svg>
+        </button></li>
+        <li><button class="cat-card" type="button" data-cat="Templates">
+          <span class="cat-card__icon"><svg class="ico"><use href="#i-grid"/></svg></span>
+          <span class="cat-card__name">Templates</span>
+          <span class="cat-card__meta">96 products</span>
+        </button></li>
+        <li><button class="cat-card" type="button" data-cat="Courses">
+          <span class="cat-card__icon"><svg class="ico"><use href="#i-play"/></svg></span>
+          <span class="cat-card__name">Courses</span>
+          <span class="cat-card__meta">54 products</span>
+        </button></li>
+        <li><button class="cat-card" type="button" data-cat="E-books">
+          <span class="cat-card__icon"><svg class="ico"><use href="#i-book"/></svg></span>
+          <span class="cat-card__name">E-books</span>
+          <span class="cat-card__meta">71 products</span>
+        </button></li>
+        <li><button class="cat-card" type="button" data-cat="Notion">
+          <span class="cat-card__icon"><svg class="ico"><use href="#i-note"/></svg></span>
+          <span class="cat-card__name">Notion systems</span>
+          <span class="cat-card__meta">63 products</span>
+        </button></li>
+        <li><button class="cat-card" type="button" data-cat="Presets">
+          <span class="cat-card__icon"><svg class="ico"><use href="#i-sliders"/></svg></span>
+          <span class="cat-card__name">Presets &amp; LUTs</span>
+          <span class="cat-card__meta">42 products</span>
+        </button></li>
+        <li><button class="cat-card" type="button" data-cat="Icons">
+          <span class="cat-card__icon"><svg class="ico"><use href="#i-shapes"/></svg></span>
+          <span class="cat-card__name">Icons &amp; Assets</span>
+          <span class="cat-card__meta">32 products</span>
+        </button></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ====== CATALOG ====== -->
+  <section class="section catalog" id="catalog">
+    <div class="wrap">
+      <div class="section__head section__head--tight">
+        <div>
+          <p class="eyebrow">The vault</p>
+          <h2>Hand-picked, reviewed, ready to use.</h2>
+          <p class="section__sub">Every product is manually reviewed for quality, documentation and licence clarity.</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="chips" role="group" aria-label="Filter by category">
+          <button class="chip is-active" type="button" data-filter="all" aria-pressed="true">All</button>
+          <button class="chip" type="button" data-filter="UI Kits" aria-pressed="false">UI Kits</button>
+          <button class="chip" type="button" data-filter="Templates" aria-pressed="false">Templates</button>
+          <button class="chip" type="button" data-filter="Courses" aria-pressed="false">Courses</button>
+          <button class="chip" type="button" data-filter="E-books" aria-pressed="false">E-books</button>
+          <button class="chip" type="button" data-filter="Notion" aria-pressed="false">Notion</button>
+          <button class="chip" type="button" data-filter="Presets" aria-pressed="false">Presets</button>
+          <button class="chip" type="button" data-filter="Icons" aria-pressed="false">Icons</button>
+          <button class="chip chip--wish" type="button" data-filter="wish" aria-pressed="false">
+            <svg class="ico"><use href="#i-heart"/></svg> Saved
+          </button>
+        </div>
+
+        <div class="toolbar__right">
+          <div class="mini-search">
+            <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+            <label class="sr-only" for="catalogSearch">Search catalog</label>
+            <input id="catalogSearch" type="search" placeholder="Search…" autocomplete="off" />
+          </div>
+          <div class="select-wrap">
+            <label class="sr-only" for="sort">Sort products</label>
+            <select id="sort">
+              <option value="popular">Most popular</option>
+              <option value="new">Newest</option>
+              <option value="rating">Top rated</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+            </select>
+            <svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <p class="results" id="results" role="status" aria-live="polite"></p>
+
+      <div class="grid" id="productGrid"></div>
+
+      <div class="empty" id="empty" hidden>
+        <span class="empty__icon"><svg class="ico"><use href="#i-search"/></svg></span>
+        <h3>No products match that search</h3>
+        <p>Try a broader keyword, or reset the filters to see the full vault.</p>
+        <button class="btn btn--ghost" type="button" id="resetFilters">Reset filters</button>
+      </div>
+
+      <div class="catalog__foot">
+        <p id="gridFootnote">Showing <strong>9</strong> of 486 products</p>
+        <button class="btn btn--ghost" type="button" id="loadMore">
+          Load more products <svg class="ico"><use href="#i-arrow"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== VALUE PROPS ====== -->
+  <section class="section values" id="bestsellers">
+    <div class="wrap">
+      <div class="values__grid">
+        <article class="value reveal">
+          <span class="value__icon"><svg class="ico"><use href="#i-bolt"/></svg></span>
+          <h3>Instant, private delivery</h3>
+          <p>Files unlock the second payment clears — no waiting, no back-and-forth emails, no expiring links.</p>
+        </article>
+        <article class="value reveal">
+          <span class="value__icon"><svg class="ico"><use href="#i-refresh"/></svg></span>
+          <h3>Lifetime updates</h3>
+          <p>When a creator ships a new version, it lands in your library for free. Forever, including v2.</p>
+        </article>
+        <article class="value reveal">
+          <span class="value__icon"><svg class="ico"><use href="#i-shield"/></svg></span>
+          <h3>Clear, boring licences</h3>
+          <p>One page per licence, plain English, no legal maze. Commercial use is spelled out up front.</p>
+        </article>
+        <article class="value reveal">
+          <span class="value__icon"><svg class="ico"><use href="#i-globe"/></svg></span>
+          <h3>14-day guarantee</h3>
+          <p>Not the right fit? Get a refund within 14 days, no interrogation. Creators still get paid.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== SELL ====== -->
+  <section class="section sell" id="sell">
+    <div class="wrap sell__grid">
+      <div class="sell__copy">
+        <p class="eyebrow">For creators</p>
+        <h2>You made it. Keep 90% of it.</h2>
+        <p class="section__sub">
+          Neurio is built by people who have sold digital products before. Transparent
+          fees, Friday payouts, and a product page that actually converts — without
+          paying for ads to find your own audience.
+        </p>
+        <ul class="ticks">
+          <li><svg class="ico"><use href="#i-check"/></svg> Flat 10% platform fee — no hidden processing cuts</li>
+          <li><svg class="ico"><use href="#i-check"/></svg> Payouts every Friday to bank or Wise</li>
+          <li><svg class="ico"><use href="#i-check"/></svg> Built-in licence generation &amp; VAT handling</li>
+          <li><svg class="ico"><use href="#i-check"/></svg> Launch support from a real human in 24h</li>
+        </ul>
+        <div class="sell__actions">
+          <button class="btn btn--primary" type="button" data-open-sell>Start selling free</button>
+          <a class="btn btn--ghost" href="#reviews">Read seller stories</a>
+        </div>
+      </div>
+
+      <div class="dash reveal" aria-label="Example creator dashboard">
+        <div class="dash__top">
+          <div class="dash__dots" aria-hidden="true"><i></i><i></i><i></i></div>
+          <span class="dash__title">Earnings · October</span>
+          <span class="dash__live"><i></i> Live</span>
+        </div>
+        <div class="dash__body">
+          <p class="dash__label">Net revenue</p>
+          <p class="dash__amount">$8,412<span>.50</span></p>
+          <p class="dash__delta"><svg class="ico"><use href="#i-arrow"/></svg> 32.4% vs. September</p>
+
+          <div class="spark" aria-hidden="true">
+            <svg viewBox="0 0 300 90" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--mint)" stop-opacity=".35"/>
+                  <stop offset="100%" stop-color="var(--mint)" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path class="spark__area" d="M0 74 L30 66 L60 70 L90 52 L120 58 L150 40 L180 45 L210 28 L240 32 L270 16 L300 8 L300 90 L0 90 Z" fill="url(#sparkFill)"/>
+              <path class="spark__line" d="M0 74 L30 66 L60 70 L90 52 L120 58 L150 40 L180 45 L210 28 L240 32 L270 16 L300 8" fill="none" stroke="var(--mint)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <ul class="dash__rows">
+            <li><span class="dash__thumb cover cover--violet"><svg class="ico"><use href="#i-layout"/></svg></span><span class="dash__rowmeta"><strong>Nova Dashboard Kit</strong><small>142 sales this month</small></span><span class="dash__sum">$3,408</span></li>
+            <li><span class="dash__thumb cover cover--lime"><svg class="ico"><use href="#i-note"/></svg></span><span class="dash__rowmeta"><strong>Ops OS for Notion</strong><small>96 sales this month</small></span><span class="dash__sum">$2,784</span></li>
+            <li><span class="dash__thumb cover cover--amber"><svg class="ico"><use href="#i-book"/></svg></span><span class="dash__rowmeta"><strong>Pricing Playbook</strong><small>71 sales this month</small></span><span class="dash__sum">$1,409</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== REVIEWS ====== -->
+  <section class="section reviews" id="reviews">
+    <div class="wrap">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">Reviews</p>
+          <h2>4.9 out of 5, across 3,200+ orders.</h2>
+        </div>
+        <div class="rating-block">
+          <span class="rating-block__num">4.9</span>
+          <span class="rating-block__stars" aria-label="4.9 out of 5 stars">★★★★★</span>
+          <span class="rating-block__meta">Verified buyers only</span>
+        </div>
+      </div>
+
+      <div class="review-grid">
+        <figure class="review reveal">
+          <div class="review__stars" aria-label="5 stars">★★★★★</div>
+          <blockquote>“Bought the Nova dashboard kit on a Friday, shipped a client MVP on Tuesday. The Figma variables alone saved me a week.”</blockquote>
+          <figcaption><span class="avatar" style="--a:#7c5cff">AK</span><span><strong>Amine K.</strong><small>Product designer · Casablanca</small></span></figcaption>
+        </figure>
+        <figure class="review reveal">
+          <div class="review__stars" aria-label="5 stars">★★★★★</div>
+          <blockquote>“The licence actually explains what I can and can’t do. That sounds boring until you’ve had a client legal team ask.”</blockquote>
+          <figcaption><span class="avatar" style="--a:#34e2b5">MJ</span><span><strong>Maya J.</strong><small>Freelance developer · Berlin</small></span></figcaption>
+        </figure>
+        <figure class="review reveal">
+          <div class="review__stars" aria-label="5 stars">★★★★★</div>
+          <blockquote>“I’ve sold on three platforms. Neurio is the first where I didn’t have to explain my own product to support twice a month.”</blockquote>
+          <figcaption><span class="avatar" style="--a:#ffb454">SR</span><span><strong>Sofia R.</strong><small>Creator · 2,100 sales</small></span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== NEWSLETTER ====== -->
+  <section class="section newsletter">
+    <div class="wrap">
+      <div class="news-card reveal">
+        <div class="news-card__glow" aria-hidden="true"></div>
+        <div class="news-card__copy">
+          <p class="eyebrow">The Friday drop</p>
+          <h2>Five new products. Every Friday. No noise.</h2>
+          <p>One short email with the week’s best releases and a subscriber-only discount. Unsubscribe in one click.</p>
+        </div>
+        <form class="news-form" id="newsForm">
+          <label class="sr-only" for="email">Email address</label>
+          <div class="news-form__row">
+            <svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>
+            <input id="email" type="email" required placeholder="you@studio.com" autocomplete="email" />
+            <button class="btn btn--primary" type="submit">Get the drop</button>
+          </div>
+          <p class="news-form__note" id="newsNote">Join 18,400 designers, developers and founders.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ====== FOOTER ====== -->
+<footer class="footer">
+  <div class="wrap footer__grid">
+    <div class="footer__brand">
+      <a class="brand" href="#top" aria-label="Neurio home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64"><path d="M19 45V19l26 26V19" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="brand__name">neurio</span>
+      </a>
+      <p>A curated marketplace for digital products, built by independent makers.<br />Made with care in Casablanca.</p>
+      <div class="socials">
+        <a href="#top" aria-label="Neurio on X">X</a>
+        <a href="#top" aria-label="Neurio on Instagram">IG</a>
+        <a href="#top" aria-label="Neurio on LinkedIn">in</a>
+        <a href="#top" aria-label="Neurio on Dribbble">Dr</a>
+      </div>
+    </div>
+
+    <nav class="footer__col" aria-label="Marketplace">
+      <h3>Marketplace</h3>
+      <a href="#catalog">All products</a>
+      <a href="#categories">Categories</a>
+      <a href="#bestsellers">Bestsellers</a>
+      <a href="#top">Gift cards</a>
+      <a href="#top">Licences</a>
+    </nav>
+
+    <nav class="footer__col" aria-label="Creators">
+      <h3>Creators</h3>
+      <a href="#sell">Start selling</a>
+      <a href="#sell">Payouts &amp; fees</a>
+      <a href="#sell">Seller handbook</a>
+      <a href="#top">Affiliates</a>
+      <a href="#top">Creator fund</a>
+    </nav>
+
+    <nav class="footer__col" aria-label="Support">
+      <h3>Support</h3>
+      <a href="#top">Help centre</a>
+      <a href="#top">Refund policy</a>
+      <a href="#top">Contact us</a>
+      <a href="#top">Status</a>
+    </nav>
+  </div>
+
+  <div class="wrap footer__bottom">
+    <p>© <span id="year">2026</span> Neurio Studio SARL. All rights reserved.</p>
+    <div class="footer__legal">
+      <a href="#top">Privacy</a><a href="#top">Terms</a><a href="#top">Cookies</a>
+    </div>
+    <div class="payments" aria-label="Accepted payment methods">
+      <span>VISA</span><span>MC</span><span>AMEX</span><span>PayPal</span><span>Wise</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ====== CART DRAWER ====== -->
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle" aria-hidden="true">
+  <header class="drawer__head">
+    <h2 id="cartTitle">Your cart <span class="drawer__badge" id="cartBadge">0</span></h2>
+    <button class="icon-btn" type="button" data-close aria-label="Close cart"><svg class="ico"><use href="#i-close"/></svg></button>
+  </header>
+
+  <div class="drawer__body" id="cartBody">
+    <div class="cart-empty" id="cartEmpty">
+      <span class="cart-empty__icon"><svg class="ico"><use href="#i-cart"/></svg></span>
+      <h3>Nothing here yet</h3>
+      <p>Your future favourite kit is three clicks away.</p>
+      <button class="btn btn--primary btn--sm" type="button" data-close>Browse products</button>
+    </div>
+    <ul class="cart-list" id="cartList"></ul>
+  </div>
+
+  <footer class="drawer__foot" id="cartFoot" hidden>
+    <div class="promo">
+      <svg class="ico" aria-hidden="true"><use href="#i-spark"/></svg>
+      <label class="sr-only" for="promo">Discount code</label>
+      <input id="promo" type="text" placeholder="Discount code" autocomplete="off" />
+      <button class="btn btn--ghost btn--sm" type="button" id="applyPromo">Apply</button>
+    </div>
+    <p class="promo__msg" id="promoMsg" role="status"></p>
+
+    <dl class="totals">
+      <div><dt>Subtotal</dt><dd id="subtotal">$0.00</dd></div>
+      <div id="discountRow" hidden><dt>Discount <span id="discountTag"></span></dt><dd id="discount">−$0.00</dd></div>
+      <div class="totals__grand"><dt>Total</dt><dd id="total">$0.00</dd></div>
+    </dl>
+    <p class="drawer__note"><svg class="ico"><use href="#i-lock"/></svg> Secure checkout · Instant download · 14-day guarantee</p>
+    <button class="btn btn--primary btn--block" type="button" id="checkout">Checkout</button>
+  </footer>
+</aside>
+
+<!-- ====== QUICK VIEW ====== -->
+<div class="modal" id="quickView" role="dialog" aria-modal="true" aria-labelledby="qvTitle" aria-hidden="true">
+  <div class="modal__panel" id="qvPanel">
+    <button class="icon-btn modal__close" type="button" data-close aria-label="Close product"><svg class="ico"><use href="#i-close"/></svg></button>
+    <div id="qvContent"></div>
+  </div>
+</div>
+
+<!-- ====== SELLER MODAL ====== -->
+<div class="modal" id="sellModal" role="dialog" aria-modal="true" aria-labelledby="sellTitle" aria-hidden="true">
+  <div class="modal__panel modal__panel--sm">
+    <button class="icon-btn modal__close" type="button" data-close aria-label="Close"><svg class="ico"><use href="#i-close"/></svg></button>
+    <form class="seller-form" id="sellForm" novalidate>
+      <p class="eyebrow">Creator application</p>
+      <h2 id="sellTitle">Sell your work on Neurio</h2>
+      <p class="seller-form__sub">Tell us what you make. We reply within one business day with a store link and a launch checklist.</p>
+      <div class="field"><label for="sName">Name</label><input id="sName" required placeholder="Your name" /></div>
+      <div class="field"><label for="sEmail">Email</label><input id="sEmail" type="email" required placeholder="you@studio.com" /></div>
+      <div class="field"><label for="sType">What do you sell?</label>
+        <select id="sType">
+          <option>UI kits &amp; design systems</option>
+          <option>Templates</option>
+          <option>Courses</option>
+          <option>E-books</option>
+          <option>Notion systems</option>
+          <option>Presets &amp; assets</option>
+        </select>
+      </div>
+      <div class="field"><label for="sLink">Portfolio or product link</label><input id="sLink" placeholder="https://" /></div>
+      <button class="btn btn--primary btn--block" type="submit">Send application</button>
+      <p class="seller-form__note">No listing fee. Flat 10% only when you make a sale.</p>
+    </form>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script src="assets/app.js" defer></script>
+</body>
+</html>
