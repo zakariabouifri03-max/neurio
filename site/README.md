@@ -16,16 +16,17 @@ python3 -m http.server 4173 --bind 0.0.0.0
 | File | Purpose |
 | --- | --- |
 | `index.html` | Full page: hero, categories, catalog, seller pitch, reviews, newsletter, footer, cart drawer, product quick view, seller form |
-| `assets/styles.css` | Design tokens + all components (dark, violet/mint palette, self-hosted Inter variable font) |
+| `assets/styles.css` | Design tokens + all components (light theme, violet/mint palette, self-hosted Inter variable font) |
 | `assets/app.js` | Product data, filtering/sorting/search, cart, wishlist, quick view, promo codes, demo checkout |
 | `assets/fonts/` | Inter variable woff2 (latin) — no external font requests |
-| `assets/hero-ambient.jpg` | Hero backdrop |
+| `assets/hero-ambient-light.jpg` | Hero backdrop |
 
 ## Interactions
 
 - **Search** — hero search, catalog search, popular tags and `/` shortcut. Results are ranked by relevance (title > category > creator > formats).
 - **Filter & sort** — category chips, "Saved" wishlist view, five sort modes, load more (9 → 18).
 - **Product quick view** — description, deliverables, formats, price, add to cart, save.
+- **Five-star catalogue** — every product is rated 5/5 in the seeded data; change `rating` on any product in `PRODUCTS` to adjust.
 - **Cart drawer** — quantity control, remove, discount codes (`LAUNCH30` = 30%, `WELCOME10` = 10%), totals, demo checkout that issues an order number.
 - **Wishlist** — persisted in `localStorage`, reflected in the header badge.
 - **Seller flow** — application modal with inline validation.
