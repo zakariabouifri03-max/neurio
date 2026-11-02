@@ -1,0 +1,90 @@
+{
+  "collection": {
+    "name": "K-STUDIO STYLE · Vol. 1",
+    "tagline": "Faux applique · leopard patchwork · coquette bows · vintage western",
+    "price": "1.67 - 2.43 USD (25% off sales, same ladder as the reference shop)",
+    "note": "Every design ships as a 4500x5400 px transparent PNG (300 dpi) plus SVG. Titles follow the reference shop's formula: Hooks + Design + Style + Format + Digital Download."
+  },
+  "designs": [
+    {
+      "id": "d01",
+      "file": "d01-holly-jolly-leopard",
+      "title": "Holly Jolly PNG, Leopard Patchwork Christmas Font, Faux Applique Tree, Rustic Vintage Sublimation, Digital Download PNG Clipart",
+      "tags": ["holly jolly png", "leopard christmas png", "patchwork alphabet", "faux applique", "christmas tree png", "western christmas", "retro holiday png", "sublimation design", "christian christmas", "shirt png design", "coquette christmas", "digital download", "gingham christmas"],
+      "description": "HOLLY JOLLY — leopard + gingham patchwork letters with a stitched faux-applique tree and a cream coquette bow. Print-ready 4500x5400 px transparent PNG, SVG included.",
+      "shirt": "#1C1C1C"
+    },
+    {
+      "id": "d02",
+      "file": "d02-merry-christmas-patchwork",
+      "title": "Merry Christmas PNG, Patchwork Letters, Six Fabric Patterns, Faux Applique Bow, Retro Holiday Sublimation, Digital Download PNG Art",
+      "tags": ["merry christmas png", "patchwork png", "patterned letters", "gingham png", "leopard christmas", "retro christmas png", "vintage holiday", "sublimation png", "shirt design png", "farmhouse christmas", "coquette bow png", "digital download", "winter png"],
+      "description": "MERRY CHRISTMAS — six fabrics (gingham, leopard, pine, polka, plaid, stripes) cut into faux-applique letters with whipped stitching and a cream bow. Transparent PNG + SVG.",
+      "shirt": "#243028"
+    },
+    {
+      "id": "d03",
+      "file": "d03-leopard-christmas-tree",
+      "title": "Leopard Christmas Tree PNG, Animal Print Holiday, Faux Applique Tree, Gold Stitched Ornaments, Rustic Vintage Sublimation, Digital Download",
+      "tags": ["leopard christmas tree", "animal print png", "christmas tree png", "faux applique", "gold christmas png", "western holiday", "rustic christmas", "sublimation design", "coquette bow png", "merry christmas png", "digital download", "holiday shirt png", "sweatshirt png"],
+      "description": "The hero shape of the collection: a four-tier leopard faux-applique tree, gold stitched ornaments and a big cream bow, with MERRY / CHRISTMAS lettering. Transparent PNG + SVG.",
+      "shirt": "#1C1C1C"
+    },
+    {
+      "id": "d04",
+      "file": "d04-christmas-please-cocktails",
+      "title": "Christmas Please PNG, Santa Martini Coquette Cocktails, Retro Doodle Festive Design, Holiday Bar Cart Sublimation, Digital Download PNG",
+      "tags": ["christmas please png", "martini png", "coquette christmas", "cocktail png", "santa martini", "retro holiday png", "girls christmas png", "sublimation design", "bar cart png", "funny christmas png", "digital download", "hand drawn png", "party png"],
+      "description": "CHRISTMAS PLEASE — three coquette martinis with bows, cherries and candy-cane stirrers, finished with a gold bow and hanging ornaments. Transparent PNG + SVG.",
+      "shirt": "#F0E6D6"
+    },
+    {
+      "id": "d05",
+      "file": "d05-give-thanks-turkey",
+      "title": "Give Thanks PNG, Thanksgiving Turkey Design, Gold Doodle Bow, Polka Dot Letters, Christian Fall Sublimation, Digital Download PNG Design",
+      "tags": ["give thanks png", "thanksgiving png", "turkey png", "fall png", "pumpkin png", "christian fall png", "polka dot letters", "gold bow png", "retro thanksgiving", "farmhouse fall", "sublimation design", "digital download", "autumn shirt png"],
+      "description": "GIVE THANKS — polka-dot lettering, a gold line-art bow, a hand-drawn turkey with pumpkins, leaves and acorns. Transparent PNG + SVG.",
+      "shirt": "#3F4A3C"
+    },
+    {
+      "id": "d06",
+      "file": "d06-thankful-fall-scribble",
+      "title": "Thankful PNG, Fall Scribble Typography, Retro Doodle Turkey, Pumpkin Acorn Leaf Art, Autumn Sublimation, Digital Download PNG Shirt Art",
+      "tags": ["thankful png", "fall typography png", "scribble letters", "hand drawn fall", "turkey png", "pumpkin png", "autumn png", "retro thanksgiving", "sublimation design", "boho fall png", "digital download", "mom fall shirt", "doodle png"],
+      "description": "THANKFUL in chunky hand lettering with scribble shading, plus a doodle turkey, pumpkin, leaves and acorns, and a FALL VIBES patch. Transparent PNG + SVG.",
+      "shirt": "#4A3527"
+    },
+    {
+      "id": "d07",
+      "file": "d07-small-town-christmas-truck",
+      "title": "Small Town Christmas PNG, Vintage Red Truck, Tree In The Bed, Rustic Farmhouse Holiday, Retro Country Sublimation, Digital Download PNG",
+      "tags": ["small town christmas", "red truck png", "christmas truck", "farmhouse christmas", "vintage christmas png", "country christmas", "retro holiday png", "tree farm png", "sublimation design", "digital download", "christmas shirt png", "western christmas", "snowflake png"],
+      "description": "SMALL TOWN CHRISTMAS — a vintage red truck hauling a pine, framed by snowy pines and a gold script. Transparent PNG + SVG.",
+      "shirt": "#22262B"
+    },
+    {
+      "id": "d08",
+      "file": "d08-christmas-raccoon-funny",
+      "title": "Christmas Raccoon PNG, Funny Holiday Raccoon, Santa Hat Iced Coffee, Retro Wildlife Christmas, Sarcastic Sublimation, Digital Download PNG",
+      "tags": ["christmas raccoon png", "funny christmas png", "santa hat png", "iced coffee png", "raccoon png", "sarcastic shirt png", "retro wildlife", "animal christmas", "sublimation design", "digital download", "humor png", "trash panda png", "sweatshirt png"],
+      "description": "FULLY BOOKED, NO REFUNDS — a santa-hatted raccoon with an iced coffee, a red bow and gold snowflakes. Transparent PNG + SVG.",
+      "shirt": "#3B3B3B"
+    },
+    {
+      "id": "d09",
+      "file": "d09-take-it-to-the-hoop",
+      "title": "Take It To The Hoop PNG, Minimalist Basketball Line Art, Retro Game Day Design, Sneaker Sublimation, Sports Mom PNG, Digital Download",
+      "tags": ["basketball png", "game day png", "take it to the hoop", "sports mom png", "line art png", "sneaker png", "retro sports png", "basketball mom", "sublimation design", "digital download", "minimalist png", "hoop png", "team shirt png"],
+      "description": "TAKE IT TO THE HOOP — wobbly court grid, hand-drawn hoop, basketball and sneaker with a bold script. Transparent PNG + SVG.",
+      "shirt": "#E7DFD2"
+    },
+    {
+      "id": "d10",
+      "file": "d10-western-mama-patchwork",
+      "title": "Western Mama PNG, Patchwork Custom Name Style, Leopard Gingham Plaid Letters, Coquette Bows, Cowboy Boots, Digital Download PNG Art",
+      "tags": ["western mama png", "patchwork name png", "leopard png", "gingham png", "coquette bow png", "cowboy boot png", "cowboy hat png", "mama png", "boho western png", "sublimation design", "digital download", "custom name png", "farmhouse mama"],
+      "description": "WESTERN MAMA — four-fabric patchwork MAMA, two coquette bows, cowboy boot and hat, gold stars. Swap MAMA for any name. Transparent PNG + SVG.",
+      "shirt": "#5A3B2E"
+    }
+  ]
+}

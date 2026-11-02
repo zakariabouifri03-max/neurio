@@ -1,0 +1,13 @@
+{
+  "name": "neurio",
+  "private": true,
+  "description": "Design tooling for the K-Studio style sublimation PNG collection (tools/designs).",
+  "scripts": {
+    "designs": "python3 tools/designs/designs.py",
+    "mockups": "python3 tools/designs/mockup.py",
+    "showcase": "python3 tools/designs/showcase.py"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2"
+  }
+}
