@@ -8,6 +8,8 @@ venv/
 # Node
 node_modules/
 dist/
+# ...except the built Chrome extension, which is committed as the distributable
+!extension/dist/
 *.log
 
 # Backend data (uploads, results, sqlite) — never commit user photos
