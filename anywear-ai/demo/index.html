@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Demo Store — Anywear AI Test Page</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, sans-serif; background: #f6f6f7; color: #111; }
+    .nav { padding: 16px 32px; border-bottom: 1px solid #e8e8ec; display: flex; gap: 24px; align-items: center; }
+    .nav b { font-size: 18px; }
+    .nav span { font-size: 13px; color: #8a8a92; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; padding: 32px; max-width: 1200px; margin: 0 auto; }
+    .card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); cursor: pointer; transition: box-shadow .2s; }
+    .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+    .card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
+    .card .info { padding: 16px; }
+    .card .info h3 { font-size: 14px; font-weight: 600; }
+    .card .info .price { font-size: 16px; font-weight: 700; margin-top: 4px; }
+    .card .info .tag { display: inline-block; font-size: 11px; background: #111; color: #fff; padding: 2px 8px; border-radius: 999px; margin-top: 8px; }
+    .hint { text-align: center; padding: 24px; color: #8a8a92; font-size: 13px; max-width: 600px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <nav class="nav"><b>Demo Store</b><span>Anywear AI detection test page</span></nav>
+
+  <div class="hint">
+    This is a fake store for testing the Anywear extension. Click the Anywear AI icon in your toolbar,
+    then click <b>Scan page</b>. The product images below should be detected automatically.
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80" alt="Linen summer dress in beige" />
+      <div class="info"><h3>Linen Summer Dress</h3><div class="price">$89</div><span class="tag">dress</span></div>
+    </div>
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80" alt="Classic white cotton t-shirt" />
+      <div class="info"><h3>Cotton T-Shirt</h3><div class="price">$25</div><span class="tag">shirt</span></div>
+    </div>
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=80" alt="Black denim jacket" />
+      <div class="info"><h3>Denim Jacket</h3><div class="price">$120</div><span class="tag">jacket</span></div>
+    </div>
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&q=80" alt="Slim fit trousers in navy" />
+      <div class="info"><h3>Slim Trousers</h3><div class="price">$75</div><span class="tag">trousers</span></div>
+    </div>
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80" alt="Red knit sweater" />
+      <div class="info"><h3>Knit Sweater</h3><div class="price">$65</div><span class="tag">sweater</span></div>
+    </div>
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80" alt="Floral midi skirt" />
+      <div class="info"><h3>Floral Skirt</h3><div class="price">$55</div><span class="tag">skirt</span></div>
+    </div>
+  </div>
+</body>
+</html>

@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 
 from .config import settings
 from .db import init_db
-from .routers import files, health, history, tryon, upload
+from .routers import demo, files, health, history, tryon, upload
 
 settings.ensure_dirs()
 init_db(settings.db_path)
@@ -21,6 +21,9 @@ app = FastAPI(title=settings.app_name, version="1.0.0", lifespan=None)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
+    # Chrome extensions originate from chrome-extension://<id>, which can't
+    # be listed explicitly (the id is random per install). Allow them via regex.
+    allow_origin_regex=r"chrome-extension://.*",
     allow_credentials=False,
     allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
@@ -37,6 +40,7 @@ app.include_router(upload.router, prefix="/api", tags=["upload"])
 app.include_router(tryon.router, prefix="/api", tags=["tryon"])
 app.include_router(history.router, prefix="/api", tags=["history"])
 app.include_router(files.router, prefix="/api", tags=["files"])
+app.include_router(demo.router, tags=["demo"])
 
 
 @app.get("/")

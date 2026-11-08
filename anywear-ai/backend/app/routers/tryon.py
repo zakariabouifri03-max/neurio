@@ -65,9 +65,13 @@ async def try_on(
             raise HTTPException(status_code=422, detail=f"garment image invalid: {exc}") from exc
         garment_file_id, _ = storage.save_upload(garment_bytes, garment.content_type or "image/png")
     elif garment_url:
+        import asyncio
+
         from ..services.jobs import fetch_garment
 
-        garment_bytes = fetch_garment(garment_url)
+        # Run the synchronous fetch in a thread — otherwise the async event
+        # loop is blocked and the backend can't respond to its own request.
+        garment_bytes = await asyncio.to_thread(fetch_garment, garment_url)
         if not garment_bytes:
             raise HTTPException(status_code=422, detail="could not fetch garment image from URL")
         try:

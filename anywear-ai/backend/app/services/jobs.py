@@ -69,9 +69,11 @@ def run_job(job_id: str) -> None:
         validate_image_bytes(person_bytes)
         validate_image_bytes(garment_bytes)
 
+        from ..ai_client import get_provider
+
+        provider = get_provider()  # ensures anywear_ai is importable
         from anywear_ai import TryOnOptions
 
-        provider = get_provider()
         options = TryOnOptions(category=row["category"] or "other", max_size=1024)
         result = provider.generate(person_bytes, garment_bytes, options)
 

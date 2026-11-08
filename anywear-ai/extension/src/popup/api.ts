@@ -51,18 +51,34 @@ export class ApiClient {
   private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
     const headers: Record<string, string> = { ...(init.headers as Record<string, string>) };
     if (this.apiKey) headers["Authorization"] = `Bearer ${this.apiKey}`;
-    const resp = await fetch(`${this.baseURL}${path}`, { ...init, headers });
-    if (!resp.ok) {
-      let detail = `HTTP ${resp.status}`;
-      try {
-        const body = await resp.json();
-        if (body?.detail) detail = String(body.detail);
-      } catch {
-        /* keep default */
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 30000);
+    try {
+      const resp = await fetch(`${this.baseURL}${path}`, { ...init, headers, signal: controller.signal });
+      if (!resp.ok) {
+        let detail = `HTTP ${resp.status}`;
+        try {
+          const body = await resp.json();
+          if (body?.detail) detail = String(body.detail);
+        } catch {
+          /* keep default */
+        }
+        throw { status: resp.status, detail } satisfies ApiError;
       }
-      throw { status: resp.status, detail } satisfies ApiError;
+      return resp.json() as Promise<T>;
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") {
+        throw { status: 0, detail: `Request timed out — backend at ${this.baseURL} is not responding` } satisfies ApiError;
+      }
+      if (e && typeof e === "object" && "status" in e) throw e; // already an ApiError
+      // Network failure (backend not running, DNS, CORS, etc.)
+      throw {
+        status: 0,
+        detail: `Cannot reach backend at ${this.baseURL}. Start it with: uvicorn app.main:app --port 8000`,
+      } satisfies ApiError;
+    } finally {
+      window.clearTimeout(timeout);
     }
-    return resp.json() as Promise<T>;
   }
 
   async health(): Promise<Health> {

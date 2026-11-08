@@ -7,13 +7,17 @@
  * which fetches it server-side (no CORS restrictions).
  */
 export async function imageToDataURL(url: string): Promise<string | null> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
   try {
-    const resp = await fetch(url, { mode: "cors", credentials: "omit" });
+    const resp = await fetch(url, { mode: "cors", credentials: "omit", signal: controller.signal });
     if (!resp.ok) return null;
     const blob = await resp.blob();
     return await blobToDataURL(blob);
   } catch {
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

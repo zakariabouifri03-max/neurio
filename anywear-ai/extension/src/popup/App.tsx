@@ -113,7 +113,17 @@ export default function App() {
 
   const sendPopupRequest = useCallback((req: PopupRequest): Promise<any> => {
     return new Promise((resolve) => {
-      chrome.runtime.sendMessage({ request: req }, (res) => resolve(res));
+      try {
+        chrome.runtime.sendMessage({ request: req }, (res) => {
+          if (chrome.runtime.lastError) {
+            resolve({ ok: false, error: chrome.runtime.lastError.message });
+          } else {
+            resolve(res);
+          }
+        });
+      } catch (e) {
+        resolve({ ok: false, error: String(e) });
+      }
     });
   }, []);
 
@@ -189,8 +199,13 @@ export default function App() {
       const blob = await fetch(c.src).then((r) => r.blob());
       return { file: new File([blob], "garment.png", { type: blob.type || "image/png" }), url: null };
     }
-    // Try page fetch (works same-origin); fall back to URL mode for the backend.
-    const res = await sendPopupRequest({ type: "fetch-image", url: c.src });
+    // Try page fetch with an 8s timeout; fall back to URL mode for the backend.
+    const res = await Promise.race([
+      sendPopupRequest({ type: "fetch-image", url: c.src }),
+      new Promise((resolve) =>
+        setTimeout(() => resolve({ ok: false, error: "fetch-timeout" }), 8000)
+      ),
+    ]);
     if (res?.ok && res.dataURL) {
       const blob = await fetch(res.dataURL).then((r) => r.blob());
       return { file: new File([blob], "garment.png", { type: blob.type || "image/png" }), url: null };
@@ -199,37 +214,20 @@ export default function App() {
     return { file: null, url: c.src };
   }, [garmentFile, selectedGarment, sendPopupRequest]);
 
-  // --- try-on ---
-  const runTryOn = useCallback(async () => {
-    if (!personFile) return;
-    const garment = await garmentAsFile();
-    if (!garment.file && !garment.url) {
-      showToast("Select a garment image first", "error");
-      return;
-    }
-    setStep("processing");
-    setProgress(8);
-    try {
-      const res = await client.submitTryOn({
-        personFile,
-        garmentFile: garment.file,
-        garmentUrl: garment.url,
-        category,
-      });
-      setJob({ job_id: res.job_id, status: "queued" } as JobStatus);
-      setProgress(22);
-      pollJob(res.job_id);
-    } catch (e) {
-      const err = e as ApiError;
-      showToast(`Try-on failed: ${err.detail}`, "error");
-      setStep("person");
-    }
-  }, [personFile, garmentAsFile, client, category, showToast]);
-
+  // --- job polling ---
   const pollJob = useCallback(
     (jobId: string) => {
       if (pollTimer.current) window.clearInterval(pollTimer.current);
+      let pollCount = 0;
+      const maxPolls = 120; // ~3 min at 1.5s intervals
       const tick = async () => {
+        pollCount++;
+        if (pollCount > maxPolls) {
+          showToast("Generation timed out — check backend status", "error");
+          setStep("person");
+          if (pollTimer.current) window.clearInterval(pollTimer.current);
+          return;
+        }
         try {
           const status = await client.job(jobId);
           setJob(status);
@@ -248,13 +246,63 @@ export default function App() {
             if (pollTimer.current) window.clearInterval(pollTimer.current);
           }
         } catch {
-          /* keep polling */
+          // Backend unreachable during polling — warn after a few attempts.
+          if (pollCount % 10 === 0) {
+            showToast("Lost connection to backend — generation may still be running", "error");
+          }
         }
       };
       pollTimer.current = window.setInterval(tick, settings.pollIntervalMs);
     },
     [client, refreshHistory, settings.pollIntervalMs, showToast]
   );
+
+  // --- try-on ---
+  const runTryOn = useCallback(async () => {
+    if (!personFile) return;
+    setStep("processing");
+    setProgress(5);
+    try {
+      // Pre-flight: verify backend is reachable before doing anything else
+      let health: Awaited<ReturnType<ApiClient["health"]>>;
+      try {
+        health = await client.health();
+      } catch (e) {
+        const err = e as ApiError;
+        showToast(err.detail || "Backend not reachable — start it with uvicorn app.main:app --port 8000", "error");
+        setStep("person");
+        return;
+      }
+      if (!health.provider_available) {
+        showToast(`AI provider "${health.provider}" not available — check backend logs`, "error");
+        setStep("person");
+        return;
+      }
+
+      setProgress(15);
+      const garment = await garmentAsFile();
+      if (!garment.file && !garment.url) {
+        showToast("Select a garment image first", "error");
+        setStep("person");
+        return;
+      }
+
+      setProgress(30);
+      const res = await client.submitTryOn({
+        personFile,
+        garmentFile: garment.file,
+        garmentUrl: garment.url,
+        category,
+      });
+      setJob({ job_id: res.job_id, status: "queued" } as JobStatus);
+      setProgress(40);
+      pollJob(res.job_id);
+    } catch (e) {
+      const err = e as ApiError;
+      showToast(`Try-on failed: ${err.detail || "unknown error"}`, "error");
+      setStep("person");
+    }
+  }, [personFile, garmentAsFile, client, category, showToast, pollJob]);
 
   const downloadResult = useCallback(() => {
     if (!resultImg) return;
