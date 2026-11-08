@@ -1,0 +1,20 @@
+{
+  "name": "anywear-ai",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Universal AI virtual try-on Chrome extension with FastAPI backend",
+  "workspaces": [
+    "extension",
+    "dashboard"
+  ],
+  "scripts": {
+    "backend": "uvicorn app.main:app --reload --port 8000",
+    "backend:test": "pytest tests/ -q",
+    "extension:build": "npm run build -w anywear-extension",
+    "extension:test": "npm run test -w anywear-extension",
+    "dashboard:dev": "npm run dev -w anywear-dashboard",
+    "dashboard:build": "npm run build -w anywear-dashboard",
+    "ai:test": "pytest ai-engine/tests/ -q",
+    "test": "npm run backend:test && npm run ai:test && npm run extension:test"
+  }
+}

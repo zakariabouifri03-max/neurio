@@ -1,0 +1,32 @@
+{
+  "name": "anywear-extension",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Anywear AI — universal virtual try-on Chrome extension",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && node scripts/build-scripts.mjs",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "icons": "python3 scripts/gen-icons.py"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "@types/node": "^26.6.6",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "jsdom": "^31.0.0",
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.6",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4",
+    "vitest": "^2.0.3"
+  }
+}
