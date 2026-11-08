@@ -720,12 +720,21 @@ export default function App() {
         >
           New try-on
         </button>
-        <button
-          onClick={() => setStep(step === "settings" ? "product" : "settings")}
-          className="text-[11px] font-medium text-ink-muted hover:text-ink"
-        >
-          Settings
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => chrome.tabs.create({ url: `${settings.apiBaseURL}/live` })}
+            className="text-[11px] font-semibold text-ink-soft hover:text-ink"
+            title="Open the Live Studio (camera try-on)"
+          >
+            Live Studio
+          </button>
+          <button
+            onClick={() => setStep(step === "settings" ? "product" : "settings")}
+            className="text-[11px] font-medium text-ink-muted hover:text-ink"
+          >
+            Settings
+          </button>
+        </div>
       </footer>
     </div>
   );
