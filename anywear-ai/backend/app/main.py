@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 
 from .config import settings
 from .db import init_db
-from .routers import demo, files, health, history, tryon, upload
+from .routers import demo, files, health, history, live, tryon, upload
 
 settings.ensure_dirs()
 init_db(settings.db_path)
@@ -41,6 +41,7 @@ app.include_router(tryon.router, prefix="/api", tags=["tryon"])
 app.include_router(history.router, prefix="/api", tags=["history"])
 app.include_router(files.router, prefix="/api", tags=["files"])
 app.include_router(demo.router, tags=["demo"])
+app.include_router(live.router, tags=["live"])
 
 
 @app.get("/")

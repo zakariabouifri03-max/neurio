@@ -1,0 +1,332 @@
+[
+  {
+    "id": "dress_0",
+    "name": "Blue Dress",
+    "category": "dress",
+    "image": "/demo/images/dress_0.png",
+    "color": [
+      120,
+      160,
+      200
+    ]
+  },
+  {
+    "id": "dress_1",
+    "name": "Red Dress",
+    "category": "dress",
+    "image": "/demo/images/dress_1.png",
+    "color": [
+      200,
+      120,
+      120
+    ]
+  },
+  {
+    "id": "dress_2",
+    "name": "Green Dress",
+    "category": "dress",
+    "image": "/demo/images/dress_2.png",
+    "color": [
+      120,
+      200,
+      160
+    ]
+  },
+  {
+    "id": "dress_3",
+    "name": "Black Dress",
+    "category": "dress",
+    "image": "/demo/images/dress_3.png",
+    "color": [
+      80,
+      80,
+      80
+    ]
+  },
+  {
+    "id": "dress_4",
+    "name": "Purple Dress",
+    "category": "dress",
+    "image": "/demo/images/dress_4.png",
+    "color": [
+      200,
+      180,
+      220
+    ]
+  },
+  {
+    "id": "shirt_0",
+    "name": "White Shirt",
+    "category": "shirt",
+    "image": "/demo/images/shirt_0.png",
+    "color": [
+      240,
+      240,
+      245
+    ]
+  },
+  {
+    "id": "shirt_1",
+    "name": "Black Shirt",
+    "category": "shirt",
+    "image": "/demo/images/shirt_1.png",
+    "color": [
+      60,
+      60,
+      60
+    ]
+  },
+  {
+    "id": "shirt_2",
+    "name": "Blue Shirt",
+    "category": "shirt",
+    "image": "/demo/images/shirt_2.png",
+    "color": [
+      120,
+      160,
+      200
+    ]
+  },
+  {
+    "id": "shirt_3",
+    "name": "Grey Shirt",
+    "category": "shirt",
+    "image": "/demo/images/shirt_3.png",
+    "color": [
+      160,
+      160,
+      160
+    ]
+  },
+  {
+    "id": "shirt_4",
+    "name": "Beige Shirt",
+    "category": "shirt",
+    "image": "/demo/images/shirt_4.png",
+    "color": [
+      220,
+      200,
+      180
+    ]
+  },
+  {
+    "id": "jacket_0",
+    "name": "Denim Jacket",
+    "category": "jacket",
+    "image": "/demo/images/jacket_0.png",
+    "color": [
+      70,
+      80,
+      100
+    ]
+  },
+  {
+    "id": "jacket_1",
+    "name": "Black Jacket",
+    "category": "jacket",
+    "image": "/demo/images/jacket_1.png",
+    "color": [
+      40,
+      40,
+      40
+    ]
+  },
+  {
+    "id": "jacket_2",
+    "name": "Brown Jacket",
+    "category": "jacket",
+    "image": "/demo/images/jacket_2.png",
+    "color": [
+      107,
+      78,
+      61
+    ]
+  },
+  {
+    "id": "jacket_3",
+    "name": "Olive Jacket",
+    "category": "jacket",
+    "image": "/demo/images/jacket_3.png",
+    "color": [
+      85,
+      107,
+      47
+    ]
+  },
+  {
+    "id": "jacket_4",
+    "name": "Charcoal Jacket",
+    "category": "jacket",
+    "image": "/demo/images/jacket_4.png",
+    "color": [
+      60,
+      60,
+      80
+    ]
+  },
+  {
+    "id": "trousers_0",
+    "name": "Navy Trousers",
+    "category": "trousers",
+    "image": "/demo/images/trousers_0.png",
+    "color": [
+      50,
+      60,
+      80
+    ]
+  },
+  {
+    "id": "trousers_1",
+    "name": "Black Trousers",
+    "category": "trousers",
+    "image": "/demo/images/trousers_1.png",
+    "color": [
+      30,
+      30,
+      30
+    ]
+  },
+  {
+    "id": "trousers_2",
+    "name": "Khaki Trousers",
+    "category": "trousers",
+    "image": "/demo/images/trousers_2.png",
+    "color": [
+      189,
+      183,
+      107
+    ]
+  },
+  {
+    "id": "trousers_3",
+    "name": "Grey Trousers",
+    "category": "trousers",
+    "image": "/demo/images/trousers_3.png",
+    "color": [
+      128,
+      128,
+      128
+    ]
+  },
+  {
+    "id": "trousers_4",
+    "name": "Brown Trousers",
+    "category": "trousers",
+    "image": "/demo/images/trousers_4.png",
+    "color": [
+      80,
+      60,
+      40
+    ]
+  },
+  {
+    "id": "sweater_0",
+    "name": "Red Sweater",
+    "category": "sweater",
+    "image": "/demo/images/sweater_0.png",
+    "color": [
+      180,
+      100,
+      90
+    ]
+  },
+  {
+    "id": "sweater_1",
+    "name": "Green Sweater",
+    "category": "sweater",
+    "image": "/demo/images/sweater_1.png",
+    "color": [
+      90,
+      139,
+      110
+    ]
+  },
+  {
+    "id": "sweater_2",
+    "name": "Blue Sweater",
+    "category": "sweater",
+    "image": "/demo/images/sweater_2.png",
+    "color": [
+      90,
+      122,
+      180
+    ]
+  },
+  {
+    "id": "sweater_3",
+    "name": "Cream Sweater",
+    "category": "sweater",
+    "image": "/demo/images/sweater_3.png",
+    "color": [
+      245,
+      240,
+      224
+    ]
+  },
+  {
+    "id": "sweater_4",
+    "name": "Purple Sweater",
+    "category": "sweater",
+    "image": "/demo/images/sweater_4.png",
+    "color": [
+      140,
+      100,
+      160
+    ]
+  },
+  {
+    "id": "skirt_0",
+    "name": "Pink Skirt",
+    "category": "skirt",
+    "image": "/demo/images/skirt_0.png",
+    "color": [
+      200,
+      150,
+      180
+    ]
+  },
+  {
+    "id": "skirt_1",
+    "name": "Black Skirt",
+    "category": "skirt",
+    "image": "/demo/images/skirt_1.png",
+    "color": [
+      50,
+      50,
+      50
+    ]
+  },
+  {
+    "id": "skirt_2",
+    "name": "Blue Skirt",
+    "category": "skirt",
+    "image": "/demo/images/skirt_2.png",
+    "color": [
+      120,
+      160,
+      200
+    ]
+  },
+  {
+    "id": "skirt_3",
+    "name": "White Skirt",
+    "category": "skirt",
+    "image": "/demo/images/skirt_3.png",
+    "color": [
+      240,
+      240,
+      240
+    ]
+  },
+  {
+    "id": "skirt_4",
+    "name": "Yellow Skirt",
+    "category": "skirt",
+    "image": "/demo/images/skirt_4.png",
+    "color": [
+      180,
+      200,
+      100
+    ]
+  }
+]
