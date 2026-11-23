@@ -88,7 +88,7 @@ STORY = [
                            "labels": [("NATIONAL MEDAL OF TECHNOLOGY", (720, 250), "Medal", {"size": 56}),
                                       ("2009", (720, 360), "two", {"size": 84})],
                            "stamp": [("FOR THE INVENTION THAT UNDID HIS EMPLOYER", (960, 900), "employer",
-                                      kit.RED, 54, -3)]}),
+                                      kit.RED, 34, -3)]}),
     ("card", "What the Line Means", "", 1.6),
     (S.BlackShot, 43, 44, {"lines": [("Cute.", 132, "brush", (216, 238, 108)),
                                      ("Do not tell anyone.", 96, "brush", (236, 228, 208))]}),
