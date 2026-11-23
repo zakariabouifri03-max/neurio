@@ -1,0 +1,76 @@
+{
+  "_note": "DRAFT storyboard. 36 shots covering ~39 sentences; 'sent' ranges are provisional and MUST be matched to the real sentence list from `python3 -m engine sentences projects/cute-camera`, then checked with `plan`. No fake timings are included. Cue words are drawn from the shot's own sentences.",
+  "title": "The $200 Machine That Was Cute",
+  "mood": "business",
+  "cast": [
+    {
+      "id": "sasson",
+      "name": "Sasson",
+      "role": "young engineer",
+      "look": "round head, cream shirt, thin 70s tie, floppy dark hair, glasses pushed up, holds a toaster-shaped camera",
+      "palette": "cream, mid grey, ink"
+    },
+    {
+      "id": "kellner",
+      "name": "Kellner",
+      "role": "executive",
+      "look": "older, dark suit, wide square glasses, heavy brow, tie knot loose, never smiles",
+      "palette": "navy, charcoal, ink"
+    },
+    {
+      "id": "board1",
+      "name": "Board Member",
+      "role": "silent boardroom figure",
+      "look": "suit silhouette, no face detail, sits low in chair",
+      "palette": "near-black, ink"
+    },
+    {
+      "id": "board2",
+      "name": "Board Member 2",
+      "role": "silent boardroom figure",
+      "look": "suit silhouette, hands folded on table",
+      "palette": "near-black, ink"
+    }
+  ],
+  "shots": [
+    { "kind": "chapter", "sent": "1", "text": "The Toaster", "mood": "business" },
+    { "kind": "office", "sent": "1", "chars": ["sasson"], "night": true, "labels": [{"text": "ROCHESTER, NEW YORK", "x": 1180, "y": 250, "at": "Rochester"}], "note": "Sasson at a cluttered desk, one lamp pool; a memo slides onto the desk" },
+    { "kind": "closeup", "sent": "2", "chars": ["sasson"], "night": true, "labels": [{"text": "FIND OUT IF IT'S GOOD FOR ANYTHING", "x": 960, "y": 300, "at": "anything"}], "note": "hands turning a small square sensor in a lamp beam" },
+    { "kind": "office", "sent": "3", "chars": ["sasson"], "night": true, "tag": {"text": "STEVE SASSON, 24", "at": "Sasson"}, "note": "name tag lower third; wall sign in background reads FILM" },
+    { "kind": "table", "sent": "4", "props": ["papers", "sensor", "cassette", "wires"], "night": true, "note": "exploded view: sensor, lens, boards, cassette, all under one ink outline" },
+    { "kind": "closeup", "sent": "4", "props": ["camera_box"], "night": true, "labels": [{"text": "8 LBS", "x": 1400, "y": 780, "at": "eight pounds"}], "note": "the assembled box held in two hands; a kitchen toaster beside it for scale" },
+    { "kind": "closeup", "sent": "5", "chars": ["sasson"], "night": true, "note": "sasson alone, arm out, lens an inch from a colleague's face off frame" },
+    { "kind": "black", "sent": "6", "text": "Then he waited.", "note": "single typed line, silent-card rhythm not needed but keep 1 line on black" },
+    { "kind": "counter", "sent": "7", "night": true, "labels": [{"text": "23 SECONDS", "x": 1300, "y": 300, "at": "Twenty-three"}], "note": "big counter ticking to 23 on a cassette deck" },
+    { "kind": "graphic", "sent": "7", "night": true, "icons": ["pixel_grid"], "labels": [{"text": "100 × 100", "x": 1350, "y": 780, "at": "hundred pixels wide"}, {"text": "0.01 MP", "x": 1350, "y": 860, "at": "megapixel"}], "note": "100x100 grid filling in one square at a time, then a face resolving out of static" },
+    { "kind": "split", "sent": "8", "chars": ["sasson"], "night": true, "labels": [{"text": "FILM", "x": 500, "y": 300}, {"text": "NO FILM", "x": 1420, "y": 300, "at": "film"}], "note": "left: perfect film photo; right: 100x100 static. the joke is the left one is obsolete" },
+    { "kind": "board", "sent": "9", "chars": ["sasson", "kellner", "board1", "board2"], "night": true, "note": "wide boardroom, long table, the small camera centre, the TV glow behind them" },
+    { "kind": "closeup", "sent": "10", "chars": ["kellner"], "night": true, "tag": {"text": "WALTER KELLNER, ADVANCED TECHNOLOGY", "at": "Kellner"}, "note": "the question lands as a typed card" },
+    { "kind": "bubble", "sent": "10", "chars": ["kellner", "sasson"], "night": true, "text": "WHAT DO YOU THINK THIS IS GOING TO DO TO OUR FILM BUSINESS?", "at": "business" },
+    { "kind": "closeup", "sent": "11", "chars": ["sasson"], "night": true, "labels": [{"text": "\"I DON'T KNOW — BUT IT WORKS.\"", "x": 960, "y": 260, "at": "worked"}], "note": "sasson's best frame: quiet, certain, not triumphant" },
+    { "kind": "stamp", "sent": "12", "chars": ["kellner"], "night": true, "stamp": {"text": "CUTE.", "at": "cute", "color": "lime"}, "note": "lime stamp slams onto the boardroom table" },
+    { "kind": "stamp", "sent": "12", "chars": ["kellner", "board1", "board2"], "night": true, "stamp": {"text": "DON'T TELL ANYONE.", "at": "anyone", "color": "red"}, "note": "red marker ring around the camera, bigger, slower hit. the money shot of the video" },
+    { "kind": "chapter", "sent": "13", "text": "The Thirty-Seven Years", "mood": "business", "note": "chapter card after the reveal — one silent beat" },
+    { "kind": "chart", "sent": "13", "night": true, "labels": [{"text": "90% OF US FILM", "x": 1300, "y": 260, "at": "ninety percent"}], "note": "bar at 90 with the rest greyed; do not invent revenue figures" },
+    { "kind": "graphic", "sent": "13", "night": true, "icons": ["camera", "film_canister", "photo_print", "chemical_bottle"], "at": "chemical", "note": "four tiles, then all four scrubbed out in one red sweep" },
+    { "kind": "closeup", "sent": "14", "chars": ["sasson"], "night": true, "labels": [{"text": "NOT IGNORED", "x": 1400, "y": 280, "at": "ignore"}], "note": "deliberate correction of the myth, on screen" },
+    { "kind": "document", "sent": "14", "night": true, "labels": [{"text": "PATENT US 4,131,919", "x": 1250, "y": 820, "at": "patented"}], "note": "patent front page slides in and gets stamped 1977" },
+    { "kind": "counter", "sent": "14", "night": true, "labels": [{"text": "DIGITAL R&D BUDGET", "x": 1250, "y": 260}], "note": "counter climbing, no dollar values — unlabeled units only" },
+    { "kind": "chart", "sent": "14", "night": true, "labels": [{"text": "#1 IN US DIGITAL CAMERAS", "x": 1250, "y": 280, "at": "anyone else"}], "note": "Kodak line rising above competitors, then the same line continuing to fall" },
+    { "kind": "closeup", "sent": "15", "chars": ["kellner"], "night": true, "note": "kellner's hand on a film canister like it's a handrail" },
+    { "kind": "graphic", "sent": "15", "night": true, "icons": ["margin_arrow"], "labels": [{"text": "THE MARGIN", "x": 1250, "y": 320, "at": "margin"}], "note": "up-arrow with the camera box sitting on top of it, pressing it down" },
+    { "kind": "closeup", "sent": "15", "chars": ["sasson"], "night": true, "tag": {"text": "BUILT BY THEIR OWN ENGINEER", "at": "engineer"} },
+    { "kind": "document", "sent": "16", "night": true, "labels": [{"text": "CHAPTER 11", "x": 1250, "y": 300, "at": "bankruptcy"}], "props": ["newspaper"], "note": "front page, JANUARY 2012 stamp, hard cut to black" },
+    { "kind": "black", "sent": "16", "text": "THE COMPANY THAT INVENTED THE DIGITAL PHOTOGRAPH", "note": "two typed lines, black card, 1.2 s, silent" },
+    { "kind": "closeup", "sent": "17", "chars": ["sasson"], "night": false, "day": true, "labels": [{"text": "NATIONAL MEDAL OF TECHNOLOGY, 2009", "x": 1250, "y": 260, "at": "two thousand nine"}], "note": "first bright/day shot of the film — the medal, the man, no crowd" },
+    { "kind": "stamp", "sent": "17", "night": true, "stamp": {"text": "FOR THE INVENTION THAT UNDID HIS EMPLOYER", "at": "employer", "color": "cream"}, "note": "the sting, on cream" },
+    { "kind": "chapter", "sent": "18", "text": "What the Line Means", "mood": "business" },
+    { "kind": "black", "sent": "18", "text": "Cute. Do not tell anyone.", "note": "handwriting in white on black, exactly as the executive said it" },
+    { "kind": "graphic", "sent": "19", "night": true, "icons": ["toy_robot", "brick_phone", "desktop_pc", "camera_box"], "at": "objects", "note": "four 'toys' in a row, each one lit, each one a warning" },
+    { "kind": "graphic", "sent": "20", "night": true, "icons": ["margin_arrow", "question_mark"], "labels": [{"text": "WHO OWNS THE MONEY IT THREATENS?", "x": 960, "y": 300, "at": "money"}], "note": "the thesis, as the largest text in the video" },
+    { "kind": "board", "sent": "21", "chars": ["kellner", "board1", "board2"], "night": true, "note": "the same conference room, wide, empty of Sasson; four faces turned toward the TV" },
+    { "kind": "document", "sent": "21", "night": true, "props": ["papers"], "labels": [{"text": "PUT IT NEXT TO THE FILM", "x": 1250, "y": 800, "at": "already had"}], "note": "the camera set down on a stack of film ledgers" },
+    { "kind": "polaroid", "sent": "22", "night": true, "note": "pull-out of the empty boardroom with the camera still on the table; hold the white frame, then the last card" },
+    { "kind": "black", "sent": "22", "text": "THE ARITHMETIC WON.", "note": "final typed card, 2 s, let the music resolve" }
+  ]
+}

@@ -1,0 +1,406 @@
+{
+ "method": "pause",
+ "parts": [
+  [
+   "a.mp3",
+   0.0,
+   50.02
+  ],
+  [
+   "b.mp3",
+   50.27,
+   41.31
+  ],
+  [
+   "c.mp3",
+   91.83000000000001,
+   43.16
+  ],
+  [
+   "d.mp3",
+   135.24,
+   34.16
+  ]
+ ],
+ "sentences": [
+  {
+   "i": 1,
+   "text": "In December of nineteen seventy-five, a young engineer at Kodak was handed a strange assignment.",
+   "start": 0.155,
+   "end": 5.571,
+   "chars": 96
+  },
+  {
+   "i": 2,
+   "text": "Find out if a new light sensor was good for anything.",
+   "start": 5.571,
+   "end": 8.562,
+   "chars": 53
+  },
+  {
+   "i": 3,
+   "text": "His name was Steve Sasson.",
+   "start": 9.09,
+   "end": 10.856,
+   "chars": 26
+  },
+  {
+   "i": 4,
+   "text": "He worked in Rochester, New York, for a company that sold film.",
+   "start": 10.856,
+   "end": 15.136,
+   "chars": 63
+  },
+  {
+   "i": 5,
+   "text": "Sasson wired the sensor to a lens, a dozen circuit boards, and a cassette recorder.",
+   "start": 15.596,
+   "end": 20.514,
+   "chars": 83
+  },
+  {
+   "i": 6,
+   "text": "The result weighed about eight pounds.",
+   "start": 20.514,
+   "end": 22.766,
+   "chars": 38
+  },
+  {
+   "i": 7,
+   "text": "It was roughly the size of a toaster.",
+   "start": 23.171,
+   "end": 25.199,
+   "chars": 37
+  },
+  {
+   "i": 8,
+   "text": "He pointed it at a colleague, and pressed the button.",
+   "start": 25.199,
+   "end": 28.105,
+   "chars": 53
+  },
+  {
+   "i": 9,
+   "text": "Then he waited.",
+   "start": 28.553,
+   "end": 29.398,
+   "chars": 15
+  },
+  {
+   "i": 10,
+   "text": "Twenty-three seconds.",
+   "start": 29.398,
+   "end": 30.581,
+   "chars": 21
+  },
+  {
+   "i": 11,
+   "text": "That's how long it took to write one picture onto tape.",
+   "start": 31.027,
+   "end": 34.474,
+   "chars": 55
+  },
+  {
+   "i": 12,
+   "text": "The image was one hundred pixels wide by one hundred pixels tall.",
+   "start": 34.474,
+   "end": 38.548,
+   "chars": 65
+  },
+  {
+   "i": 13,
+   "text": "A hundredth of a megapixel.",
+   "start": 38.961,
+   "end": 40.749,
+   "chars": 27
+  },
+  {
+   "i": 14,
+   "text": "Black and white.",
+   "start": 41.193,
+   "end": 42.59,
+   "chars": 16
+  },
+  {
+   "i": 15,
+   "text": "Mostly static.",
+   "start": 42.59,
+   "end": 43.812,
+   "chars": 14
+  },
+  {
+   "i": 16,
+   "text": "By every normal measure, it was a terrible camera.",
+   "start": 44.224,
+   "end": 47.317,
+   "chars": 50
+  },
+  {
+   "i": 17,
+   "text": "And the first one that did not need film.",
+   "start": 47.317,
+   "end": 49.852,
+   "chars": 41
+  },
+  {
+   "i": 18,
+   "text": "Sasson showed it to the people who ran Kodak.",
+   "start": 50.43,
+   "end": 52.951,
+   "chars": 45
+  },
+  {
+   "i": 19,
+   "text": "They sat in a conference room and watched a picture appear on a television set.",
+   "start": 52.951,
+   "end": 57.376,
+   "chars": 79
+  },
+  {
+   "i": 20,
+   "text": "Nobody gasped.",
+   "start": 57.376,
+   "end": 58.16,
+   "chars": 14
+  },
+  {
+   "i": 21,
+   "text": "One executive, Walter Kellner, asked him a question.",
+   "start": 58.583,
+   "end": 61.815,
+   "chars": 52
+  },
+  {
+   "i": 22,
+   "text": "What do you think this is going to do to our film business?",
+   "start": 62.297,
+   "end": 66.748,
+   "chars": 59
+  },
+  {
+   "i": 23,
+   "text": "Sasson did not know.",
+   "start": 66.748,
+   "end": 68.257,
+   "chars": 20
+  },
+  {
+   "i": 24,
+   "text": "But he knew it worked.",
+   "start": 68.761,
+   "end": 70.342,
+   "chars": 22
+  },
+  {
+   "i": 25,
+   "text": "Management's reaction became the line that made this story famous.",
+   "start": 70.342,
+   "end": 75.086,
+   "chars": 66
+  },
+  {
+   "i": 26,
+   "text": "They told him it was cute.",
+   "start": 75.354,
+   "end": 76.913,
+   "chars": 26
+  },
+  {
+   "i": 27,
+   "text": "And then they told him not to tell anyone about it.",
+   "start": 76.913,
+   "end": 79.97,
+   "chars": 51
+  },
+  {
+   "i": 28,
+   "text": "Think about what that room was protecting.",
+   "start": 79.97,
+   "end": 82.489,
+   "chars": 42
+  },
+  {
+   "i": 29,
+   "text": "Kodak sold about ninety percent of the film in America.",
+   "start": 82.938,
+   "end": 86.776,
+   "chars": 55
+  },
+  {
+   "i": 30,
+   "text": "Every roll was a camera sale, a development fee, a print, and a chemical.",
+   "start": 87.21,
+   "end": 93.537,
+   "chars": 73
+  },
+  {
+   "i": 31,
+   "text": "The machine on that table erased all four at once.",
+   "start": 94.024,
+   "end": 97.357,
+   "chars": 50
+  },
+  {
+   "i": 32,
+   "text": "Kodak did not ignore digital.",
+   "start": 97.854,
+   "end": 99.972,
+   "chars": 29
+  },
+  {
+   "i": 33,
+   "text": "That part of the story is a myth, and it is worth saying out loud.",
+   "start": 99.972,
+   "end": 104.791,
+   "chars": 66
+  },
+  {
+   "i": 34,
+   "text": "The company patented Sasson's camera in nineteen seventy-seven.",
+   "start": 105.318,
+   "end": 109.178,
+   "chars": 63
+  },
+  {
+   "i": 35,
+   "text": "It poured money into digital research.",
+   "start": 109.178,
+   "end": 111.507,
+   "chars": 38
+  },
+  {
+   "i": 36,
+   "text": "For a while, it sold more digital cameras in America than anyone else.",
+   "start": 112.011,
+   "end": 115.808,
+   "chars": 70
+  },
+  {
+   "i": 37,
+   "text": "But it kept choosing the roll of film.",
+   "start": 115.808,
+   "end": 117.869,
+   "chars": 38
+  },
+  {
+   "i": 38,
+   "text": "The margin was too good to walk away from, and the machine that threatened it had been built by their own engineer.",
+   "start": 118.239,
+   "end": 124.128,
+   "chars": 115
+  },
+  {
+   "i": 39,
+   "text": "In twenty twelve, Kodak filed for bankruptcy.",
+   "start": 124.445,
+   "end": 126.703,
+   "chars": 45
+  },
+  {
+   "i": 40,
+   "text": "The company that invented the digital photograph could not survive the digital photograph.",
+   "start": 126.703,
+   "end": 131.221,
+   "chars": 90
+  },
+  {
+   "i": 41,
+   "text": "In two thousand nine, Steve Sasson received the National Medal of Technology.",
+   "start": 131.688,
+   "end": 135.928,
+   "chars": 77
+  },
+  {
+   "i": 42,
+   "text": "He was honoured for the invention that undid his employer.",
+   "start": 136.433,
+   "end": 140.077,
+   "chars": 58
+  },
+  {
+   "i": 43,
+   "text": "Cute.",
+   "start": 140.077,
+   "end": 140.579,
+   "chars": 5
+  },
+  {
+   "i": 44,
+   "text": "Do not tell anyone.",
+   "start": 141.059,
+   "end": 142.192,
+   "chars": 19
+  },
+  {
+   "i": 45,
+   "text": "Every industry has one of these objects.",
+   "start": 142.192,
+   "end": 144.576,
+   "chars": 40
+  },
+  {
+   "i": 46,
+   "text": "A toy that is really a warning.",
+   "start": 144.576,
+   "end": 146.424,
+   "chars": 31
+  },
+  {
+   "i": 47,
+   "text": "The giveaway is never the quality of the toy.",
+   "start": 146.992,
+   "end": 149.575,
+   "chars": 45
+  },
+  {
+   "i": 48,
+   "text": "The giveaway is who owns the money it threatens.",
+   "start": 149.575,
+   "end": 152.33,
+   "chars": 48
+  },
+  {
+   "i": 49,
+   "text": "Those executives were not stupid.",
+   "start": 152.33,
+   "end": 154.224,
+   "chars": 33
+  },
+  {
+   "i": 50,
+   "text": "They saw the future clearly, in a conference room, in nineteen seventy-five, and they put it next to the film they already had.",
+   "start": 154.723,
+   "end": 160.244,
+   "chars": 127
+  },
+  {
+   "i": 51,
+   "text": "That is the whole story.",
+   "start": 160.631,
+   "end": 162.144,
+   "chars": 24
+  },
+  {
+   "i": 52,
+   "text": "Someone built the future in a back room.",
+   "start": 162.144,
+   "end": 164.665,
+   "chars": 40
+  },
+  {
+   "i": 53,
+   "text": "Someone else did the arithmetic.",
+   "start": 165.123,
+   "end": 167.656,
+   "chars": 32
+  },
+  {
+   "i": 54,
+   "text": "The arithmetic won.",
+   "start": 167.656,
+   "end": 169.161,
+   "chars": 19
+  }
+ ],
+ "speech_end": 169.161
+}

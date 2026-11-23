@@ -3,3 +3,10 @@ Thumbs.db
 *.log
 __pycache__/
 *.pyc
+
+# render intermediates
+projects/cute-camera/work/seg_*.mp4
+projects/cute-camera/work/mix.wav
+projects/cute-camera/work/sheet/
+__pycache__/
+projects/cute-camera/work/
